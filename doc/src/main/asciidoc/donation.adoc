@@ -12,18 +12,17 @@
 // limitations under the License.
 //
 
-Eclipse Open Services Cloud
-===========================
-Eclipe Foundation
-:doctype: article
-:toc: left
-:toclevels: 3
-:toc-position: left
-:toc-title: Eclipse OSC
-:numbered:
+== Donation guideline
 
-include::overview.adoc[]
+This section is a checklist of items required for the code donation.
 
-include::proposal.adoc[]
+[%interactive]
+* [ ] Apache license header in all source files
+* [ ] LICENSE file in source distribution root
+* [ ] NOTICE file in source distribution root
+* [ ] DISCLAIMER file (?)
+* [ ] Published source distribution
+* [ ] No binary in source distribution
+* [ ] No compiled archives bundled in source distribution
+* [ ] Checksums and PGP signature for published artifacts
 
-include::donation.adoc[]
