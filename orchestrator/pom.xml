@@ -22,14 +22,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <artifactId>osc-parent</artifactId>
         <groupId>org.eclipse.osc</groupId>
-        <artifactId>api</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.eclipse.osc.api</groupId>
-    <artifactId>identity</artifactId>
-    <name>Eclipse OSC :: API :: Identity</name>
+    <artifactId>orchestrator</artifactId>
+    <name>Eclipse OSC :: Orchestrator</name>
+    <packaging>pom</packaging>
 
 </project>

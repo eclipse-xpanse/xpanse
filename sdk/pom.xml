@@ -21,18 +21,20 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.osc</groupId>
-    <artifactId>osc-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <parent>
+        <artifactId>osc-parent</artifactId>
+        <groupId>org.eclipse.osc</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>sdk</artifactId>
+    <name>Eclipse OSC :: SDK</name>
     <packaging>pom</packaging>
-    <name>Eclipse OSC</name>
 
     <modules>
-        <module>doc</module>
-        <module>api</module>
-        <module>sdk</module>
-        <module>orchestrator</module>
-        <module>runtime</module>
+        <module>java</module>
+        <module>python</module>
     </modules>
 
 </project>

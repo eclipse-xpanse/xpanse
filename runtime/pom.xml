@@ -21,18 +21,15 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse.osc</groupId>
-    <artifactId>osc-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>Eclipse OSC</name>
+    <parent>
+        <artifactId>osc-parent</artifactId>
+        <groupId>org.eclipse.osc</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-    <modules>
-        <module>doc</module>
-        <module>api</module>
-        <module>sdk</module>
-        <module>orchestrator</module>
-        <module>runtime</module>
-    </modules>
+    <artifactId>runtime</artifactId>
+    <name>Eclipse OSC :: Runtime</name>
+    <packaging>pom</packaging>
 
 </project>
