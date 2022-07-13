@@ -23,7 +23,7 @@ A managed service is described using Open Services Cloud Configuration Language 
 
 OCL is a yaml descriptor of a managed service, describing the expected final state of your service, interacting with the fundamental APIs:
 
-----
+```yaml
 osc {
  version = ">= 0.0.1"
 }
@@ -79,7 +79,7 @@ container {
     image = "docker-image"
     replica = 10
 }
-----
+```
 
 ## OCL loading
 
