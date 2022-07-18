@@ -7,8 +7,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Open Services Cloud',
-  tagline: 'Open Services Cloud is a framework making ',
-  url: 'https://osc.io',
+  tagline: 'Open Services Cloud is an Open Source project allowing to easily implement native managed service on any cloud provider.',
+  url: 'https://osc.eclipse.org',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -34,17 +34,9 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
         },
         blog: {
           showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -66,10 +58,12 @@ const config = {
           {
             type: 'doc',
             docId: 'intro',
-            position: 'left',
-            label: 'API & Configuration Language',
+            position: 'right',
+            label: 'Documentation',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          {to: '/download', label: 'Download', position: 'right'},
+          {to: '/blog', label: 'Blog', position: 'right'},
+          {to: '/demo', label: 'Demo', position: 'right'},
           {
             href: 'https://github.com/jbonofre/osc',
             label: 'GitHub',
@@ -84,8 +78,16 @@ const config = {
             title: 'Docs',
             items: [
               {
+                label: 'Getting Started',
+                to: '/docs/getting-starter',
+              },
+              {
                 label: 'API & Configuration Language',
-                to: '/docs/intro',
+                to: '/docs/ocl',
+              },
+              {
+                label: 'Supported Cloud',
+                to: '/docs/cloud',
               },
             ],
           },
@@ -93,25 +95,37 @@ const config = {
             title: 'Community',
             items: [
               {
+                label: 'Mailing Lists',
+                href: 'https://www.eclipse.org',
+              },
+              {
                 label: 'Slack',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+                href: 'https://app.slack.com/client/T02U1MCB4HW/C02U1MCDB9N?cdn_fallback=2',
               },
               {
                 label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
+                href: 'https://twitter.com/openservicescloud',
               },
             ],
           },
           {
-            title: 'More',
+            title: 'Project',
             items: [
               {
-                label: 'Blog',
-                to: '/blog',
+                label: 'Eclipse',
+                href: 'https://www.eclipse.org',
               },
               {
                 label: 'GitHub',
                 href: 'https://github.com/jbonofre/osc',
+              },
+              {
+                label: 'Blog',
+                href: '/blog',
+              },
+              {
+                label: 'Demo',
+                to: '/demo',
               },
             ],
           },

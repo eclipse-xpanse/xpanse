@@ -4,42 +4,46 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Portable cloud service',
+    img: require('@site/static/img/cloud.png').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        An Open Services Cloud service is portable. It means that it can be
+        deployed on any cloud provider (supporting Open Services Cloud).
+        You don't have any cloud provider lock-in anymore.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Managed service easily',
+    img: require('@site/static/img/easily.png').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Creating a service with Open Services Cloud is very easy: you describe a
+        service using a configuration language, with the integration with other
+        cloud provider services.
+        You don't have service lock out anymore.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'Open Source services catalog',
+    img: require('@site/static/img/catalog.png').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        As a service is described using Open Services Cloud Configuration Language,
+        it's pretty easy to provide a catalog of services descriptors, running on
+        any cloud.
       </>
     ),
   },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({img, title, description}) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <img src={img} width="100"/>
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>
