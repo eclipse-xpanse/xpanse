@@ -2,9 +2,9 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Introduction
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Let's discover **Open Services Cloud in less than 5 minutes**.
 
 ## Getting Started
 
