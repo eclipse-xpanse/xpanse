@@ -8,40 +8,78 @@ Let's discover **Open Services Cloud in less than 5 minutes**.
 
 ## Getting Started
 
-Get started by **creating a new site**.
+Get started by **creating a simple managed service**.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+You will create a service configuration descriptor and you will submit to Open Services Cloud using one supported channel (CLI, REST, ...).
 
 ### What you'll need
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+To actually create the service, you have to submit the service descriptor to **Open Serrvices Cloud orchestrator**.
 
-## Generate a new site
+You can:
+- install the orchestrator locally on your machine to test your service. This approach is mostly use for testing as some fundamental services can be mocked.
+- use a cloud provider supporting Open Services Cloud, meaning that the orchestrator runs directly on the cloud provider
 
-Generate a new Docusaurus site using the **classic template**.
+## Create service descriptor
 
-The classic template will automatically be added to your project after you run the command:
+A service is described with a **yaml file**. In this descriptor, you will define:
 
-```bash
-npm init docusaurus@latest my-website classic
-```
+- the service components
+- the integration of the service with the fundamental services (computing, billing, ...)
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+The yaml descriptor can be created by hand, or using CLI or starter site (interactive mode).
 
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
 
 ```bash
-cd my-website
-npm run start
+bin/ocl --create --name my-service --billing-model renting --billing-period monthly --network ...
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+For example, here's a very simple service descriptor:
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+```yaml
+osc {
+  osc_version = ">= 0.0.1"
+  name = "my-service"
+  version = "1.0"
+}
+billing {
+  model = "renting"
+  period = "monthly"
+  fixed_price = "20"
+  variable_price = "10"
+  variable_item = "instance"
+}
+network {
+  vpc "myservicevpc" {
+    name = "myvpc"
+    cidr = "192.168.1.0/24"
+  }
+  subnet "myservicesubnet" {
+    vpc = "myvpc"
+    name = "mysubnet"
+    cidr = "192.168.1.0/26"
+    gateway = "192.168.1.1"
+  }
+}
+computing {
+  registry = "docker-registry"
+  cluster = "k8s-location"
+  image = "mysoftware"
+}
+```
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+## Deploy the service
+
+To actually deploy the service, you have to submit the **yaml file** to the **Open Services Cloud orchestrator**.
+
+The orchestrator supports several channels:
+
+- CLI
+- REST
+- SDK
+
+For instance, you can deploy the service descriptor via REST:
+
+```bash
+curl -XPOST -d @service.yaml -H "Content-Type: application/yaml" http://osc.orchestrator/path
+```

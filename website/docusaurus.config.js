@@ -79,16 +79,24 @@ const config = {
             items: [
               {
                 label: 'Getting Started',
-                to: '/docs/getting-starter',
+                to: '/docs/intro',
               },
               {
-                label: 'API & Configuration Language',
+                label: 'Configuration Language',
                 to: '/docs/ocl',
               },
               {
                 label: 'Supported Cloud',
-                to: '/docs/cloud',
+                to: '/docs/supported-cloud',
               },
+              {
+                label: 'Running the orchestrator',
+                to: '/docs/orchestrator',
+              },
+              {
+                label: 'Resources',
+                to: '/docs/resources',
+              }
             ],
           },
           {
@@ -96,7 +104,7 @@ const config = {
             items: [
               {
                 label: 'Mailing Lists',
-                href: 'https://www.eclipse.org',
+                href: 'https://accounts.eclipse.org/mailing-list/osc-wg',
               },
               {
                 label: 'Slack',
@@ -130,7 +138,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Eclipse Foundation, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Eclipse Foundation.`,
       },
       prism: {
         theme: lightCodeTheme,

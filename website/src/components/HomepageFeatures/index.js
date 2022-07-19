@@ -27,7 +27,7 @@ const FeatureList = [
     ),
   },
   {
-    title: 'Open Source services catalog',
+    title: 'Services catalog',
     img: require('@site/static/img/catalog.png').default,
     description: (
       <>
