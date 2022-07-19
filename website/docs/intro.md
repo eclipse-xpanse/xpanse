@@ -41,6 +41,8 @@ osc {
   osc_version = ">= 0.0.1"
   name = "my-service"
   version = "1.0"
+  namespace = "mynamespace"
+  region = `eu-west-france`
 }
 billing {
   model = "renting"
