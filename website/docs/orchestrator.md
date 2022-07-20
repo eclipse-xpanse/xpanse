@@ -2,9 +2,9 @@
 sidebar_position: 4
 ---
 
-# Open Services Cloud orchestrator
+# Orchestrator
 
-Open Services Cloud orchestrator is the central server.
+Open Services Cloud orchestrator is the central server runtime.
 
 It acts as a gateway taking the service configuration language and dealing with the cloud services to actually deploy the service.
 
