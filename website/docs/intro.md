@@ -14,7 +14,7 @@ You will create a service configuration descriptor and you will submit to Open S
 
 ### What you'll need
 
-To actually create the service, you have to submit the service descriptor to **Open Serrvices Cloud orchestrator**.
+To actually create the service, you have to submit the service descriptor to **Open Services Cloud orchestrator**.
 
 You can:
 - install the orchestrator locally on your machine to test your service. This approach is mostly use for testing as some fundamental services can be mocked.
