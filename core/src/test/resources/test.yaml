@@ -1,0 +1,26 @@
+osc:
+  osc: ">=0.1.0"
+  name: "my-test-name"
+  version: "1.0.0"
+  namespace: "foo-bar"
+  region: "test-region"
+billing:
+  model: renting
+  period: monthly
+  currency: euro
+  fixedPrice: 20
+  variablePrice: 10
+  variableItem: instance
+network:
+  vpc:
+    name: my-vpc
+    cidr: 192.168.1.0/24
+  subnet:
+    vpc: my-vpc
+    name: mysubnet
+    cidr: 192.168.1.0/26
+    gateway: 192.168.1.1
+  dns:
+    - entry: a
+      domain: my-domain
+      nodes: mynode

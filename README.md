@@ -25,17 +25,18 @@ OCL is a yaml descriptor of a managed service, describing the expected final sta
 
 ```yaml
 osc:
-  osc_version: >=0.0.1
-  name: my-service
-  version: 1.0
-  namespace: my-namespace
-  region: eu-west-france
+  osc: "">=0.0.1"
+  name: "my-service"
+  version: "1.0"
+  namespace: "my-namespace"
+  region: "eu-west-france"
 billing:
-  model: renting
-  period: monthly
-  fixed_price: 20
-  variable_price: 10
-  variable_item: instance
+  model: "renting"
+  period: "monthly"
+  currency: "euro""
+  fixedPrice: 20
+  variablePrice: 10
+  variableItem: "instance"
 network:
   vpc:
     name: my-vpc
