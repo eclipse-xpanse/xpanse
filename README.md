@@ -24,61 +24,41 @@ A managed service is described using Open Services Cloud Configuration Language 
 OCL is a yaml descriptor of a managed service, describing the expected final state of your service, interacting with the fundamental APIs:
 
 ```yaml
-osc {
- version = ">= 0.0.1"
-}
-billing {
-  model = "flat"
-  period = "monthly"
-  pricing = "10"
-}
-console {
-  name "My Service"
-  logo "http://..."
-  frame "..".
-}
-network {
-  vpc "myvpc" {
-    name = "myvpc"
-    cidr = "192.168.1.0/24"
-  }
-  subnet "mysubnet" {
-    vpc = "myvpc"
-    name = "mysubnet"
-    cidr = "192.168.1.0/26"
-    gateway = "192.168.1.1"
-  }
-  loadbalancer "mylb" {
-    algorithm = "round-robin"
-    port = 80
-    protocol = "http"
-    members = "mynode"
-  }
-}
-computing {
-  node "mynode" {
-    image = "myimage"
-    size = "t1.micro"
-    network = "mysubnet"
-  }
-}
-dns {
-    entry "a" {
-        name "a"
-        domain = "my-domain"
-        nodes = "mynode"
-    }
-}
-storage {
-   blob "myblobstorage" {
-     
-   }
-}
-container {
-    cluster = "my-cluster"
-    image = "docker-image"
-    replica = 10
-}
+osc:
+  osc_version: >=0.0.1
+  name: my-service
+  version: 1.0
+  namespace: my-namespace
+  region: eu-west-france
+billing:
+  model: renting
+  period: monthly
+  fixed_price: 20
+  variable_price: 10
+  variable_item: instance
+network:
+  vpc:
+    name: my-vpc
+    cidr: 192.168.1.0/24
+  subnet:
+    vpc: my-vpc
+    name: mysubnet
+    cidr: 192.168.1.0/26
+    gateway: 192.168.1.1
+  dns:
+    - entry: a
+      domain: my-domain
+      nodes: mynode
+computing:
+  registry: docker-registry
+  cluster: k8s-location
+  image: mysoftware
+storage:
+  - blob: myblobstorage
+container:
+  cluster: my-cluster
+  image: docker-image
+  replica: 10
 ```
 
 ## OCL loading

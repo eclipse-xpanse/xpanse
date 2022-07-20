@@ -28,11 +28,8 @@
     <name>Eclipse OSC</name>
 
     <modules>
+        <module>core</module>
         <module>ui</module>
-        <module>api</module>
-        <module>sdk</module>
-        <module>orchestrator</module>
-        <module>runtime</module>
     </modules>
 
 </project>

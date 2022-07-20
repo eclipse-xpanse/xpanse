@@ -37,37 +37,41 @@ bin/ocl --create --name my-service --billing-model renting --billing-period mont
 For example, here's a very simple service descriptor:
 
 ```yaml
-osc {
-  osc_version = ">= 0.0.1"
-  name = "my-service"
-  version = "1.0"
-  namespace = "mynamespace"
-  region = `eu-west-france`
-}
-billing {
-  model = "renting"
-  period = "monthly"
-  fixed_price = "20"
-  variable_price = "10"
-  variable_item = "instance"
-}
-network {
-  vpc "myservicevpc" {
-    name = "myvpc"
-    cidr = "192.168.1.0/24"
-  }
-  subnet "myservicesubnet" {
-    vpc = "myvpc"
-    name = "mysubnet"
-    cidr = "192.168.1.0/26"
-    gateway = "192.168.1.1"
-  }
-}
-computing {
-  registry = "docker-registry"
-  cluster = "k8s-location"
-  image = "mysoftware"
-}
+osc:
+  osc_version: >=0.0.1
+  name: my-service
+  version: 1.0
+  namespace: my-namespace
+  region: eu-west-france
+billing:
+  model: renting
+  period: monthly
+  fixed_price: 20
+  variable_price: 10
+  variable_item: instance
+network:
+  vpc:
+    name: my-vpc
+    cidr: 192.168.1.0/24
+  subnet:
+    vpc: my-vpc
+    name: mysubnet
+    cidr: 192.168.1.0/26
+    gateway: 192.168.1.1
+  dns:
+    - entry: a
+      domain: my-domain
+      nodes: mynode
+computing:
+  registry: docker-registry
+  cluster: k8s-location
+  image: mysoftware
+storage:
+  - blob: myblobstorage
+container:
+  cluster: my-cluster
+  image: docker-image
+  replica: 10
 ```
 
 ## Deploy the service
