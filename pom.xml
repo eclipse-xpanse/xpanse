@@ -29,7 +29,6 @@
 
     <modules>
         <module>core</module>
-        <module>ui</module>
     </modules>
 
 </project>
