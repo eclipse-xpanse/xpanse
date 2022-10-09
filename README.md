@@ -38,13 +38,14 @@ OCL is a json descriptor of a managed service, describing the expected final sta
   },
   "compute": {
     "vm": [{
+      "name": "my-vm",
       "type": "t2.large",
       "platform": "linux-x64",
       "vpc": "my-vpc",
       "subnet": "my-subnet",
-      "security-group": "my-sg",
+      "security": "my-sg",
       "storage": "my-storage",
-      "public": true
+      "publicly": true
     }]
   },
   "network": {

@@ -1,0 +1,11 @@
+{
+  "name": "open-services-cloud",
+  "properties": {
+    "base.directory": "target/runtime/osc",
+    "include.transitive": true
+  },
+  "dependencies": [
+    "k5:karaf-boot",
+    "mvn:org.eclipse.osc.services/ocl-loader/1.0.0-SNAPSHOT"
+  ]
+}
