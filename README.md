@@ -1,8 +1,8 @@
-# Eclipse Open Services Cloud
+# Open Services Cloud
 
-Eclipse Open Services Cloud is an Open Source project allowing to easily implement native managed service on any cloud service provider.
+Open Services Cloud is an Open Source project allowing to easily implement native managed service on any cloud service provider.
 
-Eclipse Open Services Cloud unleash your cloud services by removing vendor lock-in and lock out. It standardizes and exposes cloud service providers core services, meaning that your Open Services Cloud service is portable (multi-cloud) on any cloud topology and provider.
+Open Services Cloud unleash your cloud services by removing vendor lock-in and lock out. It standardizes and exposes cloud service providers core services, meaning that your Open Services Cloud service is portable (multi-cloud) on any cloud topology and provider.
 It also avoids tight coupling of your service to other cloud service provider services.
 
 ## APIs (core services)
@@ -21,45 +21,57 @@ Open Services Cloud interacts directly with the fundamental APIs used by the clo
 
 A managed service is described using Open Services Cloud Configuration Language (OCL).
 
-OCL is a yaml descriptor of a managed service, describing the expected final state of your service, interacting with the fundamental APIs:
+OCL is a json descriptor of a managed service, describing the expected final state of your service, interacting with the fundamental APIs:
 
-```yaml
-osc:
-  osc: "">=0.0.1"
-  name: "my-service"
-  version: "1.0"
-  namespace: "my-namespace"
-  region: "eu-west-france"
-billing:
-  model: "renting"
-  period: "monthly"
-  currency: "euro""
-  fixedPrice: 20
-  variablePrice: 10
-  variableItem: "instance"
-network:
-  vpc:
-    name: my-vpc
-    cidr: 192.168.1.0/24
-  subnet:
-    vpc: my-vpc
-    name: mysubnet
-    cidr: 192.168.1.0/26
-    gateway: 192.168.1.1
-  dns:
-    - entry: a
-      domain: my-domain
-      nodes: mynode
-computing:
-  registry: docker-registry
-  cluster: k8s-location
-  image: mysoftware
-storage:
-  - blob: myblobstorage
-container:
-  cluster: my-cluster
-  image: docker-image
-  replica: 10
+```json
+{
+  "name": "my-service",
+  "category": "compute",
+  "namespace": "my-namespace",
+  "billing": {
+    "model": "flat",
+    "period": "monthly",
+    "currency": "euro",
+    "fixedPrice": 20,
+    "variablePrice": 10,
+    "variableItem": "instance"
+  },
+  "compute": {
+    "vm": [{
+      "type": "t2.large",
+      "platform": "linux-x64",
+      "vpc": "my-vpc",
+      "subnet": "my-subnet",
+      "security-group": "my-sg",
+      "storage": "my-storage",
+      "public": true
+    }]
+  },
+  "network": {
+    "vpc": [{
+      "name": "my-vpc",
+      "cidrs": "172.31.0.0/16",
+      "routes": "",
+      "acl": ""
+    }],
+    "subnet": [{
+      "name": "my-subnet",
+      "vpc": "my-vpc",
+      "table": "",
+      "routes": ""
+    }],
+    "security": [{
+      "name": "my-sg",
+      "inbound": [ "22->22", "443->443", "80->80" ],
+      "outbound": []
+    }]
+  },
+  "storage": [{
+    "name": "my-storage",
+    "type": "ssd",
+    "size": "8GiB" 
+  }]
+}
 ```
 
 ## OCL loading
