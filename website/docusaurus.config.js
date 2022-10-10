@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Open Services Cloud',
   tagline: 'Open Services Cloud is an Open Source project allowing to easily implement native managed service on any cloud provider.',
-  url: 'https://jbonofre.github.io/osc/',
+  url: 'https://huaweicloud.github.io/osc/',
   baseUrl: '/osc/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -16,7 +16,7 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'jbonofre', // Usually your GitHub org/user name.
+  organizationName: 'huaweicloud', // Usually your GitHub org/user name.
   projectName: 'osc', // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
