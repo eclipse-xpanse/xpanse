@@ -36,42 +36,56 @@ bin/ocl --create --name my-service --billing-model renting --billing-period mont
 
 For example, here's a very simple service descriptor:
 
-```yaml
-osc:
-  osc: ">=0.0.1"
-  name: my-service
-  version: 1.0
-  namespace: my-namespace
-  region: eu-west-france
-billing:
-  model: renting
-  period: monthly
-  fixedPrice: 20
-  variablePrice: 10
-  variableItem: instance
-network:
-  vpc:
-    name: my-vpc
-    cidr: 192.168.1.0/24
-  subnet:
-    vpc: my-vpc
-    name: mysubnet
-    cidr: 192.168.1.0/26
-    gateway: 192.168.1.1
-  dns:
-    - entry: a
-      domain: my-domain
-      nodes: mynode
-computing:
-  registry: docker-registry
-  cluster: k8s-location
-  image: mysoftware
-storage:
-  - blob: myblobstorage
-container:
-  cluster: my-cluster
-  image: docker-image
-  replica: 10
+```json
+{
+  "name": "my-service",
+  "category": "compute",
+  "namespace": "my-namespace",
+  "billing": {
+    "model": "flat",
+    "period": "monthly",
+    "currency": "euro",
+    "fixedPrice": 20,
+    "variablePrice": 10,
+    "variableItem": "instance"
+  },
+  "compute": {
+    "vm": [{
+      "name": "my-vm",
+      "type": "t2.large",
+      "platform": "linux-x64",
+      "vpc": "my-vpc",
+      "subnet": "my-subnet",
+      "security": "my-sg",
+      "storage": "my-storage",
+      "publicly": true
+    }]
+  },
+  "network": {
+    "vpc": [{
+      "name": "my-vpc",
+      "cidrs": "172.31.0.0/16",
+      "routes": "",
+      "acl": ""
+    }],
+    "subnet": [{
+      "name": "my-subnet",
+      "vpc": "my-vpc",
+      "table": "",
+      "routes": ""
+    }],
+    "security": [{
+      "name": "my-sg",
+      "inbound": [ "22->22", "443->443", "80->80" ],
+      "outbound": []
+    }]
+  },
+  "storage": [{
+    "name": "my-storage",
+    "type": "ssd",
+    "size": "8GiB" 
+  }]
+}
 ```
 
 ## Deploy the service
