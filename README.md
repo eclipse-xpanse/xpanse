@@ -28,6 +28,10 @@ OCL is a json descriptor of a managed service, describing the expected final sta
   "name": "my-service",
   "category": "compute",
   "namespace": "my-namespace",
+  "artifacts": [
+    "mvn:groupId/artifact/1.6",
+    "https://path/to/artifact"
+  ],
   "billing": {
     "model": "flat",
     "period": "monthly",

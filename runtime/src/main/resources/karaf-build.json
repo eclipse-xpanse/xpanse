@@ -6,6 +6,7 @@
   },
   "dependencies": [
     "k5:karaf-boot",
-    "mvn:org.eclipse.osc.services/ocl-loader/1.0.0-SNAPSHOT"
+    "mvn:org.eclipse.osc.services/ocl-loader/1.0.0-SNAPSHOT",
+    "mvn:org.eclipse.osc.services/orchestrator/1.0.0-SNAPSHOT"
   ]
 }
