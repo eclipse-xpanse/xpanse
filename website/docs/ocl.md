@@ -145,3 +145,61 @@ This is the list of security (groups) defined in the service network. Each secur
 ## Terraform Provider
 
 OCL is also available as Terraform Provider, supporting the same details as above.
+
+```hcl
+resource "osc_service" "myservice" {
+  name      = "my-service"
+  category  = "compute"
+  namespace = "my-namespace"
+
+  billing {
+    model         = "flat"
+    period        = "monthly"
+    currency      = "euro"
+    fixedPrice    = 20
+    variablePrice = 10
+    variableItem  = "instance"
+  }
+
+  compute {
+    vm {
+      name     = "my-vm"
+      type     = "t2.large"
+      platform = "linux-x64"
+      vpc      = "my-vpc"
+      subnet   = "my-subnet"
+      security = "my-sg"
+      storage  = "my-storage"
+      publicly = true
+    }
+  }
+
+  network {
+    vpc {
+      name   = "my-vpc"
+      cidrs  = "172.31.0.0/16"
+      routes = ""
+      acl    = ""
+    }
+
+    subnet {
+      name   = "my-subnet"
+      vpc    = "my-vpc"
+      table  = ""
+      routes = ""
+    }
+
+    security {
+      name     = "my-sg"
+      inbound  = ["22->22", "443->443", "80->80"]
+      outbound = []
+    }
+  }
+
+  storage {
+    name = "my-storage"
+    type = "ssd"
+    size = "8GiB"
+  }
+}
+```
