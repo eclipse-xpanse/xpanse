@@ -10,7 +10,7 @@ public class Ocl {
     private String name;
     private String category;
     private String namespace;
-    private List<String> artifacts;
+    private List<Artifact> artifacts;
 
     private Billing billing;
     private Compute compute;

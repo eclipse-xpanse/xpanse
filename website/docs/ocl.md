@@ -13,7 +13,13 @@ The first part of the OCL service descriptor is basically service metadata:
 * `name` is the name of your service, used to identify the service in the CSP catalog, user console, etc
 * `category` is the overall category of the service. It's especially use to integrate the service in the right menu of the user console.
 * `namespace` is the location of the service. It could be in a CSP subdomain, in a region, and any kind of CSP classification.
-* `artifacts` is the list of binary artifacts used to bootstrap the managed service.
+* `artifacts` is the list of artifacts used to bootstrap the managed service.
+
+An artifact is described with:
+* `name` identifies the artifact
+* `type` defines the artifact type (jar, deb, docker, rpm, ...)
+* `url` is the location (URL) of the artifact (https, file, mvn, ...)
+* `properties` is a list of properties (metadata) used for bootstrapping and deployment
 
 ## Services Integration
 
@@ -97,8 +103,23 @@ This is the list of security (groups) defined in the service network. Each secur
   "category": "compute",
   "namespace": "my-namespace",
   "artifacts": [
-    "mvn:groupId/artifactId/version",
-    "https://host/path/to/artifact"
+    {
+      "name": "my-artifact",
+      "type": "jar",
+      "url": "mvn:groupId/artifact/1.6",
+      "properties": {
+        "additional": "property",
+        "another": "one"
+      }
+    },
+    {
+      "name": "another-artifact",
+      "type": "docker",
+      "url": "https://path/to/artifact",
+      "properties": {
+        "one": "property"
+      }
+    }
   ],
   "billing": {
     "model": "flat",
