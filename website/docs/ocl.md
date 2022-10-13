@@ -13,6 +13,7 @@ The first part of the OCL service descriptor is basically service metadata:
 * `name` is the name of your service, used to identify the service in the CSP catalog, user console, etc
 * `category` is the overall category of the service. It's especially use to integrate the service in the right menu of the user console.
 * `namespace` is the location of the service. It could be in a CSP subdomain, in a region, and any kind of CSP classification.
+* `properties` is all metadata (key/value pairs) for the managed services. These properties are used by the OSC Orchestrator.
 * `artifacts` is the list of artifacts used to bootstrap the managed service.
 
 An artifact is described with:
@@ -35,6 +36,8 @@ You can configure the business model associated to the service:
 * `fixedPrice` is the fixed price during the period (the price applied one shot whatever is the service use)
 * `variablePrice` is the price depending of item volume
 * `variableItem` is the item used to calculate the variable price on the period (for instance, the number of instances, the number of transactions, ...)
+* `backend` is the software provider (managed service provider) billing backend system used for payback.
+* `properties` is all properties related to billing, they are used by OSC for payback and bootstrapping.
 
 ### Compute
 
@@ -83,6 +86,11 @@ This is the list of security (groups) defined in the service network. Each secur
 
 ### Administration Console
 
+`console` element described the integration with CSP admin console, with:
+
+* `backend` is the admin console backend API URL
+* `properties` is key/value pairs used by OSC for the console integration
+
 ### Observability & Tracing
 
 #### Logging
@@ -102,6 +110,10 @@ This is the list of security (groups) defined in the service network. Each secur
   "name": "my-service",
   "category": "compute",
   "namespace": "my-namespace",
+  "properties": {
+    "meta": "data",
+    "other": true
+  },
   "artifacts": [
     {
       "name": "my-artifact",
@@ -127,7 +139,11 @@ This is the list of security (groups) defined in the service network. Each secur
     "currency": "euro",
     "fixedPrice": 20,
     "variablePrice": 10,
-    "variableItem": "instance"
+    "variableItem": "instance",
+    "backend": "https://software_provider/billing/backend",
+    "properties": {
+      "billing_prop": "value"
+    }
   },
   "compute": {
     "vm": [{
@@ -164,7 +180,13 @@ This is the list of security (groups) defined in the service network. Each secur
     "name": "my-storage",
     "type": "ssd",
     "size": "8GiB" 
-  }]
+  }],
+  "console": {
+    "backend": "https://...",
+    "properties": {
+      "one": "two"
+    }
+  }
 }
 ```
 

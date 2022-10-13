@@ -28,6 +28,10 @@ OCL is a json descriptor of a managed service, describing the expected final sta
   "name": "my-service",
   "category": "compute",
   "namespace": "my-namespace",
+  "properties": {
+    "meta": "data",
+    "other": true
+  },
   "artifacts": [
     {
       "name": "my-artifact",
@@ -53,7 +57,11 @@ OCL is a json descriptor of a managed service, describing the expected final sta
     "currency": "euro",
     "fixedPrice": 20,
     "variablePrice": 10,
-    "variableItem": "instance"
+    "variableItem": "instance",
+    "backend": "https://software_provider/billing/backend",
+    "properties": {
+      "billing_prop": "value"
+    }
   },
   "compute": {
     "vm": [{
@@ -89,8 +97,14 @@ OCL is a json descriptor of a managed service, describing the expected final sta
   "storage": [{
     "name": "my-storage",
     "type": "ssd",
-    "size": "8GiB" 
-  }]
+    "size": "8GiB"
+  }],
+  "console": {
+    "backend": "https://...",
+    "properties": {
+      "one": "two"
+    }
+  }
 }
 ```
 
