@@ -65,7 +65,7 @@ const config = {
           {to: '/blog', label: 'Blog', position: 'right'},
           {to: '/demo', label: 'Demo', position: 'right'},
           {
-            href: 'https://github.com/jbonofre/osc',
+            href: 'https://github.com/huaweicloud/osc',
             label: 'GitHub',
             position: 'right',
           },
@@ -125,7 +125,7 @@ const config = {
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/jbonofre/osc',
+                href: 'https://github.com/huaweicloud/osc',
               },
               {
                 label: 'Blog',
