@@ -11,29 +11,28 @@ public interface OrchestratorPlugin {
      * Register a managed service using the provided OCL descriptor.
      *
      * @param ocl the OCL model describing the managed service.
-     * @return the service ID on the CSP infrastructure.
      */
-    String registerManagedService(Ocl ocl);
+    void registerManagedService(Ocl ocl);
 
     /**
      * Start (exposing the managed service to the users) the managed service.
      *
-     * @param sid the service ID to start.
+     * @param managedServiceName the service ID to start.
      */
-    void startManagedService(String sid);
+    void startManagedService(String managedServiceName);
 
     /**
      * Stop (hidding the managed service for the users) the managed service.
      *
-     * @param sid the service ID to stop.
+     * @param managedServiceName the service ID to stop.
      */
-    void stopManagedService(String sid);
+    void stopManagedService(String managedServiceName);
 
     /**
      * Unregister and destroy/clean managed service resources.
      *
-     * @param sid the service ID to unregister and destroy.
+     * @param managedServiceName the service ID to unregister and destroy.
      */
-    void unregisterManagedService(String sid);
+    void unregisterManagedService(String managedServiceName);
 
 }

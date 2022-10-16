@@ -9,10 +9,9 @@ import org.eclipse.osc.services.ocl.loader.Ocl;
 import org.eclipse.osc.services.ocl.loader.OclLoader;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 @Log
@@ -20,7 +19,10 @@ import java.util.stream.Collectors;
 public class OrchestratorService implements Service {
 
     private List<OrchestratorPlugin> plugins = new ArrayList<>();
-    private Set<String> managedServices = new HashSet<>();
+
+    // TODO it should be a persistent storage, not memory
+    // TODO use reentrantlock instead of concurrent set to avoid long wait on threads
+    private Set<String> managedServices = new ConcurrentSkipListSet<>();
 
     private OclLoader oclLoader;
 
@@ -54,55 +56,59 @@ public class OrchestratorService implements Service {
      */
     public void registerManagedService(String oclLocation) throws Exception {
         Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        if (ocl.getName() == null) {
+            throw new IllegalArgumentException("Managed service name is required");
+        }
         plugins.forEach(plugin -> {
-            managedServices.add(plugin.registerManagedService(ocl));
+            plugin.registerManagedService(ocl);
         });
+        managedServices.add(ocl.getName());
     }
 
     /**
      * Start (expose to users) a managed service on all orchestrator plugins.
      *
-     * @param sid the managed service ID.
+     * @param managedServiceName the managed service name.
      * @throws Exception if start fails.
      */
-    public void startManagedService(String sid) throws Exception {
-        if (!managedServices.contains(sid)) {
-            throw new IllegalStateException("Managed service " + sid + " not found");
+    public void startManagedService(String managedServiceName) throws Exception {
+        if (!managedServices.contains(managedServiceName)) {
+            throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
         plugins.forEach(plugin -> {
-            plugin.startManagedService(sid);
+            plugin.startManagedService(managedServiceName);
         });
     }
 
     /**
      * Stop (managed service is not visible to users anymore) a managed service on all orchestrator plugins.
      *
-     * @param sid the managed service ID.
+     * @param managedServiceName the managed service name.
      * @throws Exception if stop fails.
      */
-    public void stopManagedService(String sid) throws Exception {
-        if (!managedServices.contains(sid)) {
-            throw new IllegalStateException("Managed service " + sid + " not found");
+    public void stopManagedService(String managedServiceName) throws Exception {
+        if (!managedServices.contains(managedServiceName)) {
+            throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
         plugins.forEach(plugin -> {
-            plugin.stopManagedService(sid);
+            plugin.stopManagedService(managedServiceName);
         });
     }
 
     /**
      * Unregister a managed service and destroy/clean all associated resources on all orchestrator plugins.
      *
-     * @param sid the managed service ID.
+     * @param managedServiceName the managed service name.
      * @throws Exception if unregister fails.
      */
-    public void unregisterManagedService(String sid) throws Exception {
-        if (!managedServices.contains(sid)) {
-            throw new IllegalStateException("Managed service " + sid + " not found");
+    public void unregisterManagedService(String managedServiceName) throws Exception {
+        if (!managedServices.contains(managedServiceName)) {
+            throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
         plugins.forEach(plugin -> {
-            plugin.unregisterManagedService(sid);
+            plugin.unregisterManagedService(managedServiceName);
         });
-        managedServices.remove(sid);
+        managedServices.remove(managedServiceName);
     }
 
 }

@@ -23,14 +23,19 @@ public class OrchestratorServiceTest {
         Assertions.assertEquals(1, orchestratorService.getPlugins().size());
         Assertions.assertTrue(orchestratorService.getPlugins().get(0) instanceof PluginTest);
 
+        PluginTest pluginTest = (PluginTest) orchestratorService.getPlugins().get(0);
+
         orchestratorService.registerManagedService("file:./target/test-classes/test.json");
 
         Assertions.assertEquals(1, orchestratorService.getManagedServices().size());
         List<String> managedServicesList = new ArrayList<>(orchestratorService.getManagedServices());
-        Assertions.assertEquals("1", managedServicesList.get(0));
+        Assertions.assertEquals("test-service", managedServicesList.get(0));
 
-        orchestratorService.startManagedService("1");
-        orchestratorService.stopManagedService("1");
+        Assertions.assertNotNull(pluginTest.getOcl());
+        Assertions.assertEquals("test-service", pluginTest.getOcl().getName());
+
+        orchestratorService.startManagedService("test-service");
+        orchestratorService.stopManagedService("test-service");
 
         try {
             orchestratorService.startManagedService("43421");
@@ -39,9 +44,11 @@ public class OrchestratorServiceTest {
             // good
         }
 
-        orchestratorService.unregisterManagedService("1");
+        orchestratorService.unregisterManagedService("test-service");
 
         Assertions.assertEquals(0, orchestratorService.getManagedServices().size());
+
+        Assertions.assertNull(pluginTest.getOcl());
     }
 
 }

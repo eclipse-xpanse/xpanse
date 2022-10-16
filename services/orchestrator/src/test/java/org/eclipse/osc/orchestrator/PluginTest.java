@@ -7,15 +7,17 @@ import org.eclipse.osc.services.ocl.loader.Ocl;
 @Log
 public class PluginTest implements OrchestratorPlugin, Service {
 
+    private Ocl ocl;
+
     @Override
     public String name() {
         return "osc-orchestrator-plugin-test";
     }
 
     @Override
-    public String registerManagedService(Ocl ocl) {
+    public void registerManagedService(Ocl ocl) {
         log.info("OSC Test Plugin :: Registering managed service");
-        return "1";
+        this.ocl = ocl;
     }
 
     @Override
@@ -31,6 +33,11 @@ public class PluginTest implements OrchestratorPlugin, Service {
     @Override
     public void unregisterManagedService(String sid) {
         log.info("OSC Test Plugin :: Unregistering managed service " + sid);
+        this.ocl = null;
+    }
+
+    public Ocl getOcl() {
+        return this.ocl;
     }
 
 }
