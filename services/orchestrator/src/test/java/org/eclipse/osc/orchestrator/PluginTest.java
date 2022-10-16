@@ -20,19 +20,23 @@ public class PluginTest implements OrchestratorPlugin, Service {
         this.ocl = ocl;
     }
 
-    @Override
-    public void startManagedService(String sid) {
-        log.info("OSC Test Plugin :: Starting managed service " + sid);
+    public void updateManagedService(String managedServiceName, Ocl ocl) {
+        log.info("OSC Test Plugin :: Updating managed service " + managedServiceName);
     }
 
     @Override
-    public void stopManagedService(String sid) {
-        log.info("OSC Test Plugin ::Stopping managed service " + sid);
+    public void startManagedService(String managedServiceName) {
+        log.info("OSC Test Plugin :: Starting managed service " + managedServiceName);
     }
 
     @Override
-    public void unregisterManagedService(String sid) {
-        log.info("OSC Test Plugin :: Unregistering managed service " + sid);
+    public void stopManagedService(String managedServiceName) {
+        log.info("OSC Test Plugin ::Stopping managed service " + managedServiceName);
+    }
+
+    @Override
+    public void unregisterManagedService(String managedServiceName) {
+        log.info("OSC Test Plugin :: Unregistering managed service " + managedServiceName);
         this.ocl = null;
     }
 

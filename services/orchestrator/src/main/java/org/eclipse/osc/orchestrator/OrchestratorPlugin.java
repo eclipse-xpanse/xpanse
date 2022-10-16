@@ -15,6 +15,14 @@ public interface OrchestratorPlugin {
     void registerManagedService(Ocl ocl);
 
     /**
+     * Update an existing managed service using the provided OCL descriptor.
+     *
+     * @param managedServiceName the managed service to update, identified by the given name.
+     * @param ocl the OCL descriptor to update the managed service.
+     */
+    void updateManagedService(String managedServiceName, Ocl ocl);
+
+    /**
      * Start (exposing the managed service to the users) the managed service.
      *
      * @param managedServiceName the service ID to start.

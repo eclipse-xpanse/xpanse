@@ -66,6 +66,20 @@ public class OrchestratorService implements Service {
     }
 
     /**
+     * Update existing managed service with a new OCL descriptor.
+     *
+     * @param managedServiceName the managed service to update, identified by the given name.
+     * @param oclLocation the new OCL descriptor.
+     * @throws Exception if the update fails.
+     */
+    public void updateManagedService(String managedServiceName, String oclLocation) throws Exception {
+        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        plugins.forEach(plugin -> {
+            plugin.updateManagedService(managedServiceName, ocl);
+        });
+    }
+
+    /**
      * Start (expose to users) a managed service on all orchestrator plugins.
      *
      * @param managedServiceName the managed service name.
