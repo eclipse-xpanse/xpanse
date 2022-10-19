@@ -5,9 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Security {
+public class RouteTable {
 
     private String name;
-    private List<SecurityRule> rules;
+    private List<RouteTableEntry> table;
 
 }

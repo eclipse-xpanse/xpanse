@@ -49,23 +49,34 @@ OCL is a json descriptor of a managed service, describing the expected final sta
     }]
   },
   "network": {
-    "vpc": [{
-      "name": "my-vpc",
-      "cidrs": "172.31.0.0/16",
-      "routes": "",
-      "acl": ""
-    }],
-    "subnet": [{
-      "name": "my-subnet",
-      "vpc": "my-vpc",
-      "table": "",
-      "routes": ""
-    }],
-    "security": [{
-      "name": "my-sg",
-      "inbound": [ "22->22", "443->443", "80->80" ],
-      "outbound": []
-    }]
+    "vpc": [
+      {
+        "name": "my-vpc",
+        "cidrs": "172.31.0.0/16"
+      }
+    ],
+    "subnet": [
+      {
+        "name": "my-subnet",
+        "vpc": "my-vpc",
+        "cidr": "172.31.1.0/24"
+      }
+    ],
+    "security": [
+      {
+        "name": "my-sg",
+        "rules": [
+          {
+            "name": "my-app-msg",
+            "priority": 1,
+            "protocol": "TCP",
+            "cidr": "172.31.2.0/24",
+            "port": "3389",
+            "action": "allow"
+          }
+        ]
+      }
+    ]
   },
   "storage": [{
     "name": "my-storage",

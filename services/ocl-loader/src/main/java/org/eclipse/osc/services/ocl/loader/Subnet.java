@@ -7,7 +7,8 @@ public class Subnet {
 
     private String vpc;
     private String name;
-    private String table;
+    private String cidr;
+    private String acl;
     private String routes;
 
 }

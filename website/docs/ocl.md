@@ -116,23 +116,70 @@ This is the list of security (groups) defined in the service network. Each secur
     }]
   },
   "network": {
-    "vpc": [{
-      "name": "my-vpc",
-      "cidrs": "172.31.0.0/16",
-      "routes": "",
-      "acl": ""
-    }],
-    "subnet": [{
-      "name": "my-subnet",
-      "vpc": "my-vpc",
-      "table": "",
-      "routes": ""
-    }],
-    "security": [{
-      "name": "my-sg",
-      "inbound": [ "22->22", "443->443", "80->80" ],
-      "outbound": []
-    }]
+    "vpc": [
+      {
+        "name": "my-vpc",
+        "cidrs": "172.31.0.0/16"
+      },
+      {
+        "name": "my-another-vpc",
+        "cidrs": "172.32.0.0/16"
+      }
+    ],
+    "subnet": [
+      {
+        "name": "my-subnet",
+        "vpc": "my-vpc",
+        "acl": "disable-ssh",
+        "routes": "my-route",
+        "cidr": "172.31.1.0/24"
+      }
+    ],
+    "security": [
+      {
+        "name": "my-sg",
+        "rules": [
+          {
+            "name": "my-app-msg",
+            "priority": 1,
+            "protocol": "TCP",
+            "cidr": "172.31.2.0/24",
+            "port": "3389",
+            "action": "allow"
+          }
+        ]
+      }
+    ],
+    "acl": [
+      {
+        "name": "my-acl",
+        "rules": [
+          {
+            "name": "disable-ssh",
+            "priority": 1,
+            "protocol": "TCP",
+            "cidr": "any",
+            "direction": "inbound",
+            "from_port": "any",
+            "to_port": "22",
+            "action": "deny"
+          }
+        ]
+      }
+    ],
+    "route": [
+      {
+        "name": "my-route",
+        "table": [
+          {
+            "name": "my_internet",
+            "destination": "172.16.0.0/16",
+            "type": "peering",
+            "nexthop": "my-another-vpc"
+          }
+        ]
+      }
+    ]
   },
   "storage": [{
     "name": "my-storage",

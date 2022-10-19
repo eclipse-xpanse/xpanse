@@ -5,9 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Security {
-
+public class ACL {
     private String name;
-    private List<SecurityRule> rules;
-
+    private List<ACLRule> rules;
 }

@@ -7,7 +7,5 @@ public class VPC {
 
     private String name;
     private String cidrs;
-    private String routes;
-    private String acl;
 
 }
