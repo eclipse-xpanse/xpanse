@@ -204,8 +204,8 @@ export default function App() {
       <>
       <Modal centered mask={false} title={<Space><Image width={50} src="./logo.png" preview={false}/>Welcome to OSC Demo</Space>} open={true} okText="Log In" cancelText="Reset" onOk={loginForm.submit} onCancel={() => loginForm.resetFields()}>
         <Form name="login" form={loginForm} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} autoComplete="off" onFinish={(values) => {
-          if (values.username !== 'csp' && values.username !== 'software_vendor' && values.username !== 'user') {
-            message.error("Please use valid user: csp, software_vendor, user");
+          if (values.username !== 'csp' && values.username !== 'user') {
+            message.error("Please use valid user: csp, user");
           } else {
             setUser(values.username);
           }
@@ -220,7 +220,6 @@ export default function App() {
         <Space><i>You have three username depending of the persona you want to use:
           <ul>
             <li><b>csp</b> for cloud service provider</li>
-            <li><b>software_vendor</b> for software vendor</li>
             <li><b>user</b> for end user</li>
           </ul>
         </i></Space>

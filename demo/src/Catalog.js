@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { message, Row, Col, Input, Divider, Space, Breadcrumb, Tree, Button, Descriptions, Badge } from 'antd';
 import Icon from '@ant-design/icons';
-import { CloudOutlined, DatabaseOutlined, NodeIndexOutlined, UpCircleOutlined, UploadOutlined, HomeOutlined, AppstoreOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { SettingOutlined, CloudOutlined, DatabaseOutlined, NodeIndexOutlined, UpCircleOutlined, UploadOutlined, HomeOutlined, AppstoreOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { ReactComponent as KubernetesSvg } from './kubernetes_icon.svg';
 import { ReactComponent as RancherSvg } from './rancher_icon.svg';
 import { ReactComponent as CassandraSvg } from './cassandra_icon.svg';
@@ -309,18 +309,15 @@ function Catalog(props) {
           <Button type="primary" icon={<PlayCircleOutlined/>} onClick={() => handleStartClick(serviceToInstall, props.setItems, props.items)}>Deploy</Button>
         </Col>
       </Row>
-      </>
-    );
-  }
-  if (props.user === 'software_vendor') {
-    return (
-      <>
-      <Breadcrumb><Breadcrumb.Item href="/"><HomeOutlined /></Breadcrumb.Item><Breadcrumb.Item href="/catalog"><AppstoreOutlined /><span>Catalog</span></Breadcrumb.Item></Breadcrumb>
-      <h2>Services Catalog <small>(powered by Open Services Cloud)</small></h2>
       <Divider orientation="left">Register</Divider>
-      <Button type="primary" icon={<UploadOutlined />}>Click to Upload OCL Descriptor</Button> 
-      <TextArea rows={8} readOnly={true} placeholder={pulsar} />
-      <Button type="primary" icon={<UpCircleOutlined/>} onClick={() => handleRegisterClick(props.setTreeData)}>Register</Button>
+      <Row>
+        <Col span={18}>
+          <Input addonAfter={<SettingOutlined/>} disabled={true} defaultValue="https://raw.githubusercontent.com/huaweicloud/osc/6ee7f2ade1445b9a502a18cc8a504d0eefac66ed/demo/src/pulsar.json" />
+        </Col>
+        <Col span={6}>
+          <Button type="primary" icon={<UpCircleOutlined/>} onClick={() => handleRegisterClick(props.setTreeData)}>Fetch & Register</Button>
+        </Col>
+      </Row>
       </>
     );
   }
