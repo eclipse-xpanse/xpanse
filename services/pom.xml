@@ -18,6 +18,7 @@
 
     <modules>
         <module>ocl-loader</module>
+        <module>orchestrator</module>
     </modules>
 
 </project>

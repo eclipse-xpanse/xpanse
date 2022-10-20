@@ -14,7 +14,12 @@ public class OclLoader implements Service {
 
     @Override
     public String name() {
-        return "ocl-loader";
+        return "osc-ocl-loader";
+    }
+
+    @Override
+    public int priority() {
+        return 900;
     }
 
     @Override

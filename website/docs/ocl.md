@@ -13,6 +13,14 @@ The first part of the OCL service descriptor is basically service metadata:
 * `name` is the name of your service, used to identify the service in the CSP catalog, user console, etc
 * `category` is the overall category of the service. It's especially use to integrate the service in the right menu of the user console.
 * `namespace` is the location of the service. It could be in a CSP subdomain, in a region, and any kind of CSP classification.
+* `properties` is all metadata (key/value pairs) for the managed services. These properties are used by the OSC Orchestrator.
+* `artifacts` is the list of artifacts used to bootstrap the managed service.
+
+An artifact is described with:
+* `name` identifies the artifact
+* `type` defines the artifact type (jar, deb, docker, rpm, ...)
+* `url` is the location (URL) of the artifact (https, file, mvn, ...)
+* `properties` is a list of properties (metadata) used for bootstrapping and deployment
 
 ## Services Integration
 
@@ -22,12 +30,14 @@ The `billing` component defines the integration into cloud provider billing syst
 
 You can configure the business model associated to the service:
 
-* `model` - (Required) Defines the business model (`flat`, `exponential`, ...).
-* `period` - (Required) Defines the rental period (`daily`, `weekly`, `monthly`, `yearly`).
-* `currency` - (Optional) Defines the billing currency (`euro`, `usd`, ...).
-* `fixedPrice` - (Optional) The fixed price during the period (the price applied one shot whatever is the service use).
-* `variablePrice` - (Optional) The price depending of item volume.
-* `variableItem` - (Optional) The item used to calculate the variable price on the period (for instance, the number of instances, the number of transactions, ...).
+* `model` defines the business model (`flat`, `exponential`, ...)
+* `period` defines the rental period (`daily`, `weekly`, `monthly`, `yearly`)
+* `currency` defines the billing currency (`euro`, `usd`, ...)
+* `fixedPrice` is the fixed price during the period (the price applied one shot whatever is the service use)
+* `variablePrice` is the price depending of item volume
+* `variableItem` is the item used to calculate the variable price on the period (for instance, the number of instances, the number of transactions, ...)
+* `backend` is the software provider (managed service provider) billing backend system used for payback.
+* `properties` is all properties related to billing, they are used by OSC for payback and bootstrapping.
 
 ### Compute
 
@@ -82,6 +92,11 @@ This is the list of security (groups) defined in the service network. Each secur
 
 ### Administration Console
 
+`console` element described the integration with CSP admin console, with:
+
+* `backend` is the admin console backend API URL
+* `properties` is key/value pairs used by OSC for the console integration
+
 ### Observability & Tracing
 
 #### Logging
@@ -101,13 +116,40 @@ This is the list of security (groups) defined in the service network. Each secur
   "name": "my-service",
   "category": "compute",
   "namespace": "my-namespace",
+  "properties": {
+    "meta": "data",
+    "other": true
+  },
+  "artifacts": [
+    {
+      "name": "my-artifact",
+      "type": "jar",
+      "url": "mvn:groupId/artifact/1.6",
+      "properties": {
+        "additional": "property",
+        "another": "one"
+      }
+    },
+    {
+      "name": "another-artifact",
+      "type": "docker",
+      "url": "https://path/to/artifact",
+      "properties": {
+        "one": "property"
+      }
+    }
+  ],
   "billing": {
     "model": "flat",
     "period": "monthly",
     "currency": "euro",
     "fixedPrice": 20,
     "variablePrice": 10,
-    "variableItem": "instance"
+    "variableItem": "instance",
+    "backend": "https://software_provider/billing/backend",
+    "properties": {
+      "billing_prop": "value"
+    }
   },
   "compute": {
     "vm": [{
@@ -160,7 +202,13 @@ This is the list of security (groups) defined in the service network. Each secur
     "name": "my-storage",
     "type": "ssd",
     "size": "8GiB" 
-  }]
+  }],
+  "console": {
+    "backend": "https://...",
+    "properties": {
+      "one": "two"
+    }
+  }
 }
 ```
 
@@ -173,6 +221,7 @@ resource "osc_service" "myservice" {
   name      = "my-service"
   category  = "compute"
   namespace = "my-namespace"
+  artifacts = ["mvn:groupId/artifactId/version", "https://host/path/to/artifact"]
 
   billing {
     model         = "flat"
