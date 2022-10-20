@@ -41,10 +41,10 @@ OCL is a json descriptor of a managed service, describing the expected final sta
       "name": "my-vm",
       "type": "t2.large",
       "platform": "linux-x64",
-      "vpc": "$.vpc[0]",
+      "vpc": "$.network.vpc[0]",
       "subnet": "$.network.subnet[0]",
-      "security": "$.network.security.rules[0]",
-      "storage": "$.storage[0]",
+      "security": ["$.network.security[0]"],
+      "storage": ["$.storage[0]"],
       "publicly": true
     }]
   },
@@ -72,8 +72,7 @@ OCL is a json descriptor of a managed service, describing the expected final sta
             "protocol": "TCP",
             "cidr": "172.31.2.0/24",
             "direction": "inbound",
-            "source_port_range": "*",
-            "destination_port_range": "3389",
+            "ports": "3389",
             "action": "allow"
           }
         ]

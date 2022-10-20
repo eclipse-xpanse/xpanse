@@ -2,6 +2,8 @@ package org.eclipse.osc.services.ocl.loader;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class VM {
 
@@ -10,8 +12,8 @@ public class VM {
     private String platform;
     private String vpc;
     private String subnet;
-    private String security;
-    private String storage;
+    private List<String> security;
+    private List<String> storage;
     private boolean publicly;
 
 }

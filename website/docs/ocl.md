@@ -40,8 +40,8 @@ This is the list of VMs used by the service. Each VM has:
 * `platform` - (Required) The VM image/platform, like `linux-x64` (to be generic).
 * `vpc` - (Required) The `JsonPath` of the VPC.
 * `subnet` - (Required) The `JsonPath` of the Subnet.
-* `security` - (Required) The `JsonPath` of the security.
-* `storage` - (Required) The `JsonPath` of the storage.
+* `security` - (Required) A list of `JsonPath` of `security`.
+* `storage` - (Required) A list of `JsonPath` of the `storage`.
 * `publicly` - (Required) The flag to indicate if the VM should be exposed on Internet (`true`) or only local (`false`).
 
 ### Network
@@ -60,24 +60,6 @@ This is the list of subnet defined in the service network. Each subnet has:
 * `name` - (Required) The name of the subnet, used in other OCL elements.
 * `vpc` - (Required) The `JsonPath` of the VPC where the subnet is attached.
 * `cidr` - (Required) The subnet IP address range.
-* `acl` - (Optional) The `JsonPath` of the ACL which attached to the subnet.
-* `route_table` - (Optional) The subnet table.
-
-##### RouteTable
-
-This is an object defined in the Subnet. Each route_table has: 
-
-* `name` - (Required) The name of the route_table.
-* `entries` - (Required) The entry list of this route table.
-
-###### Entry
-
-This is the list of entry defined in the route_table. Each entry has:
-
-* `name` - (Required) The name of the Entry defined in the route_table.
-* `destination` - (Required) The destination of the entry.
-* `type` - (Required) The type of the entry. Possible values include: `vpc_peering`,`internet`.
-* `nexthop` - (Required) The NextHop of the entry. 
 
 #### Security
 
@@ -93,16 +75,8 @@ This is the list of security (groups) defined in the service network. Each secur
 * `protocol` - (Required) Network protocol this rule applies to. Possible values include: `Tcp`,`Udp`,`Icmp`,`*`(which matches all).
 * `cidr` - (Required) The IP address range this rule applies to. The `*` matches any IP.
 * `direction` - (Required) The direction of the network traffic. Possible values include: `inbound`,`outbound`
-* `source_port_range` - (Required) The source Port or Range. Integer or range between `0` and `65536` or `*` to match any.
-* `destination_port_range` - (Required) The destination Port or Range. Integer or range between `0` and `65536` or `*` to match any.
+* `ports` - (Required) Port or Range. Integer or range between `0` and `65536` or `*` to match any.
 * `action` - (Required) Specifies whether network traffic is allowed or denied. Possible values include: `allow`,`deny`.
-
-#### ACL
-
-This is the lis of ACL (rules) defined in the service network. Each ACL has:
-
-* `name` - (Required) The name of the security, used in other OCL elements.
-* `rules` - (Required) The list of security rule. See [`SecurityRule`](#SecurityRule).
 
 ### Storage
 
@@ -140,10 +114,10 @@ This is the lis of ACL (rules) defined in the service network. Each ACL has:
       "name": "my-vm",
       "type": "t2.large",
       "platform": "linux-x64",
-      "vpc": "$.vpc[0]",
+      "vpc": "$.network.vpc[0]",
       "subnet": "$.network.subnet[0]",
-      "security": "$.network.security[0]",
-      "storage": "$.storage[0]}",
+      "security": ["$.network.security[0]"],
+      "storage": ["$.storage[0]}"],
       "publicly": true
     }]
   },
@@ -161,20 +135,8 @@ This is the lis of ACL (rules) defined in the service network. Each ACL has:
     "subnet": [
       {
         "name": "my-subnet",
-        "vpc": "$.vpc[0]",
-        "cidr": "172.31.1.0/24",
-        "acl": "$.network.acl[0]}",
-        "route_table": {
-            "name": "my-route",
-            "entries": [
-              {
-                "name": "my_internet",
-                "destination": "172.16.0.0/16",
-                "type": "peering",
-                "nexthop": "$.vpc[1].name"
-              }
-            ]
-        }
+        "vpc": "$.network.vpc[0]",
+        "cidr": "172.31.1.0/24"
       }
     ],
     "security": [
@@ -187,26 +149,8 @@ This is the lis of ACL (rules) defined in the service network. Each ACL has:
             "protocol": "TCP",
             "cidr": "172.31.2.0/24",
             "direction": "inbound",
-            "source_port_range": "*",
-            "destination_port_range": "3389",
+            "ports": "3389",
             "action": "allow"
-          }
-        ]
-      }
-    ],
-    "acl": [
-      {
-        "name": "my-acl",
-        "rules": [
-          {
-            "name": "disable-ssh",
-            "priority": 1,
-            "protocol": "TCP",
-            "cidr": "0.0.0.0/0",
-            "direction": "ingress",
-            "source_port_range": "*",
-            "destination_port_range": "22",
-            "action": "deny"
           }
         ]
       }

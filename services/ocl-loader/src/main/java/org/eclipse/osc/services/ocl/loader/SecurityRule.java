@@ -10,8 +10,7 @@ public class SecurityRule {
     private String protocol;
     private String cidr;
     private String direction;
-    private String source_port;
-    private String dest_port;
+    private String ports;
     private String action;
 
 }

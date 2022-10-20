@@ -10,7 +10,5 @@ public class Network {
     private List<VPC> vpc;
     private List<Subnet> subnet;
     private List<Security> security;
-    private List<ACL> acl;
-    private List<RouteTable> routes;
 
 }
