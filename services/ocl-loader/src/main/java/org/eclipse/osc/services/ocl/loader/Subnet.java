@@ -9,6 +9,6 @@ public class Subnet {
     private String name;
     private String cidr;
     private String acl;
-    private String routes;
+    private RouteTable route;
 
 }

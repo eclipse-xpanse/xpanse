@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class ACL {
     private String name;
-    private List<ACLRule> rules;
+    private List<SecurityRule> rules;
 }

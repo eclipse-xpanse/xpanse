@@ -9,7 +9,9 @@ public class SecurityRule {
     private Integer priority;
     private String protocol;
     private String cidr;
-    private Integer port;
+    private String direction;
+    private String source_port;
+    private String dest_port;
     private String action;
 
 }
