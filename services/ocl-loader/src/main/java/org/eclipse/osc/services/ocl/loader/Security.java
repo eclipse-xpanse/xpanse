@@ -8,7 +8,6 @@ import java.util.List;
 public class Security {
 
     private String name;
-    private List<String> inbound;
-    private List<String> outbound;
+    private List<SecurityRule> rules;
 
 }
