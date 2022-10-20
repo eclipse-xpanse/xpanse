@@ -75,7 +75,7 @@ This is the list of security (groups) defined in the service network. Each secur
 * `protocol` - (Required) Network protocol this rule applies to. Possible values include: `Tcp`,`Udp`,`Icmp`,`*`(which matches all).
 * `cidr` - (Required) The IP address range this rule applies to. The `*` matches any IP.
 * `direction` - (Required) The direction of the network traffic. Possible values include: `inbound`,`outbound`
-* `ports` - (Required) Port or Range. Integer or range between `0` and `65536` or `*` to match any.
+* `ports` - (Required) (Optional) Specifies the port value range, which supports single port (80), continuous port (1-30) and discontinuous port (22, 3389, 80) The valid port values is range form 1 to 65,535.
 * `action` - (Required) Specifies whether network traffic is allowed or denied. Possible values include: `allow`,`deny`.
 
 ### Storage

@@ -58,7 +58,7 @@ OCL is a json descriptor of a managed service, describing the expected final sta
     "subnet": [
       {
         "name": "my-subnet",
-        "vpc": "my-vpc",
+        "vpc": "$.network.vpc[0]",
         "cidr": "172.31.1.0/24"
       }
     ],
