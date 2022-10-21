@@ -2,14 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { message, Row, Col, Input, Divider, Space, Breadcrumb, Tree, Button, Descriptions, Badge } from 'antd';
 import Icon from '@ant-design/icons';
-import { SettingOutlined, CloudOutlined, DatabaseOutlined, NodeIndexOutlined, UpCircleOutlined, UploadOutlined, HomeOutlined, AppstoreOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { SettingOutlined, CloudOutlined, DatabaseOutlined, NodeIndexOutlined, UpCircleOutlined, HomeOutlined, AppstoreOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { ReactComponent as KubernetesSvg } from './kubernetes_icon.svg';
 import { ReactComponent as RancherSvg } from './rancher_icon.svg';
 import { ReactComponent as CassandraSvg } from './cassandra_icon.svg';
 import { ReactComponent as ActivemqSvg } from './activemq_icon.svg';
 import { ReactComponent as PulsarSvg } from './pulsar_icon.svg';
-
-const { TextArea } = Input;
 
 function Property(props) {
   if (!props.service) {
@@ -277,19 +275,6 @@ function handleRegisterClick(setTreeData) {
 function Catalog(props) {
 	const [service, setService] = useState();
   const [serviceToInstall, setServiceToInstall] = useState();
-  const pulsar = "// static example of OCL service descriptor\n" + 
-    "osc:\n" + 
-    "\tname: pulsar" +
-    "\tversion: 2.7.5" +
-    "\tcategory: integration" +
-    "billing:\n" +
-    "\tmode: monthly flat\n" +
-    "\tnegociated: 200\n" +
-    "\tdiscount: 50\n" +
-    "\tactual: 150\n" +
-    "requirements:\n" +
-    "\tservices: vm\n"
-    ;
   if (props.user === 'csp') {
     return (
       <>
@@ -312,7 +297,7 @@ function Catalog(props) {
       <Divider orientation="left">Register</Divider>
       <Row>
         <Col span={18}>
-          <Input addonAfter={<SettingOutlined/>} disabled={true} defaultValue="https://raw.githubusercontent.com/huaweicloud/osc/6ee7f2ade1445b9a502a18cc8a504d0eefac66ed/demo/src/pulsar.json" />
+          <Input addonAfter={<SettingOutlined/>} disabled={false} defaultValue="https://raw.githubusercontent.com/huaweicloud/osc/6ee7f2ade1445b9a502a18cc8a504d0eefac66ed/demo/src/pulsar.json" />
         </Col>
         <Col span={6}>
           <Button type="primary" icon={<UpCircleOutlined/>} onClick={() => handleRegisterClick(props.setTreeData)}>Fetch & Register</Button>

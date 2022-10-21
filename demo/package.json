@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@ant-design/charts": "^1.4.2",
     "antd": "^4.22.2",
     "react": "^18.0.2",
     "react-dom": "^18.2.0",

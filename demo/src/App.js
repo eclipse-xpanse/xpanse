@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DownOutlined, AppstoreOutlined, BankOutlined, ConsoleSqlOutlined, DatabaseOutlined, CloudOutlined, CloudServerOutlined, ContainerOutlined, NodeIndexOutlined } from '@ant-design/icons';
+import { MonitorOutlined, DownOutlined, AppstoreOutlined, BankOutlined, ConsoleSqlOutlined, DatabaseOutlined, CloudOutlined, CloudServerOutlined, ContainerOutlined, NodeIndexOutlined } from '@ant-design/icons';
 import Icon from '@ant-design/icons';
 import { Layout, Menu, Image, Space, Form, Input, Button, Modal, Dropdown, message } from 'antd';
 import { Route, Switch } from 'react-router';
@@ -23,13 +23,17 @@ import Cassandra from './Cassandra';
 import Activemq from './Activemq';
 import Pulsar from './Pulsar';
 import Billing from './Billing';
+import Monitoring from './Monitoring';
 
 function SideMenu(props) {
   const [collapsed, setCollapsed] = useState(false);
   var menuItems = props.items.slice();
   if (props.user === 'user') {
     var serviceItems = menuItems.filter(i => i.key !== 'catalog');
-    menuItems = [ { id: 'services', label: 'Services', icon: <AppstoreOutlined />,  children: [] } ];
+    menuItems = [ 
+			{ id: 'services', label: 'Services', icon: <AppstoreOutlined />,  children: [] },
+			{ id: 'monitoring', label: <Link to="/monitoring">Monitoring</Link>, icon: <MonitorOutlined/> }
+		];
     menuItems[0].children = serviceItems;
   } else {
     menuItems = menuItems.filter(i => i.key === 'catalog');
@@ -85,6 +89,9 @@ function Content(props) {
         <Route path="/billing" key="billing">
           <Billing vms={props.vms} containers={props.containers} rds={props.rds} kafka={props.kafka} kubernetes={props.kubernetes} rancher={props.rancher} cassandra={props.cassandra} activemq={props.activemq} pulsar={props.pulsar} items={props.items} />
         </Route>
+				<Route path="/monitoring" key="monitoring">
+					<Monitoring />
+				</Route>
 			</Switch>
       </div>
     </Layout.Content>
