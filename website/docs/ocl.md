@@ -120,25 +120,43 @@ This is the list of security (groups) defined in the service network. Each secur
     "meta": "data",
     "other": true
   },
-  "artifacts": [
-    {
-      "name": "my-artifact",
-      "type": "jar",
-      "url": "mvn:groupId/artifact/1.6",
-      "properties": {
-        "additional": "property",
-        "another": "one"
+  "image": {
+    "provisioners": [{
+      "name": "my-kafka-release",
+      "type": "shell",
+      "environment_vars": [
+        "WORK_HOME=/usr1/KAFKA/"
+      ],
+      "inline": [
+        "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar"
+      ]
+    }
+    ],
+    "base": {
+      "ubuntu-x64": {
+        "name": "base_image",
+        "ssh_user": "root",
+        "type": "t2.large",
+        "image_filter": {
+          "filters": {
+            "name": "ubuntu-for-osc-*"
+          }
+        }
+      },
+      "centos-x64": {
+        "name": "base_image",
+        "ssh_user": "root",
+        "type": "t2.large",
+        "image_id": "ed2c9ea6-7134-44b9-bbfa-109e0753766e"
       }
     },
-    {
-      "name": "another-artifact",
-      "type": "docker",
-      "url": "https://path/to/artifact",
-      "properties": {
-        "one": "property"
+    "artifacts": {
+      "kafka_image": {
+        "base": "$.image.base.ubuntu-x64",
+        "provisioners": ["$.image.provisioners[0]"]
       }
     }
-  ],
+  },
   "billing": {
     "model": "flat",
     "period": "monthly",
@@ -152,16 +170,23 @@ This is the list of security (groups) defined in the service network. Each secur
     }
   },
   "compute": {
-    "vm": [{
-      "name": "my-vm",
-      "type": "t2.large",
-      "platform": "linux-x64",
-      "vpc": "$.network.vpc[0]",
-      "subnet": "$.network.subnet[0]",
-      "security": ["$.network.security[0]"],
-      "storage": ["$.storage[0]}"],
-      "publicly": true
-    }]
+    "vm": [
+      {
+        "name": "my-vm",
+        "type": "t2.large",
+        "platform": "linux-x64",
+        "image": "$.image.artifacts.kafka_image",
+        "vpc": "$.network.vpc[0]",
+        "subnet": "$.network.subnet[0]",
+        "security": [
+          "$.network.security[0]"
+        ],
+        "storage": [
+          "$.storage[0]}"
+        ],
+        "publicly": true
+      }
+    ]
   },
   "network": {
     "vpc": [
@@ -198,11 +223,13 @@ This is the list of security (groups) defined in the service network. Each secur
       }
     ]
   },
-  "storage": [{
-    "name": "my-storage",
-    "type": "ssd",
-    "size": "8GiB" 
-  }],
+  "storage": [
+    {
+      "name": "my-storage",
+      "type": "ssd",
+      "size": "8GiB"
+    }
+  ],
   "console": {
     "backend": "https://...",
     "properties": {
