@@ -23,8 +23,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.karaf</groupId>
-            <artifactId>karaf-boot</artifactId>
+            <groupId>org.apache.karaf.minho</groupId>
+            <artifactId>minho-boot</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.osc.services</groupId>

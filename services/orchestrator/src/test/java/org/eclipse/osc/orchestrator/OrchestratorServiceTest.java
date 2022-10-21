@@ -1,8 +1,8 @@
 package org.eclipse.osc.orchestrator;
 
-import org.apache.karaf.boot.Karaf;
-import org.apache.karaf.boot.service.KarafLifeCycleService;
-import org.apache.karaf.boot.service.ServiceRegistry;
+import org.apache.karaf.minho.boot.Minho;
+import org.apache.karaf.minho.boot.service.LifeCycleService;
+import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.eclipse.osc.services.ocl.loader.OclLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ public class OrchestratorServiceTest {
 
     @Test
     public void loadPluginTest() throws Exception {
-        Karaf karaf = Karaf.builder().loader(() -> Stream.of(new KarafLifeCycleService(), new OclLoader(), new PluginTest(), new OrchestratorService())).build().start();
+        Minho karaf = Minho.builder().loader(() -> Stream.of(new LifeCycleService(), new OclLoader(), new OrchestratorService(), new PluginTest())).build().start();
 
         ServiceRegistry serviceRegistry = karaf.getServiceRegistry();
         OrchestratorService orchestratorService = serviceRegistry.get(OrchestratorService.class);

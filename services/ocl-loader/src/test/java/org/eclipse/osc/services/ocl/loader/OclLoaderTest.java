@@ -1,6 +1,6 @@
 package org.eclipse.osc.services.ocl.loader;
 
-import org.apache.karaf.boot.Karaf;
+import org.apache.karaf.minho.boot.Minho;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,9 +11,9 @@ public class OclLoaderTest {
 
     @Test
     public void loading() throws Exception {
-        Karaf karaf = Karaf.builder().loader(() -> Stream.of(new OclLoader())).build().start();
+        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
 
-        OclLoader oclLoader = karaf.getServiceRegistry().get(OclLoader.class);
+        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
 
         Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
 

@@ -2,15 +2,14 @@ package org.eclipse.osc.orchestrator;
 
 import lombok.Data;
 import lombok.extern.java.Log;
-import org.apache.karaf.boot.service.KarafLifeCycleService;
-import org.apache.karaf.boot.service.ServiceRegistry;
-import org.apache.karaf.boot.spi.Service;
+import org.apache.karaf.minho.boot.service.LifeCycleService;
+import org.apache.karaf.minho.boot.service.ServiceRegistry;
+import org.apache.karaf.minho.boot.spi.Service;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 import org.eclipse.osc.services.ocl.loader.OclLoader;
 
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
@@ -40,9 +39,9 @@ public class OrchestratorService implements Service {
             throw new IllegalStateException("OCL Loader service is not present");
         }
 
-        KarafLifeCycleService karafLifeCycleService = serviceRegistry.get(KarafLifeCycleService.class);
+        LifeCycleService lifeCycleService = serviceRegistry.get(LifeCycleService.class);
 
-        karafLifeCycleService.onStart(() -> {
+        lifeCycleService.onStart(() -> {
             log.info("Loading OSC orchestrator plugins");
             plugins = serviceRegistry.getAll().values().stream().filter(service -> service instanceof OrchestratorPlugin).map(service -> (OrchestratorPlugin) service).collect(Collectors.toList());
         });

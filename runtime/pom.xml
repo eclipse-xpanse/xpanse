@@ -19,9 +19,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.karaf.tooling</groupId>
-                <artifactId>karaf-maven-plugin</artifactId>
-                <version>5.0-SNAPSHOT</version>
+                <groupId>org.apache.karaf.minho.tooling</groupId>
+                <artifactId>minho-maven-plugin</artifactId>
+                <version>${minho.version}</version>
                 <executions>
                     <execution>
                         <id>package</id>
@@ -29,7 +29,7 @@
                             <goal>package</goal>
                         </goals>
                         <configuration>
-                            <karafBuild>${project.basedir}/src/main/resources/karaf-build.json</karafBuild>
+                            <minhoBuild>${project.basedir}/src/main/resources/minho-build.json</minhoBuild>
                         </configuration>
                     </execution>
                 </executions>
