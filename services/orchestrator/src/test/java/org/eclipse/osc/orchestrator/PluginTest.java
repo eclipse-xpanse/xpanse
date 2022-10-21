@@ -1,7 +1,7 @@
 package org.eclipse.osc.orchestrator;
 
 import lombok.extern.java.Log;
-import org.apache.karaf.boot.spi.Service;
+import org.apache.karaf.minho.boot.spi.Service;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Log
