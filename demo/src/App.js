@@ -28,7 +28,7 @@ import Monitoring from './Monitoring';
 function SideMenu(props) {
   const [collapsed, setCollapsed] = useState(false);
   var menuItems = props.items.slice();
-  if (props.user === 'user') {
+  if (props.user === 'user' || props.user === 'otc') {
     var serviceItems = menuItems.filter(i => i.key !== 'catalog');
     menuItems = [ 
 			{ id: 'services', label: 'Services', icon: <AppstoreOutlined />,  children: [] },
@@ -38,14 +38,25 @@ function SideMenu(props) {
   } else {
     menuItems = menuItems.filter(i => i.key === 'catalog');
   }
-  return (
-    <Layout.Sider collapsible collapsed={collapsed} onCollapse={newValue => setCollapsed(newValue)}>
-      <div className="logo">
-				<Link to="/"><Image width={50} src="./logo.png" preview={false}/></Link>
-      </div>
-			<Menu items={menuItems} mode="inline" theme="dark"/>
-    </Layout.Sider>
-  );
+  if (props.user === 'otc') {
+    return (
+      <Layout.Sider style={{ background: '#e30074' }}>
+        <div className="logo">
+          <Link to="/"><Image width={50} src="./otc.jpg" preview={false}/></Link>
+        </div>
+        <Menu items={menuItems} mode="inline" theme="light" style={{ color: '#000000', background: '#e30074' }}/>
+      </Layout.Sider>
+    );
+  } else {
+    return (
+      <Layout.Sider collapsible collapsed={collapsed} onCollapse={newValue => setCollapsed(newValue)}>
+        <div className="logo">
+          <Link to="/"><Image width={50} src="./logo.png" preview={false}/></Link>
+        </div>
+        <Menu items={menuItems} mode="inline" theme="dark"/>
+      </Layout.Sider>
+    );
+  }
 }
 
 function Content(props) {
@@ -57,7 +68,7 @@ function Content(props) {
 					<Home treeData={props.treeData} items={props.items} />
 				</Route>
 				<Route path="/vm" key="vm">
-					<VM vms={props.vms} setVms={props.setVms} vmTypes={props.vmTypes}/>
+					<VM vms={props.vms} setVms={props.setVms} vmTypes={props.vmTypes} />
 				</Route>
 				<Route path="/container" key="container">
 					<Container registries={props.registries} setRegistries={props.setRegistries} containers={props.containers} setContainers={props.setContainers} />
@@ -184,6 +195,14 @@ export default function App() {
       { key: 'signout', label: <Button type='primary' onClick={ () => setUser(null) }>Sign Out</Button> }
     ]} />
   );
+  if (user === 'otc') {
+    userMenu = (
+      <Menu items={[
+        { key: 'billing', label: <Link to='/billing'><Space><BankOutlined />Billing Dashboard</Space></Link> },
+        { key: 'signout', label: <Button style={{ background: '#e30074' }} type='primary' onClick={ () => setUser(null) }>Sign Out</Button> }
+      ]} />
+    );
+  }
   if (user === 'csp') {
     userMenu = (
       <Menu items={[
@@ -211,7 +230,7 @@ export default function App() {
       <>
       <Modal centered mask={false} title={<Space><Image width={50} src="./logo.png" preview={false}/>Welcome to OSC Demo</Space>} open={true} okText="Log In" cancelText="Reset" onOk={loginForm.submit} onCancel={() => loginForm.resetFields()}>
         <Form name="login" form={loginForm} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} autoComplete="off" onFinish={(values) => {
-          if (values.username !== 'csp' && values.username !== 'user') {
+          if (values.username !== 'csp' && values.username !== 'user' && values.username !== 'otc') {
             message.error("Please use valid user: csp, user");
           } else {
             setUser(values.username);
@@ -226,8 +245,9 @@ export default function App() {
         </Form>
         <Space><i>You have three username depending of the persona you want to use:
           <ul>
-            <li><b>csp</b> for cloud service provider</li>
-            <li><b>user</b> for end user</li>
+            <li><b>csp</b> for cloud service provider admin user</li>
+            <li><b>user</b> for OSC end user</li>
+            <li><b>otc</b> for OTC end user</li>
           </ul>
         </i></Space>
       </Modal>
