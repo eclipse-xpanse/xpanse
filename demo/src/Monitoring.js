@@ -1,112 +1,31 @@
 import { Breadcrumb, Row, Col, Card } from 'antd';
 import { HomeOutlined, MonitorOutlined } from '@ant-design/icons';
-import { Area } from '@ant-design/plots';
+import { Line } from '@ant-design/plots';
 import { Link } from 'react-router-dom';
 
 function Monitoring(props) {
-	const data = [
-  {
-    "time": "08:00",
-    "value": 0,
-    "category": "VM test"
-  },
-  {
-    "time": "08:00",
-    "value": 54,
-    "category": "VM test2"
-  },
-  {
-    "time": "08:00",
-    "value": 0,
-    "category": "Database test"
-  },
-  {
-    "time": "08:00",
-    "value": 0,
-    "category": "Kafka test"
-  },
-  {
-    "time": "08:00",
-    "value": 0,
-    "category": "Kubernetes test"
-  },
-  {
-    "time": "08:30",
-    "value": 0,
-    "category": "VM test"
-  },
-  {
-    "time": "08:30",
-    "value": 54,
-    "category": "VM test2"
-  },
-  {
-    "time": "08:30",
-    "value": 0,
-    "category": "Database test"
-  },
-  {
-    "time": "08:30",
-    "value": 0,
-    "category": "Kafka test"
-  },
-  {
-    "time": "08:30",
-    "value": 0,
-    "category": "Kubernetes test"
-  },
-  {
-    "time": "09:00",
-    "value": 0,
-    "category": "VM test"
-  },
-  {
-    "time": "09:00",
-    "value": 57,
-    "category": "VM test2"
-  },
-  {
-    "time": "09:30",
-    "value": 0,
-    "category": "VM test"
-  },
-  {
-    "time": "09:30",
-    "value": 0,
-    "category": "VM test2"
-  },
-  {
-    "time": "09:30",
-    "value": 0,
-    "category": "Database test"
-  },
-  {
-    "time": "10:00",
-    "value": 0,
-    "category": "VM test"
-  },
-  {
-    "time": "10:00",
-    "value": 59,
-    "category": "VM test2"
-  },
-  {
-    "time": "10:00",
-    "value": 0,
-    "category": "Database test"
-  },
-  {
-    "time": "10:00",
-    "value": 0,
-    "category": "Kubernetes test"
-  },
-  {
-    "time": "10:00",
-    "value": 0,
-    "category": "Kafka test"
-  },
-];
-const config = {
+  var vmData = [];
+  props.vms.forEach((vm) => {
+    var itemData = [
+      { "time": "08:00", "value": 0, "category": "vm-" + vm.name },
+      { "time": "08:30", "value": 10, "category": "vm-" + vm.name },
+      { "time": "09:00", "value": 20, "category": "vm-" + vm.name }
+    ];
+    vmData = vmData.concat(itemData);
+  }); 
+  var rdsData = [];
+  props.rds.forEach((rds) => {
+    var itemData = [
+      { "time": "08:00", "value": 90, "category": "rds-" + rds.name },
+      { "time": "08:30", "value": 30, "category": "rds-" + rds.name },
+      { "time": "09:00", "value": 50, "category": "rds-" + rds.name }
+    ];
+    rdsData = rdsData.concat(itemData);
+  });
+
+  const data = vmData.concat(rdsData);
+
+  const config = {
     data,
     xField: 'time',
     yField: 'value',
@@ -123,13 +42,13 @@ const config = {
 			<Row>
 				<Col span={12}>
 					<Card title="CPU Utilization (%)" bordered={true}>
-						<Area {...config} />
+						<Line {...config} />
 					</Card>
 					// Status check failed (count)
 				</Col>
 				<Col span={12}>
 					<Card title="Network in (bytes)" bordered={true}>
-						<Area {...config} />
+						<Line {...config} />
 					</Card>
 					// network out (bytes)
 				</Col>

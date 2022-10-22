@@ -90,7 +90,7 @@ function Content(props) {
           <Billing vms={props.vms} containers={props.containers} rds={props.rds} kafka={props.kafka} kubernetes={props.kubernetes} rancher={props.rancher} cassandra={props.cassandra} activemq={props.activemq} pulsar={props.pulsar} items={props.items} />
         </Route>
 				<Route path="/monitoring" key="monitoring">
-					<Monitoring />
+					<Monitoring vms={props.vms} rds={props.rds}  />
 				</Route>
 			</Switch>
       </div>
