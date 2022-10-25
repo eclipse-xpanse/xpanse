@@ -48,7 +48,6 @@ OCL is a json descriptor of a managed service, describing the expected final sta
     "base": [
       {
         "name": "ubuntu-x64",
-        "ssh_user": "root",
         "type": "t2.large",
         "filters": {
           "name": "ubuntu-for-osc-*"
@@ -88,7 +87,7 @@ OCL is a json descriptor of a managed service, describing the expected final sta
           "$.network.security[0]"
         ],
         "storage": [
-          "$.storage[0]}"
+          "$.storage[0]"
         ],
         "publicly": true
       }

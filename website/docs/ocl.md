@@ -37,14 +37,14 @@ This is the list of provisioners used by the `image.artifacts`. Each provisioner
 
 ```json
 {
-    "name": "my-kafka-release",
-    "type": "shell",
-    "environment_vars": [
-        "WORK_HOME=/usr1/KAFKA/"
-        ],
-    "inline": [
+  "name": "my-kafka-release",
+  "type": "shell",
+  "environment_vars": [
+    "WORK_HOME=/usr1/KAFKA/"
+  ],
+  "inline": [
     "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar"
-    ]
+  ]
 }
 ```
 
@@ -55,8 +55,7 @@ This block defines a `shell` provisioner which set an environment variable named
 This is the list of base image used by the `image.artifacts`. Each `image.base` has:
 
 * `name` - (Required) The name of the `image.base`.
-* `ssh_user` - (Required) The ssh user for the  `image.base`.
-* `type` - (Required) The type(flavor) of vm, which the image will be use by.
+* `type` - (Required) The type(flavor) of vm, which the image will be used by.
 * `filters` - (Required) The filters to lock the image.
 
 ##### `image.base.filters`
@@ -182,7 +181,6 @@ This is the list of security (groups) defined in the service network. Each secur
     "base": [
       {
         "name": "ubuntu-x64",
-        "ssh_user": "root",
         "type": "t2.large",
         "filters": {
           "name": "ubuntu-for-osc-*"
@@ -190,7 +188,6 @@ This is the list of security (groups) defined in the service network. Each secur
       },
       {
         "name": "centos-x64",
-        "ssh_user": "root",
         "type": "t2.large",
         "filters": {
           "id": "ed2c9ea6-7134-44b9-bbfa-109e0753766e"
