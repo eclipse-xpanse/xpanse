@@ -32,25 +32,37 @@ OCL is a json descriptor of a managed service, describing the expected final sta
     "meta": "data",
     "other": true
   },
-  "artifacts": [
-    {
-      "name": "my-artifact",
-      "type": "jar",
-      "url": "mvn:groupId/artifact/1.6",
-      "properties": {
-        "additional": "property",
-        "another": "one"
+  "image": {
+    "provisioners": [
+      {
+        "name": "my-kafka-release",
+        "type": "shell",
+        "environment_vars": [
+          "WORK_HOME=/usr1/KAFKA/"
+        ],
+        "inline": [
+          "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar"
+        ]
       }
-    },
-    {
-      "name": "another-artifact",
-      "type": "docker",
-      "url": "https://path/to/artifact",
-      "properties": {
-        "one": "property"
+    ],
+    "base": [
+      {
+        "name": "ubuntu-x64",
+        "ssh_user": "root",
+        "type": "t2.large",
+        "filters": {
+          "name": "ubuntu-for-osc-*"
+        }
       }
-    }
-  ],
+    ],
+    "artifacts": [
+      {
+        "name": "kafka_image",
+        "base": "$.image.base[0]",
+        "provisioners": ["$.image.provisioners[0]"]
+      }
+    ]
+  },
   "billing": {
     "model": "flat",
     "period": "monthly",
@@ -64,22 +76,29 @@ OCL is a json descriptor of a managed service, describing the expected final sta
     }
   },
   "compute": {
-    "vm": [{
-      "name": "my-vm",
-      "type": "t2.large",
-      "platform": "linux-x64",
-      "vpc": "$.network.vpc[0]",
-      "subnet": "$.network.subnet[0]",
-      "security": ["$.network.security[0]"],
-      "storage": ["$.storage[0]"],
-      "publicly": true
-    }]
+    "vm": [
+      {
+        "name": "my-vm",
+        "type": "t2.large",
+        "image": "$.image.artifacts[0]",
+        "subnet": [
+          "$.network.subnet[0]"
+        ],
+        "security": [
+          "$.network.security[0]"
+        ],
+        "storage": [
+          "$.storage[0]}"
+        ],
+        "publicly": true
+      }
+    ]
   },
   "network": {
     "vpc": [
       {
         "name": "my-vpc",
-        "cidrs": "172.31.0.0/16"
+        "cidr": "172.31.0.0/16"
       }
     ],
     "subnet": [
