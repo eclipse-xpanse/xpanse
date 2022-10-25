@@ -24,6 +24,53 @@ An artifact is described with:
 
 ## Services Integration
 
+### Image
+
+#### Provisioners
+
+This is the list of provisioners used by the `image.artifacts`. Each provisioner has:
+
+* `name` - (Required) The name of the provisioner.
+* `type` - (Required) The type of the provisioner. Possible values include: `shell`(more type will be coming).
+* `environment_vars` - (Required) The variables for provisioner.
+* `inline` - (Required) The inline attributes for provisioner.
+
+```json
+{
+  "name": "my-kafka-release",
+  "type": "shell",
+  "environment_vars": [
+    "WORK_HOME=/usr1/KAFKA/"
+  ],
+  "inline": [
+    "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar"
+  ]
+}
+```
+
+This block defines a `shell` provisioner which set an environment variable named `WORK_HOME` in the shell execution environment and runs the commands in the `inline` attribute.
+
+#### `image.base`
+
+This is the list of base image used by the `image.artifacts`. Each `image.base` has:
+
+* `name` - (Required) The name of the `image.base`.
+* `type` - (Required) The type(flavor) of vm, which the image will be used by.
+* `filters` - (Required) The filters to lock the image.
+
+##### `image.base.filters`
+
+* `name` - (Optional) The name to filter the image.
+* `id` - (Optional) The identifier to lock the image.
+
+#### Artifacts
+
+This is the list of artifact image. Each `image.base` has:
+
+* `name` - (Required) The name of the artifact image.
+* `base` - (Required) The `JsonPath` of the base images, which the artifact image will be based.
+* `provisioners` - (Required) The `JsonPath` list of the provisioners to build the artifact image.
+
 ### Billing
 
 The `billing` component defines the integration into cloud provider billing system.
@@ -47,9 +94,7 @@ This is the list of VMs used by the service. Each VM has:
 
 * `name` - (Required) The name of the VM.
 * `type` - (Required) The VM type, like `t2.large` for example.
-* `platform` - (Required) The VM image/platform, like `linux-x64` (to be generic).
-* `vpc` - (Required) The `JsonPath` of the VPC.
-* `subnet` - (Required) The `JsonPath` of the Subnet.
+* `subnet` - (Required) A list of `JsonPath` of the `subnet`. The subnet for main Nic must be in the first place.
 * `security` - (Required) A list of `JsonPath` of `security`.
 * `storage` - (Required) A list of `JsonPath` of the `storage`.
 * `publicly` - (Required) The flag to indicate if the VM should be exposed on Internet (`true`) or only local (`false`).
@@ -84,7 +129,7 @@ This is the list of security (groups) defined in the service network. Each secur
 * `priority` - (Required) The priority of the security rule. The lower the priority number, the higher the priority of the rule.
 * `protocol` - (Required) Network protocol this rule applies to. Possible values include: `Tcp`,`Udp`,`Icmp`,`*`(which matches all).
 * `cidr` - (Required) The IP address range this rule applies to. The `*` matches any IP.
-* `direction` - (Required) The direction of the network traffic. Possible values include: `inbound`,`outbound`
+* `direction` - (Required) The direction of the network traffic. Possible values include: `inbound`,`outbound`.
 * `ports` - (Required) (Optional) Specifies the port value range, which supports single port (80), continuous port (1-30) and discontinuous port (22, 3389, 80) The valid port values is range form 1 to 65,535.
 * `action` - (Required) Specifies whether network traffic is allowed or denied. Possible values include: `allow`,`deny`.
 
@@ -120,25 +165,43 @@ This is the list of security (groups) defined in the service network. Each secur
     "meta": "data",
     "other": true
   },
-  "artifacts": [
-    {
-      "name": "my-artifact",
-      "type": "jar",
-      "url": "mvn:groupId/artifact/1.6",
-      "properties": {
-        "additional": "property",
-        "another": "one"
+  "image": {
+    "provisioners": [
+      {
+        "name": "my-kafka-release",
+        "type": "shell",
+        "environment_vars": [
+          "WORK_HOME=/usr1/KAFKA/"
+        ],
+        "inline": [
+          "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar"
+        ]
       }
-    },
-    {
-      "name": "another-artifact",
-      "type": "docker",
-      "url": "https://path/to/artifact",
-      "properties": {
-        "one": "property"
+    ],
+    "base": [
+      {
+        "name": "ubuntu-x64",
+        "type": "t2.large",
+        "filters": {
+          "name": "ubuntu-for-osc-*"
+        }
+      },
+      {
+        "name": "centos-x64",
+        "type": "t2.large",
+        "filters": {
+          "id": "ed2c9ea6-7134-44b9-bbfa-109e0753766e"
+        }
       }
-    }
-  ],
+    ],
+    "artifacts": [
+      {
+        "name": "kafka_image",
+        "base": "$.image.base[0]",
+        "provisioners": ["$.image.provisioners[0]"]
+      }
+    ]
+  },
   "billing": {
     "model": "flat",
     "period": "monthly",
@@ -152,16 +215,23 @@ This is the list of security (groups) defined in the service network. Each secur
     }
   },
   "compute": {
-    "vm": [{
-      "name": "my-vm",
-      "type": "t2.large",
-      "platform": "linux-x64",
-      "vpc": "$.network.vpc[0]",
-      "subnet": "$.network.subnet[0]",
-      "security": ["$.network.security[0]"],
-      "storage": ["$.storage[0]}"],
-      "publicly": true
-    }]
+    "vm": [
+      {
+        "name": "my-vm",
+        "type": "t2.large",
+        "image": "$.image.artifacts[0]",
+        "subnet": [
+          "$.network.subnet[0]"
+        ],
+        "security": [
+          "$.network.security[0]"
+        ],
+        "storage": [
+          "$.storage[0]}"
+        ],
+        "publicly": true
+      }
+    ]
   },
   "network": {
     "vpc": [
@@ -198,11 +268,13 @@ This is the list of security (groups) defined in the service network. Each secur
       }
     ]
   },
-  "storage": [{
-    "name": "my-storage",
-    "type": "ssd",
-    "size": "8GiB" 
-  }],
+  "storage": [
+    {
+      "name": "my-storage",
+      "type": "ssd",
+      "size": "8GiB"
+    }
+  ],
   "console": {
     "backend": "https://...",
     "properties": {
