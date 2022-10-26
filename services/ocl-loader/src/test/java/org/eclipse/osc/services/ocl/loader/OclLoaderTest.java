@@ -25,6 +25,8 @@ public class OclLoaderTest {
         Assertions.assertEquals("instance", ocl.getBilling().getVariableItem());
         Assertions.assertEquals(20.0, ocl.getBilling().getFixedPrice());
         Assertions.assertEquals(10.0, ocl.getBilling().getVariablePrice());
+
+        Assertions.assertEquals("ubuntu-x64", ocl.getImage().getBase().get(0).getName());
     }
 
 }
