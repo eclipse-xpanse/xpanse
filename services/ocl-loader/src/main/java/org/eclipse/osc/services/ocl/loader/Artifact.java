@@ -4,13 +4,13 @@ import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @Data
 public class Artifact {
 
     private String name;
-    private String type;
-    private String url;
-    private Map<String, Object> properties = new HashMap<>();
+    private String base;
+    private List<String> provisioners;
 
 }

@@ -12,7 +12,7 @@ public class Ocl {
     private String category;
     private String namespace;
     private Map<String, Object> properties;
-    private List<Artifact> artifacts;
+    private Image image;
 
     private Billing billing;
     private Compute compute;

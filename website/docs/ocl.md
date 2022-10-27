@@ -227,7 +227,7 @@ This is the list of security (groups) defined in the service network. Each secur
           "$.network.security[0]"
         ],
         "storage": [
-          "$.storage[0]}"
+          "$.storage[0]"
         ],
         "publicly": true
       }
