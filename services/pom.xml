@@ -19,6 +19,7 @@
     <modules>
         <module>ocl-loader</module>
         <module>orchestrator</module>
+        <module>openstack</module>
     </modules>
 
 </project>
