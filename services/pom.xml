@@ -20,6 +20,7 @@
         <module>ocl-loader</module>
         <module>orchestrator</module>
         <module>openstack</module>
+        <module>huaweicloud</module>
     </modules>
 
 </project>
