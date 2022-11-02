@@ -29,4 +29,41 @@ public class OclLoaderTest {
         Assertions.assertEquals("ubuntu-x64", ocl.getImage().getBase().get(0).getName());
     }
 
+    @Test
+    public void testBlockAssociationProvisioner() throws Exception {
+        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
+
+        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
+
+        Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
+
+        Assertions.assertNotNull(ocl);
+
+        String kafka_provisioner_s = ocl.getImage().getArtifacts().get(0).getProvisioners().get(0);
+        Provisioner kafka_provisioner = ocl.referTo(kafka_provisioner_s, Provisioner.class);
+        Assertions.assertEquals("my-kafka-release", kafka_provisioner.getName());
+        Assertions.assertEquals("shell", kafka_provisioner.getType());
+        Assertions.assertEquals("WORK_HOME=/usr1/KAFKA/", kafka_provisioner.getEnvironment_vars().get(0));
+        Assertions.assertEquals("echo $PATH", kafka_provisioner.getInline().get(1));
+    }
+
+    @Test
+    public void testBlockAssociationArtifact() throws Exception {
+        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
+
+        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
+
+        Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
+
+        Assertions.assertNotNull(ocl);
+
+        VM vm = ocl.getCompute().getVm().get(0);
+        Assertions.assertEquals("my-vm", vm.getName());
+        Assertions.assertEquals("$.image.artifacts[0]", vm.getImage());
+
+        Artifact artifact = ocl.referTo(vm.getImage(), Artifact.class);
+        BaseImage base_image = ocl.referTo(artifact.getBase(), BaseImage.class);
+        Assertions.assertEquals("ubuntu-x64", base_image.getName());
+    }
+
 }

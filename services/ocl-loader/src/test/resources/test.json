@@ -19,7 +19,8 @@
           "WORK_HOME=/usr1/KAFKA/"
         ],
         "inline": [
-          "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar"
+          "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar",
+          "echo $PATH"
         ]
       }
     ],
@@ -43,7 +44,7 @@
       {
         "name": "kafka_image",
         "base": "$.image.base[0]",
-        "provisioners": ["/image/provisioners/0"]
+        "provisioners": ["$.image.provisioners[0]"]
       }
     ]
   },
