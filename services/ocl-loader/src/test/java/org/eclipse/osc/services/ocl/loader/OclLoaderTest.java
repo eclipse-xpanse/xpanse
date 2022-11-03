@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OclLoaderTest {
@@ -40,11 +41,11 @@ public class OclLoaderTest {
         Assertions.assertNotNull(ocl);
 
         String kafka_provisioner_s = ocl.getImage().getArtifacts().get(0).getProvisioners().get(0);
-        Provisioner kafka_provisioner = ocl.referTo(kafka_provisioner_s, Provisioner.class);
-        Assertions.assertEquals("my-kafka-release", kafka_provisioner.getName());
-        Assertions.assertEquals("shell", kafka_provisioner.getType());
-        Assertions.assertEquals("WORK_HOME=/usr1/KAFKA/", kafka_provisioner.getEnvironment_vars().get(0));
-        Assertions.assertEquals("echo $PATH", kafka_provisioner.getInline().get(1));
+        Optional<Provisioner> kafka_provisioner = ocl.referTo(kafka_provisioner_s, Provisioner.class);
+        Assertions.assertEquals("my-kafka-release", kafka_provisioner.get().getName());
+        Assertions.assertEquals("shell", kafka_provisioner.get().getType());
+        Assertions.assertEquals("WORK_HOME=/usr1/KAFKA/", kafka_provisioner.get().getEnvironment_vars().get(0));
+        Assertions.assertEquals("echo $PATH", kafka_provisioner.get().getInline().get(1));
     }
 
     @Test
@@ -61,9 +62,9 @@ public class OclLoaderTest {
         Assertions.assertEquals("my-vm", vm.getName());
         Assertions.assertEquals("$.image.artifacts[0]", vm.getImage());
 
-        Artifact artifact = ocl.referTo(vm.getImage(), Artifact.class);
-        BaseImage base_image = ocl.referTo(artifact.getBase(), BaseImage.class);
-        Assertions.assertEquals("ubuntu-x64", base_image.getName());
+        Optional<Artifact> artifact = ocl.referTo(vm.getImage(), Artifact.class);
+        Optional<BaseImage> base_image = ocl.referTo(artifact.get().getBase(), BaseImage.class);
+        Assertions.assertEquals("ubuntu-x64", base_image.get().getName());
     }
 
 }
