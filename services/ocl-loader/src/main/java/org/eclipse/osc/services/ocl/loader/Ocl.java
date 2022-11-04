@@ -6,6 +6,7 @@ import lombok.extern.java.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class Ocl {
                     object = getter.invoke(object);
                 }
             } catch (Exception ex) {
-                log.log(Level.WARNING, ex.getMessage());
+                log.log(Level.WARNING, ex.getMessage() + "\nStack Info:\n" + Arrays.toString(ex.getStackTrace()));
                 return Optional.empty();
             }
         }

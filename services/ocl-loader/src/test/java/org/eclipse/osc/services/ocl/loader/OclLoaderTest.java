@@ -67,4 +67,29 @@ public class OclLoaderTest {
         Assertions.assertEquals("ubuntu-x64", base_image.get().getName());
     }
 
+    @Test
+    public void testJsonParser() throws Exception {
+        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
+
+        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
+
+        Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
+
+        Assertions.assertNotNull(ocl);
+
+        Optional<Artifact> artifact = ocl.referTo("$.xxxxxxxxxxxxxxxxxxxx", Artifact.class);
+        Assertions.assertEquals(true, artifact.isEmpty());
+
+        artifact = ocl.referTo("......xxxxxxxxxxxxxxxxxxxx", Artifact.class);
+        Assertions.assertEquals(true, artifact.isEmpty());
+
+        artifact = ocl.referTo("......xxxxx[1][3232]", Artifact.class);
+        Assertions.assertEquals(true, artifact.isEmpty());
+
+        Optional<Provisioner> provisioner = ocl.referTo("$.image.provisioners[1]", Provisioner.class);
+        Assertions.assertEquals(false, provisioner.isPresent());
+
+        provisioner = ocl.referTo("$.image.provisioners[0]", Provisioner.class);
+        Assertions.assertEquals(true, provisioner.isPresent());
+    }
 }
