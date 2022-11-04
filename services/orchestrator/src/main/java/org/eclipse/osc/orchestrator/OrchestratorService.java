@@ -10,7 +10,6 @@ import org.eclipse.osc.services.ocl.loader.OclLoader;
 
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 @Log
@@ -19,9 +18,7 @@ public class OrchestratorService implements Service {
 
     private List<OrchestratorPlugin> plugins = new ArrayList<>();
 
-    // TODO it should be a persistent storage, not memory
-    // TODO use reentrantlock instead of concurrent set to avoid long wait on threads
-    private Set<String> managedServices = new ConcurrentSkipListSet<>();
+    private OrchestratorStorage storage;
 
     private OclLoader oclLoader;
 
@@ -37,6 +34,12 @@ public class OrchestratorService implements Service {
         oclLoader = serviceRegistry.get(OclLoader.class);
         if (oclLoader == null) {
             throw new IllegalStateException("OCL Loader service is not present");
+        }
+
+        storage = serviceRegistry.get(OrchestratorStorage.class);
+        if (storage == null) {
+            log.warning("No orchestrator storage service found in the service registry, using default in-memory orchestrator storage");
+            storage = new FileOrchestratorStorage();
         }
 
         LifeCycleService lifeCycleService = serviceRegistry.get(LifeCycleService.class);
@@ -61,7 +64,7 @@ public class OrchestratorService implements Service {
         plugins.forEach(plugin -> {
             plugin.registerManagedService(ocl);
         });
-        managedServices.add(ocl.getName());
+        storage.store(ocl.getName());
     }
 
     /**
@@ -85,7 +88,7 @@ public class OrchestratorService implements Service {
      * @throws Exception if start fails.
      */
     public void startManagedService(String managedServiceName) throws Exception {
-        if (!managedServices.contains(managedServiceName)) {
+        if (!storage.exists(managedServiceName)) {
             throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
         plugins.forEach(plugin -> {
@@ -100,7 +103,7 @@ public class OrchestratorService implements Service {
      * @throws Exception if stop fails.
      */
     public void stopManagedService(String managedServiceName) throws Exception {
-        if (!managedServices.contains(managedServiceName)) {
+        if (!storage.exists(managedServiceName)) {
             throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
         plugins.forEach(plugin -> {
@@ -115,13 +118,13 @@ public class OrchestratorService implements Service {
      * @throws Exception if unregister fails.
      */
     public void unregisterManagedService(String managedServiceName) throws Exception {
-        if (!managedServices.contains(managedServiceName)) {
+        if (!storage.exists(managedServiceName)) {
             throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
         plugins.forEach(plugin -> {
             plugin.unregisterManagedService(managedServiceName);
         });
-        managedServices.remove(managedServiceName);
+        storage.remove(managedServiceName);
     }
 
 }

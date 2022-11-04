@@ -1,1 +1,2 @@
 org.eclipse.osc.orchestrator.plugin.openstack.OpenstackOrchestratorPlugin
+org.eclipse.osc.orchestrator.plugin.openstack.SwiftOrchestratorStorage
