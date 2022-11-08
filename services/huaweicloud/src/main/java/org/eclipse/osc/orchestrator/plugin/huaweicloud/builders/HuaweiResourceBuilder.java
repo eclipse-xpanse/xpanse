@@ -7,7 +7,6 @@ import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Log
 public class HuaweiResourceBuilder extends AtomBuilder {
-
     public String name() {
         return "Huawei-Cloud-resource-Builder";
     }

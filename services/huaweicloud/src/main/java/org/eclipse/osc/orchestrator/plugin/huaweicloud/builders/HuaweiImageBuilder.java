@@ -7,7 +7,6 @@ import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Log
 public class HuaweiImageBuilder extends AtomBuilder {
-
     public String name() {
         return "Huawei-Cloud-image-Builder";
     }

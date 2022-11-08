@@ -1,19 +1,18 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
 import org.eclipse.osc.orchestrator.OrchestratorPlugin;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.logging.Level;
-
 @Log
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Service {
-
-    private final HashMap<String, Ocl> managedOcl = new HashMap<String, Ocl>();
+    private final Map<String, Ocl> managedOcl = new HashMap<>();
 
     @Override
     public String name() {
@@ -40,11 +39,12 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     @Override
     public void startManagedService(String managedServiceName) {
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.log(Level.WARNING, "Service: " + managedServiceName +" not registered.");
+            log.log(Level.WARNING, "Service: " + managedServiceName + " not registered.");
             return;
         }
         BuilderFactory factory = new BuilderFactory();
-        Optional<AtomBuilder> optionalAtomBuilder = factory.createBuilder("basic", managedOcl.get(managedServiceName));
+        Optional<AtomBuilder> optionalAtomBuilder =
+            factory.createBuilder("basic", managedOcl.get(managedServiceName));
         BuilderContext ctx = new BuilderContext();
 
         if (optionalAtomBuilder.isEmpty()) {
@@ -59,7 +59,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     @Override
     public void stopManagedService(String managedServiceName) {
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.log(Level.WARNING, "Service: " + managedServiceName +" not registered.");
+            log.log(Level.WARNING, "Service: " + managedServiceName + " not registered.");
             return;
         }
         log.info("Stop managed service " + managedServiceName + " on Huawei Cloud");
@@ -68,7 +68,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     @Override
     public void unregisterManagedService(String managedServiceName) {
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.log(Level.WARNING, "Service: " + managedServiceName +" not registered.");
+            log.log(Level.WARNING, "Service: " + managedServiceName + " not registered.");
             return;
         }
         log.info("Destroy managed service " + managedServiceName + " from Huawei Cloud");

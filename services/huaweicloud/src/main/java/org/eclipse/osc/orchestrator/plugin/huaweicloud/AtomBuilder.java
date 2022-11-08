@@ -1,136 +1,130 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
-import lombok.extern.java.Log;
-import org.eclipse.osc.services.ocl.loader.Ocl;
-
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.java.Log;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.enums.BuilderState;
+import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Log
 public abstract class AtomBuilder {
-
-    public enum State {
-        PENDING,
-        RUNNING,
-        DELETING,
-        SUCCESS,
-        FAILED
-    }
-
     public String name() {
         return "AtomBuilder";
     }
 
-    @Setter@Getter
-    private State state;
+    @Setter
+    @Getter
+    private BuilderState state;
 
-    @Setter@Getter
-    private long timeOut;
+    @Setter
+    @Getter
+    private long timeout = TimeUnit.MICROSECONDS.toSeconds(300);
 
-    @Setter@Getter
+    @Setter
+    @Getter
     private String lastFail;
 
     @Getter
-    private AtomBuilder father;
+    private AtomBuilder parent;
 
-    private final List<AtomBuilder> children;
+    private final List<AtomBuilder> subBuilders = new ArrayList<>();
 
-    private Ocl mOcl;
+    protected final Ocl ocl;
 
     public AtomBuilder(Ocl ocl) {
-        mOcl = ocl;
-        children = new ArrayList<>();
-        setTimeOut(300);
+        this.ocl = ocl;
     }
 
     public void addSubBuilder(AtomBuilder builder) {
-        builder.father = this;
-        children.add(builder);
+        builder.parent = this;
+        subBuilders.add(builder);
     }
 
     public boolean needWaiting() {
-        return state == State.DELETING || state == State.RUNNING;
+        return state == BuilderState.DELETING || state == BuilderState.RUNNING;
     }
 
     public boolean build(BuilderContext ctx) {
-        setState(State.RUNNING);
+        setState(BuilderState.RUNNING);
 
-        for (AtomBuilder subBuilder: children) {
+        for (AtomBuilder subBuilder : subBuilders) {
             if (!subBuilder.build(ctx)) {
-                setState(State.FAILED);
+                setState(BuilderState.FAILED);
                 log.warning("Submit build failed." + subBuilder.name());
                 return false;
             }
         }
 
         long startTime = System.currentTimeMillis();
-        long timeOut = 100 * 1000;
-        if (!children.isEmpty()) {
-            AtomBuilder longest = children.stream().max(Comparator.comparing(AtomBuilder::getTimeOut)).get();
-            timeOut = longest.getTimeOut() * 1000;
+        long timeout = TimeUnit.MICROSECONDS.toSeconds(100);
+        if (!subBuilders.isEmpty()) {
+            timeout = subBuilders.stream()
+                          .max(Comparator.comparing(AtomBuilder::getTimeout))
+                          .get()
+                          .getTimeout();
         }
 
-        while (!children.isEmpty() && children.stream().allMatch(AtomBuilder::needWaiting)) {
+        while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)) {
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException ex) {
                 log.info(ex.getMessage());
             }
 
-            if ((System.currentTimeMillis() - startTime) > timeOut) {
-                setState(State.FAILED);
+            if ((System.currentTimeMillis() - startTime) > timeout) {
+                setState(BuilderState.FAILED);
                 setLastFail("Builder Timeout " + name());
                 return false;
             }
         }
 
-        if (children.stream().anyMatch(builder -> (builder.getState() == State.FAILED))) {
-            setState(State.FAILED);
+        if (subBuilders.stream().anyMatch(builder -> builder.getState() == BuilderState.FAILED)) {
+            setState(BuilderState.FAILED);
             // Todo: give out the specified failed reason with setLastFail().
             return false;
         }
 
         if (!create(ctx)) {
-            setState(State.FAILED);
+            setState(BuilderState.FAILED);
             return false;
-        };
+        }
 
-        setState(State.SUCCESS);
+        setState(BuilderState.SUCCESS);
         return true;
     }
 
     public boolean rollback(BuilderContext ctx) {
-        setState(State.DELETING);
+        setState(BuilderState.DELETING);
 
         if (!destroy(ctx)) {
             log.warning("Builder destroy failed." + name());
             setLastFail("Builder destroy failed." + name());
-            setState(State.FAILED);
+            setState(BuilderState.FAILED);
         } else {
-            setState(State.PENDING);
-        };
+            setState(BuilderState.PENDING);
+        }
 
-        for (AtomBuilder subBuilder: children) {
+        for (AtomBuilder subBuilder : subBuilders) {
             if (!subBuilder.rollback(ctx)) {
-                setState(State.FAILED);
+                setState(BuilderState.FAILED);
             }
         }
 
         long startTime = System.currentTimeMillis();
-        long timeOut = 100 * 1000;
-        if (!children.isEmpty()) {
-            AtomBuilder longest = children.stream().max(Comparator.comparing(AtomBuilder::getTimeOut)).get();
-            timeOut = longest.getTimeOut() * 1000;
+        long timeout = TimeUnit.MICROSECONDS.toSeconds(100);
+        if (!subBuilders.isEmpty()) {
+            timeout = subBuilders.stream()
+                          .max(Comparator.comparing(AtomBuilder::getTimeout))
+                          .get()
+                          .getTimeout();
         }
 
-        while (!children.isEmpty() && children.stream().allMatch(AtomBuilder::needWaiting)
-                && (System.currentTimeMillis() - startTime) <= timeOut) {
-
+        while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)
+            && (System.currentTimeMillis() - startTime) <= timeout) {
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException ex) {
@@ -138,11 +132,10 @@ public abstract class AtomBuilder {
             }
         }
 
-        return getState() == State.PENDING;
+        return getState() == BuilderState.PENDING;
     }
 
     public abstract boolean create(BuilderContext ctx);
 
     public abstract boolean destroy(BuilderContext ctx);
-
 }

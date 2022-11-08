@@ -1,5 +1,8 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import static org.mockito.Mockito.*;
+
+import java.util.stream.Stream;
 import org.apache.karaf.minho.boot.Minho;
 import org.apache.karaf.minho.boot.service.LifeCycleService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
@@ -9,17 +12,11 @@ import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuild
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 import org.eclipse.osc.services.ocl.loader.OclLoader;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.stream.Stream;
-
-import static org.mockito.Mockito.*;
-
 public class HuaweiCloudTest {
-
     private HuaweiEnvBuilder envBuilder;
     private HuaweiImageBuilder imageBuilder;
     private HuaweiResourceBuilder resourceBuilder;
@@ -31,22 +28,30 @@ public class HuaweiCloudTest {
         Ocl ocl = new Ocl();
         ctx = new BuilderContext();
 
-        envBuilder = mock(HuaweiEnvBuilder.class, withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
-        imageBuilder = mock(HuaweiImageBuilder.class, withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
-        resourceBuilder = mock(HuaweiResourceBuilder.class, withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
+        envBuilder = mock(HuaweiEnvBuilder.class,
+            withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
+        imageBuilder = mock(HuaweiImageBuilder.class,
+            withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
+        resourceBuilder = mock(HuaweiResourceBuilder.class,
+            withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
     }
 
     @Test
     public void loadPluginTest() throws Exception {
-        Minho karaf = Minho.builder().loader(() -> Stream.of(new LifeCycleService(), new OclLoader(), new OrchestratorService(), new HuaweiCloudOrchestratorPlugin())).build().start();
+        Minho karaf =
+            Minho.builder()
+                .loader(()
+                            -> Stream.of(new LifeCycleService(), new OclLoader(),
+                                new OrchestratorService(), new HuaweiCloudOrchestratorPlugin()))
+                .build()
+                .start();
 
         ServiceRegistry serviceRegistry = karaf.getServiceRegistry();
         OrchestratorService orchestratorService = serviceRegistry.get(OrchestratorService.class);
 
         Assertions.assertEquals(1, orchestratorService.getPlugins().size());
-        Assertions.assertTrue(orchestratorService.getPlugins().get(0) instanceof HuaweiCloudOrchestratorPlugin);
-
-        HuaweiCloudOrchestratorPlugin huaweiPlugin = (HuaweiCloudOrchestratorPlugin) orchestratorService.getPlugins().get(0);
+        Assertions.assertTrue(
+            orchestratorService.getPlugins().get(0) instanceof HuaweiCloudOrchestratorPlugin);
 
         orchestratorService.registerManagedService("file:./target/test-classes/huawei_test.json");
 
@@ -63,7 +68,7 @@ public class HuaweiCloudTest {
         when(envBuilder.create(any())).thenReturn(true);
         when(imageBuilder.create(any())).thenReturn(true);
         when(resourceBuilder.create(any())).thenReturn(true);
-        Assertions.assertEquals(true, resourceBuilder.build(ctx));
+        Assertions.assertTrue(resourceBuilder.build(ctx));
 
         verify(envBuilder, times(1)).build(ctx);
         verify(envBuilder, times(1)).create(ctx);
@@ -71,7 +76,8 @@ public class HuaweiCloudTest {
 
     @Test
     public void builderTreeTest() {
-        HuaweiEnvBuilder envBuilder2 = mock(HuaweiEnvBuilder.class, withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
+        HuaweiEnvBuilder envBuilder2 = mock(HuaweiEnvBuilder.class,
+            withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
 
         imageBuilder.addSubBuilder(envBuilder);
         imageBuilder.addSubBuilder(envBuilder2);
@@ -80,7 +86,7 @@ public class HuaweiCloudTest {
         when(envBuilder.create(any())).thenReturn(true);
         when(imageBuilder.create(any())).thenReturn(true);
         when(resourceBuilder.create(any())).thenReturn(true);
-        Assertions.assertEquals(true, resourceBuilder.build(ctx));
+        Assertions.assertTrue(resourceBuilder.build(ctx));
 
         verify(envBuilder, times(1)).build(ctx);
         verify(envBuilder, times(1)).create(ctx);
@@ -100,7 +106,7 @@ public class HuaweiCloudTest {
         when(imageBuilder.create(any())).thenReturn(true);
         when(resourceBuilder.create(any())).thenReturn(true);
 
-        Assertions.assertEquals(false, resourceBuilder.build(ctx));
+        Assertions.assertFalse(resourceBuilder.build(ctx));
 
         verify(envBuilder, times(1)).build(ctx);
         verify(envBuilder, times(1)).create(ctx);
@@ -114,7 +120,7 @@ public class HuaweiCloudTest {
         when(envBuilder.destroy(any())).thenReturn(true);
         when(imageBuilder.destroy(any())).thenReturn(true);
         when(resourceBuilder.destroy(any())).thenReturn(true);
-        Assertions.assertEquals(true, resourceBuilder.rollback(ctx));
+        Assertions.assertTrue(resourceBuilder.rollback(ctx));
 
         verify(envBuilder, times(1)).rollback(ctx);
         verify(envBuilder, times(1)).destroy(ctx);
@@ -122,7 +128,8 @@ public class HuaweiCloudTest {
 
     @Test
     public void builderTreeRollbackTest() {
-        HuaweiEnvBuilder envBuilder2 = mock(HuaweiEnvBuilder.class, withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
+        HuaweiEnvBuilder envBuilder2 = mock(HuaweiEnvBuilder.class,
+            withSettings().useConstructor(ocl).defaultAnswer(CALLS_REAL_METHODS));
 
         imageBuilder.addSubBuilder(envBuilder);
         imageBuilder.addSubBuilder(envBuilder2);
@@ -131,7 +138,7 @@ public class HuaweiCloudTest {
         when(envBuilder.destroy(any())).thenReturn(true);
         when(imageBuilder.destroy(any())).thenReturn(true);
         when(resourceBuilder.destroy(any())).thenReturn(true);
-        Assertions.assertEquals(true, resourceBuilder.rollback(ctx));
+        Assertions.assertTrue(resourceBuilder.rollback(ctx));
 
         verify(envBuilder, times(1)).rollback(ctx);
         verify(envBuilder, times(1)).destroy(ctx);
@@ -149,7 +156,7 @@ public class HuaweiCloudTest {
         when(imageBuilder.destroy(any())).thenReturn(true);
         when(resourceBuilder.destroy(any())).thenReturn(true);
 
-        Assertions.assertEquals(false, resourceBuilder.rollback(ctx));
+        Assertions.assertFalse(resourceBuilder.rollback(ctx));
 
         verify(envBuilder, times(1)).rollback(ctx);
         verify(envBuilder, times(1)).destroy(ctx);

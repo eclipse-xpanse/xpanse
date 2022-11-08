@@ -5,11 +5,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public class BuilderContext {
-    private final HashMap<String,Object> ctx = new HashMap<String,Object>();
+    private final Map<String, Object> ctx = new HashMap<>();
 
-    public boolean put(String key, Object object){
+    public void put(String key, Object object) {
         ctx.put(key, object);
-        return true;
     }
 
     public Optional<Object> get(String key) {
