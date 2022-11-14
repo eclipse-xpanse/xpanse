@@ -12,8 +12,3 @@ public class Image {
     private List<Artifact> artifacts;
 
 }
-
-
-
-
-

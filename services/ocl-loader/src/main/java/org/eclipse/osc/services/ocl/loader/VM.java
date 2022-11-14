@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class VM {
+public class VM extends RuntimeBase {
 
     private String name;
     private String type;
