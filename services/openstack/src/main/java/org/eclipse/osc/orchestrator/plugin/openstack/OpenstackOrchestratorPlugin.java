@@ -1,6 +1,6 @@
 package org.eclipse.osc.orchestrator.plugin.openstack;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-@Log
+@Slf4j
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin, Service {
 
     private String authenticationUrl;
@@ -75,8 +75,8 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin, Service 
                 + authenticationDomain + "\" }, \"password\": \""
                 + authenticationPassword + "\" }}}, \"scope\": { \"project\": { \"id\": \""
                 + authenticationProject + "\" }}}}";
-        log.fine("Authentication JSON request:");
-        log.fine(authJson);
+        log.debug("Authentication JSON request:");
+        log.debug(authJson);
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()))) {
             writer.write(authJson);
             writer.flush();
@@ -94,21 +94,21 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin, Service 
 
     @Override
     public void updateManagedService(String managedServiceName, Ocl ocl) {
-        log.info("Updating managed service " + managedServiceName + " on openstack");
+        log.info("Updating managed service {} on openstack", managedServiceName);
     }
 
     @Override
     public void startManagedService(String managedServiceName) {
-        log.info("Start managed service " + managedServiceName + " on openstack");
+        log.info("Start managed service {} on openstack", managedServiceName);
     }
 
     @Override
     public void stopManagedService(String managedServiceName) {
-        log.info("Stop managed service " + managedServiceName + " on openstack");
+        log.info("Stop managed service {} on openstack", managedServiceName);
     }
 
     @Override
     public void unregisterManagedService(String managedServiceName) {
-        log.info("Destroy managed service " + managedServiceName + " from openstack");
+        log.info("Destroy managed service {} from openstack", managedServiceName);
     }
 }

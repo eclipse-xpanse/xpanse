@@ -1,6 +1,6 @@
 package org.eclipse.osc.orchestrator;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
@@ -11,9 +11,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
-@Log
+@Slf4j
 public class FileOrchestratorStorage implements OrchestratorStorage, Service {
 
     public final static String DEFAULT_FILENAME = "orchestrator.properties";
@@ -66,7 +65,7 @@ public class FileOrchestratorStorage implements OrchestratorStorage, Service {
         try {
             properties.save(new FileOutputStream(file), null);
         } catch (Exception e) {
-            log.severe("Can't save orchestrator state: " + e.getMessage());
+            log.warn("Can't save orchestrator state", e);
         }
     }
 

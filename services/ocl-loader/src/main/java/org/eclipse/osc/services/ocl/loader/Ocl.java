@@ -2,9 +2,8 @@ package org.eclipse.osc.services.ocl.loader;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Log
+@Slf4j
 @Data
 public class Ocl {
 
@@ -35,7 +34,7 @@ public class Ocl {
     public <T> Optional<T> referTo(String jsonPath, Class<T> valueType) {
 
         if (!jsonPath.startsWith("$.")) {
-            log.log(Level.WARNING, jsonPath + "is not a valid JsonPath.");
+            log.warn("{} is not a valid JsonPath.", jsonPath);
             return Optional.empty();
         }
 
@@ -59,7 +58,7 @@ public class Ocl {
                     object = getter.invoke(object);
                 }
             } catch (Exception ex) {
-                log.log(Level.WARNING, ex.getMessage() + "\nStack Info:\n" + Arrays.toString(ex.getStackTrace()));
+                log.warn("Refer failed", ex);
                 return Optional.empty();
             }
         }
@@ -67,7 +66,7 @@ public class Ocl {
         if (object.getClass() == valueType) {
             return Optional.ofNullable((T) object);
         } else {
-            log.log(Level.WARNING, "Not the same type. Please check your JsonPath.");
+            log.warn("Not the same type. Please check your JsonPath.");
             return Optional.empty();
         }
     }

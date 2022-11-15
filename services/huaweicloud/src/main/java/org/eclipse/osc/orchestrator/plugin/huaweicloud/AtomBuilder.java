@@ -55,7 +55,7 @@ public abstract class AtomBuilder {
         for (AtomBuilder subBuilder : subBuilders) {
             if (!subBuilder.build(ctx)) {
                 setState(BuilderState.FAILED);
-                log.warn("Submit build failed." + subBuilder.name());
+                log.warn("Submit build failed {}", subBuilder.name());
                 return false;
             }
         }
@@ -73,7 +73,7 @@ public abstract class AtomBuilder {
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException ex) {
-                log.info(ex.getMessage());
+                log.warn("Timeout", ex);
             }
 
             if ((System.currentTimeMillis() - startTime) > timeout) {
@@ -102,7 +102,7 @@ public abstract class AtomBuilder {
         setState(BuilderState.DELETING);
 
         if (!destroy(ctx)) {
-            log.warn("Builder destroy failed." + name());
+            log.warn("Builder destroy failed: {}", name());
             setLastFail("Builder destroy failed." + name());
             setState(BuilderState.FAILED);
         } else {
@@ -129,7 +129,7 @@ public abstract class AtomBuilder {
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException ex) {
-                log.info(ex.getMessage());
+                log.info("Timeout", ex);
             }
         }
 
