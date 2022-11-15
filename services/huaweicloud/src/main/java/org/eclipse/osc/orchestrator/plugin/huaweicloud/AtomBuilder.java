@@ -6,11 +6,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.enums.BuilderState;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
-@Log
+@Slf4j
 public abstract class AtomBuilder {
     public String name() {
         return "AtomBuilder";
@@ -54,7 +55,7 @@ public abstract class AtomBuilder {
         for (AtomBuilder subBuilder : subBuilders) {
             if (!subBuilder.build(ctx)) {
                 setState(BuilderState.FAILED);
-                log.warning("Submit build failed." + subBuilder.name());
+                log.warn("Submit build failed." + subBuilder.name());
                 return false;
             }
         }
@@ -63,9 +64,9 @@ public abstract class AtomBuilder {
         long timeout = TimeUnit.MICROSECONDS.toSeconds(100);
         if (!subBuilders.isEmpty()) {
             timeout = subBuilders.stream()
-                          .max(Comparator.comparing(AtomBuilder::getTimeout))
-                          .get()
-                          .getTimeout();
+                    .max(Comparator.comparing(AtomBuilder::getTimeout))
+                    .get()
+                    .getTimeout();
         }
 
         while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)) {
@@ -101,7 +102,7 @@ public abstract class AtomBuilder {
         setState(BuilderState.DELETING);
 
         if (!destroy(ctx)) {
-            log.warning("Builder destroy failed." + name());
+            log.warn("Builder destroy failed." + name());
             setLastFail("Builder destroy failed." + name());
             setState(BuilderState.FAILED);
         } else {
@@ -118,13 +119,13 @@ public abstract class AtomBuilder {
         long timeout = TimeUnit.MICROSECONDS.toSeconds(100);
         if (!subBuilders.isEmpty()) {
             timeout = subBuilders.stream()
-                          .max(Comparator.comparing(AtomBuilder::getTimeout))
-                          .get()
-                          .getTimeout();
+                    .max(Comparator.comparing(AtomBuilder::getTimeout))
+                    .get()
+                    .getTimeout();
         }
 
         while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)
-            && (System.currentTimeMillis() - startTime) <= timeout) {
+                && (System.currentTimeMillis() - startTime) <= timeout) {
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException ex) {

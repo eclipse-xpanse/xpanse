@@ -1,12 +1,14 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
-@Log
+@Slf4j
 public class HuaweiImageBuilder extends AtomBuilder {
+    @Override
     public String name() {
         return "Huawei-Cloud-image-Builder";
     }
