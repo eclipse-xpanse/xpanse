@@ -24,12 +24,21 @@
                 <version>${minho.version}</version>
                 <executions>
                     <execution>
-                        <id>package</id>
+                        <id>osc-huaweicloud</id>
                         <goals>
                             <goal>package</goal>
                         </goals>
                         <configuration>
-                            <minhoBuild>${project.basedir}/src/main/resources/minho-build.json</minhoBuild>
+                            <minhoBuild>src/main/resources/osc-huaweicloud.json</minhoBuild>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>osc-openstack</id>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                        <configuration>
+                            <minhoBuild>src/main/resources/osc-openstack.json</minhoBuild>
                         </configuration>
                     </execution>
                 </executions>
