@@ -1,15 +1,16 @@
 {
-  "name": "open-services-cloud",
+  "name": "osc-openstack",
   "properties": {
-    "base.directory": "target/runtime/osc",
+    "base.directory": "target/runtime/osc-openstack",
     "include.transitive": true
   },
   "dependencies": [
-    "k5:karaf-boot",
-    "k5:karaf-banner",
+    "minho:minho-boot",
+    "minho:minho-banner",
     "mvn:org.slf4j/slf4j-jdk14/2.0.3",
     "mvn:org.eclipse.osc.services/ocl-loader/1.0.0-SNAPSHOT",
     "mvn:org.eclipse.osc.services/orchestrator/1.0.0-SNAPSHOT",
+    "mvn:org.eclipse.osc.services/openstack/1.0.0-SNAPSHOT",
     "file:src/main/resources/banner.txt"
   ]
 }
