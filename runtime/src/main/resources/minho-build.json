@@ -7,6 +7,7 @@
   "dependencies": [
     "k5:karaf-boot",
     "k5:karaf-banner",
+    "mvn:org.slf4j/slf4j-jdk14/2.0.3",
     "mvn:org.eclipse.osc.services/ocl-loader/1.0.0-SNAPSHOT",
     "mvn:org.eclipse.osc.services/orchestrator/1.0.0-SNAPSHOT",
     "file:src/main/resources/banner.txt"

@@ -1,7 +1,7 @@
 package org.eclipse.osc.orchestrator;
 
 import lombok.Data;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.LifeCycleService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Log
+@Slf4j
 @Data
 public class OrchestratorService implements Service {
 
@@ -38,7 +38,7 @@ public class OrchestratorService implements Service {
 
         storage = serviceRegistry.get(OrchestratorStorage.class);
         if (storage == null) {
-            log.warning("No orchestrator storage service found in the service registry, using default in-memory orchestrator storage");
+            log.warn("No orchestrator storage service found in the service registry, using default in-memory orchestrator storage");
             storage = new FileOrchestratorStorage();
         }
 
