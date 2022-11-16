@@ -1,21 +1,25 @@
 package org.eclipse.osc.services.ocl.loader;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.extern.java.Log;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.lang.reflect.InvocationTargetException;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Log
+@Slf4j
 @Data
 public class Ocl {
 
@@ -31,18 +35,41 @@ public class Ocl {
     private List<Storage> storage;
     private Console console;
 
+    private static ObjectMapper theMapper = new ObjectMapper();
+
+    /**
+     * an OCL object might be passed to different plugins for processing,
+     * in case any plugin want to change the property of Ocl, we should not change
+     * the original
+     * Object, we should change a deep copy. The method is for deep copy
+     * 
+     * @return
+     */
+    public Ocl deepCopy() {
+        try {
+            StringWriter out = new StringWriter();
+            theMapper.writeValue(out, this);
+            return theMapper.readValue(new StringReader(out.toString()), Ocl.class);
+        } catch (IOException ex) {
+            // Should not happen , since we don't actually touch any real I/O device
+            throw new IllegalStateException("Deep copy failed", ex);
+
+        }
+    }
+
     @JsonIgnore
+    @SuppressWarnings("unchecked")
     public <T> Optional<T> referTo(String jsonPath, Class<T> valueType) {
 
         if (!jsonPath.startsWith("$.")) {
-            log.log(Level.WARNING, jsonPath + "is not a valid JsonPath.");
+            log.warn(jsonPath + "is not a valid JsonPath.");
             return Optional.empty();
         }
 
         Matcher matcher = Pattern.compile("([A-Za-z_0-9]+(?=[$\\.\\[\\]]{1}))").matcher(jsonPath);
 
         Object object = this;
-        while(matcher.find()) {
+        while (matcher.find()) {
             String matchStr = matcher.group();
             if (matchStr.equals("$")) {
                 continue;
@@ -53,13 +80,13 @@ public class Ocl {
                     Integer index = Integer.parseInt(matchStr);
                     Method getter = object.getClass().getDeclaredMethod("get", int.class);
                     object = getter.invoke(object, index);
-                } catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     Method getter = object.getClass().getDeclaredMethod("get" +
-                            matchStr.substring(0,1).toUpperCase(Locale.ROOT) + matchStr.substring(1));
+                            matchStr.substring(0, 1).toUpperCase(Locale.ROOT) + matchStr.substring(1));
                     object = getter.invoke(object);
                 }
             } catch (Exception ex) {
-                log.log(Level.WARNING, ex.getMessage() + "\nStack Info:\n" + Arrays.toString(ex.getStackTrace()));
+                log.error(ex.getMessage() + "\nStack Info:\n", ex);
                 return Optional.empty();
             }
         }
@@ -67,7 +94,7 @@ public class Ocl {
         if (object.getClass() == valueType) {
             return Optional.ofNullable((T) object);
         } else {
-            log.log(Level.WARNING, "Not the same type. Please check your JsonPath.");
+            log.warn("Not the same type. Please check your JsonPath.");
             return Optional.empty();
         }
     }
