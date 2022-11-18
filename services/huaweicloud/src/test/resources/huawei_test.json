@@ -43,7 +43,9 @@
       {
         "name": "kafka_image",
         "base": "$.image.base[0]",
-        "provisioners": ["/image/provisioners/0"]
+        "provisioners": [
+          "/image/provisioners/0"
+        ]
       }
     ]
   },
@@ -51,7 +53,7 @@
     "vm": [
       {
         "name": "my-vm",
-        "type": "t2.large",
+        "type": "c7.large.4",
         "image": "$.image.artifacts[0]",
         "subnet": [
           "$.network.subnet[0]"
@@ -69,41 +71,39 @@
   "network": {
     "vpc": [
       {
-        "name": "my-vpc",
-        "cidr": "172.31.0.0/16"
-      },
-      {
-        "name": "my-another-vpc",
-        "cidr": "172.32.0.0/16"
+        "name": "osc-vpc",
+        "cidr": "10.10.0.0/16"
       }
     ],
     "subnet": [
       {
-        "name": "my-subnet",
+        "name": "osc-subnet",
         "vpc": "$.network.vpc[0]",
-        "cidr": "172.31.1.0/24"
+        "cidr": "10.10.1.0/24"
       }
     ],
     "security": [
       {
-        "name": "my-sg",
+        "name": "osc_sg",
         "rules": [
           {
-            "name": "my-app-msg",
+            "name": "osc_sg_kafka",
             "priority": 1,
-            "protocol": "TCP",
-            "cidr": "172.31.2.0/24",
+            "protocol": "tcp",
+            "cidr": "10.10.2.0/24",
             "direction": "inbound",
-            "ports": "3389",
+            "ports": "3389, 4200-4300",
             "action": "allow"
           }
         ]
       }
     ]
   },
-  "storage": [{
-    "name": "my-storage",
-    "type": "ssd",
-    "size": "8GiB"
-  }]
+  "storage": [
+    {
+      "name": "my-storage",
+      "type": "ssd",
+      "size": "8GiB"
+    }
+  ]
 }

@@ -7,12 +7,12 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.enums.BuilderState;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Slf4j
 public abstract class AtomBuilder {
+
     public String name() {
         return "AtomBuilder";
     }
@@ -55,7 +55,7 @@ public abstract class AtomBuilder {
         for (AtomBuilder subBuilder : subBuilders) {
             if (!subBuilder.build(ctx)) {
                 setState(BuilderState.FAILED);
-                log.warn("Submit build failed {}", subBuilder.name());
+                log.error("Submit builder: {} failed.", subBuilder.name());
                 return false;
             }
         }
@@ -102,7 +102,7 @@ public abstract class AtomBuilder {
         setState(BuilderState.DELETING);
 
         if (!destroy(ctx)) {
-            log.warn("Builder destroy failed: {}", name());
+            log.error("Builder: {} destroy failed.", name());
             setLastFail("Builder destroy failed." + name());
             setState(BuilderState.FAILED);
         } else {

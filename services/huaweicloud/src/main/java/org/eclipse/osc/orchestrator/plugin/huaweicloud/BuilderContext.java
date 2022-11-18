@@ -2,20 +2,13 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.karaf.minho.boot.service.ConfigService;
 
-public class BuilderContext {
-    private final Map<String, Object> ctx = new HashMap<>();
+public class BuilderContext extends HashMap<String, Map<String, String>> {
 
-    public void put(String key, Object object) {
-        ctx.put(key, object);
-    }
-
-    public Optional<Object> get(String key) {
-        if (ctx.containsKey(key)) {
-            return Optional.ofNullable(ctx.get(key));
-        }
-
-        return Optional.empty();
-    }
+    @Getter
+    @Setter
+    private ConfigService config;
 }
