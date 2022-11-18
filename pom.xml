@@ -47,6 +47,12 @@
                 <scope>provided</scope>
             </dependency>
 
+
+            <dependency>
+                <groupId>org.apache.karaf.minho</groupId>
+                <artifactId>minho-banner</artifactId>
+                <version>${minho.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.karaf.minho</groupId>
                 <artifactId>minho-boot</artifactId>
@@ -54,7 +60,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.karaf.minho</groupId>
-                <artifactId>minho-banner</artifactId>
+                <artifactId>minho-http</artifactId>
+                <version>${minho.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.karaf.minho</groupId>
+                <artifactId>minho-rest</artifactId>
                 <version>${minho.version}</version>
             </dependency>
 
