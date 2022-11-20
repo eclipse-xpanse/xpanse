@@ -1,6 +1,7 @@
 package org.eclipse.osc.services.ocl.loader;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+
 import java.lang.reflect.Method;
 
 import java.util.List;
@@ -62,7 +64,7 @@ public class Ocl {
     public <T> Optional<T> referTo(String jsonPath, Class<T> valueType) {
 
         if (!jsonPath.startsWith("$.")) {
-            log.warn(jsonPath + "is not a valid JsonPath.");
+            log.warn("{} is not a valid JsonPath.", jsonPath);
             return Optional.empty();
         }
 
@@ -86,7 +88,8 @@ public class Ocl {
                     object = getter.invoke(object);
                 }
             } catch (Exception ex) {
-                log.error(ex.getMessage() + "\nStack Info:\n", ex);
+
+                log.warn("Refer failed", ex);
                 return Optional.empty();
             }
         }

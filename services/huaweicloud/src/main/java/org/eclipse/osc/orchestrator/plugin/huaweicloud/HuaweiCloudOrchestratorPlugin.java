@@ -34,13 +34,13 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     @Override
     public void updateManagedService(String managedServiceName, Ocl ocl) {
         managedOcl.put(managedServiceName, ocl);
-        log.info("Updating managed service " + managedServiceName + " on Huawei Cloud");
+        log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
     }
 
     @Override
     public void startManagedService(String managedServiceName) {
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.warn("Service: " + managedServiceName + " not registered.");
+            log.warn("Service: {} not registered.", managedServiceName);
             return;
         }
         BuilderFactory factory = new BuilderFactory();
@@ -53,24 +53,24 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         }
         optionalAtomBuilder.get().build(ctx);
 
-        log.info("Start managed service " + managedServiceName + " on Huawei Cloud");
+        log.info("Start managed service {} on Huawei Cloud", managedServiceName);
     }
 
     @Override
     public void stopManagedService(String managedServiceName) {
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.warn("Service: " + managedServiceName + " not registered.");
+            log.warn("Service: {} not registered.", managedServiceName);
             return;
         }
-        log.info("Stop managed service " + managedServiceName + " on Huawei Cloud");
+        log.info("Stop managed service {} on Huawei Cloud", managedServiceName);
     }
 
     @Override
     public void unregisterManagedService(String managedServiceName) {
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.warn("Service: " + managedServiceName + " not registered.");
+            log.warn("Service: {} not registered.", managedServiceName);
             return;
         }
-        log.info("Destroy managed service " + managedServiceName + " from Huawei Cloud");
+        log.info("Destroy managed service {} from Huawei Cloud", managedServiceName);
     }
 }
