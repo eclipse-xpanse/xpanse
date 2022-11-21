@@ -32,14 +32,14 @@ This is the list of provisioners used by the `image.artifacts`. Each provisioner
 
 * `name` - (Required) The name of the provisioner.
 * `type` - (Required) The type of the provisioner. Possible values include: `shell`(more type will be coming).
-* `environment_vars` - (Required) The variables for provisioner.
+* `environments` - (Required) The variables for provisioner.
 * `inline` - (Required) The inline attributes for provisioner.
 
 ```json
 {
   "name": "my-kafka-release",
   "type": "shell",
-  "environment_vars": [
+  "environments": [
     "WORK_HOME=/usr1/KAFKA/"
   ],
   "inline": [

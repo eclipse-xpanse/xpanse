@@ -15,7 +15,7 @@
       {
         "name": "my-kafka-release",
         "type": "shell",
-        "environment_vars": [
+        "environments": [
           "WORK_HOME=/usr1/KAFKA/"
         ],
         "inline": [

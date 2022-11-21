@@ -58,6 +58,33 @@ public abstract class AtomBuilder {
         return state == BuilderState.DELETING || state == BuilderState.RUNNING;
     }
 
+    private boolean waitSubBuilders() {
+        long startTime = System.currentTimeMillis();
+        long timeToWait = TimeUnit.MICROSECONDS.toSeconds(100);
+        if (!subBuilders.isEmpty()) {
+            timeToWait = subBuilders.stream()
+                .max(Comparator.comparing(AtomBuilder::getTimeout))
+                .get()
+                .getTimeout();
+        }
+
+        while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)) {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException ex) {
+                log.warn("Timeout", ex);
+                Thread.currentThread().interrupt();
+            }
+
+            if ((System.currentTimeMillis() - startTime) > timeToWait) {
+                setState(BuilderState.FAILED);
+                setLastFail("Builder Timeout " + name());
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Builders will be started in sequence. Util all the sub builders going to be successful. Then
      * the current builder will start to build.
@@ -76,27 +103,9 @@ public abstract class AtomBuilder {
             }
         }
 
-        long startTime = System.currentTimeMillis();
-        long timeout = TimeUnit.MICROSECONDS.toSeconds(100);
-        if (!subBuilders.isEmpty()) {
-            timeout = subBuilders.stream()
-                .max(Comparator.comparing(AtomBuilder::getTimeout))
-                .get()
-                .getTimeout();
-        }
-
-        while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)) {
-            try {
-                TimeUnit.SECONDS.sleep(5);
-            } catch (InterruptedException ex) {
-                log.warn("Timeout", ex);
-            }
-
-            if ((System.currentTimeMillis() - startTime) > timeout) {
-                setState(BuilderState.FAILED);
-                setLastFail("Builder Timeout " + name());
-                return false;
-            }
+        if (!waitSubBuilders()) {
+            log.error("Wait sub builders failed.");
+            return false;
         }
 
         if (subBuilders.stream().anyMatch(builder -> builder.getState() == BuilderState.FAILED)) {
@@ -138,22 +147,8 @@ public abstract class AtomBuilder {
             }
         }
 
-        long startTime = System.currentTimeMillis();
-        long timeout = TimeUnit.MICROSECONDS.toSeconds(100);
-        if (!subBuilders.isEmpty()) {
-            timeout = subBuilders.stream()
-                .max(Comparator.comparing(AtomBuilder::getTimeout))
-                .get()
-                .getTimeout();
-        }
-
-        while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)
-            && (System.currentTimeMillis() - startTime) <= timeout) {
-            try {
-                TimeUnit.SECONDS.sleep(5);
-            } catch (InterruptedException ex) {
-                log.info("Timeout", ex);
-            }
+        if (!waitSubBuilders()) {
+            log.error("Wait sub builders failed.");
         }
 
         return getState() == BuilderState.PENDING;
