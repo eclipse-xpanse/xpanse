@@ -2,6 +2,7 @@
 .project
 .classpath
 .settings
+.vscode
 target
 eclipse-classes
 atlassian-ide-plugin.xml
