@@ -40,15 +40,31 @@ public abstract class AtomBuilder {
         this.ocl = ocl;
     }
 
+    /**
+     * Add a sub-builder for this. The current builder will not start to build until all the sub
+     * builders were successfully built.
+     */
     public void addSubBuilder(AtomBuilder builder) {
         builder.parent = this;
         subBuilders.add(builder);
     }
 
-    public boolean needWaiting() {
+    /**
+     * If return true, that means the builder is working in progress.
+     *
+     * @return Ether or not need to be waiting.
+     */
+    private boolean needWaiting() {
         return state == BuilderState.DELETING || state == BuilderState.RUNNING;
     }
 
+    /**
+     * Builders will be started in sequence. Util all the sub builders going to be successful. Then
+     * the current builder will start to build.
+     *
+     * @param ctx The building context for the whole building progress.
+     * @return The building result, true or false. More detailed state will be present by @state.
+     */
     public boolean build(BuilderContext ctx) {
         setState(BuilderState.RUNNING);
 
@@ -64,9 +80,9 @@ public abstract class AtomBuilder {
         long timeout = TimeUnit.MICROSECONDS.toSeconds(100);
         if (!subBuilders.isEmpty()) {
             timeout = subBuilders.stream()
-                    .max(Comparator.comparing(AtomBuilder::getTimeout))
-                    .get()
-                    .getTimeout();
+                .max(Comparator.comparing(AtomBuilder::getTimeout))
+                .get()
+                .getTimeout();
         }
 
         while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)) {
@@ -98,6 +114,13 @@ public abstract class AtomBuilder {
         return true;
     }
 
+    /**
+     * Builders will be started to roll back in sequence. The current builder will begin to roll
+     * back first. Due to the try-my-best strategy, the @rollback() result may be ignored.
+     *
+     * @param ctx The building context for the whole building progress.
+     * @return The rollback result, true or false. More detailed state will be present by @state.
+     */
     public boolean rollback(BuilderContext ctx) {
         setState(BuilderState.DELETING);
 
@@ -119,13 +142,13 @@ public abstract class AtomBuilder {
         long timeout = TimeUnit.MICROSECONDS.toSeconds(100);
         if (!subBuilders.isEmpty()) {
             timeout = subBuilders.stream()
-                    .max(Comparator.comparing(AtomBuilder::getTimeout))
-                    .get()
-                    .getTimeout();
+                .max(Comparator.comparing(AtomBuilder::getTimeout))
+                .get()
+                .getTimeout();
         }
 
         while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)
-                && (System.currentTimeMillis() - startTime) <= timeout) {
+            && (System.currentTimeMillis() - startTime) <= timeout) {
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException ex) {
@@ -136,7 +159,19 @@ public abstract class AtomBuilder {
         return getState() == BuilderState.PENDING;
     }
 
+    /**
+     * Creating actions for current builder.
+     *
+     * @param ctx The building context for the whole building progress.
+     * @return The creating result, true or false.
+     */
     public abstract boolean create(BuilderContext ctx);
 
+    /**
+     * Destroying actions for current builder.
+     *
+     * @param ctx The building context for the whole building progress.
+     * @return The creating result, true or false.
+     */
     public abstract boolean destroy(BuilderContext ctx);
 }
