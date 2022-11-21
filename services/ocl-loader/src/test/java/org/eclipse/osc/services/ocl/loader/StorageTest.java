@@ -14,6 +14,7 @@ public class StorageTest {
         storage.setName("sameName");
         anotherStorage.setName("sameName");
         Assertions.assertNotEquals(storage, anotherStorage);
+        Assertions.assertNotEquals(storage.hashCode(), anotherStorage.hashCode());
     }
 
 }
