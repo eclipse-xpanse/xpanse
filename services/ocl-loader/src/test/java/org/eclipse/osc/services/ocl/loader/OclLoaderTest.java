@@ -40,12 +40,14 @@ public class OclLoaderTest {
 
         Assertions.assertNotNull(ocl);
 
-        String kafka_provisioner_s = ocl.getImage().getArtifacts().get(0).getProvisioners().get(0);
-        Optional<Provisioner> kafka_provisioner = ocl.referTo(kafka_provisioner_s, Provisioner.class);
-        Assertions.assertEquals("my-kafka-release", kafka_provisioner.get().getName());
-        Assertions.assertEquals("shell", kafka_provisioner.get().getType());
-        Assertions.assertEquals("WORK_HOME=/usr1/KAFKA/", kafka_provisioner.get().getEnvironment_vars().get(0));
-        Assertions.assertEquals("echo $PATH", kafka_provisioner.get().getInline().get(1));
+        String KafkaProvisionerStr = ocl.getImage().getArtifacts().get(0).getProvisioners().get(0);
+        Optional<Provisioner> kafkaProvisioner = ocl.referTo(KafkaProvisionerStr,
+            Provisioner.class);
+        Assertions.assertEquals("my-kafka-release", kafkaProvisioner.get().getName());
+        Assertions.assertEquals("shell", kafkaProvisioner.get().getType());
+        Assertions.assertEquals("WORK_HOME=/usr1/KAFKA/",
+            kafkaProvisioner.get().getEnvironments().get(0));
+        Assertions.assertEquals("echo $PATH", kafkaProvisioner.get().getInline().get(1));
     }
 
     @Test
@@ -63,8 +65,8 @@ public class OclLoaderTest {
         Assertions.assertEquals("$.image.artifacts[0]", vm.getImage());
 
         Optional<Artifact> artifact = ocl.referTo(vm.getImage(), Artifact.class);
-        Optional<BaseImage> base_image = ocl.referTo(artifact.get().getBase(), BaseImage.class);
-        Assertions.assertEquals("ubuntu-x64", base_image.get().getName());
+        Optional<BaseImage> baseImage = ocl.referTo(artifact.get().getBase(), BaseImage.class);
+        Assertions.assertEquals("ubuntu-x64", baseImage.get().getName());
     }
 
     @Test
@@ -86,7 +88,8 @@ public class OclLoaderTest {
         artifact = ocl.referTo("......xxxxx[1][3232]", Artifact.class);
         Assertions.assertEquals(true, artifact.isEmpty());
 
-        Optional<Provisioner> provisioner = ocl.referTo("$.image.provisioners[1]", Provisioner.class);
+        Optional<Provisioner> provisioner = ocl.referTo("$.image.provisioners[1]",
+            Provisioner.class);
         Assertions.assertEquals(false, provisioner.isPresent());
 
         provisioner = ocl.referTo("$.image.provisioners[0]", Provisioner.class);

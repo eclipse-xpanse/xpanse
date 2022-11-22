@@ -7,6 +7,7 @@ import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBu
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
 public class BuilderFactory {
+
     public Optional<AtomBuilder> createBuilder(String builderType, Ocl ocl) {
         if (builderType.equals("basic")) {
             HuaweiEnvBuilder envBuilder = new HuaweiEnvBuilder(ocl);
@@ -18,7 +19,6 @@ public class BuilderFactory {
 
             return Optional.of(resourceBuilder);
         }
-
         return Optional.empty();
     }
 }

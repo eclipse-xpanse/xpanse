@@ -37,7 +37,7 @@ OCL is a json descriptor of a managed service, describing the expected final sta
       {
         "name": "my-kafka-release",
         "type": "shell",
-        "environment_vars": [
+        "environments": [
           "WORK_HOME=/usr1/KAFKA/"
         ],
         "inline": [
@@ -58,7 +58,9 @@ OCL is a json descriptor of a managed service, describing the expected final sta
       {
         "name": "kafka_image",
         "base": "$.image.base[0]",
-        "provisioners": ["$.image.provisioners[0]"]
+        "provisioners": [
+          "$.image.provisioners[0]"
+        ]
       }
     ]
   },
