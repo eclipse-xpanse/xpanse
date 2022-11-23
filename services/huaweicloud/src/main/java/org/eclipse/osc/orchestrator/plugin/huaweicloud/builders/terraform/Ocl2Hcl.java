@@ -59,7 +59,7 @@ class Ocl2Hcl {
             || ocl.getNetwork() == null
             || ocl.getNetwork().getSecurity() == null
             || ocl.getNetwork().getSecurity().get(0).getRules() == null) {
-            return "Invalid Security Group Rule";
+            throw new IllegalArgumentException("Invalid Security Group Rule");
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -94,7 +94,7 @@ class Ocl2Hcl {
         if (ocl == null
             || ocl.getNetwork() == null
             || ocl.getNetwork().getSecurity() == null) {
-            return "Invalid Security Group";
+            throw new IllegalArgumentException();
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -111,7 +111,7 @@ class Ocl2Hcl {
         if (ocl == null
             || ocl.getNetwork() == null
             || ocl.getNetwork().getVpc() == null) {
-            return "Invalid VPC";
+            throw new IllegalArgumentException();
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -129,7 +129,7 @@ class Ocl2Hcl {
         if (ocl == null
             || ocl.getNetwork() == null
             || ocl.getNetwork().getSubnet() == null) {
-            return "Invalid VPC subnet";
+            throw new IllegalArgumentException();
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -158,14 +158,23 @@ class Ocl2Hcl {
     }
 
     public String getHclAvailabilityZone() {
+        if (ocl == null) {
+            throw new IllegalArgumentException();
+        }
         return "";
     }
 
     public String getHclFlavor() {
+        if (ocl == null) {
+            throw new IllegalArgumentException();
+        }
         return "";
     }
 
     public String getHclImage() {
+        if (ocl == null) {
+            throw new IllegalArgumentException();
+        }
         return "";
     }
 
@@ -173,7 +182,7 @@ class Ocl2Hcl {
         if (ocl == null
             || ocl.getCompute() == null
             || ocl.getCompute().getVm() == null) {
-            return "Invalid Compute VM";
+            throw new IllegalArgumentException();
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -216,7 +225,7 @@ class Ocl2Hcl {
 
     public String getHclStorage() {
         if (ocl == null || ocl.getStorage() == null) {
-            return "";
+            throw new IllegalArgumentException();
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -234,21 +243,16 @@ class Ocl2Hcl {
     }
 
     public String getHcl() {
-        try {
-            String hcl;
-            hcl = getHclSecurityGroup();
-            hcl += getHclSecurityGroupRule();
-            hcl += getHclVpc();
-            hcl += getHclVm();
-            hcl += getHclVpcSubnet();
-            hcl += getHclFlavor();
-            hcl += getHclImage();
-            hcl += getHclAvailabilityZone();
-            hcl += getHclStorage();
-            return hcl;
-        } catch (Exception ex) {
-            log.error("Ocl2Hcl failed. Please check you OCL.", ex);
-            return "";
-        }
+        String hcl;
+        hcl = getHclSecurityGroup();
+        hcl += getHclSecurityGroupRule();
+        hcl += getHclVpc();
+        hcl += getHclVm();
+        hcl += getHclVpcSubnet();
+        hcl += getHclFlavor();
+        hcl += getHclImage();
+        hcl += getHclAvailabilityZone();
+        hcl += getHclStorage();
+        return hcl;
     }
 }

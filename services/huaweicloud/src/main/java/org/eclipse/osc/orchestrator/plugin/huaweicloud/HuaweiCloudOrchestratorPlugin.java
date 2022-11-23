@@ -26,12 +26,10 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     public void onRegister(ServiceRegistry serviceRegistry) {
         log.info("Registering Huawei Cloud Orchestrator ...");
         if (serviceRegistry == null) {
-            log.error("ServiceRegistry is null");
             throw new IllegalStateException("ServiceRegistry is null");
         }
         ConfigService configService = serviceRegistry.get(ConfigService.class);
         if (configService == null) {
-            log.error("Config service is not present in the registry");
             throw new IllegalStateException("Config service is not present in the registry");
         }
 
@@ -42,8 +40,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     public void registerManagedService(Ocl ocl) {
         log.info("Register managed service, creating  Huawei Cloud resource");
         if (ocl == null) {
-            log.error("registering invalid ocl. ocl = null");
-            return;
+            throw new IllegalArgumentException("registering invalid ocl. ocl = null");
         }
         managedOcl.put(ocl.getName(), ocl);
     }
@@ -51,6 +48,9 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     @Override
     public void updateManagedService(String managedServiceName, Ocl ocl) {
         log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
+        if (ocl == null) {
+            throw new IllegalArgumentException("Invalid ocl. ocl = null");
+        }
         managedOcl.put(managedServiceName, ocl);
     }
 
@@ -58,26 +58,23 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     public void startManagedService(String managedServiceName) {
         log.info("Start managed service {} on Huawei Cloud", managedServiceName);
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.error("Service: {} not registered.", managedServiceName);
-            return;
+            throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
 
-        // TODO: need to do a deep copy for ocl.
-        Ocl ocl = managedOcl.get(managedServiceName);
+        Ocl ocl = managedOcl.get(managedServiceName).deepCopy();
         if (ocl == null) {
-            log.error("Ocl object is null.");
-            return;
+            throw new IllegalStateException("Ocl object is null.");
         }
 
         BuilderFactory factory = new BuilderFactory();
-        Optional<AtomBuilder> optionalAtomBuilder = factory.createBuilder("basic", ocl);
+        Optional<AtomBuilder> optionalAtomBuilder = factory.createBuilder(
+            BuilderFactory.BASIC_BUILDER, ocl);
 
         BuilderContext ctx = new BuilderContext();
         ctx.setConfig(config);
 
         if (optionalAtomBuilder.isEmpty()) {
-            log.error("Builder not found.");
-            return;
+            throw new IllegalStateException("Builder not found.");
         }
         optionalAtomBuilder.get().build(ctx);
     }
@@ -86,7 +83,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     public void stopManagedService(String managedServiceName) {
         log.info("Stop managed service {} on Huawei Cloud", managedServiceName);
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.error("Service: {} not registered.", managedServiceName);
+            throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
     }
 
@@ -94,7 +91,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     public void unregisterManagedService(String managedServiceName) {
         log.info("Destroy managed service {} from Huawei Cloud", managedServiceName);
         if (!managedOcl.containsKey(managedServiceName)) {
-            log.error("Service: {} not registered.", managedServiceName);
+            throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
     }
 }

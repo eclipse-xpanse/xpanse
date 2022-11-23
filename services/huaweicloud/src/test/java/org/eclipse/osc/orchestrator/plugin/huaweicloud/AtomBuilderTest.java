@@ -30,8 +30,9 @@ public class AtomBuilderTest {
         ocl = new Ocl();
 
         ConfigService conf = new ConfigService();
-        conf.setProperties(Map.of("HW_ACCESS_KEY", "test_access_key", "HW_SECRET_KEY",
-            "test_secret_key", "HW_REGION_NAME", "test_region_name"));
+        conf.setProperties(
+            Map.of(HuaweiEnvBuilder.ACCESS_KEY, "test_access_key", HuaweiEnvBuilder.SECRET_KEY,
+                "test_secret_key", HuaweiEnvBuilder.REGION_NAME, "test_region_name"));
         ctx = new BuilderContext();
         ctx.setConfig(conf);
 

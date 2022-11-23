@@ -7,7 +7,7 @@ public class HuaweiEnvBuilderTest {
 
     @Test
     public void builderTest() {
-        HuaweiEnvBuilder builer = new HuaweiEnvBuilder(null);
-        Assertions.assertDoesNotThrow(() -> builer.create(null));
+        HuaweiEnvBuilder builder = new HuaweiEnvBuilder(null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> builder.create(null));
     }
 }

@@ -11,7 +11,8 @@ public class BuilderFactoryTest {
     public void basicBuilderTest() {
         BuilderFactory builderFactory = new BuilderFactory();
 
-        Optional<AtomBuilder> builder = builderFactory.createBuilder("basic", new Ocl());
+        Optional<AtomBuilder> builder = builderFactory.createBuilder(BuilderFactory.BASIC_BUILDER,
+            new Ocl());
 
         Assertions.assertEquals(true, builder.isPresent());
     }

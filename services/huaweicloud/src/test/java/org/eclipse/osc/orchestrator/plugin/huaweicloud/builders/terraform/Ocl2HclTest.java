@@ -124,16 +124,14 @@ public class Ocl2HclTest {
     @Test
     public void Ocl2HclNullTest() {
         Ocl2Hcl hcl = new Ocl2Hcl(new Ocl());
-        Assertions.assertDoesNotThrow(hcl::getHcl);
+        Assertions.assertThrows(IllegalArgumentException.class, hcl::getHcl);
 
-        Assertions.assertDoesNotThrow(hcl::getHclSecurityGroupRule);
-        Assertions.assertDoesNotThrow(hcl::getHclSecurityGroup);
-        Assertions.assertDoesNotThrow(hcl::getHclVpcSubnet);
-        Assertions.assertDoesNotThrow(hcl::getHclVpc);
-        Assertions.assertDoesNotThrow(hcl::getHclFlavor);
-        Assertions.assertDoesNotThrow(hcl::getHclImage);
-        Assertions.assertDoesNotThrow(hcl::getHclVm);
-        Assertions.assertDoesNotThrow(hcl::getHclStorage);
+        Assertions.assertThrows(IllegalArgumentException.class, hcl::getHclSecurityGroupRule);
+        Assertions.assertThrows(IllegalArgumentException.class, hcl::getHclSecurityGroup);
+        Assertions.assertThrows(IllegalArgumentException.class, hcl::getHclVpcSubnet);
+        Assertions.assertThrows(IllegalArgumentException.class, hcl::getHclVpc);
+        Assertions.assertThrows(IllegalArgumentException.class, hcl::getHclVm);
+        Assertions.assertThrows(IllegalArgumentException.class, hcl::getHclStorage);
     }
 
     @Test

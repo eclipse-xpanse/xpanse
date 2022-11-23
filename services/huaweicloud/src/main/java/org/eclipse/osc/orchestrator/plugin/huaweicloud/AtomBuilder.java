@@ -13,6 +13,9 @@ import org.eclipse.osc.services.ocl.loader.Ocl;
 @Slf4j
 public abstract class AtomBuilder {
 
+    private static final long WAIT_AND_CHECK_TIME = 5;
+    private static final long BUILDING_TIMEOUT_DEFAULT = 100;
+
     public String name() {
         return "AtomBuilder";
     }
@@ -60,7 +63,7 @@ public abstract class AtomBuilder {
 
     private boolean waitSubBuilders() {
         long startTime = System.currentTimeMillis();
-        long timeToWait = TimeUnit.MICROSECONDS.toSeconds(100);
+        long timeToWait = TimeUnit.MICROSECONDS.toSeconds(BUILDING_TIMEOUT_DEFAULT);
         if (!subBuilders.isEmpty()) {
             timeToWait = subBuilders.stream()
                 .max(Comparator.comparing(AtomBuilder::getTimeout))
@@ -70,7 +73,7 @@ public abstract class AtomBuilder {
 
         while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)) {
             try {
-                TimeUnit.SECONDS.sleep(5);
+                TimeUnit.SECONDS.sleep(WAIT_AND_CHECK_TIME);
             } catch (InterruptedException ex) {
                 log.warn("Timeout", ex);
                 Thread.currentThread().interrupt();

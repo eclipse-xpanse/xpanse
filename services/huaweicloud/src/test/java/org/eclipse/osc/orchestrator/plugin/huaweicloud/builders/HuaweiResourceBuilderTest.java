@@ -7,7 +7,7 @@ public class HuaweiResourceBuilderTest {
 
     @Test
     public void builderTest() {
-        HuaweiResourceBuilder builer = new HuaweiResourceBuilder(null);
-        Assertions.assertDoesNotThrow(() -> builer.create(null));
+        HuaweiResourceBuilder builder = new HuaweiResourceBuilder(null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> builder.create(null));
     }
 }

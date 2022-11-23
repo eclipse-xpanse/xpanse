@@ -22,7 +22,7 @@ public class HuaweiResourceBuilder extends AtomBuilder {
         log.info("Creating Huawei Cloud resources.");
         if (ctx == null) {
             log.error("Dependent builder: {} must build first.", "Huawei-Cloud-env-Builder");
-            return false;
+            throw new IllegalArgumentException();
         }
 
         return true;

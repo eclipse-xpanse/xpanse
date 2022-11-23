@@ -8,8 +8,10 @@ import org.eclipse.osc.services.ocl.loader.Ocl;
 
 public class BuilderFactory {
 
+    public static final String BASIC_BUILDER = "basic";
+
     public Optional<AtomBuilder> createBuilder(String builderType, Ocl ocl) {
-        if (builderType.equals("basic")) {
+        if (builderType.equals(BASIC_BUILDER)) {
             HuaweiEnvBuilder envBuilder = new HuaweiEnvBuilder(ocl);
             HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
             HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl);

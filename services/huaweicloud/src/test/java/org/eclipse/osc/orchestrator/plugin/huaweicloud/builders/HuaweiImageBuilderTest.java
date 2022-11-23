@@ -7,7 +7,7 @@ public class HuaweiImageBuilderTest {
 
     @Test
     public void builderTest() {
-        HuaweiImageBuilder builer = new HuaweiImageBuilder(null);
-        Assertions.assertDoesNotThrow(() -> builer.create(null));
+        HuaweiImageBuilder builder = new HuaweiImageBuilder(null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> builder.create(null));
     }
 }
