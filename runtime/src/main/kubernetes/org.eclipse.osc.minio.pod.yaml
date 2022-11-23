@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: minio
+  name: minio
+  namespace: osc
+spec:
+  containers:
+  - name: minio
+    image: quay.io/minio/minio:latest
+    command:
+    - /bin/bash
+    - -c
+    args:
+    - minio server /data --console-address :9090
+    volumeMounts:
+    - mountPath: /data
+      name: localvolume
+  volumes:
+  - name: localvolume
+    hostPath:
+      path: /mnt/disk1/data
+      type: DirectoryOrCreate
+  # nodeSelector:
+    # kubernetes.io/hostname: kube.local

@@ -1,0 +1,6 @@
+{
+  "properties": {
+    "rest.packages": "org.eclipse.osc.services.api",
+    "rest.path": "/osc/*"
+  }
+}
