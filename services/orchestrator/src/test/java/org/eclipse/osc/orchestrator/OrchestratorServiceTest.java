@@ -1,6 +1,7 @@
 package org.eclipse.osc.orchestrator;
 
 import org.apache.karaf.minho.boot.Minho;
+import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.LifeCycleService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
@@ -8,17 +9,18 @@ import org.eclipse.osc.services.ocl.loader.OclLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class OrchestratorServiceTest {
 
     @Test
     public void loadPluginTest() throws Exception {
-        Minho minho = Minho.builder().loader(() -> Stream.of(new LifeCycleService(), new OclLoader(), new OrchestratorService(), new PluginTest())).build().start();
+        ConfigService configService = new ConfigService();
+        Map<String, String> properties = new HashMap<>();
+        properties.put("orchestrator.store.filename", "target/test-classes/test.properties");
+        configService.setProperties(properties);
+        Minho minho = Minho.builder().loader(() -> Stream.of(configService, new LifeCycleService(), new OclLoader(), new OrchestratorService(), new PluginTest())).build().start();
 
         ServiceRegistry serviceRegistry = minho.getServiceRegistry();
         OrchestratorService orchestratorService = serviceRegistry.get(OrchestratorService.class);

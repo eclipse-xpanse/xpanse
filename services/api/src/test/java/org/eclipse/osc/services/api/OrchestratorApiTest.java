@@ -109,6 +109,7 @@ public class OrchestratorApiTest {
         Map<String, String> properties = new HashMap<>();
         properties.put("rest.packages", "org.eclipse.osc.services.api");
         properties.put("rest.path", "/osc/*");
+        properties.put("orchestrator.store.filename", "target/test-classes/orchestrator.properties");
         configService.setProperties(properties);
 
         OrchestratorService orchestratorService = new OrchestratorService();
@@ -117,7 +118,6 @@ public class OrchestratorApiTest {
                 configService,
                 new LifeCycleService(),
                 new OclLoader(),
-                new FileOrchestratorStorage(),
                 orchestratorService,
                 new JettyWebContainerService(),
                 new JerseyRestService()
