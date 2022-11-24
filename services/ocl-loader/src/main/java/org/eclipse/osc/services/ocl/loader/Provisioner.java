@@ -9,7 +9,7 @@ public class Provisioner {
 
     private String name;
     private String type;
-    private List<String> environment_vars;
+    private List<String> environments;
     private List<String> inline;
 
 }
