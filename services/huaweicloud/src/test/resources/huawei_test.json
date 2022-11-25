@@ -52,7 +52,7 @@
   "compute": {
     "vm": [
       {
-        "name": "my-vm",
+        "name": "osc-test-vm",
         "type": "c7.large.4",
         "image": "$.image.artifacts[0]",
         "subnet": [
@@ -102,8 +102,8 @@
   "storage": [
     {
       "name": "my-storage",
-      "type": "ssd",
-      "size": "8GiB"
+      "type": "SAS",
+      "size": "20GiB"
     }
   ]
 }

@@ -24,18 +24,24 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         return "Huawei-Cloud-env-Builder";
     }
 
-    @Override
-    public boolean create(BuilderContext ctx) {
-        log.info("Prepare Huawei Cloud environment.");
+    private boolean needRebuild(BuilderContext ctx) {
+        return ctx.get(name()) == null;
+    }
+
+    private void prepareEnv(BuilderContext ctx) {
         if (ctx == null) {
             log.error("Builder Context is null.");
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Builder Context is null.");
+        }
+
+        if (!needRebuild(ctx)) {
+            return;
         }
 
         ConfigService configCtx = ctx.getConfig();
         if (configCtx == null) {
             log.error("configCtx not found, in BuilderContext.");
-            return false;
+            throw new IllegalArgumentException("configCtx not found, in BuilderContext.");
         }
 
         String accessKey = configCtx.getProperty(ACCESS_KEY);
@@ -47,16 +53,20 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         envCtx.put(SECRET_KEY, secretKey);
         envCtx.put(REGION_NAME, region);
 
-        ctx.put(
+        ctx.put(name(), envCtx);
+    }
 
-            name(), envCtx);
-
+    @Override
+    public boolean create(BuilderContext ctx) {
+        log.info("Prepare Huawei Cloud environment.");
+        prepareEnv(ctx);
         return true;
     }
 
     @Override
     public boolean destroy(BuilderContext ctx) {
         log.info("Destroy Huawei Cloud environment.");
+        prepareEnv(ctx);
         return true;
     }
 }

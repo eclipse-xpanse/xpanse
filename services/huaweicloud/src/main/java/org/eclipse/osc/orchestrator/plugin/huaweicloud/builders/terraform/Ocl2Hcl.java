@@ -54,12 +54,22 @@ class Ocl2Hcl {
         return portPairs;
     }
 
+    private String getHclVariables(String... hclVars) {
+        StringBuilder hcl = new StringBuilder();
+        for (String hclVar : hclVars) {
+            hcl.append(String.format("variable \"%s\" {"
+                + "\n  type = string\n"
+                + "\n}\n", hclVar));
+        }
+        return hcl.toString();
+    }
+
     public String getHclSecurityGroupRule() {
         if (ocl == null
             || ocl.getNetwork() == null
             || ocl.getNetwork().getSecurity() == null
             || ocl.getNetwork().getSecurity().get(0).getRules() == null) {
-            throw new IllegalArgumentException("Invalid Security Group Rule");
+            throw new IllegalArgumentException("Ocl for security group rule is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -94,7 +104,7 @@ class Ocl2Hcl {
         if (ocl == null
             || ocl.getNetwork() == null
             || ocl.getNetwork().getSecurity() == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Ocl for security group is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -111,7 +121,7 @@ class Ocl2Hcl {
         if (ocl == null
             || ocl.getNetwork() == null
             || ocl.getNetwork().getVpc() == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Ocl for VPC is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -129,7 +139,7 @@ class Ocl2Hcl {
         if (ocl == null
             || ocl.getNetwork() == null
             || ocl.getNetwork().getSubnet() == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Ocl for VPC subnet is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -159,21 +169,21 @@ class Ocl2Hcl {
 
     public String getHclAvailabilityZone() {
         if (ocl == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Ocl for AvailabilityZone is invalid.");
         }
-        return "";
+        return "\ndata \"huaweicloud_availability_zones\" \"osc-az\" {}";
     }
 
     public String getHclFlavor() {
         if (ocl == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Ocl for flavor is invalid.");
         }
         return "";
     }
 
     public String getHclImage() {
         if (ocl == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Ocl for image is invalid.");
         }
         return "";
     }
@@ -182,7 +192,7 @@ class Ocl2Hcl {
         if (ocl == null
             || ocl.getCompute() == null
             || ocl.getCompute().getVm() == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Ocl for vm is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -225,7 +235,7 @@ class Ocl2Hcl {
 
     public String getHclStorage() {
         if (ocl == null || ocl.getStorage() == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Ocl for storage is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
@@ -236,6 +246,9 @@ class Ocl2Hcl {
                     + "\n  size = \"%s\"",
                 storage.getName(), storage.getName(), storage.getType(),
                 storage.getSize().replaceAll("[^0-9]*GiB", "").strip()));
+            // TODO: Add variable [var.availability_zone] for availability_zone
+            hcl.append("\n  availability_zone = data.huaweicloud_availability_zones.osc-az"
+                + ".names[0]");
             hcl.append("\n}\n\n");
         }
 
@@ -243,16 +256,15 @@ class Ocl2Hcl {
     }
 
     public String getHcl() {
-        String hcl;
-        hcl = getHclSecurityGroup();
-        hcl += getHclSecurityGroupRule();
-        hcl += getHclVpc();
-        hcl += getHclVm();
-        hcl += getHclVpcSubnet();
-        hcl += getHclFlavor();
-        hcl += getHclImage();
-        hcl += getHclAvailabilityZone();
-        hcl += getHclStorage();
-        return hcl;
+        return getHclVariables()
+            + getHclSecurityGroup()
+            + getHclSecurityGroupRule()
+            + getHclVpc()
+            + getHclVm()
+            + getHclVpcSubnet()
+            + getHclFlavor()
+            + getHclImage()
+            + getHclAvailabilityZone()
+            + getHclStorage();
     }
 }

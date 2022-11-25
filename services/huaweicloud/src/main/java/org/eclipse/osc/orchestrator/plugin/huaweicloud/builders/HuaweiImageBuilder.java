@@ -21,7 +21,7 @@ public class HuaweiImageBuilder extends AtomBuilder {
     public boolean create(BuilderContext ctx) {
         log.info("Creating Huawei Cloud Image.");
         if (ctx == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Builder context is null.");
         }
         return true;
     }
