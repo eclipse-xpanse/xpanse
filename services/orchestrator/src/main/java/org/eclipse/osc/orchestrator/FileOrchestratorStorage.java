@@ -15,10 +15,10 @@ import java.util.Set;
 @Slf4j
 public class FileOrchestratorStorage implements OrchestratorStorage, Service {
 
-    public final static String DEFAULT_FILENAME = "orchestrator.properties";
+    public static final String DEFAULT_FILENAME = "orchestrator.properties";
 
     private Properties properties = new Properties();
-    private File file;
+    private File file = new File(DEFAULT_FILENAME);
 
     @Override
     public String name() {
@@ -27,7 +27,7 @@ public class FileOrchestratorStorage implements OrchestratorStorage, Service {
 
     @Override
     public void onRegister(ServiceRegistry serviceRegistry) throws IOException {
-        file = new File(DEFAULT_FILENAME);
+
         ConfigService configService = serviceRegistry.get(ConfigService.class);
         if (configService != null
                 && configService.properties() != null
@@ -35,7 +35,9 @@ public class FileOrchestratorStorage implements OrchestratorStorage, Service {
             file = new File(configService.properties().get("orchestrator.storage.filename").toString());
         }
         if (file.exists()) {
-            properties.load(new FileInputStream(file));
+            try (var stream = new FileInputStream(file)) {
+                properties.load(stream);
+            }
         }
     }
 
@@ -62,10 +64,10 @@ public class FileOrchestratorStorage implements OrchestratorStorage, Service {
     }
 
     private void save() {
-        try {
-            properties.save(new FileOutputStream(file), null);
-        } catch (Exception e) {
-            log.warn("Can't save orchestrator state", e);
+        try (var stream = new FileOutputStream(file)) {
+            properties.store(stream, null);
+        } catch (IOException ex) {
+            log.warn("Can't save orchestrator state", ex);
         }
     }
 
