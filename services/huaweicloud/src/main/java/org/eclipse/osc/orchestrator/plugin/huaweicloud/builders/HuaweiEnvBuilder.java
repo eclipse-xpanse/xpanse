@@ -49,9 +49,15 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         String region = configCtx.getProperty(REGION_NAME);
 
         Map<String, String> envCtx = new HashMap<>();
-        envCtx.put(ACCESS_KEY, accessKey);
-        envCtx.put(SECRET_KEY, secretKey);
-        envCtx.put(REGION_NAME, region);
+        if (accessKey != null) {
+            envCtx.put(ACCESS_KEY, accessKey);
+        }
+        if (secretKey != null) {
+            envCtx.put(SECRET_KEY, secretKey);
+        }
+        if (region != null) {
+            envCtx.put(REGION_NAME, region);
+        }
 
         ctx.put(name(), envCtx);
     }

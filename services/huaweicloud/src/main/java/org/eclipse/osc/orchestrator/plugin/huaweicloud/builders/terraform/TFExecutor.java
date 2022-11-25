@@ -37,7 +37,7 @@ public class TFExecutor {
 
         tfPath = ws.getAbsolutePath() + FileSystems.getDefault().getSeparator() + "main.tf";
         String verPath =
-            ws.getAbsolutePath() + FileSystems.getDefault().getSeparator() + "/version.tf";
+            ws.getAbsolutePath() + FileSystems.getDefault().getSeparator() + "version.tf";
         workPath = ws.getAbsolutePath();
         log.info("Terraform working directory is " + workPath);
 

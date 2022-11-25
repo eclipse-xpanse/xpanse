@@ -25,6 +25,10 @@ public class TFExecutorTest {
 
         Assertions.assertNotNull(ocl);
 
+        for (var artifact : ocl.getImage().getArtifacts()) {
+            artifact.setId("cecc4bcf-b055-4d35-bd5f-693d4412eaef");
+        }
+
         HuaweiEnvBuilder envBuilder;
         HuaweiImageBuilder imageBuilder;
         HuaweiResourceBuilder resourceBuilder;
@@ -40,9 +44,6 @@ public class TFExecutorTest {
         ConfigService configService = new ConfigService();
         builderContext.setConfig(configService);
 
-        for (var artifact : ocl.getImage().getArtifacts()) {
-            artifact.setId("cecc4bcf-b055-4d35-bd5f-693d4412eaef");
-        }
         Assertions.assertThrows(
             TFExecutorException.class, () -> resourceBuilder.build(builderContext));
     }
@@ -56,6 +57,10 @@ public class TFExecutorTest {
 
         Assertions.assertNotNull(ocl);
 
+        for (var artifact : ocl.getImage().getArtifacts()) {
+            artifact.setId("cecc4bcf-b055-4d35-bd5f-693d4412eaef");
+        }
+
         HuaweiEnvBuilder envBuilder;
         HuaweiResourceBuilder resourceBuilder;
 
@@ -65,10 +70,6 @@ public class TFExecutorTest {
         BuilderContext builderContext = new BuilderContext();
         ConfigService configService = new ConfigService();
         builderContext.setConfig(configService);
-
-        for (var artifact : ocl.getImage().getArtifacts()) {
-            artifact.setId("cecc4bcf-b055-4d35-bd5f-693d4412eaef");
-        }
 
         envBuilder.destroy(builderContext);
         Assertions.assertThrows(
