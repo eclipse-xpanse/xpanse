@@ -1,0 +1,7 @@
+apiVersion: osc.eclipse.org/v1
+kind: Osc
+metadata:
+  name: test-managed-service
+  namespace: osc
+spec:
+  ocl: http://foo.bar/ocl.json
