@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class HuaweiEnvBuilder extends AtomBuilder {
     private void prepareEnv(BuilderContext ctx) {
         if (ctx == null) {
             log.error("Builder Context is null.");
-            throw new IllegalArgumentException("Builder Context is null.");
+            throw new BuilderException(this, "Builder Context is null.");
         }
 
         if (!needRebuild(ctx)) {
@@ -41,7 +42,7 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         ConfigService configCtx = ctx.getConfig();
         if (configCtx == null) {
             log.error("configCtx not found, in BuilderContext.");
-            throw new IllegalArgumentException("configCtx not found, in BuilderContext.");
+            throw new BuilderException(this, "configCtx not found, in BuilderContext.");
         }
 
         String accessKey = configCtx.getProperty(ACCESS_KEY);

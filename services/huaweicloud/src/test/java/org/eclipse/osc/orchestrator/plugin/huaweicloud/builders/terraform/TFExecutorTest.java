@@ -8,7 +8,6 @@ import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.TFExecutorException;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 import org.eclipse.osc.services.ocl.loader.OclLoader;
 import org.junit.jupiter.api.Assertions;
@@ -45,7 +44,7 @@ public class TFExecutorTest {
         builderContext.setConfig(configService);
 
         Assertions.assertThrows(
-            TFExecutorException.class, () -> resourceBuilder.build(builderContext));
+            IllegalStateException.class, () -> resourceBuilder.build(builderContext));
     }
 
     @Test
@@ -73,6 +72,6 @@ public class TFExecutorTest {
 
         envBuilder.destroy(builderContext);
         Assertions.assertThrows(
-            TFExecutorException.class, () -> resourceBuilder.destroy(builderContext));
+            IllegalStateException.class, () -> resourceBuilder.destroy(builderContext));
     }
 }
