@@ -30,7 +30,7 @@ public class SystemCmd {
         log.info("SystemCmd executing cmd: " + String.join(" ", cmd));
         try {
             String line;
-            String[] safeCmd = cmd.split("[^0-9a-zA-Z]{1}", 2);
+            String[] safeCmd = cmd.split(" +");
             ProcessBuilder processBuilder = new ProcessBuilder(safeCmd);
             if (this.env != null) {
                 processBuilder.environment().putAll(this.env);
