@@ -33,7 +33,7 @@ public class TFExecutor {
                     + ws.getAbsolutePath());
         }
 
-        tfPath = ws.getAbsolutePath() + FileSystems.getDefault().getSeparator() + "main.tf";
+        tfPath = ws.getAbsolutePath() + FileSystems.getDefault().getSeparator() + "resources.tf";
         String verPath =
             ws.getAbsolutePath() + FileSystems.getDefault().getSeparator() + "version.tf";
         workPath = ws.getAbsolutePath();
