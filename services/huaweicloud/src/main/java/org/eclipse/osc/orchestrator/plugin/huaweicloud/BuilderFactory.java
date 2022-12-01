@@ -15,11 +15,13 @@ public class BuilderFactory {
             HuaweiEnvBuilder envBuilder = new HuaweiEnvBuilder(ocl);
             HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
             HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl);
+            HuaweiEnvBuilder envBuilderTail = new HuaweiEnvBuilder(ocl);
 
             imageBuilder.addSubBuilder(envBuilder);
             resourceBuilder.addSubBuilder(imageBuilder);
+            envBuilderTail.addSubBuilder(resourceBuilder);
 
-            return Optional.of(resourceBuilder);
+            return Optional.of(envBuilderTail);
         }
         return Optional.empty();
     }

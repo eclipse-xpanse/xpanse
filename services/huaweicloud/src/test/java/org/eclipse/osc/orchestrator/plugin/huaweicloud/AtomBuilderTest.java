@@ -5,7 +5,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.Map;
 import org.apache.karaf.minho.boot.service.ConfigService;
@@ -129,10 +128,6 @@ public class AtomBuilderTest {
     public void builderListRollbackFailedTest() {
         imageBuilder.addSubBuilder(envBuilder);
         resourceBuilder.addSubBuilder(imageBuilder);
-
-        when(envBuilder.destroy(any())).thenReturn(false);
-        when(imageBuilder.destroy(any())).thenReturn(true);
-        when(resourceBuilder.destroy(any())).thenReturn(true);
 
         doReturn(false).when(envBuilder).destroy(any());
         doReturn(true).when(imageBuilder).destroy(any());

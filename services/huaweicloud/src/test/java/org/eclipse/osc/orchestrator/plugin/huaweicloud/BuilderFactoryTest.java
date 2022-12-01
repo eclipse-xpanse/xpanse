@@ -14,7 +14,7 @@ public class BuilderFactoryTest {
         Optional<AtomBuilder> builder = builderFactory.createBuilder(BuilderFactory.BASIC_BUILDER,
             new Ocl());
 
-        Assertions.assertEquals(true, builder.isPresent());
+        Assertions.assertTrue(builder.isPresent());
     }
 
     @Test
@@ -23,6 +23,6 @@ public class BuilderFactoryTest {
 
         Optional<AtomBuilder> builder = builderFactory.createBuilder("invalid", new Ocl());
 
-        Assertions.assertEquals(true, builder.isEmpty());
+        Assertions.assertTrue(builder.isEmpty());
     }
 }

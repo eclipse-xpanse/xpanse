@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Slf4j
@@ -24,18 +25,24 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         return "Huawei-Cloud-env-Builder";
     }
 
-    @Override
-    public boolean create(BuilderContext ctx) {
-        log.info("Prepare Huawei Cloud environment.");
+    private boolean needRebuild(BuilderContext ctx) {
+        return ctx.get(name()) == null;
+    }
+
+    private void prepareEnv(BuilderContext ctx) {
         if (ctx == null) {
             log.error("Builder Context is null.");
-            throw new IllegalArgumentException();
+            throw new BuilderException(this, "Builder Context is null.");
+        }
+
+        if (!needRebuild(ctx)) {
+            return;
         }
 
         ConfigService configCtx = ctx.getConfig();
         if (configCtx == null) {
             log.error("configCtx not found, in BuilderContext.");
-            return false;
+            throw new BuilderException(this, "configCtx not found, in BuilderContext.");
         }
 
         String accessKey = configCtx.getProperty(ACCESS_KEY);
@@ -43,20 +50,30 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         String region = configCtx.getProperty(REGION_NAME);
 
         Map<String, String> envCtx = new HashMap<>();
-        envCtx.put(ACCESS_KEY, accessKey);
-        envCtx.put(SECRET_KEY, secretKey);
-        envCtx.put(REGION_NAME, region);
+        if (accessKey != null) {
+            envCtx.put(ACCESS_KEY, accessKey);
+        }
+        if (secretKey != null) {
+            envCtx.put(SECRET_KEY, secretKey);
+        }
+        if (region != null) {
+            envCtx.put(REGION_NAME, region);
+        }
 
-        ctx.put(
+        ctx.put(name(), envCtx);
+    }
 
-            name(), envCtx);
-
+    @Override
+    public boolean create(BuilderContext ctx) {
+        log.info("Prepare Huawei Cloud environment.");
+        prepareEnv(ctx);
         return true;
     }
 
     @Override
     public boolean destroy(BuilderContext ctx) {
         log.info("Destroy Huawei Cloud environment.");
+        prepareEnv(ctx);
         return true;
     }
 }

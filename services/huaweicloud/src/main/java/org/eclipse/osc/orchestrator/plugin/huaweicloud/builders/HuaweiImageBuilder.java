@@ -3,6 +3,7 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Slf4j
@@ -21,7 +22,7 @@ public class HuaweiImageBuilder extends AtomBuilder {
     public boolean create(BuilderContext ctx) {
         log.info("Creating Huawei Cloud Image.");
         if (ctx == null) {
-            throw new IllegalArgumentException();
+            throw new BuilderException(this, "Builder context is null.");
         }
         return true;
     }
