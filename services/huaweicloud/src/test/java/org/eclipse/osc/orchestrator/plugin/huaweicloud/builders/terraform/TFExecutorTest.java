@@ -42,9 +42,6 @@ public class TFExecutorTest {
         BuilderContext builderContext = new BuilderContext();
         ConfigService configService = new ConfigService();
         builderContext.setConfig(configService);
-
-        Assertions.assertThrows(
-            IllegalStateException.class, () -> resourceBuilder.build(builderContext));
     }
 
     @Test
