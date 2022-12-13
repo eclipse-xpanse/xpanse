@@ -3,7 +3,6 @@ package org.eclipse.osc.orchestrator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
-import org.apache.karaf.minho.boot.spi.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,27 +12,16 @@ import java.util.Properties;
 import java.util.Set;
 
 @Slf4j
-public class FileOrchestratorStorage implements OrchestratorStorage, Service {
+public class FileOrchestratorStorage implements OrchestratorStorage {
 
     public static final String DEFAULT_FILENAME = "orchestrator.properties";
 
     private Properties properties = new Properties();
     private File file = new File(DEFAULT_FILENAME);
 
-    @Override
-    public String name() {
-        return "osc-orchestrator-file-storage";
-    }
-
-    @Override
-    public void onRegister(ServiceRegistry serviceRegistry) throws IOException {
-
+    public FileOrchestratorStorage(ServiceRegistry serviceRegistry) throws IOException {
         ConfigService configService = serviceRegistry.get(ConfigService.class);
-        if (configService != null
-                && configService.properties() != null
-                && configService.properties().get("orchestrator.storage.filename") != null) {
-            file = new File(configService.properties().get("orchestrator.storage.filename").toString());
-        }
+        file = new File(configService.getProperty("orchestrator.store.filename", DEFAULT_FILENAME));
         if (file.exists()) {
             try (var stream = new FileInputStream(file)) {
                 properties.load(stream);

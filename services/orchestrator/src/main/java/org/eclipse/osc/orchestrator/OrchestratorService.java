@@ -38,8 +38,8 @@ public class OrchestratorService implements Service {
 
         storage = serviceRegistry.get(OrchestratorStorage.class);
         if (storage == null) {
-            log.warn("No orchestrator storage service found in the service registry, using default in-memory orchestrator storage");
-            storage = new FileOrchestratorStorage();
+            log.warn("No orchestrator storage service found in the service registry, using default file orchestrator storage");
+            storage = new FileOrchestratorStorage(serviceRegistry);
         }
 
         LifeCycleService lifeCycleService = serviceRegistry.get(LifeCycleService.class);

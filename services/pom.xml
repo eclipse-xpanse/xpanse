@@ -21,6 +21,7 @@
         <module>orchestrator</module>
         <module>openstack</module>
         <module>huaweicloud</module>
+        <module>k8s</module>
         <module>api</module>
     </modules>
 
