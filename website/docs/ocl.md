@@ -123,7 +123,7 @@ This is the list of security (groups) defined in the service network. Each secur
 * `name` - (Required) The name of the security, used in other OCL elements.
 * `rules` - (Required) The list of security rule.
 
-##### SecurityRule <span id = "SecurityRule">
+##### SecurityRule
 
 * `name` - (Required) The name of the security rule, define in `security` (groups).
 * `priority` - (Required) The priority of the security rule. The lower the priority number, the higher the priority of the rule.

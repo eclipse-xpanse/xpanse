@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Open Services Cloud',
   tagline: 'Open Services Cloud is an Open Source project allowing to easily implement native managed service on any cloud provider.',
-  url: 'https://huaweicloud.github.io/osc/',
+  url: 'https://huaweicloud.github.io/',
   baseUrl: '/osc/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
