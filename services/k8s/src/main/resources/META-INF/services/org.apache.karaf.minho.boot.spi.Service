@@ -1,2 +1,2 @@
 org.eclipse.osc.services.k8s.K8sOrchestratorPlugin
-org.eclipse.osc.services.k8s.operator.OscOperator
+#org.eclipse.osc.services.k8s.operator.OscOperator
