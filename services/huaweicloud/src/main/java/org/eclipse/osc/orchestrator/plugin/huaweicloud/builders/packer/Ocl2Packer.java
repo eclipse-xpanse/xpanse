@@ -1,9 +1,10 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer;
 
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.services.ocl.loader.Artifact;
-import org.eclipse.osc.services.ocl.loader.BaseImage;
+//import org.eclipse.osc.services.ocl.loader.BaseImage;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 import org.eclipse.osc.services.ocl.loader.Provisioner;
 
@@ -32,13 +33,13 @@ class Ocl2Packer {
                 }
 
                 String type = provisioner.get().getType();
-                if (type != "shell") {
+                if (!Objects.equals(type, "shell")) {
                     throw new IllegalArgumentException(
-                        "Ocl for image provisioner type is invalid.");
+                            "Ocl for image provisioner type is invalid.");
                 }
 
                 for (String inline : provisioner.get().getInline()) {
-                    installScript.append(String.format("\n%s", inline));
+                    installScript.append(String.format("%n%s", inline));
                 }
             }
         }
@@ -48,49 +49,50 @@ class Ocl2Packer {
 
     public String getHclImages() {
         StringBuilder hcl = new StringBuilder();
-        Optional<BaseImage> baseImage = ocl.referTo(artifact.getBase(), BaseImage.class);
-        hcl.append(String.format("\nvariable \"region_name\" {"
-                + "\n  type = string"
-                + "\n  default = env(\"HW_REGION_NAME\")"
-                + "\n}"
-                + "\nvariable \"secret_key\" {"
-                + "\n  type = string"
-                + "\n  default = env(\"HW_SECRET_KEY\")"
-                + "\n}"
-                + "\nvariable \"access_key\" {"
-                + "\n  type = string"
-                + "\n  default = env(\"HW_ACCESS_KEY\")"
-                + "\n}"
-                + "\nsource \"huaweicloud-ecs\" \"%s\" {"
-                + "\n  region             = var.region_name"
-                + "\n  image_name         = \"%s\""
-                + "\n  access_key         = var.access_key"
-                + "\n  secret_key         = var.secret_key"
-                + "\n  eip_bandwidth_size = \"5\""
-                + "\n  eip_type           = \"5_bgp\""
-                + "\n  flavor             = \"s6.large.2\""
-                + "\n  instance_name      = \"%s\""
-                + "\n  security_groups    = [\"default\"]"
-                + "\n  source_image_filter {"
-                + "\n    filter {"
-                + "\n      name = \"%s\""
-                + "\n      visibility = \"public\""
-                + "\n    }"
-                + "\n    most_recent = true"
-                + "\n  }"
-                + "\n  ssh_ip_version     = \"4\""
-                + "\n  ssh_username       = \"root\""
-                + "\n}\n",
-            artifact.getName(), artifact.getName(), artifact.getName()));
+        // Optional<BaseImage> baseImage = ocl.referTo(artifact.getBase(),
+        // BaseImage.class);
+        hcl.append(String.format("%nvariable \"region_name\" {"
+                + "%n  type = string"
+                + "%n  default = env(\"HW_REGION_NAME\")"
+                + "%n}"
+                + "%nvariable \"secret_key\" {"
+                + "%n  type = string"
+                + "%n  default = env(\"HW_SECRET_KEY\")"
+                + "%n}"
+                + "%nvariable \"access_key\" {"
+                + "%n  type = string"
+                + "%n  default = env(\"HW_ACCESS_KEY\")"
+                + "%n}"
+                + "%nsource \"huaweicloud-ecs\" \"%s\" {"
+                + "%n  region             = var.region_name"
+                + "%n  image_name         = \"%s\""
+                + "%n  access_key         = var.access_key"
+                + "%n  secret_key         = var.secret_key"
+                + "%n  eip_bandwidth_size = \"5\""
+                + "%n  eip_type           = \"5_bgp\""
+                + "%n  flavor             = \"s6.large.2\""
+                + "%n  instance_name      = \"%s\""
+                + "%n  security_groups    = [\"default\"]"
+                + "%n  source_image_filter {"
+                + "%n    filter {"
+                + "%n      name = \"%s\""
+                + "%n      visibility = \"public\""
+                + "%n    }"
+                + "%n    most_recent = true"
+                + "%n  }"
+                + "%n  ssh_ip_version     = \"4\""
+                + "%n  ssh_username       = \"root\""
+                + "%n}%n",
+                artifact.getName(), artifact.getName(), artifact.getName()));
 
-        hcl.append(String.format("\nbuild {"
-                + "\n  sources = [\"source.huaweicloud-ecs.%s\"]"
-                + "\n  provisioner \"shell\" {"
-                + "\n    pause_before = \"30s\""
-                + "\n    script       = \"install_script.sh\""
-                + "\n  }"
-                + "\n}\n",
-            artifact.getName()));
+        hcl.append(String.format("%nbuild {"
+                + "%n  sources = [\"source.huaweicloud-ecs.%s\"]"
+                + "%n  provisioner \"shell\" {"
+                + "%n    pause_before = \"30s\""
+                + "%n    script       = \"install_script.sh\""
+                + "%n  }"
+                + "%n}%n",
+                artifact.getName()));
 
         return hcl.toString();
     }
