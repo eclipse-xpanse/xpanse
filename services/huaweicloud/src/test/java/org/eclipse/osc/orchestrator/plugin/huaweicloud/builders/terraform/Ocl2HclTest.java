@@ -27,7 +27,7 @@ public class Ocl2HclTest {
         secRule.setProtocol("tcp");
         secRule.setCidr("10.10.2.0/24");
         secRule.setDirection("inbound");
-        secRule.setPorts("3389, 4200-4300, 5000");
+        secRule.setPorts("8080, 9092-9093, 2181");
         secRule.setAction("allow");
         secRule.setName("secRuleTest");
 
@@ -89,6 +89,8 @@ public class Ocl2HclTest {
         List<String> storageList = new ArrayList<>();
         storageList.add("$.storage[0]");
         vm.setStorage(storageList);
+
+        vm.setPublicly(true);
 
         // Vm list
         List<VM> vmList = new ArrayList<>();
