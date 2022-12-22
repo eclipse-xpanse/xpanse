@@ -163,8 +163,8 @@ public class Ocl2HclTest {
                 .find());
         Assertions.assertTrue(Pattern.compile("direction.*=.*\"ingress\"").matcher(hcl).find());
         Assertions.assertTrue(Pattern.compile("protocol.*=.*\"tcp\"").matcher(hcl).find());
-        Assertions.assertTrue(Pattern.compile("port_range_min.*=.*\"4200\"").matcher(hcl).find());
-        Assertions.assertTrue(Pattern.compile("port_range_max.*=.*\"4300\"").matcher(hcl).find());
+        Assertions.assertTrue(Pattern.compile("port_range_min.*=.*\"9092\"").matcher(hcl).find());
+        Assertions.assertTrue(Pattern.compile("port_range_max.*=.*\"9093\"").matcher(hcl).find());
         Assertions.assertTrue(
             Pattern.compile("remote_ip_prefix.*=.*\"10\\.10\\.2\\.0/24\"").matcher(hcl).find());
 
