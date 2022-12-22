@@ -1,8 +1,11 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer;
 
+import lombok.Data;
+
+@Data
 public class PackerVars {
 
-    public String vpcId = "";
-    public String subnetId = "";
-    public String secGroupName = "";
+    private String vpcId = "";
+    private String subnetId = "";
+    private String secGroupName = "";
 }

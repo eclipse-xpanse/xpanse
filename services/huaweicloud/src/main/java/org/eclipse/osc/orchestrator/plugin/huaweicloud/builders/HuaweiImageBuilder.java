@@ -27,6 +27,8 @@ public class HuaweiImageBuilder extends AtomBuilder {
         return "Huawei-Cloud-image-Builder";
     }
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public boolean create(BuilderContext ctx) {
         log.info("Creating Huawei Cloud Image.");
@@ -125,8 +127,6 @@ public class HuaweiImageBuilder extends AtomBuilder {
     }
 
     public PackerVars prepareEnv(TFExecutor tfExecutor) {
-
-        PackerVars packerVars = new PackerVars();
         log.info("Creating Huawei Cloud resources.");
 
         tfExecutor.tfInit();
@@ -134,9 +134,8 @@ public class HuaweiImageBuilder extends AtomBuilder {
         tfExecutor.tfApply();
         String stateContent = tfExecutor.getTFState();
 
+        PackerVars packerVars = new PackerVars();
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             TFState tfState = objectMapper.readValue(stateContent, TFState.class);
             for (var resource : tfState.getResources()) {
                 if (resource.getInstances().size() != 1) {
@@ -145,15 +144,15 @@ public class HuaweiImageBuilder extends AtomBuilder {
                 TFStateResourceInstance instance = resource.getInstances().get(0);
                 if (Objects.equals(resource.getType(), "huaweicloud_networking_secgroup")) {
                     if (instance.attributes.containsKey("name")) {
-                        packerVars.secGroupName = instance.attributes.get("name").toString();
+                        packerVars.setSecGroupName(instance.attributes.get("name").toString());
                     }
                 }
                 if (Objects.equals(resource.getType(), "huaweicloud_vpc_subnet")) {
                     if (instance.attributes.containsKey("vpc_id")) {
-                        packerVars.vpcId = instance.attributes.get("vpc_id").toString();
+                        packerVars.setVpcId(instance.attributes.get("vpc_id").toString());
                     }
                     if (instance.attributes.containsKey("id")) {
-                        packerVars.subnetId = instance.attributes.get("id").toString();
+                        packerVars.setSubnetId(instance.attributes.get("id").toString());
                     }
                 }
             }

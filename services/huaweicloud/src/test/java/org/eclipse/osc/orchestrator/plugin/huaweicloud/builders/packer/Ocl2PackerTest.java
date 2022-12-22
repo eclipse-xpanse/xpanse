@@ -56,8 +56,7 @@ public class Ocl2PackerTest {
         Ocl ocl = prepareOcl();
         Ocl2Packer ocl2Packer = new Ocl2Packer(ocl, ocl.getImage().getArtifacts().get(0));
 
-        PackerVars packerVars = new PackerVars();
-        String hclImages = ocl2Packer.getHclImages(packerVars);
+        String hclImages = ocl2Packer.getHclImages(new PackerVars());
 
         Assertions.assertTrue(
             Pattern.compile("image_name.*=.*kafka_image").matcher(hclImages).find());
