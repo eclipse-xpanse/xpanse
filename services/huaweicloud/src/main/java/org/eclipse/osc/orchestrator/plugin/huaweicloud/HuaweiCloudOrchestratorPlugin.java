@@ -61,14 +61,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
             throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
 
-        Ocl ocl = managedOcl.get(managedServiceName).deepCopy();
-        if (ocl == null) {
-            throw new IllegalStateException("Ocl object is null.");
-        }
-
-        BuilderFactory factory = new BuilderFactory();
-        Optional<AtomBuilder> optionalAtomBuilder = factory.createBuilder(
-            BuilderFactory.BASIC_BUILDER, ocl);
+        Optional<AtomBuilder> optionalAtomBuilder = createBuiler(managedServiceName);
 
         BuilderContext ctx = new BuilderContext();
         ctx.setConfig(config);
@@ -85,6 +78,15 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         if (!managedOcl.containsKey(managedServiceName)) {
             throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
+        Optional<AtomBuilder> optionalAtomBuilder = createBuiler(managedServiceName);
+
+        BuilderContext ctx = new BuilderContext();
+        ctx.setConfig(config);
+
+        if (optionalAtomBuilder.isEmpty()) {
+            throw new IllegalStateException("Builder not found.");
+        }
+        optionalAtomBuilder.get().rollback(ctx);
     }
 
     @Override
@@ -93,5 +95,16 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         if (!managedOcl.containsKey(managedServiceName)) {
             throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
+        managedOcl.remove(managedServiceName);
+    }
+
+    private Optional<AtomBuilder> createBuiler(String managedServiceName) {
+        Ocl ocl = managedOcl.get(managedServiceName).deepCopy();
+        if (ocl == null) {
+            throw new IllegalStateException("Ocl object is null.");
+        }
+
+        BuilderFactory factory = new BuilderFactory();
+        return factory.createBuilder(BuilderFactory.BASIC_BUILDER, ocl);
     }
 }
