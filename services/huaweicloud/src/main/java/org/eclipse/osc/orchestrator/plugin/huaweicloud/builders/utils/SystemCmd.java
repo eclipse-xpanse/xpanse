@@ -44,6 +44,7 @@ public class SystemCmd {
                 new BufferedReader(new InputStreamReader((process.getInputStream())));
             while ((line = outputReader.readLine()) != null) {
                 stdErrOut.append(line).append("\n");
+                log.info(line);
             }
 
             if (waitSecond == 0) {

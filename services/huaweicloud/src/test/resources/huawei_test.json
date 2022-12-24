@@ -1,5 +1,5 @@
 {
-  "name": "my-service",
+  "name": "kafka-service",
   "category": "compute",
   "namespace": "my-namespace",
   "billing": {
@@ -19,13 +19,22 @@
           "WORK_HOME=/usr1/KAFKA/"
         ],
         "inline": [
-          "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar"
+          "echo \"start install docker\"",
+          "echo \"run install\"",
+          "apt-get update",
+          "apt install -y docker.io",
+          "docker network create app-tier --driver bridge",
+          "docker run -d --name zookeeper-server --network app-tier -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:latest",
+          "docker run -d --name kafka-server --network app-tier -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181 bitnami/kafka:latest",
+          "echo \"docker restart zookeeper-server\" >> /etc/rc.local",
+          "echo \"docker restart kafka-server\" >> /etc/rc.local",
+          "chmod a+x /etc/rc.local"
         ]
       }
     ],
     "base": [
       {
-        "name": "ubuntu-x64",
+        "name": "Ubuntu 20.04 server 64bit",
         "type": "t2.large",
         "filters": {
           "name": "ubuntu-for-osc-*"
@@ -44,7 +53,7 @@
         "name": "kafka_image",
         "base": "$.image.base[0]",
         "provisioners": [
-          "/image/provisioners/0"
+          "$.image.provisioners[0]"
         ]
       }
     ]
@@ -52,7 +61,7 @@
   "compute": {
     "vm": [
       {
-        "name": "osc-test-vm",
+        "name": "osc-kafka-vm",
         "type": "c7.large.4",
         "image": "$.image.artifacts[0]",
         "subnet": [
@@ -71,28 +80,46 @@
   "network": {
     "vpc": [
       {
-        "name": "osc-vpc",
+        "name": "osc-res-vpc",
         "cidr": "10.10.0.0/16"
       }
     ],
     "subnet": [
       {
-        "name": "osc-subnet",
+        "name": "osc-res-subnet",
         "vpc": "$.network.vpc[0]",
         "cidr": "10.10.1.0/24"
       }
     ],
     "security": [
       {
-        "name": "osc_sg",
+        "name": "osc-res-sg",
         "rules": [
           {
-            "name": "osc_sg_kafka",
+            "name": "osc-res-sg-kafka",
             "priority": 1,
             "protocol": "tcp",
-            "cidr": "10.10.2.0/24",
+            "cidr": "10.10.2.6/32",
             "direction": "inbound",
-            "ports": "3389, 4200-4300",
+            "ports": "8080, 9092-9093, 2181",
+            "action": "allow"
+          },
+          {
+            "name": "osc-res-sg-ssh-public",
+            "priority": 1,
+            "protocol": "tcp",
+            "cidr": "121.36.59.153/32",
+            "direction": "inbound",
+            "ports": "22, 8080, 9092-9093,2181",
+            "action": "allow"
+          },
+          {
+            "name": "osc-res-sg-ssh-private",
+            "priority": 1,
+            "protocol": "tcp",
+            "cidr": "198.19.0.0/16",
+            "direction": "inbound",
+            "ports": "22",
             "action": "allow"
           }
         ]
@@ -101,7 +128,7 @@
   },
   "storage": [
     {
-      "name": "my-storage",
+      "name": "osc-res-storage",
       "type": "SAS",
       "size": "20GiB"
     }

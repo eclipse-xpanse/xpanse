@@ -4,12 +4,13 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.services.ocl.loader.Artifact;
-//import org.eclipse.osc.services.ocl.loader.BaseImage;
+import org.eclipse.osc.services.ocl.loader.BaseImage;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 import org.eclipse.osc.services.ocl.loader.Provisioner;
 
 @Slf4j
 class Ocl2Packer {
+
     private final Ocl ocl;
     private final Artifact artifact;
 
@@ -35,7 +36,7 @@ class Ocl2Packer {
                 String type = provisioner.get().getType();
                 if (!Objects.equals(type, "shell")) {
                     throw new IllegalArgumentException(
-                            "Ocl for image provisioner type is invalid.");
+                        "Ocl for image provisioner type is invalid.");
                 }
 
                 for (String inline : provisioner.get().getInline()) {
@@ -47,10 +48,10 @@ class Ocl2Packer {
         return installScript.toString();
     }
 
-    public String getHclImages() {
+    public String getHclImages(PackerVars packerVars) {
         StringBuilder hcl = new StringBuilder();
-        // Optional<BaseImage> baseImage = ocl.referTo(artifact.getBase(),
-        // BaseImage.class);
+        Optional<BaseImage> baseImage = ocl.referTo(artifact.getBase(), BaseImage.class);
+
         hcl.append(String.format("%nvariable \"region_name\" {"
                 + "%n  type = string"
                 + "%n  default = env(\"HW_REGION_NAME\")"
@@ -72,9 +73,11 @@ class Ocl2Packer {
                 + "%n  eip_type           = \"5_bgp\""
                 + "%n  flavor             = \"s6.large.2\""
                 + "%n  instance_name      = \"%s\""
-                + "%n  security_groups    = [\"default\"]"
+                + "%n  vpc_id             = \"%s\""
+                + "%n  subnets            = [\"%s\"]"
+                + "%n  security_groups    = [\"%s\"]"
                 + "%n  source_image_filter {"
-                + "%n    filter {"
+                + "%n    filters {"
                 + "%n      name = \"%s\""
                 + "%n      visibility = \"public\""
                 + "%n    }"
@@ -83,7 +86,9 @@ class Ocl2Packer {
                 + "%n  ssh_ip_version     = \"4\""
                 + "%n  ssh_username       = \"root\""
                 + "%n}%n",
-                artifact.getName(), artifact.getName(), artifact.getName()));
+            artifact.getName(), artifact.getName(), artifact.getName(),
+            packerVars.getVpcId(), packerVars.getSubnetId(), packerVars.getSecGroupName(),
+            baseImage.get().getName()));
 
         hcl.append(String.format("%nbuild {"
                 + "%n  sources = [\"source.huaweicloud-ecs.%s\"]"
@@ -92,7 +97,7 @@ class Ocl2Packer {
                 + "%n    script       = \"install_script.sh\""
                 + "%n  }"
                 + "%n}%n",
-                artifact.getName()));
+            artifact.getName()));
 
         return hcl.toString();
     }

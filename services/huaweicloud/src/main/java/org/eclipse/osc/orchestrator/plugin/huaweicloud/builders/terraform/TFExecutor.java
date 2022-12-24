@@ -4,28 +4,26 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.utils.SystemCmd;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.TFExecutorException;
-import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Slf4j
 public class TFExecutor {
 
-    private final Ocl ocl;
     private final Map<String, String> env;
     private String tfPath;
     private String workPath;
 
-    public TFExecutor(final Ocl ocl, Map<String, String> env) {
-        this.ocl = ocl;
+    public TFExecutor(Map<String, String> env) {
         this.env = env;
     }
 
-    public void createWorkspace() {
+    public void createWorkspace(String name) {
         File ws =
-            new File("terraform_ws" + FileSystems.getDefault().getSeparator() + ocl.getName());
+            new File("terraform_ws" + FileSystems.getDefault().getSeparator() + name);
 
         if (!ws.exists() && !ws.mkdirs()) {
             throw new TFExecutorException(
@@ -57,13 +55,10 @@ public class TFExecutor {
         }
     }
 
-    public void createTFScript() {
-        Ocl2Hcl hcl = new Ocl2Hcl(ocl);
-        String hclStr = hcl.getHcl();
-
+    public void createTFScript(String script) {
         try {
             try (FileWriter tfFile = new FileWriter(tfPath)) {
-                tfFile.write(hclStr);
+                tfFile.write(script);
             }
         } catch (IOException ex) {
             throw new TFExecutorException("TFExecutor createTFScript failed.", ex);
@@ -107,5 +102,20 @@ public class TFExecutor {
         boolean exeRet = execute("terraform destroy -auto-approve", out);
         log.info(out.toString());
         return exeRet;
+    }
+
+    public String getTFState() {
+        File tfState = new File(workPath + FileSystems.getDefault().getSeparator()
+            + "terraform.tfstate");
+        if (!tfState.exists()) {
+            log.info("Terraform state file not exists.");
+            return "";
+        }
+
+        try {
+            return Files.readString(tfState.toPath());
+        } catch (IOException ex) {
+            throw new TFExecutorException("Read state file failed.", ex);
+        }
     }
 }

@@ -27,7 +27,7 @@ public class Ocl2HclTest {
         secRule.setProtocol("tcp");
         secRule.setCidr("10.10.2.0/24");
         secRule.setDirection("inbound");
-        secRule.setPorts("3389, 4200-4300, 5000");
+        secRule.setPorts("8080, 9092-9093, 2181");
         secRule.setAction("allow");
         secRule.setName("secRuleTest");
 
@@ -89,6 +89,8 @@ public class Ocl2HclTest {
         List<String> storageList = new ArrayList<>();
         storageList.add("$.storage[0]");
         vm.setStorage(storageList);
+
+        vm.setPublicly(true);
 
         // Vm list
         List<VM> vmList = new ArrayList<>();
@@ -161,8 +163,8 @@ public class Ocl2HclTest {
                 .find());
         Assertions.assertTrue(Pattern.compile("direction.*=.*\"ingress\"").matcher(hcl).find());
         Assertions.assertTrue(Pattern.compile("protocol.*=.*\"tcp\"").matcher(hcl).find());
-        Assertions.assertTrue(Pattern.compile("port_range_min.*=.*\"4200\"").matcher(hcl).find());
-        Assertions.assertTrue(Pattern.compile("port_range_max.*=.*\"4300\"").matcher(hcl).find());
+        Assertions.assertTrue(Pattern.compile("port_range_min.*=.*\"9092\"").matcher(hcl).find());
+        Assertions.assertTrue(Pattern.compile("port_range_max.*=.*\"9093\"").matcher(hcl).find());
         Assertions.assertTrue(
             Pattern.compile("remote_ip_prefix.*=.*\"10\\.10\\.2\\.0/24\"").matcher(hcl).find());
 

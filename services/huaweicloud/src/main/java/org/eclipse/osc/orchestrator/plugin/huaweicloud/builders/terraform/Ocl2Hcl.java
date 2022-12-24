@@ -229,6 +229,26 @@ class Ocl2Hcl {
                     .collect(Collectors.joining(","));
             hcl.append("\n  security_group_ids = [ ").append(securityGroupids).append(" ]");
             hcl.append("\n}\n\n");
+
+            if (vm.isPublicly()) {
+                hcl.append(String.format(""
+                    + "resource \"huaweicloud_vpc_eip\" \"osc-eip-%s\" {\n"
+                    + "  publicip {\n"
+                    + "    type = \"5_bgp\"\n"
+                    + "  }\n"
+                    + "  bandwidth {\n"
+                    + "    name        = \"osc-eip-%s\"\n"
+                    + "    size        = 5\n"
+                    + "    share_type  = \"PER\"\n"
+                    + "    charge_mode = \"traffic\"\n"
+                    + "  }\n"
+                    + "}\n"
+                    + "\n"
+                    + "resource \"huaweicloud_compute_eip_associate\" \"osc-eip-associated-%s\" {\n"
+                    + "  public_ip   = huaweicloud_vpc_eip.osc-eip-%s.address\n"
+                    + "  instance_id = huaweicloud_compute_instance.%s.id\n"
+                    + "}", vm.getName(), vm.getName(), vm.getName(), vm.getName(), vm.getName()));
+            }
         }
         return hcl.toString();
     }

@@ -13,7 +13,8 @@ import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Slf4j
 public class PackerExecutor {
-    private static final String IMAGE = "huaweicloud-ecs: An image was created:";
+
+    private static final String IMAGE = ": An image was created:";
 
     private final Ocl ocl;
     private final Artifact artifact;
@@ -34,7 +35,7 @@ public class PackerExecutor {
         if (!ws.exists() && !ws.mkdirs()) {
             throw new PackerExecutorException(
                 "Create workspace for PackerExecutor failed, File path not created: "
-                + ws.getAbsolutePath());
+                    + ws.getAbsolutePath());
         }
 
         workPath = ws.getAbsolutePath();
@@ -57,9 +58,9 @@ public class PackerExecutor {
         }
     }
 
-    public void createPackerScript() {
+    public void createPackerScript(PackerVars packerVars) {
         Ocl2Packer ocl2Packer = new Ocl2Packer(ocl, artifact);
-        String packerScript = ocl2Packer.getHclImages();
+        String packerScript = ocl2Packer.getHclImages(packerVars);
         packerPath = workPath + FileSystems.getDefault().getSeparator() + "huaweicloud.pkr.hcl";
 
         try {

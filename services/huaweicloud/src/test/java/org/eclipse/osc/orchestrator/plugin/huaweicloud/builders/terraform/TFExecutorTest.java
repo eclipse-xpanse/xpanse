@@ -11,10 +11,12 @@ import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBu
 import org.eclipse.osc.services.ocl.loader.Ocl;
 import org.eclipse.osc.services.ocl.loader.OclLoader;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class TFExecutorTest {
 
+    @Disabled
     @Test
     public void TFExecutorBasicTest() throws Exception {
         Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
