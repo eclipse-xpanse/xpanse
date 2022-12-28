@@ -24,6 +24,16 @@ public class SwiftOrchestratorStorage implements OrchestratorStorage, Service {
     }
 
     @Override
+    public void store(String sid, String pluginName, String key, String value) {
+
+    }
+
+    @Override
+    public String getKey(String sid, String pluginName, String key) {
+        return "";
+    }
+
+    @Override
     public boolean exists(String sid) {
         return false;
     }

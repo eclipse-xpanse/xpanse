@@ -36,6 +36,19 @@ public class FileOrchestratorStorage implements OrchestratorStorage {
     }
 
     @Override
+    public void store(String sid, String pluginName, String key, String value) {
+        String propertyKey = sid + "__" + pluginName + "__" + key;
+        properties.put(propertyKey, value);
+        save();
+    }
+
+    @Override
+    public String getKey(String sid, String pluginName, String key) {
+        String propertyKey = sid + "__" + pluginName + "__" + key;
+        return properties.getProperty(propertyKey, "");
+    }
+
+    @Override
     public boolean exists(String sid) {
         return properties.containsKey(sid);
     }

@@ -1,10 +1,9 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import java.util.Set;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
 import org.eclipse.osc.orchestrator.OrchestratorStorage;
-
-import java.util.Set;
 
 public class ObsOrchestratorStorage implements OrchestratorStorage, Service {
 
@@ -21,6 +20,16 @@ public class ObsOrchestratorStorage implements OrchestratorStorage, Service {
     @Override
     public void store(String sid) {
 
+    }
+
+    @Override
+    public void store(String sid, String pluginName, String key, String value) {
+
+    }
+
+    @Override
+    public String getKey(String sid, String pluginName, String key) {
+        return "";
     }
 
     @Override

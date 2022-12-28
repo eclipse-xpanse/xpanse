@@ -53,11 +53,22 @@ public class MinioOrchestratorStorage implements OrchestratorStorage, Service {
     public void store(String sid) {
         if (!exists(sid)) {
             try (ByteArrayInputStream bais = new ByteArrayInputStream(sid.getBytes("UTF-8"))) {
-                minioClient.putObject(PutObjectArgs.builder().bucket(BUCKET_NAME).object(sid).stream(bais, bais.available(), -1).build());
+                minioClient.putObject(PutObjectArgs.builder().bucket(BUCKET_NAME).object(sid)
+                    .stream(bais, bais.available(), -1).build());
             } catch (Exception e) {
                 throw new IllegalStateException("Can't store " + sid + " in Minio", e);
             }
         }
+    }
+
+    @Override
+    public void store(String sid, String pluginName, String key, String value) {
+
+    }
+
+    @Override
+    public String getKey(String sid, String pluginName, String key) {
+        return "";
     }
 
     @Override
