@@ -30,6 +30,7 @@
     <modules>
         <module>services</module>
         <module>runtime</module>
+        <module>osc-init</module>
     </modules>
 
     <properties>
