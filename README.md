@@ -152,11 +152,12 @@ Open Services Cloud provides different options to generate and provision OCL:
 
 OCL descriptor is an abstract description of the final managed service state. It's generic enough to work with any cloud service provider.
 
-Open Services Cloud runtime embeds an orchestrator responsible:
+Open Services Cloud runtime embeds an orchestrator responsible to delegate the services management to plugins.
 
-1. to generate the graph of actions required to reach the final expected state
-2. the graph generation depends on the underlying cloud provider
-3. the orchestrator has different bindings (pluggable), each binding converts OCL definition to the concrete cloud provider APIs calls
+Each plugin is dedicated to handle a cloud provider infrastructure and do actions required to actually deal with the services lifecycle:
+
+1. to bind OCL to the concrete cloud provider internal APIs
+1. to generate the graph of actions required to reach the final expected state, specifically for a target cloud provider
 
 ## Runtime
 
@@ -167,3 +168,57 @@ The runtime embeds and run together:
 1. the orchestrator with the different bindings
 2. the OCL loader and parser
 3. the frontends (REST API, ...)
+
+### Build
+
+First, you can build the whole OSC project, including all modules (orchestrator, OCL, runtime, etc), simply with:
+
+```bash
+$ mvn clean install
+```
+
+### Package
+
+By default, the generated runtime doesn't include any specific plugin.
+
+You can build a runtime including available plugin for target cloud provider:
+
+* for Huawei Cloud:
+
+```bash
+$ cd runtime
+$ mvn clean install -Phuaweicloud
+```
+
+* for Openstack:
+
+```bash
+$ cd runtime
+$ mvn clean install -Popenstack
+```
+
+* for Kubernetes:
+
+```bash
+$ cd runtime
+$ mvn clean install -Pk8s
+```
+
+### Run
+
+The previous commands build:
+
+1. the runtime in "exploded" mode in `runtime/target/runtime` folder. To launch the runtime, you just have to do:
+
+```bash
+$ cd runtime/target/runtime
+$ java -jar minho-boot-1.0-SNAPSHOT.jar
+```
+
+2. a docker image per runtime, ready to launch the runtime:
+
+```bash
+$ docker run --name my-osc-runtime osc/osc-huaweicloud
+```
+
+Eventually, you can also deploy with Kubernetes. OSC provides manifest in `runtime/src/main/kubernetes` folder. You can use `kubectl apply` to deploy these manifests on your Kubernetes cluster.
