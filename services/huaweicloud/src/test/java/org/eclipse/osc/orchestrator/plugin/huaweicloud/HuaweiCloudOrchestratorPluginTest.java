@@ -9,6 +9,7 @@ import org.apache.karaf.minho.boot.Minho;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.LifeCycleService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
+import org.eclipse.osc.orchestrator.FileOrchestratorStorage;
 import org.eclipse.osc.orchestrator.OrchestratorService;
 import org.eclipse.osc.services.ocl.loader.OclLoader;
 import org.junit.jupiter.api.Assertions;
@@ -60,9 +61,11 @@ public class HuaweiCloudOrchestratorPluginTest {
         Map<String, String> properties = new HashMap<>();
         properties.put("orchestrator.store.filename", "target/test-classes/test.properties");
         configService.setProperties(properties);
+
         Minho minho = Minho.builder().loader(
             () -> Stream.of(configService, new LifeCycleService(), new OclLoader(),
-                new OrchestratorService(), new HuaweiCloudOrchestratorPlugin())).build().start();
+                new OrchestratorService(), new HuaweiCloudOrchestratorPlugin(),
+                new FileOrchestratorStorage(configService))).build().start();
 
         ServiceRegistry serviceRegistry = minho.getServiceRegistry();
         OrchestratorService orchestratorService = serviceRegistry.get(OrchestratorService.class);

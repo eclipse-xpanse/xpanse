@@ -1,8 +1,9 @@
 package org.eclipse.osc.orchestrator;
 
 import java.util.Set;
+import org.apache.karaf.minho.boot.spi.Service;
 
-public interface OrchestratorStorage {
+public interface OrchestratorStorage extends Service {
 
     /**
      * Add a managed service id in the store.

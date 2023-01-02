@@ -2,6 +2,7 @@ package org.eclipse.osc.orchestrator;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.LifeCycleService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
@@ -38,8 +39,10 @@ public class OrchestratorService implements Service {
 
         storage = serviceRegistry.get(OrchestratorStorage.class);
         if (storage == null) {
-            log.warn("No orchestrator storage service found in the service registry, using default file orchestrator storage");
-            storage = new FileOrchestratorStorage(serviceRegistry);
+            log.warn(
+                "No orchestrator storage service found in the service registry, using default "
+                    + "file orchestrator storage");
+            storage = new FileOrchestratorStorage(serviceRegistry.get(ConfigService.class));
         }
 
         LifeCycleService lifeCycleService = serviceRegistry.get(LifeCycleService.class);
