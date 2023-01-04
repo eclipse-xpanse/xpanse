@@ -1,28 +1,16 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Configuration Language
 
 The Open Services Cloud Configuration Language allows you to describe your service and interaction with fundamentals services (computing, network, billing, ...).
 
-## Metadata
-
 The first part of the OCL service descriptor is basically service metadata:
 
-* `name` is the name of your service, used to identify the service in the CSP catalog, user console, etc
+* `name` is the name of the service, used to identify the service in the CSP catalog, user console, etc
 * `category` is the overall category of the service. It's especially use to integrate the service in the right menu of the user console.
 * `namespace` is the location of the service. It could be in a CSP subdomain, in a region, and any kind of CSP classification.
-* `properties` is all metadata (key/value pairs) for the managed services. These properties are used by the OSC Orchestrator.
-* `artifacts` is the list of artifacts used to bootstrap the managed service.
-
-An artifact is described with:
-* `name` identifies the artifact
-* `type` defines the artifact type (jar, deb, docker, rpm, ...)
-* `url` is the location (URL) of the artifact (https, file, mvn, ...)
-* `properties` is a list of properties (metadata) used for bootstrapping and deployment
-
-## Services Integration
 
 ### Image
 

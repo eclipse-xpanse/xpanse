@@ -8,6 +8,8 @@ import org.apache.karaf.minho.boot.Minho;
 import org.eclipse.osc.orchestrator.OrchestratorService;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
+import java.util.Set;
+
 @Slf4j
 @Path("/")
 public class OrchestratorApi {
@@ -38,6 +40,17 @@ public class OrchestratorApi {
         return "ready";
     }
 
+    @Path("/services")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String services() throws Exception {
+        StringBuilder builder = new StringBuilder();
+        getOrchestrator().getStorage().services().stream().forEach(service -> {
+            builder.append(service).append("\n");
+        });
+        return builder.toString();
+    }
+
     @Path("/start")
     @POST
     public Response start(@HeaderParam("managedServiceName") String managedServiceName) throws Exception {
@@ -64,7 +77,7 @@ public class OrchestratorApi {
     @Path("/update/fetch")
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
-    public Response update(@HeaderParam("managedServiceName") String managedServiceName, String oclLocation) throws Exception {
+    public Response update(@HeaderParam("managedServiceName") String managedServiceName, @HeaderParam("ocl") String oclLocation) throws Exception {
         getOrchestrator().updateManagedService(managedServiceName, oclLocation);
         return Response.ok().build();
     }
