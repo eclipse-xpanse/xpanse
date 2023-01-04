@@ -81,27 +81,43 @@ const config = {
                 label: 'Getting Started',
                 to: '/docs/intro',
               },
+							{
+								label: 'Architecture',
+								to: '/docs/architecture',
+							},
               {
                 label: 'Configuration Language',
                 to: '/docs/ocl',
               },
               {
-                label: 'Supported Cloud',
-                to: '/docs/supported-cloud',
+                label: 'Runtime',
+                to: '/docs/runtime',
               },
               {
-                label: 'Running the orchestrator',
-                to: '/docs/orchestrator',
+                label: 'API',
+                to: '/docs/api',
               },
-              {
-                label: 'Resources',
-                to: '/docs/resources',
-              }
+							{
+								label: 'Supported Cloud',
+								to: '/docs/supported-cloud',
+							},
+							{
+								label: 'Resources',
+								to: '/docs/resources',
+							},
+							{
+								label: 'Plugin',
+								to: '/docs/plugin',
+							},
             ],
           },
           {
             title: 'Community',
             items: [
+							{
+								label: 'Contribute',
+								to: '/docs/contribute',
+							},
               {
                 label: 'Mailing Lists',
                 href: 'https://accounts.eclipse.org/mailing-list/osc-wg',
