@@ -65,7 +65,7 @@ public class HuaweiCloudOrchestratorPluginTest {
         Minho minho = Minho.builder().loader(
             () -> Stream.of(configService, new LifeCycleService(), new OclLoader(),
                 new OrchestratorService(), new HuaweiCloudOrchestratorPlugin(),
-                new FileOrchestratorStorage(configService))).build().start();
+                new FileOrchestratorStorage())).build().start();
 
         ServiceRegistry serviceRegistry = minho.getServiceRegistry();
         OrchestratorService orchestratorService = serviceRegistry.get(OrchestratorService.class);

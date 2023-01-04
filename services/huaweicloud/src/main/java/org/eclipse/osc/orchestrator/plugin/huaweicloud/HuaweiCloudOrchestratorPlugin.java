@@ -8,6 +8,7 @@ import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
 import org.eclipse.osc.orchestrator.OrchestratorPlugin;
+import org.eclipse.osc.orchestrator.OrchestratorStorage;
 import org.eclipse.osc.services.ocl.loader.Ocl;
 
 @Slf4j
@@ -16,6 +17,21 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     private final Map<String, Ocl> managedOcl = new HashMap<>();
 
     private ConfigService config;
+
+    private OrchestratorStorage storage;
+
+    private ServiceRegistry serviceRegistry;
+
+    private void reloadStorage() {
+        if (serviceRegistry == null) {
+            return;
+        }
+
+        storage = serviceRegistry.get(OrchestratorStorage.class);
+        if (storage == null) {
+            throw new IllegalStateException("OrchestratorStorage does not existed.");
+        }
+    }
 
     @Override
     public String name() {
@@ -34,6 +50,10 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         }
 
         config = configService;
+
+        //  The default FileOrchestratorStorage service that comes from Orchestrator may not be
+        //  ready now, save the ServiceRegistry to load the FileOrchestratorStorage further.
+        this.serviceRegistry = serviceRegistry;
     }
 
     @Override

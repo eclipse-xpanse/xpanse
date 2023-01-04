@@ -8,16 +8,26 @@ import java.util.Properties;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
+import org.apache.karaf.minho.boot.service.ServiceRegistry;
+import org.apache.karaf.minho.boot.spi.Service;
 
 @Slf4j
-public class FileOrchestratorStorage implements OrchestratorStorage {
+public class FileOrchestratorStorage implements OrchestratorStorage, Service {
 
     public static final String DEFAULT_FILENAME = "orchestrator.properties";
 
     private final Properties properties = new Properties();
     private File file = new File(DEFAULT_FILENAME);
 
-    public FileOrchestratorStorage(ConfigService configService) {
+    @Override
+    public String name() {
+        return "file-orchestrator-storage";
+    }
+
+    @Override
+    public void onRegister(ServiceRegistry serviceRegistry) {
+        log.info("Registering file orchestrator storage service ...");
+        ConfigService configService = serviceRegistry.get(ConfigService.class);
         file = new File(configService.getProperty("orchestrator.store.filename", DEFAULT_FILENAME));
         if (file.exists()) {
             try {
