@@ -204,6 +204,13 @@ $ cd runtime
 $ mvn clean install -Pk8s
 ```
 
+By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image adding `-Ddocker.skip=false` as build argument:
+
+```shell
+$ cd runtime
+$ mvn clean install -Phuaweicloud -Ddocker.skip=false
+```
+
 ### Run
 
 The previous commands build:
@@ -215,7 +222,7 @@ $ cd runtime/target/runtime
 $ java -jar minho-boot-1.0-SNAPSHOT.jar
 ```
 
-2. a docker image per runtime, ready to launch the runtime:
+2. optionally (if you used `-Ddocker.skip=false`, a docker image per runtime, ready to launch the runtime:
 
 ```shell
 $ docker run --name my-osc-runtime osc/osc-huaweicloud

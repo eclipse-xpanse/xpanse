@@ -68,7 +68,11 @@ You can build only the runtime (once you built completely the project):
 $ mvn clean install -Pk8s -pl runtime
 ```
 
-***NOTE***: The `huaweicloud`, `openstack`, and `k8s` profiles build the docker images. You can skip docker images creation by adding `-Ddocker.skip=true` to the `mvn` command.
+You can also build corresponding Docker image by adding `-Ddocker.skip=false` argument to the build command:
+
+```shell
+$ mvn clean install -Phuaweicloud -Ddocker.skip=false
+```
 
 ## Launch
 
@@ -139,9 +143,7 @@ ready
 
 ### Docker
 
-By default, the `huaweicloud`, `openstack`, and  `k8s` profiles build corresponding docker image.
-
-***NOTE***: you can skip docker image creation by adding `-Ddocker.skip=true` argument to the `mvn` command.
+If you use `-Ddocker.skip=false` as option on the build command line, you have docker image ready for the runtime.
 
 You can see the docker images created:
 
