@@ -15,6 +15,7 @@ public class HuaweiEnvBuilder extends AtomBuilder {
     public static final String ACCESS_KEY = "HW_ACCESS_KEY";
     public static final String SECRET_KEY = "HW_SECRET_KEY";
     public static final String REGION_NAME = "HW_REGION_NAME";
+    public static final String ENTERPRISE_PROJECT_ID = "HW_ENTERPRISE_PROJECT_ID";
 
     public HuaweiEnvBuilder(Ocl ocl) {
         super(ocl);
@@ -48,6 +49,7 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         String accessKey = configCtx.getProperty(ACCESS_KEY);
         String secretKey = configCtx.getProperty(SECRET_KEY);
         String region = configCtx.getProperty(REGION_NAME);
+        String project_id = configCtx.getProperty(ENTERPRISE_PROJECT_ID);
 
         Map<String, String> envCtx = new HashMap<>();
         if (accessKey != null) {
@@ -58,6 +60,9 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         }
         if (region != null) {
             envCtx.put(REGION_NAME, region);
+        }
+        if (project_id != null) {
+            envCtx.put(ENTERPRISE_PROJECT_ID, project_id);
         }
 
         ctx.put(name(), envCtx);
