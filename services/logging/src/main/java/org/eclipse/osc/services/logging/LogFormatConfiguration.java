@@ -11,6 +11,16 @@ import java.util.Objects;
 public class LogFormatConfiguration implements Service {
 
     @Override
+    public String name() {
+        return "osc-logging-configuration";
+    }
+
+    @Override
+    public int priority() {
+        return 1;
+    }
+
+    @Override
     public void onRegister(ServiceRegistry serviceRegistry) {
         log.info("Registering log configuration");
         if (Objects.isNull(serviceRegistry)) {
