@@ -53,6 +53,10 @@
         </dependency>
     </dependencies>
 
+    <properties>
+        <docker.skip>true</docker.skip>
+    </properties>
+
     <build>
         <resources>
             <resource>
