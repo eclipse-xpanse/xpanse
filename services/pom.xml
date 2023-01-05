@@ -23,6 +23,7 @@
         <module>huaweicloud</module>
         <module>k8s</module>
         <module>api</module>
+        <module>logging</module>
     </modules>
 
 </project>
