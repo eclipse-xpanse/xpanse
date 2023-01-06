@@ -61,7 +61,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
             throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
 
-        Optional<AtomBuilder> optionalAtomBuilder = createBuiler(managedServiceName);
+        Optional<AtomBuilder> optionalAtomBuilder = createBuilder(managedServiceName);
 
         BuilderContext ctx = new BuilderContext();
         ctx.setConfig(config);
@@ -78,7 +78,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         if (!managedOcl.containsKey(managedServiceName)) {
             throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
-        Optional<AtomBuilder> optionalAtomBuilder = createBuiler(managedServiceName);
+        Optional<AtomBuilder> optionalAtomBuilder = createBuilder(managedServiceName);
 
         BuilderContext ctx = new BuilderContext();
         ctx.setConfig(config);
@@ -98,7 +98,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         managedOcl.remove(managedServiceName);
     }
 
-    private Optional<AtomBuilder> createBuiler(String managedServiceName) {
+    private Optional<AtomBuilder> createBuilder(String managedServiceName) {
         Ocl ocl = managedOcl.get(managedServiceName).deepCopy();
         if (ocl == null) {
             throw new IllegalStateException("Ocl object is null.");
