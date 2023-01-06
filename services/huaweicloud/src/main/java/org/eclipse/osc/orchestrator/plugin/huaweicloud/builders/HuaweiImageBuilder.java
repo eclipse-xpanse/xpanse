@@ -145,6 +145,7 @@ public class HuaweiImageBuilder extends AtomBuilder {
                 if (Objects.equals(resource.getType(), "huaweicloud_networking_secgroup")) {
                     if (instance.attributes.containsKey("name")) {
                         packerVars.setSecGroupName(instance.attributes.get("name").toString());
+                        packerVars.setSecGroupId(instance.attributes.get("id").toString());
                     }
                 }
                 if (Objects.equals(resource.getType(), "huaweicloud_vpc_subnet")) {

@@ -7,5 +7,6 @@ public class PackerVars {
 
     private String vpcId = "";
     private String subnetId = "";
+    private String secGroupId = "";
     private String secGroupName = "";
 }
