@@ -28,7 +28,8 @@
     <name>OSC</name>
 
     <modules>
-        <module>services</module>
+        <module>modules</module>
+        <module>plugins</module>
         <module>runtime</module>
     </modules>
 

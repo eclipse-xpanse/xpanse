@@ -25,7 +25,7 @@ You can create a basic plugin Maven `pom.xml` containing the OSC Orchestrator an
     
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.osc.services</groupId>
+            <groupId>org.eclipse.osc.modules</groupId>
             <artifactId>orchestrator</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>

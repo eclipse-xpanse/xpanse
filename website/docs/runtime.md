@@ -98,7 +98,7 @@ INFO: Starting minho-rest-service
 Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.rest.jersey.JerseyRestService onRegister
 INFO:   path: /osc/*
 Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.rest.jersey.JerseyRestService onRegister
-INFO:   packages: org.eclipse.osc.services.api
+INFO:   packages: org.eclipse.osc.modules.api
 Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.web.jetty.JettyWebContainerService addServlet
 INFO: Adding servlet java.lang.Class with context /osc/*
 Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.boot.service.ServiceRegistry add
@@ -112,7 +112,7 @@ INFO:
  \___/| .__/ \___|_| |_| |____/ \___|_|    \_/ |_|\___\___||___/  \____|_|\___/ \__,_|\__,_|
       |_|
 
-        Open Services Cloud 1.0.0-SNAPSHOT (2022)
+        Open Services Cloud 1.0.0-SNAPSHOT (2023)
 
 Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.boot.service.ServiceRegistry lambda$start$2
 INFO: Starting services
@@ -174,7 +174,7 @@ INFO:
  \___/| .__/ \___|_| |_| |____/ \___|_|    \_/ |_|\___\___||___/  \____|_|\___/ \__,_|\__,_|
       |_|
 
-        Open Services Cloud 1.0.0-SNAPSHOT (2022)
+        Open Services Cloud 1.0.0-SNAPSHOT (2023)
 
 Jan 02, 2023 5:54:38 AM org.apache.karaf.minho.boot.service.ServiceRegistry lambda$start$2
 INFO: Starting services
@@ -265,7 +265,7 @@ INFO:
  \___/| .__/ \___|_| |_| |____/ \___|_|    \_/ |_|\___\___||___/  \____|_|\___/ \__,_|\__,_|
       |_|
 
-        Open Services Cloud 1.0.0-SNAPSHOT (2022)
+        Open Services Cloud 1.0.0-SNAPSHOT (2023)
 
 Jan 02, 2023 6:26:37 AM org.apache.karaf.minho.boot.service.ServiceRegistry lambda$start$2
 INFO: Starting services

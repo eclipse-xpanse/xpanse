@@ -12,7 +12,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>runtime</artifactId>
+    <artifactId>osc-runtime</artifactId>
     <name>OSC :: Runtime</name>
 
     <dependencies>
@@ -37,17 +37,17 @@
             <artifactId>minho-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.osc.services</groupId>
+            <groupId>org.eclipse.osc.modules</groupId>
             <artifactId>ocl-loader</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.osc.services</groupId>
+            <groupId>org.eclipse.osc.modules</groupId>
             <artifactId>orchestrator</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.osc.services</groupId>
+            <groupId>org.eclipse.osc.modules</groupId>
             <artifactId>api</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -149,7 +149,7 @@
             <id>huaweicloud</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.eclipse.osc.services</groupId>
+                    <groupId>org.eclipse.osc.plugins</groupId>
                     <artifactId>huaweicloud</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -174,7 +174,7 @@
             <id>k8s</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.eclipse.osc.services</groupId>
+                    <groupId>org.eclipse.osc.plugins</groupId>
                     <artifactId>k8s</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -199,7 +199,7 @@
             <id>openstack</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.eclipse.osc.services</groupId>
+                    <groupId>org.eclipse.osc.plugins</groupId>
                     <artifactId>openstack</artifactId>
                     <version>${project.version}</version>
                 </dependency>
