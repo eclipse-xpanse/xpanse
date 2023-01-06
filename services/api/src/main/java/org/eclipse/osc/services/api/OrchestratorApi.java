@@ -1,14 +1,17 @@
 package org.eclipse.osc.services.api;
 
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.Minho;
 import org.eclipse.osc.orchestrator.OrchestratorService;
 import org.eclipse.osc.services.ocl.loader.Ocl;
-
-import java.util.Set;
 
 @Slf4j
 @Path("/")
@@ -33,21 +36,16 @@ public class OrchestratorApi {
     @Path("/health")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String health() throws Exception {
-        if (getOrchestrator() == null) {
-            throw new IllegalStateException("Orchestrator service is not ready");
-        }
+    public String health() {
         return "ready";
     }
 
     @Path("/services")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String services() throws Exception {
+    public String services() {
         StringBuilder builder = new StringBuilder();
-        getOrchestrator().getStorage().services().stream().forEach(service -> {
-            builder.append(service).append("\n");
-        });
+        getOrchestrator().getStorage().services().forEach(service -> builder.append(service).append("\n"));
         return builder.toString();
     }
 
@@ -82,7 +80,7 @@ public class OrchestratorApi {
         return Response.ok().build();
     }
 
-    private OrchestratorService getOrchestrator() throws Exception {
+    private OrchestratorService getOrchestrator() {
         Minho minho = Minho.getInstance();
         OrchestratorService orchestratorService = minho.getServiceRegistry().get(OrchestratorService.class);
 
