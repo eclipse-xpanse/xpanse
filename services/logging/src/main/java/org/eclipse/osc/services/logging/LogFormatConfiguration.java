@@ -1,6 +1,5 @@
 package org.eclipse.osc.services.logging;
 
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
@@ -12,6 +11,8 @@ import java.util.logging.LogManager;
 
 @Slf4j
 public class LogFormatConfiguration implements Service {
+
+    private static final String LOG_FORMAT_CONFIG_NAME = "osc.log.format";
 
     @Override
     public String name() {
@@ -33,10 +34,10 @@ public class LogFormatConfiguration implements Service {
         if (Objects.isNull(configService)) {
             throw new IllegalStateException("Config service is not present in the registry");
         }
-        if (Objects.nonNull(configService.getProperty("jul.log.format"))) {
+        if (Objects.nonNull(configService.getProperty(LOG_FORMAT_CONFIG_NAME))) {
             LogManager.getLogManager().reset();
             System.setProperty("java.util.logging.SimpleFormatter.format",
-                    configService.getProperty("jul.log.format"));
+                    configService.getProperty(LOG_FORMAT_CONFIG_NAME));
             LogManager.getLogManager().readConfiguration();
         }
     }

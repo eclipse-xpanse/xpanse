@@ -2,6 +2,6 @@
   "properties": {
     "rest.packages": "org.eclipse.osc.services.api",
     "rest.path": "/osc/*",
-    "jul.log.format": "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$-6s %2$s %5$s%6$s%n"
+    "osc.log.format": "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$-6s %2$s %5$s%6$s%n"
   }
 }
