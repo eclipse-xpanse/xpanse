@@ -109,7 +109,7 @@ public class PackerExecutor {
 
         String[] lines = out.toString().split("\\n");
         for (String line : lines) {
-            if (line.indexOf(IMAGE) != -1) {
+            if (line.contains(IMAGE)) {
                 String[] s = line.split(" ");
                 imageId = s[s.length - 1];
                 break;

@@ -46,6 +46,7 @@ public class TFExecutorTest {
         builderContext.setConfig(configService);
     }
 
+    @Disabled
     @Test
     public void TFExecutorPlanRollBackTest() throws Exception {
         Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();

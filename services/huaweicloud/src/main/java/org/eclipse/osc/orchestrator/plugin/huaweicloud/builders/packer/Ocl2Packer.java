@@ -87,7 +87,7 @@ class Ocl2Packer {
                 + "%n  ssh_username       = \"root\""
                 + "%n}%n",
             artifact.getName(), artifact.getName(), artifact.getName(),
-            packerVars.getVpcId(), packerVars.getSubnetId(), packerVars.getSecGroupName(),
+            packerVars.getVpcId(), packerVars.getSubnetId(), packerVars.getSecGroupId(),
             baseImage.get().getName()));
 
         hcl.append(String.format("%nbuild {"
