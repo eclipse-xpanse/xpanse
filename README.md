@@ -218,14 +218,22 @@ The previous commands build:
 1. the runtime in "exploded" mode in `runtime/target/runtime` folder. To launch the runtime, you just have to do:
 
 ```shell
-$ cd runtime/target/runtime
-$ java -jar minho-boot-1.0-SNAPSHOT.jar
+$ cd runtime/target/
+$ java -jar osc-runtime-1.0.0-SNAPSHOT.jar
 ```
 
 2. optionally (if you used `-Ddocker.skip=false`, a docker image per runtime, ready to launch the runtime:
 
 ```shell
 $ docker run --name my-osc-runtime osc/osc-huaweicloud
+```
+
+3. Optionally, we can also build an uber/fat jar which contains all the dependencies:
+```shell
+$ cd runtime
+$ mvn clean install -DskipTests -Puberjar,huaweicloud
+$ cd runtime/target
+$ java -jar osc-runtime-all-dependencies-1.0.0-SNAPSHOT.jar
 ```
 
 Eventually, you can also deploy with Kubernetes. OSC provides manifest in `runtime/src/main/kubernetes` folder. You can use `kubectl apply` to deploy these manifests on your Kubernetes cluster.

@@ -60,6 +60,7 @@
 
     <properties>
         <docker.skip>true</docker.skip>
+        <osc.main.class>org.eclipse.osc.runtime.OscMain</osc.main.class>
     </properties>
 
     <build>
@@ -130,7 +131,7 @@
                             </tags>
                         </to>
                         <container>
-                            <mainClass>org.apache.karaf.minho.boot.Main</mainClass>
+                            <mainClass>${osc.main.class}</mainClass>
                             <appRoot>/osc</appRoot>
                             <workingDirectory>/osc</workingDirectory>
                             <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
@@ -147,10 +148,27 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.4.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                                <classpathPrefix>runtime/</classpathPrefix>
+                                <mainClass>${osc.main.class}</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
-
     <profiles>
         <profile>
             <id>huaweicloud</id>
@@ -227,6 +245,32 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>uberjar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                                    <transformers>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <mainClass>${osc.main.class}</mainClass>
+                                        </transformer>
+                                    </transformers>
+                                    <finalName>${project.artifactId}-all-dependencies-${project.version}</finalName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
-
 </project>
