@@ -5,4 +5,4 @@
  \___/| .__/ \___|_| |_| |____/ \___|_|    \_/ |_|\___\___||___/  \____|_|\___/ \__,_|\__,_|
       |_|
 
-        Open Services Cloud ${project.version} (2022)
+        Open Services Cloud ${project.version} (2023)
