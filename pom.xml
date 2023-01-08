@@ -36,7 +36,7 @@
     <properties>
         <junit.version>5.8.2</junit.version>
         <lombok.version>1.18.24</lombok.version>
-        <minho.version>1.0-SNAPSHOT</minho.version>
+        <minho.version>0.1</minho.version>
     </properties>
 
     <dependencyManagement>
