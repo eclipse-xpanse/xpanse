@@ -148,4 +148,26 @@ public class OrchestratorService implements Service {
         storage.remove(managedServiceName);
     }
 
+    /**
+     * Get the runtime state of the managed service.
+     *
+     * @param managedServiceName the managed service name.
+     */
+    public String getManagedServiceState(String managedServiceName) throws Exception {
+        if (!storage.exists(managedServiceName)) {
+            throw new IllegalStateException("Managed service " + managedServiceName + " not found");
+        }
+        StringBuilder response = new StringBuilder("[\n");
+        plugins.forEach(plugin -> {
+            if (plugin instanceof Service) {
+                response.append(storage.getKey(managedServiceName, ((Service) plugin).name(),
+                    "state"));
+                response.append("\n");
+            }
+        });
+        response.append("]\n");
+
+        return response.toString();
+    }
+
 }

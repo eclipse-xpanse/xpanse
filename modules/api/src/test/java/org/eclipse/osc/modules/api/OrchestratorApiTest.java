@@ -102,6 +102,23 @@ public class OrchestratorApiTest {
         Assertions.assertEquals(200, connection.getResponseCode());
     }
 
+    @Test
+    public void state() throws Exception {
+        OrchestratorService orchestratorService = Minho.getInstance().getServiceRegistry()
+            .get(OrchestratorService.class);
+
+        Ocl ocl = new Ocl();
+        ocl.setName("test");
+        orchestratorService.registerManagedService(ocl);
+
+        URL url = new URL("http://localhost:8080/osc/services/state/test");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        Assertions.assertEquals("OK", connection.getResponseMessage());
+        Assertions.assertEquals(200, connection.getResponseCode());
+    }
+
     @BeforeEach
     private void setup() throws Exception {
         ConfigService configService = new ConfigService();
