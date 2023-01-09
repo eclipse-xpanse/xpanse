@@ -38,9 +38,7 @@ public class OrchestratorApi {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String health() throws Exception {
-        if (getOrchestrator() == null) {
-            throw new IllegalStateException("Orchestrator service is not ready");
-        }
+        getOrchestrator();
         return "ready";
     }
 

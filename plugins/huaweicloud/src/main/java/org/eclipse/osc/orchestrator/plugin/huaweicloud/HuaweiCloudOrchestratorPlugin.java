@@ -27,7 +27,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
 
     @Override
     public String name() {
-        return "osc-orchestrator-huaweicloud";
+        return "osc-huaweicloud-plugin";
     }
 
     @Override
