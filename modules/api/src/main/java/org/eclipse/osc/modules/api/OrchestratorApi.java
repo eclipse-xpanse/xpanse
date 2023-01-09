@@ -1,6 +1,12 @@
 package org.eclipse.osc.modules.api;
 
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +42,15 @@ public class OrchestratorApi {
             throw new IllegalStateException("Orchestrator service is not ready");
         }
         return "ready";
+    }
+
+    @Path("/services/state/{managedServiceName}")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String state(@PathParam("managedServiceName") String managedServiceName)
+        throws Exception {
+        OrchestratorService orchestratorService = getOrchestrator();
+        return orchestratorService.getManagedServiceState(managedServiceName);
     }
 
     @Path("/services")
