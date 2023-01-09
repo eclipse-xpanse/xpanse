@@ -20,6 +20,7 @@
         <module>ocl-loader</module>
         <module>orchestrator</module>
         <module>api</module>
+        <module>logging</module>
     </modules>
 
 </project>
