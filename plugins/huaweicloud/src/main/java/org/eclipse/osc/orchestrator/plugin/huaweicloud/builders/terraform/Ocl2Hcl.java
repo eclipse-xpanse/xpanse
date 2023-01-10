@@ -218,6 +218,8 @@ class Ocl2Hcl {
                     .append(".id\n  }"));
             }
 
+            hcl.append("\n  admin_pass = \"Cloud#1234\"");
+
             List<String> securityGroupList = new ArrayList<>();
             for (var secGroup : vm.getSecurity()) {
                 Optional<Security> subnet = ocl.referTo(secGroup, Security.class);

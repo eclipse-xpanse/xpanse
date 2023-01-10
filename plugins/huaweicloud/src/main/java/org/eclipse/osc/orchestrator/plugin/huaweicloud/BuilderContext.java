@@ -2,13 +2,14 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.apache.karaf.minho.boot.service.ConfigService;
+import org.eclipse.osc.modules.ocl.loader.OclResources;
 
+@Data
 public class BuilderContext extends HashMap<String, Map<String, String>> {
 
-    @Getter
-    @Setter
     private ConfigService config;
+
+    private OclResources oclResources = new OclResources();
 }
