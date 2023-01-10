@@ -123,7 +123,7 @@ public class OrchestratorApiTest {
     private void setup() throws Exception {
         ConfigService configService = new ConfigService();
         Map<String, String> properties = new HashMap<>();
-        properties.put("rest.packages", "org.eclipse.osc.modules.api");
+        properties.put("rest.packages", "org.eclipse.osc.modules.api;io.swagger.v3.jaxrs2.integration.resources");
         properties.put("rest.path", "/osc/*");
         properties.put("orchestrator.store.filename", "target/test-classes/orchestrator.properties");
         configService.setProperties(properties);
