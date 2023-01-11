@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.modules.ocl.loader.Ocl;
+import org.eclipse.osc.modules.ocl.loader.OclResource;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer.PackerExecutor;
@@ -13,7 +15,6 @@ import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.TFExec
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.TFState;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.TFStateResourceInstance;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
 
 @Slf4j
 public class HuaweiImageBuilder extends AtomBuilder {
@@ -27,7 +28,17 @@ public class HuaweiImageBuilder extends AtomBuilder {
         return "Huawei-Cloud-image-Builder";
     }
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+
+    private void addImageToCtx(BuilderContext ctx, String imageName, String imageId) {
+        OclResource oclResource = new OclResource();
+        oclResource.setId(imageId);
+        oclResource.setType("image");
+        oclResource.setState("active");
+        oclResource.setName(imageName);
+        ctx.getOclResources().getResources().add(oclResource);
+    }
 
     @Override
     public boolean create(BuilderContext ctx) {
@@ -37,16 +48,15 @@ public class HuaweiImageBuilder extends AtomBuilder {
             throw new BuilderException(this, "Builder context is null.");
         }
 
-        TFExecutor tfExecutor = prepareExecutor(ctx);
-        // Create resources for packer through terraform
-        PackerVars packerVars = prepareEnv(tfExecutor);
-
         if (ocl == null || ocl.getImage() == null || ocl.getImage().getArtifacts() == null) {
             log.info("There's no image artifacts need to be built.");
             return true;
         }
 
-        String imageId = "";
+        TFExecutor tfExecutor = prepareExecutor(ctx);
+        // Create resources for packer through terraform
+        PackerVars packerVars = prepareEnv(tfExecutor);
+
         Map<String, String> imageCtx = new HashMap<>();
 
         for (var artifact : ocl.getImage().getArtifacts()) {
@@ -57,7 +67,8 @@ public class HuaweiImageBuilder extends AtomBuilder {
             packerExecutor.createInstallScript();
             packerExecutor.createPackerScript(packerVars);
 
-            imageId = packerExecutor.packerBuild();
+            String imageId = packerExecutor.packerBuild();
+            addImageToCtx(ctx, artifact.getName(), imageId);
 
             if (!packerExecutor.packerInit()) {
                 throw new BuilderException(this, "PackerExecutor.packerInit failed." + name());
@@ -80,6 +91,8 @@ public class HuaweiImageBuilder extends AtomBuilder {
     public boolean destroy(BuilderContext ctx) {
         log.info("Destroying Huawei Cloud Image.");
         // TODO: destroy the temporary images here or after resources created.
+        TFExecutor tfExecutor = prepareExecutor(ctx);
+        destroyEnv(tfExecutor);
         return true;
     }
 
@@ -95,22 +108,22 @@ public class HuaweiImageBuilder extends AtomBuilder {
         }
         TFExecutor executor = new TFExecutor(envCtx);
         executor.createWorkspace(name());
-        executor.createTFScript(""
+        executor.createTFScript(String.format(""
             + "resource \"huaweicloud_vpc\" \"vpc\" {\n"
-            + "  name = \"osc-packer-01\"\n"
+            + "  name = \"osc-packer-%s\"\n"
             + "  cidr = \"192.168.0.0/16\"\n"
             + "}\n"
             + "\n"
             + "resource \"huaweicloud_vpc_subnet\" \"subnet\" {\n"
-            + "  name       = \"osc-packer-01\"\n"
+            + "  name       = \"osc-packer-%s\"\n"
             + "  cidr       = \"192.168.1.0/24\"\n"
             + "  gateway_ip = \"192.168.1.1\"\n"
             + "  vpc_id     = huaweicloud_vpc.vpc.id\n"
             + "}\n"
             + "\n"
             + "resource \"huaweicloud_networking_secgroup\" \"secgroup\" {\n"
-            + "  name        = \"osc-packer-secgroup_1\"\n"
-            + "  description = \"My security group\"\n"
+            + "  name        = \"osc-packer-secgroup_%s\"\n"
+            + "  description = \"Osc security group\"\n"
             + "}\n"
             + "\n"
             + "resource \"huaweicloud_networking_secgroup_rule\" \"test\" {\n"
@@ -121,7 +134,7 @@ public class HuaweiImageBuilder extends AtomBuilder {
             + "  port_range_min    = 22\n"
             + "  port_range_max    = 22\n"
             + "  remote_ip_prefix  = \"159.138.32.195/32\"\n"
-            + "}");
+            + "}", ocl.getName(), ocl.getName(), ocl.getName()));
 
         return executor;
     }

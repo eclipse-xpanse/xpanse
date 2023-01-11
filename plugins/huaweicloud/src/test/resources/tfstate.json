@@ -1,0 +1,653 @@
+{
+  "version": 4,
+  "terraform_version": "1.3.4",
+  "serial": 115,
+  "lineage": "b122dd9a-76e5-b6e7-a74a-f392eeef9d1a",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "data",
+      "type": "huaweicloud_availability_zones",
+      "name": "osc-az",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "74326821",
+            "names": [
+              "cn-north-4a",
+              "cn-north-4b",
+              "cn-north-4c",
+              "cn-north-4g"
+            ],
+            "region": null,
+            "state": "available"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_compute_eip_associate",
+      "name": "osc-eip-associated-osc-kafka-vm",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bandwidth_id": null,
+            "fixed_ip": "10.10.1.199",
+            "id": "123.249.105.172/235de8e8-4107-47e2-a4d8-2245400e1d77/10.10.1.199",
+            "instance_id": "235de8e8-4107-47e2-a4d8-2245400e1d77",
+            "port_id": "156f2ffa-55cf-458d-ad29-ae9dd3bf7f2c",
+            "public_ip": "123.249.105.172",
+            "region": "cn-north-4",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_compute_instance.osc-kafka-vm",
+            "huaweicloud_networking_secgroup.osc-res-sg",
+            "huaweicloud_vpc.osc-res-vpc",
+            "huaweicloud_vpc_eip.osc-eip-osc-kafka-vm",
+            "huaweicloud_vpc_subnet.osc-res-subnet"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_compute_instance",
+      "name": "osc-kafka-vm",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "10.10.1.199",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "agency_name": "",
+            "agent_list": "",
+            "auto_pay": null,
+            "auto_renew": null,
+            "availability_zone": "cn-north-4b",
+            "bandwidth": [],
+            "block_device": [],
+            "charging_mode": "postPaid",
+            "data_disks": [],
+            "delete_disks_on_termination": null,
+            "delete_eip_on_termination": true,
+            "eip_id": null,
+            "eip_type": null,
+            "enterprise_project_id": "0",
+            "flavor_id": "c7.large.4",
+            "flavor_name": "c7.large.4",
+            "id": "235de8e8-4107-47e2-a4d8-2245400e1d77",
+            "image_id": "e001d7f7-02f2-4b89-9f55-4d82d96d09b5",
+            "image_name": "kafka_image",
+            "key_pair": null,
+            "metadata": null,
+            "name": "osc-kafka-vm",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "10.10.1.199",
+                "fixed_ip_v6": "",
+                "ipv6_enable": false,
+                "mac": "fa:16:3e:54:4b:11",
+                "port": "156f2ffa-55cf-458d-ad29-ae9dd3bf7f2c",
+                "source_dest_check": true,
+                "uuid": "84829267-64be-40c6-a699-91d3efb3cf2f"
+              }
+            ],
+            "period": null,
+            "period_unit": null,
+            "power_action": null,
+            "public_ip": null,
+            "region": "cn-north-4",
+            "scheduler_hints": [],
+            "security_group_ids": [
+              "f7aa4c8c-2379-497f-bada-306f16f88a1c"
+            ],
+            "security_groups": [
+              "osc-res-sg"
+            ],
+            "spot_duration": null,
+            "spot_duration_count": null,
+            "spot_maximum_price": null,
+            "status": "ACTIVE",
+            "stop_before_destroy": false,
+            "system_disk_id": "793d39c1-f96c-48a0-8699-689fd8fcb121",
+            "system_disk_size": 40,
+            "system_disk_type": "GPSSD",
+            "tags": null,
+            "timeouts": null,
+            "user_data": null,
+            "user_id": null,
+            "volume_attached": [
+              {
+                "boot_index": 0,
+                "pci_address": "688860300000cf00fa16520d39517815",
+                "size": 40,
+                "type": "GPSSD",
+                "volume_id": "793d39c1-f96c-48a0-8699-689fd8fcb121"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg",
+            "huaweicloud_vpc.osc-res-vpc",
+            "huaweicloud_vpc_subnet.osc-res-subnet"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_evs_volume",
+      "name": "osc-res-storage",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "attachment": [],
+            "auto_pay": null,
+            "auto_renew": null,
+            "availability_zone": "cn-north-4a",
+            "backup_id": null,
+            "cascade": false,
+            "charging_mode": null,
+            "description": "",
+            "device_type": "VBD",
+            "enterprise_project_id": "0",
+            "id": "3c7b1b66-06bf-4614-a069-3497f7dd6f22",
+            "image_id": null,
+            "kms_id": null,
+            "multiattach": false,
+            "name": "osc-res-storage",
+            "period": null,
+            "period_unit": null,
+            "region": "cn-north-4",
+            "size": 20,
+            "snapshot_id": "",
+            "tags": null,
+            "timeouts": null,
+            "volume_type": "SAS",
+            "wwn": "688860300002af70fa16e8e337626396"
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "data.huaweicloud_availability_zones.osc-az"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup",
+      "name": "osc-res-sg",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2022-12-27T03:20:41Z",
+            "delete_default_rules": null,
+            "description": "",
+            "enterprise_project_id": "0",
+            "id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "name": "osc-res-sg",
+            "region": "cn-north-4",
+            "rules": [
+              {
+                "action": "allow",
+                "description": "",
+                "direction": "egress",
+                "ethertype": "IPv6",
+                "id": "9561a622-2822-42c6-aed7-01b64345f3cc",
+                "port_range_max": 0,
+                "port_range_min": 0,
+                "ports": "",
+                "priority": 100,
+                "protocol": "",
+                "remote_address_group_id": "",
+                "remote_group_id": "",
+                "remote_ip_prefix": ""
+              },
+              {
+                "action": "allow",
+                "description": "",
+                "direction": "egress",
+                "ethertype": "IPv4",
+                "id": "12da1716-9c6a-416e-b884-495e2dfd8db5",
+                "port_range_max": 0,
+                "port_range_min": 0,
+                "ports": "",
+                "priority": 100,
+                "protocol": "",
+                "remote_address_group_id": "",
+                "remote_group_id": "",
+                "remote_ip_prefix": ""
+              },
+              {
+                "action": "allow",
+                "description": "",
+                "direction": "ingress",
+                "ethertype": "IPv6",
+                "id": "ead71844-2811-4c9c-9727-8e0f9c9639c7",
+                "port_range_max": 0,
+                "port_range_min": 0,
+                "ports": "",
+                "priority": 100,
+                "protocol": "",
+                "remote_address_group_id": "",
+                "remote_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+                "remote_ip_prefix": ""
+              },
+              {
+                "action": "allow",
+                "description": "",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "id": "75c271e9-45ce-450e-927d-dcc6046cae62",
+                "port_range_max": 0,
+                "port_range_min": 0,
+                "ports": "",
+                "priority": 100,
+                "protocol": "",
+                "remote_address_group_id": "",
+                "remote_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+                "remote_ip_prefix": ""
+              }
+            ],
+            "timeouts": null,
+            "updated_at": "2022-12-27T03:20:41Z"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "osc-res-sg-kafka_0",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "7f37c5b8-9290-452d-bd42-077e13553ec9",
+            "port_range_max": 8080,
+            "port_range_min": 8080,
+            "ports": "8080",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-north-4",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "10.10.2.6/32",
+            "security_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "osc-res-sg-kafka_1",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "35e993e7-7a8c-4d26-8556-72c975e000a2",
+            "port_range_max": 9093,
+            "port_range_min": 9092,
+            "ports": "9092-9093",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-north-4",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "10.10.2.6/32",
+            "security_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "osc-res-sg-kafka_2",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "ec15541b-e63c-454d-a326-e47a2fd976c0",
+            "port_range_max": 2181,
+            "port_range_min": 2181,
+            "ports": "2181",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-north-4",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "10.10.2.6/32",
+            "security_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "osc-res-sg-ssh-private_7",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "6b9625cc-943d-49e6-8d12-8b033e08d935",
+            "port_range_max": 22,
+            "port_range_min": 22,
+            "ports": "22",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-north-4",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "198.19.0.0/16",
+            "security_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "osc-res-sg-ssh-public_3",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "535b1c8c-b042-4293-a9cc-00d6f2bbd373",
+            "port_range_max": 22,
+            "port_range_min": 22,
+            "ports": "22",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-north-4",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "1.1.1.1/32",
+            "security_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "osc-res-sg-ssh-public_4",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "81f86edd-46de-42df-ab09-4c6b1b478e5c",
+            "port_range_max": 8080,
+            "port_range_min": 8080,
+            "ports": "8080",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-north-4",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "1.1.1.1/32",
+            "security_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "osc-res-sg-ssh-public_5",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "c1f7743f-3adb-4a9e-8565-1b3c5378dff3",
+            "port_range_max": 9093,
+            "port_range_min": 9092,
+            "ports": "9092-9093",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-north-4",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "1.1.1.1/32",
+            "security_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "osc-res-sg-ssh-public_6",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "8fbc9aa9-a4e7-4b2a-8d3d-fadfb23b4394",
+            "port_range_max": 2181,
+            "port_range_min": 2181,
+            "ports": "2181",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-north-4",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "1.1.1.1/32",
+            "security_group_id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_networking_secgroup.osc-res-sg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_vpc",
+      "name": "osc-res-vpc",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cidr": "10.10.0.0/16",
+            "description": "",
+            "enterprise_project_id": "0",
+            "id": "569cbba6-0e4d-4f33-a096-e5ef5dc3174a",
+            "name": "osc-res-vpc",
+            "region": "cn-north-4",
+            "routes": [],
+            "secondary_cidr": null,
+            "status": "OK",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_vpc_eip",
+      "name": "osc-eip-osc-kafka-vm",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": "123.249.105.172",
+            "auto_pay": null,
+            "auto_renew": null,
+            "bandwidth": [
+              {
+                "charge_mode": "traffic",
+                "id": "1d65ee8b-7b88-4828-8818-3a3429d10a95",
+                "name": "osc-eip-osc-kafka-vm",
+                "share_type": "PER",
+                "size": 5
+              }
+            ],
+            "charging_mode": null,
+            "enterprise_project_id": "0",
+            "id": "bb145061-909e-4fdd-b499-4ef23622f1ae",
+            "ipv6_address": "",
+            "name": "",
+            "period": null,
+            "period_unit": null,
+            "port_id": "",
+            "private_ip": "",
+            "publicip": [
+              {
+                "ip_address": "123.249.105.172",
+                "ip_version": 4,
+                "port_id": "",
+                "type": "5_bgp"
+              }
+            ],
+            "region": "cn-north-4",
+            "status": "UNBOUND",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_vpc_subnet",
+      "name": "osc-res-subnet",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "availability_zone": "",
+            "cidr": "10.10.1.0/24",
+            "description": "",
+            "dhcp_enable": true,
+            "dns_list": [
+              "100.125.1.250",
+              "100.125.129.250"
+            ],
+            "gateway_ip": "10.10.1.1",
+            "id": "84829267-64be-40c6-a699-91d3efb3cf2f",
+            "ipv4_subnet_id": "5105bcee-c673-49e3-a9f4-4ede6cc53143",
+            "ipv6_cidr": "",
+            "ipv6_enable": false,
+            "ipv6_gateway": "",
+            "ipv6_subnet_id": "",
+            "name": "osc-res-subnet",
+            "primary_dns": "100.125.1.250",
+            "region": "cn-north-4",
+            "secondary_dns": "100.125.129.250",
+            "subnet_id": "5105bcee-c673-49e3-a9f4-4ede6cc53143",
+            "tags": null,
+            "timeouts": null,
+            "vpc_id": "569cbba6-0e4d-4f33-a096-e5ef5dc3174a"
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "huaweicloud_vpc.osc-res-vpc"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

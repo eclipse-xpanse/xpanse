@@ -60,6 +60,9 @@ public class HuaweiResourceBuilder extends AtomBuilder {
         if (!tfExecutor.tfApply()) {
             throw new BuilderException(this, "TFExecutor.tfApply failed." + name());
         }
+
+        tfExecutor.updateOclResources(ctx.getOclResources());
+
         return true;
     }
 
@@ -83,6 +86,8 @@ public class HuaweiResourceBuilder extends AtomBuilder {
             log.error("ResourceBuilder destroy failed {}.", name());
             return false;
         }
+
         return true;
     }
+
 }
