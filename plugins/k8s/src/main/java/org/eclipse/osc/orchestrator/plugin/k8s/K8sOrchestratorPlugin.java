@@ -11,7 +11,7 @@ public class K8sOrchestratorPlugin implements Service, OrchestratorPlugin {
 
     @Override
     public String name() {
-        return "osc-k8s-orchestrator-plugin-service";
+        return "osc-k8s-plugin";
     }
 
     @Override

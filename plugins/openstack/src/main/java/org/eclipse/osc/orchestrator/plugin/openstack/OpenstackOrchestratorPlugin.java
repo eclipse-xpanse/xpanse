@@ -1,95 +1,69 @@
 package org.eclipse.osc.orchestrator.plugin.openstack;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.apache.karaf.minho.boot.spi.Service;
-import org.eclipse.osc.orchestrator.OrchestratorPlugin;
 import org.eclipse.osc.modules.ocl.loader.Ocl;
+import org.eclipse.osc.orchestrator.OrchestratorPlugin;
+import org.openstack4j.api.Builders;
+import org.openstack4j.api.OSClient;
+import org.openstack4j.model.magnum.Container;
+import org.openstack4j.model.magnum.ContainerBuilder;
+import org.openstack4j.model.network.IPVersionType;
+import org.openstack4j.openstack.magnum.MagnumContainer;
 
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.Objects;
 
 @Slf4j
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin, Service {
 
-    private String authenticationUrl;
-    private String authenticationUsername;
-    private String authenticationPassword;
-    private String authenticationDomain;
-    private String authenticationProject;
+    private static final String SUCCESSFUL_INSTALLATION_LOG = "Kafka up and running"; //TODO - to be moved to Ocl?
+    private OSClient.OSClientV3 osClient;
 
     @Override
     public String name() {
-        return "osc-orchestrator-openstack";
+        return "osc-openstack-plugin";
     }
 
     @Override
     public void onRegister(ServiceRegistry serviceRegistry) {
-        ConfigService configService = serviceRegistry.get(ConfigService.class);
-        if (configService == null) {
-            throw new IllegalStateException("Config service is not present in the registry");
-        }
-        // typically authentication.url should look like https://foo/v3/auth/tokens
-        if (configService.getProperty("authentication.url") == null) {
-            throw new IllegalStateException("authentication.url is not present in config service");
-        }
-        authenticationUrl = configService.getProperty("authentication.url");
-        if (configService.getProperty("authentication.username") == null) {
-            throw new IllegalStateException("authentication.username is not present in config service");
-        }
-        authenticationUsername = configService.getProperty("authentication.username");
-        if (configService.getProperty("authentication.password") == null) {
-            throw new IllegalStateException("authentication.password is not present in config service");
-        }
-        authenticationPassword = configService.getProperty("authentication.password");
-        if (configService.getProperty("authentication.domain") == null) {
-            throw new IllegalStateException("authentication.domain is not present in config service");
-        }
-        authenticationDomain = configService.getProperty("authentication.domain");
-        if (configService.getProperty("authentication.project") == null) {
-            throw new IllegalStateException("authentication.project is not present in config service");
-        }
-        authenticationProject = configService.getProperty("authentication.project");
-    }
-
-    /**
-     * Authenticate on the openstack URL and get the token
-     *
-     * @return the token
-     * @throws Exception if the authentcation fails
-     */
-    private String authenticate() throws Exception {
-        log.info("Authenticate on " + authenticationUrl);
-        // TODO support proxy
-        HttpURLConnection connection = (HttpURLConnection) new URL(authenticationUrl).openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("Accept", "application/json");
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        String authJson = "{ \"auth\": { \"identity\": { \"methods\": [\"password\"], \"password\": { \"user\": { \"name\": \""
-                + authenticationUsername + "\", \"domain\": { \"name\": \""
-                + authenticationDomain + "\" }, \"password\": \""
-                + authenticationPassword + "\" }}}, \"scope\": { \"project\": { \"id\": \""
-                + authenticationProject + "\" }}}}";
-        log.debug("Authentication JSON request:");
-        log.debug(authJson);
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()))) {
-            writer.write(authJson);
-            writer.flush();
-        }
-        if (connection.getResponseCode() != 201) {
-            throw new IllegalStateException("Can't get token (" + connection.getResponseCode() + "): " + connection.getResponseMessage());
-        }
-        return connection.getHeaderField("X-Subject-Token");
+        osClient = KeystoneManager.getClient(serviceRegistry);
     }
 
     @Override
     public void registerManagedService(Ocl ocl) {
-        log.info("Register managed service, creating openstack resource");
+        log.info("Register managed service, creating openstack resources");
+        if (Objects.nonNull(ocl.getNetwork())) {
+            log.info("Creating Neutron network resources ...");
+            ocl.getNetwork().getSubnet().forEach(subnet -> osClient.networking().subnet().create(Builders.subnet()
+                    .name(subnet.getId())
+                    .ipVersion(IPVersionType.V4)
+                    .cidr(subnet.getCidr())
+                    .build()));
+        }
+        if (Objects.nonNull(ocl.getImage())) {
+            ocl.getImage().getArtifacts().forEach(artifact -> {
+                if (artifact.getType().equalsIgnoreCase("docker")) {
+                    log.info("Starting docker container via Magnum ...");
+                    ContainerBuilder builder = new MagnumContainer.ContainerConcreteBuilder();
+                    builder.image(artifact.getBase());
+                    builder.name(artifact.getName());
+                    Container container = osClient.magnum().createContainer(builder.build());
+                    osClient.magnum().startContainer(artifact.getName());
+                    log.info("Docker container " + container.getStatus());
+                }
+                if (artifact.getType().equalsIgnoreCase("image")) {
+                    log.info("Starting bare VM via Nova ...");
+                    try {
+                        NovaManager.createVm(this.osClient, artifact, ocl);
+                        log.info("VM with name created {} and Kafka is being installed on it", artifact.getName());
+                    } catch (Exception e) {
+                        log.warn("Virtual machine {} create failed with exception ", artifact.getName(), e);
+                    }
+                    isKafkaProvisioningSuccessful(artifact.getName());
+                }
+            });
+        }
     }
 
     @Override
@@ -110,5 +84,10 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin, Service 
     @Override
     public void unregisterManagedService(String managedServiceName) {
         log.info("Destroy managed service {} from openstack", managedServiceName);
+    }
+
+    private boolean isKafkaProvisioningSuccessful(String vmName) {
+        String vmConsoleLogs = NovaManager.getVmConsoleLog(this.osClient, 50, vmName);
+        return vmConsoleLogs.contains(SUCCESSFUL_INSTALLATION_LOG);
     }
 }

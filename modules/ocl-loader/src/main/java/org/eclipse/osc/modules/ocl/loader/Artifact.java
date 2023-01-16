@@ -11,6 +11,7 @@ public class Artifact extends RuntimeBase {
 
     private String name;
     private String base;
+    private String type;
     private List<String> provisioners;
 
 }
