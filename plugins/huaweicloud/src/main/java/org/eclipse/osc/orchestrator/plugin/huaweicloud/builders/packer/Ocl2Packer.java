@@ -70,7 +70,7 @@ class Ocl2Packer {
                 + "%n  access_key         = var.access_key"
                 + "%n  secret_key         = var.secret_key"
                 + "%n  eip_bandwidth_size = \"5\""
-                + "%n  eip_type           = \"5_bgp\""
+                + "%n  eip_type           = \"5_sbgp\""
                 + "%n  flavor             = \"s6.large.2\""
                 + "%n  instance_name      = \"%s\""
                 + "%n  vpc_id             = \"%s\""

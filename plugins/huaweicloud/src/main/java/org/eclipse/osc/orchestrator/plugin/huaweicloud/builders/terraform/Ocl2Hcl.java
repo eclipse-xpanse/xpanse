@@ -236,7 +236,7 @@ class Ocl2Hcl {
                 hcl.append(String.format(""
                     + "resource \"huaweicloud_vpc_eip\" \"osc-eip-%s\" {\n"
                     + "  publicip {\n"
-                    + "    type = \"5_bgp\"\n"
+                    + "    type = \"5_sbgp\"\n"
                     + "  }\n"
                     + "  bandwidth {\n"
                     + "    name        = \"osc-eip-%s\"\n"
