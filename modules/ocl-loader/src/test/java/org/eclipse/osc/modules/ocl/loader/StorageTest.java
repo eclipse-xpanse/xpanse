@@ -1,5 +1,6 @@
 package org.eclipse.osc.modules.ocl.loader;
 
+import org.eclipse.osc.modules.ocl.loader.data.models.Storage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

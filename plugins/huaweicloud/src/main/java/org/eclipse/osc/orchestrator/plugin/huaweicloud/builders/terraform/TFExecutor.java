@@ -1,14 +1,15 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.utils.SystemCmd;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.TFExecutorException;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.utils.SystemCmd;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.TFExecutorException;
 
 @Slf4j
 public class TFExecutor {

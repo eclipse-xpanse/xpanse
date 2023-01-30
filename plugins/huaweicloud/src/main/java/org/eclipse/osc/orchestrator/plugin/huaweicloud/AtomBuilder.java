@@ -1,14 +1,15 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.enums.BuilderState;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.enums.BuilderState;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
 
 @Slf4j
 public abstract class AtomBuilder {

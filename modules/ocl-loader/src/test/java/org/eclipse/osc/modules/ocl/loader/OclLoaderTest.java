@@ -1,20 +1,29 @@
 package org.eclipse.osc.modules.ocl.loader;
 
-import org.apache.karaf.minho.boot.Minho;
+import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
+import org.eclipse.osc.modules.ocl.loader.data.models.BaseImage;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Provisioner;
+import org.eclipse.osc.modules.ocl.loader.data.models.VM;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.stream.Stream;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {OclLoader.class, })
 public class OclLoaderTest {
+
+    @Autowired
+    OclLoader oclLoader;
 
     @Test
     public void loading() throws Exception {
-        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
-
-        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
 
         Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
 
@@ -32,14 +41,8 @@ public class OclLoaderTest {
 
     @Test
     public void testBlockAssociationProvisioner() throws Exception {
-        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
-
-        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
-
         Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
-
         Assertions.assertNotNull(ocl);
-
         String KafkaProvisionerStr = ocl.getImage().getArtifacts().get(0).getProvisioners().get(0);
         Optional<Provisioner> kafkaProvisioner = ocl.referTo(KafkaProvisionerStr,
             Provisioner.class);
@@ -52,14 +55,8 @@ public class OclLoaderTest {
 
     @Test
     public void testBlockAssociationArtifact() throws Exception {
-        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
-
-        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
-
         Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
-
         Assertions.assertNotNull(ocl);
-
         VM vm = ocl.getCompute().getVm().get(0);
         Assertions.assertEquals("my-vm", vm.getName());
         Assertions.assertEquals("$.image.artifacts[0]", vm.getImage());
@@ -71,28 +68,25 @@ public class OclLoaderTest {
 
     @Test
     public void testJsonParser() throws Exception {
-        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
-
-        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
 
         Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
 
         Assertions.assertNotNull(ocl);
 
         Optional<Artifact> artifact = ocl.referTo("$.xxxxxxxxxxxxxxxxxxxx", Artifact.class);
-        Assertions.assertEquals(true, artifact.isEmpty());
+        Assertions.assertTrue(artifact.isEmpty());
 
         artifact = ocl.referTo("......xxxxxxxxxxxxxxxxxxxx", Artifact.class);
-        Assertions.assertEquals(true, artifact.isEmpty());
+        Assertions.assertTrue(artifact.isEmpty());
 
         artifact = ocl.referTo("......xxxxx[1][3232]", Artifact.class);
-        Assertions.assertEquals(true, artifact.isEmpty());
+        Assertions.assertTrue(artifact.isEmpty());
 
         Optional<Provisioner> provisioner = ocl.referTo("$.image.provisioners[1]",
             Provisioner.class);
-        Assertions.assertEquals(false, provisioner.isPresent());
+        Assertions.assertFalse(provisioner.isPresent());
 
         provisioner = ocl.referTo("$.image.provisioners[0]", Provisioner.class);
-        Assertions.assertEquals(true, provisioner.isPresent());
+        Assertions.assertTrue(provisioner.isPresent());
     }
 }

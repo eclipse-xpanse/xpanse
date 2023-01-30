@@ -1,13 +1,14 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.OclResources;
+import org.eclipse.osc.modules.ocl.loader.data.models.RuntimeBase;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.TFExecutorException;
+
 import java.io.IOException;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.OclResources;
-import org.eclipse.osc.modules.ocl.loader.RuntimeBase;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.TFExecutorException;
 
 @Slf4j
 public class OclTFExecutor extends TFExecutor {

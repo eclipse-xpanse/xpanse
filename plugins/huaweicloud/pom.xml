@@ -23,10 +23,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.karaf.minho</groupId>
-            <artifactId>minho-boot</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.osc.modules</groupId>
             <artifactId>orchestrator</artifactId>
             <version>${project.version}</version>
@@ -55,11 +51,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

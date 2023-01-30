@@ -1,12 +1,13 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.eclipse.osc.modules.ocl.loader.OclResource;
+import org.eclipse.osc.modules.ocl.loader.data.models.OclResource;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TFResources {
 

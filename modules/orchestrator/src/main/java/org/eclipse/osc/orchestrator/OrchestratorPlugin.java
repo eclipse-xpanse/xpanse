@@ -1,6 +1,6 @@
 package org.eclipse.osc.orchestrator;
 
-import org.eclipse.osc.modules.ocl.loader.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 
 /**
  * This interface describes orchestrator plugin in charge of interacting with backend fundamental APIs.
@@ -30,7 +30,7 @@ public interface OrchestratorPlugin {
     void startManagedService(String managedServiceName);
 
     /**
-     * Stop (hidding the managed service for the users) the managed service.
+     * Stop (hiding the managed service for the users) the managed service.
      *
      * @param managedServiceName the service ID to stop.
      */

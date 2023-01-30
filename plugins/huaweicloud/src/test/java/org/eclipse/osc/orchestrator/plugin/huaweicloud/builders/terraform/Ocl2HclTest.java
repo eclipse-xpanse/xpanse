@@ -1,23 +1,24 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
+import org.eclipse.osc.modules.ocl.loader.data.models.Compute;
+import org.eclipse.osc.modules.ocl.loader.data.models.Network;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Security;
+import org.eclipse.osc.modules.ocl.loader.data.models.SecurityRule;
+import org.eclipse.osc.modules.ocl.loader.data.models.Storage;
+import org.eclipse.osc.modules.ocl.loader.data.models.Subnet;
+import org.eclipse.osc.modules.ocl.loader.data.models.VM;
+import org.eclipse.osc.modules.ocl.loader.data.models.VPC;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import org.eclipse.osc.modules.ocl.loader.Compute;
-import org.eclipse.osc.modules.ocl.loader.Network;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.Security;
-import org.eclipse.osc.modules.ocl.loader.SecurityRule;
-import org.eclipse.osc.modules.ocl.loader.Storage;
-import org.eclipse.osc.modules.ocl.loader.Subnet;
-import org.eclipse.osc.modules.ocl.loader.VM;
-import org.eclipse.osc.modules.ocl.loader.VPC;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 public class Ocl2HclTest {
 

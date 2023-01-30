@@ -11,7 +11,7 @@ The demo shows the benefits of Open Services Cloud regarding the different cloud
 
 The demo uses [reactjs](https://reactjs.org/) and [ant design](https://ant.design/).
 
-You basically two ways to build and run the demo: 
+You basically have two ways to build and run the demo: 
 * using [nodejs](https://nodejs.org/en/)
 * using [docker](https://www.docker.com/)
 

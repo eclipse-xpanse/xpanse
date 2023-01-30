@@ -34,7 +34,7 @@ You can [download](/download) the OSC runtime or [build your own runtime](runtim
 In "exploded mode", you have a `runtime` folder, where you can easily launch with:
 
 ```shell
-$ java -jar minho-boot-1.0-SNAPSHOT.jar
+$ java -jar osc-runtime-1.0-SNAPSHOT.jar
 ```
 
 You can copy the whole `runtime` folder on another VM or machine and launch the same way.
@@ -44,7 +44,7 @@ You can copy the whole `runtime` folder on another VM or machine and launch the 
 The runtime is also available as Docker images. You can run a Docker container with:
 
 ```shell
-$ docker run -d --name my-runtime -p 8080:8080 osc/osc-openstack
+$ docker run -d --name my-runtime -p 8080:8080 osc
 ```
 
 OS also provides Kubernetes manifest files allowing you to easily deploy on K8S using `kubectl apply -f`.

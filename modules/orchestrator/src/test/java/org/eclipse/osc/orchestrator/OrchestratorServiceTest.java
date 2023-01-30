@@ -1,29 +1,29 @@
 package org.eclipse.osc.orchestrator;
 
-import org.apache.karaf.minho.boot.Minho;
-import org.apache.karaf.minho.boot.service.ConfigService;
-import org.apache.karaf.minho.boot.service.LifeCycleService;
-import org.apache.karaf.minho.boot.service.ServiceRegistry;
-import org.apache.karaf.minho.boot.spi.Service;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = { PluginTest.class, OclLoader.class, FileOrchestratorStorage.class, OrchestratorService.class})
 public class OrchestratorServiceTest {
+
+    @Autowired
+    OrchestratorService orchestratorService;
 
     @Test
     public void loadPluginTest() throws Exception {
-        ConfigService configService = new ConfigService();
-        Map<String, String> properties = new HashMap<>();
-        properties.put("orchestrator.store.filename", "target/test-classes/test.properties");
-        configService.setProperties(properties);
-        Minho minho = Minho.builder().loader(() -> Stream.of(configService, new LifeCycleService(), new OclLoader(), new OrchestratorService(), new PluginTest())).build().start();
-
-        ServiceRegistry serviceRegistry = minho.getServiceRegistry();
-        OrchestratorService orchestratorService = serviceRegistry.get(OrchestratorService.class);
 
         Assertions.assertEquals(1, orchestratorService.getPlugins().size());
         Assertions.assertTrue(orchestratorService.getPlugins().get(0) instanceof PluginTest);
@@ -32,8 +32,8 @@ public class OrchestratorServiceTest {
 
         orchestratorService.registerManagedService("file:./target/test-classes/test.json");
 
-        Assertions.assertEquals(1, orchestratorService.getStorage().services().size());
-        List<String> managedServicesList = new ArrayList<>(orchestratorService.getStorage().services());
+        Assertions.assertEquals(1, orchestratorService.getOrchestratorStorage().services().size());
+        List<String> managedServicesList = new ArrayList<>(orchestratorService.getOrchestratorStorage().services());
         Assertions.assertEquals("test-service", managedServicesList.get(0));
 
         Assertions.assertNotNull(pluginTest.getOcl());
@@ -51,7 +51,7 @@ public class OrchestratorServiceTest {
 
         orchestratorService.unregisterManagedService("test-service");
 
-        Assertions.assertEquals(0, orchestratorService.getStorage().services().size());
+        Assertions.assertEquals(0, orchestratorService.getOrchestratorStorage().services().size());
 
         Assertions.assertNull(pluginTest.getOcl());
     }
@@ -59,64 +59,9 @@ public class OrchestratorServiceTest {
     @Test
     public void loadWithCustomStorageTest() throws Exception {
         Set<String> services = new HashSet<>();
-
-        Minho minho = Minho.builder().loader(() -> Stream.of(
-                new LifeCycleService(),
-                new OclLoader(),
-                new OrchestratorStorageTest(services),
-                new OrchestratorService(),
-                new PluginTest())).build().start();
-
-        ServiceRegistry serviceRegistry = minho.getServiceRegistry();
-
-        OrchestratorService orchestratorService = serviceRegistry.get(OrchestratorService.class);
         orchestratorService.registerManagedService("file:./target/test-classes/test.json");
 
-        Assertions.assertEquals(1, services.size());
-    }
-
-    class OrchestratorStorageTest implements OrchestratorStorage, Service {
-
-        private final Set<String> services;
-
-        public OrchestratorStorageTest(Set<String> services) {
-            this.services = services;
-        }
-
-        @Override
-        public String name() {
-            return "orchestrator-storage-test";
-        }
-
-        @Override
-        public void store(String sid) {
-            services.add(sid);
-        }
-
-        @Override
-        public void store(String sid, String pluginName, String key, String value) {
-
-        }
-
-        @Override
-        public String getKey(String sid, String pluginName, String key) {
-            return "";
-        }
-
-        @Override
-        public boolean exists(String sid) {
-            return services.contains(sid);
-        }
-
-        @Override
-        public Set<String> services() {
-            return services;
-        }
-
-        @Override
-        public void remove(String sid) {
-            services.remove(sid);
-        }
+        Assertions.assertEquals(1, orchestratorService.getPlugins().size());
     }
 
 }

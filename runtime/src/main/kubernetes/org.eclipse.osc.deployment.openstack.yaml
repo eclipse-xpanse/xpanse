@@ -17,10 +17,10 @@ spec:
     spec:
       containers:
         - name: osc
-          image: osc/osc-openstack:1.0.0-SNAPSHOT
-          envFrom:
-            - configMapRef:
-                name: osc-config
+          image: osc:1.0.0-SNAPSHOT
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: openstack
           ports:
             - containerPort: 8080
           livenessProbe:

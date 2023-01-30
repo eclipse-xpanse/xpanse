@@ -1,18 +1,14 @@
 package org.eclipse.osc.orchestrator;
 
 import lombok.extern.java.Log;
-import org.apache.karaf.minho.boot.spi.Service;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.springframework.stereotype.Component;
 
 @Log
-public class PluginTest implements OrchestratorPlugin, Service {
+@Component
+public class PluginTest implements OrchestratorPlugin {
 
     private Ocl ocl;
-
-    @Override
-    public String name() {
-        return "osc-orchestrator-plugin-test";
-    }
 
     @Override
     public void registerManagedService(Ocl ocl) {

@@ -1,7 +1,7 @@
 package org.eclipse.osc.orchestrator.plugin.openstack;
 
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.Provisioner;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Provisioner;
 
 import java.util.Base64;
 import java.util.List;

@@ -1,13 +1,14 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders;
 
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.OclTFExecutor;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
-import org.eclipse.osc.modules.ocl.loader.Artifact;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
+
+import java.util.Map;
 
 @Slf4j
 public class HuaweiResourceBuilder extends AtomBuilder {

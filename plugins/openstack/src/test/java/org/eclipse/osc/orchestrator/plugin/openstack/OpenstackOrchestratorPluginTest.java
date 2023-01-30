@@ -1,43 +1,50 @@
 package org.eclipse.osc.orchestrator.plugin.openstack;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.karaf.minho.boot.Minho;
-import org.apache.karaf.minho.boot.service.ConfigService;
-import org.apache.karaf.minho.boot.service.LifeCycleService;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
-import org.eclipse.osc.orchestrator.OrchestratorService;
-import org.junit.jupiter.api.Disabled;
+import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.openstack4j.api.OSClient;
+import org.openstack4j.openstack.identity.v3.domain.KeystoneToken;
+import org.openstack4j.openstack.internal.OSClientSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 
-@Slf4j
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = { OclLoader.class })
+@TestPropertySource(locations = "classpath:application-test.properties")
+@ActiveProfiles(value = {"openstack","test"})
 public class OpenstackOrchestratorPluginTest {
 
-    @Test
-    @Disabled("Needs a working openstack instance")
-    public void onRegisterTest() throws Exception {
+    @Autowired
+    OclLoader oclLoader;
 
-        OpenstackOrchestratorPlugin plugin = new OpenstackOrchestratorPlugin();
-        ConfigService configService = new ConfigService();
-        Map<String, String> properties = new HashMap<>();
-        properties.put("openstack.endpoint", "https://119.8.97.198:5000/v3");
-        properties.put("openstack.secret", "openstack");
-        properties.put("openstack.domainName", "Default");
-        properties.put("openstack.enableSslCertificateValidation", "false");
-        configService.setProperties(properties);
-        Minho minho = Minho.builder()
-                .loader(() -> Stream.of(configService, new LifeCycleService(), new OclLoader(), plugin, new SwiftOrchestratorStorage(), new OrchestratorService()))
-                .build()
-                .start();
-        log.info("started");
-        minho.getServiceRegistry().get(OrchestratorService.class).onRegister(minho.getServiceRegistry());
-        OclLoader oclLoader = minho.getServiceRegistry().get(OclLoader.class);
+    @MockBean
+    KeystoneManager keystoneManager;
+
+    @MockBean
+    NovaManager novaManager;
+
+    @Test
+    public void onRegisterTest() throws Exception {
+        when(this.keystoneManager.getClient()).thenReturn(OSClientSession.OSClientSessionV3.createSession(new KeystoneToken()));
+        OpenstackOrchestratorPlugin openstackOrchestratorPlugin = new OpenstackOrchestratorPlugin(this.keystoneManager, this.novaManager);
+        doAnswer(invocationOnMock -> null).when(this.novaManager).createVm(any(OSClient.OSClientV3.class), any(Artifact.class), any(Ocl.class));
+        when(this.novaManager.getVmConsoleLog(any(OSClient.OSClientV3.class), anyInt(), anyString())).thenReturn("kafka up and running");
         Ocl ocl = oclLoader.getOcl(new File("target/test-classes/kafka-test.json").toURI().toURL());
-        plugin.registerManagedService(ocl);
+        openstackOrchestratorPlugin.registerManagedService(ocl);
     }
 }

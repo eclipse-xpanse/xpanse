@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: osc-config
-  namespace: osc
-  labels:
-    app: osc
-data:
-  rest.path: "/osc/*"
