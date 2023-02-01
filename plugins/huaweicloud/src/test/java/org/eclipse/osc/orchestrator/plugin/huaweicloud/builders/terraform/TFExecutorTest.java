@@ -1,27 +1,34 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
-import java.io.File;
-import java.util.stream.Stream;
-import org.apache.karaf.minho.boot.Minho;
-import org.apache.karaf.minho.boot.service.ConfigService;
+import org.eclipse.osc.modules.ocl.loader.OclLoader;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.File;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {OclLoader.class})
 public class TFExecutorTest {
 
+    @Autowired
+    Environment environment;
+    @Autowired
+    OclLoader oclLoader;
     @Disabled
     @Test
     public void TFExecutorBasicTest() throws Exception {
-        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
-        Ocl ocl = minho.getServiceRegistry()
-            .get(OclLoader.class)
+        Ocl ocl = this.oclLoader
             .getOcl(new File("target/test-classes/huawei_test.json").toURI().toURL());
 
         Assertions.assertNotNull(ocl);
@@ -42,16 +49,13 @@ public class TFExecutorTest {
         resourceBuilder.addSubBuilder(imageBuilder);
 
         BuilderContext builderContext = new BuilderContext();
-        ConfigService configService = new ConfigService();
-        builderContext.setConfig(configService);
+        builderContext.setEnvironment(environment);
     }
 
     @Disabled
     @Test
     public void TFExecutorPlanRollBackTest() throws Exception {
-        Minho minho = Minho.builder().loader(() -> Stream.of(new OclLoader())).build().start();
-        Ocl ocl = minho.getServiceRegistry()
-            .get(OclLoader.class)
+        Ocl ocl = this.oclLoader
             .getOcl(new File("target/test-classes/huawei_test.json").toURI().toURL());
 
         Assertions.assertNotNull(ocl);
@@ -67,8 +71,7 @@ public class TFExecutorTest {
         resourceBuilder = new HuaweiResourceBuilder(ocl);
 
         BuilderContext builderContext = new BuilderContext();
-        ConfigService configService = new ConfigService();
-        builderContext.setConfig(configService);
+        builderContext.setEnvironment(this.environment);
 
         envBuilder.destroy(builderContext);
         Assertions.assertThrows(

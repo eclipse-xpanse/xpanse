@@ -1,22 +1,29 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
+import org.eclipse.osc.modules.ocl.loader.OclLoader;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.OclResources;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.nio.file.Files;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.OclLoader;
-import org.eclipse.osc.modules.ocl.loader.OclResources;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {OclLoader.class})
 public class OclTFExecutorTest {
 
+    @Autowired
+    OclLoader oclLoader;
     @Test
     public void TFExecutorBasicTest() throws Exception {
-        OclLoader oclLoader = new OclLoader();
-        oclLoader.onRegister(null);
         Ocl ocl = oclLoader.getOcl(
             new File("target/test-classes/huawei_test.json").toURI().toURL());
 

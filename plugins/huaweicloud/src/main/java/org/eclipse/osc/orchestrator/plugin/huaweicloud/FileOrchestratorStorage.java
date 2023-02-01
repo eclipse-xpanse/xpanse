@@ -1,35 +1,32 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.orchestrator.OrchestratorStorage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.karaf.minho.boot.service.ConfigService;
-import org.apache.karaf.minho.boot.service.ServiceRegistry;
-import org.apache.karaf.minho.boot.spi.Service;
-import org.eclipse.osc.orchestrator.OrchestratorStorage;
 
 @Slf4j
-public class FileOrchestratorStorage implements OrchestratorStorage, Service {
+@Component
+@Profile("huaweicloud")
+public class FileOrchestratorStorage implements OrchestratorStorage {
 
     public static final String DEFAULT_FILENAME = "orchestrator.properties";
-
     private final Properties properties = new Properties();
-    private File file = new File(DEFAULT_FILENAME);
+    private final File file;
 
-    @Override
-    public String name() {
-        return "file-orchestrator-storage";
-    }
-
-    @Override
-    public void onRegister(ServiceRegistry serviceRegistry) {
-        log.info("Registering file orchestrator storage service ...");
-        ConfigService configService = serviceRegistry.get(ConfigService.class);
-        file = new File(configService.getProperty("orchestrator.store.filename", DEFAULT_FILENAME));
+    @Autowired
+    public FileOrchestratorStorage(Environment environment) {
+        log.info("Using FileOrchestratorStorage from Huaweicloud plugin");
+        file = new File(environment.getProperty("orchestrator.store.filename", DEFAULT_FILENAME));
         if (file.exists()) {
             try {
                 try (var stream = new FileInputStream(file)) {
@@ -39,11 +36,6 @@ public class FileOrchestratorStorage implements OrchestratorStorage, Service {
                 throw new IllegalStateException("Read file failed " + file, ex);
             }
         }
-    }
-
-    @Override
-    public int priority() {
-        return 900;
     }
 
     @Override

@@ -1,10 +1,11 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
-import java.util.Optional;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
+
+import java.util.Optional;
 
 public class BuilderFactory {
 

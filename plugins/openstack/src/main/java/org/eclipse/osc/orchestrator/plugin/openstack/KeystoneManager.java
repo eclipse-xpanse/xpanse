@@ -1,11 +1,12 @@
 package org.eclipse.osc.orchestrator.plugin.openstack;
 
-import org.apache.karaf.minho.boot.service.ConfigService;
-import org.apache.karaf.minho.boot.service.ServiceRegistry;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.core.transport.Config;
 import org.openstack4j.model.common.Identifier;
 import org.openstack4j.openstack.OSFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -13,35 +14,39 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Objects;
 
+@Component
 public class KeystoneManager {
+    
+    Environment environment;
+    
+    @Autowired
+    public KeystoneManager(Environment environment) {
+        this.environment = environment;
+    }
 
-    public static OSClient.OSClientV3 getClient(ServiceRegistry serviceRegistry) {
-        ConfigService configService = serviceRegistry.get(ConfigService.class);
+    public OSClient.OSClientV3 getClient() {
         OSClient.OSClientV3 osClient = null;
-        if (configService == null) {
-            throw new IllegalStateException("Config service is not available");
-        }
-
-        String endpoint = configService.getProperty("openstack.endpoint", "http://127.0.0.1:5000/v3");
+        OSFactory.enableHttpLoggingFilter(true);
+        String endpoint = this.environment.getProperty("openstack.endpoint", "http://127.0.0.1:5000/v3");
         String domainId = null;
-        if (configService.getProperty("openstack.domainId") != null) {
-            domainId = configService.getProperty("openstack.domainId");
+        if (this.environment.getProperty("openstack.domainId") != null) {
+            domainId = this.environment.getProperty("openstack.domainId");
         }
         String domainName = null;
-        if (configService.getProperty("openstack.domainName") != null) {
-            domainName = configService.getProperty("openstack.domainName");
+        if (this.environment.getProperty("openstack.domainName") != null) {
+            domainName = this.environment.getProperty("openstack.domainName");
         }
         String projectId = null;
-        if (configService.getProperty("openstack.projectId") != null) {
-            projectId = configService.getProperty("openstack.projectId");
+        if (this.environment.getProperty("openstack.projectId") != null) {
+            projectId = this.environment.getProperty("openstack.projectId");
         }
         String projectName = null;
-        if (configService.getProperty("openstack.projectName") != null) {
-            projectName = configService.getProperty("openstack.projectName");
+        if (this.environment.getProperty("openstack.projectName") != null) {
+            projectName = this.environment.getProperty("openstack.projectName");
         }
-        String username = configService.getProperty("openstack.username", "admin");
-        String secret = configService.getProperty("openstack.secret", "secret");
-        boolean isSslValidationEnabled = Boolean.getBoolean(configService.getProperty(
+        String username = this.environment.getProperty("openstack.username", "admin");
+        String secret = this.environment.getProperty("openstack.secret", "secret");
+        boolean isSslValidationEnabled = Boolean.getBoolean(this.environment.getProperty(
                 "openstack.enableSslCertificateValidation", "true"));
 
         Identifier domainIdentifier = null;
@@ -80,7 +85,6 @@ public class KeystoneManager {
                     .credentials(username, secret, domainIdentifier)
                     .withConfig(buildClientConfig(endpoint, isSslValidationEnabled))
                     .authenticate();
-            OSFactory.enableHttpLoggingFilter(true);
         }
         if (domainIdentifier == null && projectIdentifier == null) {
             osClient = OSFactory.builderV3()

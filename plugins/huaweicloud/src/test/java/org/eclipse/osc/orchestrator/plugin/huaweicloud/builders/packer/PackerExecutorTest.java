@@ -1,16 +1,17 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer;
 
+import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
+import org.eclipse.osc.modules.ocl.loader.data.models.BaseImage;
+import org.eclipse.osc.modules.ocl.loader.data.models.Image;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Provisioner;
+import org.eclipse.osc.modules.ocl.loader.data.models.Storage;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.eclipse.osc.modules.ocl.loader.Artifact;
-import org.eclipse.osc.modules.ocl.loader.BaseImage;
-import org.eclipse.osc.modules.ocl.loader.Image;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.Provisioner;
-import org.eclipse.osc.modules.ocl.loader.Storage;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 public class PackerExecutorTest {
 

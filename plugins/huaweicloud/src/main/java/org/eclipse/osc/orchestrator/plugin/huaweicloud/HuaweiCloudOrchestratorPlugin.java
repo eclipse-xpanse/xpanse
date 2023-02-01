@@ -2,48 +2,37 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.OclResources;
+import org.eclipse.osc.orchestrator.OrchestratorPlugin;
+import org.eclipse.osc.orchestrator.OrchestratorStorage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.karaf.minho.boot.service.ConfigService;
-import org.apache.karaf.minho.boot.service.ServiceRegistry;
-import org.apache.karaf.minho.boot.spi.Service;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.OclResources;
-import org.eclipse.osc.orchestrator.OrchestratorPlugin;
-import org.eclipse.osc.orchestrator.OrchestratorStorage;
 
 @Slf4j
-public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Service {
+@Component
+@Profile(value = "huaweicloud")
+public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     private final Map<String, Ocl> managedOcl = new HashMap<>();
 
-    private ConfigService config;
+    private final Environment environment;
 
-    OrchestratorStorage storage;
+    private final OrchestratorStorage orchestratorStorage;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    @Override
-    public String name() {
-        return "osc-huaweicloud-plugin";
-    }
-
-    @Override
-    public void onRegister(ServiceRegistry serviceRegistry) {
-        log.info("Registering Huawei Cloud Orchestrator ...");
-        if (serviceRegistry == null) {
-            throw new IllegalStateException("ServiceRegistry is null");
-        }
-        ConfigService configService = serviceRegistry.get(ConfigService.class);
-        if (configService == null) {
-            throw new IllegalStateException("Config service is not present in the registry");
-        }
-
-        storage = serviceRegistry.get(OrchestratorStorage.class);
-
-        config = configService;
+    @Autowired
+    public HuaweiCloudOrchestratorPlugin(Environment environment, OrchestratorStorage orchestratorStorage) {
+        this.environment = environment;
+        this.orchestratorStorage = orchestratorStorage;
     }
 
     @Override
@@ -81,7 +70,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
             BuilderFactory.BASIC_BUILDER, ocl);
 
         BuilderContext ctx = new BuilderContext();
-        ctx.setConfig(config);
+        ctx.setEnvironment(this.environment);
 
         if (optionalAtomBuilder.isEmpty()) {
             throw new IllegalStateException("Builder not found.");
@@ -114,7 +103,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         Optional<AtomBuilder> optionalAtomBuilder = createBuilder(managedServiceName);
 
         BuilderContext ctx = new BuilderContext();
-        ctx.setConfig(config);
+        ctx.setEnvironment(this.environment);
 
         if (optionalAtomBuilder.isEmpty()) {
             throw new IllegalStateException("Builder not found.");
@@ -152,8 +141,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
             throw new IllegalStateException("Serial OCL object to json failed.", ex);
         }
 
-        if (storage != null) {
-            storage.store(managedServiceName, name(), "state", oclResourceStr);
+        if (this.orchestratorStorage != null) {
+            this.orchestratorStorage.store(managedServiceName, HuaweiCloudOrchestratorPlugin.class.getSimpleName(), "state", oclResourceStr);
         } else {
             log.warn("storage is null.");
         }
@@ -162,8 +151,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     private OclResources getOclResources(String managedServiceName) {
         OclResources oclResources;
         String oclResourceStr;
-        if (storage != null) {
-            oclResourceStr = storage.getKey(managedServiceName, name(), "state");
+        if (this.orchestratorStorage != null) {
+            oclResourceStr = this.orchestratorStorage.getKey(managedServiceName, HuaweiCloudOrchestratorPlugin.class.getSimpleName(), "state");
         } else {
             return null;
         }

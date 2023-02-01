@@ -1,15 +1,16 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.utils.SystemCmd;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.PackerExecutorException;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.utils.SystemCmd;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.PackerExecutorException;
-import org.eclipse.osc.modules.ocl.loader.Artifact;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
 
 @Slf4j
 public class PackerExecutor {

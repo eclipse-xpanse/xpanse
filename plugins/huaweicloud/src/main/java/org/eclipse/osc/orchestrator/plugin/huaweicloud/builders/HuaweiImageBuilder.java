@@ -1,12 +1,9 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.OclResource;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.OclResource;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer.PackerExecutor;
@@ -14,8 +11,11 @@ import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer.PackerVar
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.TFExecutor;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.TFState;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.TFStateResourceInstance;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.utils.IPTool;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class HuaweiImageBuilder extends AtomBuilder {
@@ -109,8 +109,7 @@ public class HuaweiImageBuilder extends AtomBuilder {
         }
         TFExecutor executor = new TFExecutor(envCtx);
         executor.createWorkspace(name());
-        StringBuilder script = new StringBuilder();
-        script.append(String.format(""
+        executor.createTFScript(String.format(""
             + "resource \"huaweicloud_vpc\" \"vpc\" {\n"
             + "  name = \"osc-packer-%s\"\n"
             + "  cidr = \"192.168.0.0/16\"\n"
@@ -127,25 +126,16 @@ public class HuaweiImageBuilder extends AtomBuilder {
             + "  name        = \"osc-packer-secgroup_%s\"\n"
             + "  description = \"Osc security group\"\n"
             + "}\n"
-            + "\n", ocl.getName(), ocl.getName(), ocl.getName()));
-
-        // Get my external ip address, and add it to security group rule.
-        String myIp = new IPTool().probeExternalIp();
-        if (myIp != null) {
-            script.append(String.format(
-                "resource \"huaweicloud_networking_secgroup_rule\" \"ssh-public-ip\" "
-                    + "{\n"
-                    + "  security_group_id = huaweicloud_networking_secgroup.secgroup.id\n"
-                    + "  direction         = \"ingress\"\n"
-                    + "  ethertype         = \"IPv4\"\n"
-                    + "  protocol          = \"tcp\"\n"
-                    + "  port_range_min    = 22\n"
-                    + "  port_range_max    = 22\n"
-                    + "  remote_ip_prefix  = \"%s/32\"\n"
-                    + "}"
-                    + "\n", myIp));
-        }
-        executor.createTFScript(script.toString());
+            + "\n"
+            + "resource \"huaweicloud_networking_secgroup_rule\" \"test\" {\n"
+            + "  security_group_id = huaweicloud_networking_secgroup.secgroup.id\n"
+            + "  direction         = \"ingress\"\n"
+            + "  ethertype         = \"IPv4\"\n"
+            + "  protocol          = \"tcp\"\n"
+            + "  port_range_min    = 22\n"
+            + "  port_range_max    = 22\n"
+            + "  remote_ip_prefix  = \"159.138.32.195/32\"\n"
+            + "}", ocl.getName(), ocl.getName(), ocl.getName()));
 
         return executor;
     }

@@ -1,17 +1,18 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.InetAddressValidator;
+import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Security;
+import org.eclipse.osc.modules.ocl.loader.data.models.Subnet;
+import org.eclipse.osc.modules.ocl.loader.data.models.VPC;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.validator.routines.InetAddressValidator;
-import org.eclipse.osc.modules.ocl.loader.Artifact;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.Security;
-import org.eclipse.osc.modules.ocl.loader.Subnet;
-import org.eclipse.osc.modules.ocl.loader.VPC;
 
 @Data
 class PortPair {
@@ -236,7 +237,7 @@ class Ocl2Hcl {
                 hcl.append(String.format(""
                     + "resource \"huaweicloud_vpc_eip\" \"osc-eip-%s\" {\n"
                     + "  publicip {\n"
-                    + "    type = \"5_sbgp\"\n"
+                    + "    type = \"5_bgp\"\n"
                     + "  }\n"
                     + "  bandwidth {\n"
                     + "    name        = \"osc-eip-%s\"\n"

@@ -1,53 +1,48 @@
 package org.eclipse.osc.orchestrator;
 
-import lombok.Data;
+import java.util.Set;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.karaf.minho.boot.service.LifeCycleService;
-import org.apache.karaf.minho.boot.service.ServiceRegistry;
-import org.apache.karaf.minho.boot.spi.Service;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
-@Data
-public class OrchestratorService implements Service {
+@Component
+public class OrchestratorService implements ApplicationListener<ApplicationEvent> {
 
-    private List<OrchestratorPlugin> plugins = new ArrayList<>();
+    private final OrchestratorStorage orchestratorStorage;
+    private final OclLoader oclLoader;
 
-    private OrchestratorStorage storage;
-
-    private OclLoader oclLoader;
-
-    @Override
-    public String name() {
-        return "osc-orchestrator";
+    @Getter
+    private final List<OrchestratorPlugin> plugins = new ArrayList<>();
+    @Autowired
+    public OrchestratorService(OclLoader oclLoader, OrchestratorStorage orchestratorStorage) {
+        this.oclLoader = oclLoader;
+        this.orchestratorStorage = orchestratorStorage;
     }
-
     @Override
-    public void onRegister(ServiceRegistry serviceRegistry) throws Exception {
-        log.info("Registering OSC orchestrator service ...");
-
-        oclLoader = serviceRegistry.get(OclLoader.class);
-        if (oclLoader == null) {
-            throw new IllegalStateException("OCL Loader service is not present");
+    public void onApplicationEvent(ApplicationEvent event) {
+        if (event instanceof ContextRefreshedEvent) {
+            ApplicationContext applicationContext = ((ContextRefreshedEvent) event).getApplicationContext();
+            plugins.addAll(applicationContext.getBeansOfType(OrchestratorPlugin.class).values());
+            if (plugins.size() > 1) {
+                throw new RuntimeException("More than one OSC plugin found. Only one plugin can be active at a time.");
+            }
+            if (plugins.isEmpty()) {
+                log.warn("No OSC plugins loaded by the runtime.");
+            }
         }
-
-        storage = serviceRegistry.get(OrchestratorStorage.class);
-        if (storage == null) {
-            log.warn("No orchestrator storage service found in the service registry, using default file orchestrator storage");
-            storage = new FileOrchestratorStorage(serviceRegistry);
-        }
-
-        LifeCycleService lifeCycleService = serviceRegistry.get(LifeCycleService.class);
-
-        lifeCycleService.onStart(() -> {
-            log.info("Loading OSC orchestrator plugins");
-            plugins = serviceRegistry.getAll().values().stream().filter(service -> service instanceof OrchestratorPlugin).map(service -> (OrchestratorPlugin) service).collect(Collectors.toList());
-        });
     }
 
     /**
@@ -65,16 +60,15 @@ public class OrchestratorService implements Service {
      * Register a managed service on all orchestrator plugins, directly using OCL descriptor.
      *
      * @param ocl the OCL descriptor.
-     * @throws Exception if registration fails.
      */
-    public void registerManagedService(Ocl ocl) throws Exception {
+    public void registerManagedService(Ocl ocl) {
         if (ocl.getName() == null) {
             throw new IllegalArgumentException("Managed service name is required");
         }
         plugins.forEach(plugin -> {
             plugin.registerManagedService(ocl);
         });
-        storage.store(ocl.getName());
+        orchestratorStorage.store(ocl.getName());
     }
 
     /**
@@ -94,58 +88,46 @@ public class OrchestratorService implements Service {
      *
      * @param managedServiceName the managed service to update, identified by the given name.
      * @param ocl the new/update OCL descriptor.
-     * @throws Exception if the update fails.
      */
-    public void updateManagedService(String managedServiceName, Ocl ocl) throws Exception {
-        plugins.forEach(plugin -> {
-            plugin.updateManagedService(managedServiceName, ocl);
-        });
+    public void updateManagedService(String managedServiceName, Ocl ocl) {
+        plugins.forEach(plugin -> plugin.updateManagedService(managedServiceName, ocl));
     }
 
     /**
      * Start (expose to users) a managed service on all orchestrator plugins.
      *
      * @param managedServiceName the managed service name.
-     * @throws Exception if start fails.
      */
-    public void startManagedService(String managedServiceName) throws Exception {
-        if (!storage.exists(managedServiceName)) {
+    public void startManagedService(String managedServiceName) {
+        if (!orchestratorStorage.exists(managedServiceName)) {
             throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
-        plugins.forEach(plugin -> {
-            plugin.startManagedService(managedServiceName);
-        });
+        plugins.forEach(plugin -> plugin.startManagedService(managedServiceName));
     }
 
     /**
      * Stop (managed service is not visible to users anymore) a managed service on all orchestrator plugins.
      *
      * @param managedServiceName the managed service name.
-     * @throws Exception if stop fails.
      */
-    public void stopManagedService(String managedServiceName) throws Exception {
-        if (!storage.exists(managedServiceName)) {
+    public void stopManagedService(String managedServiceName) {
+        if (!orchestratorStorage.exists(managedServiceName)) {
             throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
-        plugins.forEach(plugin -> {
-            plugin.stopManagedService(managedServiceName);
-        });
+        plugins.forEach(plugin -> plugin.stopManagedService(managedServiceName));
     }
 
     /**
      * Unregister a managed service and destroy/clean all associated resources on all orchestrator plugins.
      *
      * @param managedServiceName the managed service name.
-     * @throws Exception if unregister fails.
      */
-    public void unregisterManagedService(String managedServiceName) throws Exception {
-        if (!storage.exists(managedServiceName)) {
+    public void unregisterManagedService(String managedServiceName) {
+        if (!orchestratorStorage.exists(managedServiceName)) {
             throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
-        plugins.forEach(plugin -> {
-            plugin.unregisterManagedService(managedServiceName);
-        });
-        storage.remove(managedServiceName);
+        plugins.forEach(plugin -> plugin.unregisterManagedService(managedServiceName));
+        orchestratorStorage.remove(managedServiceName);
     }
 
     /**
@@ -153,14 +135,14 @@ public class OrchestratorService implements Service {
      *
      * @param managedServiceName the managed service name.
      */
-    public String getManagedServiceState(String managedServiceName) throws Exception {
-        if (!storage.exists(managedServiceName)) {
+    public String getManagedServiceState(String managedServiceName) {
+        if (!orchestratorStorage.exists(managedServiceName)) {
             throw new IllegalStateException("Managed service " + managedServiceName + " not found");
         }
         StringBuilder response = new StringBuilder("[\n");
         plugins.forEach(plugin -> {
-            if (plugin instanceof Service) {
-                response.append(storage.getKey(managedServiceName, ((Service) plugin).name(),
+            if (plugin != null) {
+                response.append(orchestratorStorage.getKey(managedServiceName, plugin.getClass().getSimpleName(),
                     "state"));
                 response.append("\n");
             }
@@ -168,6 +150,10 @@ public class OrchestratorService implements Service {
         response.append("]\n");
 
         return response.toString();
+    }
+
+    public Set<String> getStoredServices() {
+        return this.orchestratorStorage.services();
     }
 
 }

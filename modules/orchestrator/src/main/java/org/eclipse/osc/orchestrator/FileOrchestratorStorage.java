@@ -1,29 +1,26 @@
 package org.eclipse.osc.orchestrator;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.karaf.minho.boot.service.ConfigService;
-import org.apache.karaf.minho.boot.service.ServiceRegistry;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 
 @Slf4j
 public class FileOrchestratorStorage implements OrchestratorStorage {
 
-    public static final String DEFAULT_FILENAME = "orchestrator.properties";
+    private final Properties properties = new Properties();
+    private final File file;
 
-    private Properties properties = new Properties();
-    private File file = new File(DEFAULT_FILENAME);
-
-    public FileOrchestratorStorage(ServiceRegistry serviceRegistry) throws IOException {
-        ConfigService configService = serviceRegistry.get(ConfigService.class);
-        file = new File(configService.getProperty("orchestrator.store.filename", DEFAULT_FILENAME));
+    public FileOrchestratorStorage(Environment environment) throws IOException {
+        log.info("No other storage beans found. Using default file storage.");
+        this.file = new File(Objects.requireNonNull(environment.getProperty("orchestrator.store.filename")));
         if (file.exists()) {
-            try (var stream = new FileInputStream(file)) {
+            try (FileInputStream stream = new FileInputStream(file)) {
                 properties.load(stream);
             }
         }

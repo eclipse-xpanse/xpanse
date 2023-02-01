@@ -1,12 +1,13 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
+import org.eclipse.osc.modules.ocl.loader.data.models.BaseImage;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Provisioner;
+
 import java.util.Objects;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.osc.modules.ocl.loader.Artifact;
-import org.eclipse.osc.modules.ocl.loader.BaseImage;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.Provisioner;
 
 @Slf4j
 class Ocl2Packer {
@@ -70,7 +71,7 @@ class Ocl2Packer {
                 + "%n  access_key         = var.access_key"
                 + "%n  secret_key         = var.secret_key"
                 + "%n  eip_bandwidth_size = \"5\""
-                + "%n  eip_type           = \"5_sbgp\""
+                + "%n  eip_type           = \"5_bgp\""
                 + "%n  flavor             = \"s6.large.2\""
                 + "%n  instance_name      = \"%s\""
                 + "%n  vpc_id             = \"%s\""

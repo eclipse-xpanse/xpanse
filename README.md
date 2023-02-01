@@ -9,7 +9,7 @@ It also avoids tight coupling of your service to other cloud service provider se
 
 Open Services Cloud interacts directly with the fundamental APIs used by the cloud service provider to create managed service:
 
-* **identity** deling with access, users, groups, roles, ...
+* **identity** dealing with access, users, groups, roles, ...
 * **computing** abstracts the manipulation of virtual machines
 * **storage** abstracts the manipulation of storage volumes
 * **vpc** abstracts the manipulation of network devices
@@ -154,10 +154,10 @@ OCL descriptor is an abstract description of the final managed service state. It
 
 Open Services Cloud runtime embeds an orchestrator responsible to delegate the services management to plugins.
 
-Each plugin is dedicated to handle a cloud provider infrastructure and do actions required to actually deal with the services lifecycle:
+Each plugin is dedicated to handle a cloud provider infrastructure and do actions required to actually deal with the services' lifecycle:
 
 1. to bind OCL to the concrete cloud provider internal APIs
-1. to generate the graph of actions required to reach the final expected state, specifically for a target cloud provider
+2. to generate the graph of actions required to reach the final expected state, specifically for a target cloud provider
 
 ## Runtime
 
@@ -169,63 +169,40 @@ The runtime embeds and run together:
 2. the OCL loader and parser
 3. the frontends (REST API, ...)
 
-### Build
+### Build and Package
 
-First, you can build the whole OSC project, including all modules (orchestrator, OCL, runtime, etc), simply with:
+First, you can build the whole OSC project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply with:
 
 ```shell
 $ mvn clean install
 ```
 
-### Package
+### Run
 
-By default, the generated runtime doesn't include any specific plugin.
-
-You can build a runtime including available plugin for target cloud provider:
+By default, the application will not activate any plugins. They must be activated via spring profiles. Also ensure that only one plugin is active at a time.
 
 * for Huawei Cloud:
 
 ```shell
-$ cd runtime
-$ mvn clean install -Phuaweicloud
+$ cd runtime/target
+$ java -jar osc-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=huaweicloud
 ```
 
 * for Openstack:
 
 ```shell
-$ cd runtime
-$ mvn clean install -Popenstack
-```
-
-* for Kubernetes:
-
-```shell
-$ cd runtime
-$ mvn clean install -Pk8s
+$ cd runtime/target
+$ java -jar osc-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
 By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image adding `-Ddocker.skip=false` as build argument:
 
 ```shell
 $ cd runtime
-$ mvn clean install -Phuaweicloud -Ddocker.skip=false
+$ mvn clean install -Ddocker.skip=false
 ```
 
-### Run
-
-The previous commands build:
-
-1. the runtime in "exploded" mode in `runtime/target/runtime` folder. To launch the runtime, you just have to do:
-
+We can start OSC runtime with a specific plugin by passing the plugin name in the profile name. For example to start huaweicloud
 ```shell
-$ cd runtime/target/runtime
-$ java -jar minho-boot-1.0-SNAPSHOT.jar
+$ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-osc-runtime osc
 ```
-
-2. optionally (if you used `-Ddocker.skip=false`, a docker image per runtime, ready to launch the runtime:
-
-```shell
-$ docker run --name my-osc-runtime osc/osc-huaweicloud
-```
-
-Eventually, you can also deploy with Kubernetes. OSC provides manifest in `runtime/src/main/kubernetes` folder. You can use `kubectl apply` to deploy these manifests on your Kubernetes cluster.

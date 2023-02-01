@@ -1,21 +1,27 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import org.eclipse.osc.modules.ocl.loader.OclLoader;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuilder;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.Map;
-import org.apache.karaf.minho.boot.service.ConfigService;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuilder;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {OclLoader.class})
 public class AtomBuilderTest {
 
     private HuaweiEnvBuilder envBuilder;
@@ -24,16 +30,18 @@ public class AtomBuilderTest {
     private BuilderContext ctx;
     private Ocl ocl;
 
+    @Autowired
+    Environment environment;
+
+
     @BeforeEach
     public void mockBuilder() {
         ocl = new Ocl();
-
-        ConfigService conf = new ConfigService();
-        conf.setProperties(
-            Map.of(HuaweiEnvBuilder.ACCESS_KEY, "test_access_key", HuaweiEnvBuilder.SECRET_KEY,
-                "test_secret_key", HuaweiEnvBuilder.REGION_NAME, "test_region_name"));
+        environment.getProperty(HuaweiEnvBuilder.ACCESS_KEY, "test_access_key");
+        environment.getProperty(HuaweiEnvBuilder.SECRET_KEY, "test_secret_key");
+        environment.getProperty(HuaweiEnvBuilder.REGION_NAME, "test_region_name");
         ctx = new BuilderContext();
-        ctx.setConfig(conf);
+        ctx.setEnvironment(environment);
 
         envBuilder = spy(new HuaweiEnvBuilder(ocl));
         imageBuilder = spy(new HuaweiImageBuilder(ocl));

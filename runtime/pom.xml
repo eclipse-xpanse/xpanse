@@ -1,40 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <artifactId>osc-runtime</artifactId>
+    <packaging>jar</packaging>
     <parent>
         <groupId>org.eclipse.osc</groupId>
         <artifactId>osc-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <artifactId>osc-runtime</artifactId>
-    <name>OSC :: Runtime</name>
-
+    <properties>
+        <docker.skip>true</docker.skip>
+        <image.name>osc</image.name>
+    </properties>
     <dependencies>
         <dependency>
-            <groupId>org.apache.karaf.minho</groupId>
-            <artifactId>minho-boot</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.minho</groupId>
-            <artifactId>minho-banner</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.minho</groupId>
-            <artifactId>minho-config-json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.minho</groupId>
-            <artifactId>minho-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.karaf.minho</groupId>
-            <artifactId>minho-rest</artifactId>
+            <groupId>org.eclipse.osc.modules</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.osc.modules</groupId>
@@ -47,34 +32,20 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.osc.modules</groupId>
-            <artifactId>api</artifactId>
+            <groupId>org.eclipse.osc.plugins</groupId>
+            <artifactId>openstack</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.osc.modules</groupId>
-            <artifactId>logging</artifactId>
+            <groupId>org.eclipse.osc.plugins</groupId>
+            <artifactId>huaweicloud</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
-    <properties>
-        <docker.skip>true</docker.skip>
-    </properties>
-
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-            </plugin>
-            <plugin>
+                <!--used to update application version in the application banner-->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
@@ -86,147 +57,58 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/runtime</outputDirectory>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main/resources</directory>
                                     <filtering>true</filtering>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>application.properties</include>
+                                    </includes>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <to>
+                        <image>${image.name}</image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                        </tags>
+                    </to>
+                    <container>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                    <skip>${docker.skip}</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>docker-build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>dockerBuild</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.8</version>
-                    <executions>
-                        <execution>
-                            <id>copy-resources</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>copy-dependencies</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}/runtime</outputDirectory>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>com.google.cloud.tools</groupId>
-                    <artifactId>jib-maven-plugin</artifactId>
-                    <version>3.3.1</version>
-                    <configuration>
-                        <containerizingMode>packaged</containerizingMode>
-                        <to>
-                            <image>${image.name}</image>
-                            <tags>
-                                <tag>${project.version}</tag>
-                            </tags>
-                        </to>
-                        <container>
-                            <mainClass>org.apache.karaf.minho.boot.Main</mainClass>
-                            <appRoot>/osc</appRoot>
-                            <workingDirectory>/osc</workingDirectory>
-                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-                        </container>
-                        <skip>${docker.skip}</skip>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>docker-build</id>
-                            <phase>install</phase>
-                            <goals>
-                                <goal>dockerBuild</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
-
-    <profiles>
-        <profile>
-            <id>huaweicloud</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.osc.plugins</groupId>
-                    <artifactId>huaweicloud</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-            </dependencies>
-            <properties>
-                <image.name>osc/osc-huaweicloud</image.name>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.google.cloud.tools</groupId>
-                        <artifactId>jib-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>k8s</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.osc.plugins</groupId>
-                    <artifactId>k8s</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-            </dependencies>
-            <properties>
-                <image.name>osc/osc-k8s</image.name>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.google.cloud.tools</groupId>
-                        <artifactId>jib-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>openstack</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.eclipse.osc.plugins</groupId>
-                    <artifactId>openstack</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-            </dependencies>
-            <properties>
-                <image.name>osc/osc-openstack</image.name>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.google.cloud.tools</groupId>
-                        <artifactId>jib-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 </project>

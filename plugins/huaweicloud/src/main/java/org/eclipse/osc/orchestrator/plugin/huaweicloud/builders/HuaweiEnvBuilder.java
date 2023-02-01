@@ -1,13 +1,14 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders;
 
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.karaf.minho.boot.service.ConfigService;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
+import org.springframework.core.env.Environment;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 public class HuaweiEnvBuilder extends AtomBuilder {
@@ -40,16 +41,16 @@ public class HuaweiEnvBuilder extends AtomBuilder {
             return;
         }
 
-        ConfigService configCtx = ctx.getConfig();
-        if (configCtx == null) {
+        Environment environment = ctx.getEnvironment();
+        if (environment == null) {
             log.error("configCtx not found, in BuilderContext.");
             throw new BuilderException(this, "configCtx not found, in BuilderContext.");
         }
 
-        String accessKey = configCtx.getProperty(ACCESS_KEY);
-        String secretKey = configCtx.getProperty(SECRET_KEY);
-        String region = configCtx.getProperty(REGION_NAME);
-        String project_id = configCtx.getProperty(ENTERPRISE_PROJECT_ID);
+        String accessKey = environment.getProperty(ACCESS_KEY);
+        String secretKey = environment.getProperty(SECRET_KEY);
+        String region = environment.getProperty(REGION_NAME);
+        String project_id = environment.getProperty(ENTERPRISE_PROJECT_ID);
 
         Map<String, String> envCtx = new HashMap<>();
         if (accessKey != null) {

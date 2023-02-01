@@ -1,23 +1,32 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders;
 
+import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
+import org.eclipse.osc.modules.ocl.loader.data.models.BaseImage;
+import org.eclipse.osc.modules.ocl.loader.data.models.Image;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Provisioner;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.TFExecutor;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.karaf.minho.boot.service.ConfigService;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.TFExecutor;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
-import org.eclipse.osc.modules.ocl.loader.Artifact;
-import org.eclipse.osc.modules.ocl.loader.BaseImage;
-import org.eclipse.osc.modules.ocl.loader.Image;
-import org.eclipse.osc.modules.ocl.loader.Ocl;
-import org.eclipse.osc.modules.ocl.loader.Provisioner;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
+@ExtendWith(SpringExtension.class)
+//@ContextConfiguration(classes = {Environment.class})
 public class HuaweiImageBuilderTest {
+
+    @Autowired
+    Environment environment;
 
     private void prepareImage(Ocl ocl) {
         BaseImage baseImage = new BaseImage();
@@ -80,8 +89,7 @@ public class HuaweiImageBuilderTest {
         Ocl ocl = prepareOcl();
         // Create builder context & ConfigService
         BuilderContext builderContext = new BuilderContext();
-        ConfigService configService = new ConfigService();
-        builderContext.setConfig(configService);
+        builderContext.setEnvironment(this.environment);
         // Create HuaweiImageBuilder
         HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
         builderContext.put(new HuaweiEnvBuilder(ocl).name(), new HashMap<>());
@@ -96,8 +104,7 @@ public class HuaweiImageBuilderTest {
         Ocl ocl = prepareOcl();
         // Create builder context & ConfigService
         BuilderContext builderContext = new BuilderContext();
-        ConfigService configService = new ConfigService();
-        builderContext.setConfig(configService);
+        builderContext.setEnvironment(this.environment);
         // Create HuaweiImageBuilder
         HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
         builderContext.put(new HuaweiEnvBuilder(ocl).name(), new HashMap<>());
