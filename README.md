@@ -9,7 +9,7 @@ It also avoids tight coupling of your service to other cloud service provider se
 
 Open Services Cloud interacts directly with the fundamental APIs used by the cloud service provider to create managed service:
 
-* **identity** deling with access, users, groups, roles, ...
+* **identity** dealing with access, users, groups, roles, ...
 * **computing** abstracts the manipulation of virtual machines
 * **storage** abstracts the manipulation of storage volumes
 * **vpc** abstracts the manipulation of network devices
@@ -154,10 +154,10 @@ OCL descriptor is an abstract description of the final managed service state. It
 
 Open Services Cloud runtime embeds an orchestrator responsible to delegate the services management to plugins.
 
-Each plugin is dedicated to handle a cloud provider infrastructure and do actions required to actually deal with the services lifecycle:
+Each plugin is dedicated to handle a cloud provider infrastructure and do actions required to actually deal with the services' lifecycle:
 
 1. to bind OCL to the concrete cloud provider internal APIs
-1. to generate the graph of actions required to reach the final expected state, specifically for a target cloud provider
+2. to generate the graph of actions required to reach the final expected state, specifically for a target cloud provider
 
 ## Runtime
 
