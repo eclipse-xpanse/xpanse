@@ -31,6 +31,16 @@
             <artifactId>orchestrator</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.osc.plugins</groupId>
+            <artifactId>openstack</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.osc.plugins</groupId>
+            <artifactId>huaweicloud</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

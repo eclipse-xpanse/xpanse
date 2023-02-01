@@ -1,6 +1,7 @@
 package org.eclipse.osc.orchestrator;
 
-import lombok.Data;
+import java.util.Set;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
@@ -8,22 +9,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Data
-@Service
+@Component
 public class OrchestratorService implements ApplicationListener<ApplicationEvent> {
 
-    private OrchestratorStorage orchestratorStorage;
-    private OclLoader oclLoader;
+    private final OrchestratorStorage orchestratorStorage;
+    private final OclLoader oclLoader;
 
-    private List<OrchestratorPlugin> plugins = new ArrayList<>();
+    @Getter
+    private final List<OrchestratorPlugin> plugins = new ArrayList<>();
     @Autowired
     public OrchestratorService(OclLoader oclLoader, OrchestratorStorage orchestratorStorage) {
         this.oclLoader = oclLoader;
@@ -148,6 +150,10 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         response.append("]\n");
 
         return response.toString();
+    }
+
+    public Set<String> getStoredServices() {
+        return this.orchestratorStorage.services();
     }
 
 }

@@ -9,6 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <groupId>org.eclipse.osc.plugins</groupId>
     <artifactId>openstack</artifactId>
     <name>OSC :: Plugins :: Openstack</name>
     <dependencies>

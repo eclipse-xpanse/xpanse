@@ -3,6 +3,7 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.orchestrator.OrchestratorStorage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -15,15 +16,16 @@ import java.util.Set;
 
 @Slf4j
 @Component
+@Profile("huaweicloud")
 public class FileOrchestratorStorage implements OrchestratorStorage {
 
     public static final String DEFAULT_FILENAME = "orchestrator.properties";
     private final Properties properties = new Properties();
     private final File file;
-    Environment environment;
 
     @Autowired
     public FileOrchestratorStorage(Environment environment) {
+        log.info("Using FileOrchestratorStorage from Huaweicloud plugin");
         file = new File(environment.getProperty("orchestrator.store.filename", DEFAULT_FILENAME));
         if (file.exists()) {
             try {

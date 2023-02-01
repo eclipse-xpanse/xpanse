@@ -32,8 +32,8 @@ public class OrchestratorServiceTest {
 
         orchestratorService.registerManagedService("file:./target/test-classes/test.json");
 
-        Assertions.assertEquals(1, orchestratorService.getOrchestratorStorage().services().size());
-        List<String> managedServicesList = new ArrayList<>(orchestratorService.getOrchestratorStorage().services());
+        Assertions.assertEquals(1, orchestratorService.getStoredServices().size());
+        List<String> managedServicesList = new ArrayList<>(orchestratorService.getStoredServices());
         Assertions.assertEquals("test-service", managedServicesList.get(0));
 
         Assertions.assertNotNull(pluginTest.getOcl());
@@ -51,7 +51,7 @@ public class OrchestratorServiceTest {
 
         orchestratorService.unregisterManagedService("test-service");
 
-        Assertions.assertEquals(0, orchestratorService.getOrchestratorStorage().services().size());
+        Assertions.assertEquals(0, orchestratorService.getStoredServices().size());
 
         Assertions.assertNull(pluginTest.getOcl());
     }

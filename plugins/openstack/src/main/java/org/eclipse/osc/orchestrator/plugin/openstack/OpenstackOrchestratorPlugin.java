@@ -24,20 +24,20 @@ import java.util.Objects;
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     private static final String SUCCESSFUL_INSTALLATION_LOG = "Kafka up and running"; //TODO - to be moved to Ocl?
-    private final OSClient.OSClientV3 osClient;
+    private final KeystoneManager keystoneManager;
     private final NovaManager novaManager;
 
     private final Map<String, Ocl> managedOcl = new HashMap<>();
 
     @Autowired
     public OpenstackOrchestratorPlugin(KeystoneManager keystoneManager, NovaManager novaManager) {
-        this.osClient = keystoneManager.getClient();
+        log.info("Loading OpenstackOrchestratorPlugin");
+        this.keystoneManager = keystoneManager;
         this.novaManager = novaManager;
     }
 
     @Override
     public void registerManagedService(Ocl ocl) {
-        log.info("Register managed service, creating openstack resources");
         managedOcl.put(ocl.getName(), ocl);
     }
 
@@ -50,6 +50,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     public void startManagedService(String managedServiceName) {
         log.info("Start managed service {} on openstack", managedServiceName);
         log.info("Register managed service, creating openstack resources");
+        OSClient.OSClientV3 osClient = this.keystoneManager.getClient();
         Ocl ocl = managedOcl.get(managedServiceName);
         if (Objects.nonNull(ocl.getNetwork())) {
             log.info("Creating Neutron network resources ...");
@@ -73,12 +74,12 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                 if (artifact.getType().equalsIgnoreCase("image")) {
                     log.info("Starting bare VM via Nova ...");
                     try {
-                        this.novaManager.createVm(this.osClient, artifact, ocl);
+                        this.novaManager.createVm(osClient, artifact, ocl);
                         log.info("VM with name created {} and Kafka is being installed on it", artifact.getName());
                     } catch (Exception e) {
                         log.warn("Virtual machine {} create failed with exception ", artifact.getName(), e);
                     }
-                    isProvisioningSuccessful(artifact.getName());
+                    isProvisioningSuccessful(osClient, artifact.getName());
                 }
             });
         }
@@ -87,12 +88,13 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public void stopManagedService(String managedServiceName) {
         log.info("Stop managed service {} on openstack", managedServiceName);
+        OSClient.OSClientV3 osClient = this.keystoneManager.getClient();
         Ocl ocl = managedOcl.get(managedServiceName);
         if (Objects.nonNull(ocl.getImage())) {
             ocl.getImage().getArtifacts().forEach(artifact -> {
                 if (artifact.getType().equalsIgnoreCase("image")) {
                     log.info("Stopping bare VM via Nova ...");
-                    this.novaManager.stopVm(artifact.getName(), this.osClient);
+                    this.novaManager.stopVm(artifact.getName(), osClient);
                 }
             });
         }
@@ -101,20 +103,21 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public void unregisterManagedService(String managedServiceName) {
         log.info("Destroy managed service {} from openstack", managedServiceName);
+        OSClient.OSClientV3 osClient = this.keystoneManager.getClient();
         Ocl ocl = managedOcl.get(managedServiceName);
         if (Objects.nonNull(ocl.getImage())) {
             ocl.getImage().getArtifacts().forEach(artifact -> {
                 if (artifact.getType().equalsIgnoreCase("image")) {
                     log.info("Deleting bare VM via Nova ...");
-                    this.novaManager.deleteVm(artifact.getName(), this.osClient);
+                    this.novaManager.deleteVm(artifact.getName(), osClient);
                 }
             });
         }
     }
 
     @VisibleForTesting
-    boolean isProvisioningSuccessful(String vmName) {
-        String vmConsoleLogs = this.novaManager.getVmConsoleLog(this.osClient, 50, vmName);
+    boolean isProvisioningSuccessful(OSClient.OSClientV3 osClient, String vmName) {
+        String vmConsoleLogs = this.novaManager.getVmConsoleLog(osClient, 50, vmName);
         return vmConsoleLogs.contains(SUCCESSFUL_INSTALLATION_LOG);
     }
 }
