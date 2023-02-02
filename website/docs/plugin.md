@@ -8,7 +8,7 @@ This section described how to develop an orchestrator plugin (and associated sto
 
 ## Orchestrator
 
-An orchestrator plugin is basically a class that implements the `org.eclipse.osc.orchestrator.OrchestratorPlugin`
+An orchestrator plugin is basically a class that implements the `OrchestratorPlugin`
 interface.
 It must also be annotated with `@Component` so that the class is scanned and loaded into the spring context.
 
@@ -27,12 +27,12 @@ You can create a basic plugin Maven `pom.xml` containing the OSC Orchestrator an
 
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.osc.modules</groupId>
+            <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>orchestrator</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.osc.modules</groupId>
+            <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>ocl-loader</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -86,7 +86,7 @@ Most of the time, an orchestrator plugin needs a storage, especially to store th
 This storage has to be persistent on the cloud infrastructure.
 
 Creating an orchestrator storage is similar to the main orchestrator plugin, the only different is that you need to
-implement `org.eclipse.osc.orchestrator.OrchestratorStorage` interface instead of `OrchestratorPlugin`.
+implement `OrchestratorStorage` interface instead of `OrchestratorPlugin`.
 It must also be annotated with `@Component` so that the class is scanned and loaded into the spring context.
 
 ```java
