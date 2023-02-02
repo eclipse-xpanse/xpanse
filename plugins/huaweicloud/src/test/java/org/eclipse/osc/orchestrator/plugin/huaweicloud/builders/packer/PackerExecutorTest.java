@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer;
 
 import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;

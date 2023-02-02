@@ -1,5 +1,5 @@
 Eclipse Open Services Cloud
-Copyright 2022 Eclipse Foundation
+Copyright 2023 Eclipse Foundation
 
 I. Included Software
 
@@ -11,14 +11,27 @@ This product includes software developed at
 Eclipse Foundation (http://www.eclipse.org/).
 Licensed under the EPL.
 
-II. Used Software
+II. Used Softwares
 
-This product uses software developed at
-SLF4J (http://www.slf4j.org/).
-Licensed under the MIT License.
+MIT License: JUL to SLF4J bridge, SLF4J API Module
+BSD-3-Clause: asm
+BSD License 3: Hamcrest
+Eclipse Public License v2.0: JUnit Jupiter (Aggregator), JUnit Jupiter API, JUnit Jupiter Engine, JUnit Jupiter Params, JUnit Platform Commons, JUnit Platform Engine API
+GPL2 w/ CPE: Jakarta Annotations API
+GNU Lesser General Public License: Logback Classic Module, Logback Core Module
+EDL 1.0: Jakarta Activation API
+Apache License 2.0: JSON library from Android SDK
+The MIT License: mockito-core, mockito-junit-jupiter
+Apache License, Version 2.0: Apache Log4j API, Apache Log4j to SLF4J Adapter, AssertJ fluent assertions, Byte Buddy (without dependencies), Byte Buddy agent, OSC, Objenesis, SnakeYAML, Spring AOP, Spring Beans, Spring Commons Logging Bridge, Spring Context, Spring Core, Spring Expression Language (SpEL), Spring TestContext Framework, Spring Web, Spring Web MVC, spring-boot, spring-boot-autoconfigure, spring-boot-starter, spring-boot-starter-json, spring-boot-starter-logging, spring-boot-starter-test, spring-boot-starter-tomcat, spring-boot-starter-web, spring-boot-test, spring-boot-test-autoconfigure, tomcat-embed-core, tomcat-embed-el, tomcat-embed-websocket, org.apiguardian:apiguardian-api, org.opentest4j:opentest4j, JSON library from Android SDK
+Eclipse Distribution License - v 1.0: Jakarta XML Binding API
+EPL 2.0: Jakarta Annotations API
+The Apache Software License, Version 2.0: ASM based accessors helper used by json-smart, JSON Small and Fast Parser, JSONassert, Jackson datatype: JSR310, Jackson datatype: jdk8, Jackson-annotations, Jackson-core, Jackson-module-parameter-names, jackson-databind, micrometer-commons, micrometer-observation, org.xmlunit:xmlunit-core, project ':json-path'
+Eclipse Public License - v 1.0: Logback Classic Module, Logback Core Module
 
 III. License Summary
 - Apache License 2.0
 - BSD License
 - EPL License
 - MIT License
+- GNU License
+- GPL2 License

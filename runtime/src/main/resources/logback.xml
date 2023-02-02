@@ -1,3 +1,9 @@
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ SPDX-FileCopyrightText: Huawei Inc.
+  ~
+  -->
+
 <configuration>
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
