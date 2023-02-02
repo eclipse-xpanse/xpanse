@@ -6,14 +6,16 @@
 
 package org.eclipse.osc.modules.ocl.loader.data.models;
 
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
+/**
+ * Defines the VM configuration required for the managed service to be deployed.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class VM extends RuntimeBase {
+public class Vm extends RuntimeBase {
 
     private String name;
     private String type;

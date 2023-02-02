@@ -7,49 +7,54 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.modules.ocl.loader.data.models.OclResources;
 import org.eclipse.osc.modules.ocl.loader.data.models.RuntimeBase;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.TFExecutorException;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.TerraformExecutorException;
 
-import java.io.IOException;
-import java.util.Map;
-
+/**
+ * Terraform executor to install resources based on Ocl.
+ */
 @Slf4j
-public class OclTFExecutor extends TFExecutor {
+public class OclTerraformExecutor extends TerraformExecutor {
 
     private final Ocl ocl;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public OclTFExecutor(final Ocl ocl, Map<String, String> env) {
+    public OclTerraformExecutor(final Ocl ocl, Map<String, String> env) {
         super(env);
         this.ocl = ocl;
     }
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void createWorkspace() {
         super.createWorkspace(ocl.getName());
     }
 
-    public void createTFScript() {
+    /**
+     * Creates terraform script based on Ocl descriptor.
+     */
+    public void createTerraformScript() {
+
         Ocl2Hcl hcl = new Ocl2Hcl(ocl);
         String hclStr = hcl.getHcl();
 
-        super.createTFScript(hclStr);
+        super.createTerraformScript(hclStr);
     }
 
     private void updateOclObject(
-        RuntimeBase runtimeObj, String resourceType, String resourceName, TFState tfState) {
+            RuntimeBase runtimeObj, String resourceType, String resourceName, TfState tfState) {
         for (var resource : tfState.getResources()) {
             if (resource.getInstances().size() < 1 || !resource.getType().equals(resourceType)) {
                 continue;
             }
 
-            TFStateResourceInstance instance = resource.getInstances().get(0);
+            TfStateResourceInstance instance = resource.getInstances().get(0);
             if (resource.getName().equals(resourceName)
-                || (instance.attributes.containsKey("name")
-                && instance.attributes.get("name").equals(resourceName))) {
+                    || (instance.attributes.containsKey("name")
+                    && instance.attributes.get("name").equals(resourceName))) {
                 runtimeObj.setId(instance.attributes.get("id").toString());
                 runtimeObj.setState("active");
             }
@@ -57,16 +62,16 @@ public class OclTFExecutor extends TFExecutor {
     }
 
     private void updateOclRuntime() {
-        TFState tfState;
+        TfState tfState;
         try {
-            tfState = objectMapper.readValue(getTFState(), TFState.class);
+            tfState = objectMapper.readValue(getTerraformState(), TfState.class);
         } catch (IOException ex) {
             log.error("Parse terraform state content failed.");
-            throw new TFExecutorException("Parse terraform state content failed.", ex);
+            throw new TerraformExecutorException("Parse terraform state content failed.", ex);
         }
         for (var secGroup : ocl.getNetwork().getSecurity()) {
             updateOclObject(
-                secGroup, "huaweicloud_networking_secgroup", secGroup.getName(), tfState);
+                    secGroup, "huaweicloud_networking_secgroup", secGroup.getName(), tfState);
         }
 
         for (var subnet : ocl.getNetwork().getSubnet()) {
@@ -82,16 +87,21 @@ public class OclTFExecutor extends TFExecutor {
         }
     }
 
+    /**
+     * Updates resources requested by Ocl descriptors on the target environment.
+     *
+     * @param oclResources List of OclResources to be managed by Terraform.
+     */
     public void updateOclResources(OclResources oclResources) {
-        TFState tfState;
+        TfState tfState;
         try {
-            tfState = objectMapper.readValue(getTFState(), TFState.class);
+            tfState = objectMapper.readValue(getTerraformState(), TfState.class);
         } catch (IOException ex) {
             log.error("Parse terraform state content failed.");
-            throw new TFExecutorException("Parse terraform state content failed.", ex);
+            throw new TerraformExecutorException("Parse terraform state content failed.", ex);
         }
 
-        TFResources tfResources = new TFResources();
+        TfResources tfResources = new TfResources();
         tfResources.update(tfState);
 
         oclResources.getResources().addAll(tfResources.getResources());

@@ -9,6 +9,9 @@ package org.eclipse.osc.modules.ocl.loader.data.models;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Defines security rules to be applied for the managed service.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SecurityRule extends RuntimeBase {

@@ -6,6 +6,10 @@
 
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
 import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
 import org.eclipse.osc.modules.ocl.loader.data.models.BaseImage;
 import org.eclipse.osc.modules.ocl.loader.data.models.Image;
@@ -13,11 +17,6 @@ import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.modules.ocl.loader.data.models.Provisioner;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class Ocl2PackerTest {
 
@@ -40,7 +39,7 @@ public class Ocl2PackerTest {
         provisioner.setType("shell");
         provisioner.setEnvironments(Arrays.asList("WORK_HOME=/usr/KAFKA"));
         provisioner.setInline(Arrays.asList("cd ${WORK_HOME} && wget "
-            + "http://xxxx/kafka/release.jar"));
+                + "http://xxxx/kafka/release.jar"));
         List<Provisioner> provisionerList = new ArrayList<>();
         provisionerList.add(provisioner);
 
@@ -66,15 +65,15 @@ public class Ocl2PackerTest {
         String hclImages = ocl2Packer.getHclImages(new PackerVars());
 
         Assertions.assertTrue(
-            Pattern.compile("image_name.*=.*kafka_image").matcher(hclImages).find());
+                Pattern.compile("image_name.*=.*kafka_image").matcher(hclImages).find());
         Assertions.assertTrue(
-            Pattern.compile("source.*\"huaweicloud-ecs\".*\"kafka_image\".*").matcher(hclImages)
-                .find());
+                Pattern.compile("source.*\"huaweicloud-ecs\".*\"kafka_image\".*").matcher(hclImages)
+                        .find());
 
         String installScript = ocl2Packer.getInstallScript();
         Assertions.assertTrue(
-            Pattern.compile("cd \\$\\{WORK_HOME\\} && wget http://xxxx/kafka/release.jar")
-                .matcher(installScript)
-                .find());
+                Pattern.compile("cd \\$\\{WORK_HOME\\} && wget http://xxxx/kafka/release.jar")
+                        .matcher(installScript)
+                        .find());
     }
 }

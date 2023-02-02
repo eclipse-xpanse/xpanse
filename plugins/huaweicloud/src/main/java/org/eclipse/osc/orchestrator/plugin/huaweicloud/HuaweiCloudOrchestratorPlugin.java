@@ -8,6 +8,9 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.modules.ocl.loader.data.models.OclResources;
@@ -18,10 +21,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
+/**
+ * Plugin to deploy managed services on Huawei cloud.
+ */
 @Slf4j
 @Component
 @Profile(value = "huaweicloud")
@@ -36,7 +38,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public HuaweiCloudOrchestratorPlugin(Environment environment, OrchestratorStorage orchestratorStorage) {
+    public HuaweiCloudOrchestratorPlugin(Environment environment,
+                                         OrchestratorStorage orchestratorStorage) {
         this.environment = environment;
         this.orchestratorStorage = orchestratorStorage;
     }
@@ -73,7 +76,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
         BuilderFactory factory = new BuilderFactory();
         Optional<AtomBuilder> optionalAtomBuilder = factory.createBuilder(
-            BuilderFactory.BASIC_BUILDER, ocl);
+                BuilderFactory.BASIC_BUILDER, ocl);
 
         BuilderContext ctx = new BuilderContext();
         ctx.setEnvironment(this.environment);
@@ -142,13 +145,14 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         String oclResourceStr;
         try {
             oclResourceStr = objectMapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(oclResources);
+                    .writeValueAsString(oclResources);
         } catch (JsonProcessingException ex) {
             throw new IllegalStateException("Serial OCL object to json failed.", ex);
         }
 
         if (this.orchestratorStorage != null) {
-            this.orchestratorStorage.store(managedServiceName, HuaweiCloudOrchestratorPlugin.class.getSimpleName(), "state", oclResourceStr);
+            this.orchestratorStorage.store(managedServiceName,
+                    HuaweiCloudOrchestratorPlugin.class.getSimpleName(), "state", oclResourceStr);
         } else {
             log.warn("storage is null.");
         }
@@ -158,7 +162,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         OclResources oclResources;
         String oclResourceStr;
         if (this.orchestratorStorage != null) {
-            oclResourceStr = this.orchestratorStorage.getKey(managedServiceName, HuaweiCloudOrchestratorPlugin.class.getSimpleName(), "state");
+            oclResourceStr = this.orchestratorStorage.getKey(managedServiceName,
+                    HuaweiCloudOrchestratorPlugin.class.getSimpleName(), "state");
         } else {
             return null;
         }

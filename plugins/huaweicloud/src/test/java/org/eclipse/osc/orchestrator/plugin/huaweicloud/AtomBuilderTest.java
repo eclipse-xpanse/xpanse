@@ -6,6 +6,12 @@
 
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
@@ -20,25 +26,17 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {OclLoader.class})
 public class AtomBuilderTest {
 
+    @Autowired
+    Environment environment;
     private HuaweiEnvBuilder envBuilder;
     private HuaweiImageBuilder imageBuilder;
     private HuaweiResourceBuilder resourceBuilder;
     private BuilderContext ctx;
     private Ocl ocl;
-
-    @Autowired
-    Environment environment;
-
 
     @BeforeEach
     public void mockBuilder() {

@@ -6,11 +6,13 @@
 
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import java.util.Set;
 import org.eclipse.osc.orchestrator.OrchestratorStorage;
 import org.springframework.context.annotation.Profile;
 
-import java.util.Set;
-
+/**
+ * Storage bean for Huawei cloud plugin based on OBS storage service.
+ */
 @Profile(value = "huaweicloud")
 public class ObsOrchestratorStorage implements OrchestratorStorage {
 

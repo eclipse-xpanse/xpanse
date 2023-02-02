@@ -8,6 +8,9 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions;
 
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 
+/**
+ * Defines exceptions returned by the builder.
+ */
 public class BuilderException extends RuntimeException {
 
     public BuilderException(AtomBuilder builder) {

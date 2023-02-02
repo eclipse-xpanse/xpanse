@@ -7,13 +7,15 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
 import lombok.Data;
 
-import java.util.Map;
-
+/**
+ * TfState class.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class TFStateResourceInstance {
+public class TfState {
 
-    public Map<String, Object> attributes;
+    public List<TfStateResource> resources;
 }

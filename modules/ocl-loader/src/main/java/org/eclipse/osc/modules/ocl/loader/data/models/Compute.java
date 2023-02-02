@@ -6,13 +6,15 @@
 
 package org.eclipse.osc.modules.ocl.loader.data.models;
 
+import java.util.List;
 import lombok.Data;
 
-import java.util.List;
-
+/**
+ * Defines compute services required to run the managed service.
+ */
 @Data
 public class Compute {
 
-    private List<VM> vm;
+    private List<Vm> vm;
 
 }

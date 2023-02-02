@@ -6,15 +6,14 @@
 
 package org.eclipse.osc.modules.ocl.loader;
 
-import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.osc.modules.ocl.loader.data.models.Storage;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.Arrays;
+import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.osc.modules.ocl.loader.data.models.Storage;
+import org.junit.jupiter.api.Test;
 
 public class OclTest {
     @Test

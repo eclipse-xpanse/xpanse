@@ -4,13 +4,16 @@ sidebar_position: 3
 
 # Configuration Language
 
-The Open Services Cloud Configuration Language allows you to describe your service and interaction with fundamentals services (computing, network, billing, ...).
+The Open Services Cloud Configuration Language allows you to describe your service and interaction with fundamentals
+services (computing, network, billing, ...).
 
 The first part of the OCL service descriptor is basically service metadata:
 
 * `name` is the name of the service, used to identify the service in the CSP catalog, user console, etc
-* `category` is the overall category of the service. It's especially use to integrate the service in the right menu of the user console.
-* `namespace` is the location of the service. It could be in a CSP subdomain, in a region, and any kind of CSP classification.
+* `category` is the overall category of the service. It's especially use to integrate the service in the right menu of
+  the user console.
+* `namespace` is the location of the service. It could be in a CSP subdomain, in a region, and any kind of CSP
+  classification.
 
 ### Image
 
@@ -36,7 +39,8 @@ This is the list of provisioners used by the `image.artifacts`. Each provisioner
 }
 ```
 
-This block defines a `shell` provisioner which set an environment variable named `WORK_HOME` in the shell execution environment and runs the commands in the `inline` attribute.
+This block defines a `shell` provisioner which set an environment variable named `WORK_HOME` in the shell execution
+environment and runs the commands in the `inline` attribute.
 
 #### `image.base`
 
@@ -70,7 +74,8 @@ You can configure the business model associated to the service:
 * `currency` defines the billing currency (`euro`, `usd`, ...)
 * `fixedPrice` is the fixed price during the period (the price applied one shot whatever is the service use)
 * `variablePrice` is the price depending of item volume
-* `variableItem` is the item used to calculate the variable price on the period (for instance, the number of instances, the number of transactions, ...)
+* `variableItem` is the item used to calculate the variable price on the period (for instance, the number of instances,
+  the number of transactions, ...)
 * `backend` is the software provider (managed service provider) billing backend system used for payback.
 * `properties` is all properties related to billing, they are used by OSC for payback and bootstrapping.
 
@@ -114,11 +119,14 @@ This is the list of security (groups) defined in the service network. Each secur
 ##### SecurityRule
 
 * `name` - (Required) The name of the security rule, define in `security` (groups).
-* `priority` - (Required) The priority of the security rule. The lower the priority number, the higher the priority of the rule.
-* `protocol` - (Required) Network protocol this rule applies to. Possible values include: `Tcp`,`Udp`,`Icmp`,`*`(which matches all).
+* `priority` - (Required) The priority of the security rule. The lower the priority number, the higher the priority of
+  the rule.
+* `protocol` - (Required) Network protocol this rule applies to. Possible values include: `Tcp`,`Udp`,`Icmp`,`*`(which
+  matches all).
 * `cidr` - (Required) The IP address range this rule applies to. The `*` matches any IP.
 * `direction` - (Required) The direction of the network traffic. Possible values include: `inbound`,`outbound`.
-* `ports` - (Required) (Optional) Specifies the port value range, which supports single port (80), continuous port (1-30) and discontinuous port (22, 3389, 80) The valid port values is range form 1 to 65,535.
+* `ports` - (Required) (Optional) Specifies the port value range, which supports single port (80), continuous port (
+  1-30) and discontinuous port (22, 3389, 80) The valid port values is range form 1 to 65,535.
 * `action` - (Required) Specifies whether network traffic is allowed or denied. Possible values include: `allow`,`deny`.
 
 ### Storage
@@ -186,7 +194,9 @@ This is the list of security (groups) defined in the service network. Each secur
       {
         "name": "kafka_image",
         "base": "$.image.base[0]",
-        "provisioners": ["$.image.provisioners[0]"]
+        "provisioners": [
+          "$.image.provisioners[0]"
+        ]
       }
     ]
   },

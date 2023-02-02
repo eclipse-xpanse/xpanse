@@ -31,7 +31,8 @@ curl -XPOST -H "Content-Type: application/json" -d @my-osl.json http://host/osc/
 
 ## `/osc/register/fetch`
 
-The `/osc/register/fetch` endpoint allows you to provide the location of a OCL json descriptor (on HTTP URL for instance) as header.
+The `/osc/register/fetch` endpoint allows you to provide the location of a OCL json descriptor (on HTTP URL for
+instance) as header.
 
 The orchestrator will fetch the OCL json descriptor from the location and deploy the corresponding service.
 
@@ -86,9 +87,11 @@ curl -XPOST -H "managedServiceName: my-service" -H "Content-Type: application/js
 
 ## `/osc/update/fetch`
 
-The `/osc/update/fetch` endpoint updates a registered service with by fetching a new OCL json descriptor from a location.
+The `/osc/update/fetch` endpoint updates a registered service with by fetching a new OCL json descriptor from a
+location.
 
-The `managedServiceName` header identified the service to update, the `ocl` header defines the new OCL json descriptor location:
+The `managedServiceName` header identified the service to update, the `ocl` header defines the new OCL json descriptor
+location:
 
 ```shell
 curl -XPOST -H "managedServiceName: my-service" -H "ocl: http://host/my-new-ocl.json" http://host/osc/update/fetch

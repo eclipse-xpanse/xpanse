@@ -6,11 +6,13 @@
 
 package org.eclipse.osc.modules.ocl.loader.data.models;
 
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
+/**
+ * List of OclResources.
+ **/
 @Data
 public class OclResources {
 

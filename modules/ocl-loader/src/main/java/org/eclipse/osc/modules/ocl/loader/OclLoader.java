@@ -7,11 +7,13 @@
 package org.eclipse.osc.modules.ocl.loader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URL;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
-
+/**
+ * Bean to deserialize Ocl data.
+ */
 @Component
 public class OclLoader {
 

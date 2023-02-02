@@ -1,7 +1,7 @@
 {
-	"services": [	
-		{
-			"name": "Greenshift Database"
-		}
-	]
+  "services": [
+    {
+      "name": "Greenshift Database"
+    }
+  ]
 }

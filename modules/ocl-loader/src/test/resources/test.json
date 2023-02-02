@@ -44,7 +44,9 @@
       {
         "name": "kafka_image",
         "base": "$.image.base[0]",
-        "provisioners": ["$.image.provisioners[0]"]
+        "provisioners": [
+          "$.image.provisioners[0]"
+        ]
       }
     ]
   },
@@ -102,9 +104,11 @@
       }
     ]
   },
-  "storage": [{
-    "name": "my-storage",
-    "type": "ssd",
-    "size": "8GiB"
-  }]
+  "storage": [
+    {
+      "name": "my-storage",
+      "type": "ssd",
+      "size": "8GiB"
+    }
+  ]
 }

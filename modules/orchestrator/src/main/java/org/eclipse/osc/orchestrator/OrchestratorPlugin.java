@@ -9,7 +9,8 @@ package org.eclipse.osc.orchestrator;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 
 /**
- * This interface describes orchestrator plugin in charge of interacting with backend fundamental APIs.
+ * This interface describes orchestrator plugin in charge of interacting with
+ * backend fundamental APIs.
  */
 public interface OrchestratorPlugin {
 
@@ -24,7 +25,7 @@ public interface OrchestratorPlugin {
      * Update an existing managed service using the provided OCL descriptor.
      *
      * @param managedServiceName the managed service to update, identified by the given name.
-     * @param ocl the OCL descriptor to update the managed service.
+     * @param ocl                the OCL descriptor to update the managed service.
      */
     void updateManagedService(String managedServiceName, Ocl ocl);
 
