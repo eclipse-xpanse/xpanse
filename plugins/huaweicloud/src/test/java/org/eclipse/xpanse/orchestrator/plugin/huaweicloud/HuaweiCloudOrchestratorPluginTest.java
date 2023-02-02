@@ -9,12 +9,14 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
+import org.eclipse.xpanse.orchestrator.DefaultOrchestratorStorageBean;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,8 +24,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class, OrchestratorService.class,
-        FileOrchestratorStorage.class, OclLoader.class})
+        DefaultOrchestratorStorageBean.class, OclLoader.class})
 @ActiveProfiles(value = {"huaweicloud", "test"})
+@SpringBootTest
 public class HuaweiCloudOrchestratorPluginTest {
     @Autowired
     HuaweiCloudOrchestratorPlugin huaweiCloudOrchestratorPlugin;
