@@ -12,7 +12,7 @@
             </Pattern>
         </encoder>
     </appender>
-    <logger name="org.eclipse.osc" level="info" additivity="false">
+    <logger name="org.eclipse.xpanse" level="info" additivity="false">
         <appender-ref ref="Console"/>
     </logger>
     <root level="error">
