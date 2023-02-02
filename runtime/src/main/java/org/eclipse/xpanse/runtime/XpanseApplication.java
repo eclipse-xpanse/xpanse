@@ -15,10 +15,10 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @SpringBootApplication
 @ComponentScan(basePackages = "org.eclipse.xpanse")
-public class OscApplication {
+public class XpanseApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OscApplication.class, args);
+        SpringApplication.run(XpanseApplication.class, args);
     }
 
 }
