@@ -10,7 +10,8 @@ Let's discover **Open Services Cloud in less than 5 minutes**.
 
 **Open Services Cloud** is composed by:
 
-* an orchestrator responsible of the managed services (deployment, start, stop, ...) and loading plugins specific for each supported cloud provider
+* an orchestrator responsible of the managed services (deployment, start, stop, ...) and loading plugins specific for
+  each supported cloud provider
 * a language describing managed services, called OCL (Open Services Cloud Configuration Language)
 * a REST API to interact with the orchestrator
 * runtime (eventually including cloud provider plugins) assemblying all components together in a running service
@@ -23,7 +24,8 @@ You will create a simple service descriptor and you will deploy to Open Services
 
 You need a OSC runtime:
 
-* use the runtime provided by a cloud provider supporting Open Services Cloud (the cloud provider already have the runtime and you can directly use the APIs)
+* use the runtime provided by a cloud provider supporting Open Services Cloud (the cloud provider already have the
+  runtime and you can directly use the APIs)
 * launch the runtime of your cloud infrastructure (on a VM or Kubernetes cluster for instance)
 * launch the runtime on your machine or cloud infrastructure.
 
@@ -109,7 +111,9 @@ For example, here's a very simple service descriptor:
       {
         "name": "kafka_image",
         "base": "$.image.base[0]",
-        "provisioners": ["$.image.provisioners[0]"]
+        "provisioners": [
+          "$.image.provisioners[0]"
+        ]
       }
     ]
   },
@@ -167,11 +171,13 @@ For example, here's a very simple service descriptor:
       }
     ]
   },
-  "storage": [{
-    "name": "my-storage",
-    "type": "ssd",
-    "size": "8GiB"
-  }]
+  "storage": [
+    {
+      "name": "my-storage",
+      "type": "ssd",
+      "size": "8GiB"
+    }
+  ]
 }
 ```
 

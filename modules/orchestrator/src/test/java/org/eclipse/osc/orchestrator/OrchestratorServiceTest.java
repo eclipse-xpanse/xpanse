@@ -6,6 +6,10 @@
 
 package org.eclipse.osc.orchestrator;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,14 +19,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { PluginTest.class, OclLoader.class, FileOrchestratorStorage.class, OrchestratorService.class})
+@ContextConfiguration(classes = {PluginTest.class, OclLoader.class, FileOrchestratorStorage.class,
+        OrchestratorService.class})
 public class OrchestratorServiceTest {
 
     @Autowired

@@ -6,6 +6,8 @@
 
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.eclipse.osc.orchestrator.OrchestratorService;
 import org.junit.jupiter.api.Assertions;
@@ -18,12 +20,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class, OrchestratorService.class, FileOrchestratorStorage.class, OclLoader.class})
-@ActiveProfiles(value = {"huaweicloud","test"})
+@ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class, OrchestratorService.class,
+        FileOrchestratorStorage.class, OclLoader.class})
+@ActiveProfiles(value = {"huaweicloud", "test"})
 public class HuaweiCloudOrchestratorPluginTest {
     @Autowired
     HuaweiCloudOrchestratorPlugin huaweiCloudOrchestratorPlugin;
@@ -35,21 +35,21 @@ public class HuaweiCloudOrchestratorPluginTest {
     @Test()
     public void illegalTest() {
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> huaweiCloudOrchestratorPlugin.registerManagedService(null));
+                () -> huaweiCloudOrchestratorPlugin.registerManagedService(null));
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> huaweiCloudOrchestratorPlugin.updateManagedService(null, null));
+                () -> huaweiCloudOrchestratorPlugin.updateManagedService(null, null));
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> huaweiCloudOrchestratorPlugin.startManagedService(null));
+                () -> huaweiCloudOrchestratorPlugin.startManagedService(null));
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> huaweiCloudOrchestratorPlugin.startManagedService(""));
+                () -> huaweiCloudOrchestratorPlugin.startManagedService(""));
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> huaweiCloudOrchestratorPlugin.stopManagedService(null));
+                () -> huaweiCloudOrchestratorPlugin.stopManagedService(null));
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> huaweiCloudOrchestratorPlugin.stopManagedService(""));
+                () -> huaweiCloudOrchestratorPlugin.stopManagedService(""));
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> huaweiCloudOrchestratorPlugin.unregisterManagedService(null));
+                () -> huaweiCloudOrchestratorPlugin.unregisterManagedService(null));
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> huaweiCloudOrchestratorPlugin.unregisterManagedService(""));
+                () -> huaweiCloudOrchestratorPlugin.unregisterManagedService(""));
     }
 
     @Disabled
@@ -58,7 +58,7 @@ public class HuaweiCloudOrchestratorPluginTest {
 
         Assertions.assertEquals(1, this.orchestratorService.getPlugins().size());
         Assertions.assertTrue(
-            orchestratorService.getPlugins().get(0) instanceof HuaweiCloudOrchestratorPlugin);
+                orchestratorService.getPlugins().get(0) instanceof HuaweiCloudOrchestratorPlugin);
 
         orchestratorService.registerManagedService("file:./target/test-classes/huawei_test.json");
 

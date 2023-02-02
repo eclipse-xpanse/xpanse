@@ -6,16 +6,18 @@
 
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders;
 
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
-import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.OclTFExecutor;
+import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.OclTerraformExecutor;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.exceptions.BuilderException;
 
-import java.util.Map;
-
+/**
+ * Class to build all resources on Huawei cloud.
+ */
 @Slf4j
 public class HuaweiResourceBuilder extends AtomBuilder {
 
@@ -43,7 +45,7 @@ public class HuaweiResourceBuilder extends AtomBuilder {
         }
         if (imageCtx == null) {
             log.error("Dependent builder: {} must build first.",
-                new HuaweiImageBuilder(ocl).name());
+                    new HuaweiImageBuilder(ocl).name());
             throw new BuilderException(this, "HuaweiImageBuilder context is null.");
         }
 
@@ -53,10 +55,10 @@ public class HuaweiResourceBuilder extends AtomBuilder {
             }
         }
 
-        OclTFExecutor tfExecutor = new OclTFExecutor(ocl, envCtx);
+        OclTerraformExecutor tfExecutor = new OclTerraformExecutor(ocl, envCtx);
 
         tfExecutor.createWorkspace();
-        tfExecutor.createTFScript();
+        tfExecutor.createTerraformScript();
 
         if (!tfExecutor.tfInit()) {
             throw new BuilderException(this, "TFExecutor.tfInit failed." + name());
@@ -76,11 +78,11 @@ public class HuaweiResourceBuilder extends AtomBuilder {
     @Override
     public boolean destroy(BuilderContext ctx) {
         log.info("Destroying Huawei Cloud resources.");
-        OclTFExecutor tfExecutor = new OclTFExecutor(ocl,
-            ctx.get(new HuaweiEnvBuilder(ocl).name()));
+        OclTerraformExecutor tfExecutor = new OclTerraformExecutor(ocl,
+                ctx.get(new HuaweiEnvBuilder(ocl).name()));
 
         tfExecutor.createWorkspace();
-        tfExecutor.createTFScript();
+        tfExecutor.createTerraformScript();
 
         if (!tfExecutor.tfInit()) {
             log.error("ResourceBuilder Init failed {}.", name());

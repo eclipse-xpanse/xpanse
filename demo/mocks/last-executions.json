@@ -1,269 +1,269 @@
 {
-    "items": [
-        {
-            "comment": "(log) batch-id: 49042fb4-3aef-4064-8a15-7e842a7fe602\nArtifactId: aggregator\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:30.913777Z",
-            "id": "1f7ac191-821c-4c2c-911a-abf675498026",
-            "name": "aggregator",
-            "started": "2021-08-09T10:00:12.973085Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: bfaf031d-3f1b-43be-b7c5-d46684fec419\nArtifactId: austria\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:03.610885Z",
-            "id": "419445f2-9f4f-40ce-a0d8-ac975e0bf0ba",
-            "name": "Austria",
-            "started": "2021-08-09T10:00:12.531853Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: aff3fb94-04a5-44a2-bb23-8cd27d04e565\nArtifactId: belgium\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:27.321799Z",
-            "id": "076a44cd-c7fc-43e8-80d8-1301f90a27e7",
-            "name": "Belgium",
-            "started": "2021-08-09T10:00:27.893602Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: d858577d-2f2a-4106-ba29-5bcbfb918e36\nArtifactId: bulgaria\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:44.236641Z",
-            "id": "89a26dd0-e259-4395-b668-c4d6d8c270cb",
-            "name": "Bulgaria",
-            "started": "2021-08-09T10:00:19.422299Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 1e8b6a36-86fd-4ba4-8b56-6d4d3c083abb\nArtifactId: croatia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:14.898209Z",
-            "id": "52aa4a42-cc0b-4aee-9c0a-aeeaf8ce91af",
-            "name": "Croatia",
-            "started": "2021-08-09T10:00:11.467157Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 80bd2725-204e-4a4a-82c2-b8130daa844e\nArtifactId: cyprus\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:24.556838Z",
-            "id": "44ff34f1-bc14-4a73-a7b4-619289c23409",
-            "name": "Cyprus",
-            "started": "2021-08-09T10:00:14.546158Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: fee3c52e-6525-47a1-be34-5afc4a89a17c\nArtifactId: czech-republic\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:42.126930Z",
-            "id": "97d50616-07a3-4349-8940-2ab1477ca407",
-            "name": "CzechRepublic",
-            "started": "2021-08-09T10:00:13.486585Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 4ddfc2a7-c689-4aa1-a6bb-947135f8741f\nArtifactId: denmark\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:07.829196Z",
-            "id": "80a03a6d-aa37-46b8-983d-4cb8557e6ecf",
-            "name": "Denmark",
-            "started": "2021-08-09T10:00:27.972903Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: b2599afc-5e10-4b5d-8719-c9944c253676\nArtifactId: eba\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:08.544377Z",
-            "id": "6e258c9c-b666-4143-b65c-c21df6ba949c",
-            "name": "EBA",
-            "started": "2021-08-09T10:00:16.241097Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: b7bab69a-70b8-4995-8188-26cf36c79ab4\nArtifactId: estonia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:34.648069Z",
-            "id": "7262f6c7-b522-4e6d-930b-4f4c145191ff",
-            "name": "Estonia",
-            "started": "2021-08-09T10:00:14.873363Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 6742e8e8-fabd-4635-84ff-006e8c411724\nArtifactId: finland\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:31.057402Z",
-            "id": "b62c2a32-f001-4704-a78f-46b66c064c7d",
-            "name": "Finland",
-            "started": "2021-08-09T10:00:18.750492Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 6185b226-d040-4c61-a508-7d11827b8645\nArtifactId: france\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T09:38:40.571588Z",
-            "id": "1ff2d45c-4865-4382-9567-6cbe71319ffd",
-            "name": "France",
-            "started": "2021-08-09T09:00:32.360978Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 0d9ef3bb-d3bd-4b98-8b7e-fbb61ed3256b\nArtifactId: germany\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:22.458946Z",
-            "id": "75c4254e-8d58-43d9-870d-a77cdaddd484",
-            "name": "Germany",
-            "started": "2021-08-09T10:00:30.719819Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 8ab653ce-1eb6-4e61-af23-5eb037d6f656\nArtifactId: greece\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:46.859726Z",
-            "id": "e9fa7f66-0809-44a6-9fe1-fc6bc08141ba",
-            "name": "Greece",
-            "started": "2021-08-09T10:00:25.338185Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: a57690ec-1076-40db-9c34-3959848d3d4c\nArtifactId: iceland\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:41.410192Z",
-            "id": "793d5320-856a-4a6a-91d5-84a4a3bb8846",
-            "name": "Iceland",
-            "started": "2021-08-09T10:00:28.860647Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: a4e5aac9-85a0-4bd4-93e0-1268acb9982e\nArtifactId: ireland\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:59.452862Z",
-            "id": "15de49d5-b69c-4368-9da7-72db3fd4077e",
-            "name": "Ireland",
-            "started": "2021-08-09T10:00:22.056194Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 8db25ec9-6567-481e-9895-8980678fc720\nArtifactId: italy\nBuild-Timestamp: 20210809075231\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n\nfailed",
-            "finished": "2021-08-09T09:05:45.764809Z",
-            "id": "8db25ec9-6567-481e-9895-8980678fc720",
-            "name": "Italy",
-            "started": "2021-08-09T08:20:18.342093Z",
-            "status": "FAILURE"
-        },
-        {
-            "comment": "(log) batch-id: b303bc9d-ad74-4a4d-87ef-aabca71a03a5\nArtifactId: latvia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:05.481665Z",
-            "id": "72f47dec-2c2b-4c1b-bb21-5bd823c7a37d",
-            "name": "Latvia",
-            "started": "2021-08-09T10:00:20.308323Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: be885c71-114d-47b9-800f-5ed66fed0938\nArtifactId: liechtenstein\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:46.526175Z",
-            "id": "1c5ad662-bd0e-454f-9367-4d8c98ff14cf",
-            "name": "Liechtenstein",
-            "started": "2021-08-09T10:00:30.583686Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 06eef97e-0bbd-406f-87cc-33cad9eb837c\nArtifactId: lithuania\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T09:02:08.029899Z",
-            "id": "c72bd143-93b5-49ee-bd3b-91e4b67bc83d",
-            "name": "Lithuania",
-            "started": "2021-08-09T09:00:31.635817Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: e296d563-0fa5-4bc5-9920-d541a1cbf927\nArtifactId: luxembourg\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:43.486399Z",
-            "id": "5e4a6156-ad3c-4007-af9c-d993fc5b52c0",
-            "name": "Luxembourg",
-            "started": "2021-08-09T10:00:26.200257Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 45527975-b472-4632-b1cc-bb0a318b4a9a\nArtifactId: malta\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:30.868809Z",
-            "id": "82311cfd-7d49-4d94-b1e7-e96125422d68",
-            "name": "Malta",
-            "started": "2021-08-09T10:00:27.543121Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 5715ffb1-1ebf-4171-871a-b915d6fca230\nArtifactId: netherlands\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:42.337573Z",
-            "id": "919e4275-0c3c-481e-b2b6-d6f5e6420838",
-            "name": "Netherlands",
-            "started": "2021-08-09T10:00:22.573371Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 746a23d0-8c05-4039-b1fc-28d98f012d5f\nArtifactId: norway\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:07.942033Z",
-            "id": "eff91690-9184-41e4-a0c4-849ab1e43519",
-            "name": "Norway",
-            "started": "2021-08-09T10:00:30.866121Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 8c43bc35-872d-4b7a-8b1d-362a0aee64ff\nArtifactId: poland\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:55.537892Z",
-            "id": "4e1c82f7-eb63-4518-ab21-20762d93014b",
-            "name": "Poland",
-            "started": "2021-08-09T10:00:28.595004Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 3aac5ba1-26d0-465d-850c-45ccf0d9f2ba\nArtifactId: portugal\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:01:27.042764Z",
-            "id": "b610eaca-361c-44ae-a268-74a963da20a2",
-            "name": "Portugal",
-            "started": "2021-08-09T10:00:11.232930Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 03644e70-f2cc-4585-af5d-679459f62ddc\nArtifactId: romania\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:43.094181Z",
-            "id": "f464af54-31b6-4eda-9138-2e21d62ad250",
-            "name": "Romania",
-            "started": "2021-08-09T10:00:29.105124Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 606d4d72-299a-4258-b1a8-9dd09c730d97\nArtifactId: slovakia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:41.965496Z",
-            "id": "c2ab271f-83ad-4501-923c-66ca50dc2489",
-            "name": "Slovakia",
-            "started": "2021-08-09T10:00:25.172458Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 2926d77b-495d-4555-8199-bfc21fdfdaef\nArtifactId: slovenia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:19.699867Z",
-            "id": "931b835c-820c-488d-94a7-babda019d9db",
-            "name": "Slovenia",
-            "started": "2021-08-09T10:00:11.832912Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 1fbb7876-c20d-40ba-ba6e-b1eebc041bf1\nArtifactId: spain\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T09:02:27.704357Z",
-            "id": "e1108204-9432-481d-ba06-38ce7dd8f98b",
-            "name": "Spain",
-            "started": "2021-08-09T09:00:34.167909Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 1c647a43-2bd2-4c46-96d1-f357f74c7e7d\nArtifactId: sweden\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T10:00:58.204438Z",
-            "id": "8debecb2-a841-4ac5-96bd-169fc3da3338",
-            "name": "Sweden",
-            "started": "2021-08-09T10:00:30.528234Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 98f94638-786a-4669-a081-5c14b496526c\nArtifactId: truncator\nBuild-Timestamp: 20210807155850\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 3af61a07df58a36264187f688b1a0350c21d003b\nGit-Time: 2021-08-07T15:58:42Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-08T00:00:32.067979Z",
-            "id": "803e227c-8d79-4051-b68d-e3b80003adb6",
-            "name": "Truncator",
-            "started": "2021-08-08T00:00:28.459768Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "(log) batch-id: 8211c0ce-8667-4135-8d75-a9e31a2fc238\nArtifactId: united-kingdom\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-            "finished": "2021-08-09T09:14:54.073149Z",
-            "id": "73a5f612-0e00-48bf-992c-f2e167ba3017",
-            "name": "UnitedKingdom",
-            "started": "2021-08-09T09:00:33.401737Z",
-            "status": "SUCCESS"
-        }
-    ],
-    "total": 33
+  "items": [
+    {
+      "comment": "(log) batch-id: 49042fb4-3aef-4064-8a15-7e842a7fe602\nArtifactId: aggregator\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:30.913777Z",
+      "id": "1f7ac191-821c-4c2c-911a-abf675498026",
+      "name": "aggregator",
+      "started": "2021-08-09T10:00:12.973085Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: bfaf031d-3f1b-43be-b7c5-d46684fec419\nArtifactId: austria\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:03.610885Z",
+      "id": "419445f2-9f4f-40ce-a0d8-ac975e0bf0ba",
+      "name": "Austria",
+      "started": "2021-08-09T10:00:12.531853Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: aff3fb94-04a5-44a2-bb23-8cd27d04e565\nArtifactId: belgium\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:27.321799Z",
+      "id": "076a44cd-c7fc-43e8-80d8-1301f90a27e7",
+      "name": "Belgium",
+      "started": "2021-08-09T10:00:27.893602Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: d858577d-2f2a-4106-ba29-5bcbfb918e36\nArtifactId: bulgaria\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:44.236641Z",
+      "id": "89a26dd0-e259-4395-b668-c4d6d8c270cb",
+      "name": "Bulgaria",
+      "started": "2021-08-09T10:00:19.422299Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 1e8b6a36-86fd-4ba4-8b56-6d4d3c083abb\nArtifactId: croatia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:14.898209Z",
+      "id": "52aa4a42-cc0b-4aee-9c0a-aeeaf8ce91af",
+      "name": "Croatia",
+      "started": "2021-08-09T10:00:11.467157Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 80bd2725-204e-4a4a-82c2-b8130daa844e\nArtifactId: cyprus\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:24.556838Z",
+      "id": "44ff34f1-bc14-4a73-a7b4-619289c23409",
+      "name": "Cyprus",
+      "started": "2021-08-09T10:00:14.546158Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: fee3c52e-6525-47a1-be34-5afc4a89a17c\nArtifactId: czech-republic\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:42.126930Z",
+      "id": "97d50616-07a3-4349-8940-2ab1477ca407",
+      "name": "CzechRepublic",
+      "started": "2021-08-09T10:00:13.486585Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 4ddfc2a7-c689-4aa1-a6bb-947135f8741f\nArtifactId: denmark\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:07.829196Z",
+      "id": "80a03a6d-aa37-46b8-983d-4cb8557e6ecf",
+      "name": "Denmark",
+      "started": "2021-08-09T10:00:27.972903Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: b2599afc-5e10-4b5d-8719-c9944c253676\nArtifactId: eba\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:08.544377Z",
+      "id": "6e258c9c-b666-4143-b65c-c21df6ba949c",
+      "name": "EBA",
+      "started": "2021-08-09T10:00:16.241097Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: b7bab69a-70b8-4995-8188-26cf36c79ab4\nArtifactId: estonia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:34.648069Z",
+      "id": "7262f6c7-b522-4e6d-930b-4f4c145191ff",
+      "name": "Estonia",
+      "started": "2021-08-09T10:00:14.873363Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 6742e8e8-fabd-4635-84ff-006e8c411724\nArtifactId: finland\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:31.057402Z",
+      "id": "b62c2a32-f001-4704-a78f-46b66c064c7d",
+      "name": "Finland",
+      "started": "2021-08-09T10:00:18.750492Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 6185b226-d040-4c61-a508-7d11827b8645\nArtifactId: france\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T09:38:40.571588Z",
+      "id": "1ff2d45c-4865-4382-9567-6cbe71319ffd",
+      "name": "France",
+      "started": "2021-08-09T09:00:32.360978Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 0d9ef3bb-d3bd-4b98-8b7e-fbb61ed3256b\nArtifactId: germany\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:22.458946Z",
+      "id": "75c4254e-8d58-43d9-870d-a77cdaddd484",
+      "name": "Germany",
+      "started": "2021-08-09T10:00:30.719819Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 8ab653ce-1eb6-4e61-af23-5eb037d6f656\nArtifactId: greece\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:46.859726Z",
+      "id": "e9fa7f66-0809-44a6-9fe1-fc6bc08141ba",
+      "name": "Greece",
+      "started": "2021-08-09T10:00:25.338185Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: a57690ec-1076-40db-9c34-3959848d3d4c\nArtifactId: iceland\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:41.410192Z",
+      "id": "793d5320-856a-4a6a-91d5-84a4a3bb8846",
+      "name": "Iceland",
+      "started": "2021-08-09T10:00:28.860647Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: a4e5aac9-85a0-4bd4-93e0-1268acb9982e\nArtifactId: ireland\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:59.452862Z",
+      "id": "15de49d5-b69c-4368-9da7-72db3fd4077e",
+      "name": "Ireland",
+      "started": "2021-08-09T10:00:22.056194Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 8db25ec9-6567-481e-9895-8980678fc720\nArtifactId: italy\nBuild-Timestamp: 20210809075231\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n\nfailed",
+      "finished": "2021-08-09T09:05:45.764809Z",
+      "id": "8db25ec9-6567-481e-9895-8980678fc720",
+      "name": "Italy",
+      "started": "2021-08-09T08:20:18.342093Z",
+      "status": "FAILURE"
+    },
+    {
+      "comment": "(log) batch-id: b303bc9d-ad74-4a4d-87ef-aabca71a03a5\nArtifactId: latvia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:05.481665Z",
+      "id": "72f47dec-2c2b-4c1b-bb21-5bd823c7a37d",
+      "name": "Latvia",
+      "started": "2021-08-09T10:00:20.308323Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: be885c71-114d-47b9-800f-5ed66fed0938\nArtifactId: liechtenstein\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:46.526175Z",
+      "id": "1c5ad662-bd0e-454f-9367-4d8c98ff14cf",
+      "name": "Liechtenstein",
+      "started": "2021-08-09T10:00:30.583686Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 06eef97e-0bbd-406f-87cc-33cad9eb837c\nArtifactId: lithuania\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T09:02:08.029899Z",
+      "id": "c72bd143-93b5-49ee-bd3b-91e4b67bc83d",
+      "name": "Lithuania",
+      "started": "2021-08-09T09:00:31.635817Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: e296d563-0fa5-4bc5-9920-d541a1cbf927\nArtifactId: luxembourg\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:43.486399Z",
+      "id": "5e4a6156-ad3c-4007-af9c-d993fc5b52c0",
+      "name": "Luxembourg",
+      "started": "2021-08-09T10:00:26.200257Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 45527975-b472-4632-b1cc-bb0a318b4a9a\nArtifactId: malta\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:30.868809Z",
+      "id": "82311cfd-7d49-4d94-b1e7-e96125422d68",
+      "name": "Malta",
+      "started": "2021-08-09T10:00:27.543121Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 5715ffb1-1ebf-4171-871a-b915d6fca230\nArtifactId: netherlands\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:42.337573Z",
+      "id": "919e4275-0c3c-481e-b2b6-d6f5e6420838",
+      "name": "Netherlands",
+      "started": "2021-08-09T10:00:22.573371Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 746a23d0-8c05-4039-b1fc-28d98f012d5f\nArtifactId: norway\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:07.942033Z",
+      "id": "eff91690-9184-41e4-a0c4-849ab1e43519",
+      "name": "Norway",
+      "started": "2021-08-09T10:00:30.866121Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 8c43bc35-872d-4b7a-8b1d-362a0aee64ff\nArtifactId: poland\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:55.537892Z",
+      "id": "4e1c82f7-eb63-4518-ab21-20762d93014b",
+      "name": "Poland",
+      "started": "2021-08-09T10:00:28.595004Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 3aac5ba1-26d0-465d-850c-45ccf0d9f2ba\nArtifactId: portugal\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:01:27.042764Z",
+      "id": "b610eaca-361c-44ae-a268-74a963da20a2",
+      "name": "Portugal",
+      "started": "2021-08-09T10:00:11.232930Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 03644e70-f2cc-4585-af5d-679459f62ddc\nArtifactId: romania\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:43.094181Z",
+      "id": "f464af54-31b6-4eda-9138-2e21d62ad250",
+      "name": "Romania",
+      "started": "2021-08-09T10:00:29.105124Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 606d4d72-299a-4258-b1a8-9dd09c730d97\nArtifactId: slovakia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:41.965496Z",
+      "id": "c2ab271f-83ad-4501-923c-66ca50dc2489",
+      "name": "Slovakia",
+      "started": "2021-08-09T10:00:25.172458Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 2926d77b-495d-4555-8199-bfc21fdfdaef\nArtifactId: slovenia\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:19.699867Z",
+      "id": "931b835c-820c-488d-94a7-babda019d9db",
+      "name": "Slovenia",
+      "started": "2021-08-09T10:00:11.832912Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 1fbb7876-c20d-40ba-ba6e-b1eebc041bf1\nArtifactId: spain\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T09:02:27.704357Z",
+      "id": "e1108204-9432-481d-ba06-38ce7dd8f98b",
+      "name": "Spain",
+      "started": "2021-08-09T09:00:34.167909Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 1c647a43-2bd2-4c46-96d1-f357f74c7e7d\nArtifactId: sweden\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T10:00:58.204438Z",
+      "id": "8debecb2-a841-4ac5-96bd-169fc3da3338",
+      "name": "Sweden",
+      "started": "2021-08-09T10:00:30.528234Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 98f94638-786a-4669-a081-5c14b496526c\nArtifactId: truncator\nBuild-Timestamp: 20210807155850\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 3af61a07df58a36264187f688b1a0350c21d003b\nGit-Time: 2021-08-07T15:58:42Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-08T00:00:32.067979Z",
+      "id": "803e227c-8d79-4051-b68d-e3b80003adb6",
+      "name": "Truncator",
+      "started": "2021-08-08T00:00:28.459768Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "(log) batch-id: 8211c0ce-8667-4135-8d75-a9e31a2fc238\nArtifactId: united-kingdom\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+      "finished": "2021-08-09T09:14:54.073149Z",
+      "id": "73a5f612-0e00-48bf-992c-f2e167ba3017",
+      "name": "UnitedKingdom",
+      "started": "2021-08-09T09:00:33.401737Z",
+      "status": "SUCCESS"
+    }
+  ],
+  "total": 33
 }

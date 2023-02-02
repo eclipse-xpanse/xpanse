@@ -6,6 +6,7 @@
 
 package org.eclipse.osc.orchestrator.plugin.openstack;
 
+import java.io.File;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.junit.jupiter.api.Disabled;
@@ -17,13 +18,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.File;
-
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { OpenstackOrchestratorPlugin.class, OclLoader.class, KeystoneManager.class, NovaManager.class, GlanceManager.class, NeutronManager.class })
+@ContextConfiguration(classes = {OpenstackOrchestratorPlugin.class, OclLoader.class,
+        KeystoneManager.class, NovaManager.class, GlanceManager.class, NeutronManager.class})
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Disabled("Needs a working openstack instance")
-@ActiveProfiles(value = {"openstack","test"})
+@ActiveProfiles(value = {"openstack", "test"})
 public class OpenstackOrchestratorPluginIntegrationTest {
 
     @Autowired

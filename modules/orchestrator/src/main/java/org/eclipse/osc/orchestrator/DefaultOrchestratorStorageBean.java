@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+/**
+ * Bean to conditionally start the default storage.
+ */
 @Configuration
 public class DefaultOrchestratorStorageBean {
 

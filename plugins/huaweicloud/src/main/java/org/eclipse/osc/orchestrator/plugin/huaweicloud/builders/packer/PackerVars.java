@@ -8,6 +8,9 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.packer;
 
 import lombok.Data;
 
+/**
+ * Packer variables.
+ */
 @Data
 public class PackerVars {
 

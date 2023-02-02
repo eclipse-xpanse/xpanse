@@ -16,15 +16,26 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 
+/**
+ * Default storage bean used by runtime when plugin has not provided its own storage bean
+ * to store runtime information.
+ */
 @Slf4j
 public class FileOrchestratorStorage implements OrchestratorStorage {
 
     private final Properties properties = new Properties();
     private final File file;
 
+    /**
+     * Initialize Storage bean.
+     *
+     * @param environment Environment bean from SpringContext.
+     * @throws IOException Exception when external resource cannot be read.
+     */
     public FileOrchestratorStorage(Environment environment) throws IOException {
         log.info("No other storage beans found. Using default file storage.");
-        this.file = new File(Objects.requireNonNull(environment.getProperty("orchestrator.store.filename")));
+        this.file = new File(
+                Objects.requireNonNull(environment.getProperty("orchestrator.store.filename")));
         if (file.exists()) {
             try (FileInputStream stream = new FileInputStream(file)) {
                 properties.load(stream);

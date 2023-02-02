@@ -1,359 +1,359 @@
 {
-    "comment": "(log) batch-id: 49042fb4-3aef-4064-8a15-7e842a7fe602\nArtifactId: aggregator\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
-    "finished": "2021-08-09T10:00:30.913777Z",
-    "id": "1f7ac191-821c-4c2c-911a-abf675498026",
-    "name": "aggregator",
-    "started": "2021-08-09T10:00:12.973085Z",
-    "status": "SUCCESS",
-    "steps": [
-        {
-            "comment": "Manual: Diff[deleted=[], added=[], updated=[], initialTotal=0, newSize=0]\nBelgium: Diff[deleted=[], added=[], updated=[], initialTotal=70, newSize=70]\nFinland: Diff[deleted=[], added=[], updated=[], initialTotal=202, newSize=202]\nFrance: Diff[deleted=[], added=[], updated=[], initialTotal=397, newSize=397]\nGermany: Diff[deleted=[], added=[], updated=[], initialTotal=1450, newSize=1450]\nNetherlands: Diff[deleted=[], added=[], updated=[], initialTotal=184, newSize=184]\nSweden: Diff[deleted=[], added=[], updated=[], initialTotal=191, newSize=191]\nUnitedKingdom: Diff[deleted=[], added=[], updated=[], initialTotal=218, newSize=218]",
-            "finished": "2021-08-09T10:00:21.556970Z",
-            "id": "9cf01bec-1ef0-4039-bd44-27158e5e3011",
-            "name": "compute-providers-diff",
-            "previousId": "d4661f14-3991-4c1f-9f73-3446574b2a7b",
-            "started": "2021-08-09T10:00:12.981869Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=0\ndeleted: 0, added: 0, updated: 0, initial-size=0, new-size=0",
-            "finished": "2021-08-09T10:00:14.442279Z",
-            "id": "f10c05bf-d9c0-48ff-b391-b6000933445b",
-            "name": "Manual diff",
-            "started": "2021-08-09T10:00:13.041963Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=218\ndeleted: 0, added: 0, updated: 0, initial-size=218, new-size=218",
-            "finished": "2021-08-09T10:00:16.110913Z",
-            "id": "0d82e8b5-3ffe-4747-b5c0-4fd266486ca2",
-            "name": "UnitedKingdom diff",
-            "previousId": "f10c05bf-d9c0-48ff-b391-b6000933445b",
-            "started": "2021-08-09T10:00:14.456692Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=1450\ndeleted: 0, added: 0, updated: 0, initial-size=1450, new-size=1450",
-            "finished": "2021-08-09T10:00:19.272311Z",
-            "id": "1d5a2f30-65f6-475c-9c30-18a68897d3ae",
-            "name": "Germany diff",
-            "previousId": "0d82e8b5-3ffe-4747-b5c0-4fd266486ca2",
-            "started": "2021-08-09T10:00:16.117779Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=397\ndeleted: 0, added: 0, updated: 0, initial-size=397, new-size=397",
-            "finished": "2021-08-09T10:00:20.120696Z",
-            "id": "f3d4c898-42ad-4930-b49e-7daca299426d",
-            "name": "France diff",
-            "previousId": "1d5a2f30-65f6-475c-9c30-18a68897d3ae",
-            "started": "2021-08-09T10:00:19.287310Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=191\ndeleted: 0, added: 0, updated: 0, initial-size=191, new-size=191",
-            "finished": "2021-08-09T10:00:20.424884Z",
-            "id": "45214e4d-c22c-444b-ac64-1c7a106c8ce9",
-            "name": "Sweden diff",
-            "previousId": "f3d4c898-42ad-4930-b49e-7daca299426d",
-            "started": "2021-08-09T10:00:20.121460Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=184\ndeleted: 0, added: 0, updated: 0, initial-size=184, new-size=184",
-            "finished": "2021-08-09T10:00:20.774886Z",
-            "id": "bfd42aef-3916-4713-89a3-282ec698474e",
-            "name": "Netherlands diff",
-            "previousId": "45214e4d-c22c-444b-ac64-1c7a106c8ce9",
-            "started": "2021-08-09T10:00:20.425584Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=70\ndeleted: 0, added: 0, updated: 0, initial-size=70, new-size=70",
-            "finished": "2021-08-09T10:00:20.943711Z",
-            "id": "c2b3426a-a5cf-40ce-9b61-08c125249ac0",
-            "name": "Belgium diff",
-            "previousId": "bfd42aef-3916-4713-89a3-282ec698474e",
-            "started": "2021-08-09T10:00:20.775517Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=202\ndeleted: 0, added: 0, updated: 0, initial-size=202, new-size=202",
-            "finished": "2021-08-09T10:00:21.538965Z",
-            "id": "d4661f14-3991-4c1f-9f73-3446574b2a7b",
-            "name": "Finland diff",
-            "previousId": "c2b3426a-a5cf-40ce-9b61-08c125249ac0",
-            "started": "2021-08-09T10:00:20.944302Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "Austria: Diff[deleted=[], added=[], updated=[], initialTotal=6, newSize=6]\nBulgaria: Diff[deleted=[], added=[], updated=[], initialTotal=19, newSize=19]\nCroatia: Diff[deleted=[], added=[], updated=[], initialTotal=11, newSize=11]\nCyprus: Diff[deleted=[], added=[], updated=[], initialTotal=25, newSize=25]\nCzechRepublic: Diff[deleted=[], added=[], updated=[], initialTotal=165, newSize=165]\nDenmark: Diff[deleted=[], added=[], updated=[], initialTotal=55, newSize=55]\nEstonia: Diff[deleted=[], added=[], updated=[], initialTotal=25, newSize=25]\nGreece: Diff[deleted=[], added=[], updated=[], initialTotal=12, newSize=12]\nHungary: Diff[deleted=[], added=[], updated=[], initialTotal=17, newSize=17]\nIceland: Diff[deleted=[], added=[], updated=[], initialTotal=0, newSize=0]\nIreland: Diff[deleted=[], added=[], updated=[], initialTotal=42, newSize=42]\nItaly: Diff[deleted=[], added=[], updated=[], initialTotal=65, newSize=65]\nLatvia: Diff[deleted=[], added=[], updated=[], initialTotal=25, newSize=25]\nLiechtenstein: Diff[deleted=[], added=[], updated=[], initialTotal=5, newSize=5]\nLithuania: Diff[deleted=[], added=[], updated=[], initialTotal=145, newSize=145]\nLuxembourg: Diff[deleted=[], added=[], updated=[], initialTotal=24, newSize=24]\nMalta: Diff[deleted=[], added=[], updated=[], initialTotal=48, newSize=48]\nNorway: Diff[deleted=[], added=[], updated=[], initialTotal=33, newSize=33]\nPoland: Diff[deleted=[], added=[], updated=[], initialTotal=1945, newSize=1945]\nPortugal: Diff[deleted=[], added=[], updated=[], initialTotal=14, newSize=14]\nRomania: Diff[deleted=[], added=[], updated=[], initialTotal=12, newSize=12]\nSlovakia: Diff[deleted=[], added=[], updated=[], initialTotal=16, newSize=16]\nSlovenia: Diff[deleted=[], added=[], updated=[], initialTotal=6, newSize=6]\nSpain: Diff[deleted=[], added=[], updated=[], initialTotal=68, newSize=68]",
-            "finished": "2021-08-09T10:00:28.177329Z",
-            "id": "611eee34-0d77-4b56-ab3c-b6ca52bef2b2",
-            "name": "eba-diffs",
-            "previousId": "adbf6b62-bc4f-4a33-a3b2-bf30d3f571d1",
-            "started": "2021-08-09T10:00:21.557057Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=6\ndeleted: 0, added: 0, updated: 0, initial-size=6, new-size=6",
-            "finished": "2021-08-09T10:00:21.658040Z",
-            "id": "f8ad02d5-a574-4a04-9cc8-cbeedbdcf9bf",
-            "name": "Austria diff",
-            "previousId": "9cf01bec-1ef0-4039-bd44-27158e5e3011",
-            "started": "2021-08-09T10:00:21.558216Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=19\ndeleted: 0, added: 0, updated: 0, initial-size=19, new-size=19",
-            "finished": "2021-08-09T10:00:21.842112Z",
-            "id": "add28d35-b171-4244-af02-3f4b018ed6ab",
-            "name": "Bulgaria diff",
-            "previousId": "f8ad02d5-a574-4a04-9cc8-cbeedbdcf9bf",
-            "started": "2021-08-09T10:00:21.662441Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=11\ndeleted: 0, added: 0, updated: 0, initial-size=11, new-size=11",
-            "finished": "2021-08-09T10:00:22.048247Z",
-            "id": "c6ba6c53-a3c9-4268-8851-7f540d543af7",
-            "name": "Croatia diff",
-            "previousId": "add28d35-b171-4244-af02-3f4b018ed6ab",
-            "started": "2021-08-09T10:00:21.842232Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=25\ndeleted: 0, added: 0, updated: 0, initial-size=25, new-size=25",
-            "finished": "2021-08-09T10:00:22.137090Z",
-            "id": "60eabbaa-a0dc-4a69-8f99-89aabc7cb99d",
-            "name": "Cyprus diff",
-            "previousId": "c6ba6c53-a3c9-4268-8851-7f540d543af7",
-            "started": "2021-08-09T10:00:22.048364Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=165\ndeleted: 0, added: 0, updated: 0, initial-size=165, new-size=165",
-            "finished": "2021-08-09T10:00:22.502299Z",
-            "id": "8b4a68c4-23bf-43b3-ade6-3de4781e6f06",
-            "name": "CzechRepublic diff",
-            "previousId": "60eabbaa-a0dc-4a69-8f99-89aabc7cb99d",
-            "started": "2021-08-09T10:00:22.137205Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=55\ndeleted: 0, added: 0, updated: 0, initial-size=55, new-size=55",
-            "finished": "2021-08-09T10:00:22.713338Z",
-            "id": "3f11d2a0-4fdc-4cb8-8d9c-f3613598964e",
-            "name": "Denmark diff",
-            "previousId": "8b4a68c4-23bf-43b3-ade6-3de4781e6f06",
-            "started": "2021-08-09T10:00:22.502434Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=25\ndeleted: 0, added: 0, updated: 0, initial-size=25, new-size=25",
-            "finished": "2021-08-09T10:00:22.927588Z",
-            "id": "3eda6062-3c1f-4da9-9ca3-c60fbf5ac049",
-            "name": "Estonia diff",
-            "previousId": "3f11d2a0-4fdc-4cb8-8d9c-f3613598964e",
-            "started": "2021-08-09T10:00:22.713454Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=12\ndeleted: 0, added: 0, updated: 0, initial-size=12, new-size=12",
-            "finished": "2021-08-09T10:00:23.106494Z",
-            "id": "56738eb2-9481-40ee-92bd-d732eca59af4",
-            "name": "Greece diff",
-            "previousId": "3eda6062-3c1f-4da9-9ca3-c60fbf5ac049",
-            "started": "2021-08-09T10:00:22.927718Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=17\ndeleted: 0, added: 0, updated: 0, initial-size=17, new-size=17",
-            "finished": "2021-08-09T10:00:23.290151Z",
-            "id": "368fb555-3582-4cdf-976d-e0af1406208a",
-            "name": "Hungary diff",
-            "previousId": "56738eb2-9481-40ee-92bd-d732eca59af4",
-            "started": "2021-08-09T10:00:23.108218Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=0\ndeleted: 0, added: 0, updated: 0, initial-size=0, new-size=0",
-            "finished": "2021-08-09T10:00:23.456246Z",
-            "id": "50546d64-1e0c-4863-928b-65a0f6528e4c",
-            "name": "Iceland diff",
-            "previousId": "368fb555-3582-4cdf-976d-e0af1406208a",
-            "started": "2021-08-09T10:00:23.290297Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=42\ndeleted: 0, added: 0, updated: 0, initial-size=42, new-size=42",
-            "finished": "2021-08-09T10:00:23.605808Z",
-            "id": "17e2001a-8093-49b6-89db-ed5baa589f22",
-            "name": "Ireland diff",
-            "previousId": "50546d64-1e0c-4863-928b-65a0f6528e4c",
-            "started": "2021-08-09T10:00:23.456377Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=65\ndeleted: 0, added: 0, updated: 0, initial-size=65, new-size=65",
-            "finished": "2021-08-09T10:00:23.757529Z",
-            "id": "e46c6503-069a-45bd-829b-52cafe1e1988",
-            "name": "Italy diff",
-            "previousId": "17e2001a-8093-49b6-89db-ed5baa589f22",
-            "started": "2021-08-09T10:00:23.605926Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=25\ndeleted: 0, added: 0, updated: 0, initial-size=25, new-size=25",
-            "finished": "2021-08-09T10:00:23.955677Z",
-            "id": "924f6bdf-b9a6-4367-8d18-040eeb7ded9d",
-            "name": "Latvia diff",
-            "previousId": "e46c6503-069a-45bd-829b-52cafe1e1988",
-            "started": "2021-08-09T10:00:23.761729Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=5\ndeleted: 0, added: 0, updated: 0, initial-size=5, new-size=5",
-            "finished": "2021-08-09T10:00:24.083365Z",
-            "id": "70dd6c54-9618-4e1d-9f04-b83e2a576750",
-            "name": "Liechtenstein diff",
-            "previousId": "924f6bdf-b9a6-4367-8d18-040eeb7ded9d",
-            "started": "2021-08-09T10:00:23.955794Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=145\ndeleted: 0, added: 0, updated: 0, initial-size=145, new-size=145",
-            "finished": "2021-08-09T10:00:24.300116Z",
-            "id": "9b301072-4a31-4106-8603-f96f9cb9669c",
-            "name": "Lithuania diff",
-            "previousId": "70dd6c54-9618-4e1d-9f04-b83e2a576750",
-            "started": "2021-08-09T10:00:24.083479Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=24\ndeleted: 0, added: 0, updated: 0, initial-size=24, new-size=24",
-            "finished": "2021-08-09T10:00:24.380897Z",
-            "id": "ad9c77cd-04b5-45a6-b031-7c88d13799d0",
-            "name": "Luxembourg diff",
-            "previousId": "9b301072-4a31-4106-8603-f96f9cb9669c",
-            "started": "2021-08-09T10:00:24.300221Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=48\ndeleted: 0, added: 0, updated: 0, initial-size=48, new-size=48",
-            "finished": "2021-08-09T10:00:24.474659Z",
-            "id": "1384a7ad-18e2-413f-ab3a-3b926f1027f0",
-            "name": "Malta diff",
-            "previousId": "ad9c77cd-04b5-45a6-b031-7c88d13799d0",
-            "started": "2021-08-09T10:00:24.381010Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=33\ndeleted: 0, added: 0, updated: 0, initial-size=33, new-size=33",
-            "finished": "2021-08-09T10:00:24.619274Z",
-            "id": "fdd42cb4-d910-4009-8880-6761bf5f61b1",
-            "name": "Norway diff",
-            "previousId": "1384a7ad-18e2-413f-ab3a-3b926f1027f0",
-            "started": "2021-08-09T10:00:24.474764Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=1945\ndeleted: 0, added: 0, updated: 0, initial-size=1945, new-size=1945",
-            "finished": "2021-08-09T10:00:26.329926Z",
-            "id": "4c2776e8-5dd7-4329-be38-1c8e0981186f",
-            "name": "Poland diff",
-            "previousId": "fdd42cb4-d910-4009-8880-6761bf5f61b1",
-            "started": "2021-08-09T10:00:24.619375Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=14\ndeleted: 0, added: 0, updated: 0, initial-size=14, new-size=14",
-            "finished": "2021-08-09T10:00:26.820411Z",
-            "id": "67448b18-c71b-49f8-9ddb-a4267398e116",
-            "name": "Portugal diff",
-            "previousId": "4c2776e8-5dd7-4329-be38-1c8e0981186f",
-            "started": "2021-08-09T10:00:26.330029Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=12\ndeleted: 0, added: 0, updated: 0, initial-size=12, new-size=12",
-            "finished": "2021-08-09T10:00:27.091976Z",
-            "id": "28a0bd1c-39f3-4dd9-86b6-126889bcca37",
-            "name": "Romania diff",
-            "previousId": "67448b18-c71b-49f8-9ddb-a4267398e116",
-            "started": "2021-08-09T10:00:26.820523Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=16\ndeleted: 0, added: 0, updated: 0, initial-size=16, new-size=16",
-            "finished": "2021-08-09T10:00:27.235749Z",
-            "id": "faa9c3d8-2b40-4664-b7a5-e49f5b550b04",
-            "name": "Slovakia diff",
-            "previousId": "28a0bd1c-39f3-4dd9-86b6-126889bcca37",
-            "started": "2021-08-09T10:00:27.092077Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=6\ndeleted: 0, added: 0, updated: 0, initial-size=6, new-size=6",
-            "finished": "2021-08-09T10:00:27.407302Z",
-            "id": "8d02457e-d2b4-4dfa-a3e0-a4bda9fdfa38",
-            "name": "Slovenia diff",
-            "previousId": "faa9c3d8-2b40-4664-b7a5-e49f5b550b04",
-            "started": "2021-08-09T10:00:27.235847Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "\ndatabase-size=68\ndeleted: 0, added: 0, updated: 0, initial-size=68, new-size=68",
-            "finished": "2021-08-09T10:00:28.065344Z",
-            "id": "adbf6b62-bc4f-4a33-a3b2-bf30d3f571d1",
-            "name": "Spain diff",
-            "previousId": "8d02457e-d2b4-4dfa-a3e0-a4bda9fdfa38",
-            "started": "2021-08-09T10:00:27.407429Z",
-            "status": "SUCCESS"
-        },
-        {
-            "finished": "2021-08-09T10:00:30.908400Z",
-            "id": "33df4687-3d37-472d-b0a8-c1f2f7ee9254",
-            "name": "business-rules",
-            "previousId": "611eee34-0d77-4b56-ab3c-b6ca52bef2b2",
-            "started": "2021-08-09T10:00:28.177412Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.",
-            "finished": "2021-08-09T10:00:30.909474Z",
-            "id": "c5d569b6-37e3-4a9b-903d-18786e13815d",
-            "name": "set-deletion-to-withdraw-status",
-            "previousId": "33df4687-3d37-472d-b0a8-c1f2f7ee9254",
-            "started": "2021-08-09T10:00:30.908465Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "Manual: No change.\nBelgium: No change.\nFinland: No change.\nFrance: No change.\nGermany: No change.\nNetherlands: No change.\nSweden: No change.\nUnitedKingdom: No change.\nAustria: No change.\nBulgaria: No change.\nCroatia: No change.\nCyprus: No change.\nCzechRepublic: No change.\nDenmark: No change.\nEstonia: No change.\nGreece: No change.\nHungary: No change.\nIceland: No change.\nIreland: No change.\nItaly: No change.\nLatvia: No change.\nLiechtenstein: No change.\nLithuania: No change.\nLuxembourg: No change.\nMalta: No change.\nNorway: No change.\nPoland: No change.\nPortugal: No change.\nRomania: No change.\nSlovakia: No change.\nSlovenia: No change.\nSpain: No change.",
-            "finished": "2021-08-09T10:00:30.910901Z",
-            "id": "267fac4b-847d-49ac-8766-e724c02d1563",
-            "name": "increment-version-for-updates",
-            "previousId": "c5d569b6-37e3-4a9b-903d-18786e13815d",
-            "started": "2021-08-09T10:00:30.909527Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "[AD][S][E] Skipping diff for Manual since it is empty\n[AD][S][E] Skipping diff for Belgium since it is empty\n[AD][S][E] Skipping diff for Finland since it is empty\n[AD][S][E] Skipping diff for France since it is empty\n[AD][S][E] Skipping diff for Germany since it is empty\n[AD][S][E] Skipping diff for Netherlands since it is empty\n[AD][S][E] Skipping diff for Sweden since it is empty\n[AD][S][E] Skipping diff for UnitedKingdom since it is empty\n[AD][S][E] Skipping diff for Austria since it is empty\n[AD][S][E] Skipping diff for Bulgaria since it is empty\n[AD][S][E] Skipping diff for Croatia since it is empty\n[AD][S][E] Skipping diff for Cyprus since it is empty\n[AD][S][E] Skipping diff for CzechRepublic since it is empty\n[AD][S][E] Skipping diff for Denmark since it is empty\n[AD][S][E] Skipping diff for Estonia since it is empty\n[AD][S][E] Skipping diff for Greece since it is empty\n[AD][S][E] Skipping diff for Hungary since it is empty\n[AD][S][E] Skipping diff for Iceland since it is empty\n[AD][S][E] Skipping diff for Ireland since it is empty\n[AD][S][E] Skipping diff for Italy since it is empty\n[AD][S][E] Skipping diff for Latvia since it is empty\n[AD][S][E] Skipping diff for Liechtenstein since it is empty\n[AD][S][E] Skipping diff for Lithuania since it is empty\n[AD][S][E] Skipping diff for Luxembourg since it is empty\n[AD][S][E] Skipping diff for Malta since it is empty\n[AD][S][E] Skipping diff for Norway since it is empty\n[AD][S][E] Skipping diff for Poland since it is empty\n[AD][S][E] Skipping diff for Portugal since it is empty\n[AD][S][E] Skipping diff for Romania since it is empty\n[AD][S][E] Skipping diff for Slovakia since it is empty\n[AD][S][E] Skipping diff for Slovenia since it is empty\n[AD][S][E] Skipping diff for Spain since it is empty\n",
-            "finished": "2021-08-09T10:00:30.913253Z",
-            "id": "a51cd852-dee2-4d3f-8330-309fb4c765e0",
-            "name": "apply-diffs",
-            "previousId": "267fac4b-847d-49ac-8766-e724c02d1563",
-            "started": "2021-08-09T10:00:30.910949Z",
-            "status": "SUCCESS"
-        },
-        {
-            "comment": "No diff, skipping notifications",
-            "finished": "2021-08-09T10:00:30.913733Z",
-            "id": "e943aa7a-d942-4d15-8ed6-71ae1704b927",
-            "name": "notify-diff",
-            "previousId": "a51cd852-dee2-4d3f-8330-309fb4c765e0",
-            "started": "2021-08-09T10:00:30.913298Z",
-            "status": "SUCCESS"
-        }
-    ]
+  "comment": "(log) batch-id: 49042fb4-3aef-4064-8a15-7e842a7fe602\nArtifactId: aggregator\nBuild-Timestamp: 20210809085400\nGit-Branch: develop\nGit-Origin: https://github.com/yupiik/batch-sample-data.git\nGit-Sha: 221b42b17fea715719eb0517971b23dd6528069a\nGit-Time: 2021-08-09T07:19:48Z\nGroupId: com.yupiik.batch\nVersion: 1.0.2-SNAPSHOT\n",
+  "finished": "2021-08-09T10:00:30.913777Z",
+  "id": "1f7ac191-821c-4c2c-911a-abf675498026",
+  "name": "aggregator",
+  "started": "2021-08-09T10:00:12.973085Z",
+  "status": "SUCCESS",
+  "steps": [
+    {
+      "comment": "Manual: Diff[deleted=[], added=[], updated=[], initialTotal=0, newSize=0]\nBelgium: Diff[deleted=[], added=[], updated=[], initialTotal=70, newSize=70]\nFinland: Diff[deleted=[], added=[], updated=[], initialTotal=202, newSize=202]\nFrance: Diff[deleted=[], added=[], updated=[], initialTotal=397, newSize=397]\nGermany: Diff[deleted=[], added=[], updated=[], initialTotal=1450, newSize=1450]\nNetherlands: Diff[deleted=[], added=[], updated=[], initialTotal=184, newSize=184]\nSweden: Diff[deleted=[], added=[], updated=[], initialTotal=191, newSize=191]\nUnitedKingdom: Diff[deleted=[], added=[], updated=[], initialTotal=218, newSize=218]",
+      "finished": "2021-08-09T10:00:21.556970Z",
+      "id": "9cf01bec-1ef0-4039-bd44-27158e5e3011",
+      "name": "compute-providers-diff",
+      "previousId": "d4661f14-3991-4c1f-9f73-3446574b2a7b",
+      "started": "2021-08-09T10:00:12.981869Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=0\ndeleted: 0, added: 0, updated: 0, initial-size=0, new-size=0",
+      "finished": "2021-08-09T10:00:14.442279Z",
+      "id": "f10c05bf-d9c0-48ff-b391-b6000933445b",
+      "name": "Manual diff",
+      "started": "2021-08-09T10:00:13.041963Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=218\ndeleted: 0, added: 0, updated: 0, initial-size=218, new-size=218",
+      "finished": "2021-08-09T10:00:16.110913Z",
+      "id": "0d82e8b5-3ffe-4747-b5c0-4fd266486ca2",
+      "name": "UnitedKingdom diff",
+      "previousId": "f10c05bf-d9c0-48ff-b391-b6000933445b",
+      "started": "2021-08-09T10:00:14.456692Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=1450\ndeleted: 0, added: 0, updated: 0, initial-size=1450, new-size=1450",
+      "finished": "2021-08-09T10:00:19.272311Z",
+      "id": "1d5a2f30-65f6-475c-9c30-18a68897d3ae",
+      "name": "Germany diff",
+      "previousId": "0d82e8b5-3ffe-4747-b5c0-4fd266486ca2",
+      "started": "2021-08-09T10:00:16.117779Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=397\ndeleted: 0, added: 0, updated: 0, initial-size=397, new-size=397",
+      "finished": "2021-08-09T10:00:20.120696Z",
+      "id": "f3d4c898-42ad-4930-b49e-7daca299426d",
+      "name": "France diff",
+      "previousId": "1d5a2f30-65f6-475c-9c30-18a68897d3ae",
+      "started": "2021-08-09T10:00:19.287310Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=191\ndeleted: 0, added: 0, updated: 0, initial-size=191, new-size=191",
+      "finished": "2021-08-09T10:00:20.424884Z",
+      "id": "45214e4d-c22c-444b-ac64-1c7a106c8ce9",
+      "name": "Sweden diff",
+      "previousId": "f3d4c898-42ad-4930-b49e-7daca299426d",
+      "started": "2021-08-09T10:00:20.121460Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=184\ndeleted: 0, added: 0, updated: 0, initial-size=184, new-size=184",
+      "finished": "2021-08-09T10:00:20.774886Z",
+      "id": "bfd42aef-3916-4713-89a3-282ec698474e",
+      "name": "Netherlands diff",
+      "previousId": "45214e4d-c22c-444b-ac64-1c7a106c8ce9",
+      "started": "2021-08-09T10:00:20.425584Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=70\ndeleted: 0, added: 0, updated: 0, initial-size=70, new-size=70",
+      "finished": "2021-08-09T10:00:20.943711Z",
+      "id": "c2b3426a-a5cf-40ce-9b61-08c125249ac0",
+      "name": "Belgium diff",
+      "previousId": "bfd42aef-3916-4713-89a3-282ec698474e",
+      "started": "2021-08-09T10:00:20.775517Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=202\ndeleted: 0, added: 0, updated: 0, initial-size=202, new-size=202",
+      "finished": "2021-08-09T10:00:21.538965Z",
+      "id": "d4661f14-3991-4c1f-9f73-3446574b2a7b",
+      "name": "Finland diff",
+      "previousId": "c2b3426a-a5cf-40ce-9b61-08c125249ac0",
+      "started": "2021-08-09T10:00:20.944302Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "Austria: Diff[deleted=[], added=[], updated=[], initialTotal=6, newSize=6]\nBulgaria: Diff[deleted=[], added=[], updated=[], initialTotal=19, newSize=19]\nCroatia: Diff[deleted=[], added=[], updated=[], initialTotal=11, newSize=11]\nCyprus: Diff[deleted=[], added=[], updated=[], initialTotal=25, newSize=25]\nCzechRepublic: Diff[deleted=[], added=[], updated=[], initialTotal=165, newSize=165]\nDenmark: Diff[deleted=[], added=[], updated=[], initialTotal=55, newSize=55]\nEstonia: Diff[deleted=[], added=[], updated=[], initialTotal=25, newSize=25]\nGreece: Diff[deleted=[], added=[], updated=[], initialTotal=12, newSize=12]\nHungary: Diff[deleted=[], added=[], updated=[], initialTotal=17, newSize=17]\nIceland: Diff[deleted=[], added=[], updated=[], initialTotal=0, newSize=0]\nIreland: Diff[deleted=[], added=[], updated=[], initialTotal=42, newSize=42]\nItaly: Diff[deleted=[], added=[], updated=[], initialTotal=65, newSize=65]\nLatvia: Diff[deleted=[], added=[], updated=[], initialTotal=25, newSize=25]\nLiechtenstein: Diff[deleted=[], added=[], updated=[], initialTotal=5, newSize=5]\nLithuania: Diff[deleted=[], added=[], updated=[], initialTotal=145, newSize=145]\nLuxembourg: Diff[deleted=[], added=[], updated=[], initialTotal=24, newSize=24]\nMalta: Diff[deleted=[], added=[], updated=[], initialTotal=48, newSize=48]\nNorway: Diff[deleted=[], added=[], updated=[], initialTotal=33, newSize=33]\nPoland: Diff[deleted=[], added=[], updated=[], initialTotal=1945, newSize=1945]\nPortugal: Diff[deleted=[], added=[], updated=[], initialTotal=14, newSize=14]\nRomania: Diff[deleted=[], added=[], updated=[], initialTotal=12, newSize=12]\nSlovakia: Diff[deleted=[], added=[], updated=[], initialTotal=16, newSize=16]\nSlovenia: Diff[deleted=[], added=[], updated=[], initialTotal=6, newSize=6]\nSpain: Diff[deleted=[], added=[], updated=[], initialTotal=68, newSize=68]",
+      "finished": "2021-08-09T10:00:28.177329Z",
+      "id": "611eee34-0d77-4b56-ab3c-b6ca52bef2b2",
+      "name": "eba-diffs",
+      "previousId": "adbf6b62-bc4f-4a33-a3b2-bf30d3f571d1",
+      "started": "2021-08-09T10:00:21.557057Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=6\ndeleted: 0, added: 0, updated: 0, initial-size=6, new-size=6",
+      "finished": "2021-08-09T10:00:21.658040Z",
+      "id": "f8ad02d5-a574-4a04-9cc8-cbeedbdcf9bf",
+      "name": "Austria diff",
+      "previousId": "9cf01bec-1ef0-4039-bd44-27158e5e3011",
+      "started": "2021-08-09T10:00:21.558216Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=19\ndeleted: 0, added: 0, updated: 0, initial-size=19, new-size=19",
+      "finished": "2021-08-09T10:00:21.842112Z",
+      "id": "add28d35-b171-4244-af02-3f4b018ed6ab",
+      "name": "Bulgaria diff",
+      "previousId": "f8ad02d5-a574-4a04-9cc8-cbeedbdcf9bf",
+      "started": "2021-08-09T10:00:21.662441Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=11\ndeleted: 0, added: 0, updated: 0, initial-size=11, new-size=11",
+      "finished": "2021-08-09T10:00:22.048247Z",
+      "id": "c6ba6c53-a3c9-4268-8851-7f540d543af7",
+      "name": "Croatia diff",
+      "previousId": "add28d35-b171-4244-af02-3f4b018ed6ab",
+      "started": "2021-08-09T10:00:21.842232Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=25\ndeleted: 0, added: 0, updated: 0, initial-size=25, new-size=25",
+      "finished": "2021-08-09T10:00:22.137090Z",
+      "id": "60eabbaa-a0dc-4a69-8f99-89aabc7cb99d",
+      "name": "Cyprus diff",
+      "previousId": "c6ba6c53-a3c9-4268-8851-7f540d543af7",
+      "started": "2021-08-09T10:00:22.048364Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=165\ndeleted: 0, added: 0, updated: 0, initial-size=165, new-size=165",
+      "finished": "2021-08-09T10:00:22.502299Z",
+      "id": "8b4a68c4-23bf-43b3-ade6-3de4781e6f06",
+      "name": "CzechRepublic diff",
+      "previousId": "60eabbaa-a0dc-4a69-8f99-89aabc7cb99d",
+      "started": "2021-08-09T10:00:22.137205Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=55\ndeleted: 0, added: 0, updated: 0, initial-size=55, new-size=55",
+      "finished": "2021-08-09T10:00:22.713338Z",
+      "id": "3f11d2a0-4fdc-4cb8-8d9c-f3613598964e",
+      "name": "Denmark diff",
+      "previousId": "8b4a68c4-23bf-43b3-ade6-3de4781e6f06",
+      "started": "2021-08-09T10:00:22.502434Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=25\ndeleted: 0, added: 0, updated: 0, initial-size=25, new-size=25",
+      "finished": "2021-08-09T10:00:22.927588Z",
+      "id": "3eda6062-3c1f-4da9-9ca3-c60fbf5ac049",
+      "name": "Estonia diff",
+      "previousId": "3f11d2a0-4fdc-4cb8-8d9c-f3613598964e",
+      "started": "2021-08-09T10:00:22.713454Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=12\ndeleted: 0, added: 0, updated: 0, initial-size=12, new-size=12",
+      "finished": "2021-08-09T10:00:23.106494Z",
+      "id": "56738eb2-9481-40ee-92bd-d732eca59af4",
+      "name": "Greece diff",
+      "previousId": "3eda6062-3c1f-4da9-9ca3-c60fbf5ac049",
+      "started": "2021-08-09T10:00:22.927718Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=17\ndeleted: 0, added: 0, updated: 0, initial-size=17, new-size=17",
+      "finished": "2021-08-09T10:00:23.290151Z",
+      "id": "368fb555-3582-4cdf-976d-e0af1406208a",
+      "name": "Hungary diff",
+      "previousId": "56738eb2-9481-40ee-92bd-d732eca59af4",
+      "started": "2021-08-09T10:00:23.108218Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=0\ndeleted: 0, added: 0, updated: 0, initial-size=0, new-size=0",
+      "finished": "2021-08-09T10:00:23.456246Z",
+      "id": "50546d64-1e0c-4863-928b-65a0f6528e4c",
+      "name": "Iceland diff",
+      "previousId": "368fb555-3582-4cdf-976d-e0af1406208a",
+      "started": "2021-08-09T10:00:23.290297Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=42\ndeleted: 0, added: 0, updated: 0, initial-size=42, new-size=42",
+      "finished": "2021-08-09T10:00:23.605808Z",
+      "id": "17e2001a-8093-49b6-89db-ed5baa589f22",
+      "name": "Ireland diff",
+      "previousId": "50546d64-1e0c-4863-928b-65a0f6528e4c",
+      "started": "2021-08-09T10:00:23.456377Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=65\ndeleted: 0, added: 0, updated: 0, initial-size=65, new-size=65",
+      "finished": "2021-08-09T10:00:23.757529Z",
+      "id": "e46c6503-069a-45bd-829b-52cafe1e1988",
+      "name": "Italy diff",
+      "previousId": "17e2001a-8093-49b6-89db-ed5baa589f22",
+      "started": "2021-08-09T10:00:23.605926Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=25\ndeleted: 0, added: 0, updated: 0, initial-size=25, new-size=25",
+      "finished": "2021-08-09T10:00:23.955677Z",
+      "id": "924f6bdf-b9a6-4367-8d18-040eeb7ded9d",
+      "name": "Latvia diff",
+      "previousId": "e46c6503-069a-45bd-829b-52cafe1e1988",
+      "started": "2021-08-09T10:00:23.761729Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=5\ndeleted: 0, added: 0, updated: 0, initial-size=5, new-size=5",
+      "finished": "2021-08-09T10:00:24.083365Z",
+      "id": "70dd6c54-9618-4e1d-9f04-b83e2a576750",
+      "name": "Liechtenstein diff",
+      "previousId": "924f6bdf-b9a6-4367-8d18-040eeb7ded9d",
+      "started": "2021-08-09T10:00:23.955794Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=145\ndeleted: 0, added: 0, updated: 0, initial-size=145, new-size=145",
+      "finished": "2021-08-09T10:00:24.300116Z",
+      "id": "9b301072-4a31-4106-8603-f96f9cb9669c",
+      "name": "Lithuania diff",
+      "previousId": "70dd6c54-9618-4e1d-9f04-b83e2a576750",
+      "started": "2021-08-09T10:00:24.083479Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=24\ndeleted: 0, added: 0, updated: 0, initial-size=24, new-size=24",
+      "finished": "2021-08-09T10:00:24.380897Z",
+      "id": "ad9c77cd-04b5-45a6-b031-7c88d13799d0",
+      "name": "Luxembourg diff",
+      "previousId": "9b301072-4a31-4106-8603-f96f9cb9669c",
+      "started": "2021-08-09T10:00:24.300221Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=48\ndeleted: 0, added: 0, updated: 0, initial-size=48, new-size=48",
+      "finished": "2021-08-09T10:00:24.474659Z",
+      "id": "1384a7ad-18e2-413f-ab3a-3b926f1027f0",
+      "name": "Malta diff",
+      "previousId": "ad9c77cd-04b5-45a6-b031-7c88d13799d0",
+      "started": "2021-08-09T10:00:24.381010Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=33\ndeleted: 0, added: 0, updated: 0, initial-size=33, new-size=33",
+      "finished": "2021-08-09T10:00:24.619274Z",
+      "id": "fdd42cb4-d910-4009-8880-6761bf5f61b1",
+      "name": "Norway diff",
+      "previousId": "1384a7ad-18e2-413f-ab3a-3b926f1027f0",
+      "started": "2021-08-09T10:00:24.474764Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=1945\ndeleted: 0, added: 0, updated: 0, initial-size=1945, new-size=1945",
+      "finished": "2021-08-09T10:00:26.329926Z",
+      "id": "4c2776e8-5dd7-4329-be38-1c8e0981186f",
+      "name": "Poland diff",
+      "previousId": "fdd42cb4-d910-4009-8880-6761bf5f61b1",
+      "started": "2021-08-09T10:00:24.619375Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=14\ndeleted: 0, added: 0, updated: 0, initial-size=14, new-size=14",
+      "finished": "2021-08-09T10:00:26.820411Z",
+      "id": "67448b18-c71b-49f8-9ddb-a4267398e116",
+      "name": "Portugal diff",
+      "previousId": "4c2776e8-5dd7-4329-be38-1c8e0981186f",
+      "started": "2021-08-09T10:00:26.330029Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=12\ndeleted: 0, added: 0, updated: 0, initial-size=12, new-size=12",
+      "finished": "2021-08-09T10:00:27.091976Z",
+      "id": "28a0bd1c-39f3-4dd9-86b6-126889bcca37",
+      "name": "Romania diff",
+      "previousId": "67448b18-c71b-49f8-9ddb-a4267398e116",
+      "started": "2021-08-09T10:00:26.820523Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=16\ndeleted: 0, added: 0, updated: 0, initial-size=16, new-size=16",
+      "finished": "2021-08-09T10:00:27.235749Z",
+      "id": "faa9c3d8-2b40-4664-b7a5-e49f5b550b04",
+      "name": "Slovakia diff",
+      "previousId": "28a0bd1c-39f3-4dd9-86b6-126889bcca37",
+      "started": "2021-08-09T10:00:27.092077Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=6\ndeleted: 0, added: 0, updated: 0, initial-size=6, new-size=6",
+      "finished": "2021-08-09T10:00:27.407302Z",
+      "id": "8d02457e-d2b4-4dfa-a3e0-a4bda9fdfa38",
+      "name": "Slovenia diff",
+      "previousId": "faa9c3d8-2b40-4664-b7a5-e49f5b550b04",
+      "started": "2021-08-09T10:00:27.235847Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "\ndatabase-size=68\ndeleted: 0, added: 0, updated: 0, initial-size=68, new-size=68",
+      "finished": "2021-08-09T10:00:28.065344Z",
+      "id": "adbf6b62-bc4f-4a33-a3b2-bf30d3f571d1",
+      "name": "Spain diff",
+      "previousId": "8d02457e-d2b4-4dfa-a3e0-a4bda9fdfa38",
+      "started": "2021-08-09T10:00:27.407429Z",
+      "status": "SUCCESS"
+    },
+    {
+      "finished": "2021-08-09T10:00:30.908400Z",
+      "id": "33df4687-3d37-472d-b0a8-c1f2f7ee9254",
+      "name": "business-rules",
+      "previousId": "611eee34-0d77-4b56-ab3c-b6ca52bef2b2",
+      "started": "2021-08-09T10:00:28.177412Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.No change.",
+      "finished": "2021-08-09T10:00:30.909474Z",
+      "id": "c5d569b6-37e3-4a9b-903d-18786e13815d",
+      "name": "set-deletion-to-withdraw-status",
+      "previousId": "33df4687-3d37-472d-b0a8-c1f2f7ee9254",
+      "started": "2021-08-09T10:00:30.908465Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "Manual: No change.\nBelgium: No change.\nFinland: No change.\nFrance: No change.\nGermany: No change.\nNetherlands: No change.\nSweden: No change.\nUnitedKingdom: No change.\nAustria: No change.\nBulgaria: No change.\nCroatia: No change.\nCyprus: No change.\nCzechRepublic: No change.\nDenmark: No change.\nEstonia: No change.\nGreece: No change.\nHungary: No change.\nIceland: No change.\nIreland: No change.\nItaly: No change.\nLatvia: No change.\nLiechtenstein: No change.\nLithuania: No change.\nLuxembourg: No change.\nMalta: No change.\nNorway: No change.\nPoland: No change.\nPortugal: No change.\nRomania: No change.\nSlovakia: No change.\nSlovenia: No change.\nSpain: No change.",
+      "finished": "2021-08-09T10:00:30.910901Z",
+      "id": "267fac4b-847d-49ac-8766-e724c02d1563",
+      "name": "increment-version-for-updates",
+      "previousId": "c5d569b6-37e3-4a9b-903d-18786e13815d",
+      "started": "2021-08-09T10:00:30.909527Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "[AD][S][E] Skipping diff for Manual since it is empty\n[AD][S][E] Skipping diff for Belgium since it is empty\n[AD][S][E] Skipping diff for Finland since it is empty\n[AD][S][E] Skipping diff for France since it is empty\n[AD][S][E] Skipping diff for Germany since it is empty\n[AD][S][E] Skipping diff for Netherlands since it is empty\n[AD][S][E] Skipping diff for Sweden since it is empty\n[AD][S][E] Skipping diff for UnitedKingdom since it is empty\n[AD][S][E] Skipping diff for Austria since it is empty\n[AD][S][E] Skipping diff for Bulgaria since it is empty\n[AD][S][E] Skipping diff for Croatia since it is empty\n[AD][S][E] Skipping diff for Cyprus since it is empty\n[AD][S][E] Skipping diff for CzechRepublic since it is empty\n[AD][S][E] Skipping diff for Denmark since it is empty\n[AD][S][E] Skipping diff for Estonia since it is empty\n[AD][S][E] Skipping diff for Greece since it is empty\n[AD][S][E] Skipping diff for Hungary since it is empty\n[AD][S][E] Skipping diff for Iceland since it is empty\n[AD][S][E] Skipping diff for Ireland since it is empty\n[AD][S][E] Skipping diff for Italy since it is empty\n[AD][S][E] Skipping diff for Latvia since it is empty\n[AD][S][E] Skipping diff for Liechtenstein since it is empty\n[AD][S][E] Skipping diff for Lithuania since it is empty\n[AD][S][E] Skipping diff for Luxembourg since it is empty\n[AD][S][E] Skipping diff for Malta since it is empty\n[AD][S][E] Skipping diff for Norway since it is empty\n[AD][S][E] Skipping diff for Poland since it is empty\n[AD][S][E] Skipping diff for Portugal since it is empty\n[AD][S][E] Skipping diff for Romania since it is empty\n[AD][S][E] Skipping diff for Slovakia since it is empty\n[AD][S][E] Skipping diff for Slovenia since it is empty\n[AD][S][E] Skipping diff for Spain since it is empty\n",
+      "finished": "2021-08-09T10:00:30.913253Z",
+      "id": "a51cd852-dee2-4d3f-8330-309fb4c765e0",
+      "name": "apply-diffs",
+      "previousId": "267fac4b-847d-49ac-8766-e724c02d1563",
+      "started": "2021-08-09T10:00:30.910949Z",
+      "status": "SUCCESS"
+    },
+    {
+      "comment": "No diff, skipping notifications",
+      "finished": "2021-08-09T10:00:30.913733Z",
+      "id": "e943aa7a-d942-4d15-8ed6-71ae1704b927",
+      "name": "notify-diff",
+      "previousId": "a51cd852-dee2-4d3f-8330-309fb4c765e0",
+      "started": "2021-08-09T10:00:30.913298Z",
+      "status": "SUCCESS"
+    }
+  ]
 }

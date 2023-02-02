@@ -6,48 +6,44 @@
 
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.enums.BuilderState;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+/**
+ * Parent builder class which orchestrates all tasks that needs to be executed.
+ */
 @Slf4j
 public abstract class AtomBuilder {
 
     private static final long WAIT_AND_CHECK_TIME = 5;
     private static final long BUILDING_TIMEOUT_DEFAULT = 100;
-
-    public String name() {
-        return "AtomBuilder";
-    }
-
+    protected final Ocl ocl;
+    private final List<AtomBuilder> subBuilders = new ArrayList<>();
     @Setter
     @Getter
     private BuilderState state;
-
     @Setter
     @Getter
     private long timeout = TimeUnit.MICROSECONDS.toSeconds(300);
-
     @Setter
     @Getter
     private String lastFail;
-
     @Getter
     private AtomBuilder parent;
 
-    private final List<AtomBuilder> subBuilders = new ArrayList<>();
-
-    protected final Ocl ocl;
-
     public AtomBuilder(Ocl ocl) {
         this.ocl = ocl;
+    }
+
+    public String name() {
+        return "AtomBuilder";
     }
 
     /**
@@ -73,9 +69,9 @@ public abstract class AtomBuilder {
         long timeToWait = TimeUnit.MICROSECONDS.toSeconds(BUILDING_TIMEOUT_DEFAULT);
         if (!subBuilders.isEmpty()) {
             timeToWait = subBuilders.stream()
-                .max(Comparator.comparing(AtomBuilder::getTimeout))
-                .get()
-                .getTimeout();
+                    .max(Comparator.comparing(AtomBuilder::getTimeout))
+                    .get()
+                    .getTimeout();
         }
 
         while (!subBuilders.isEmpty() && subBuilders.stream().allMatch(AtomBuilder::needWaiting)) {

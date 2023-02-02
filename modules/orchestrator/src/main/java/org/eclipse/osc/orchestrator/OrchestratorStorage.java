@@ -8,6 +8,9 @@ package org.eclipse.osc.orchestrator;
 
 import java.util.Set;
 
+/**
+ * Interface to be implemented by all runtime storage providers.
+ */
 public interface OrchestratorStorage {
 
     /**

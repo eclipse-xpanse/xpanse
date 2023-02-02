@@ -8,13 +8,13 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: 9000
-    targetPort: 9000
-    nodePort: 30090
-    name: minio-api
-  - port: 9090
-    targetPort: 9090
-    nodePort: 30091
-    name: minio-console
+    - port: 9000
+      targetPort: 9000
+      nodePort: 30090
+      name: minio-api
+    - port: 9090
+      targetPort: 9090
+      nodePort: 30091
+      name: minio-console
   selector:
     app: minio

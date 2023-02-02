@@ -21,11 +21,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST interface methods for processing OCL.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/osc")
 public class OrchestratorApi {
-    OrchestratorService orchestratorService;
+    private final OrchestratorService orchestratorService;
+
     @Autowired
     public OrchestratorApi(OrchestratorService orchestratorService) {
         this.orchestratorService = orchestratorService;
@@ -45,43 +49,54 @@ public class OrchestratorApi {
     }
 
     @GetMapping("/health")
+    @ResponseStatus(HttpStatus.OK)
     public String health() {
         return "ready";
     }
 
     @GetMapping("/services/state/{managedServiceName}")
+    @ResponseStatus(HttpStatus.OK)
     public String state(@PathVariable("managedServiceName") String managedServiceName) {
         return this.orchestratorService.getManagedServiceState(managedServiceName);
     }
 
+    /**
+     * Profiles the names of the managed services currently deployed.
+     *
+     * @return list of all services deployed.
+     */
     @GetMapping("/services")
+    @ResponseStatus(HttpStatus.OK)
     public String services() {
         StringBuilder builder = new StringBuilder();
-        this.orchestratorService.getStoredServices().forEach(service -> builder.append(service).append("\n"));
+        this.orchestratorService.getStoredServices()
+                .forEach(service -> builder.append(service).append("\n"));
         return builder.toString();
     }
 
     @PostMapping("/start/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
-    public void start(@PathVariable("managedServiceName") String managedServiceName) throws Exception {
+    public void start(@PathVariable("managedServiceName") String managedServiceName) {
         this.orchestratorService.startManagedService(managedServiceName);
     }
 
     @PostMapping("/stop/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
-    public void stop(@PathVariable("managedServiceName") String managedServiceName) throws Exception {
+    public void stop(@PathVariable("managedServiceName") String managedServiceName) {
         this.orchestratorService.stopManagedService(managedServiceName);
     }
 
     @PutMapping("/update/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("managedServiceName") String managedServiceName, @RequestBody Ocl ocl) throws Exception {
+    public void update(@PathVariable("managedServiceName") String managedServiceName,
+                       @RequestBody Ocl ocl) throws Exception {
         this.orchestratorService.updateManagedService(managedServiceName, ocl);
     }
 
     @PutMapping("/update/fetch/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("managedServiceName") String managedServiceName, @RequestHeader(value = "ocl") String oclLocation) throws Exception {
+    public void update(@PathVariable("managedServiceName") String managedServiceName,
+                       @RequestHeader(value = "ocl") String oclLocation) throws Exception {
         this.orchestratorService.updateManagedService(managedServiceName, oclLocation);
     }
 

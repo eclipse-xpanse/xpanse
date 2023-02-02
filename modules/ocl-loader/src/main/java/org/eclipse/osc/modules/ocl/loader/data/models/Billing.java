@@ -6,11 +6,13 @@
 
 package org.eclipse.osc.modules.ocl.loader.data.models;
 
-import lombok.Data;
-
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Data;
 
+/**
+ * Defines the billing model of the managed service.
+ */
 @Data
 public class Billing {
 

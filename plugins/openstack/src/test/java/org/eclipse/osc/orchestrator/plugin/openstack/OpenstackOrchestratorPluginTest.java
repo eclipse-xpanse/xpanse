@@ -6,6 +6,13 @@
 
 package org.eclipse.osc.orchestrator.plugin.openstack;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.eclipse.osc.modules.ocl.loader.data.models.Artifact;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
@@ -21,18 +28,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.File;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { OclLoader.class })
+@ContextConfiguration(classes = {OclLoader.class})
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ActiveProfiles(value = {"openstack","test"})
+@ActiveProfiles(value = {"openstack", "test"})
 public class OpenstackOrchestratorPluginTest {
 
     @Autowired
@@ -46,10 +45,14 @@ public class OpenstackOrchestratorPluginTest {
 
     @Test
     public void onRegisterTest() throws Exception {
-        when(this.keystoneManager.getClient()).thenReturn(OSClientSession.OSClientSessionV3.createSession(new KeystoneToken()));
-        OpenstackOrchestratorPlugin openstackOrchestratorPlugin = new OpenstackOrchestratorPlugin(this.keystoneManager, this.novaManager);
-        doAnswer(invocationOnMock -> null).when(this.novaManager).createVm(any(OSClient.OSClientV3.class), any(Artifact.class), any(Ocl.class));
-        when(this.novaManager.getVmConsoleLog(any(OSClient.OSClientV3.class), anyInt(), anyString())).thenReturn("kafka up and running");
+        when(this.keystoneManager.getClient()).thenReturn(
+                OSClientSession.OSClientSessionV3.createSession(new KeystoneToken()));
+        OpenstackOrchestratorPlugin openstackOrchestratorPlugin =
+                new OpenstackOrchestratorPlugin(this.keystoneManager, this.novaManager);
+        doAnswer(invocationOnMock -> null).when(this.novaManager)
+                .createVm(any(OSClient.OSClientV3.class), any(Artifact.class), any(Ocl.class));
+        when(this.novaManager.getVmConsoleLog(any(OSClient.OSClientV3.class), anyInt(),
+                anyString())).thenReturn("kafka up and running");
         Ocl ocl = oclLoader.getOcl(new File("target/test-classes/kafka-test.json").toURI().toURL());
         openstackOrchestratorPlugin.registerManagedService(ocl);
     }

@@ -1,0 +1,6 @@
+^#!
+^<\?xml.*>$
+^\W*$
+^\W*SPDX-License-Identifier: Apache-2.0
+^\W*SPDX-FileCopyrightText:.*
+^\W*$

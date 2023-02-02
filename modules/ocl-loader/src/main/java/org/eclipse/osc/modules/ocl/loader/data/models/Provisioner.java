@@ -6,10 +6,12 @@
 
 package org.eclipse.osc.modules.ocl.loader.data.models;
 
+import java.util.List;
 import lombok.Data;
 
-import java.util.List;
-
+/**
+ * Defines all provisioning steps needed to fully deploy the managed service.
+ */
 @Data
 public class Provisioner {
 

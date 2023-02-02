@@ -1,23 +1,29 @@
 # Open Services Cloud Demo
 
-The goal of Open Services Cloud demo is to illustrate Open Services Cloud values, and how it can look like from users standpoint.
+The goal of Open Services Cloud demo is to illustrate Open Services Cloud values, and how it can look like from users
+standpoint.
 
 The demo shows the benefits of Open Services Cloud regarding the different cloud personas:
-* the end user, who can use the same services on different cloud providers (multi-cloud), with seamless integration with cloud providers service (monitoring, billing, ...)
-* the software vendor, who can describe his software with OCL (Open Services Cloud Configuration Language), and deploy his software as native managed service on any cloud provider
+
+* the end user, who can use the same services on different cloud providers (multi-cloud), with seamless integration with
+  cloud providers service (monitoring, billing, ...)
+* the software vendor, who can describe his software with OCL (Open Services Cloud Configuration Language), and deploy
+  his software as native managed service on any cloud provider
 * the cloud provider, who can extend his service catalog by easily integrating OCL described services
 
 ## Build & Run
 
 The demo uses [reactjs](https://reactjs.org/) and [ant design](https://ant.design/).
 
-You basically have two ways to build and run the demo: 
+You basically have two ways to build and run the demo:
+
 * using [nodejs](https://nodejs.org/en/)
 * using [docker](https://www.docker.com/)
 
 ### Nodejs
 
-To build and run locally on your machine, you have to install [nodejs](https://nodejs.org/en/) on your machine, with `npm` or `yarn` command in your `PATH`.
+To build and run locally on your machine, you have to install [nodejs](https://nodejs.org/en/) on your machine,
+with `npm` or `yarn` command in your `PATH`.
 
 First, you have to download and install the dependencies:
 
@@ -57,13 +63,17 @@ _or_
 $ yarn build
 ```
 
-The demo static content is located in the `build` or `target/classes/META-INF/resources` (depending of your environment) folder. You can copy this folder in any web server (Apache httpd, nginx, ...).
+The demo static content is located in the `build` or `target/classes/META-INF/resources` (depending of your environment)
+folder. You can copy this folder in any web server (Apache httpd, nginx, ...).
 
 ### Docker
 
-The demo also includes a `Dockerfile` to both build and package the demo as a Docker image. With this approach you don't need [nodejs](https://nodejs.org) installed on your machine (neither `npm` or `yarn` commands), you just need a Docker daemon running locally.
+The demo also includes a `Dockerfile` to both build and package the demo as a Docker image. With this approach you don't
+need [nodejs](https://nodejs.org) installed on your machine (neither `npm` or `yarn` commands), you just need a Docker
+daemon running locally.
 
-The Docker build fetch a nodejs Docker image to build the demo (static) and package a Docker image running the demo with `nginx`.
+The Docker build fetch a nodejs Docker image to build the demo (static) and package a Docker image running the demo
+with `nginx`.
 
 To build `osc-demo` Docker image on your machine, you just have to do:
 
@@ -81,9 +91,11 @@ You can access the demo on `http://localhost:80`.
 
 #### Kubernetes
 
-It's also possible to deploy the demo on a Kubernetes cluster. The demo provides the K8S manifest in the `kubernetes` folder.
+It's also possible to deploy the demo on a Kubernetes cluster. The demo provides the K8S manifest in the `kubernetes`
+folder.
 
-Once you built the demo Docker image, you can tag and push the image on a registry where your Kubernetes cluster can retrieve images from.
+Once you built the demo Docker image, you can tag and push the image on a registry where your Kubernetes cluster can
+retrieve images from.
 
 For instance, you can push on minikube registry with tag (assuming minikube is running on `192.168.49.2`):
 

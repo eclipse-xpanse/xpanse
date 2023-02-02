@@ -6,6 +6,11 @@
 
 package org.eclipse.osc.orchestrator.plugin.openstack;
 
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.Objects;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.core.transport.Config;
 import org.openstack4j.model.common.Identifier;
@@ -14,26 +19,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.Objects;
-
+/**
+ * Bean to handle all requests to the Keystone API.
+ */
 @Component
 public class KeystoneManager {
-    
+
     Environment environment;
-    
+
     @Autowired
     public KeystoneManager(Environment environment) {
         this.environment = environment;
     }
 
+    private static String getIpAddressFromUrl(String url) {
+        try {
+            return InetAddress.getByName(new URL(url).getHost()).getHostAddress();
+        } catch (UnknownHostException | MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Config buildClientConfig(String endpoint, boolean isSslVerificationEnabled) {
+        Config config = Config.newConfig().withEndpointNATResolution(getIpAddressFromUrl(endpoint));
+        if (!isSslVerificationEnabled) {
+            config.withSSLVerificationDisabled();
+        }
+        return config;
+    }
+
+    /**
+     * Method fully instantiates an Openstack client object which must be used in all further
+     * communications to the Openstack.
+     *
+     * @return OpenStack Client object which is authenticated with the Openstack instance.
+     */
     public OSClient.OSClientV3 getClient() {
         OSClient.OSClientV3 osClient = null;
         OSFactory.enableHttpLoggingFilter(true);
-        String endpoint = this.environment.getProperty("openstack.endpoint", "http://127.0.0.1:5000/v3");
+        String endpoint =
+                this.environment.getProperty("openstack.endpoint", "http://127.0.0.1:5000/v3");
         String domainId = null;
         if (this.environment.getProperty("openstack.domainId") != null) {
             domainId = this.environment.getProperty("openstack.domainId");
@@ -103,21 +128,5 @@ public class KeystoneManager {
             throw new IllegalStateException("Openstack client could not be instantiated");
         }
         return osClient;
-    }
-
-    private static String getIpAddressFromUrl(String url) {
-        try {
-            return InetAddress.getByName(new URL(url).getHost()).getHostAddress();
-        } catch (UnknownHostException | MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static Config buildClientConfig(String endpoint, boolean isSslVerificationEnabled) {
-        Config config = Config.newConfig().withEndpointNATResolution(getIpAddressFromUrl(endpoint));
-        if (!isSslVerificationEnabled) {
-            config.withSSLVerificationDisabled();
-        }
-        return config;
     }
 }

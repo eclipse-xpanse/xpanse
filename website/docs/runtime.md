@@ -4,14 +4,17 @@ sidebar_position: 4
 
 # Runtime
 
-Open Services Cloud runtime is the running module. It packages and executes all together: OCL loader, orchestrator, plugins, REST API, ...
+Open Services Cloud runtime is the running module. It packages and executes all together: OCL loader, orchestrator,
+plugins, REST API, ...
 
 ## Build
 
 You can easily build OSC yourself.
 
 As requirement, you need:
-* a Java Developer Kit (JDK) installed, version 17 or newer. You can use [openjdk](https://openjdk.org/) or [temurin](https://adoptium.net/)
+
+* a Java Developer Kit (JDK) installed, version 17 or newer. You can use [openjdk](https://openjdk.org/)
+  or [temurin](https://adoptium.net/)
 * [Apache Maven 3.8.x or newer](https://maven.apache.org/)
 
 You can clone the project locally on your machine with:
@@ -21,7 +24,8 @@ $ git clone https://github.com/huaweicloud/osc
 $ cd osc
 ```
 
-First, you can build the whole OSC project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply with:
+First, you can build the whole OSC project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply
+with:
 
 ```shell
 $ mvn clean install
@@ -29,7 +33,8 @@ $ mvn clean install
 
 ### Run
 
-By default, the application will not activate any plugins. They must be activated via spring profiles. Also ensure that only one plugin is active at a time.
+By default, the application will not activate any plugins. They must be activated via spring profiles. Also ensure that
+only one plugin is active at a time.
 
 * for Huawei Cloud:
 
@@ -45,14 +50,17 @@ $ cd runtime/target
 $ java -jar osc-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
-By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image adding `-Ddocker.skip=false` as build argument:
+By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image
+adding `-Ddocker.skip=false` as build argument:
 
 ```shell
 $ cd runtime
 $ mvn clean install -Ddocker.skip=false
 ```
 
-We can start OSC runtime with a specific plugin by passing the plugin name in the profile name. For example to start huaweicloud
+We can start OSC runtime with a specific plugin by passing the plugin name in the profile name. For example to start
+huaweicloud
+
 ```shell
 $ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-osc-runtime osc
 ```
@@ -78,7 +86,8 @@ You can see the log messages:
 
 ```
 
-The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST API:
+The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST
+API:
 
 ```shell
 $ curl -XGET http://localhost:8080/osc/health
@@ -119,7 +128,8 @@ $ docker logs my-osc
 
 ```
 
-The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST API:
+The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST
+API:
 
 ```shell
 $ curl -XGET http://localhost:8080/osc/health
@@ -128,7 +138,8 @@ ready
 
 ### Kubernetes
 
-OSC provides all Kubernetes manifest files in the `runtime/src/main/kubernetes` folder, allowing you to deploy all resources on your Kubernetes cluster.
+OSC provides all Kubernetes manifest files in the `runtime/src/main/kubernetes` folder, allowing you to deploy all
+resources on your Kubernetes cluster.
 
 As example, you can deploy on local `minikube` instance. First, start your `minikube` instance:
 

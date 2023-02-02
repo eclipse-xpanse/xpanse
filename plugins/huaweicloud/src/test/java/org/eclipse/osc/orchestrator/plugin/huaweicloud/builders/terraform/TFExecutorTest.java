@@ -6,6 +6,7 @@
 
 package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform;
 
+import java.io.File;
 import org.eclipse.osc.modules.ocl.loader.OclLoader;
 import org.eclipse.osc.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
@@ -21,8 +22,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.File;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {OclLoader.class})
 public class TFExecutorTest {
@@ -31,11 +30,12 @@ public class TFExecutorTest {
     Environment environment;
     @Autowired
     OclLoader oclLoader;
+
     @Disabled
     @Test
     public void TFExecutorBasicTest() throws Exception {
         Ocl ocl = this.oclLoader
-            .getOcl(new File("target/test-classes/huawei_test.json").toURI().toURL());
+                .getOcl(new File("target/test-classes/huawei_test.json").toURI().toURL());
 
         Assertions.assertNotNull(ocl);
 
@@ -62,7 +62,7 @@ public class TFExecutorTest {
     @Test
     public void TFExecutorPlanRollBackTest() throws Exception {
         Ocl ocl = this.oclLoader
-            .getOcl(new File("target/test-classes/huawei_test.json").toURI().toURL());
+                .getOcl(new File("target/test-classes/huawei_test.json").toURI().toURL());
 
         Assertions.assertNotNull(ocl);
 
@@ -81,6 +81,6 @@ public class TFExecutorTest {
 
         envBuilder.destroy(builderContext);
         Assertions.assertThrows(
-            IllegalStateException.class, () -> resourceBuilder.destroy(builderContext));
+                IllegalStateException.class, () -> resourceBuilder.destroy(builderContext));
     }
 }

@@ -6,11 +6,13 @@
 
 package org.eclipse.osc.modules.ocl.loader.data.models;
 
-import lombok.Data;
-
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Data;
 
+/**
+ * Describes the list of resources that are deployed as part of managed service deployment.
+ */
 @Data
 public class OclResource {
 
