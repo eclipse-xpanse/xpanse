@@ -17,7 +17,6 @@
     </parent>
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>orchestrator</artifactId>
-    <name>XPANSE :: Modules :: Orchestrator</name>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>

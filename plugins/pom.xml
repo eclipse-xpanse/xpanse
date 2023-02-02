@@ -16,7 +16,6 @@
     </parent>
     <artifactId>plugins</artifactId>
     <packaging>pom</packaging>
-    <name>XPANSE :: Plugins</name>
     <modules>
         <module>openstack</module>
         <module>huaweicloud</module>

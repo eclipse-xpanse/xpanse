@@ -17,7 +17,6 @@
     </parent>
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>ocl-loader</artifactId>
-    <name>XPANSE :: Modules :: OCL Loader</name>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>

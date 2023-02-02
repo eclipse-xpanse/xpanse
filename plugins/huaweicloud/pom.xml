@@ -20,7 +20,6 @@
 
     <groupId>org.eclipse.xpanse.plugins</groupId>
     <artifactId>huaweicloud</artifactId>
-    <name>XPANSE :: Plugins :: HuaweiCloud</name>
 
     <dependencies>
         <dependency>

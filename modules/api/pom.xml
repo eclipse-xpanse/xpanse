@@ -17,7 +17,6 @@
     </parent>
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>api</artifactId>
-    <name>XPANSE :: Modules :: API</name>
     <dependencies>
         <dependency>
             <groupId>org.springdoc</groupId>

@@ -17,7 +17,6 @@
     </parent>
     <groupId>org.eclipse.xpanse.plugins</groupId>
     <artifactId>openstack</artifactId>
-    <name>XPANSE :: Plugins :: Openstack</name>
     <dependencies>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
