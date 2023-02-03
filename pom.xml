@@ -178,6 +178,7 @@
                 <version>${checkstyle-maven-plugin.version}</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
+                    <headerLocation>license.header</headerLocation>
                     <failsOnError>true</failsOnError>
                     <violationSeverity>warning</violationSeverity>
                 </configuration>
@@ -188,14 +189,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>1.6</version>
-                <configuration>
-                    <!-- your own config goes here -->
-                </configuration>
             </plugin>
         </plugins>
     </build>
