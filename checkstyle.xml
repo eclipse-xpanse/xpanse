@@ -37,6 +37,12 @@
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
 
+    <module name="SuppressWithPlainTextCommentFilter">
+        <property name="offCommentFormat" value="CHECKSTYLE OFF\: ([\w\|]+)"/>
+        <property name="onCommentFormat" value="CHECKSTYLE ON\: ([\w\|]+)"/>
+        <property name="checkFormat" value="$1"/>
+    </module>
+
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
@@ -365,7 +371,7 @@
         </module>
     </module>
     <module name="RegexpHeader">
-        <property name="headerFile" value="license.header"/>
+        <property name="headerFile" value="${checkstyle.header.file}"/>
         <property name="multiLines" value="1,2"/>
     </module>
 </module>
