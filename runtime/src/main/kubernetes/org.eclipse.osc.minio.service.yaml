@@ -4,7 +4,7 @@ metadata:
   name: minio
   labels:
     app: minio
-  namespace: osc
+  namespace: xpanse
 spec:
   type: NodePort
   ports:

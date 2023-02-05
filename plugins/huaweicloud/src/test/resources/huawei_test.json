@@ -35,7 +35,7 @@
         "name": "Ubuntu 20.04 server 64bit",
         "type": "t2.large",
         "filters": {
-          "name": "ubuntu-for-osc-*"
+          "name": "ubuntu-for-xpanse-*"
         }
       },
       {
@@ -59,7 +59,7 @@
   "compute": {
     "vm": [
       {
-        "name": "osc-kafka-vm",
+        "name": "xpanse-kafka-vm",
         "type": "c7.large.4",
         "image": "$.image.artifacts[0]",
         "subnet": [
@@ -78,23 +78,23 @@
   "network": {
     "vpc": [
       {
-        "name": "osc-res-vpc",
+        "name": "xpanse-res-vpc",
         "cidr": "10.10.0.0/16"
       }
     ],
     "subnet": [
       {
-        "name": "osc-res-subnet",
+        "name": "xpanse-res-subnet",
         "vpc": "$.network.vpc[0]",
         "cidr": "10.10.1.0/24"
       }
     ],
     "security": [
       {
-        "name": "osc-res-sg",
+        "name": "xpanse-res-sg",
         "rules": [
           {
-            "name": "osc-res-sg-kafka",
+            "name": "xpanse-res-sg-kafka",
             "priority": 1,
             "protocol": "tcp",
             "cidr": "10.10.2.6/32",
@@ -103,7 +103,7 @@
             "action": "allow"
           },
           {
-            "name": "osc-res-sg-ssh-public",
+            "name": "xpanse-res-sg-ssh-public",
             "priority": 1,
             "protocol": "tcp",
             "cidr": "121.36.59.153/32",
@@ -112,7 +112,7 @@
             "action": "allow"
           },
           {
-            "name": "osc-res-sg-ssh-private",
+            "name": "xpanse-res-sg-ssh-private",
             "priority": 1,
             "protocol": "tcp",
             "cidr": "198.19.0.0/16",
@@ -126,7 +126,7 @@
   },
   "storage": [
     {
-      "name": "osc-res-storage",
+      "name": "xpanse-res-storage",
       "type": "SAS",
       "size": "20GiB"
     }

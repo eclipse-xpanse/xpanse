@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Ocl {
     private static ObjectMapper theMapper = new ObjectMapper();
     @NotBlank
-    @Schema(description = "Name of the service to be managed by OSC")
+    @Schema(description = "Name of the service to be managed by xpanse")
     private String name;
     private String category;
     private String namespace;

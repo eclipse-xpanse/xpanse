@@ -27,8 +27,7 @@ class TfResourceEipAssociate extends TfResourceSchema {
     }
 
     public boolean isMatch(OclResource oclResource, TfStateResource tfStateResource) {
-        return oclResource.getType().equals("compute")
-                &&
-                ("osc-eip-associated-" + oclResource.getName()).equals(tfStateResource.getName());
+        return oclResource.getType().equals("compute") && ("xpanse-eip-associated-"
+                + oclResource.getName()).equals(tfStateResource.getName());
     }
 }

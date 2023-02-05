@@ -29,7 +29,7 @@
         "name": "ubuntu-x64",
         "type": "t2.large",
         "filters": {
-          "name": "ubuntu-for-osc-*"
+          "name": "ubuntu-for-xpanse-*"
         }
       },
       {

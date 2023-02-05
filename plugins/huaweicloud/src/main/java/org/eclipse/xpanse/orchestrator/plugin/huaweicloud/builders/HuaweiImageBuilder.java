@@ -75,12 +75,12 @@ public class HuaweiImageBuilder extends AtomBuilder {
             packerExecutor.createInstallScript();
             packerExecutor.createPackerScript(packerVars);
 
-            String imageId = packerExecutor.packerBuild();
-            addImageToCtx(ctx, artifact.getName(), imageId);
-
             if (!packerExecutor.packerInit()) {
                 throw new BuilderException(this, "PackerExecutor.packerInit failed." + name());
             }
+
+            String imageId = packerExecutor.packerBuild();
+            addImageToCtx(ctx, artifact.getName(), imageId);
             if (imageId.isEmpty()) {
                 throw new BuilderException(
                         this, "PackerExecutor.packerBuild failed: imageId not found." + name());
@@ -118,19 +118,19 @@ public class HuaweiImageBuilder extends AtomBuilder {
         executor.createWorkspace(name());
         executor.createTerraformScript(String.format(""
                 + "resource \"huaweicloud_vpc\" \"vpc\" {\n"
-                + "  name = \"osc-packer-%s\"\n"
+                + "  name = \"xpanse-packer-%s\"\n"
                 + "  cidr = \"192.168.0.0/16\"\n"
                 + "}\n"
                 + "\n"
                 + "resource \"huaweicloud_vpc_subnet\" \"subnet\" {\n"
-                + "  name       = \"osc-packer-%s\"\n"
+                + "  name       = \"xpanse-packer-%s\"\n"
                 + "  cidr       = \"192.168.1.0/24\"\n"
                 + "  gateway_ip = \"192.168.1.1\"\n"
                 + "  vpc_id     = huaweicloud_vpc.vpc.id\n"
                 + "}\n"
                 + "\n"
                 + "resource \"huaweicloud_networking_secgroup\" \"secgroup\" {\n"
-                + "  name        = \"osc-packer-secgroup_%s\"\n"
+                + "  name        = \"xpanse-packer-secgroup_%s\"\n"
                 + "  description = \"Osc security group\"\n"
                 + "}\n"
                 + "\n"

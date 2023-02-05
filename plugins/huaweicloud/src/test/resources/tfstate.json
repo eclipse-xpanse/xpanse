@@ -8,7 +8,7 @@
     {
       "mode": "data",
       "type": "huaweicloud_availability_zones",
-      "name": "osc-az",
+      "name": "xpanse-az",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -31,7 +31,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_compute_eip_associate",
-      "name": "osc-eip-associated-osc-kafka-vm",
+      "name": "xpanse-eip-associated-xpanse-kafka-vm",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -48,11 +48,11 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_compute_instance.osc-kafka-vm",
-            "huaweicloud_networking_secgroup.osc-res-sg",
-            "huaweicloud_vpc.osc-res-vpc",
-            "huaweicloud_vpc_eip.osc-eip-osc-kafka-vm",
-            "huaweicloud_vpc_subnet.osc-res-subnet"
+            "huaweicloud_compute_instance.xpanse-kafka-vm",
+            "huaweicloud_networking_secgroup.xpanse-res-sg",
+            "huaweicloud_vpc.xpanse-res-vpc",
+            "huaweicloud_vpc_eip.xpanse-eip-xpanse-kafka-vm",
+            "huaweicloud_vpc_subnet.xpanse-res-subnet"
           ]
         }
       ]
@@ -60,7 +60,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_compute_instance",
-      "name": "osc-kafka-vm",
+      "name": "xpanse-kafka-vm",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -90,7 +90,7 @@
             "image_name": "kafka_image",
             "key_pair": null,
             "metadata": null,
-            "name": "osc-kafka-vm",
+            "name": "xpanse-kafka-vm",
             "network": [
               {
                 "access_network": false,
@@ -113,7 +113,7 @@
               "f7aa4c8c-2379-497f-bada-306f16f88a1c"
             ],
             "security_groups": [
-              "osc-res-sg"
+              "xpanse-res-sg"
             ],
             "spot_duration": null,
             "spot_duration_count": null,
@@ -139,9 +139,9 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg",
-            "huaweicloud_vpc.osc-res-vpc",
-            "huaweicloud_vpc_subnet.osc-res-subnet"
+            "huaweicloud_networking_secgroup.xpanse-res-sg",
+            "huaweicloud_vpc.xpanse-res-vpc",
+            "huaweicloud_vpc_subnet.xpanse-res-subnet"
           ]
         }
       ]
@@ -149,7 +149,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_evs_volume",
-      "name": "osc-res-storage",
+      "name": "xpanse-res-storage",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -169,7 +169,7 @@
             "image_id": null,
             "kms_id": null,
             "multiattach": false,
-            "name": "osc-res-storage",
+            "name": "xpanse-res-storage",
             "period": null,
             "period_unit": null,
             "region": "cn-north-4",
@@ -182,7 +182,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "data.huaweicloud_availability_zones.osc-az"
+            "data.huaweicloud_availability_zones.xpanse-az"
           ]
         }
       ]
@@ -190,7 +190,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup",
-      "name": "osc-res-sg",
+      "name": "xpanse-res-sg",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -201,7 +201,7 @@
             "description": "",
             "enterprise_project_id": "0",
             "id": "f7aa4c8c-2379-497f-bada-306f16f88a1c",
-            "name": "osc-res-sg",
+            "name": "xpanse-res-sg",
             "region": "cn-north-4",
             "rules": [
               {
@@ -275,7 +275,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup_rule",
-      "name": "osc-res-sg-kafka_0",
+      "name": "xpanse-res-sg-kafka_0",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -300,7 +300,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg"
+            "huaweicloud_networking_secgroup.xpanse-res-sg"
           ]
         }
       ]
@@ -308,7 +308,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup_rule",
-      "name": "osc-res-sg-kafka_1",
+      "name": "xpanse-res-sg-kafka_1",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -333,7 +333,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg"
+            "huaweicloud_networking_secgroup.xpanse-res-sg"
           ]
         }
       ]
@@ -341,7 +341,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup_rule",
-      "name": "osc-res-sg-kafka_2",
+      "name": "xpanse-res-sg-kafka_2",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -366,7 +366,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg"
+            "huaweicloud_networking_secgroup.xpanse-res-sg"
           ]
         }
       ]
@@ -374,7 +374,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup_rule",
-      "name": "osc-res-sg-ssh-private_7",
+      "name": "xpanse-res-sg-ssh-private_7",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -399,7 +399,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg"
+            "huaweicloud_networking_secgroup.xpanse-res-sg"
           ]
         }
       ]
@@ -407,7 +407,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup_rule",
-      "name": "osc-res-sg-ssh-public_3",
+      "name": "xpanse-res-sg-ssh-public_3",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -432,7 +432,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg"
+            "huaweicloud_networking_secgroup.xpanse-res-sg"
           ]
         }
       ]
@@ -440,7 +440,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup_rule",
-      "name": "osc-res-sg-ssh-public_4",
+      "name": "xpanse-res-sg-ssh-public_4",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -465,7 +465,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg"
+            "huaweicloud_networking_secgroup.xpanse-res-sg"
           ]
         }
       ]
@@ -473,7 +473,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup_rule",
-      "name": "osc-res-sg-ssh-public_5",
+      "name": "xpanse-res-sg-ssh-public_5",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -498,7 +498,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg"
+            "huaweicloud_networking_secgroup.xpanse-res-sg"
           ]
         }
       ]
@@ -506,7 +506,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_networking_secgroup_rule",
-      "name": "osc-res-sg-ssh-public_6",
+      "name": "xpanse-res-sg-ssh-public_6",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -531,7 +531,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_networking_secgroup.osc-res-sg"
+            "huaweicloud_networking_secgroup.xpanse-res-sg"
           ]
         }
       ]
@@ -539,7 +539,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_vpc",
-      "name": "osc-res-vpc",
+      "name": "xpanse-res-vpc",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -549,7 +549,7 @@
             "description": "",
             "enterprise_project_id": "0",
             "id": "569cbba6-0e4d-4f33-a096-e5ef5dc3174a",
-            "name": "osc-res-vpc",
+            "name": "xpanse-res-vpc",
             "region": "cn-north-4",
             "routes": [],
             "secondary_cidr": null,
@@ -564,7 +564,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_vpc_eip",
-      "name": "osc-eip-osc-kafka-vm",
+      "name": "xpanse-eip-xpanse-kafka-vm",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -577,7 +577,7 @@
               {
                 "charge_mode": "traffic",
                 "id": "1d65ee8b-7b88-4828-8818-3a3429d10a95",
-                "name": "osc-eip-osc-kafka-vm",
+                "name": "xpanse-eip-xpanse-kafka-vm",
                 "share_type": "PER",
                 "size": 5
               }
@@ -611,7 +611,7 @@
     {
       "mode": "managed",
       "type": "huaweicloud_vpc_subnet",
-      "name": "osc-res-subnet",
+      "name": "xpanse-res-subnet",
       "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
       "instances": [
         {
@@ -632,7 +632,7 @@
             "ipv6_enable": false,
             "ipv6_gateway": "",
             "ipv6_subnet_id": "",
-            "name": "osc-res-subnet",
+            "name": "xpanse-res-subnet",
             "primary_dns": "100.125.1.250",
             "region": "cn-north-4",
             "secondary_dns": "100.125.129.250",
@@ -643,7 +643,7 @@
           },
           "sensitive_attributes": [],
           "dependencies": [
-            "huaweicloud_vpc.osc-res-vpc"
+            "huaweicloud_vpc.xpanse-res-vpc"
           ]
         }
       ]

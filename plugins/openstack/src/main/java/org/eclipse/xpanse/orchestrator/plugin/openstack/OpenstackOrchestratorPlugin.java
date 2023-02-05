@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * OSC plugin implementation for openstack cloud.
+ * xpanse plugin implementation for openstack cloud.
  */
 @Slf4j
 @Component

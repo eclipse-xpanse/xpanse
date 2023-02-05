@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: osc
-  namespace: osc
+  name: xpanse
+  namespace: xpanse
   labels:
-    app: osc
+    app: xpanse
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: osc
+      app: xpanse
   template:
     metadata:
       labels:
-        app: osc
+        app: xpanse
     spec:
       containers:
-        - name: osc
-          image: osc:1.0.0-SNAPSHOT
+        - name: xpanse
+          image: xpanse:1.0.0-SNAPSHOT
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: openstack
@@ -25,13 +25,13 @@ spec:
             - containerPort: 8080
           livenessProbe:
             httpGet:
-              path: /osc/health
+              path: /xpanse/health
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /osc/health
+              path: /xpanse/health
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10

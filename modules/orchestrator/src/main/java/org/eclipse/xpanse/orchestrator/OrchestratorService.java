@@ -48,11 +48,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
                     ((ContextRefreshedEvent) event).getApplicationContext();
             plugins.addAll(applicationContext.getBeansOfType(OrchestratorPlugin.class).values());
             if (plugins.size() > 1) {
-                throw new RuntimeException(
-                        "More than one OSC plugin found. Only one plugin can be active at a time.");
+                throw new RuntimeException("More than one xpanse plugin found. "
+                        + "Only one plugin can be active at a time.");
             }
             if (plugins.isEmpty()) {
-                log.warn("No OSC plugins loaded by the runtime.");
+                log.warn("No xpanse plugins loaded by the runtime.");
             }
         }
     }
@@ -117,8 +117,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     }
 
     /**
-     * Stop (managed service is not visible to users anymore) a managed service
-     * on all orchestrator plugins.
+     * Stop (managed service is not visible to users anymore) a managed service on all orchestrator
+     * plugins.
      *
      * @param managedServiceName the managed service name.
      */
@@ -130,8 +130,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     }
 
     /**
-     * Unregister a managed service and destroy/clean all associated resources
-     * on all orchestrator plugins.
+     * Unregister a managed service and destroy/clean all associated resources on all orchestrator
+     * plugins.
      *
      * @param managedServiceName the managed service name.
      */
@@ -156,8 +156,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         plugins.forEach(plugin -> {
             if (plugin != null) {
                 response.append(orchestratorStorage.getKey(managedServiceName,
-                        plugin.getClass().getSimpleName(),
-                        "state"));
+                        plugin.getClass().getSimpleName(), "state"));
                 response.append("\n");
             }
         });
@@ -169,5 +168,4 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public Set<String> getStoredServices() {
         return this.orchestratorStorage.services();
     }
-
 }
