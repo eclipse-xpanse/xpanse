@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * Main entry class to OSC runtime. This class can be directly executed to start the server.
+ * Main entry class to xpanse runtime. This class can be directly executed to start the server.
  */
 @SpringBootApplication
 @ComponentScan(basePackages = "org.eclipse.xpanse")

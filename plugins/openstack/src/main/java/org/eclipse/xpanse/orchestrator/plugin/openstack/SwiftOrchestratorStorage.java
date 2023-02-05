@@ -68,10 +68,11 @@ public class SwiftOrchestratorStorage implements OrchestratorStorage {
     }
 
     private void createObjectStoreOnOpenstack() {
-        String containerName = this.environment.getProperty("orchestrator.store.container", "osc");
+        String containerName =
+                this.environment.getProperty("orchestrator.store.container", "xpanse");
         String objectName = this.environment.getProperty("orchestrator.store.filename",
                 "orchestrator.properties");
-        this.keystoneManager.getClient().objectStorage().containers().create("osc");
+        this.keystoneManager.getClient().objectStorage().containers().create("xpanse");
         this.keystoneManager.getClient().objectStorage().objects()
                 .put(containerName, objectName, Payloads.create(InputStream.nullInputStream()));
     }

@@ -52,14 +52,14 @@ public class Ocl2HclTest {
 
         // Vpc
         Vpc vpc = new Vpc();
-        vpc.setName("osc-vpc");
+        vpc.setName("xpanse-vpc");
         vpc.setCidr("10.10.0.0/16");
         List<Vpc> vpcList = new ArrayList<>();
         vpcList.add(vpc);
 
         // Subnet
         Subnet subnet = new Subnet();
-        subnet.setName("osc-subnet");
+        subnet.setName("xpanse-subnet");
         subnet.setCidr("10.10.0.0/24");
         subnet.setVpc("$.network.vpc[0]");
         List<Subnet> subnetList = new ArrayList<>();
@@ -197,7 +197,7 @@ public class Ocl2HclTest {
         doCallRealMethod().when(ocl2Hcl).getHclVpc();
         String hcl = ocl2Hcl.getHclVpc();
         Assertions.assertTrue(
-                Pattern.compile("resource.*\"huaweicloud_vpc\".*\"osc-vpc\".*").matcher(hcl)
+                Pattern.compile("resource.*\"huaweicloud_vpc\".*\"xpanse-vpc\".*").matcher(hcl)
                         .find());
         Assertions.assertTrue(Pattern.compile("cidr.*=.*\"10.10.0.0/16\"").matcher(hcl).find());
     }
@@ -213,14 +213,14 @@ public class Ocl2HclTest {
         Assertions.assertDoesNotThrow(ocl2Hcl::getHclVpcSubnet);
         String hcl = ocl2Hcl.getHclVpcSubnet();
         Assertions.assertTrue(
-                Pattern.compile("resource.*\"huaweicloud_vpc_subnet\".*\"osc-subnet\".*")
+                Pattern.compile("resource.*\"huaweicloud_vpc_subnet\".*\"xpanse-subnet\".*")
                         .matcher(hcl)
                         .find());
-        Assertions.assertTrue(Pattern.compile("name.*=.*\"osc-subnet\"").matcher(hcl).find());
+        Assertions.assertTrue(Pattern.compile("name.*=.*\"xpanse-subnet\"").matcher(hcl).find());
         Assertions.assertTrue(Pattern.compile("cidr.*=.*\"10.10.0.0/24\"").matcher(hcl).find());
         Assertions.assertTrue(Pattern.compile("gateway_ip.*=.*\"10.10.0.1\"").matcher(hcl).find());
         Assertions.assertTrue(
-                Pattern.compile("vpc_id.*=.*huaweicloud_vpc.osc-vpc.id").matcher(hcl).find());
+                Pattern.compile("vpc_id.*=.*huaweicloud_vpc.xpanse-vpc.id").matcher(hcl).find());
     }
 
     @Test
@@ -292,7 +292,7 @@ public class Ocl2HclTest {
         Assertions.assertTrue(Pattern.compile("name.*=.*\"my-vm\"").matcher(hcl).find());
         Assertions.assertTrue(Pattern.compile("flavor_id.*=.*\"c7.large.4\"").matcher(hcl).find());
         Assertions.assertTrue(
-                Pattern.compile("uuid.*=.*huaweicloud_vpc_subnet.osc-subnet.id").matcher(hcl)
+                Pattern.compile("uuid.*=.*huaweicloud_vpc_subnet.xpanse-subnet.id").matcher(hcl)
                         .find());
         Assertions.assertTrue(
                 Pattern

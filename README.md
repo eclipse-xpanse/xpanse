@@ -1,16 +1,16 @@
-# Open Services Cloud
+# xpanse
 
-Open Services Cloud is an Open Source project allowing to easily implement native managed service on any cloud service
+Xpanse is an Open Source project allowing to easily implement native managed service on any cloud service
 provider.
 
-Open Services Cloud unleash your cloud services by removing vendor lock-in and lock out. It standardizes and exposes
-cloud service providers core services, meaning that your Open Services Cloud service is portable (multi-cloud) on any
+Xpanse unleash your cloud services by removing vendor lock-in and lock out. It standardizes and exposes
+cloud service providers core services, meaning that your xpanse service is portable (multi-cloud) on any
 cloud topology and provider.
 It also avoids tight coupling of your service to other cloud service provider services.
 
 ## APIs (core services)
 
-Open Services Cloud interacts directly with the fundamental APIs used by the cloud service provider to create managed
+Xpanse interacts directly with the fundamental APIs used by the cloud service provider to create managed
 service:
 
 * **identity** dealing with access, users, groups, roles, ...
@@ -55,7 +55,7 @@ fundamental APIs:
         "name": "ubuntu-x64",
         "type": "t2.large",
         "filters": {
-          "name": "ubuntu-for-osc-*"
+          "name": "ubuntu-for-xpanse-*"
         }
       }
     ],
@@ -149,10 +149,10 @@ fundamental APIs:
 
 ## OCL loading
 
-Open Services Cloud provides different options to generate and provision OCL:
+Xpanse provides different options to generate and provision OCL:
 
-* REST API on the Open Services Cloud runtime
-* CLI allowing to directly interact with Open Services Cloud via command line
+* REST API on the xpanse runtime
+* CLI allowing to directly interact with xpanse via command line
 * language frontend (SDL) for Java, Python, ...
 
 ## Orchestrator & binding
@@ -160,7 +160,7 @@ Open Services Cloud provides different options to generate and provision OCL:
 OCL descriptor is an abstract description of the final managed service state. It's generic enough to work with any cloud
 service provider.
 
-Open Services Cloud runtime embeds an orchestrator responsible to delegate the services management to plugins.
+Xpanse runtime embeds an orchestrator responsible to delegate the services management to plugins.
 
 Each plugin is dedicated to handle a cloud provider infrastructure and do actions required to actually deal with the
 services' lifecycle:
@@ -170,7 +170,7 @@ services' lifecycle:
 
 ## Runtime
 
-Open Services CLoud runtime is the overall component running on the cloud provider.
+Xpanse runtime is the overall component running on the cloud provider.
 
 The runtime embeds and run together:
 
@@ -180,7 +180,7 @@ The runtime embeds and run together:
 
 ### Build and Package
 
-First, you can build the whole OSC project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply
+First, you can build the whole xpanse project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply
 with:
 
 ```shell
@@ -196,14 +196,14 @@ only one plugin is active at a time.
 
 ```shell
 $ cd runtime/target
-$ java -jar osc-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=huaweicloud
+$ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=huaweicloud
 ```
 
 * for Openstack:
 
 ```shell
 $ cd runtime/target
-$ java -jar osc-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
+$ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
 By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image
@@ -214,11 +214,11 @@ $ cd runtime
 $ mvn clean install -Ddocker.skip=false
 ```
 
-We can start OSC runtime with a specific plugin by passing the plugin name in the profile name. For example to start
+We can start xpanse runtime with a specific plugin by passing the plugin name in the profile name. For example to start
 huaweicloud
 
 ```shell
-$ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-osc-runtime osc
+$ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-xpanse-runtime xpanse
 ```
 
 ### Static Code Analysis using CheckStyle
