@@ -7,7 +7,8 @@
 package org.eclipse.xpanse.orchestrator.plugin.openstack;
 
 import java.util.Optional;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Subnet;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.network.IPVersionType;
@@ -18,21 +19,27 @@ import org.springframework.stereotype.Component;
  * Bean to handle all requests to Neutron APIs.
  */
 @Component
+@Slf4j
 public class NeutronManager {
 
     /**
      * Creates the network required to deploy a managed service.
      *
-     * @param ocl Ocl request object to deploy a managed service.
-     * @param os  fully authenticated and instantiated Openstack client object.
+     * @param subnet   subnet to be created on openstack.
+     * @param osClient fully authenticated and instantiated Openstack client object.
      */
-    public void createNetwork(Ocl ocl, OSClient.OSClientV3 os) {
-        ocl.getNetwork().getSubnet()
-                .forEach(subnet -> os.networking().subnet().create(Builders.subnet()
-                        .name(subnet.getId())
-                        .ipVersion(IPVersionType.V4)
-                        .cidr(subnet.getCidr())
-                        .build()));
+    public void createNetwork(Subnet subnet, OSClient.OSClientV3 osClient) {
+        try {
+            getNetworkId(osClient, subnet.getName());
+            log.info("Network with name {} exists already.", subnet.getName());
+        } catch (RuntimeException exception) {
+            log.info("Network with name {} does not exist yet. Creating now", subnet.getName());
+            osClient.networking().subnet().create(Builders.subnet()
+                    .name(subnet.getId())
+                    .ipVersion(IPVersionType.V4)
+                    .cidr(subnet.getCidr())
+                    .build());
+        }
     }
 
     /**
@@ -43,7 +50,7 @@ public class NeutronManager {
      * @return ID of the virtual network. This is a unique value allocated by Openstack
      * for each network created.
      */
-    public String getVmNetworkId(OSClient.OSClientV3 osClient, String vmNetworkName) {
+    public String getNetworkId(OSClient.OSClientV3 osClient, String vmNetworkName) {
         Optional<? extends Network> network;
         network = osClient.networking()
                 .network()

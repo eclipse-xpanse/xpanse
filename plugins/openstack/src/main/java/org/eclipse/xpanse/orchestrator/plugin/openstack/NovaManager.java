@@ -6,13 +6,13 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.openstack;
 
-import java.util.Collections;
 import java.util.Optional;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Artifact;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import java.util.stream.Collectors;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Vm;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.compute.Action;
+import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,18 +55,18 @@ public class NovaManager {
      * Method to create virtual machine to deploy a managed service.
      *
      * @param osClient Fully initialized client to connect to an Openstack installation.
-     * @param artifact Artifact details of the virtual machine to be deployed.
-     * @param ocl      Full OCL descriptor of the managed service to be deployed.
+     * @param vm       VM details of the virtual machine to be deployed.
      */
-    public void createVm(OSClient.OSClientV3 osClient, Artifact artifact, Ocl ocl) {
+    public void createVm(OSClient.OSClientV3 osClient, Vm vm) {
         osClient.compute().servers().boot(Builders
                 .server()
-                .name(artifact.getName())
-                .flavor("3") // TODO To check how to get this value from OCL
-                .image(this.glanceManager.getImageId(osClient, artifact.getBase()))
-                .networks(Collections.singletonList(this.neutronManager.getVmNetworkId(
-                        osClient, "external"))) // TODO To check how to get this value from OCL
-                .userData(UserDataHelper.getUserData(artifact.getProvisioners(), ocl))
+                .name(vm.getName())
+                .flavor(getVmFlavourId(vm.getType(), osClient))
+                .image(this.glanceManager.getImageId(osClient, vm.getImage()))
+                .networks(vm.getSubnet().stream()
+                        .map(subnet -> this.neutronManager.getNetworkId(osClient, subnet)).collect(
+                                Collectors.toList()))
+                .userData(UserDataHelper.getUserData(vm.getUserData()))
                 .configDrive(true)
                 .build());
     }
@@ -85,5 +85,22 @@ public class NovaManager {
     public void deleteVm(String vmName, OSClient.OSClientV3 osClient) {
         String vmId = getVmId(osClient, vmName);
         osClient.compute().servers().action(vmId, Action.FORCEDELETE);
+    }
+
+    /**
+     * Method to get ID of a VM flavour from an Openstack installation.
+     *
+     * @param flavourName name of the VM flavour.
+     * @param osClient Fully initialized client to connect to an Openstack installation.
+     * @return Unique ID of the VM flavour.
+     */
+    public String getVmFlavourId(String flavourName, OSClient.OSClientV3 osClient) {
+        Optional<? extends Flavor> flavor;
+        flavor = osClient.compute().flavors().list().stream()
+                .filter(flavour -> flavour.getName().equals(flavourName)).findFirst();
+        if (flavor.isEmpty()) {
+            throw new RuntimeException("No flavour with name " + flavourName + " found");
+        }
+        return flavor.get().getId();
     }
 }
