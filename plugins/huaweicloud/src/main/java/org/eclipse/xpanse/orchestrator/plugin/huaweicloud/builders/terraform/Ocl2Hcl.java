@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.InetAddressValidator;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Artifact;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Security;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Subnet;
@@ -74,9 +73,10 @@ class Ocl2Hcl {
             for (var securityRule : secGroup.getRules()) {
                 var portPairs = getPortPairs(securityRule.getPorts());
                 for (PortPair portPair : portPairs) {
+                    //CHECKSTYLE OFF: LineLength
                     hcl.append(String.format("""
 
-                                    resource "huaweicloud_networking_secgroup_rule"  "%s_%d" {
+                                    resource "huaweicloud_networking_secgroup_rule" "%s_%d" {
                                       security_group_id = huaweicloud_networking_secgroup.%s.id
                                       direction         = "%s"
                                       ethertype         = "IPV4"
@@ -90,9 +90,11 @@ class Ocl2Hcl {
                             securityRule.getDirection().equals("inbound") ? "ingress" : "egress",
                             securityRule.getProtocol(), portPair.getFrom(), portPair.getTo(),
                             securityRule.getCidr()));
+                    //CHECKSTYLE ON: LineLength
                 }
             }
         }
+
         return hcl.toString();
     }
 
@@ -111,6 +113,7 @@ class Ocl2Hcl {
 
                     """, secGroup.getName(), secGroup.getName()));
         }
+
         return hcl.toString();
     }
 
@@ -167,7 +170,7 @@ class Ocl2Hcl {
         if (ocl == null) {
             throw new IllegalArgumentException("Ocl for AvailabilityZone is invalid.");
         }
-        return "\ndata \"huaweicloud_availability_zones\" \"xpanse-az\" {}";
+        return "\ndata \"huaweicloud_availability_zones\" \"xpanse-az\" {}\n";
     }
 
     public String getHclFlavor() {
@@ -190,19 +193,19 @@ class Ocl2Hcl {
         }
 
         StringBuilder hcl = new StringBuilder();
+
+        hcl.append("""
+                resource "huaweicloud_compute_keypair" "xpanse-keypair" {
+                  name = "xpanse-keypair"
+                }""");
+
         for (var vm : ocl.getCompute().getVm()) {
             hcl.append(String.format("""
 
                     resource "huaweicloud_compute_instance" "%s" {
                       name = "%s\"""", vm.getName(), vm.getName()));
 
-            Optional<Artifact> artifact = ocl.referTo(vm.getImage(), Artifact.class);
-            if (artifact.isPresent()) {
-                hcl.append("\n  image_id = \"").append(artifact.get().getId()).append("\"");
-            } else {
-                log.error("image id not found.");
-                hcl.append("\n  image_id = \"").append("image_id_not_found").append("\"");
-            }
+            hcl.append("\n  image_id = \"").append(vm.getImage()).append("\"");
             hcl.append("\n  flavor_id = \"").append(vm.getType()).append("\"");
 
             for (var subnetPath : vm.getSubnet()) {
@@ -212,7 +215,13 @@ class Ocl2Hcl {
                                 .append(value.getName()).append(".id\n  }"));
             }
 
-            hcl.append("\n  admin_pass = \"Cloud#1234\"");
+            hcl.append("\n  key_pair = \"xpanse-keypair\"");
+            hcl.append("\n  user_data = \"#cloud-config\\nruncmd:\\n");
+
+            for (String command : vm.getUserData().getCommands()) {
+                hcl.append("  - ").append(command).append("\\n");
+            }
+            hcl.append("\"");
 
             List<String> securityGroupList = new ArrayList<>();
             for (var secGroup : vm.getSecurity()) {
@@ -226,25 +235,26 @@ class Ocl2Hcl {
             hcl.append("\n}\n\n");
 
             if (vm.isPublicly()) {
+                //CHECKSTYLE OFF: LineLength
                 hcl.append(String.format("""
-                                resource "huaweicloud_vpc_eip" "xpanse-eip-%s" {
+                                resource "huaweicloud_vpc_eip" "%s" {
                                   publicip {
                                     type = "5_sbgp"
                                   }
                                   bandwidth {
-                                    name        = "xpanse-eip-%s"
+                                    name        = "%s"
                                     size        = 5
                                     share_type  = "PER"
                                     charge_mode = "traffic"
                                   }
                                 }
 
-                                resource \
-                                "huaweicloud_compute_eip_associate""xpanse-eip-associated-%s" {
-                                  public_ip   = huaweicloud_vpc_eip.xpanse-eip-%s.address
+                                resource "huaweicloud_compute_eip_associate" "%s" {
+                                  public_ip   = huaweicloud_vpc_eip.%s.address
                                   instance_id = huaweicloud_compute_instance.%s.id
                                 }""", vm.getName(), vm.getName(), vm.getName(), vm.getName(),
                         vm.getName()));
+                //CHECKSTYLE ON: LineLength
             }
         }
         return hcl.toString();
@@ -258,7 +268,6 @@ class Ocl2Hcl {
         StringBuilder hcl = new StringBuilder();
         for (var storage : ocl.getStorage()) {
             hcl.append(String.format("""
-
                             resource "huaweicloud_evs_volume" "%s" {
                               name = "%s"
                               volume_type = "%s"

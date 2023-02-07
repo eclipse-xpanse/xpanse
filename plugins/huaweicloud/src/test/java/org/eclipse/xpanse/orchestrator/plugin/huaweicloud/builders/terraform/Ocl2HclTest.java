@@ -20,8 +20,10 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.Security;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SecurityRule;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Storage;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Subnet;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.UserData;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Vm;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Vpc;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.UserDataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -96,7 +98,15 @@ public class Ocl2HclTest {
         storageList.add("$.storage[0]");
         vm.setStorage(storageList);
 
+        // UserData for VM
+        UserData userData = new UserData();
+        userData.setType(UserDataType.SHELL);
+        List<String> commands = new ArrayList<>();
+        commands.add("echo \"hello world\"");
+        userData.setCommands(commands);
+
         vm.setPublicly(true);
+        vm.setUserData(userData);
 
         // Vm list
         List<Vm> vmList = new ArrayList<>();
@@ -181,10 +191,12 @@ public class Ocl2HclTest {
         doCallRealMethod().when(ocl2Hcl).getHclSecurityGroup();
         hcl = ocl2Hcl.getHclSecurityGroup();
         Assertions.assertTrue(
-                Pattern.compile("resource.*\"huaweicloud_networking_secgroup\".*\"securityTest")
+                Pattern.compile(
+                                "resource.*\"huaweicloud_networking_secgroup\".*\"securityTest")
                         .matcher(hcl)
                         .find());
-        Assertions.assertTrue(Pattern.compile("name.*=.*\"securityTest\"").matcher(hcl).find());
+        Assertions.assertTrue(
+                Pattern.compile("name.*=.*\"securityTest\"").matcher(hcl).find());
     }
 
     @Test

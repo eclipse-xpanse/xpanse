@@ -9,7 +9,6 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud;
 import java.util.Optional;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
-import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuilder;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
 
 /**
@@ -17,6 +16,7 @@ import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiResourc
  */
 public class BuilderFactory {
 
+    public static final String ENV_BUILDER = "env";
     public static final String BASIC_BUILDER = "basic";
 
     /**
@@ -26,19 +26,13 @@ public class BuilderFactory {
      * @param ocl         Complete Ocl descriptor of the managed service to be deployed.
      * @return AtomBuilder object.
      */
-    public Optional<AtomBuilder> createBuilder(String builderType, Ocl ocl) {
-        if (builderType.equals(BASIC_BUILDER)) {
-            HuaweiEnvBuilder envBuilder = new HuaweiEnvBuilder(ocl);
-            HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
-            HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl);
-            HuaweiEnvBuilder envBuilderTail = new HuaweiEnvBuilder(ocl);
-
-            imageBuilder.addSubBuilder(envBuilder);
-            resourceBuilder.addSubBuilder(imageBuilder);
-            envBuilderTail.addSubBuilder(resourceBuilder);
-
-            return Optional.of(envBuilderTail);
+    public AtomBuilder createBuilder(String builderType, Ocl ocl) {
+        if (builderType.equals(ENV_BUILDER)) {
+            return new HuaweiEnvBuilder(ocl);
+        } else if (builderType.equals(BASIC_BUILDER)) {
+            return new HuaweiResourceBuilder(ocl);
         }
-        return Optional.empty();
+
+        throw new IllegalStateException("Builder Type is in valid.");
     }
 }
