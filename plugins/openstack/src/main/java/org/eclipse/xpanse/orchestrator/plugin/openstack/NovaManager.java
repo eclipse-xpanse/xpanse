@@ -23,12 +23,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class NovaManager {
 
-    private final GlanceManager glanceManager;
     private final NeutronManager neutronManager;
 
     @Autowired
-    public NovaManager(GlanceManager glanceManager, NeutronManager neutronManager) {
-        this.glanceManager = glanceManager;
+    public NovaManager(NeutronManager neutronManager) {
         this.neutronManager = neutronManager;
     }
 
@@ -62,7 +60,7 @@ public class NovaManager {
                 .server()
                 .name(vm.getName())
                 .flavor(getVmFlavourId(vm.getType(), osClient))
-                .image(this.glanceManager.getImageId(osClient, vm.getImage()))
+                .image(vm.getImage())
                 .networks(vm.getSubnet().stream()
                         .map(subnet -> this.neutronManager.getNetworkId(osClient, subnet)).collect(
                                 Collectors.toList()))
