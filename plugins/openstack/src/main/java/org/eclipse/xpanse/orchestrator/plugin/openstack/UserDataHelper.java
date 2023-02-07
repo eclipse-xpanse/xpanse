@@ -7,9 +7,8 @@
 package org.eclipse.xpanse.orchestrator.plugin.openstack;
 
 import java.util.Base64;
-import java.util.List;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Provisioner;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.UserData;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.UserDataType;
 
 /**
  * Helper class to handle UserData scripts.
@@ -20,21 +19,15 @@ public class UserDataHelper {
      * Method to build a bash script to be executed as part of cloud-init using the
      * provisioning commands described in the Ocl.
      *
-     * @param provisionersToBeExecuted provisioners in the managed service that must be used to
-     *                                 generate the cloud-init script.
-     * @param ocl                      Full description of the managed service.
+     * @param userData Object holding the userdata information for the VM.
      * @return cloud-init bash script as a string.
      */
-    public static String getUserData(List<String> provisionersToBeExecuted, Ocl ocl) {
+    public static String getUserData(UserData userData) {
         StringBuilder shellScript = new StringBuilder();
-        for (Provisioner provisioner : ocl.getImage().getProvisioners()) {
-            if (provisionersToBeExecuted.contains(provisioner.getName())) {
-                if (provisioner.getType().equalsIgnoreCase("shell")) {
-                    shellScript = new StringBuilder("#!/bin/sh\n");
-                    for (String scriptLine : provisioner.getInline()) {
-                        shellScript.append(scriptLine).append("\n");
-                    }
-                }
+        if (userData.getType() == UserDataType.SHELL) {
+            shellScript = new StringBuilder("#!/bin/sh\n");
+            for (String command : userData.getCommands()) {
+                shellScript.append(command).append("\n");
             }
         }
         return Base64.getEncoder().encodeToString(shellScript.toString().getBytes());
