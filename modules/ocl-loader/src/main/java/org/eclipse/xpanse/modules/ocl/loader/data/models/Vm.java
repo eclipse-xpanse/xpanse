@@ -24,5 +24,6 @@ public class Vm extends RuntimeBase {
     private List<String> security;
     private List<String> storage;
     private boolean publicly;
+    private UserData userData;
 
 }
