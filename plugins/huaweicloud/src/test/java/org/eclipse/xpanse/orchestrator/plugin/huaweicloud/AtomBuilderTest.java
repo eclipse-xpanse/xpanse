@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
-import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuilder;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +32,6 @@ public class AtomBuilderTest {
     @Autowired
     Environment environment;
     private HuaweiEnvBuilder envBuilder;
-    private HuaweiImageBuilder imageBuilder;
     private HuaweiResourceBuilder resourceBuilder;
     private BuilderContext ctx;
     private Ocl ocl;
@@ -48,17 +46,14 @@ public class AtomBuilderTest {
         ctx.setEnvironment(environment);
 
         envBuilder = spy(new HuaweiEnvBuilder(ocl));
-        imageBuilder = spy(new HuaweiImageBuilder(ocl));
         resourceBuilder = spy(new HuaweiResourceBuilder(ocl));
     }
 
     @Test
     public void builderListTest() {
-        imageBuilder.addSubBuilder(envBuilder);
-        resourceBuilder.addSubBuilder(imageBuilder);
+        resourceBuilder.addSubBuilder(envBuilder);
 
         doReturn(true).when(envBuilder).create(any());
-        doReturn(true).when(imageBuilder).create(any());
         doReturn(true).when(resourceBuilder).create(any());
         Assertions.assertTrue(resourceBuilder.build(ctx));
 
@@ -70,12 +65,10 @@ public class AtomBuilderTest {
     public void builderTreeTest() {
         HuaweiEnvBuilder envBuilder2 = spy(new HuaweiEnvBuilder(ocl));
 
-        imageBuilder.addSubBuilder(envBuilder);
-        imageBuilder.addSubBuilder(envBuilder2);
-        resourceBuilder.addSubBuilder(imageBuilder);
+        resourceBuilder.addSubBuilder(envBuilder);
+        resourceBuilder.addSubBuilder(envBuilder2);
 
         doReturn(true).when(envBuilder).create(any());
-        doReturn(true).when(imageBuilder).create(any());
         doReturn(true).when(resourceBuilder).create(any());
         Assertions.assertTrue(resourceBuilder.build(ctx));
 
@@ -83,16 +76,13 @@ public class AtomBuilderTest {
         verify(envBuilder, times(1)).create(ctx);
         verify(envBuilder2, times(1)).build(ctx);
         verify(envBuilder2, times(1)).create(ctx);
-        verify(imageBuilder, times(1)).create(ctx);
     }
 
     @Test
     public void builderListFailedTest() {
-        imageBuilder.addSubBuilder(envBuilder);
-        resourceBuilder.addSubBuilder(imageBuilder);
+        resourceBuilder.addSubBuilder(envBuilder);
 
         doReturn(false).when(envBuilder).create(any());
-        doReturn(true).when(imageBuilder).create(any());
         doReturn(true).when(resourceBuilder).create(any());
 
         Assertions.assertFalse(resourceBuilder.build(ctx));
@@ -103,11 +93,9 @@ public class AtomBuilderTest {
 
     @Test
     public void builderListRollbackTest() {
-        imageBuilder.addSubBuilder(envBuilder);
-        resourceBuilder.addSubBuilder(imageBuilder);
+        resourceBuilder.addSubBuilder(envBuilder);
 
         doReturn(true).when(envBuilder).destroy(any());
-        doReturn(true).when(imageBuilder).destroy(any());
         doReturn(true).when(resourceBuilder).destroy(any());
         Assertions.assertTrue(resourceBuilder.rollback(ctx));
 
@@ -119,13 +107,11 @@ public class AtomBuilderTest {
     public void builderTreeRollbackTest() {
         HuaweiEnvBuilder envBuilder2 = spy(new HuaweiEnvBuilder(ocl));
 
-        imageBuilder.addSubBuilder(envBuilder);
-        imageBuilder.addSubBuilder(envBuilder2);
-        resourceBuilder.addSubBuilder(imageBuilder);
+        resourceBuilder.addSubBuilder(envBuilder);
+        resourceBuilder.addSubBuilder(envBuilder2);
 
         doReturn(true).when(envBuilder).destroy(any());
         doReturn(true).when(envBuilder2).destroy(any());
-        doReturn(true).when(imageBuilder).destroy(any());
         doReturn(true).when(resourceBuilder).destroy(any());
         Assertions.assertTrue(resourceBuilder.rollback(ctx));
 
@@ -133,16 +119,13 @@ public class AtomBuilderTest {
         verify(envBuilder, times(1)).destroy(ctx);
         verify(envBuilder2, times(1)).rollback(ctx);
         verify(envBuilder2, times(1)).destroy(ctx);
-        verify(imageBuilder, times(1)).destroy(ctx);
     }
 
     @Test
     public void builderListRollbackFailedTest() {
-        imageBuilder.addSubBuilder(envBuilder);
-        resourceBuilder.addSubBuilder(imageBuilder);
+        resourceBuilder.addSubBuilder(envBuilder);
 
         doReturn(false).when(envBuilder).destroy(any());
-        doReturn(true).when(imageBuilder).destroy(any());
         doReturn(true).when(resourceBuilder).destroy(any());
 
         Assertions.assertFalse(resourceBuilder.rollback(ctx));

@@ -10,58 +10,12 @@
     "variablePrice": 10,
     "variableItem": "instance"
   },
-  "image": {
-    "provisioners": [
-      {
-        "name": "my-kafka-release",
-        "type": "shell",
-        "environments": [
-          "WORK_HOME=/usr1/KAFKA/"
-        ],
-        "inline": [
-          "echo \"start install docker\"",
-          "echo \"run install\"",
-          "apt-get update",
-          "apt install -y docker.io",
-          "docker network create app-tier --driver bridge",
-          "docker run -d --name zookeeper-server --network app-tier -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:latest",
-          "docker run -d --name kafka-server --network app-tier -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181 bitnami/kafka:latest",
-          "echo \"@reboot docker restart zookeeper-server ; docker container rm kafka-server ; docker run -d --name kafka-server --network app-tier -p 9092:9092  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://\\`hostname\\`:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181 bitnami/kafka:latest\" | crontab -"
-        ]
-      }
-    ],
-    "base": [
-      {
-        "name": "Ubuntu 20.04 server 64bit",
-        "type": "t2.large",
-        "filters": {
-          "name": "ubuntu-for-xpanse-*"
-        }
-      },
-      {
-        "name": "centos-x64",
-        "type": "t2.large",
-        "filters": {
-          "id": "ed2c9ea6-7134-44b9-bbfa-109e0753766e"
-        }
-      }
-    ],
-    "artifacts": [
-      {
-        "name": "kafka_image",
-        "base": "$.image.base[0]",
-        "provisioners": [
-          "$.image.provisioners[0]"
-        ]
-      }
-    ]
-  },
   "compute": {
     "vm": [
       {
         "name": "xpanse-kafka-vm",
         "type": "c7.large.4",
-        "image": "$.image.artifacts[0]",
+        "image": "a3ef71cc-a5e4-11ed-9ec8-13266ec44838",
         "subnet": [
           "$.network.subnet[0]"
         ],
