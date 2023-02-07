@@ -7,7 +7,7 @@
       {
         "name": "xpanse-kafka-vm",
         "type": "m1.medium",
-        "image": "Centos",
+        "image": "3519889b-25ed-4d1a-a893-8563d5d005a9",
         "subnet": [
           "external"
         ],
