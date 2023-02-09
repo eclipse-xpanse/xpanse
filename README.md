@@ -33,68 +33,27 @@ fundamental APIs:
   "name": "my-service",
   "category": "compute",
   "namespace": "my-namespace",
-  "properties": {
-    "meta": "data",
-    "other": true
-  },
-  "image": {
-    "provisioners": [
-      {
-        "name": "my-kafka-release",
-        "type": "shell",
-        "environments": [
-          "WORK_HOME=/usr1/KAFKA/"
-        ],
-        "inline": [
-          "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar"
-        ]
-      }
-    ],
-    "base": [
-      {
-        "name": "ubuntu-x64",
-        "type": "t2.large",
-        "filters": {
-          "name": "ubuntu-for-xpanse-*"
-        }
-      }
-    ],
-    "artifacts": [
-      {
-        "name": "kafka_image",
-        "base": "$.image.base[0]",
-        "provisioners": [
-          "$.image.provisioners[0]"
-        ]
-      }
-    ]
-  },
   "billing": {
     "model": "flat",
     "period": "monthly",
     "currency": "euro",
     "fixedPrice": 20,
-    "variablePrice": 10,
-    "variableItem": "instance",
-    "backend": "https://software_provider/billing/backend",
-    "properties": {
-      "billing_prop": "value"
-    }
+    "variablePrice": 10
   },
   "compute": {
-    "vm": [
+    "vms": [
       {
         "name": "my-vm",
         "type": "t2.large",
-        "image": "$.image.artifacts[0]",
+        "image": "c7d4ff3e-a851-11ed-b9df-f329738732c0",
         "subnet": [
-          "$.network.subnet[0]"
+          "$.network.subnets[0]"
         ],
         "securityGroups": [
           "$.network.securityGroups[0]"
         ],
         "storage": [
-          "$.storage[0]"
+          "$.storages[0]"
         ],
         "publicly": true
       }
@@ -107,7 +66,7 @@ fundamental APIs:
         "cidr": "172.31.0.0/16"
       }
     ],
-    "subnet": [
+    "subnets": [
       {
         "name": "my-subnet",
         "vpc": "$.network.vpc[0]",
@@ -131,19 +90,14 @@ fundamental APIs:
       }
     ]
   },
-  "storage": [
+  "storages": [
     {
       "name": "my-storage",
       "type": "ssd",
-      "size": "8GiB"
+      "size": "80",
+      "sizeUnit": "GB"
     }
-  ],
-  "console": {
-    "backend": "https://...",
-    "properties": {
-      "one": "two"
-    }
-  }
+  ]
 }
 ```
 

@@ -72,65 +72,24 @@ For example, here's a very simple service descriptor:
   "billing": {
     "model": "flat",
     "period": "monthly",
-    "currency": "euro",
+    "currency": "EURO",
     "fixedPrice": 20,
-    "variablePrice": 10,
-    "variableItem": "instance"
-  },
-  "image": {
-    "provisioners": [
-      {
-        "name": "my-kafka-release",
-        "type": "shell",
-        "environments": [
-          "WORK_HOME=/usr1/KAFKA/"
-        ],
-        "inline": [
-          "cd ${WORK_HOME} && wget http://xxxx/kafka/release.jar",
-          "echo $PATH"
-        ]
-      }
-    ],
-    "base": [
-      {
-        "name": "ubuntu-x64",
-        "type": "t2.large",
-        "filters": {
-          "name": "ubuntu-for-osc-*"
-        }
-      },
-      {
-        "name": "centos-x64",
-        "type": "t2.large",
-        "filters": {
-          "id": "ed2c9ea6-7134-44b9-bbfa-109e0753766e"
-        }
-      }
-    ],
-    "artifacts": [
-      {
-        "name": "kafka_image",
-        "base": "$.image.base[0]",
-        "provisioners": [
-          "$.image.provisioners[0]"
-        ]
-      }
-    ]
+    "variablePrice": 10
   },
   "compute": {
-    "vm": [
+    "vms": [
       {
         "name": "my-vm",
         "type": "t2.large",
-        "image": "$.image.artifacts[0]",
-        "subnet": [
-          "$.network.subnet[0]"
+        "image": "c7d4ff3e-a851-11ed-b9df-f329738732c0",
+        "subnets": [
+          "$.network.subnets[0]"
         ],
         "securityGroups": [
           "$.network.securityGroups[0]"
         ],
-        "storage": [
-          "$.storage[0]"
+        "storages": [
+          "$.storages[0]"
         ],
         "publicly": true
       }
@@ -147,7 +106,7 @@ For example, here's a very simple service descriptor:
         "cidr": "172.32.0.0/16"
       }
     ],
-    "subnet": [
+    "subnets": [
       {
         "name": "my-subnet",
         "vpc": "$.network.vpc[0]",
@@ -171,11 +130,12 @@ For example, here's a very simple service descriptor:
       }
     ]
   },
-  "storage": [
+  "storages": [
     {
       "name": "my-storage",
       "type": "ssd",
-      "size": "8GiB"
+      "size": "80",
+      "sizeUnit": "GB"
     }
   ]
 }
