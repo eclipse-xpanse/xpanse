@@ -8,7 +8,6 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Artifact;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.BuilderContext;

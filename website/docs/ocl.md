@@ -88,7 +88,7 @@ This is the list of VMs used by the service. Each VM has:
 * `name` - (Required) The name of the VM.
 * `type` - (Required) The VM type, like `t2.large` for example.
 * `subnet` - (Required) A list of `JsonPath` of the `subnet`. The subnet for main Nic must be in the first place.
-* `security` - (Required) A list of `JsonPath` of `security`.
+* `securityGroups` - (Required) A list of `JsonPath` of `securityGroups`.
 * `storage` - (Required) A list of `JsonPath` of the `storage`.
 * `publicly` - (Required) The flag to indicate if the VM should be exposed on Internet (`true`) or only local (`false`).
 
@@ -109,17 +109,17 @@ This is the list of subnet defined in the service network. Each subnet has:
 * `vpc` - (Required) The `JsonPath` of the VPC where the subnet is attached.
 * `cidr` - (Required) The subnet IP address range.
 
-#### Security
+#### SecurityGroups
 
-This is the list of security (groups) defined in the service network. Each security has:
+This is the list of securityGroup defined in the service network. Each securityGroup has:
 
-* `name` - (Required) The name of the security, used in other OCL elements.
-* `rules` - (Required) The list of security rule.
+* `name` - (Required) The name of the securityGroup, used in other OCL elements.
+* `rules` - (Required) The list of securityGroup rule.
 
 ##### SecurityRule
 
-* `name` - (Required) The name of the security rule, define in `security` (groups).
-* `priority` - (Required) The priority of the security rule. The lower the priority number, the higher the priority of
+* `name` - (Required) The name of the securityGroup rule, define in `securityGroup` (groups).
+* `priority` - (Required) The priority of the securityGroup rule. The lower the priority number, the higher the priority of
   the rule.
 * `protocol` - (Required) Network protocol this rule applies to. Possible values include: `Tcp`,`Udp`,`Icmp`,`*`(which
   matches all).
@@ -221,8 +221,8 @@ This is the list of security (groups) defined in the service network. Each secur
         "subnet": [
           "$.network.subnet[0]"
         ],
-        "security": [
-          "$.network.security[0]"
+        "securityGroup": [
+          "$.network.securityGroup[0]"
         ],
         "storage": [
           "$.storage[0]"
@@ -249,7 +249,7 @@ This is the list of security (groups) defined in the service network. Each secur
         "cidr": "172.31.1.0/24"
       }
     ],
-    "security": [
+    "securityGroup": [
       {
         "name": "my-sg",
         "rules": [
@@ -309,7 +309,7 @@ resource "osc_service" "myservice" {
       platform = "linux-x64"
       vpc      = "my-vpc"
       subnet   = "my-subnet"
-      security = "my-sg"
+      securityGroup = "my-sg"
       storage  = "my-storage"
       publicly = true
     }
@@ -330,7 +330,7 @@ resource "osc_service" "myservice" {
       routes = ""
     }
 
-    security {
+    securityGroup {
       name     = "my-sg"
       inbound  = ["22->22", "443->443", "80->80"]
       outbound = []

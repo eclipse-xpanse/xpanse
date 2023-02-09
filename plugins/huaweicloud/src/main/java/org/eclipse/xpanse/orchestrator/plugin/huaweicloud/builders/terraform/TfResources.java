@@ -8,7 +8,7 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.terraform;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResource;
+import org.eclipse.xpanse.modules.ocl.state.OclResource;
 
 /**
  * Class to convert OCL definition to resources to be created via Terraform.
@@ -40,7 +40,7 @@ public class TfResources {
             if (tfResourceList.size() > 0) {
                 OclResource oclResource = tfResourceList.get(0);
                 ((TfResource) oclResource).update(tfStateResource);
-                return;
+                continue;
             }
             OclResource tfResource = new TfResource(tfStateResource);
             resources.add(tfResource);

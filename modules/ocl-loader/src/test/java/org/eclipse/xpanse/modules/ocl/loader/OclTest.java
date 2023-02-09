@@ -29,13 +29,13 @@ public class OclTest {
         ocl.setName("foo");
         Storage storage = new Storage();
         storage.setName("bar");
-        ocl.setStorage(Arrays.asList(storage));
+        ocl.setStorages(Arrays.asList(storage));
         Ocl aCopy = ocl.deepCopy();
         assertEquals("foo", aCopy.getName());
         assertNotSame(ocl, aCopy);
         assertNotSame(ocl.getName(), aCopy.getName());
-        assertNotSame(ocl.getStorage(), aCopy.getStorage());
-        Storage aCopiedStorage = aCopy.getStorage().get(0);
+        assertNotSame(ocl.getStorages(), aCopy.getStorages());
+        Storage aCopiedStorage = aCopy.getStorages().get(0);
         assertNotSame(aCopiedStorage, storage);
         assertEquals("bar", aCopiedStorage.getName());
     }

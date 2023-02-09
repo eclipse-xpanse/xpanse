@@ -4,11 +4,12 @@
  *
  */
 
-package org.eclipse.xpanse.modules.ocl.loader.data.models;
+package org.eclipse.xpanse.modules.ocl.state;
 
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import org.eclipse.xpanse.modules.ocl.state.OclResource;
 
 /**
  * List of OclResources.

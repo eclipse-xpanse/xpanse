@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 public class Ocl {
+
     private static ObjectMapper theMapper = new ObjectMapper();
     @NotBlank
     @Schema(description = "Name of the service to be managed by xpanse")
@@ -36,18 +37,15 @@ public class Ocl {
     private String category;
     private String namespace;
     private Map<String, Object> properties;
-    private Image image;
     private Billing billing;
     private Compute compute;
     private Network network;
-    private List<Storage> storage;
-    private Console console;
+    private List<Storage> storages;
 
     /**
-     * an OCL object might be passed to different plugins for processing,
-     * in case any plugin want to change the property of Ocl, we should not change
-     * the original
-     * Object, we should change a deep copy. The method is for deep copy
+     * an OCL object might be passed to different plugins for processing, in case any plugin want to
+     * change the property of Ocl, we should not change the original Object, we should change a deep
+     * copy. The method is for deep copy
      *
      * @return copied Ocl object.
      */

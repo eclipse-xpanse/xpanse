@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResources;
+import org.eclipse.xpanse.modules.ocl.state.OclResources;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorStorage;
 import org.springframework.beans.factory.annotation.Autowired;

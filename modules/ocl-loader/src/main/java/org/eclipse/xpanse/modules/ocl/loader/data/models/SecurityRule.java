@@ -8,6 +8,9 @@ package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.SecurityRuleAction;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.SecurityRuleDirection;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.SecurityRuleProtocol;
 
 /**
  * Defines security rules to be applied for the managed service.
@@ -18,10 +21,10 @@ public class SecurityRule extends RuntimeBase {
 
     private String name;
     private Integer priority;
-    private String protocol;
+    private SecurityRuleProtocol protocol;
     private String cidr;
-    private String direction;
+    private SecurityRuleDirection direction;
     private String ports;
-    private String action;
+    private SecurityRuleAction action;
 
 }

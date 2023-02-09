@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResource;
+import org.eclipse.xpanse.modules.ocl.state.OclResource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

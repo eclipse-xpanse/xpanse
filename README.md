@@ -90,8 +90,8 @@ fundamental APIs:
         "subnet": [
           "$.network.subnet[0]"
         ],
-        "security": [
-          "$.network.security[0]"
+        "securityGroups": [
+          "$.network.securityGroups[0]"
         ],
         "storage": [
           "$.storage[0]"
@@ -114,14 +114,14 @@ fundamental APIs:
         "cidr": "172.31.1.0/24"
       }
     ],
-    "security": [
+    "securityGroups": [
       {
         "name": "my-sg",
         "rules": [
           {
             "name": "my-remote-desktop",
             "priority": 1,
-            "protocol": "TCP",
+            "protocol": "tcp",
             "cidr": "172.31.2.0/24",
             "direction": "inbound",
             "ports": "3389",

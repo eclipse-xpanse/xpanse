@@ -11,8 +11,9 @@ import java.io.IOException;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResources;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.RuntimeBase;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
+import org.eclipse.xpanse.modules.ocl.state.OclResources;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.exceptions.TerraformExecutorException;
 
 /**
@@ -37,7 +38,6 @@ public class OclTerraformExecutor extends TerraformExecutor {
      * Creates terraform script based on Ocl descriptor.
      */
     public void createTerraformScript() {
-
         Ocl2Hcl hcl = new Ocl2Hcl(ocl);
         String hclStr = hcl.getHcl();
 
@@ -56,7 +56,7 @@ public class OclTerraformExecutor extends TerraformExecutor {
                     || (instance.attributes.containsKey("name")
                     && instance.attributes.get("name").equals(resourceName))) {
                 runtimeObj.setId(instance.attributes.get("id").toString());
-                runtimeObj.setState("active");
+                runtimeObj.setState(RuntimeState.ACTIVE);
             }
         }
     }
@@ -69,16 +69,16 @@ public class OclTerraformExecutor extends TerraformExecutor {
             log.error("Parse terraform state content failed.");
             throw new TerraformExecutorException("Parse terraform state content failed.", ex);
         }
-        for (var secGroup : ocl.getNetwork().getSecurity()) {
+        for (var secGroup : ocl.getNetwork().getSecurityGroups()) {
             updateOclObject(
                     secGroup, "huaweicloud_networking_secgroup", secGroup.getName(), tfState);
         }
 
-        for (var subnet : ocl.getNetwork().getSubnet()) {
+        for (var subnet : ocl.getNetwork().getSubnets()) {
             updateOclObject(subnet, "huaweicloud_vpc_subnet", subnet.getName(), tfState);
         }
 
-        for (var vm : ocl.getCompute().getVm()) {
+        for (var vm : ocl.getCompute().getVms()) {
             updateOclObject(vm, "huaweicloud_compute_instance", vm.getName(), tfState);
         }
 

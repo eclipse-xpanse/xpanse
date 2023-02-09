@@ -38,10 +38,6 @@ public class TFExecutorTest {
 
         Assertions.assertNotNull(ocl);
 
-        for (var artifact : ocl.getImage().getArtifacts()) {
-            artifact.setId("cecc4bcf-b055-4d35-bd5f-693d4412eaef");
-        }
-
         HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl);
 
         BuilderContext builderContext = new BuilderContext();
@@ -57,10 +53,6 @@ public class TFExecutorTest {
                 .getOcl(new File("target/test-classes/huawei_test.json").toURI().toURL());
 
         Assertions.assertNotNull(ocl);
-
-        for (var artifact : ocl.getImage().getArtifacts()) {
-            artifact.setId("cecc4bcf-b055-4d35-bd5f-693d4412eaef");
-        }
 
         HuaweiEnvBuilder envBuilder;
         HuaweiResourceBuilder resourceBuilder;

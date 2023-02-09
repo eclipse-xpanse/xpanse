@@ -6,7 +6,9 @@
 
 package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.Data;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
 
 /**
  * RuntimeBase class.
@@ -14,7 +16,9 @@ import lombok.Data;
 @Data
 public class RuntimeBase {
 
-    String state = "inactive";
+    @Hidden
+    private RuntimeState state = RuntimeState.INACTIVE;
+    @Hidden
     String id = "";
 
 }

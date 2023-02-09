@@ -17,7 +17,7 @@ public class Network {
 
     private String id;
     private List<Vpc> vpc;
-    private List<Subnet> subnet;
-    private List<Security> security;
+    private List<Subnet> subnets;
+    private List<SecurityGroup> securityGroups;
 
 }

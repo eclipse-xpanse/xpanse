@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResources;
+import org.eclipse.xpanse.modules.ocl.state.OclResources;
 import org.springframework.core.env.Environment;
 
 /**

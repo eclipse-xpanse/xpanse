@@ -126,8 +126,8 @@ For example, here's a very simple service descriptor:
         "subnet": [
           "$.network.subnet[0]"
         ],
-        "security": [
-          "$.network.security[0]"
+        "securityGroups": [
+          "$.network.securityGroups[0]"
         ],
         "storage": [
           "$.storage[0]"
@@ -154,7 +154,7 @@ For example, here's a very simple service descriptor:
         "cidr": "172.31.1.0/24"
       }
     ],
-    "security": [
+    "securityGroups": [
       {
         "name": "my-sg",
         "rules": [
