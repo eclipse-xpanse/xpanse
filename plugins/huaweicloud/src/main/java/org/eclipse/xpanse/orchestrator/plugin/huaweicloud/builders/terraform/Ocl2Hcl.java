@@ -13,9 +13,10 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Security;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.SecurityGroup;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Subnet;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Vpc;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.SecurityRuleDirection;
 
 
 @Slf4j
@@ -60,15 +61,15 @@ class Ocl2Hcl {
     }
 
     public String getHclSecurityGroupRule() {
-        if (ocl == null || ocl.getNetwork() == null || ocl.getNetwork().getSecurity() == null
-                || ocl.getNetwork().getSecurity().get(0).getRules() == null) {
+        if (ocl == null || ocl.getNetwork() == null || ocl.getNetwork().getSecurityGroups() == null
+                || ocl.getNetwork().getSecurityGroups().get(0).getRules() == null) {
             throw new IllegalArgumentException("Ocl for security group rule is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
 
         // todo: parse ports to port_range
-        for (var secGroup : ocl.getNetwork().getSecurity()) {
+        for (var secGroup : ocl.getNetwork().getSecurityGroups()) {
             int index = 0;
             for (var securityRule : secGroup.getRules()) {
                 var portPairs = getPortPairs(securityRule.getPorts());
@@ -87,9 +88,10 @@ class Ocl2Hcl {
                                     }
 
                                     """, securityRule.getName(), index++, secGroup.getName(),
-                            securityRule.getDirection().equals("inbound") ? "ingress" : "egress",
-                            securityRule.getProtocol(), portPair.getFrom(), portPair.getTo(),
-                            securityRule.getCidr()));
+                            securityRule.getDirection().equals(SecurityRuleDirection.IN) ? "ingress"
+                                    : "egress",
+                            securityRule.getProtocol().toValue(),
+                            portPair.getFrom(), portPair.getTo(), securityRule.getCidr()));
                     //CHECKSTYLE ON: LineLength
                 }
             }
@@ -99,12 +101,13 @@ class Ocl2Hcl {
     }
 
     public String getHclSecurityGroup() {
-        if (ocl == null || ocl.getNetwork() == null || ocl.getNetwork().getSecurity() == null) {
+        if (ocl == null || ocl.getNetwork() == null
+                || ocl.getNetwork().getSecurityGroups() == null) {
             throw new IllegalArgumentException("Ocl for security group is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
-        for (var secGroup : ocl.getNetwork().getSecurity()) {
+        for (var secGroup : ocl.getNetwork().getSecurityGroups()) {
             hcl.append(String.format("""
 
                     resource "huaweicloud_networking_secgroup" "%s" {
@@ -137,13 +140,13 @@ class Ocl2Hcl {
     }
 
     public String getHclVpcSubnet() {
-        if (ocl == null || ocl.getNetwork() == null || ocl.getNetwork().getSubnet() == null) {
+        if (ocl == null || ocl.getNetwork() == null || ocl.getNetwork().getSubnets() == null) {
             throw new IllegalArgumentException("Ocl for VPC subnet is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
         InetAddressValidator validator = InetAddressValidator.getInstance();
-        for (var subnet : ocl.getNetwork().getSubnet()) {
+        for (var subnet : ocl.getNetwork().getSubnets()) {
             hcl.append(String.format("""
 
                     resource "huaweicloud_vpc_subnet" "%s" {
@@ -188,7 +191,7 @@ class Ocl2Hcl {
     }
 
     public String getHclVm() {
-        if (ocl == null || ocl.getCompute() == null || ocl.getCompute().getVm() == null) {
+        if (ocl == null || ocl.getCompute() == null || ocl.getCompute().getVms() == null) {
             throw new IllegalArgumentException("Ocl for vm is invalid.");
         }
 
@@ -199,7 +202,7 @@ class Ocl2Hcl {
                   name = "xpanse-keypair"
                 }""");
 
-        for (var vm : ocl.getCompute().getVm()) {
+        for (var vm : ocl.getCompute().getVms()) {
             hcl.append(String.format("""
 
                     resource "huaweicloud_compute_instance" "%s" {
@@ -208,7 +211,7 @@ class Ocl2Hcl {
             hcl.append("\n  image_id = \"").append(vm.getImage()).append("\"");
             hcl.append("\n  flavor_id = \"").append(vm.getType()).append("\"");
 
-            for (var subnetPath : vm.getSubnet()) {
+            for (var subnetPath : vm.getSubnets()) {
                 Optional<Subnet> subnet = ocl.referTo(subnetPath, Subnet.class);
                 subnet.ifPresent(
                         value -> hcl.append("\n  network {\n    uuid = huaweicloud_vpc_subnet.")
@@ -224,8 +227,8 @@ class Ocl2Hcl {
             hcl.append("\"");
 
             List<String> securityGroupList = new ArrayList<>();
-            for (var secGroup : vm.getSecurity()) {
-                Optional<Security> subnet = ocl.referTo(secGroup, Security.class);
+            for (var secGroup : vm.getSecurityGroups()) {
+                Optional<SecurityGroup> subnet = ocl.referTo(secGroup, SecurityGroup.class);
                 subnet.ifPresent(value -> securityGroupList.add(value.getName()));
             }
             String securityGroupids = securityGroupList.stream()
@@ -261,19 +264,19 @@ class Ocl2Hcl {
     }
 
     public String getHclStorage() {
-        if (ocl == null || ocl.getStorage() == null) {
+        if (ocl == null || ocl.getStorages() == null) {
             throw new IllegalArgumentException("Ocl for storage is invalid.");
         }
 
         StringBuilder hcl = new StringBuilder();
-        for (var storage : ocl.getStorage()) {
+        for (var storage : ocl.getStorages()) {
             hcl.append(String.format("""
                             resource "huaweicloud_evs_volume" "%s" {
                               name = "%s"
                               volume_type = "%s"
                               size = "%s"
                               """, storage.getName(), storage.getName(), storage.getType(),
-                    storage.getSize().replaceAll("[^0-9]*GiB", "").strip()));
+                    storage.getSize()));
             // TODO: Add variable [var.availability_zone] for availability_zone
             hcl.append("\n  availability_zone = data.huaweicloud_availability_zones.xpanse-az"
                     + ".names[0]");

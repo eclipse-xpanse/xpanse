@@ -7,23 +7,22 @@
     "period": "monthly",
     "currency": "euro",
     "fixedPrice": 20,
-    "variablePrice": 10,
-    "variableItem": "instance"
+    "variablePrice": 10
   },
   "compute": {
-    "vm": [
+    "vms": [
       {
         "name": "xpanse-kafka-vm",
         "type": "c7.large.4",
         "image": "a3ef71cc-a5e4-11ed-9ec8-13266ec44838",
-        "subnet": [
-          "$.network.subnet[0]"
+        "subnets": [
+          "$.network.subnets[0]"
         ],
-        "security": [
-          "$.network.security[0]"
+        "securityGroups": [
+          "$.network.securityGroups[0]"
         ],
-        "storage": [
-          "$.storage[0]"
+        "storages": [
+          "$.storages[0]"
         ],
         "publicly": true,
         "userData": {
@@ -49,14 +48,14 @@
         "cidr": "10.10.0.0/16"
       }
     ],
-    "subnet": [
+    "subnets": [
       {
         "name": "xpanse-res-subnet",
         "vpc": "$.network.vpc[0]",
         "cidr": "10.10.1.0/24"
       }
     ],
-    "security": [
+    "securityGroups": [
       {
         "name": "xpanse-res-sg",
         "rules": [
@@ -65,7 +64,7 @@
             "priority": 1,
             "protocol": "tcp",
             "cidr": "10.10.2.6/32",
-            "direction": "inbound",
+            "direction": "in",
             "ports": "8080, 9092-9093, 2181",
             "action": "allow"
           },
@@ -74,7 +73,7 @@
             "priority": 1,
             "protocol": "tcp",
             "cidr": "121.36.59.153/32",
-            "direction": "inbound",
+            "direction": "in",
             "ports": "22, 8080, 9092-9093,2181",
             "action": "allow"
           },
@@ -83,7 +82,7 @@
             "priority": 1,
             "protocol": "tcp",
             "cidr": "198.19.0.0/16",
-            "direction": "inbound",
+            "direction": "in",
             "ports": "22",
             "action": "allow"
           }
@@ -91,11 +90,12 @@
       }
     ]
   },
-  "storage": [
+  "storages": [
     {
       "name": "xpanse-res-storage",
       "type": "SAS",
-      "size": "20GiB"
+      "size": "20",
+      "sizeUnit": "GB"
     }
   ]
 }

@@ -13,7 +13,7 @@ import java.io.File;
 import java.nio.file.Files;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResources;
+import org.eclipse.xpanse.modules.ocl.state.OclResources;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -32,7 +32,6 @@ public class OclLoaderTest {
         Assertions.assertEquals("flat", ocl.getBilling().getModel());
         Assertions.assertEquals("euro", ocl.getBilling().getCurrency());
         Assertions.assertEquals("monthly", ocl.getBilling().getPeriod());
-        Assertions.assertEquals("instance", ocl.getBilling().getVariableItem());
         Assertions.assertEquals(20.0, ocl.getBilling().getFixedPrice());
         Assertions.assertEquals(10.0, ocl.getBilling().getVariablePrice());
     }

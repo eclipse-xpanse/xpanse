@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Security extends RuntimeBase {
+public class SecurityGroup extends RuntimeBase {
 
     private String name;
     private List<SecurityRule> rules;

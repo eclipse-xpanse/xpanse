@@ -15,6 +15,6 @@ import lombok.Data;
 @Data
 public class Compute {
 
-    private List<Vm> vm;
+    private List<Vm> vms;
 
 }

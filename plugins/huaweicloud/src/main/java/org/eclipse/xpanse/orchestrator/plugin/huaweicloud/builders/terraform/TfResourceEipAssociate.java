@@ -9,7 +9,7 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.terraform;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResource;
+import org.eclipse.xpanse.modules.ocl.state.OclResource;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

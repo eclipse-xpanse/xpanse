@@ -39,7 +39,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Autowired
     public OpenstackOrchestratorPlugin(KeystoneManager keystoneManager, NovaManager novaManager,
-                                       NeutronManager neutronManager) {
+            NeutronManager neutronManager) {
         log.info("Loading OpenstackOrchestratorPlugin");
         this.keystoneManager = keystoneManager;
         this.novaManager = novaManager;
@@ -63,11 +63,11 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         Ocl ocl = managedOcl.get(managedServiceName);
         if (Objects.nonNull(ocl.getNetwork())) {
             log.info("Creating network resources via neutron API.");
-            ocl.getNetwork().getSubnet()
+            ocl.getNetwork().getSubnets()
                     .forEach(subnet -> this.neutronManager.createNetwork(subnet, osClient));
         }
         if (Objects.nonNull(ocl.getCompute())) {
-            ocl.getCompute().getVm().forEach(vm -> {
+            ocl.getCompute().getVms().forEach(vm -> {
                 log.info("Starting bare VM via Nova");
                 try {
                     this.novaManager.createVm(osClient, vm);
@@ -87,7 +87,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         OSClient.OSClientV3 osClient = this.keystoneManager.getClient();
         Ocl ocl = managedOcl.get(managedServiceName);
         if (Objects.nonNull(ocl.getCompute())) {
-            ocl.getCompute().getVm().forEach(vm -> {
+            ocl.getCompute().getVms().forEach(vm -> {
                 log.info("Stopping bare VM via Nova API");
                 this.novaManager.stopVm(vm.getName(), osClient);
             });
@@ -100,7 +100,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         OSClient.OSClientV3 osClient = this.keystoneManager.getClient();
         Ocl ocl = managedOcl.get(managedServiceName);
         if (Objects.nonNull(ocl.getCompute())) {
-            ocl.getCompute().getVm().forEach(vm -> {
+            ocl.getCompute().getVms().forEach(vm -> {
                 log.info("Deleting bare VM via Nova API");
                 this.novaManager.deleteVm(vm.getName(), osClient);
             });

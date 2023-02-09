@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.ocl.loader.data.models;
+package org.eclipse.xpanse.modules.ocl.state;
 
 import java.util.HashMap;
 import java.util.Map;

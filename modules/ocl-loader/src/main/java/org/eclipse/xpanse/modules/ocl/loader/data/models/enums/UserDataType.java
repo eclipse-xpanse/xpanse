@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.ocl.loader.data.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * user data types for UserData.
@@ -28,7 +29,7 @@ public enum UserDataType {
     @JsonCreator
     public UserDataType getByValue(String scriptType) {
         for (UserDataType userDataType : values()) {
-            if (userDataType.scriptType.equals(scriptType)) {
+            if (userDataType.scriptType.equals(StringUtils.lowerCase(scriptType))) {
                 return userDataType;
             }
         }

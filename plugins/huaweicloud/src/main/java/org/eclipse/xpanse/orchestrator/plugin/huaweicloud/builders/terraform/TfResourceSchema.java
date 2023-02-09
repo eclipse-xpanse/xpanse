@@ -8,7 +8,7 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.terraform;
 
 import java.util.List;
 import lombok.Data;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResource;
+import org.eclipse.xpanse.modules.ocl.state.OclResource;
 
 @Data
 class TfResourceSchema {

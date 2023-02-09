@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.terraform;
 
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResource;
+import org.eclipse.xpanse.modules.ocl.state.OclResource;
 
 class TfResource extends OclResource {
 

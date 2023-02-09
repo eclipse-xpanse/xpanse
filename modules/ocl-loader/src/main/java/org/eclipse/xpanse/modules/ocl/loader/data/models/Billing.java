@@ -6,8 +6,6 @@
 
 package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
-import java.util.HashMap;
-import java.util.Map;
 import lombok.Data;
 
 /**
@@ -21,8 +19,5 @@ public class Billing {
     private String currency;
     private Double fixedPrice;
     private Double variablePrice;
-    private String variableItem;
-    private String backend;
-    private Map<String, Object> properties = new HashMap<>();
 
 }
