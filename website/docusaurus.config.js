@@ -9,7 +9,7 @@ const config = {
   title: 'Open Services Cloud',
   tagline: 'Open Services Cloud is an Open Source project allowing to easily implement native managed service on any cloud provider.',
   url: 'https://huaweicloud.github.io/',
-  baseUrl: '/osc/',
+  baseUrl: '/xpanse/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
@@ -17,7 +17,7 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'huaweicloud', // Usually your GitHub org/user name.
-  projectName: 'osc', // Usually your repo name.
+  projectName: 'xpanse', // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
