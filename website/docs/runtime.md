@@ -9,7 +9,7 @@ plugins, REST API, ...
 
 ## Build
 
-You can easily build OSC yourself.
+You can easily build Xpanse yourself.
 
 As requirement, you need:
 
@@ -20,11 +20,11 @@ As requirement, you need:
 You can clone the project locally on your machine with:
 
 ```shell
-$ git clone https://github.com/huaweicloud/osc
-$ cd osc
+$ git clone https://github.com/huaweicloud/xpanse
+$ cd xpanse
 ```
 
-First, you can build the whole OSC project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply
+First, you can build the whole xpanse project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply
 with:
 
 ```shell
@@ -40,14 +40,14 @@ only one plugin is active at a time.
 
 ```shell
 $ cd runtime/target
-$ java -jar osc-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=huaweicloud
+$ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=huaweicloud
 ```
 
 * for Openstack:
 
 ```shell
 $ cd runtime/target
-$ java -jar osc-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
+$ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
 By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image
@@ -58,7 +58,7 @@ $ cd runtime
 $ mvn clean install -Ddocker.skip=false
 ```
 
-We can start OSC runtime with a specific plugin by passing the plugin name in the profile name. For example to start
+We can start xpanse runtime with a specific plugin by passing the plugin name in the profile name. For example to start
 huaweicloud
 
 ```shell
@@ -86,11 +86,11 @@ You can see the log messages:
 
 ```
 
-The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST
+The Xpanse REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST
 API:
 
 ```shell
-$ curl -XGET http://localhost:8080/osc/health
+$ curl -XGET http://localhost:8080/xpanse/health
 ready
 ```
 
@@ -101,38 +101,36 @@ If you use `-Ddocker.skip=false` as option on the build command line, you have d
 You can see the docker images created:
 
 ```shell
-$ docker images|grep osc
-osc                   1.0.0-SNAPSHOT   4b716096304b   15 seconds ago   293MB
-osc                   latest           4b716096304b   15 seconds ago   293MB
+$ docker images|grep xpanse
+xpanse                   1.0.0-SNAPSHOT   4b716096304b   15 seconds ago   293MB
+xpanse                   latest           4b716096304b   15 seconds ago   293MB
 ```
 
 You can run a docker container with:
 
 ```shell
-$ docker run -d --name my-osc -p 8080:8080 osc
-$ docker logs my-osc
+$ docker run -d --name my-xpanse -p 8080:8080 xpanse
+$ docker logs my-xpanse
 ...
-  ___                     ____                  _                  ____ _                 _
- / _ \ _ __   ___ _ __   / ___|  ___ _ ____   _(_) ___ ___  ___   / ___| | ___  _   _  __| |
-| | | | '_ \ / _ \ '_ \  \___ \ / _ \ '__\ \ / / |/ __/ _ \/ __| | |   | |/ _ \| | | |/ _` |
-| |_| | |_) |  __/ | | |  ___) |  __/ |   \ V /| | (_|  __/\__ \ | |___| | (_) | |_| | (_| |
- \___/| .__/ \___|_| |_| |____/ \___|_|    \_/ |_|\___\___||___/  \____|_|\___/ \__,_|\__,_|
-      |_|
+   _  __   ____    ____ _   ____    _____  ___
+  | |/_/  / __ \  / __ `/  / __ \  / ___/ / _ \
+ _>  <   / /_/ / / /_/ /  / / / / (__  ) /  __/
+/_/|_|  / .___/  \__,_/  /_/ /_/ /____/  \___/
+       /_/
 
-        Open Services Cloud 1.0.0-SNAPSHOT (2023)
-11:14:08.843 [main] INFO  o.eclipse.osc.runtime.OscApplication - Starting OscApplication using Java 17.0.5 with PID 20664
-11:14:08.849 [main] INFO  o.eclipse.osc.runtime.OscApplication - No active profile set, falling back to 1 default profile: "default"
-11:14:10.600 [main] INFO  o.e.o.o.FileOrchestratorStorage - No other storage beans found. Using default file storage.
-11:14:11.641 [main] WARN  o.e.o.o.OrchestratorService - No OSC plugins are available
-11:14:11.644 [main] INFO  o.eclipse.osc.runtime.OscApplication - Started OscApplication in 3.252 seconds (process running for 3.818)
-
+        xpanse 1.0.0-SNAPSHOT (2023)
+13:44:19.633 [main] INFO  o.e.xpanse.runtime.XpanseApplication - Starting XpanseApplication using Java 17.0.5 with PID 7344
+13:44:19.645 [main] INFO  o.e.xpanse.runtime.XpanseApplication - No active profile set, falling back to 1 default profile: "default"
+13:44:22.211 [main] INFO  o.e.x.o.FileOrchestratorStorage - No other storage beans found. Using default file storage.
+13:44:23.878 [main] WARN  o.e.x.o.OrchestratorService - No xpanse plugins loaded by the runtime.
+13:44:23.886 [main] INFO  o.e.xpanse.runtime.XpanseApplication - Started XpanseApplication in 5.029 seconds (process running for 5.992)
 ```
 
 The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST
 API:
 
 ```shell
-$ curl -XGET http://localhost:8080/osc/health
+$ curl -XGET http://localhost:8080/xpanse/health
 ready
 ```
 
@@ -165,15 +163,15 @@ deployment.apps/osc created
 You can check the status of the deployment:
 
 ```shell
-$ kubectl get deployments -n osc
+$ kubectl get deployments -n xpanse
 NAME   READY   UP-TO-DATE   AVAILABLE   AGE
-osc    1/1     1            1           20s
+xpanse    1/1     1            1           20s
 ```
 
 and the associated pod running:
 
 ```shell
-$ kubectl get pods -n osc
+$ kubectl get pods -n xpanse
 NAME                   READY   STATUS    RESTARTS   AGE
 osc-8699fd7547-vj44p   1/1     Running   0          42s
 ```
@@ -184,13 +182,13 @@ We can now deploy the service exposing the port 8080 of the OSC runtime:
 
 ```shell
 $ kubectl apply -f runtime/src/main/kubernetes/org.eclipse.osc.service.yaml 
-service/osc created
+service/xpanse created
 ```
 
 and check that the port is currently bound on the NodePort:
 
 ```shell
-$ kubectl get services -n osc
+$ kubectl get services -n xpanse
 NAME   TYPE       CLUSTER-IP    EXTERNAL-IP   PORT(S)          AGE
 osc    NodePort   10.97.81.86   <none>        8080:32228/TCP   13s
 ```
@@ -198,7 +196,7 @@ osc    NodePort   10.97.81.86   <none>        8080:32228/TCP   13s
 We can now access the health endpoint of the OSC REST API:
 
 ```shell
-$ minikube service list -n osc
+$ minikube service list -n xpanse
 |-----------|------|-------------|---------------------------|
 | NAMESPACE | NAME | TARGET PORT |            URL            |
 |-----------|------|-------------|---------------------------|
@@ -209,8 +207,8 @@ $ minikube service list -n osc
 You can now point test the health endpoint:
 
 ```shell
-$ curl -XGET http://192.168.49.2:32228/osc/health
+$ curl -XGET http://192.168.49.2:32228/xpanse/health
 ready
 ```
 
-OSC is now ready on your Kubernetes cluster.
+Xpanse is now ready on your Kubernetes cluster.
