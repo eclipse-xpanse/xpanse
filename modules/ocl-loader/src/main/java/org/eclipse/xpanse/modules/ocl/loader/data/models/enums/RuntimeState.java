@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 
 /**
- * State for data.models in runtime.
+ * State for resources in runtime.
  */
 public enum RuntimeState {
     ACTIVE("active"),

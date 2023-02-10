@@ -38,7 +38,7 @@ public class CommonExceptionHandler {
             sb.append(fieldError.getField()).append("：").append(fieldError.getDefaultMessage())
                     .append(", ");
         }
-        return new ErrResponse(ErrCode.BAD_PARAMTERS, sb.toString());
+        return new ErrResponse(ErrCode.BAD_PARAMETERS, sb.toString());
     }
 
     /**
@@ -49,7 +49,7 @@ public class CommonExceptionHandler {
     @ResponseBody
     public ErrResponse handleConstraintViolationException(ConstraintViolationException ex) {
         String failMessage = ex.getMessage();
-        return new ErrResponse(ErrCode.BAD_PARAMTERS, failMessage);
+        return new ErrResponse(ErrCode.BAD_PARAMETERS, failMessage);
     }
 
     /**

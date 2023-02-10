@@ -18,7 +18,7 @@ public class CidrValidator implements ConstraintValidator<Cidr, String> {
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         try {
-            SubnetUtils subnetUtils = new SubnetUtils(value);
+            new SubnetUtils(value);
         } catch (IllegalArgumentException ex) {
             return false;
         }

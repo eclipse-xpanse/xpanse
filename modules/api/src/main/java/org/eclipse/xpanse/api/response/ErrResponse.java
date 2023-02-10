@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.api.response;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -14,7 +15,9 @@ import lombok.Data;
 @Data
 public class ErrResponse {
 
+    @NotNull
     private String code;
+    @NotNull
     private String errMsg;
 
     public ErrResponse(ErrCode errCode, String errMsg) {

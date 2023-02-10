@@ -19,14 +19,14 @@ public enum Category {
     STORAGE("storage"),
     NETWORK("network"),
     DATABASE("database"),
-    MEDIASERVICE("mediasService"),
+    MEDIA_SERVICE("mediasService"),
     SECURITY("security"),
     MIDDLEWARE("middleware");
 
-    private final String catelog;
+    private final String catalog;
 
-    Category(String catelog) {
-        this.catelog = catelog;
+    Category(String catalog) {
+        this.catalog = catalog;
     }
 
     /**
@@ -35,7 +35,7 @@ public enum Category {
     @JsonCreator
     public Category getByValue(String period) {
         for (Category category : values()) {
-            if (category.catelog.equals(StringUtils.lowerCase(period))) {
+            if (category.catalog.equals(StringUtils.lowerCase(period))) {
                 return category;
             }
         }
@@ -47,6 +47,6 @@ public enum Category {
      */
     @JsonValue
     public String toValue() {
-        return this.catelog;
+        return this.catalog;
     }
 }

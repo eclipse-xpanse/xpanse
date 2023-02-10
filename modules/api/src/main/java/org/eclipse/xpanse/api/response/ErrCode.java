@@ -11,10 +11,10 @@ package org.eclipse.xpanse.api.response;
  */
 public enum ErrCode {
     RUNTIME_ERROR("Common.0001", "Runtime failed"),
-    BAD_PARAMTERS("Common.0002", "Parameters invalid");
+    BAD_PARAMETERS("Common.0002", "Parameters invalid");
 
-    private String code;
-    private String errMsg;
+    private final String code;
+    private final String errMsg;
 
     ErrCode(String code, String errMsg) {
         this.code = code;
