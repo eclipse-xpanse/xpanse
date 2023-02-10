@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.StringReader;
@@ -34,7 +35,9 @@ public class Ocl {
 
     private static ObjectMapper theMapper = new ObjectMapper();
 
+    @NotNull
     @NotBlank
+    @NotEmpty
     @Schema(description = "Name of the service to be managed by xpanse")
     private String name;
 
@@ -44,6 +47,8 @@ public class Ocl {
     private Category category;
 
     @NotNull
+    @NotBlank
+    @NotEmpty
     @Schema(description = "The namespace of the managed service")
     private String namespace;
 
@@ -60,6 +65,7 @@ public class Ocl {
     private Network network;
 
     @Valid
+    @NotEmpty
     @Schema(description = "The storage resources for the managed service")
     private List<Storage> storages;
 

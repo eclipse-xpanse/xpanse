@@ -86,7 +86,7 @@ public class Ocl2HclTest {
         Vm vm = new Vm();
         vm.setName("my-vm");
         vm.setType("c7.large.4");
-        vm.setImage("51cc015c-a833-11ed-b62e-3ba0fb086b32");
+        vm.setImageId("51cc015c-a833-11ed-b62e-3ba0fb086b32");
 
         // Subnet JsonPath list
         List<String> subnetList = new ArrayList<>();

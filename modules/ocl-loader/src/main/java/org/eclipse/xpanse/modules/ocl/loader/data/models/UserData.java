@@ -8,7 +8,8 @@ package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.UserDataType;
@@ -19,11 +20,12 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.UserDataType;
 @Data
 public class UserData {
 
-    @NotBlank
+    @NotNull
     @Schema(description = "The type of the UserData, valid values: shell, powershell")
     private UserDataType type;
 
-    @NotBlank
+    @NotNull
+    @NotEmpty
     @Valid
     @Schema(description = "The commands of the UserData")
     private List<String> commands;

@@ -208,7 +208,7 @@ class Ocl2Hcl {
                     resource "huaweicloud_compute_instance" "%s" {
                       name = "%s\"""", vm.getName(), vm.getName()));
 
-            hcl.append("\n  image_id = \"").append(vm.getImage()).append("\"");
+            hcl.append("\n  image_id = \"").append(vm.getImageId()).append("\"");
             hcl.append("\n  flavor_id = \"").append(vm.getType()).append("\"");
 
             for (var subnetPath : vm.getSubnets()) {

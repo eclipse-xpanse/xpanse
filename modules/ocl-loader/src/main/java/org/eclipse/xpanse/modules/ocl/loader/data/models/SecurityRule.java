@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,7 +23,9 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.SecurityRuleProto
 @EqualsAndHashCode(callSuper = true)
 public class SecurityRule extends RuntimeBase {
 
+    @NotNull
     @NotBlank
+    @NotEmpty
     @Schema(description = "The name of the security rule")
     private String name;
 
@@ -35,6 +38,8 @@ public class SecurityRule extends RuntimeBase {
     private SecurityRuleProtocol protocol;
 
     @NotNull
+    @NotBlank
+    @NotEmpty
     @Schema(description = "The cidr for the security rule, for example: 192.168.9.0/24")
     private String cidr;
 
@@ -43,6 +48,8 @@ public class SecurityRule extends RuntimeBase {
     private SecurityRuleDirection direction;
 
     @NotNull
+    @NotBlank
+    @NotEmpty
     @Schema(description =
             "The ports for the security rule, for example: 80/1024-65536/80,8000,8080")
     private String ports;
