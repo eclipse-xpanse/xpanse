@@ -6,10 +6,14 @@
 
 package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.StorageSizeUnit;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.StorageType;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * Defines the storage requirements for a managed service.
@@ -18,9 +22,19 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.StorageType;
 @EqualsAndHashCode(callSuper = true)
 public class Storage extends RuntimeBase {
 
+    @Length(min = 3, max = 64)
+    @Schema(description = "The name of the storage")
     private String name;
+
+    @Schema(description = "The type of the storage, valid values: SSD,SAS")
     private StorageType type;
+
+    @Min(value = 1)
+    @Max(value = 1024)
+    @Schema(description = "The size of the storage, the unit is specified by @sizeUnit")
     private Integer size;
+
+    @Schema(description = "The sizeUnit of the storage, the size is specified by @size")
     private StorageSizeUnit sizeUnit;
 
 }

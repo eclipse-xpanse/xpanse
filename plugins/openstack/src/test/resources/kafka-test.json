@@ -1,6 +1,6 @@
 {
   "name": "apache-kafka",
-  "category": "streaming",
+  "category": "middleware",
   "namespace": "default",
   "compute": {
     "vms": [

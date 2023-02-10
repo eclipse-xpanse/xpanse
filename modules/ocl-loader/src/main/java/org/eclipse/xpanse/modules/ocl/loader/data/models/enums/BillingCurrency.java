@@ -14,13 +14,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Currency for Billing.
  */
 public enum BillingCurrency {
-    USD("USD"),
-    EUR("EUR"),
-    GBP("GBP"),
-    CAD("CAD"),
-    DEM("DEM"),
-    FRF("FRF"),
-    CNY("CNY");
+    USD("usd"),
+    EUR("euro"),
+    GBP("gbp"),
+    CAD("cad"),
+    DEM("dem"),
+    FRF("frf"),
+    CNY("cny");
 
     private final String currency;
 
