@@ -18,7 +18,6 @@ service:
 * **storage** abstracts the manipulation of storage volumes
 * **vpc** abstracts the manipulation of network devices
 * **billing** registers the business model in the cloud provider billing system
-* **console** plugin UI components for the service into the cloud provider console
 * ...
 
 ## Configuration Language

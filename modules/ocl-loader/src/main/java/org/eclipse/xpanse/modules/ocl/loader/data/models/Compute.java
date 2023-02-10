@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import jdk.jfr.Description;
 import lombok.Data;
@@ -17,7 +17,7 @@ import lombok.Data;
 @Data
 public class Compute {
 
-    @Size(min = 1)
+    @NotEmpty
     @Description("The VMs for the managed service")
     private List<Vm> vms;
 
