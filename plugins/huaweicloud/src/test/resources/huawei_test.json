@@ -14,7 +14,7 @@
       {
         "name": "xpanse-kafka-vm",
         "type": "c7.large.4",
-        "image": "a3ef71cc-a5e4-11ed-9ec8-13266ec44838",
+        "imageId": "a3ef71cc-a5e4-11ed-9ec8-13266ec44838",
         "subnets": [
           "$.network.subnets[0]"
         ],

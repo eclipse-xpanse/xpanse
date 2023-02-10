@@ -45,7 +45,7 @@ fundamental APIs:
       {
         "name": "my-vm",
         "type": "t2.large",
-        "image": "c7d4ff3e-a851-11ed-b9df-f329738732c0",
+        "imageId": "c7d4ff3e-a851-11ed-b9df-f329738732c0",
         "subnet": [
           "$.network.subnets[0]"
         ],

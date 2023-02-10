@@ -4,16 +4,17 @@ sidebar_position: 3
 
 # Configuration Language
 
-The Open Services Cloud Configuration Language allows you to describe your service and interaction with fundamentals
-services (computing, network, billing, ...).
+The Open Services Cloud Configuration Language allows you to describe your service and interaction
+with fundamentals services (computing, network, billing, ...).
 
 The first part of the OCL service descriptor is basically service metadata:
 
-* `name` is the name of the service, used to identify the service in the CSP catalog, user console, etc
-* `category` is the overall category of the service. It's especially use to integrate the service in the right menu of
-  the user console.
-* `namespace` is the location of the service. It could be in a CSP subdomain, in a region, and any kind of CSP
-  classification.
+* `name` is the name of the service, used to identify the service in the CSP catalog, user console,
+  etc
+* `category` is the overall category of the service. It's especially use to integrate the service in
+  the right menu of the user console.
+* `namespace` is the location of the service. It could be in a CSP subdomain, in a region, and any
+  kind of CSP classification.
 
 ### Billing
 
@@ -24,7 +25,8 @@ You can configure the business model associated to the service:
 * `model` defines the business model (`flat`, `exponential`, ...)
 * `period` defines the rental period (`daily`, `weekly`, `monthly`, `yearly`)
 * `currency` defines the billing currency (`euro`, `usd`, ...)
-* `fixedPrice` is the fixed price during the period (the price applied one shot whatever is the service use)
+* `fixedPrice` is the fixed price during the period (the price applied one shot whatever is the
+  service use)
 * `variablePrice` is the price depending of item volume
 
 ### Compute
@@ -35,10 +37,12 @@ This is the list of VMs used by the service. Each VM has:
 
 * `name` - (Required) The name of the VM.
 * `type` - (Required) The VM type, like `t2.large` for example.
-* `subnets` - (Required) A list of `JsonPath` of the `subnets`. The subnet for main Nic must be in the first place.
+* `subnets` - (Required) A list of `JsonPath` of the `subnets`. The subnet for main Nic must be in
+  the first place.
 * `securityGroups` - (Required) A list of `JsonPath` of `securityGroups`.
 * `storages` - (Required) A list of `JsonPath` of the `storages`.
-* `publicly` - (Required) The flag to indicate if the VM should be exposed on Internet (`true`) or only local (`false`).
+* `publicly` - (Required) The flag to indicate if the VM should be exposed on Internet (`true`) or
+  only local (`false`).
 
 ### Network
 
@@ -67,15 +71,18 @@ This is the list of securityGroup defined in the service network. Each securityG
 ##### SecurityRule
 
 * `name` - (Required) The name of the securityGroup rule, define in `securityGroups`.
-* `priority` - (Required) The priority of the securityGroup rule. The lower the priority number, the higher the priority of
-  the rule.
-* `protocol` - (Required) Network protocol this rule applies to. Possible values include: `tcp`,`udp`,`icmp`,`*`(which
-  matches all).
+* `priority` - (Required) The priority of the securityGroup rule. The lower the priority number, the
+  higher the priority of the rule.
+* `protocol` - (Required) Network protocol this rule applies to. Possible values include: `tcp`
+  ,`udp`,`icmp`,`*`(which matches all).
 * `cidr` - (Required) The IP address range this rule applies to. The `*` matches any IP.
-* `direction` - (Required) The direction of the network traffic. Possible values include: `in`,`out`.
-* `ports` - (Required) (Optional) Specifies the port value range, which supports single port (80), continuous port (
+* `direction` - (Required) The direction of the network traffic. Possible values include: `in`,`out`
+  .
+* `ports` - (Required) (Optional) Specifies the port value range, which supports single port (80),
+  continuous port (
   1-30) and discontinuous port (22, 3389, 80) The valid port values is range form 1 to 65,535.
-* `action` - (Required) Specifies whether network traffic is allowed or denied. Possible values include: `allow`,`deny`.
+* `action` - (Required) Specifies whether network traffic is allowed or denied. Possible values
+  include: `allow`,`deny`.
 
 ### Storages
 
@@ -101,7 +108,7 @@ This is the list of securityGroup defined in the service network. Each securityG
   "billing": {
     "model": "flat",
     "period": "monthly",
-    "currency": "EURO",
+    "currency": "euro",
     "fixedPrice": 20,
     "variablePrice": 10
   },
@@ -190,33 +197,33 @@ resource "osc_service" "myservice" {
 
   compute {
     vm {
-      name     = "my-vm"
-      type     = "t2.large"
-      platform = "linux-x64"
-      vpc      = "my-vpc"
-      subnet   = "my-subnet"
+      name          = "my-vm"
+      type          = "t2.large"
+      platform      = "linux-x64"
+      vpc           = "my-vpc"
+      subnet        = "my-subnet"
       securityGroup = "my-sg"
-      storage  = "my-storage"
-      publicly = true
+      storage       = "my-storage"
+      publicly      = true
     }
   }
 
   network {
     vpc {
-      name   = "my-vpc"
-      cidr  = "172.31.0.0/16"
+      name = "my-vpc"
+      cidr = "172.31.0.0/16"
     }
 
     subnet {
-      name   = "my-subnet"
-      vpc    = "my-vpc"
+      name = "my-subnet"
+      vpc  = "my-vpc"
     }
   }
 
   storage {
-    name = "my-storage"
-    type = "ssd"
-    size = "80"
+    name     = "my-storage"
+    type     = "ssd"
+    size     = "80"
     sizeUnit = "GB"
   }
 }

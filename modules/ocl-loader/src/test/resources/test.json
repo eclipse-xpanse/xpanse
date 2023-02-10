@@ -14,7 +14,7 @@
       {
         "name": "my-vm",
         "type": "t2.large",
-        "image": "0a1b67c0-a5e6-11ed-bfa0-5f9d465faaae",
+        "imageId": "0a1b67c0-a5e6-11ed-bfa0-5f9d465faaae",
         "subnets": [
           "$.network.subnets[0]"
         ],

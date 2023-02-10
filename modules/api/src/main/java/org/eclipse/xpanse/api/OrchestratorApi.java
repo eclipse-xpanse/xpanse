@@ -6,11 +6,13 @@
 
 package org.eclipse.xpanse.api;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/xpanse")
 public class OrchestratorApi {
+
     private final OrchestratorService orchestratorService;
 
     @Autowired
@@ -35,9 +38,9 @@ public class OrchestratorApi {
         this.orchestratorService = orchestratorService;
     }
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void register(@RequestBody Ocl ocl) throws Exception {
+    public void register(@Valid @RequestBody Ocl ocl) throws Exception {
         log.info("Registering managed service with name {}", ocl.getName());
         this.orchestratorService.registerManagedService(ocl);
     }
@@ -89,14 +92,14 @@ public class OrchestratorApi {
     @PutMapping("/update/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable("managedServiceName") String managedServiceName,
-                       @RequestBody Ocl ocl) throws Exception {
+            @RequestBody Ocl ocl) throws Exception {
         this.orchestratorService.updateManagedService(managedServiceName, ocl);
     }
 
     @PutMapping("/update/fetch/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable("managedServiceName") String managedServiceName,
-                       @RequestHeader(value = "ocl") String oclLocation) throws Exception {
+            @RequestHeader(value = "ocl") String oclLocation) throws Exception {
         this.orchestratorService.updateManagedService(managedServiceName, oclLocation);
     }
 

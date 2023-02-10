@@ -8,6 +8,8 @@ package org.eclipse.xpanse.modules.ocl.loader;
 
 import java.io.File;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.BillingCurrency;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.BillingPeriod;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,8 +32,8 @@ public class OclLoaderTest {
         Assertions.assertNotNull(ocl);
 
         Assertions.assertEquals("flat", ocl.getBilling().getModel());
-        Assertions.assertEquals("euro", ocl.getBilling().getCurrency());
-        Assertions.assertEquals("monthly", ocl.getBilling().getPeriod());
+        Assertions.assertEquals(BillingCurrency.EUR, ocl.getBilling().getCurrency());
+        Assertions.assertEquals(BillingPeriod.MONTHLY, ocl.getBilling().getPeriod());
         Assertions.assertEquals(20.0, ocl.getBilling().getFixedPrice());
         Assertions.assertEquals(10.0, ocl.getBilling().getVariablePrice());
     }

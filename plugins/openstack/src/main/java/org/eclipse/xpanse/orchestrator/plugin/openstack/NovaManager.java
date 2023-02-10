@@ -60,7 +60,7 @@ public class NovaManager {
                 .server()
                 .name(vm.getName())
                 .flavor(getVmFlavourId(vm.getType(), osClient))
-                .image(vm.getImage())
+                .image(vm.getImageId())
                 .networks(vm.getSubnets().stream()
                         .map(subnet -> this.neutronManager.getNetworkId(osClient, subnet)).collect(
                                 Collectors.toList()))

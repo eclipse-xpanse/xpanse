@@ -10,22 +10,24 @@ Let's discover **Open Services Cloud in less than 5 minutes**.
 
 **Open Services Cloud** is composed by:
 
-* an orchestrator responsible of the managed services (deployment, start, stop, ...) and loading plugins specific for
-  each supported cloud provider
+* an orchestrator responsible of the managed services (deployment, start, stop, ...) and loading
+  plugins specific for each supported cloud provider
 * a language describing managed services, called OCL (Open Services Cloud Configuration Language)
 * a REST API to interact with the orchestrator
-* runtime (eventually including cloud provider plugins) assemblying all components together in a running service
+* runtime (eventually including cloud provider plugins) assemblying all components together in a
+  running service
 
 Let's get started by **launching OSC runtime** and **deploying a simple managed service**.
 
-You will create a simple service descriptor and you will deploy to Open Services Cloud using the orchestrator REST API.
+You will create a simple service descriptor and you will deploy to Open Services Cloud using the
+orchestrator REST API.
 
 ### What you'll need
 
 You need a OSC runtime:
 
-* use the runtime provided by a cloud provider supporting Open Services Cloud (the cloud provider already have the
-  runtime and you can directly use the APIs)
+* use the runtime provided by a cloud provider supporting Open Services Cloud (the cloud provider
+  already have the runtime and you can directly use the APIs)
 * launch the runtime of your cloud infrastructure (on a VM or Kubernetes cluster for instance)
 * launch the runtime on your machine or cloud infrastructure.
 
@@ -49,7 +51,8 @@ The runtime is also available as Docker images. You can run a Docker container w
 $ docker run -d --name my-runtime -p 8080:8080 osc
 ```
 
-OS also provides Kubernetes manifest files allowing you to easily deploy on K8S using `kubectl apply -f`.
+OS also provides Kubernetes manifest files allowing you to easily deploy on K8S
+using `kubectl apply -f`.
 
 Take a look on [runtime documentation](runtime) for details.
 
@@ -72,7 +75,7 @@ For example, here's a very simple service descriptor:
   "billing": {
     "model": "flat",
     "period": "monthly",
-    "currency": "EURO",
+    "currency": "euro",
     "fixedPrice": 20,
     "variablePrice": 10
   },
@@ -143,7 +146,8 @@ For example, here's a very simple service descriptor:
 
 ## Deploy the service
 
-To actually deploy the service, you have to submit the **json file** to the **Open Services Cloud orchestrator**.
+To actually deploy the service, you have to submit the **json file** to the **Open Services Cloud
+orchestrator**.
 
 The orchestrator supports several channels:
 

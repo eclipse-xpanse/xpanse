@@ -1,13 +1,13 @@
 {
   "name": "apache-kafka",
-  "category": "streaming",
+  "category": "middleware",
   "namespace": "default",
   "compute": {
     "vms": [
       {
         "name": "xpanse-kafka-vm",
         "type": "m1.medium",
-        "image": "3519889b-25ed-4d1a-a893-8563d5d005a9",
+        "imageId": "3519889b-25ed-4d1a-a893-8563d5d005a9",
         "subnets": [
           "external"
         ],
