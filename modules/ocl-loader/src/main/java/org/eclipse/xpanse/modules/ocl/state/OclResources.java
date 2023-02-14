@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.ocl.state;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import org.eclipse.xpanse.modules.ocl.state.OclResource;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
 
 /**
  * List of OclResources.
@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.ocl.state.OclResource;
 @Data
 public class OclResources {
 
-    String state = "inactive";
+    RuntimeState state = RuntimeState.INACTIVE;
     List<OclResource> resources = new ArrayList<>();
 
 }

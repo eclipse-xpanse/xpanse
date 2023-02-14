@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.terraform;
 
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
 import org.eclipse.xpanse.modules.ocl.state.OclResource;
 
 class TfResource extends OclResource {
@@ -20,7 +21,7 @@ class TfResource extends OclResource {
             TfResourceSchema tfResourceSchema, TfStateResource tfStateResource) {
         var attrs = tfStateResource.getInstances().get(0).getAttributes();
         setId(attrs.get("id").toString());
-        setState("active");
+        setState(RuntimeState.ACTIVE);
         if (tfResourceSchema != null) {
             setType(tfResourceSchema.oclType);
             for (TfProperty key : tfResourceSchema.getOutput()) {

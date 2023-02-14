@@ -6,7 +6,8 @@
 
 package org.eclipse.xpanse.orchestrator;
 
-import java.util.Set;
+import java.util.List;
+import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 
 /**
  * Interface to be implemented by all runtime storage providers.
@@ -14,51 +15,47 @@ import java.util.Set;
 public interface OrchestratorStorage {
 
     /**
-     * Add a managed service id in the store.
+     * Add or upate managed service data to database.
      *
-     * @param sid the managed service id.
+     * @param serviceStatusEntity the managed service id.
      */
-    void store(String sid);
+    void store(ServiceStatusEntity serviceStatusEntity);
 
     /**
      * Add a plugin level key-value pair in the store.
      *
-     * @param pluginName the name of the OrchestratorPlugin.
-     * @param sid        the managed service id.
-     * @param key        the property key to store
-     * @param value      the property value to store
+     * @param managedServiceName name of the managed service stored in DB.
      */
-    void store(String sid, String pluginName, String key, String value);
+    boolean isExists(String managedServiceName);
+
+    boolean isManagedServiceByNameAndPluginExists(
+            String managedServiceName, OrchestratorPlugin orchestratorPlugin);
 
     /**
-     * Add a plugin level key-value pair in the store.
+     * Method to get database entry based on service name and plugin.
      *
-     * @param pluginName the name of the OrchestratorPlugin.
-     * @param sid        the managed service id.
-     * @param key        the property key to store
+     * @param managedServiceName Name of the managed service.
+     * @param orchestratorPlugin Name of the plugin used to deploy the managed service.
+     * @return Returns the database entry for the provided arguments.
      */
-    String getKey(String sid, String pluginName, String key);
+    ServiceStatusEntity getServiceDetailsByNameAndPlugin(
+            String managedServiceName, OrchestratorPlugin orchestratorPlugin);
 
     /**
-     * Check if a managed service id is present in the store.
+     * Method to get database entry based on the service name.
      *
-     * @param sid the managed service id.
-     * @return true if the service is present in the store, false else.
+     * @param managedServiceName Name of the managed service.
+     * @return Returns the database entry for the provided arguments.
      */
-    boolean exists(String sid);
+    ServiceStatusEntity getServiceDetailsByName(String managedServiceName);
 
     /**
-     * Get the list of managed service id from the store.
+     * Method to get all stored database entries.
      *
-     * @return the list of managed service id.
+     * @return Returns all rows from the service status database table.
      */
-    Set<String> services();
+    List<ServiceStatusEntity> services();
 
-    /**
-     * Remove a managed service id from the store.
-     *
-     * @param sid the managed service id.
-     */
-    void remove(String sid);
+    void remove(String managedServiceName, OrchestratorPlugin orchestratorPlugin);
 
 }

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.api.exceptions;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.eclipse.xpanse.api.response.ErrCode;
 import org.eclipse.xpanse.api.response.ErrResponse;
@@ -56,8 +57,16 @@ public class CommonExceptionHandler {
      * Exception handler for RuntimeException.
      */
     @ExceptionHandler({RuntimeException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrResponse handleRuntimeException(RuntimeException ex) {
         String failMessage = ex.getMessage();
         return new ErrResponse(ErrCode.RUNTIME_ERROR, failMessage);
+    }
+
+    @ExceptionHandler({EntityNotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrResponse handleNotFoundException(EntityNotFoundException ex) {
+        String failMessage = ex.getMessage();
+        return new ErrResponse(ErrCode.BAD_PARAMETERS, failMessage);
     }
 }
