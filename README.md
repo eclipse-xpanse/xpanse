@@ -131,6 +131,22 @@ The runtime embeds and run together:
 2. the OCL loader and parser
 3. the frontends (REST API, ...)
 
+## Database
+
+The default database attached to the runtime is the H2 in-memory database. The same can be replaced with other production
+ready database systems by replacing the configurations mentioned below and by adding relevant maven dependencies.
+
+```
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto= update
+```
+
 ### Build and Package
 
 First, you can build the whole xpanse project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply

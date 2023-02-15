@@ -6,16 +6,16 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
 import org.eclipse.xpanse.modules.ocl.state.OclResources;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorStorage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -28,44 +28,50 @@ import org.springframework.stereotype.Component;
 @Profile(value = "huaweicloud")
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final Map<String, Ocl> managedOcl = new HashMap<>();
-
     private final Environment environment;
 
     private final OrchestratorStorage orchestratorStorage;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final ApplicationContext context;
 
+    /**
+     * Default constructor for the HuaweiCloudOrchestratorPlugin bean.
+     *
+     * @param environment Environment bean from Spring framework
+     * @param orchestratorStorage Orchestrator storage bean
+     * @param context Application context of the Spring framework
+     */
     @Autowired
     public HuaweiCloudOrchestratorPlugin(Environment environment,
-            OrchestratorStorage orchestratorStorage) {
+                                         OrchestratorStorage orchestratorStorage,
+                                         ApplicationContext context) {
         this.environment = environment;
         this.orchestratorStorage = orchestratorStorage;
+        this.context = context;
     }
 
     @Override
     public void registerManagedService(Ocl ocl) {
-        log.info("Register managed service, creating  Huawei Cloud resource");
-        if (ocl == null) {
-            throw new IllegalArgumentException("registering invalid ocl. ocl = null");
-        }
-        managedOcl.put(ocl.getName(), ocl);
+        log.info("Register managed service for HuaweiCloud");
     }
 
     @Override
     public void updateManagedService(String managedServiceName, Ocl ocl) {
-        log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
-        if (ocl == null) {
-            throw new IllegalArgumentException("Invalid ocl. ocl = null");
+        if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
+                managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
+            throw new IllegalArgumentException(
+                    "Service with name " + managedServiceName + " is not registered.");
         }
-        managedOcl.put(managedServiceName, ocl);
+        log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
     }
 
     @Override
     public void startManagedService(String managedServiceName) {
         log.info("Start managed service {} on Huawei Cloud", managedServiceName);
-        if (!managedOcl.containsKey(managedServiceName)) {
-            throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
+        if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
+                managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
+            throw new EntityNotFoundException(
+                    "Service with name " + managedServiceName + " is not registered.");
         }
 
         Ocl ocl = getOcl(managedServiceName);
@@ -77,12 +83,12 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         ctx.setEnvironment(this.environment);
 
         OclResources oclResources = getOclResources(managedServiceName);
-        if (oclResources != null && oclResources.getState().equals("active")) {
+        if (oclResources != null && oclResources.getState() == RuntimeState.ACTIVE) {
             log.info("Managed service {} already in active.", managedServiceName);
             return;
         }
 
-        ctx.getOclResources().setState("building");
+        ctx.getOclResources().setState(RuntimeState.BUILDING);
         storeOclResources(managedServiceName, ctx.getOclResources());
 
         try {
@@ -93,15 +99,17 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
             basicBuilder.rollback(ctx);
             throw ex;
         }
-        ctx.getOclResources().setState("active");
+        ctx.getOclResources().setState(RuntimeState.ACTIVE);
         storeOclResources(managedServiceName, ctx.getOclResources());
     }
 
     @Override
     public void stopManagedService(String managedServiceName) {
         log.info("Stop managed service {} on Huawei Cloud", managedServiceName);
-        if (!managedOcl.containsKey(managedServiceName)) {
-            throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
+        if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
+                managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
+            throw new EntityNotFoundException(
+                    "Service with name " + managedServiceName + " is not registered.");
         }
 
         Ocl ocl = getOcl(managedServiceName);
@@ -121,55 +129,29 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public void unregisterManagedService(String managedServiceName) {
         log.info("Destroy managed service {} from Huawei Cloud", managedServiceName);
-        if (!managedOcl.containsKey(managedServiceName)) {
-            throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
+        if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
+                managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
+            throw new EntityNotFoundException(
+                    "Service with name " + managedServiceName + " is not registered.");
         }
-        managedOcl.remove(managedServiceName);
     }
 
     private Ocl getOcl(String managedServiceName) {
-        Ocl ocl = managedOcl.get(managedServiceName).deepCopy();
-        if (ocl == null) {
-            throw new IllegalStateException("Ocl object is null.");
-        }
-
-        return ocl;
+        return this.orchestratorStorage.getServiceDetailsByNameAndPlugin(
+                        managedServiceName,
+                        this.context.getBean(HuaweiCloudOrchestratorPlugin.class))
+                .getOcl().deepCopy();
     }
 
     private void storeOclResources(String managedServiceName, OclResources oclResources) {
-        String oclResourceStr;
-        try {
-            oclResourceStr =
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(oclResources);
-        } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("Serial OCL object to json failed.", ex);
-        }
-
-        if (this.orchestratorStorage != null) {
-            this.orchestratorStorage.store(managedServiceName,
-                    HuaweiCloudOrchestratorPlugin.class.getSimpleName(), "state", oclResourceStr);
-        } else {
-            log.warn("storage is null.");
-        }
+        ServiceStatusEntity serviceStatusEntity = this.orchestratorStorage.getServiceDetailsByName(
+                managedServiceName);
+        serviceStatusEntity.setResources(oclResources);
+        this.orchestratorStorage.store(serviceStatusEntity);
     }
 
     private OclResources getOclResources(String managedServiceName) {
-        OclResources oclResources;
-        String oclResourceStr;
-        if (this.orchestratorStorage != null) {
-            oclResourceStr = this.orchestratorStorage.getKey(managedServiceName,
-                    HuaweiCloudOrchestratorPlugin.class.getSimpleName(), "state");
-        } else {
-            return null;
-        }
-
-        try {
-            oclResources = objectMapper.readValue(oclResourceStr, OclResources.class);
-        } catch (JsonProcessingException ex) {
-            log.error("Serial OCL object to json failed.", ex);
-            oclResources = new OclResources();
-        }
-
-        return oclResources;
+        return this.orchestratorStorage.getServiceDetailsByName(
+                managedServiceName).getResources();
     }
 }

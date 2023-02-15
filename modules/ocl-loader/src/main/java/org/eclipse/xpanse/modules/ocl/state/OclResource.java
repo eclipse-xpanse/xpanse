@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.ocl.state;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
 
 /**
  * Describes the list of resources that are deployed as part of managed service deployment.
@@ -16,7 +17,7 @@ import lombok.Data;
 @Data
 public class OclResource {
 
-    String state = "inactive";
+    RuntimeState state = RuntimeState.INACTIVE;
     String id = "";
     String type = "";
     String name = "";
