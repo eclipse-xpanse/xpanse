@@ -11,6 +11,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
@@ -33,7 +37,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrchestratorService implements ApplicationListener<ApplicationEvent> {
 
+    private static final int STATUS_MSG_MAX_LENGTH = 255;
+
+    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+
+    public static ThreadPoolExecutor executorService = new ThreadPoolExecutor(CPU_COUNT * 2,
+        CPU_COUNT * 4, 300, TimeUnit.SECONDS, new LinkedBlockingDeque<>(100));
+
     private final DatabaseOrchestratorStorage databaseOrchestratorStorage;
+
     private final OclLoader oclLoader;
 
     @Getter
@@ -41,7 +53,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     @Autowired
     public OrchestratorService(OclLoader oclLoader,
-                               DatabaseOrchestratorStorage databaseOrchestratorStorage) {
+        DatabaseOrchestratorStorage databaseOrchestratorStorage) {
         this.oclLoader = oclLoader;
         this.databaseOrchestratorStorage = databaseOrchestratorStorage;
     }
@@ -50,11 +62,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public void onApplicationEvent(ApplicationEvent event) {
         if (event instanceof ContextRefreshedEvent) {
             ApplicationContext applicationContext =
-                    ((ContextRefreshedEvent) event).getApplicationContext();
+                ((ContextRefreshedEvent) event).getApplicationContext();
             plugins.addAll(applicationContext.getBeansOfType(OrchestratorPlugin.class).values());
             if (plugins.size() > 1) {
                 throw new RuntimeException("More than one xpanse plugin found. "
-                        + "Only one plugin can be active at a time.");
+                    + "Only one plugin can be active at a time.");
             }
             if (plugins.isEmpty()) {
                 log.warn("No xpanse plugins loaded by the runtime.");
@@ -79,18 +91,21 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
      * @param ocl the OCL descriptor.
      */
     public void registerManagedService(Ocl ocl) {
+        if (this.databaseOrchestratorStorage.isExists(ocl.getName())) {
+            throw new RuntimeException(
+                "Managed service " + ocl.getName() + " already registered.");
+        }
         if (plugins.isEmpty()) {
             log.warn("No plugins available. Request ignored.");
-            return;
+            throw new RuntimeException("No plugins available.");
         }
-
         for (OrchestratorPlugin plugin : plugins) {
             try {
                 plugin.registerManagedService(ocl);
                 this.databaseOrchestratorStorage.store(getNewServiceStatusEntity(plugin, ocl));
             } catch (RuntimeException exception) {
                 this.databaseOrchestratorStorage.store(
-                        getFailedServiceStatusEntity(plugin, ocl, exception));
+                    getFailedServiceStatusEntity(plugin, ocl, exception));
                 throw exception;
             }
         }
@@ -104,7 +119,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
      * @throws Exception if the update fails.
      */
     public void updateManagedService(String managedServiceName, String oclLocation)
-            throws Exception {
+        throws Exception {
         Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
         updateManagedService(managedServiceName, ocl);
     }
@@ -118,14 +133,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public void updateManagedService(String managedServiceName, Ocl ocl) {
         if (!this.databaseOrchestratorStorage.isExists(managedServiceName)) {
             throw new EntityNotFoundException(
-                    "Managed service " + managedServiceName + " not found");
+                "Managed service " + managedServiceName + " not found");
         }
         for (OrchestratorPlugin orchestratorPlugin : plugins) {
             try {
                 ServiceStatusEntity serviceStatusEntity =
-                        this.databaseOrchestratorStorage.getServiceDetailsByNameAndPlugin(
-                                managedServiceName,
-                                orchestratorPlugin);
+                    this.databaseOrchestratorStorage.getServiceDetailsByNameAndPlugin(
+                        managedServiceName, orchestratorPlugin);
                 serviceStatusEntity.setServiceState(ServiceState.UPDATING);
                 this.databaseOrchestratorStorage.store(serviceStatusEntity);
                 orchestratorPlugin.updateManagedService(managedServiceName, ocl);
@@ -133,7 +147,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
                 this.databaseOrchestratorStorage.store(serviceStatusEntity);
             } catch (RuntimeException exception) {
                 this.databaseOrchestratorStorage.store(getFailedServiceStatusEntity(
-                        orchestratorPlugin, ocl, exception));
+                    orchestratorPlugin, ocl, exception));
                 throw exception;
             }
         }
@@ -147,23 +161,41 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public void startManagedService(String managedServiceName) {
         if (!this.databaseOrchestratorStorage.isExists(managedServiceName)) {
             throw new EntityNotFoundException(
-                    "Managed service " + managedServiceName + " not found");
+                "Managed service " + managedServiceName + " not found");
         }
+        int inBuildingCount = 0;
         for (OrchestratorPlugin orchestratorPlugin : plugins) {
             ServiceStatusEntity serviceStatusEntity =
-                    this.databaseOrchestratorStorage.getServiceDetailsByNameAndPlugin(
-                            managedServiceName,
-                            orchestratorPlugin);
+                this.databaseOrchestratorStorage.getServiceDetailsByNameAndPlugin(
+                    managedServiceName,
+                    orchestratorPlugin);
+            if (Objects.nonNull(serviceStatusEntity.getServiceState())) {
+                if (serviceStatusEntity.getServiceState().equals(ServiceState.STARTED)
+                    || serviceStatusEntity.getServiceState().equals(ServiceState.STARTING)) {
+                    log.warn("Managed service:{} is starting or started in plugin:{}",
+                        managedServiceName,
+                        orchestratorPlugin.getClass().getSimpleName());
+                    inBuildingCount++;
+                    if (inBuildingCount >= plugins.size()) {
+                        throw new RuntimeException(
+                            "Managed service " + managedServiceName
+                                + " is starting or already started");
+                    }
+                    continue;
+                }
+            }
             try {
                 serviceStatusEntity.setServiceState(ServiceState.STARTING);
                 this.databaseOrchestratorStorage.store(serviceStatusEntity);
-                orchestratorPlugin.startManagedService(managedServiceName);
-                serviceStatusEntity.setServiceState(ServiceState.STARTED);
-                this.databaseOrchestratorStorage.store(serviceStatusEntity);
-
+                executorService.execute(
+                    () -> {
+                        Thread.currentThread().setName(orchestratorPlugin.getClass().getSimpleName()
+                            + "_startManagedService_" + managedServiceName);
+                        orchestratorPlugin.startManagedService(managedServiceName);
+                    });
             } catch (RuntimeException exception) {
                 this.databaseOrchestratorStorage.store(getFailedServiceStatusEntity(
-                        orchestratorPlugin, serviceStatusEntity.getOcl(), exception));
+                    orchestratorPlugin, serviceStatusEntity.getOcl(), exception));
                 throw exception;
             }
         }
@@ -178,20 +210,19 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public void stopManagedService(String managedServiceName) {
         if (!this.databaseOrchestratorStorage.isExists(managedServiceName)) {
             throw new EntityNotFoundException(
-                    "Managed service " + managedServiceName + " not found");
+                "Managed service " + managedServiceName + " not found");
         }
         for (OrchestratorPlugin orchestratorPlugin : plugins) {
             ServiceStatusEntity serviceStatusEntity =
-                    this.databaseOrchestratorStorage.getServiceDetailsByNameAndPlugin(
-                            managedServiceName,
-                            orchestratorPlugin);
+                this.databaseOrchestratorStorage.getServiceDetailsByNameAndPlugin(
+                    managedServiceName, orchestratorPlugin);
             try {
                 orchestratorPlugin.stopManagedService(managedServiceName);
                 serviceStatusEntity.setServiceState(ServiceState.STOPPED);
                 this.databaseOrchestratorStorage.store(serviceStatusEntity);
             } catch (RuntimeException exception) {
                 this.databaseOrchestratorStorage.store(getFailedServiceStatusEntity(
-                        orchestratorPlugin, serviceStatusEntity.getOcl(), exception));
+                    orchestratorPlugin, serviceStatusEntity.getOcl(), exception));
                 throw exception;
             }
 
@@ -207,13 +238,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public void unregisterManagedService(String managedServiceName) {
         if (!this.databaseOrchestratorStorage.isExists(managedServiceName)) {
             throw new EntityNotFoundException(
-                    "Managed service " + managedServiceName + " not found");
+                "Managed service " + managedServiceName + " not found");
         }
         for (OrchestratorPlugin orchestratorPlugin : plugins) {
             ServiceStatusEntity serviceStatusEntity =
-                    this.databaseOrchestratorStorage.getServiceDetailsByNameAndPlugin(
-                            managedServiceName,
-                            orchestratorPlugin);
+                this.databaseOrchestratorStorage.getServiceDetailsByNameAndPlugin(
+                    managedServiceName,
+                    orchestratorPlugin);
             try {
                 serviceStatusEntity.setServiceState(ServiceState.DELETING);
                 this.databaseOrchestratorStorage.store(serviceStatusEntity);
@@ -221,7 +252,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
                 this.databaseOrchestratorStorage.remove(managedServiceName, orchestratorPlugin);
             } catch (RuntimeException exception) {
                 this.databaseOrchestratorStorage.store(getFailedServiceStatusEntity(
-                        orchestratorPlugin, serviceStatusEntity.getOcl(), exception));
+                    orchestratorPlugin, serviceStatusEntity.getOcl(), exception));
                 throw exception;
             }
 
@@ -236,11 +267,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public ServiceStatus getManagedServiceState(String managedServiceName) {
         if (!this.databaseOrchestratorStorage.isExists(managedServiceName)) {
             throw new EntityNotFoundException(
-                    "Managed service " + managedServiceName + " not found");
+                "Managed service " + managedServiceName + " not found");
         }
 
         return getServiceStatusFromEntity(
-                this.databaseOrchestratorStorage.getServiceDetailsByName(managedServiceName));
+            this.databaseOrchestratorStorage.getServiceDetailsByName(managedServiceName));
     }
 
     /**
@@ -251,13 +282,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public List<ServiceStatus> getStoredServices() {
         List<ServiceStatus> serviceStatuses = new ArrayList<>(Collections.emptyList());
         this.databaseOrchestratorStorage.services()
-                .forEach(serviceStatusEntity -> serviceStatuses.add(
-                        getServiceStatusFromEntity(serviceStatusEntity)));
+            .forEach(serviceStatusEntity -> serviceStatuses.add(
+                getServiceStatusFromEntity(serviceStatusEntity)));
         return serviceStatuses;
     }
 
     private ServiceStatusEntity getNewServiceStatusEntity(OrchestratorPlugin orchestratorPlugin,
-                                                          Ocl ocl) {
+        Ocl ocl) {
         ServiceStatusEntity serviceStatusEntity = new ServiceStatusEntity();
         serviceStatusEntity.setServiceName(ocl.getName());
         serviceStatusEntity.setServiceState(ServiceState.REGISTERED);
@@ -267,13 +298,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     }
 
     private ServiceStatusEntity getFailedServiceStatusEntity(OrchestratorPlugin orchestratorPlugin,
-                                                             Ocl ocl, Exception exception) {
+        Ocl ocl, Exception exception) {
         ServiceStatusEntity serviceStatusEntity = new ServiceStatusEntity();
         serviceStatusEntity.setServiceName(ocl.getName());
         serviceStatusEntity.setServiceState(ServiceState.FAILED);
         serviceStatusEntity.setOcl(ocl);
         serviceStatusEntity.setPluginName(orchestratorPlugin.getClass().getSimpleName());
-        serviceStatusEntity.setStatusMessage(exception.getMessage());
+        serviceStatusEntity.setStatusMessage(getValidErrorMsg(exception.getMessage()));
         return serviceStatusEntity;
     }
 
@@ -283,5 +314,12 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         serviceStatus.setServiceState(serviceStatusEntity.getServiceState());
         serviceStatus.setStatusMessage(serviceStatusEntity.getStatusMessage());
         return serviceStatus;
+    }
+
+    private String getValidErrorMsg(String errorMsg) {
+        if (errorMsg.length() > STATUS_MSG_MAX_LENGTH) {
+            return errorMsg.substring(0, STATUS_MSG_MAX_LENGTH - 1);
+        }
+        return errorMsg;
     }
 }

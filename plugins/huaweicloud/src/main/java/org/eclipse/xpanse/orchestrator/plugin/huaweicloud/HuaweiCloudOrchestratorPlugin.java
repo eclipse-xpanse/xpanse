@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.ocl.state.OclResources;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorStorage;
@@ -28,6 +29,8 @@ import org.springframework.stereotype.Component;
 @Profile(value = "huaweicloud")
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
+    private static final int STATUS_MSG_MAX_LENGTH = 255;
+
     private final Environment environment;
 
     private final OrchestratorStorage orchestratorStorage;
@@ -37,14 +40,14 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     /**
      * Default constructor for the HuaweiCloudOrchestratorPlugin bean.
      *
-     * @param environment Environment bean from Spring framework
+     * @param environment         Environment bean from Spring framework
      * @param orchestratorStorage Orchestrator storage bean
-     * @param context Application context of the Spring framework
+     * @param context             Application context of the Spring framework
      */
     @Autowired
     public HuaweiCloudOrchestratorPlugin(Environment environment,
-                                         OrchestratorStorage orchestratorStorage,
-                                         ApplicationContext context) {
+        OrchestratorStorage orchestratorStorage,
+        ApplicationContext context) {
         this.environment = environment;
         this.orchestratorStorage = orchestratorStorage;
         this.context = context;
@@ -52,15 +55,15 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public void registerManagedService(Ocl ocl) {
-        log.info("Register managed service for HuaweiCloud");
+        log.info("Register managed service:{} for HuaweiCloud", ocl.getName());
     }
 
     @Override
     public void updateManagedService(String managedServiceName, Ocl ocl) {
         if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
-                managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
+            managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
             throw new IllegalArgumentException(
-                    "Service with name " + managedServiceName + " is not registered.");
+                "Service with name " + managedServiceName + " is not registered.");
         }
         log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
     }
@@ -69,11 +72,14 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public void startManagedService(String managedServiceName) {
         log.info("Start managed service {} on Huawei Cloud", managedServiceName);
         if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
-                managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
+            managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
             throw new EntityNotFoundException(
-                    "Service with name " + managedServiceName + " is not registered.");
+                "Service with name " + managedServiceName + " is not registered.");
         }
-
+        ServiceStatusEntity serviceStatusEntity =
+            this.orchestratorStorage.getServiceDetailsByNameAndPlugin(
+                managedServiceName,
+                this.context.getBean(HuaweiCloudOrchestratorPlugin.class));
         Ocl ocl = getOcl(managedServiceName);
         BuilderFactory factory = new BuilderFactory();
         AtomBuilder envBuilder = factory.createBuilder(BuilderFactory.ENV_BUILDER, ocl);
@@ -90,26 +96,38 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
         ctx.getOclResources().setState(RuntimeState.BUILDING);
         storeOclResources(managedServiceName, ctx.getOclResources());
-
+        boolean buildSuccess = true;
         try {
             envBuilder.build(ctx);
             basicBuilder.build(ctx);
         } catch (Exception ex) {
+            buildSuccess = false;
+            String errorMsg = getValidErrorMsg(ex.getMessage());
+            serviceStatusEntity.setStatusMessage(errorMsg);
+        }
+        if (buildSuccess) {
+            serviceStatusEntity.setServiceState(ServiceState.STARTED);
+            this.orchestratorStorage.store(serviceStatusEntity);
+            ctx.getOclResources().setState(RuntimeState.ACTIVE);
+            storeOclResources(managedServiceName, ctx.getOclResources());
+        } else {
             envBuilder.build(ctx);
             basicBuilder.rollback(ctx);
-            throw ex;
+            serviceStatusEntity.setServiceState(ServiceState.FAILED);
+            this.orchestratorStorage.store(serviceStatusEntity);
+            ctx.getOclResources().setState(RuntimeState.INACTIVE);
+            storeOclResources(managedServiceName, ctx.getOclResources());
         }
-        ctx.getOclResources().setState(RuntimeState.ACTIVE);
-        storeOclResources(managedServiceName, ctx.getOclResources());
+
     }
 
     @Override
     public void stopManagedService(String managedServiceName) {
         log.info("Stop managed service {} on Huawei Cloud", managedServiceName);
         if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
-                managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
+            managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
             throw new EntityNotFoundException(
-                    "Service with name " + managedServiceName + " is not registered.");
+                "Service with name " + managedServiceName + " is not registered.");
         }
 
         Ocl ocl = getOcl(managedServiceName);
@@ -130,28 +148,36 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public void unregisterManagedService(String managedServiceName) {
         log.info("Destroy managed service {} from Huawei Cloud", managedServiceName);
         if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
-                managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
+            managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
             throw new EntityNotFoundException(
-                    "Service with name " + managedServiceName + " is not registered.");
+                "Service with name " + managedServiceName + " is not registered.");
         }
     }
 
     private Ocl getOcl(String managedServiceName) {
         return this.orchestratorStorage.getServiceDetailsByNameAndPlugin(
-                        managedServiceName,
-                        this.context.getBean(HuaweiCloudOrchestratorPlugin.class))
-                .getOcl().deepCopy();
+                managedServiceName,
+                this.context.getBean(HuaweiCloudOrchestratorPlugin.class))
+            .getOcl().deepCopy();
     }
 
     private void storeOclResources(String managedServiceName, OclResources oclResources) {
         ServiceStatusEntity serviceStatusEntity = this.orchestratorStorage.getServiceDetailsByName(
-                managedServiceName);
+            managedServiceName);
         serviceStatusEntity.setResources(oclResources);
         this.orchestratorStorage.store(serviceStatusEntity);
     }
 
     private OclResources getOclResources(String managedServiceName) {
         return this.orchestratorStorage.getServiceDetailsByName(
-                managedServiceName).getResources();
+            managedServiceName).getResources();
+    }
+
+    private String getValidErrorMsg(String errorMsg) {
+        if (errorMsg.length() > STATUS_MSG_MAX_LENGTH) {
+            return errorMsg.substring(0, STATUS_MSG_MAX_LENGTH - 1);
+        }
+        return errorMsg;
     }
 }
+

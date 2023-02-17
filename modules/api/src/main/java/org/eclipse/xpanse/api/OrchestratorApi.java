@@ -9,6 +9,7 @@ package org.eclipse.xpanse.api;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
@@ -46,16 +47,23 @@ public class OrchestratorApi {
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public void register(@Valid @RequestBody Ocl ocl) {
+    public Response register(@Valid @RequestBody Ocl ocl) {
         log.info("Registering managed service with name {}", ocl.getName());
         this.orchestratorService.registerManagedService(ocl);
+        String successMsg = String.format("Managed service %s registered successfully",
+            ocl.getName());
+        return Response.successResponse(successMsg);
     }
 
     @PostMapping("/register/fetch")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public void fetch(@RequestHeader(value = "ocl") String oclLocation) throws Exception {
+    public Response fetch(@RequestHeader(value = "ocl") String oclLocation) throws Exception {
+        log.info("Registering managed service with Url {}", oclLocation);
         this.orchestratorService.registerManagedService(oclLocation);
+        String successMsg = String.format("Managed service with URL %s registered successfully",
+            oclLocation);
+        return Response.successResponse(successMsg);
     }
 
     /**
@@ -91,31 +99,47 @@ public class OrchestratorApi {
     @PostMapping("/start/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public void start(@PathVariable("managedServiceName") String managedServiceName) {
+    public Response start(@PathVariable("managedServiceName") String managedServiceName) {
+        log.info("Starting managed service with name {}", managedServiceName);
         this.orchestratorService.startManagedService(managedServiceName);
+        String successMsg = String.format("Managed service %s starting successfully",
+            managedServiceName);
+        return Response.successResponse(successMsg);
     }
 
     @PostMapping("/stop/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public void stop(@PathVariable("managedServiceName") String managedServiceName) {
+    public Response stop(@PathVariable("managedServiceName") String managedServiceName) {
+        log.info("Stopping managed service with name {}", managedServiceName);
         this.orchestratorService.stopManagedService(managedServiceName);
+        String successMsg = String.format("Managed service %s stopped successfully",
+            managedServiceName);
+        return Response.successResponse(successMsg);
     }
 
     @PutMapping("/update/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public void update(@PathVariable("managedServiceName") String managedServiceName,
-            @RequestBody Ocl ocl) {
+    public Response update(@PathVariable("managedServiceName") String managedServiceName,
+        @RequestBody Ocl ocl) {
+        log.info("Updating managed service with name {}", managedServiceName);
         this.orchestratorService.updateManagedService(managedServiceName, ocl);
+        String successMsg = String.format("Managed service %s updated successfully",
+            managedServiceName);
+        return Response.successResponse(successMsg);
     }
 
     @PutMapping("/update/fetch/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public void update(@PathVariable("managedServiceName") String managedServiceName,
-            @RequestHeader(value = "ocl") String oclLocation) throws Exception {
+    public Response update(@PathVariable("managedServiceName") String managedServiceName,
+        @RequestHeader(value = "ocl") String oclLocation) throws Exception {
+        log.info("Updating managed service {} with url {}", managedServiceName, oclLocation);
         this.orchestratorService.updateManagedService(managedServiceName, oclLocation);
+        String successMsg = String.format("Managed service %s updated with url %s successfully",
+            managedServiceName, oclLocation);
+        return Response.successResponse(successMsg);
     }
 
 }
