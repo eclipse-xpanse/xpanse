@@ -222,7 +222,7 @@ export default function App() {
             <Content vms={vms} setVms={setVms} items={items} setItems={setItems} treeData={treeData} setTreeData={setTreeData} registries={registries} setRegistries={setRegistries} containers={containers} setContainers={setContainers} rds={rds} setRds={setRds} kafka={kafka} setKafka={setKafka} kubernetes={kubernetes} setKubernetes={setKubernetes} rancher={rancher} setRancher={setRancher} cassandra={cassandra} setCassandra={setCassandra} activemq={activemq} setActivemq={setActivemq} pulsar={pulsar} setPulsar={setPulsar} vmTypes={vmTypes} user={user} />
             <Layout.Footer>©2022 Eclipse Foundation - Open Services Cloud</Layout.Footer>
           </Layout>
-        </Router
+        </Router>
       </Layout>
     );
   } else {
