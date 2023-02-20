@@ -1,0 +1,49 @@
+.logo {
+  height: 48px;
+  margin: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  color: white;
+  font-size: large;
+}
+.logo > a {
+  text-decoration: none;
+  color: white;
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
+[data-theme='dark'] .site-layout .site-layout-background {
+  background: #141414;
+}
+.layout {
+  min-height: 100vh !important;
+}
+.site-layout {
+  padding: 0 50px !important;
+}
+.ant-layout-sider-children > svg {
+  margin: auto;
+}
+.ant-breadcrumb {
+  margin: 16px 0px !important;
+}
+.site-layout-background {
+  padding: 24px !important;
+  min-height: 360px !important;
+}
+.ant-layout-footer {
+  text-align: center !important;
+}
+.header-menu {
+  float: right;
+  position: relative;
+}
+
+.header-menu-items {
+  float: right;
+  position: absolute;
+  margin: 0;
+}
