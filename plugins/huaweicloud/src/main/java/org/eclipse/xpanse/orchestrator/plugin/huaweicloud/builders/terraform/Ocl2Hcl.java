@@ -80,7 +80,7 @@ class Ocl2Hcl {
                                     resource "huaweicloud_networking_secgroup_rule" "%s_%d" {
                                       security_group_id = huaweicloud_networking_secgroup.%s.id
                                       direction         = "%s"
-                                      ethertype         = "IPV4"
+                                      ethertype         = "IPv4"
                                       protocol          = "%s"
                                       port_range_min    = "%s"
                                       port_range_max    = "%s"
@@ -133,7 +133,7 @@ class Ocl2Hcl {
                       name = "%s"
                       cidr = "%s"
                     }
-
+                                    
                     """, vpc.getName(), vpc.getName(), vpc.getCidr()));
         }
         return hcl.toString();
@@ -197,10 +197,13 @@ class Ocl2Hcl {
 
         StringBuilder hcl = new StringBuilder();
 
-        hcl.append("""
-                resource "huaweicloud_compute_keypair" "xpanse-keypair" {
-                  name = "xpanse-keypair"
-                }""");
+        hcl.append(String.format("""
+                            
+                resource "huaweicloud_compute_keypair" "xpanse-keypair-%s" {
+                  name = "xpanse-keypair-%s"
+                }
+                """, ocl.getName(), ocl.getName())
+        );
 
         for (var vm : ocl.getCompute().getVms()) {
             hcl.append(String.format("""
@@ -218,7 +221,7 @@ class Ocl2Hcl {
                                 .append(value.getName()).append(".id\n  }"));
             }
 
-            hcl.append("\n  key_pair = \"xpanse-keypair\"");
+            hcl.append(String.format("\n  key_pair = \"xpanse-keypair-%s\"", ocl.getName()));
             hcl.append("\n  user_data = \"#cloud-config\\nruncmd:\\n");
 
             for (String command : vm.getUserData().getCommands()) {

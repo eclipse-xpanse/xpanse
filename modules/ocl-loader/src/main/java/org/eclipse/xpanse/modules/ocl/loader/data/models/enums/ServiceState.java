@@ -15,14 +15,17 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum ServiceState {
 
+    REGISTERING("registering"),
     REGISTERED("registered"),
+    STARTING("starting"),
     STARTED("started"),
-    FAILED("failed"),
     DELETING("deleting"),
+    DELETED("deleted"),
+    STOPPING("stopping"),
     STOPPED("stopped"),
     UPDATING("updating"),
     UPDATED("updated"),
-    STARTING("starting");
+    FAILED("failed");
 
     private final String serviceState;
 

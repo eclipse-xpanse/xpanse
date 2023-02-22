@@ -9,7 +9,7 @@ package org.eclipse.xpanse.api.exceptions;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.eclipse.xpanse.api.response.ErrCode;
-import org.eclipse.xpanse.api.response.ErrResponse;
+import org.eclipse.xpanse.api.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -32,14 +32,14 @@ public class CommonExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         StringBuilder sb = new StringBuilder();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             sb.append(fieldError.getField()).append("：").append(fieldError.getDefaultMessage())
-                    .append(", ");
+                .append(", ");
         }
-        return new ErrResponse(ErrCode.BAD_PARAMETERS, sb.toString());
+        return Response.errorResponse(ErrCode.BAD_PARAMETERS, sb.toString());
     }
 
     /**
@@ -48,9 +48,9 @@ public class CommonExceptionHandler {
     @ExceptionHandler({ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrResponse handleConstraintViolationException(ConstraintViolationException ex) {
+    public Response handleConstraintViolationException(ConstraintViolationException ex) {
         String failMessage = ex.getMessage();
-        return new ErrResponse(ErrCode.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ErrCode.BAD_PARAMETERS, failMessage);
     }
 
     /**
@@ -58,15 +58,22 @@ public class CommonExceptionHandler {
      */
     @ExceptionHandler({RuntimeException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrResponse handleRuntimeException(RuntimeException ex) {
+    public Response handleRuntimeException(RuntimeException ex) {
         String failMessage = ex.getMessage();
-        return new ErrResponse(ErrCode.RUNTIME_ERROR, failMessage);
+        return Response.errorResponse(ErrCode.RUNTIME_ERROR, failMessage);
     }
 
     @ExceptionHandler({EntityNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrResponse handleNotFoundException(EntityNotFoundException ex) {
+    public Response handleNotFoundException(EntityNotFoundException ex) {
         String failMessage = ex.getMessage();
-        return new ErrResponse(ErrCode.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ErrCode.BAD_PARAMETERS, failMessage);
+    }
+
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response handleException(Exception ex) {
+        String failMessage = ex.getClass().getName() + ":" + ex.getMessage();
+        return Response.errorResponse(ErrCode.RUNTIME_ERROR, failMessage);
     }
 }
