@@ -10,3 +10,5 @@ bin
 dependency-reduced-pom.xml
 .apt_generated_tests
 *.iml
+/node_modules
+.history
