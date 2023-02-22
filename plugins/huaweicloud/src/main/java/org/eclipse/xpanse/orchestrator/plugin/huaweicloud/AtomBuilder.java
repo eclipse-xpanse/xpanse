@@ -100,7 +100,6 @@ public abstract class AtomBuilder {
      */
     public boolean build(BuilderContext ctx) {
         setState(BuilderState.RUNNING);
-
         for (AtomBuilder subBuilder : subBuilders) {
             if (!subBuilder.build(ctx)) {
                 setState(BuilderState.FAILED);
@@ -108,23 +107,19 @@ public abstract class AtomBuilder {
                 return false;
             }
         }
-
         if (!waitSubBuilders()) {
             log.error("Wait sub builders failed.");
             return false;
         }
-
         if (subBuilders.stream().anyMatch(builder -> builder.getState() == BuilderState.FAILED)) {
             setState(BuilderState.FAILED);
             // Todo: give out the specified failed reason with setLastFail().
             return false;
         }
-
         if (!create(ctx)) {
             setState(BuilderState.FAILED);
             return false;
         }
-
         setState(BuilderState.SUCCESS);
         return true;
     }

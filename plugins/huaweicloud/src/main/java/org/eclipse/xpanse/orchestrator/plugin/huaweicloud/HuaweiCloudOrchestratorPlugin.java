@@ -28,6 +28,8 @@ import org.springframework.stereotype.Component;
 @Profile(value = "huaweicloud")
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
+    private static final int STATUS_MSG_MAX_LENGTH = 255;
+
     private final Environment environment;
 
     private final OrchestratorStorage orchestratorStorage;
@@ -37,14 +39,14 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     /**
      * Default constructor for the HuaweiCloudOrchestratorPlugin bean.
      *
-     * @param environment Environment bean from Spring framework
+     * @param environment         Environment bean from Spring framework
      * @param orchestratorStorage Orchestrator storage bean
-     * @param context Application context of the Spring framework
+     * @param context             Application context of the Spring framework
      */
     @Autowired
     public HuaweiCloudOrchestratorPlugin(Environment environment,
-                                         OrchestratorStorage orchestratorStorage,
-                                         ApplicationContext context) {
+            OrchestratorStorage orchestratorStorage,
+            ApplicationContext context) {
         this.environment = environment;
         this.orchestratorStorage = orchestratorStorage;
         this.context = context;
@@ -52,7 +54,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public void registerManagedService(Ocl ocl) {
-        log.info("Register managed service for HuaweiCloud");
+        log.info("Register managed service:{} for HuaweiCloud", ocl.getName());
     }
 
     @Override
@@ -73,7 +75,6 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
             throw new EntityNotFoundException(
                     "Service with name " + managedServiceName + " is not registered.");
         }
-
         Ocl ocl = getOcl(managedServiceName);
         BuilderFactory factory = new BuilderFactory();
         AtomBuilder envBuilder = factory.createBuilder(BuilderFactory.ENV_BUILDER, ocl);
@@ -87,20 +88,23 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
             log.info("Managed service {} already in active.", managedServiceName);
             return;
         }
-
-        ctx.getOclResources().setState(RuntimeState.BUILDING);
-        storeOclResources(managedServiceName, ctx.getOclResources());
-
         try {
+            ctx.getOclResources().setState(RuntimeState.BUILDING);
+            storeOclResources(managedServiceName, ctx.getOclResources());
+
             envBuilder.build(ctx);
             basicBuilder.build(ctx);
+
+            ctx.getOclResources().setState(RuntimeState.ACTIVE);
+            storeOclResources(managedServiceName, ctx.getOclResources());
         } catch (Exception ex) {
             envBuilder.build(ctx);
             basicBuilder.rollback(ctx);
+
+            ctx.getOclResources().setState(RuntimeState.INACTIVE);
+            storeOclResources(managedServiceName, ctx.getOclResources());
             throw ex;
         }
-        ctx.getOclResources().setState(RuntimeState.ACTIVE);
-        storeOclResources(managedServiceName, ctx.getOclResources());
     }
 
     @Override
@@ -154,4 +158,12 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         return this.orchestratorStorage.getServiceDetailsByName(
                 managedServiceName).getResources();
     }
+
+    private String getValidErrorMsg(String errorMsg) {
+        if (errorMsg.length() > STATUS_MSG_MAX_LENGTH) {
+            return errorMsg.substring(0, STATUS_MSG_MAX_LENGTH - 1);
+        }
+        return errorMsg;
+    }
 }
+

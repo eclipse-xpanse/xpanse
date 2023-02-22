@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 public enum RuntimeState {
     ACTIVE("active"),
     INACTIVE("inactive"),
-
     BUILDING("building");
 
     private final String state;

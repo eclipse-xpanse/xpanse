@@ -5,17 +5,17 @@
   -->
 
 <configuration>
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <Pattern>
-                %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
-            </Pattern>
-        </encoder>
-    </appender>
-    <logger name="org.eclipse.xpanse" level="info" additivity="false">
-        <appender-ref ref="Console"/>
-    </logger>
-    <root level="error">
-        <appender-ref ref="Console"/>
-    </root>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="Console">
+    <encoder>
+      <Pattern>
+        %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} [%X{SERVICE_ID} %X{PLUGIN_NAME} %X{TASK_TYPE} %X{SERVICE_NAME}]- %msg%n
+      </Pattern>
+    </encoder>
+  </appender>
+  <logger additivity="false" level="info" name="org.eclipse.xpanse">
+    <appender-ref ref="Console"/>
+  </logger>
+  <root level="error">
+    <appender-ref ref="Console"/>
+  </root>
 </configuration>

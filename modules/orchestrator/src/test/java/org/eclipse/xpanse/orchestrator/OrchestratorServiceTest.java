@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 import org.eclipse.xpanse.modules.database.ServiceStatusRepository;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
@@ -47,6 +48,7 @@ public class OrchestratorServiceTest {
 
         orchestratorService.registerManagedService("file:./target/test-classes/test.json");
         ServiceStatusEntity serviceStatusEntity = new ServiceStatusEntity();
+        serviceStatusEntity.setId(UUID.randomUUID());
         serviceStatusEntity.setServiceName("test-service");
         serviceStatusEntity.setPluginName(PluginTest.class.getSimpleName());
         when(this.serviceStatusRepository.findAll()).thenReturn(List.of(serviceStatusEntity));
