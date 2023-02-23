@@ -11,7 +11,7 @@ function clearStorage(navigate: NavigateFunction): void {
 function Logout(): JSX.Element {
   const navigate = useNavigate();
   return (
-    <Space wrap>
+    <Space wrap={true}>
       <Button type="link" onClick={() => clearStorage(navigate)} icon={<PoweroffOutlined />} block={true} size="small">
         LogOut
       </Button>
