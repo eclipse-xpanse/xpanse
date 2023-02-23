@@ -38,12 +38,14 @@
   text-align: center !important;
 }
 .header-menu {
-  float: right;
-  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  column-gap: 30px;
+  justify-content: flex-end;
 }
 
-.header-menu-items {
-  float: right;
-  position: absolute;
-  margin: 0;
+.header-menu-botton {
+  box-shadow: none;
+  border: none;
 }
