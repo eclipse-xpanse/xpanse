@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.v2.Oclv2;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * REST interface methods for processing OCL.
@@ -61,6 +63,24 @@ public class OrchestratorApi {
         String successMsg = String.format(
                 "Managed service %s registered success.", ocl.getName());
         return Response.successResponse(successMsg);
+    }
+
+    /**
+     * Register new managed service.
+     *
+     * @param ocl object of managed service.
+     * @return response
+     */
+    @PostMapping(value = "/v2/register",
+            consumes = {"application/x-yaml", "application/yml", "application/yaml"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    public Response register2(@Valid @RequestBody Oclv2 ocl) {
+        log.info("Registering managed service with name {}", ocl.getName());
+        String successMsg = String.format(
+                "Managed service %s registered success.", ocl.getName());
+        return Response.successResponse("success");
     }
 
     /**
