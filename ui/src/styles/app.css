@@ -38,9 +38,10 @@
 .header-menu {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
   column-gap: 30px;
   justify-content: flex-end;
+  align-items: center;
+  margin-top: 30px;
 }
 
 .header-menu-botton {
