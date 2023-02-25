@@ -1,20 +1,23 @@
 import { UserOutlined } from '@ant-design/icons';
-import { Dropdown, Layout, Space } from 'antd';
+import { Dropdown, Space } from 'antd';
+import { Header } from 'antd/es/layout/layout';
 import { usernameKey } from '../../utils/constants';
+import SystemStatusBar from './SystemStatusBar';
 import items from './headerUserMenuItems';
 
 function LayoutHeader(): JSX.Element {
   return (
-    <Layout.Header style={{ width: '100%', background: '#ffffff' }}>
+    <Header style={{ width: '100%', background: '#ffffff' }}>
       <div className="header-menu">
+        <SystemStatusBar />
         <Dropdown menu={{ items }} placement="topRight">
           <Space>
-            {localStorage.getItem(usernameKey)}
             <UserOutlined />
+            {localStorage.getItem(usernameKey)}
           </Space>
         </Dropdown>
       </div>
-    </Layout.Header>
+    </Header>
   );
 }
 

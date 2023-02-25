@@ -1,0 +1,467 @@
+{
+  "openapi": "3.0.1",
+  "info": { "title": "OpenAPI definition", "version": "v0" },
+  "servers": [{ "url": "http://localhost:8080", "description": "Generated server url" }],
+  "paths": {
+    "/xpanse/update/{managedServiceName}": {
+      "put": {
+        "tags": ["orchestrator-api"],
+        "operationId": "update",
+        "parameters": [
+          { "name": "managedServiceName", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Ocl" } } },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/xpanse/update/fetch/{managedServiceName}": {
+      "put": {
+        "tags": ["orchestrator-api"],
+        "operationId": "update_1",
+        "parameters": [
+          { "name": "managedServiceName", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "ocl", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/xpanse/stop/{managedServiceName}": {
+      "post": {
+        "tags": ["orchestrator-api"],
+        "operationId": "stop",
+        "parameters": [
+          { "name": "managedServiceName", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/xpanse/start/{managedServiceName}": {
+      "post": {
+        "tags": ["orchestrator-api"],
+        "operationId": "start",
+        "parameters": [
+          { "name": "managedServiceName", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/xpanse/register": {
+      "post": {
+        "tags": ["orchestrator-api"],
+        "operationId": "register",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Ocl" } } },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/xpanse/register/fetch": {
+      "post": {
+        "tags": ["orchestrator-api"],
+        "operationId": "fetch",
+        "parameters": [{ "name": "ocl", "in": "header", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/xpanse/services": {
+      "get": {
+        "tags": ["orchestrator-api"],
+        "operationId": "services",
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceStatus" } } }
+            }
+          }
+        }
+      }
+    },
+    "/xpanse/services/state/{managedServiceName}": {
+      "get": {
+        "tags": ["orchestrator-api"],
+        "operationId": "state",
+        "parameters": [
+          { "name": "managedServiceName", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ServiceStatus" } } }
+          }
+        }
+      }
+    },
+    "/xpanse/health": {
+      "get": {
+        "tags": ["orchestrator-api"],
+        "operationId": "health",
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrResponse" } } }
+          },
+          "200": {
+            "description": "OK",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SystemStatus" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrResponse": {
+        "required": ["code", "errMsg"],
+        "type": "object",
+        "properties": { "code": { "type": "string" }, "errMsg": { "type": "string" } }
+      },
+      "Billing": {
+        "required": ["currency", "fixedPrice", "model", "period", "variablePrice"],
+        "type": "object",
+        "properties": {
+          "model": { "type": "string" },
+          "period": { "type": "string", "enum": ["daily", "weekly", "monthly", "quarterly", "yearly"] },
+          "currency": { "type": "string", "enum": ["usd", "euro", "gbp", "cad", "dem", "frf", "cny"] },
+          "fixedPrice": { "type": "number", "format": "double" },
+          "variablePrice": { "type": "number", "format": "double" }
+        },
+        "description": "The billing of the managed service"
+      },
+      "Compute": {
+        "required": ["vms"],
+        "type": "object",
+        "properties": { "vms": { "type": "array", "items": { "$ref": "#/components/schemas/Vm" } } },
+        "description": "The compute resources for the managed service"
+      },
+      "Network": {
+        "required": ["securityGroups", "subnets", "vpc"],
+        "type": "object",
+        "properties": {
+          "vpc": {
+            "type": "array",
+            "description": "The list of vpc in the network",
+            "items": { "$ref": "#/components/schemas/Vpc" }
+          },
+          "subnets": {
+            "type": "array",
+            "description": "The list of subnets in the network for the @vpc",
+            "items": { "$ref": "#/components/schemas/Subnet" }
+          },
+          "securityGroups": {
+            "type": "array",
+            "description": "The list of security groups for the VMs",
+            "items": { "$ref": "#/components/schemas/SecurityGroup" }
+          }
+        },
+        "description": "The network resources for the managed service"
+      },
+      "Ocl": {
+        "required": ["category", "name", "namespace", "storages"],
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Name of the service to be managed by xpanse" },
+          "category": {
+            "type": "string",
+            "description": "The category of the managed service",
+            "enum": [
+              "compute",
+              "container",
+              "storage",
+              "network",
+              "database",
+              "mediasService",
+              "security",
+              "middleware"
+            ]
+          },
+          "namespace": { "type": "string", "description": "The namespace of the managed service" },
+          "billing": { "$ref": "#/components/schemas/Billing" },
+          "compute": { "$ref": "#/components/schemas/Compute" },
+          "network": { "$ref": "#/components/schemas/Network" },
+          "storages": {
+            "type": "array",
+            "description": "The storage resources for the managed service",
+            "items": { "$ref": "#/components/schemas/Storage" }
+          }
+        }
+      },
+      "SecurityGroup": {
+        "required": ["name", "rules"],
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the security group" },
+          "rules": {
+            "type": "array",
+            "description": "The list of the security rules",
+            "items": { "$ref": "#/components/schemas/SecurityRule" }
+          }
+        },
+        "description": "The list of security groups for the VMs"
+      },
+      "SecurityRule": {
+        "required": ["action", "cidr", "direction", "name", "ports", "priority", "protocol"],
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the security rule" },
+          "priority": { "type": "integer", "description": "The priority of the security rule", "format": "int32" },
+          "protocol": {
+            "type": "string",
+            "description": "The protocol of the security rule, valid values: tcp,udp",
+            "enum": ["tcp", "udp"]
+          },
+          "cidr": { "type": "string", "description": "The cidr for the security rule, for example: 192.168.9.0/24" },
+          "direction": {
+            "type": "string",
+            "description": "The direction for the security rule, valid values: in,out",
+            "enum": ["in", "out"]
+          },
+          "ports": {
+            "type": "string",
+            "description": "The ports for the security rule, for example: 80/1024-65536/80,8000,8080"
+          },
+          "action": {
+            "type": "string",
+            "description": "The action for the security rule, valid values: allow,deny",
+            "enum": ["allow", "deny"]
+          }
+        },
+        "description": "The list of the security rules"
+      },
+      "Storage": {
+        "required": ["name", "sizeUnit", "type"],
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the storage" },
+          "type": {
+            "type": "string",
+            "description": "The type of the storage, valid values: SSD,SAS",
+            "enum": ["SSD", "SAS"]
+          },
+          "size": {
+            "maximum": 1024,
+            "minimum": 1,
+            "type": "integer",
+            "description": "The size of the storage, the unit is specified by @sizeUnit",
+            "format": "int32"
+          },
+          "sizeUnit": {
+            "type": "string",
+            "description": "The sizeUnit of the storage, the size is specified by @size",
+            "enum": ["KB", "MB", "GB", "TB", "PB"]
+          }
+        },
+        "description": "The storage resources for the managed service"
+      },
+      "Subnet": {
+        "required": ["cidr", "name", "vpc"],
+        "type": "object",
+        "properties": {
+          "vpc": { "type": "string", "description": "The vpc which the subnet belongs to" },
+          "name": { "type": "string", "description": "The name of the subnet" },
+          "cidr": { "type": "string", "description": "The cidr of the subnet, for example: 192.168.9.0/24" }
+        },
+        "description": "The list of subnets in the network for the @vpc"
+      },
+      "UserData": {
+        "required": ["commands", "type"],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the UserData, valid values: shell, powershell",
+            "enum": ["shell", "powershell"]
+          },
+          "commands": {
+            "type": "array",
+            "description": "The commands of the UserData",
+            "items": { "type": "string", "description": "The commands of the UserData" }
+          }
+        },
+        "description": "The userData for the VM"
+      },
+      "Vm": {
+        "required": ["imageId", "name", "publicly", "securityGroups", "storages", "subnets", "type"],
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the VM" },
+          "type": {
+            "type": "string",
+            "description": "The type of the VM, It should not be same for different Cloud provider."
+          },
+          "imageId": {
+            "type": "string",
+            "description": "The image id for the VM, for example: 3f4b7f78-a8f4-11ed-9e3c-d3d3ca352d5e"
+          },
+          "subnets": {
+            "type": "array",
+            "description": "The subnets for the VM",
+            "items": { "type": "string", "description": "The subnets for the VM" }
+          },
+          "securityGroups": {
+            "type": "array",
+            "description": "The security groups for the VM",
+            "items": { "type": "string", "description": "The security groups for the VM" }
+          },
+          "storages": {
+            "type": "array",
+            "description": "The storages for the VM",
+            "items": { "type": "string", "description": "The storages for the VM" }
+          },
+          "publicly": { "type": "boolean", "description": "The publicly means either the VM needs a public ip" },
+          "userData": { "$ref": "#/components/schemas/UserData" }
+        }
+      },
+      "Vpc": {
+        "required": ["cidr", "name"],
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the vpc" },
+          "cidr": { "type": "string", "description": "The cidr of the vpc, for example: 192.168.1.0/24" }
+        },
+        "description": "The list of vpc in the network"
+      },
+      "ServiceStatus": {
+        "required": ["serviceName", "serviceState"],
+        "type": "object",
+        "properties": {
+          "serviceName": { "type": "string", "description": "The name of the service" },
+          "serviceState": {
+            "type": "string",
+            "description": "Current status of the service",
+            "enum": ["registered", "started", "failed", "deleting", "stopped", "updating", "updated", "starting"]
+          },
+          "statusMessage": {
+            "type": "string",
+            "description": "Status message. Contains the reason in case the deployment has failed."
+          }
+        }
+      },
+      "SystemStatus": {
+        "required": ["healthStatus"],
+        "type": "object",
+        "properties": { "healthStatus": { "type": "string", "enum": ["OK", "NOK"] } }
+      }
+    }
+  }
+}
