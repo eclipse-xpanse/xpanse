@@ -1,21 +1,20 @@
 import { PoweroffOutlined } from '@ant-design/icons';
-import { Button, Space } from 'antd';
+import { Button } from 'antd';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { loginPageRoute } from '../utils/constants';
 
 function clearStorage(navigate: NavigateFunction): void {
   localStorage.clear();
   console.log('navigate');
-  navigate('/login');
+  navigate(loginPageRoute);
 }
 
 function Logout(): JSX.Element {
   const navigate = useNavigate();
   return (
-    <Space wrap>
-      <Button type="link" onClick={() => clearStorage(navigate)} icon={<PoweroffOutlined />} block={true} size="small">
-        LogOut
-      </Button>
-    </Space>
+    <Button type="link" onClick={() => clearStorage(navigate)} icon={<PoweroffOutlined />} block={true} size="small">
+      LogOut
+    </Button>
   );
 }
 
