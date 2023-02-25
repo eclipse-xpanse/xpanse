@@ -19,31 +19,32 @@
   background: #141414;
 }
 .layout {
-  min-height: 100vh !important;
+  min-height: 100vh;
 }
 .site-layout {
-  padding: 0 50px !important;
+  padding: 0 50px;
 }
 .ant-layout-sider-children > svg {
   margin: auto;
 }
-.ant-breadcrumb {
-  margin: 16px 0px !important;
-}
+
 .site-layout-background {
-  padding: 24px !important;
-  min-height: 360px !important;
+  padding: 24px;
+  min-height: 360px;
 }
 .ant-layout-footer {
-  text-align: center !important;
+  text-align: center;
 }
 .header-menu {
-  float: right;
-  position: relative;
+  display: flex;
+  flex-direction: row;
+  column-gap: 30px;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 30px;
 }
 
-.header-menu-items {
-  float: right;
-  position: absolute;
-  margin: 0;
+.header-menu-botton {
+  box-shadow: none;
+  border: none;
 }
