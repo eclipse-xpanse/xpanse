@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.ocl.loader.data.models.v2;
+package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

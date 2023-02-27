@@ -7,10 +7,11 @@
 package org.eclipse.xpanse.orchestrator;
 
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Oclv2;
 
 /**
- * This interface describes orchestrator plugin in charge of interacting with
- * backend fundamental APIs.
+ * This interface describes orchestrator plugin in charge of interacting with backend fundamental
+ * APIs.
  */
 public interface OrchestratorPlugin {
 
@@ -22,12 +23,27 @@ public interface OrchestratorPlugin {
     void registerManagedService(Ocl ocl);
 
     /**
+     * Register a managed service using the provided OCL descriptor.
+     *
+     * @param ocl the OCL model describing the managed service.
+     */
+    void registerManagedService(Oclv2 ocl);
+
+    /**
      * Update an existing managed service using the provided OCL descriptor.
      *
      * @param managedServiceName the managed service to update, identified by the given name.
      * @param ocl                the OCL descriptor to update the managed service.
      */
     void updateManagedService(String managedServiceName, Ocl ocl);
+
+    /**
+     * Update an existing managed service using the provided OCL descriptor.
+     *
+     * @param managedServiceName the managed service to update, identified by the given name.
+     * @param ocl                the OCL descriptor to update the managed service.
+     */
+    void updateManagedService(String managedServiceName, Oclv2 ocl);
 
     /**
      * Start (exposing the managed service to the users) the managed service.

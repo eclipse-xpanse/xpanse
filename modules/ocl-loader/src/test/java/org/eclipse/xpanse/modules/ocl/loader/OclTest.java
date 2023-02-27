@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.Storage;
 import org.junit.jupiter.api.Test;
 
 public class OclTest {
+
     @Test
     public void testDeepCopyAnEmptyOcl() throws Exception {
         Ocl ocl = new Ocl();

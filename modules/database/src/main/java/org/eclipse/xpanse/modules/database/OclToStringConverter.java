@@ -13,8 +13,8 @@ import jakarta.persistence.Converter;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 
 /**
- * Converter to handle Ocl data type and string automatic conversion between database
- * and the entity.
+ * Converter to handle Ocl data type and string automatic conversion between database and the
+ * entity.
  */
 @Converter
 public class OclToStringConverter implements AttributeConverter<Ocl, String> {

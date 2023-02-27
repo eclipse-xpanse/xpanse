@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Oclv2;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorStorage;
 import org.openstack4j.api.OSClient;
@@ -41,9 +42,9 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Autowired
     public OpenstackOrchestratorPlugin(KeystoneManager keystoneManager, NovaManager novaManager,
-                                       NeutronManager neutronManager,
-                                       OrchestratorStorage orchestratorStorage,
-                                       ApplicationContext applicationContext) {
+            NeutronManager neutronManager,
+            OrchestratorStorage orchestratorStorage,
+            ApplicationContext applicationContext) {
         log.info("Loading OpenstackOrchestratorPlugin");
         this.keystoneManager = keystoneManager;
         this.novaManager = novaManager;
@@ -58,7 +59,17 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    public void registerManagedService(Oclv2 ocl) {
+        log.info("Registering service " + ocl.getName() + "for openstack plugin");
+    }
+
+    @Override
     public void updateManagedService(String managedServiceName, Ocl ocl) {
+        log.info("Updating managed service {} on openstack", managedServiceName);
+    }
+
+    @Override
+    public void updateManagedService(String managedServiceName, Oclv2 ocl) {
         log.info("Updating managed service {} on openstack", managedServiceName);
     }
 

@@ -13,8 +13,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Deployer kinds.
  */
 public enum DeployerKind {
-    TERRAFORM("terraform"),
-    PULUMI("pulumi");
+    TERRAFORM("terraform");
 
     private final String type;
 

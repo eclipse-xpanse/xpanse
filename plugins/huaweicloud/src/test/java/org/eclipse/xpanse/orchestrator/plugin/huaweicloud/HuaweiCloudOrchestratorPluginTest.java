@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.xpanse.modules.database.ServiceStatusRepository;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.orchestrator.DatabaseOrchestratorStorage;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
@@ -32,6 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles(value = {"huaweicloud", "test"})
 @SpringBootTest
 public class HuaweiCloudOrchestratorPluginTest {
+
     @Autowired
     HuaweiCloudOrchestratorPlugin huaweiCloudOrchestratorPlugin;
     @Autowired
@@ -45,7 +47,7 @@ public class HuaweiCloudOrchestratorPluginTest {
     @Test()
     public void illegalTest() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> huaweiCloudOrchestratorPlugin.updateManagedService(null, null));
+                () -> huaweiCloudOrchestratorPlugin.updateManagedService(null, (Ocl) null));
         Assertions.assertThrows(EntityNotFoundException.class,
                 () -> huaweiCloudOrchestratorPlugin.startManagedService(null));
         Assertions.assertThrows(EntityNotFoundException.class,
@@ -68,7 +70,8 @@ public class HuaweiCloudOrchestratorPluginTest {
         Assertions.assertTrue(
                 orchestratorService.getPlugins().get(0) instanceof HuaweiCloudOrchestratorPlugin);
 
-        orchestratorService.registerManagedService("file:./target/test-classes/huawei_test.json");
+        orchestratorService.registerManagedServiceDeprecated(
+                "file:./target/test-classes/huawei_test.json");
 
         Assertions.assertEquals(1, this.orchestratorService.getStoredServices().size());
         List<ServiceStatus> managedServicesList = new ArrayList<>(

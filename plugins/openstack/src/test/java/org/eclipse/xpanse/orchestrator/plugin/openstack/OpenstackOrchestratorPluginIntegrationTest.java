@@ -34,7 +34,8 @@ public class OpenstackOrchestratorPluginIntegrationTest {
 
     @Test
     public void onRegisterTest() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new File("target/test-classes/kafka-test.json").toURI().toURL());
+        Ocl ocl = oclLoader.getOcl(
+                new File("target/test-classes/kafka-test.json").toURI().toURL());
         openstackOrchestratorPlugin.registerManagedService(ocl);
         openstackOrchestratorPlugin.startManagedService(ocl.getName());
     }
