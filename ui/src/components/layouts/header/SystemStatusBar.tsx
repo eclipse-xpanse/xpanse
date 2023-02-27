@@ -1,5 +1,5 @@
 import { Button, Space } from 'antd';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SystemStatus, SystemStatusHealthStatusEnum } from '../../../xpanse-api/generated';
 import { apiInstance } from '../../../xpanse-api/xpanseRestApiClient';
 import SystemStatusIcon from './SystemStatusIcon';
@@ -13,6 +13,7 @@ function SystemStatusBar(): JSX.Element {
     .then((systemStatus: SystemStatus) => setHealthState(systemStatus.healthStatus))
     .catch((error: any) => {
       console.error(error);
+      setHealthState('NOK');
     });
 
   return (
