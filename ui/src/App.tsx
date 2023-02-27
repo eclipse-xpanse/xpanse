@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 import { Route, Routes } from 'react-router-dom';
 import './styles/app.css';
 import Home from './components/content/Home';
@@ -16,7 +21,7 @@ function App(): JSX.Element {
           </Protected>
         }
       />
-      <Route path="*" element={<LoginScreen />} />
+      <Route path='*' element={<LoginScreen />} />
     </Routes>
   );
 }

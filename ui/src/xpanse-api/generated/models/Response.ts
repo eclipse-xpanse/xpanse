@@ -15,27 +15,38 @@
  * Do not edit the class manually.
  */
 
-export class SystemStatus {
-  'healthStatus': SystemStatusHealthStatusEnum;
+export class Response {
+  'code': string;
+  'message': string;
+  'success': boolean;
 
   static readonly discriminator: string | undefined = undefined;
 
   static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
     {
-      'name': 'healthStatus',
-      'baseName': 'healthStatus',
-      'type': 'SystemStatusHealthStatusEnum',
+      'name': 'code',
+      'baseName': 'code',
+      'type': 'string',
+      'format': ''
+    },
+    {
+      'name': 'message',
+      'baseName': 'message',
+      'type': 'string',
+      'format': ''
+    },
+    {
+      'name': 'success',
+      'baseName': 'success',
+      'type': 'boolean',
       'format': ''
     }];
 
   static getAttributeTypeMap() {
-    return SystemStatus.attributeTypeMap;
+    return Response.attributeTypeMap;
   }
 
   public constructor() {
   }
 }
-
-
-export type SystemStatusHealthStatusEnum = 'OK' | 'NOK';
 
