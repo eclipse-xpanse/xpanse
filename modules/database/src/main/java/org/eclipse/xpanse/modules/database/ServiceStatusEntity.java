@@ -50,7 +50,7 @@ public class ServiceStatusEntity {
     @Convert(converter = OclToStringConverter.class)
     private Ocl ocl;
 
-    @Column(name = "OCL_RESOURCES",  columnDefinition = "json")
+    @Column(name = "OCL_RESOURCES", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = OclResourcesConverter.class)
     private OclResources resources;

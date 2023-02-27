@@ -28,7 +28,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PluginTest.class, OclLoader.class, DatabaseOrchestratorStorage.class,
+@ContextConfiguration(classes = {PluginTest.class, OclLoader.class,
+        DatabaseOrchestratorStorage.class,
         OrchestratorService.class})
 public class OrchestratorServiceTest {
 
@@ -46,7 +47,8 @@ public class OrchestratorServiceTest {
 
         PluginTest pluginTest = (PluginTest) orchestratorService.getPlugins().get(0);
 
-        orchestratorService.registerManagedService("file:./target/test-classes/test.json");
+        orchestratorService.registerManagedServiceDeprecated(
+                "file:./target/test-classes/test.json");
         ServiceStatusEntity serviceStatusEntity = new ServiceStatusEntity();
         serviceStatusEntity.setId(UUID.randomUUID());
         serviceStatusEntity.setServiceName("test-service");
@@ -78,7 +80,8 @@ public class OrchestratorServiceTest {
     @Test
     public void loadWithCustomStorageTest() throws Exception {
         Set<String> services = new HashSet<>();
-        orchestratorService.registerManagedService("file:./target/test-classes/test.json");
+        orchestratorService.registerManagedServiceDeprecated(
+                "file:./target/test-classes/test.json");
 
         Assertions.assertEquals(1, orchestratorService.getPlugins().size());
     }

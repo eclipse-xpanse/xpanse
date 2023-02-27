@@ -6,11 +6,12 @@
 
 package org.eclipse.xpanse.api;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Oclv2;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
@@ -20,15 +21,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * REST interface methods for processing OCL.
@@ -52,12 +55,15 @@ public class OrchestratorApi {
      * @param ocl object of managed service.
      * @return response
      */
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "Service Provider or Service Vendor",
+            description = "APIs to publish the managed services.")
+    @PostMapping(value = "/register",
+            consumes = {"application/x-yaml", "application/yml", "application/yaml"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response register(@Valid @RequestBody Ocl ocl) {
+    public Response register(@Valid @RequestBody Oclv2 ocl) {
         log.info("Registering managed service with name {}", ocl.getName());
-        this.orchestratorService.registerManagedService(ocl);
         String successMsg = String.format(
                 "Managed service %s registered success.", ocl.getName());
         return Response.successResponse(successMsg);
@@ -70,10 +76,14 @@ public class OrchestratorApi {
      * @return response
      * @throws Exception exception
      */
-    @PostMapping("/register/fetch")
+    @Tag(name = "Service Provider or Service Vendor",
+            description = "APIs to publish the managed services.")
+    @PostMapping(value = "/register",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response fetch(@RequestHeader(value = "ocl") String oclLocation) throws Exception {
+    public Response fetch(@RequestParam(name = "oclLocation") String oclLocation) throws Exception {
         log.info("Registering managed service with Url {}", oclLocation);
         this.orchestratorService.registerManagedService(oclLocation);
         String successMsg = String.format(
@@ -82,10 +92,30 @@ public class OrchestratorApi {
     }
 
     /**
+     * Unregister registered managed service.
+     *
+     * @param managedServiceName name of managed service
+     * @return response
+     */
+    @Tag(name = "Service Provider or Service Vendor",
+            description = "APIs to publish the managed services.")
+    @DeleteMapping("/register/{managedServiceName}")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    public Response unregister(@PathVariable("managedServiceName") String managedServiceName) {
+        log.info("Unregistering managed service with name {}", managedServiceName);
+        this.orchestratorService.unregisterManagedService(managedServiceName);
+        String successMsg = String.format(
+                "Managed service %s unregistered success.", managedServiceName);
+        return Response.successResponse(successMsg);
+    }
+
+    /**
      * Method to find out the current state of the system.
      *
      * @return Returns the current state of the system.
      */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
     @GetMapping("/health")
     @ResponseStatus(HttpStatus.OK)
     public SystemStatus health() {
@@ -99,7 +129,8 @@ public class OrchestratorApi {
      *
      * @return Status of the managed service.
      */
-    @GetMapping("/services/state/{managedServiceName}")
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @GetMapping("/service/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
     public ServiceStatus state(@PathVariable("managedServiceName") String managedServiceName) {
         return this.orchestratorService.getManagedServiceState(managedServiceName);
@@ -110,6 +141,7 @@ public class OrchestratorApi {
      *
      * @return list of all services deployed.
      */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
     @GetMapping("/services")
     @ResponseStatus(HttpStatus.OK)
     public List<ServiceStatus> services() {
@@ -122,7 +154,8 @@ public class OrchestratorApi {
      * @param managedServiceName name of managed service
      * @return response
      */
-    @PostMapping("/start/{managedServiceName}")
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @PostMapping("/service/{managedServiceName}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Transactional
     public Response start(@PathVariable("managedServiceName") String managedServiceName) {
@@ -139,7 +172,8 @@ public class OrchestratorApi {
      * @param managedServiceName name of managed service
      * @return response
      */
-    @PostMapping("/stop/{managedServiceName}")
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @DeleteMapping("/service/{managedServiceName}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Transactional
     public Response stop(@PathVariable("managedServiceName") String managedServiceName) {
@@ -156,11 +190,15 @@ public class OrchestratorApi {
      * @param managedServiceName name of managed service
      * @return response
      */
-    @PutMapping("/update/{managedServiceName}")
+    @Tag(name = "Service Provider or Service Vendor",
+            description = "APIs to publish the managed services.")
+    @PutMapping(value = "/register/{managedServiceName}",
+            consumes = {"application/x-yaml", "application/yml", "application/yaml"},
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public Response update(@PathVariable("managedServiceName") String managedServiceName,
-            @RequestBody Ocl ocl) {
+            @RequestBody Oclv2 ocl) {
         log.info("Updating managed service with name {}", managedServiceName);
         this.orchestratorService.updateManagedService(managedServiceName, ocl);
         String successMsg = String.format(
@@ -176,11 +214,15 @@ public class OrchestratorApi {
      * @return response
      * @throws Exception exception
      */
-    @PutMapping("/update/fetch/{managedServiceName}")
+    @Tag(name = "Service Provider or Service Vendor",
+            description = "APIs to publish the managed services.")
+    @PutMapping(value = "/register/{managedServiceName}",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public Response update(@PathVariable("managedServiceName") String managedServiceName,
-            @RequestHeader(value = "ocl") String oclLocation) throws Exception {
+            @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
         log.info("Updating managed service {} with url {}", managedServiceName, oclLocation);
         this.orchestratorService.updateManagedService(managedServiceName, oclLocation);
         String successMsg = String.format(
@@ -188,21 +230,5 @@ public class OrchestratorApi {
         return Response.successResponse(successMsg);
     }
 
-    /**
-     * Unregister registered managed service.
-     *
-     * @param managedServiceName name of managed service
-     * @return response
-     */
-    @PostMapping("/unregister/{managedServiceName}")
-    @ResponseStatus(HttpStatus.OK)
-    @Transactional
-    public Response unregister(@PathVariable("managedServiceName") String managedServiceName) {
-        log.info("Unregistering managed service with name {}", managedServiceName);
-        this.orchestratorService.unregisterManagedService(managedServiceName);
-        String successMsg = String.format(
-                "Managed service %s unregistered success.", managedServiceName);
-        return Response.successResponse(successMsg);
-    }
 
 }

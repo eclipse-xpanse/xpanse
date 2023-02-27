@@ -6,9 +6,9 @@
 
 package org.eclipse.xpanse.modules.ocl.loader.data.models;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
-import jdk.jfr.Description;
 import lombok.Data;
 
 /**
@@ -18,7 +18,7 @@ import lombok.Data;
 public class Compute {
 
     @NotEmpty
-    @Description("The VMs for the managed service")
+    @Schema(description = "The VMs for the managed service")
     private List<Vm> vms;
 
 }

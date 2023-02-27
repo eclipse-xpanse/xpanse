@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud;
 
-import java.util.Optional;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;

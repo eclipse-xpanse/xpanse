@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Oclv2;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
 import org.eclipse.xpanse.modules.ocl.state.OclResources;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
@@ -58,12 +59,22 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    public void registerManagedService(Oclv2 ocl) {
+        log.info("Register managed service:{} for HuaweiCloud", ocl.getName());
+    }
+
+    @Override
     public void updateManagedService(String managedServiceName, Ocl ocl) {
         if (!this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
                 managedServiceName, this.context.getBean(HuaweiCloudOrchestratorPlugin.class))) {
             throw new IllegalArgumentException(
                     "Service with name " + managedServiceName + " is not registered.");
         }
+        log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
+    }
+
+    @Override
+    public void updateManagedService(String managedServiceName, Oclv2 ocl) {
         log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
     }
 
