@@ -15,27 +15,50 @@
  * Do not edit the class manually.
  */
 
-export class SystemStatus {
-  'healthStatus': SystemStatusHealthStatusEnum;
+/**
+ * The flavors of the managed service
+ */
+export class Flavor {
+  /**
+   * The flavor name
+   */
+  'name': string;
+  /**
+   * The price of the flavor
+   */
+  'fixedPrice': number;
+  /**
+   * The properties of the flavor
+   */
+  'property': { [key: string]: string; };
 
   static readonly discriminator: string | undefined = undefined;
 
   static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
     {
-      'name': 'healthStatus',
-      'baseName': 'healthStatus',
-      'type': 'SystemStatusHealthStatusEnum',
+      'name': 'name',
+      'baseName': 'name',
+      'type': 'string',
+      'format': ''
+    },
+    {
+      'name': 'fixedPrice',
+      'baseName': 'fixedPrice',
+      'type': 'number',
+      'format': 'int32'
+    },
+    {
+      'name': 'property',
+      'baseName': 'property',
+      'type': '{ [key: string]: string; }',
       'format': ''
     }];
 
   static getAttributeTypeMap() {
-    return SystemStatus.attributeTypeMap;
+    return Flavor.attributeTypeMap;
   }
 
   public constructor() {
   }
 }
-
-
-export type SystemStatusHealthStatusEnum = 'OK' | 'NOK';
 

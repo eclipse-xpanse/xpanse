@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 import { Navigate, useLocation } from 'react-router-dom';
 import { Layout } from 'antd';
 import LayoutFooter from '../layouts/footer/LayoutFooter';
@@ -18,16 +23,17 @@ function Protected(protectedRouteProperties: ProtectedRouteProperties): JSX.Elem
     return <Navigate to={loginPageRoute} replace={true} state={{ from: location }} />;
   }
   return (
-    <Layout className="layout" hasSider={true}>
+    <Layout className='layout' hasSider={true}>
       <LayoutSider />
-      <Layout className="site-layout">
+      <Layout className='site-layout'>
         <LayoutHeader />
         <Layout.Content>
-          <div className="site-layout-background">{protectedRouteProperties.children}</div>
+          <div className='site-layout-background'>{protectedRouteProperties.children}</div>
         </Layout.Content>
         <LayoutFooter />
       </Layout>
     </Layout>
   );
 }
+
 export default Protected;

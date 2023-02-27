@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 export const isAuthenticatedKey: string = 'isAuthenticated';
 export const usernameKey: string = 'username';
 export const homePageRoute: string = '/home';
