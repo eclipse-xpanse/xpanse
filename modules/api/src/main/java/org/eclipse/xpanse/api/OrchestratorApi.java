@@ -55,7 +55,7 @@ public class OrchestratorApi {
      * @param ocl object of managed service.
      * @return response
      */
-    @Tag(name = "Service Provider or Service Vendor",
+    @Tag(name = "Service Vendor",
             description = "APIs to publish the managed services.")
     @PostMapping(value = "/register",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
@@ -76,9 +76,9 @@ public class OrchestratorApi {
      * @return response
      * @throws Exception exception
      */
-    @Tag(name = "Service Provider or Service Vendor",
+    @Tag(name = "Service Vendor",
             description = "APIs to publish the managed services.")
-    @PostMapping(value = "/register",
+    @PostMapping(value = "/register/file",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -97,7 +97,7 @@ public class OrchestratorApi {
      * @param managedServiceName name of managed service
      * @return response
      */
-    @Tag(name = "Service Provider or Service Vendor",
+    @Tag(name = "Service Vendor",
             description = "APIs to publish the managed services.")
     @DeleteMapping("/register/{managedServiceName}")
     @ResponseStatus(HttpStatus.OK)
@@ -115,7 +115,7 @@ public class OrchestratorApi {
      *
      * @return Returns the current state of the system.
      */
-    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Tag(name = "Admin", description = "APIs to manage the service instances")
     @GetMapping("/health")
     @ResponseStatus(HttpStatus.OK)
     public SystemStatus health() {
@@ -190,7 +190,7 @@ public class OrchestratorApi {
      * @param managedServiceName name of managed service
      * @return response
      */
-    @Tag(name = "Service Provider or Service Vendor",
+    @Tag(name = "Service Vendor",
             description = "APIs to publish the managed services.")
     @PutMapping(value = "/register/{managedServiceName}",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
@@ -214,7 +214,7 @@ public class OrchestratorApi {
      * @return response
      * @throws Exception exception
      */
-    @Tag(name = "Service Provider or Service Vendor",
+    @Tag(name = "Service Vendor",
             description = "APIs to publish the managed services.")
     @PutMapping(value = "/register/{managedServiceName}",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
