@@ -27,14 +27,12 @@ public class OclLoaderTest {
     @Test
     public void loading() throws Exception {
 
-        Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.json").toURI().toURL());
+        Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.yaml").toURI().toURL());
 
         Assertions.assertNotNull(ocl);
 
         Assertions.assertEquals("flat", ocl.getBilling().getModel());
         Assertions.assertEquals(BillingCurrency.EUR, ocl.getBilling().getCurrency());
         Assertions.assertEquals(BillingPeriod.MONTHLY, ocl.getBilling().getPeriod());
-        Assertions.assertEquals(20.0, ocl.getBilling().getFixedPrice());
-        Assertions.assertEquals(10.0, ocl.getBilling().getVariablePrice());
     }
 }

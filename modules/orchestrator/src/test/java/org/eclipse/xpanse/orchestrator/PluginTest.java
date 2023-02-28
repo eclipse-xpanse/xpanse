@@ -8,7 +8,6 @@ package org.eclipse.xpanse.orchestrator;
 
 import lombok.extern.java.Log;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Oclv2;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -24,16 +23,7 @@ public class PluginTest implements OrchestratorPlugin {
     }
 
     @Override
-    public void registerManagedService(Oclv2 ocl) {
-        log.info("Xpanse Test Plugin :: Registering managed service");
-    }
-
     public void updateManagedService(String managedServiceName, Ocl ocl) {
-        log.info("Xpanse Test Plugin :: Updating managed service " + managedServiceName);
-    }
-
-    @Override
-    public void updateManagedService(String managedServiceName, Oclv2 ocl) {
         log.info("Xpanse Test Plugin :: Updating managed service " + managedServiceName);
     }
 

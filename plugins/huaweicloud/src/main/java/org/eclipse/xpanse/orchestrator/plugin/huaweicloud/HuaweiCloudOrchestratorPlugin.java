@@ -10,8 +10,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Oclv2;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.RuntimeState;
 import org.eclipse.xpanse.modules.ocl.state.OclResources;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorStorage;
@@ -58,10 +56,6 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         log.info("Register managed service:{} for HuaweiCloud", ocl.getName());
     }
 
-    @Override
-    public void registerManagedService(Oclv2 ocl) {
-        log.info("Register managed service:{} for HuaweiCloud", ocl.getName());
-    }
 
     @Override
     public void updateManagedService(String managedServiceName, Ocl ocl) {
@@ -70,11 +64,6 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
             throw new IllegalArgumentException(
                     "Service with name " + managedServiceName + " is not registered.");
         }
-        log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
-    }
-
-    @Override
-    public void updateManagedService(String managedServiceName, Oclv2 ocl) {
         log.info("Updating managed service {} on Huawei Cloud", managedServiceName);
     }
 
@@ -95,24 +84,21 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         ctx.setEnvironment(this.environment);
 
         OclResources oclResources = getOclResources(managedServiceName);
-        if (oclResources != null && oclResources.getState() == RuntimeState.ACTIVE) {
+        if (oclResources != null) {
             log.info("Managed service {} already in active.", managedServiceName);
             return;
         }
         try {
-            ctx.getOclResources().setState(RuntimeState.BUILDING);
             storeOclResources(managedServiceName, ctx.getOclResources());
 
             envBuilder.build(ctx);
             basicBuilder.build(ctx);
 
-            ctx.getOclResources().setState(RuntimeState.ACTIVE);
             storeOclResources(managedServiceName, ctx.getOclResources());
         } catch (Exception ex) {
             envBuilder.build(ctx);
             basicBuilder.rollback(ctx);
 
-            ctx.getOclResources().setState(RuntimeState.INACTIVE);
             storeOclResources(managedServiceName, ctx.getOclResources());
             throw ex;
         }

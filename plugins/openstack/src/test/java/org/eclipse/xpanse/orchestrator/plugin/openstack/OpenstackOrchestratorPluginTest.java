@@ -7,21 +7,15 @@
 package org.eclipse.xpanse.orchestrator.plugin.openstack;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Subnet;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Vm;
 import org.eclipse.xpanse.orchestrator.OrchestratorStorage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openstack4j.api.OSClient;
 import org.openstack4j.openstack.identity.v3.domain.KeystoneToken;
 import org.openstack4j.openstack.internal.OSClientSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,12 +39,6 @@ public class OpenstackOrchestratorPluginTest {
     KeystoneManager keystoneManager;
 
     @MockBean
-    NovaManager novaManager;
-
-    @MockBean
-    NeutronManager neutronManager;
-
-    @MockBean
     ApplicationContext applicationContext;
 
     @MockBean
@@ -61,20 +49,14 @@ public class OpenstackOrchestratorPluginTest {
         when(this.keystoneManager.getClient()).thenReturn(
                 OSClientSession.OSClientSessionV3.createSession(new KeystoneToken()));
         OpenstackOrchestratorPlugin openstackOrchestratorPlugin =
-                new OpenstackOrchestratorPlugin(this.keystoneManager, this.novaManager,
-                        this.neutronManager, this.orchestratorStorage, this.applicationContext);
-        doAnswer(invocationOnMock -> null).when(this.novaManager)
-                .createVm(any(OSClient.OSClientV3.class), any(Vm.class));
-        doAnswer(invocationOnMock -> null).when(this.neutronManager)
-                .createNetwork(any(Subnet.class), any(OSClient.OSClientV3.class));
-        when(this.novaManager.getVmConsoleLog(any(OSClient.OSClientV3.class), anyInt(),
-                anyString())).thenReturn("kafka up and running");
+                new OpenstackOrchestratorPlugin(this.keystoneManager, this.orchestratorStorage,
+                        this.applicationContext);
         when(this.orchestratorStorage.isManagedServiceByNameAndPluginExists(
                 any(String.class), any())).thenReturn(true);
         ServiceStatusEntity serviceStatusEntity = new ServiceStatusEntity();
         serviceStatusEntity.setServiceName("kafka");
         Ocl ocl = oclLoader.getOcl(
-                new File("target/test-classes/kafka-test.json").toURI().toURL());
+                new File("target/test-classes/kafka-test.yaml").toURI().toURL());
         serviceStatusEntity.setOcl(ocl);
         when(this.orchestratorStorage.getServiceDetailsByNameAndPlugin(
                 any(String.class), any())).thenReturn(serviceStatusEntity);

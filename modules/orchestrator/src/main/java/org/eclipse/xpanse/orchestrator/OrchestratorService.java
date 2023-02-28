@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Oclv2;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.TaskType;
@@ -80,22 +78,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     }
 
     /**
-     * Register a managed service on all orchestrator plugins, using OCL descriptor location.
-     *
-     * @param oclLocation the location of the OCL descriptor.
-     * @throws Exception if registration fails.
-     */
-    public void registerManagedServiceDeprecated(String oclLocation) throws Exception {
-        Ocl ocl = this.oclLoader.getOcl(new URL(oclLocation));
-        registerManagedServiceDeprecated(ocl);
-    }
-
-    /**
      * Register a managed service on all orchestrator plugins, directly using OCL descriptor.
      *
      * @param ocl the OCL descriptor.
      */
-    public void registerManagedServiceDeprecated(Ocl ocl) {
+    public void registerManagedService(Ocl ocl) {
 
         MDC.put(TASK_TYPE, TaskType.REGISTER.toValue());
 
@@ -103,41 +90,9 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             throw new RuntimeException(
                     "Managed service " + ocl.getName() + " already registered.");
         }
-
-        if (plugins.isEmpty()) {
-            log.warn("No plugins available. Request ignored.");
-            throw new RuntimeException("No plugins available.");
-        }
-
-        for (OrchestratorPlugin plugin : plugins) {
-
-            ServiceStatusEntity serviceStatusEntity = getNewServiceStatusEntity(plugin, ocl);
-            try {
-                putServiceInfoIntoLogMdc(serviceStatusEntity);
-                plugin.registerManagedService(ocl);
-                serviceStatusEntity.setServiceState(ServiceState.REGISTERED);
-                this.databaseOrchestratorStorage.store(serviceStatusEntity);
-            } catch (RuntimeException exception) {
-                updateFailedServiceStatusEntity(serviceStatusEntity, exception);
-                this.databaseOrchestratorStorage.store(serviceStatusEntity);
-                throw exception;
-            }
-        }
-    }
-
-    /**
-     * Register a managed service on all orchestrator plugins, directly using OCL descriptor.
-     *
-     * @param ocl the OCL descriptor.
-     */
-    public void registerManagedService(Oclv2 ocl) {
-
-        MDC.put(TASK_TYPE, TaskType.REGISTER.toValue());
-
-        if (this.databaseOrchestratorStorage.isExists(ocl.getName())) {
-            throw new RuntimeException(
-                    "Managed service " + ocl.getName() + " already registered.");
-        }
+        ServiceStatusEntity serviceStatusEntity = new ServiceStatusEntity();
+        serviceStatusEntity.setOcl(ocl);
+        this.databaseOrchestratorStorage.store(serviceStatusEntity);
     }
 
     /**
@@ -147,7 +102,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
      * @throws Exception if registration fails.
      */
     public void registerManagedService(String oclLocation) throws Exception {
-        Oclv2 ocl = this.oclLoader.getOclv2(new URL(oclLocation));
+        Ocl ocl = this.oclLoader.getOcl(new URL(oclLocation));
         registerManagedService(ocl);
     }
 
@@ -173,6 +128,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public void updateManagedService(String managedServiceName, Ocl ocl) {
         MDC.put(TASK_TYPE, TaskType.UPDATE.toValue());
 
+        if (!managedServiceName.equals(ocl.getName())) {
+            log.warn("Can not update managed service {} with {}", managedServiceName,
+                    ocl.getName());
+        }
+
         if (!this.databaseOrchestratorStorage.isExists(managedServiceName)) {
             throw new EntityNotFoundException(
                     "Managed service " + managedServiceName + " not found");
@@ -194,19 +154,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
                 this.databaseOrchestratorStorage.store(serviceStatusEntity);
                 throw exception;
             }
-        }
-    }
-
-    /**
-     * Update existing managed service with a new/updated OCL descriptor.
-     *
-     * @param managedServiceName the managed service to update, identified by the given name.
-     * @param ocl                the new/update OCL descriptor.
-     */
-    public void updateManagedService(String managedServiceName, Oclv2 ocl) {
-        if (!managedServiceName.equals(ocl.getName())) {
-            log.warn("Can not update managed service {} with {}", managedServiceName,
-                    ocl.getName());
         }
     }
 
@@ -376,17 +323,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
                 .forEach(serviceStatusEntity -> serviceStatuses.add(
                         getServiceStatusFromEntity(serviceStatusEntity)));
         return serviceStatuses;
-    }
-
-    private ServiceStatusEntity getNewServiceStatusEntity(OrchestratorPlugin orchestratorPlugin,
-            Ocl ocl) {
-        ServiceStatusEntity serviceStatusEntity = new ServiceStatusEntity();
-        serviceStatusEntity.setServiceName(ocl.getName());
-        serviceStatusEntity.setServiceState(ServiceState.REGISTERING);
-        serviceStatusEntity.setOcl(ocl);
-        serviceStatusEntity.setPluginName(orchestratorPlugin.getClass().getSimpleName());
-        serviceStatusEntity.setId(UUID.randomUUID());
-        return serviceStatusEntity;
     }
 
     private void updateFailedServiceStatusEntity(

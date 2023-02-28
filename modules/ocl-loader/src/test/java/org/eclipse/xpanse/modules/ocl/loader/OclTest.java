@@ -10,9 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.Arrays;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Deployment;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Storage;
 import org.junit.jupiter.api.Test;
 
 public class OclTest {
@@ -28,16 +27,16 @@ public class OclTest {
     public void testDeepCopy() throws Exception {
         Ocl ocl = new Ocl();
         ocl.setName("foo");
-        Storage storage = new Storage();
-        storage.setName("bar");
-        ocl.setStorages(Arrays.asList(storage));
+        Deployment deployment = new Deployment();
+        deployment.setDeployer("terraform");
+        ocl.setDeployment(deployment);
         Ocl aCopy = ocl.deepCopy();
         assertEquals("foo", aCopy.getName());
         assertNotSame(ocl, aCopy);
         assertNotSame(ocl.getName(), aCopy.getName());
-        assertNotSame(ocl.getStorages(), aCopy.getStorages());
-        Storage aCopiedStorage = aCopy.getStorages().get(0);
-        assertNotSame(aCopiedStorage, storage);
-        assertEquals("bar", aCopiedStorage.getName());
+        assertNotSame(ocl.getDeployment(), aCopy.getDeployment());
+        Deployment aCopiedDeploy = aCopy.getDeployment();
+        assertNotSame(aCopiedDeploy, deployment);
+        assertEquals("terraform", aCopiedDeploy.getDeployer());
     }
 }
