@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 import { PoweroffOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
@@ -12,7 +17,7 @@ function clearStorage(navigate: NavigateFunction): void {
 function Logout(): JSX.Element {
   const navigate = useNavigate();
   return (
-    <Button type="link" onClick={() => clearStorage(navigate)} icon={<PoweroffOutlined />} block={true} size="small">
+    <Button type='link' onClick={() => clearStorage(navigate)} icon={<PoweroffOutlined />} block={true} size='small'>
       LogOut
     </Button>
   );

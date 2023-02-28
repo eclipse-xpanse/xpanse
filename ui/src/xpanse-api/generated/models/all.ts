@@ -1,14 +1,14 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 export * from './Billing';
-export * from './Compute';
-export * from './ErrResponse';
-export * from './Network';
-export * from './Ocl';
-export * from './SecurityGroup';
-export * from './SecurityRule';
+export * from './CloudServiceProvider';
+export * from './DeployVariable';
+export * from './Deployment';
+export * from './Flavor';
+export * from './Oclv2';
+export * from './Response';
 export * from './ServiceStatus';
-export * from './Storage';
-export * from './Subnet';
 export * from './SystemStatus';
-export * from './UserData';
-export * from './Vm';
-export * from './Vpc';

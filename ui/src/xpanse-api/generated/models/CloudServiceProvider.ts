@@ -15,21 +15,37 @@
  * Do not edit the class manually.
  */
 
-export class SystemStatus {
-  'healthStatus': SystemStatusHealthStatusEnum;
+/**
+ * The cloud service provider of the managed service
+ */
+export class CloudServiceProvider {
+  /**
+   * The Cloud Service Provider. valid values: aws, azure, alibaba, huawei
+   */
+  'name': CloudServiceProviderNameEnum;
+  /**
+   * The regions of the Cloud Service Provider
+   */
+  'regions': Array<string>;
 
   static readonly discriminator: string | undefined = undefined;
 
   static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
     {
-      'name': 'healthStatus',
-      'baseName': 'healthStatus',
-      'type': 'SystemStatusHealthStatusEnum',
+      'name': 'name',
+      'baseName': 'name',
+      'type': 'CloudServiceProviderNameEnum',
+      'format': ''
+    },
+    {
+      'name': 'regions',
+      'baseName': 'regions',
+      'type': 'Array<string>',
       'format': ''
     }];
 
   static getAttributeTypeMap() {
-    return SystemStatus.attributeTypeMap;
+    return CloudServiceProvider.attributeTypeMap;
   }
 
   public constructor() {
@@ -37,5 +53,5 @@ export class SystemStatus {
 }
 
 
-export type SystemStatusHealthStatusEnum = 'OK' | 'NOK';
+export type CloudServiceProviderNameEnum = 'aws' | 'azure' | 'alibaba' | 'huawei';
 
