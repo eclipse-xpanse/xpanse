@@ -1,28 +1,30 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 import { Configuration } from '../configuration';
 
-import { ObservableOrchestratorApiApi } from './ObservableAPI';
+import { ObservableAdminApi, ObservableServiceApi, ObservableServiceVendorApi } from './ObservableAPI';
 
-import { OrchestratorApiApiRequestFactory, OrchestratorApiApiResponseProcessor } from '../apis/OrchestratorApiApi';
-import { Ocl } from '../models/Ocl';
-import { ServiceStatus } from '../models/ServiceStatus';
+import { AdminApiRequestFactory, AdminApiResponseProcessor } from '../apis/AdminApi';
+
+import { ServiceApiRequestFactory, ServiceApiResponseProcessor } from '../apis/ServiceApi';
+
+import { ServiceVendorApiRequestFactory, ServiceVendorApiResponseProcessor } from '../apis/ServiceVendorApi';
 import { SystemStatus } from '../models/SystemStatus';
-export class PromiseOrchestratorApiApi {
-  private api: ObservableOrchestratorApiApi;
+import { ServiceStatus } from '../models/ServiceStatus';
+import { Oclv2 } from '../models/Oclv2';
+
+export class PromiseAdminApi {
+  private api: ObservableAdminApi;
 
   public constructor(
     configuration: Configuration,
-    requestFactory?: OrchestratorApiApiRequestFactory,
-    responseProcessor?: OrchestratorApiApiResponseProcessor
+    requestFactory?: AdminApiRequestFactory,
+    responseProcessor?: AdminApiResponseProcessor
   ) {
-    this.api = new ObservableOrchestratorApiApi(configuration, requestFactory, responseProcessor);
-  }
-
-  /**
-   * @param ocl
-   */
-  public fetch(ocl: string, _options?: Configuration): Promise<void> {
-    const result = this.api.fetch(ocl, _options);
-    return result.toPromise();
+    this.api = new ObservableAdminApi(configuration, requestFactory, responseProcessor);
   }
 
   /**
@@ -32,12 +34,19 @@ export class PromiseOrchestratorApiApi {
     return result.toPromise();
   }
 
-  /**
-   * @param ocl
-   */
-  public register(ocl: Ocl, _options?: Configuration): Promise<void> {
-    const result = this.api.register(ocl, _options);
-    return result.toPromise();
+
+}
+
+
+export class PromiseServiceApi {
+  private api: ObservableServiceApi;
+
+  public constructor(
+    configuration: Configuration,
+    requestFactory?: ServiceApiRequestFactory,
+    responseProcessor?: ServiceApiResponseProcessor
+  ) {
+    this.api = new ObservableServiceApi(configuration, requestFactory, responseProcessor);
   }
 
   /**
@@ -50,7 +59,7 @@ export class PromiseOrchestratorApiApi {
   /**
    * @param managedServiceName
    */
-  public start(managedServiceName: string, _options?: Configuration): Promise<void> {
+  public start(managedServiceName: string, _options?: Configuration): Promise<Response> {
     const result = this.api.start(managedServiceName, _options);
     return result.toPromise();
   }
@@ -66,26 +75,62 @@ export class PromiseOrchestratorApiApi {
   /**
    * @param managedServiceName
    */
-  public stop(managedServiceName: string, _options?: Configuration): Promise<void> {
+  public stop(managedServiceName: string, _options?: Configuration): Promise<Response> {
     const result = this.api.stop(managedServiceName, _options);
     return result.toPromise();
   }
 
+
+}
+
+
+export class PromiseServiceVendorApi {
+  private api: ObservableServiceVendorApi;
+
+  public constructor(
+    configuration: Configuration,
+    requestFactory?: ServiceVendorApiRequestFactory,
+    responseProcessor?: ServiceVendorApiResponseProcessor
+  ) {
+    this.api = new ObservableServiceVendorApi(configuration, requestFactory, responseProcessor);
+  }
+
   /**
-   * @param managedServiceName
-   * @param ocl
+   * @param oclLocation
    */
-  public update(managedServiceName: string, ocl: Ocl, _options?: Configuration): Promise<void> {
-    const result = this.api.update(managedServiceName, ocl, _options);
+  public fetch(oclLocation: string, _options?: Configuration): Promise<Response> {
+    const result = this.api.fetch(oclLocation, _options);
+    return result.toPromise();
+  }
+
+  /**
+   * @param oclv2
+   */
+  public register(oclv2: Oclv2, _options?: Configuration): Promise<Response> {
+    const result = this.api.register(oclv2, _options);
     return result.toPromise();
   }
 
   /**
    * @param managedServiceName
-   * @param ocl
    */
-  public update1(managedServiceName: string, ocl: string, _options?: Configuration): Promise<void> {
-    const result = this.api.update1(managedServiceName, ocl, _options);
+  public unregister(managedServiceName: string, _options?: Configuration): Promise<Response> {
+    const result = this.api.unregister(managedServiceName, _options);
     return result.toPromise();
   }
+
+  /**
+   * @param managedServiceName
+   * @param oclLocation
+   * @param oclv2
+   */
+  public update1(managedServiceName: string, oclLocation: string, oclv2: Oclv2, _options?: Configuration): Promise<Response> {
+    const result = this.api.update1(managedServiceName, oclLocation, oclv2, _options);
+    return result.toPromise();
+  }
+
+
 }
+
+
+
