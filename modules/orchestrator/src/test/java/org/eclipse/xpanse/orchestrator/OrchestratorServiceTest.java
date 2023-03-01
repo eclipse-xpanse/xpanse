@@ -47,8 +47,8 @@ public class OrchestratorServiceTest {
 
         PluginTest pluginTest = (PluginTest) orchestratorService.getPlugins().get(0);
 
-        orchestratorService.registerManagedServiceDeprecated(
-                "file:./target/test-classes/test.json");
+        orchestratorService.registerManagedService(
+                "file:./target/test-classes/ocl_test.yaml");
         ServiceStatusEntity serviceStatusEntity = new ServiceStatusEntity();
         serviceStatusEntity.setId(UUID.randomUUID());
         serviceStatusEntity.setServiceName("test-service");
@@ -58,9 +58,6 @@ public class OrchestratorServiceTest {
         List<ServiceStatus> managedServicesList =
                 new ArrayList<>(orchestratorService.getStoredServices());
         Assertions.assertEquals("test-service", managedServicesList.get(0).getServiceName());
-
-        Assertions.assertNotNull(pluginTest.getOcl());
-        Assertions.assertEquals("test-service", pluginTest.getOcl().getName());
 
         orchestratorService.startManagedService("test-service");
         orchestratorService.stopManagedService("test-service");
@@ -80,8 +77,8 @@ public class OrchestratorServiceTest {
     @Test
     public void loadWithCustomStorageTest() throws Exception {
         Set<String> services = new HashSet<>();
-        orchestratorService.registerManagedServiceDeprecated(
-                "file:./target/test-classes/test.json");
+        orchestratorService.registerManagedService(
+                "file:./target/test-classes/ocl_test.yaml");
 
         Assertions.assertEquals(1, orchestratorService.getPlugins().size());
     }

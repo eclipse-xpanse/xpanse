@@ -7,8 +7,6 @@
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud;
 
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
-import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBuilder;
 
 /**
  * Factory class to instantiate builder object.
@@ -26,12 +24,6 @@ public class BuilderFactory {
      * @return AtomBuilder object.
      */
     public AtomBuilder createBuilder(String builderType, Ocl ocl) {
-        if (builderType.equals(ENV_BUILDER)) {
-            return new HuaweiEnvBuilder(ocl);
-        } else if (builderType.equals(BASIC_BUILDER)) {
-            return new HuaweiResourceBuilder(ocl);
-        }
-
         throw new IllegalStateException("Builder Type is in valid.");
     }
 }

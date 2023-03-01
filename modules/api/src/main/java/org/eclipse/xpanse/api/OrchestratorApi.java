@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Oclv2;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
@@ -62,7 +62,7 @@ public class OrchestratorApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response register(@Valid @RequestBody Oclv2 ocl) {
+    public Response register(@Valid @RequestBody Ocl ocl) {
         log.info("Registering managed service with name {}", ocl.getName());
         String successMsg = String.format(
                 "Managed service %s registered success.", ocl.getName());
@@ -198,7 +198,7 @@ public class OrchestratorApi {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public Response update(@PathVariable("managedServiceName") String managedServiceName,
-            @RequestBody Oclv2 ocl) {
+            @RequestBody Ocl ocl) {
         log.info("Updating managed service with name {}", managedServiceName);
         this.orchestratorService.updateManagedService(managedServiceName, ocl);
         String successMsg = String.format(
