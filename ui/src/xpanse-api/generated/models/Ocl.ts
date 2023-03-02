@@ -14,13 +14,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+
+import { Billing } from './Billing';
 import { CloudServiceProvider } from './CloudServiceProvider';
 import { Deployment } from './Deployment';
 import { Flavor } from './Flavor';
-import { Billing } from './Billing';
 
-
-export class Oclv2 {
+export class Ocl {
   /**
    * The version of the Ocl
    */
@@ -118,7 +118,7 @@ export class Oclv2 {
     }];
 
   static getAttributeTypeMap() {
-    return Oclv2.attributeTypeMap;
+    return Ocl.attributeTypeMap;
   }
 
   public constructor() {
