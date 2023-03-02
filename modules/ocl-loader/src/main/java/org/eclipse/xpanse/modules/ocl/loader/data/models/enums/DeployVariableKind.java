@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.ocl.loader.data.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Deploy variable kinds.
@@ -28,7 +29,7 @@ public enum DeployVariableKind {
     @JsonCreator
     public DeployVariableKind getByValue(String type) {
         for (DeployVariableKind deployVariableKind : values()) {
-            if (deployVariableKind.type.equals(type)) {
+            if (deployVariableKind.type.equals(StringUtils.lowerCase(type))) {
                 return deployVariableKind;
             }
         }

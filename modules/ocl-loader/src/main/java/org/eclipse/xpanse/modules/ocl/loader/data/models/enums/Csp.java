@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.ocl.loader.data.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Cloud service providers.
@@ -30,7 +31,7 @@ public enum Csp {
     @JsonCreator
     public Csp getByValue(String name) {
         for (Csp csp : values()) {
-            if (csp.name.equals(name)) {
+            if (csp.name.equals(StringUtils.lowerCase(name))) {
                 return csp;
             }
         }
