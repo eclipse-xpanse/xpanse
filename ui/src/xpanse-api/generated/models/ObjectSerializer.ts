@@ -3,16 +3,25 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-import { CloudServiceProvider } from './CloudServiceProvider';
-import { DeployVariable } from './DeployVariable';
-import { Billing } from './Billing';
-import { Flavor } from './Flavor';
-import { SystemStatus } from './SystemStatus';
-import { Oclv2 } from './Oclv2';
-import { Deployment } from './Deployment';
-import { ServiceStatus } from './ServiceStatus';
-import { Response } from './Response';
+import { Billing } from '../models/Billing';
+import { CloudServiceProvider } from '../models/CloudServiceProvider';
+import { DeployVariable } from '../models/DeployVariable';
+import { Deployment } from '../models/Deployment';
+import { Flavor } from '../models/Flavor';
+import { Ocl } from '../models/Ocl';
+import { Response } from '../models/Response';
+import { ServiceStatus } from '../models/ServiceStatus';
+import { SystemStatus } from '../models/SystemStatus';
 
+export * from '../models/Billing';
+export * from '../models/CloudServiceProvider';
+export * from '../models/DeployVariable';
+export * from '../models/Deployment';
+export * from '../models/Flavor';
+export * from '../models/Ocl';
+export * from '../models/Response';
+export * from '../models/ServiceStatus';
+export * from '../models/SystemStatus';
 
 /* tslint:disable:no-unused-variable */
 let primitives = [
@@ -49,7 +58,7 @@ let typeMap: { [index: string]: any } = {
   'DeployVariable': DeployVariable,
   'Deployment': Deployment,
   'Flavor': Flavor,
-  'Oclv2': Oclv2,
+  'Ocl': Ocl,
   'Response': Response,
   'ServiceStatus': ServiceStatus,
   'SystemStatus': SystemStatus

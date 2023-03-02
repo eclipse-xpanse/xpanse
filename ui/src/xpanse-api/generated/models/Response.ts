@@ -16,9 +16,22 @@
  */
 
 export class Response {
+  /**
+   * The result code of response.
+   */
   'code': string;
+  /**
+   * The result message of response.
+   */
   'message': string;
+  /**
+   * The success boolean of response.
+   */
   'success': boolean;
+  /**
+   * The result data of response.
+   */
+  'data'?: any;
 
   static readonly discriminator: string | undefined = undefined;
 
@@ -39,6 +52,12 @@ export class Response {
       'name': 'success',
       'baseName': 'success',
       'type': 'boolean',
+      'format': ''
+    },
+    {
+      'name': 'data',
+      'baseName': 'data',
+      'type': 'any',
       'format': ''
     }];
 

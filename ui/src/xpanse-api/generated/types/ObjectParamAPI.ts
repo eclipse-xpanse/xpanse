@@ -3,14 +3,16 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
+import { Configuration } from '../configuration';
+import { Ocl } from '../models/Ocl';
+import { Response } from '../models/Response';
+import { ServiceStatus } from '../models/ServiceStatus';
+import { SystemStatus } from '../models/SystemStatus';
+
 import { ObservableAdminApi, ObservableServiceApi, ObservableServiceVendorApi } from './ObservableAPI';
 import { AdminApiRequestFactory, AdminApiResponseProcessor } from '../apis/AdminApi';
 import { ServiceApiRequestFactory, ServiceApiResponseProcessor } from '../apis/ServiceApi';
 import { ServiceVendorApiRequestFactory, ServiceVendorApiResponseProcessor } from '../apis/ServiceVendorApi';
-import { SystemStatus } from '../models/SystemStatus';
-import { Configuration } from '../configuration';
-import { Oclv2 } from '../models/Oclv2';
-import { ServiceStatus } from '../models/ServiceStatus';
 
 export interface AdminApiHealthRequest {
 }
@@ -98,52 +100,91 @@ export class ObjectServiceApi {
 
 }
 
+export interface ServiceVendorApiDetailRequest {
+  /**
+   * id of registered service
+   * @type string
+   * @memberof ServiceVendorApidetail
+   */
+  id: string;
+}
+
 export interface ServiceVendorApiFetchRequest {
   /**
-   *
+   * URL of Ocl file
    * @type string
    * @memberof ServiceVendorApifetch
    */
   oclLocation: string;
 }
 
+export interface ServiceVendorApiFetchUpdateRequest {
+  /**
+   * id of registered service
+   * @type string
+   * @memberof ServiceVendorApifetchUpdate
+   */
+  id: string;
+  /**
+   * URL of Ocl file
+   * @type string
+   * @memberof ServiceVendorApifetchUpdate
+   */
+  oclLocation: string;
+}
+
+export interface ServiceVendorApiListRegisteredServiceRequest {
+  /**
+   * name of the service provider
+   * @type string
+   * @memberof ServiceVendorApilistRegisteredService
+   */
+  cspName?: string;
+  /**
+   * name of the service
+   * @type string
+   * @memberof ServiceVendorApilistRegisteredService
+   */
+  serviceName?: string;
+  /**
+   * version of the service
+   * @type string
+   * @memberof ServiceVendorApilistRegisteredService
+   */
+  serviceVersion?: string;
+}
+
 export interface ServiceVendorApiRegisterRequest {
   /**
    *
-   * @type Oclv2
+   * @type Ocl
    * @memberof ServiceVendorApiregister
    */
-  oclv2: Oclv2;
+  ocl: Ocl;
 }
 
 export interface ServiceVendorApiUnregisterRequest {
   /**
-   *
+   * id of registered service
    * @type string
    * @memberof ServiceVendorApiunregister
    */
-  managedServiceName: string;
+  id: string;
 }
 
-export interface ServiceVendorApiUpdate1Request {
+export interface ServiceVendorApiUpdateRequest {
   /**
-   *
+   * id of registered service
    * @type string
-   * @memberof ServiceVendorApiupdate1
+   * @memberof ServiceVendorApiupdate
    */
-  managedServiceName: string;
+  id: string;
   /**
    *
-   * @type string
-   * @memberof ServiceVendorApiupdate1
+   * @type Ocl
+   * @memberof ServiceVendorApiupdate
    */
-  oclLocation: string;
-  /**
-   *
-   * @type Oclv2
-   * @memberof ServiceVendorApiupdate1
-   */
-  oclv2: Oclv2;
+  ocl: Ocl;
 }
 
 export class ObjectServiceVendorApi {
@@ -154,6 +195,15 @@ export class ObjectServiceVendorApi {
   }
 
   /**
+   * Get registered service using id.
+   * @param param the request object
+   */
+  public detail(param: ServiceVendorApiDetailRequest, options?: Configuration): Promise<Response> {
+    return this.api.detail(param.id, options).toPromise();
+  }
+
+  /**
+   * Register new service with URL of Ocl file.
    * @param param the request object
    */
   public fetch(param: ServiceVendorApiFetchRequest, options?: Configuration): Promise<Response> {
@@ -161,24 +211,43 @@ export class ObjectServiceVendorApi {
   }
 
   /**
+   * Update registered service using id and ocl file url.
+   * @param param the request object
+   */
+  public fetchUpdate(param: ServiceVendorApiFetchUpdateRequest, options?: Configuration): Promise<Response> {
+    return this.api.fetchUpdate(param.id, param.oclLocation, options).toPromise();
+  }
+
+  /**
+   * List registered service with query params.
+   * @param param the request object
+   */
+  public listRegisteredService(param: ServiceVendorApiListRegisteredServiceRequest = {}, options?: Configuration): Promise<Response> {
+    return this.api.listRegisteredService(param.cspName, param.serviceName, param.serviceVersion, options).toPromise();
+  }
+
+  /**
+   * Register new service using ocl model.
    * @param param the request object
    */
   public register(param: ServiceVendorApiRegisterRequest, options?: Configuration): Promise<Response> {
-    return this.api.register(param.oclv2, options).toPromise();
+    return this.api.register(param.ocl, options).toPromise();
   }
 
   /**
+   * Unregister registered service using id.
    * @param param the request object
    */
   public unregister(param: ServiceVendorApiUnregisterRequest, options?: Configuration): Promise<Response> {
-    return this.api.unregister(param.managedServiceName, options).toPromise();
+    return this.api.unregister(param.id, options).toPromise();
   }
 
   /**
+   * Update registered service using id and ocl model.
    * @param param the request object
    */
-  public update1(param: ServiceVendorApiUpdate1Request, options?: Configuration): Promise<Response> {
-    return this.api.update1(param.managedServiceName, param.oclLocation, param.oclv2, options).toPromise();
+  public update(param: ServiceVendorApiUpdateRequest, options?: Configuration): Promise<Response> {
+    return this.api.update(param.id, param.ocl, options).toPromise();
   }
 
 }

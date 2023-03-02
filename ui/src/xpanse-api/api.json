@@ -13,11 +13,11 @@
   "tags": [
     {
       "name": "Admin",
-      "description": "APIs to manage the service instances"
+      "description": "APIs for administrating Xpanse"
     },
     {
       "name": "Service Vendor",
-      "description": "APIs to publish the managed services."
+      "description": "APIs for service vendors to manage the services they provide"
     },
     {
       "name": "Service",
@@ -25,24 +25,78 @@
     }
   ],
   "paths": {
-    "/xpanse/register/{managedServiceName}": {
-      "put": {
+    "/xpanse/register/{id}": {
+      "get": {
         "tags": [
           "Service Vendor"
         ],
-        "operationId": "update_1",
+        "description": "Get registered service using id.",
+        "operationId": "detail",
         "parameters": [
           {
-            "name": "managedServiceName",
+            "name": "id",
             "in": "path",
+            "description": "id of registered service",
             "required": true,
             "schema": {
               "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Service Vendor"
+        ],
+        "description": "Update registered service using id and ocl model.",
+        "operationId": "update",
+        "parameters": [
           {
-            "name": "oclLocation",
-            "in": "query",
+            "name": "id",
+            "in": "path",
+            "description": "id of registered service",
             "required": true,
             "schema": {
               "type": "string"
@@ -53,17 +107,17 @@
           "content": {
             "application/x-yaml": {
               "schema": {
-                "$ref": "#/components/schemas/Oclv2"
+                "$ref": "#/components/schemas/Ocl"
               }
             },
             "application/yml": {
               "schema": {
-                "$ref": "#/components/schemas/Oclv2"
+                "$ref": "#/components/schemas/Ocl"
               }
             },
             "application/yaml": {
               "schema": {
-                "$ref": "#/components/schemas/Oclv2"
+                "$ref": "#/components/schemas/Ocl"
               }
             }
           },
@@ -116,11 +170,13 @@
         "tags": [
           "Service Vendor"
         ],
+        "description": "Unregister registered service using id.",
         "operationId": "unregister",
         "parameters": [
           {
-            "name": "managedServiceName",
+            "name": "id",
             "in": "path",
+            "description": "id of registered service",
             "required": true,
             "schema": {
               "type": "string"
@@ -162,6 +218,77 @@
             "description": "OK",
             "content": {
               "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/xpanse/register/file/{id}": {
+      "put": {
+        "tags": [
+          "Service Vendor"
+        ],
+        "description": "Update registered service using id and ocl file url.",
+        "operationId": "fetchUpdate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of registered service",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "oclLocation",
+            "in": "query",
+            "description": "URL of Ocl file",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
                 }
@@ -348,26 +475,105 @@
       }
     },
     "/xpanse/register": {
+      "get": {
+        "tags": [
+          "Service Vendor"
+        ],
+        "description": "List registered service with query params.",
+        "operationId": "listRegisteredService",
+        "parameters": [
+          {
+            "name": "cspName",
+            "in": "query",
+            "description": "name of the service provider",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "serviceName",
+            "in": "query",
+            "description": "name of the service",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "serviceVersion",
+            "in": "query",
+            "description": "version of the service",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "Service Vendor"
         ],
+        "description": "Register new service using ocl model.",
         "operationId": "register",
         "requestBody": {
           "content": {
             "application/x-yaml": {
               "schema": {
-                "$ref": "#/components/schemas/Oclv2"
+                "$ref": "#/components/schemas/Ocl"
               }
             },
             "application/yml": {
               "schema": {
-                "$ref": "#/components/schemas/Oclv2"
+                "$ref": "#/components/schemas/Ocl"
               }
             },
             "application/yaml": {
               "schema": {
-                "$ref": "#/components/schemas/Oclv2"
+                "$ref": "#/components/schemas/Ocl"
               }
             }
           },
@@ -422,11 +628,13 @@
         "tags": [
           "Service Vendor"
         ],
+        "description": "Register new service with URL of Ocl file.",
         "operationId": "fetch",
         "parameters": [
           {
             "name": "oclLocation",
             "in": "query",
+            "description": "URL of Ocl file",
             "required": true,
             "schema": {
               "type": "string"
@@ -592,13 +800,20 @@
         "type": "object",
         "properties": {
           "code": {
-            "type": "string"
+            "type": "string",
+            "description": "The result code of response."
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "The result message of response."
           },
           "success": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "The success boolean of response."
+          },
+          "data": {
+            "type": "object",
+            "description": "The result data of response."
           }
         }
       },
@@ -783,7 +998,7 @@
         },
         "description": "The flavors of the managed service"
       },
-      "Oclv2": {
+      "Ocl": {
         "required": [
           "billing",
           "cloudServiceProvider",
