@@ -4,7 +4,7 @@
  */
 
 import { MenuProps } from 'antd';
-import Logout from '../../content/Logout';
+import Logout from '../../content/login/Logout';
 
 const items: MenuProps['items'] = [{ key: 'signout', label: <Logout /> }];
 
