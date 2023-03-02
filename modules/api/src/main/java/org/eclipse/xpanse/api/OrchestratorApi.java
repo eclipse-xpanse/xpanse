@@ -6,16 +6,23 @@
 
 package org.eclipse.xpanse.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
+import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisterServiceQuery;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
+import org.eclipse.xpanse.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -44,70 +51,196 @@ public class OrchestratorApi {
 
     private final OrchestratorService orchestratorService;
 
+    private final RegisterService registerService;
+
     @Autowired
-    public OrchestratorApi(OrchestratorService orchestratorService) {
+    public OrchestratorApi(OrchestratorService orchestratorService,
+            RegisterService registerService) {
         this.orchestratorService = orchestratorService;
+        this.registerService = registerService;
     }
 
     /**
-     * Register new managed service.
+     * Register new service using ocl model.
      *
-     * @param ocl object of managed service.
+     * @param ocl model of Ocl.
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to publish the managed services.")
+            description = "APIs to manage register services.")
+    @Operation(description = "Register new service using ocl model.")
     @PostMapping(value = "/register",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public Response register(@Valid @RequestBody Ocl ocl) {
-        log.info("Registering managed service with name {}", ocl.getName());
+        log.info("Register new service with ocl {}", ocl);
+        registerService.registerService(ocl);
         String successMsg = String.format(
-                "Managed service %s registered success.", ocl.getName());
+                "Register new service with ocl %s.", ocl);
+        log.info(successMsg);
         return Response.successResponse(successMsg);
     }
 
     /**
-     * Register managed service with URL.
+     * Update registered service using id and ocl model.
      *
-     * @param oclLocation URL of new Ocl.
+     * @param ocl model of Ocl.
      * @return response
-     * @throws Exception exception
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to publish the managed services.")
-    @PostMapping(value = "/register/file",
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            description = "APIs to manage register services.")
+    @Operation(description = "Update registered service using id and ocl model.")
+    @PutMapping(value = "/register/{id}",
+            consumes = {"application/x-yaml", "application/yml", "application/yaml"},
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response fetch(@RequestParam(name = "oclLocation") String oclLocation) throws Exception {
-        log.info("Registering managed service with Url {}", oclLocation);
-        this.orchestratorService.registerManagedService(oclLocation);
+    public Response update(
+            @Parameter(name = "id", description = "id of registered service")
+            @PathVariable("id") String id, @Valid @RequestBody Ocl ocl) {
+        log.info("Update registered service with id {}", id);
+        registerService.updateRegisteredService(id, ocl);
         String successMsg = String.format(
-                "Managed service registered with URL %s success.", oclLocation);
+                "Update registered service with id %s", id);
+        log.info(successMsg);
         return Response.successResponse(successMsg);
     }
 
     /**
-     * Unregister registered managed service.
+     * Register new service with URL of Ocl file.
      *
-     * @param managedServiceName name of managed service
+     * @param oclLocation URL of Ocl file.
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to publish the managed services.")
-    @DeleteMapping("/register/{managedServiceName}")
+            description = "APIs to manage register services.")
+    @Operation(description = "Register new service with URL of Ocl file.")
+    @PostMapping(value = "/register/file",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response unregister(@PathVariable("managedServiceName") String managedServiceName) {
-        log.info("Unregistering managed service with name {}", managedServiceName);
-        this.orchestratorService.unregisterManagedService(managedServiceName);
+    public Response fetch(@Parameter(name = "oclLocation", description = "URL of Ocl file")
+            @RequestParam(name = "oclLocation") String oclLocation)
+            throws Exception {
+        log.info("Register new service with Url {}", oclLocation);
+        registerService.registerServiceByUrl(oclLocation);
         String successMsg = String.format(
-                "Managed service %s unregistered success.", managedServiceName);
+                "Register new service with Url %s success.", oclLocation);
+        log.info(successMsg);
         return Response.successResponse(successMsg);
+    }
+
+
+    /**
+     * Update registered service using id and ocl file url.
+     *
+     * @param id          id of registered service.
+     * @param oclLocation URL of new Ocl.
+     * @return response
+     */
+    @Tag(name = "Service Vendor",
+            description = "APIs to manage register services.")
+    @Operation(description = "Update registered service using id and ocl file url.")
+    @PutMapping(value = "/register/file/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    public Response fetchUpdate(
+            @Parameter(name = "id", description = "id of registered service")
+            @PathVariable(name = "id") String id,
+            @Parameter(name = "oclLocation", description = "URL of Ocl file")
+            @RequestParam(name = "oclLocation") String oclLocation)
+            throws Exception {
+        log.info("Update registered service {} with Url {}", id, oclLocation);
+        registerService.updateRegisteredServiceByUrl(id, oclLocation);
+        String successMsg = String.format(
+                "Update registered service %s with Url %s", id, oclLocation);
+        log.info(successMsg);
+        return Response.successResponse(successMsg);
+    }
+
+    /**
+     * Unregister registered service using id.
+     *
+     * @param id id of registered service.
+     * @return response
+     */
+    @Tag(name = "Service Vendor",
+            description = "APIs unregister registered service.")
+    @Operation(description = "Unregister registered service using id.")
+    @DeleteMapping("/register/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    public Response unregister(
+            @Parameter(name = "id", description = "id of registered service")
+            @PathVariable("id") String id) {
+        log.info("Unregister registered service using id {}", id);
+        registerService.unregisterService(id);
+        String successMsg = String.format(
+                "Unregister registered service using id %s success.", id);
+        log.info(successMsg);
+        return Response.successResponse(successMsg);
+    }
+
+
+    /**
+     * List registered service with query params.
+     *
+     * @param cspName     name of cloud service provider.
+     * @param serviceName name of registered service.
+     * @return response
+     */
+    @Tag(name = "Service Vendor",
+            description = "APIs to list the managed services.")
+    @Operation(description = "List registered service with query params.")
+    @GetMapping(value = "/register",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Response listRegisteredService(
+            @Parameter(name = "cspName", description = "name of the service provider")
+            @RequestParam(name = "cspName", required = false) String cspName,
+            @Parameter(name = "serviceName", description = "name of the service")
+            @RequestParam(name = "serviceName", required = false) String serviceName,
+            @Parameter(name = "serviceVersion", description = "version of the service")
+            @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
+        RegisterServiceQuery query = new RegisterServiceQuery();
+        query.setCspName(cspName);
+        query.setServiceName(serviceName);
+        query.setServiceVersion(serviceVersion);
+        log.info("List registered service with query model {}", query);
+        List<RegisterServiceEntity> serviceEntities = registerService.listRegisteredService(query);
+        String successMsg = String.format("List registered service with query model %s "
+                + "success.", query);
+        log.info(successMsg);
+        return Response.successResponse(serviceEntities);
+    }
+
+
+    /**
+     * Get registered service using id.
+     *
+     * @param id id of registered service.
+     * @return response
+     */
+    @Tag(name = "Service Vendor",
+            description = "APIs to get detail the registered services.")
+    @Operation(description = "Get registered service using id.")
+    @GetMapping(value = "/register/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Response detail(
+            @Parameter(name = "id", description = "id of registered service")
+            @PathVariable("id") String id) {
+        log.info("Get detail of registered service with name {}.", id);
+        RegisterServiceEntity registerServiceEntity =
+                registerService.getRegisteredService(id);
+        String successMsg = String.format(
+                "Get detail of registered service with name %s success.",
+                id);
+        log.info(successMsg);
+        return Response.successResponse(registerServiceEntity.getOcl());
     }
 
     /**
@@ -115,7 +248,7 @@ public class OrchestratorApi {
      *
      * @return Returns the current state of the system.
      */
-    @Tag(name = "Admin", description = "APIs to manage the service instances")
+    @Tag(name = "Service", description = "APIs to manage the service instances")
     @GetMapping("/health")
     @ResponseStatus(HttpStatus.OK)
     public SystemStatus health() {
@@ -183,52 +316,5 @@ public class OrchestratorApi {
                 "Task of stop managed service %s start running.", managedServiceName);
         return Response.successResponse(successMsg);
     }
-
-    /**
-     * Update registered managed service.
-     *
-     * @param managedServiceName name of managed service
-     * @return response
-     */
-    @Tag(name = "Service Vendor",
-            description = "APIs to publish the managed services.")
-    @PutMapping(value = "/register/{managedServiceName}",
-            consumes = {"application/x-yaml", "application/yml", "application/yaml"},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Transactional
-    public Response update(@PathVariable("managedServiceName") String managedServiceName,
-            @RequestBody Ocl ocl) {
-        log.info("Updating managed service with name {}", managedServiceName);
-        this.orchestratorService.updateManagedService(managedServiceName, ocl);
-        String successMsg = String.format(
-                "Managed service %s updated success.", managedServiceName);
-        return Response.successResponse(successMsg);
-    }
-
-    /**
-     * Update registered managed service with URL.
-     *
-     * @param managedServiceName name of managed service.
-     * @param oclLocation        new Ocl URL
-     * @return response
-     * @throws Exception exception
-     */
-    @Tag(name = "Service Vendor",
-            description = "APIs to publish the managed services.")
-    @PutMapping(value = "/register/{managedServiceName}",
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Transactional
-    public Response update(@PathVariable("managedServiceName") String managedServiceName,
-            @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
-        log.info("Updating managed service {} with url {}", managedServiceName, oclLocation);
-        this.orchestratorService.updateManagedService(managedServiceName, oclLocation);
-        String successMsg = String.format(
-                "Managed service %s updated with URL %s success.", managedServiceName, oclLocation);
-        return Response.successResponse(successMsg);
-    }
-
 
 }

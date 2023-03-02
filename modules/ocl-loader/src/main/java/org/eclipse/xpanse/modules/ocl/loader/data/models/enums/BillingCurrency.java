@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.ocl.loader.data.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -34,7 +35,7 @@ public enum BillingCurrency {
     @JsonCreator
     public BillingCurrency getByValue(String currency) {
         for (BillingCurrency billingCurrency : values()) {
-            if (billingCurrency.currency.equals(currency)) {
+            if (billingCurrency.currency.equals(StringUtils.lowerCase(currency))) {
                 return billingCurrency;
             }
         }

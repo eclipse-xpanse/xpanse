@@ -8,9 +8,10 @@ package org.eclipse.xpanse.api.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
-import org.eclipse.xpanse.api.response.ErrCode;
 import org.eclipse.xpanse.api.response.Response;
+import org.eclipse.xpanse.api.response.ResultCode;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -39,7 +40,7 @@ public class CommonExceptionHandler {
             sb.append(fieldError.getField()).append("：").append(fieldError.getDefaultMessage())
                 .append(", ");
         }
-        return Response.errorResponse(ErrCode.BAD_PARAMETERS, sb.toString());
+        return Response.errorResponse(ResultCode.BAD_PARAMETERS, sb.toString());
     }
 
     /**
@@ -50,7 +51,7 @@ public class CommonExceptionHandler {
     @ResponseBody
     public Response handleConstraintViolationException(ConstraintViolationException ex) {
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ErrCode.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
     }
 
     /**
@@ -60,20 +61,36 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Response handleRuntimeException(RuntimeException ex) {
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ErrCode.RUNTIME_ERROR, failMessage);
+        return Response.errorResponse(ResultCode.RUNTIME_ERROR, failMessage);
     }
 
+    /**
+     * Exception handler for HttpMessageConversionException.
+     */
+    @ExceptionHandler({HttpMessageConversionException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response handleHttpMessageConversionException(HttpMessageConversionException ex) {
+        String failMessage = ex.getMessage();
+        return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
+    }
+
+    /**
+     * Exception handler for EntityNotFoundException.
+     */
     @ExceptionHandler({EntityNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Response handleNotFoundException(EntityNotFoundException ex) {
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ErrCode.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
     }
 
+    /**
+     * Exception handler for Exception.
+     */
     @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Response handleException(Exception ex) {
         String failMessage = ex.getClass().getName() + ":" + ex.getMessage();
-        return Response.errorResponse(ErrCode.RUNTIME_ERROR, failMessage);
+        return Response.errorResponse(ResultCode.RUNTIME_ERROR, failMessage);
     }
 }
