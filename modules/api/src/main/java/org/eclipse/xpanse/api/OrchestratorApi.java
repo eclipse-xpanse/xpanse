@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
@@ -18,7 +17,6 @@ import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisterServiceQuery;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
@@ -55,7 +53,7 @@ public class OrchestratorApi {
 
     @Autowired
     public OrchestratorApi(OrchestratorService orchestratorService,
-            RegisterService registerService) {
+                           RegisterService registerService) {
         this.orchestratorService = orchestratorService;
         this.registerService = registerService;
     }
@@ -67,7 +65,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to manage register services.")
+            description = "APIs for service vendors to manage the services they offer")
     @Operation(description = "Register new service using ocl model.")
     @PostMapping(value = "/register",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
@@ -90,7 +88,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to manage register services.")
+            description = "APIs for service vendors to manage the services they offer")
     @Operation(description = "Update registered service using id and ocl model.")
     @PutMapping(value = "/register/{id}",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
@@ -115,14 +113,14 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to manage register services.")
+            description = "APIs for service vendors to manage the services they offer")
     @Operation(description = "Register new service with URL of Ocl file.")
     @PostMapping(value = "/register/file",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public Response fetch(@Parameter(name = "oclLocation", description = "URL of Ocl file")
-            @RequestParam(name = "oclLocation") String oclLocation)
+                          @RequestParam(name = "oclLocation") String oclLocation)
             throws Exception {
         log.info("Register new service with Url {}", oclLocation);
         registerService.registerServiceByUrl(oclLocation);
@@ -141,7 +139,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to manage register services.")
+            description = "APIs for service vendors to manage the services they offer")
     @Operation(description = "Update registered service using id and ocl file url.")
     @PutMapping(value = "/register/file/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -168,7 +166,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs unregister registered service.")
+            description = "APIs for service vendors to manage the services they offer")
     @Operation(description = "Unregister registered service using id.")
     @DeleteMapping("/register/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -193,7 +191,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to list the managed services.")
+            description = "APIs for service vendors to manage the services they offer")
     @Operation(description = "List registered service with query params.")
     @GetMapping(value = "/register",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -225,7 +223,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to get detail the registered services.")
+            description = "APIs for service vendors to manage the services they offer")
     @Operation(description = "Get registered service using id.")
     @GetMapping(value = "/register/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -248,7 +246,7 @@ public class OrchestratorApi {
      *
      * @return Returns the current state of the system.
      */
-    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Tag(name = "Admin", description = "APIs for administrating Xpanse")
     @GetMapping("/health")
     @ResponseStatus(HttpStatus.OK)
     public SystemStatus health() {

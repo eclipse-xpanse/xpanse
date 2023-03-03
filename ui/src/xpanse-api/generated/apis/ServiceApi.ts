@@ -10,8 +10,10 @@ import { ObjectSerializer } from '../models/ObjectSerializer';
 import { ApiException } from './exception';
 import { isCodeInRange } from '../util';
 import { SecurityAuthentication } from '../auth/auth';
-import { ServiceStatus } from '../models/ServiceStatus';
 
+
+import { Response } from '../models/Response';
+import { ServiceStatus } from '../models/ServiceStatus';
 
 /**
  * no description

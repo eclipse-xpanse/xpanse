@@ -12,3 +12,4 @@ dependency-reduced-pom.xml
 *.iml
 node_modules
 .history
+*.db

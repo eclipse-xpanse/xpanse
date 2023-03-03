@@ -3,12 +3,12 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-export * from './Billing';
-export * from './CloudServiceProvider';
-export * from './DeployVariable';
-export * from './Deployment';
-export * from './Flavor';
-export * from './Oclv2';
-export * from './Response';
-export * from './ServiceStatus';
-export * from './SystemStatus';
+export * from '../models/Billing';
+export * from '../models/CloudServiceProvider';
+export * from '../models/DeployVariable';
+export * from '../models/Deployment';
+export * from '../models/Flavor';
+export * from '../models/Ocl';
+export * from '../models/Response';
+export * from '../models/ServiceStatus';
+export * from '../models/SystemStatus';

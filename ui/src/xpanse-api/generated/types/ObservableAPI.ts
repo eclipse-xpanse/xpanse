@@ -6,13 +6,14 @@
 import { RequestContext, ResponseContext } from '../http/http';
 import { Configuration } from '../configuration';
 import { from, map, mergeMap, Observable, of } from '../rxjsStub';
-import { ServiceApiRequestFactory, ServiceApiResponseProcessor } from '../apis/ServiceApi';
-import { ServiceVendorApiRequestFactory, ServiceVendorApiResponseProcessor } from '../apis/ServiceVendorApi';
-import { SystemStatus } from '../models/SystemStatus';
+import { Ocl } from '../models/Ocl';
+import { Response } from '../models/Response';
 import { ServiceStatus } from '../models/ServiceStatus';
-import { Oclv2 } from '../models/Oclv2';
+import { SystemStatus } from '../models/SystemStatus';
 
 import { AdminApiRequestFactory, AdminApiResponseProcessor } from '../apis/AdminApi';
+import { ServiceApiRequestFactory, ServiceApiResponseProcessor } from '../apis/ServiceApi';
+import { ServiceVendorApiRequestFactory, ServiceVendorApiResponseProcessor } from '../apis/ServiceVendorApi';
 
 export class ObservableAdminApi {
   private requestFactory: AdminApiRequestFactory;
@@ -167,7 +168,30 @@ export class ObservableServiceVendorApi {
   }
 
   /**
-   * @param oclLocation
+   * Get registered service using id.
+   * @param id id of registered service
+   */
+  public detail(id: string, _options?: Configuration): Observable<Response> {
+    const requestContextPromise = this.requestFactory.detail(id, _options);
+
+    // build promise chain
+    let middlewarePreObservable = from<RequestContext>(requestContextPromise);
+    for (let middleware of this.configuration.middleware) {
+      middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
+    }
+
+    return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).pipe(mergeMap((response: ResponseContext) => {
+      let middlewarePostObservable = of(response);
+      for (let middleware of this.configuration.middleware) {
+        middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
+      }
+      return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.detail(rsp)));
+    }));
+  }
+
+  /**
+   * Register new service with URL of Ocl file.
+   * @param oclLocation URL of Ocl file
    */
   public fetch(oclLocation: string, _options?: Configuration): Observable<Response> {
     const requestContextPromise = this.requestFactory.fetch(oclLocation, _options);
@@ -188,10 +212,58 @@ export class ObservableServiceVendorApi {
   }
 
   /**
-   * @param oclv2
+   * Update registered service using id and ocl file url.
+   * @param id id of registered service
+   * @param oclLocation URL of Ocl file
    */
-  public register(oclv2: Oclv2, _options?: Configuration): Observable<Response> {
-    const requestContextPromise = this.requestFactory.register(oclv2, _options);
+  public fetchUpdate(id: string, oclLocation: string, _options?: Configuration): Observable<Response> {
+    const requestContextPromise = this.requestFactory.fetchUpdate(id, oclLocation, _options);
+
+    // build promise chain
+    let middlewarePreObservable = from<RequestContext>(requestContextPromise);
+    for (let middleware of this.configuration.middleware) {
+      middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
+    }
+
+    return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).pipe(mergeMap((response: ResponseContext) => {
+      let middlewarePostObservable = of(response);
+      for (let middleware of this.configuration.middleware) {
+        middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
+      }
+      return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.fetchUpdate(rsp)));
+    }));
+  }
+
+  /**
+   * List registered service with query params.
+   * @param cspName name of the service provider
+   * @param serviceName name of the service
+   * @param serviceVersion version of the service
+   */
+  public listRegisteredService(cspName?: string, serviceName?: string, serviceVersion?: string, _options?: Configuration): Observable<Response> {
+    const requestContextPromise = this.requestFactory.listRegisteredService(cspName, serviceName, serviceVersion, _options);
+
+    // build promise chain
+    let middlewarePreObservable = from<RequestContext>(requestContextPromise);
+    for (let middleware of this.configuration.middleware) {
+      middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
+    }
+
+    return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).pipe(mergeMap((response: ResponseContext) => {
+      let middlewarePostObservable = of(response);
+      for (let middleware of this.configuration.middleware) {
+        middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
+      }
+      return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.listRegisteredService(rsp)));
+    }));
+  }
+
+  /**
+   * Register new service using ocl model.
+   * @param ocl
+   */
+  public register(ocl: Ocl, _options?: Configuration): Observable<Response> {
+    const requestContextPromise = this.requestFactory.register(ocl, _options);
 
     // build promise chain
     let middlewarePreObservable = from<RequestContext>(requestContextPromise);
@@ -209,10 +281,11 @@ export class ObservableServiceVendorApi {
   }
 
   /**
-   * @param managedServiceName
+   * Unregister registered service using id.
+   * @param id id of registered service
    */
-  public unregister(managedServiceName: string, _options?: Configuration): Observable<Response> {
-    const requestContextPromise = this.requestFactory.unregister(managedServiceName, _options);
+  public unregister(id: string, _options?: Configuration): Observable<Response> {
+    const requestContextPromise = this.requestFactory.unregister(id, _options);
 
     // build promise chain
     let middlewarePreObservable = from<RequestContext>(requestContextPromise);
@@ -230,12 +303,12 @@ export class ObservableServiceVendorApi {
   }
 
   /**
-   * @param managedServiceName
-   * @param oclLocation
-   * @param oclv2
+   * Update registered service using id and ocl model.
+   * @param id id of registered service
+   * @param ocl
    */
-  public update1(managedServiceName: string, oclLocation: string, oclv2: Oclv2, _options?: Configuration): Observable<Response> {
-    const requestContextPromise = this.requestFactory.update1(managedServiceName, oclLocation, oclv2, _options);
+  public update(id: string, ocl: Ocl, _options?: Configuration): Observable<Response> {
+    const requestContextPromise = this.requestFactory.update(id, ocl, _options);
 
     // build promise chain
     let middlewarePreObservable = from<RequestContext>(requestContextPromise);
@@ -248,7 +321,7 @@ export class ObservableServiceVendorApi {
       for (let middleware of this.configuration.middleware) {
         middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
       }
-      return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.update1(rsp)));
+      return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.update(rsp)));
     }));
   }
 
