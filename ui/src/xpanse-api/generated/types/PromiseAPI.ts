@@ -4,7 +4,10 @@
  */
 
 import { Configuration } from '../configuration';
-
+import { Ocl } from '../models/Ocl';
+import { Response } from '../models/Response';
+import { ServiceStatus } from '../models/ServiceStatus';
+import { SystemStatus } from '../models/SystemStatus';
 import { ObservableAdminApi, ObservableServiceApi, ObservableServiceVendorApi } from './ObservableAPI';
 
 import { AdminApiRequestFactory, AdminApiResponseProcessor } from '../apis/AdminApi';
@@ -12,9 +15,6 @@ import { AdminApiRequestFactory, AdminApiResponseProcessor } from '../apis/Admin
 import { ServiceApiRequestFactory, ServiceApiResponseProcessor } from '../apis/ServiceApi';
 
 import { ServiceVendorApiRequestFactory, ServiceVendorApiResponseProcessor } from '../apis/ServiceVendorApi';
-import { SystemStatus } from '../models/SystemStatus';
-import { ServiceStatus } from '../models/ServiceStatus';
-import { Oclv2 } from '../models/Oclv2';
 
 export class PromiseAdminApi {
   private api: ObservableAdminApi;
@@ -96,7 +96,17 @@ export class PromiseServiceVendorApi {
   }
 
   /**
-   * @param oclLocation
+   * Get registered service using id.
+   * @param id id of registered service
+   */
+  public detail(id: string, _options?: Configuration): Promise<Response> {
+    const result = this.api.detail(id, _options);
+    return result.toPromise();
+  }
+
+  /**
+   * Register new service with URL of Ocl file.
+   * @param oclLocation URL of Ocl file
    */
   public fetch(oclLocation: string, _options?: Configuration): Promise<Response> {
     const result = this.api.fetch(oclLocation, _options);
@@ -104,28 +114,51 @@ export class PromiseServiceVendorApi {
   }
 
   /**
-   * @param oclv2
+   * Update registered service using id and ocl file url.
+   * @param id id of registered service
+   * @param oclLocation URL of Ocl file
    */
-  public register(oclv2: Oclv2, _options?: Configuration): Promise<Response> {
-    const result = this.api.register(oclv2, _options);
+  public fetchUpdate(id: string, oclLocation: string, _options?: Configuration): Promise<Response> {
+    const result = this.api.fetchUpdate(id, oclLocation, _options);
     return result.toPromise();
   }
 
   /**
-   * @param managedServiceName
+   * List registered service with query params.
+   * @param cspName name of the service provider
+   * @param serviceName name of the service
+   * @param serviceVersion version of the service
    */
-  public unregister(managedServiceName: string, _options?: Configuration): Promise<Response> {
-    const result = this.api.unregister(managedServiceName, _options);
+  public listRegisteredService(cspName?: string, serviceName?: string, serviceVersion?: string, _options?: Configuration): Promise<Response> {
+    const result = this.api.listRegisteredService(cspName, serviceName, serviceVersion, _options);
     return result.toPromise();
   }
 
   /**
-   * @param managedServiceName
-   * @param oclLocation
-   * @param oclv2
+   * Register new service using ocl model.
+   * @param ocl
    */
-  public update1(managedServiceName: string, oclLocation: string, oclv2: Oclv2, _options?: Configuration): Promise<Response> {
-    const result = this.api.update1(managedServiceName, oclLocation, oclv2, _options);
+  public register(ocl: Ocl, _options?: Configuration): Promise<Response> {
+    const result = this.api.register(ocl, _options);
+    return result.toPromise();
+  }
+
+  /**
+   * Unregister registered service using id.
+   * @param id id of registered service
+   */
+  public unregister(id: string, _options?: Configuration): Promise<Response> {
+    const result = this.api.unregister(id, _options);
+    return result.toPromise();
+  }
+
+  /**
+   * Update registered service using id and ocl model.
+   * @param id id of registered service
+   * @param ocl
+   */
+  public update(id: string, ocl: Ocl, _options?: Configuration): Promise<Response> {
+    const result = this.api.update(id, ocl, _options);
     return result.toPromise();
   }
 
