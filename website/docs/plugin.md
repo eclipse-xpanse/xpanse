@@ -8,16 +8,18 @@ This section described how to develop an orchestrator plugin (and associated sto
 
 ## Orchestrator
 
-An orchestrator plugin is basically a class that implements the `org.eclipse.xpanse.orchestrator.OrchestratorPlugin`
-interface.
-It must also be annotated with `@Component` so that the class is scanned and loaded into the spring context.
+An orchestrator plugin is basically a class that implements
+the `org.eclipse.xpanse.orchestrator.OrchestratorPlugin`
+interface. It must also be annotated with `@Component` so that the class is scanned and loaded into
+the spring context.
 
 You can create a basic plugin Maven `pom.xml` containing the OSC Orchestrator and OclLoader:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -79,54 +81,9 @@ public class MyPlugin implements OrchestratorPlugin {
 }
 ```
 
-## Storage
-
-Most of the time, an orchestrator plugin needs a storage, especially to store the registered service.
-
-This storage has to be persistent on the cloud infrastructure.
-
-Creating an orchestrator storage is similar to the main orchestrator plugin, the only different is that you need to
-implement `org.eclipse.xpanse.orchestrator.OrchestratorStorage` interface instead of `org.eclipse.xpanse.orchestrator.OrchestratorPlugin`.
-It must also be annotated with `@Component` so that the class is scanned and loaded into the spring context.
-
-```java
-public class MyStorage implements OrchestratorStorage {
-
-    @Override
-    public void store(String sid) {
-        // store a service ID
-    }
-
-    @Overrde
-    public void store(String sid, String pluginName, String key, String value) {
-        // store a service ID with associated key/value pair
-    }
-
-    @Override
-    public String getKey(String sid, String pluginName, String key) {
-        // get the key corresponding to the service id
-    }
-
-    @Override
-    public boolean exists(String sid) {
-        // return true if the service ID is present in the store, false else
-    }
-
-    @Override
-    public Set<String> services() {
-        // return the list of services (ID) present in the store 
-    }
-
-    @Override
-    public void remove(String sid) {
-        // remove a service (ID) from the store
-    }
-}
-```
-
 ## Adding in OSC runtime
 
-To ensure the plugin and storage implementations are correctly scanned and loaded, both the classes must also be
-additionally annotated wit  `@Profile` and with value with the plugin name.
+To ensure the plugin and storage implementations are correctly scanned and loaded, both the classes
+must also be additionally annotated wit  `@Profile` and with value with the plugin name.
 
 ```@Profile(value = "${pluginName})```

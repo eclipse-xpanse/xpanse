@@ -14,7 +14,9 @@ import org.apache.commons.lang3.StringUtils;
  * Deploy variable kinds.
  */
 public enum DeployVariableKind {
-    FIX("fix"),
+    FIX_ENV("fix_env"),
+    FIX_VARIABLE("fix_variable"),
+    ENV("env"),
     VARIABLE("variable");
 
     private final String type;

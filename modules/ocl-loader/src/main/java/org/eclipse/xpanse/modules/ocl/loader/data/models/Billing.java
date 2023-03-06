@@ -34,12 +34,4 @@ public class Billing {
     @Schema(description = "The billing currency of the managed service, valid values: euro,uso")
     private BillingCurrency currency;
 
-    @NotNull
-    @Schema(description = "The fixed price during the period for the managed service")
-    private Double fixedPrice;
-
-    @NotNull
-    @Schema(description = "The price depending of item volume for the managed service")
-    private Double variablePrice;
-
 }

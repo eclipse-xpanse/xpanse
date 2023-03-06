@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.database.register;
 
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.ServiceStatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +15,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface RegisterServiceRepository extends JpaRepository<RegisterServiceEntity, UUID> {
+
 }

@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.openstack;
 
-import java.io.File;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,8 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {OpenstackOrchestratorPlugin.class, OclLoader.class,
-        KeystoneManager.class, GlanceManager.class})
+@ContextConfiguration(classes = {OpenstackOrchestratorPlugin.class, OclLoader.class})
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Disabled("Needs a working openstack instance")
 @ActiveProfiles(value = {"openstack", "test"})
@@ -34,9 +31,5 @@ public class OpenstackOrchestratorPluginIntegrationTest {
 
     @Test
     public void onRegisterTest() throws Exception {
-        Ocl ocl = oclLoader.getOcl(
-                new File("target/test-classes/kafka-test.yaml").toURI().toURL());
-        openstackOrchestratorPlugin.registerManagedService(ocl);
-        openstackOrchestratorPlugin.startManagedService(ocl.getName());
     }
 }

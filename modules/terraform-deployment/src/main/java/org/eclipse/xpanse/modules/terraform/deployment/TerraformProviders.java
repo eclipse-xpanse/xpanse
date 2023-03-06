@@ -1,0 +1,50 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
+package org.eclipse.xpanse.modules.terraform.deployment;
+
+import java.util.Objects;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
+import org.eclipse.xpanse.modules.terraform.deployment.providers.Aws;
+import org.eclipse.xpanse.modules.terraform.deployment.providers.Huawei;
+
+/**
+ * Terraform providers.
+ */
+public enum TerraformProviders {
+    AWS(Csp.AWS, new Aws()),
+    HUAWEI(Csp.HUAWEI, new Huawei());
+
+    Csp csp;
+
+    Provider provider;
+
+    /**
+     * Constructor for TerraformProviders.
+     *
+     * @param csp      the cloud service provider.
+     * @param provider the provider for the CSP.
+     */
+    TerraformProviders(Csp csp, Provider provider) {
+        this.csp = csp;
+        this.provider = provider;
+    }
+
+    /**
+     * Get the provider by the Csp.
+     *
+     * @param csp the cloud service provider.
+     */
+    public static Provider getProvider(Csp csp) {
+        for (TerraformProviders provider : values()) {
+            if (Objects.equals(csp, provider.csp)) {
+                return provider.provider;
+            }
+        }
+
+        throw new RuntimeException("Cannot find provider " + csp + ".");
+    }
+}

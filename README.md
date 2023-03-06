@@ -76,7 +76,7 @@ deployment:
   # kind, Supported values are terraform, pulumi, crossplane.
   kind: terraform
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix,variable.
-  # - fix: The value of the fix parameters are defined by the ISV with the @value at the initial time.
+  # - env: The value of the fix parameters are defined by the ISV with the @value at the initial time.
   # - variable: The value of the variable parameters are defined by the user on the console.
   # The parameters will be used to generate the API of the managed service.
   context:
