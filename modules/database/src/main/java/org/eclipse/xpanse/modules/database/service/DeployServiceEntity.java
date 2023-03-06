@@ -18,8 +18,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,7 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.OclConverter;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Category;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 import org.hibernate.annotations.Type;
 
@@ -44,31 +43,29 @@ public class DeployServiceEntity extends CreateModifiedTime {
     private UUID id;
 
     /**
+     * The category of the Service.
+     */
+    private Category category;
+
+    /**
      * The name of the Service.
      */
-    @NotNull
-    @NotBlank
-    String name;
+    private String name;
 
     /**
      * The version of the Service.
      */
-    @NotNull
-    @NotBlank
-    String version;
+    private String version;
 
     /**
      * The csp of the Service.
      */
-    @NotNull
-    Csp csp;
+    private Csp csp;
 
     /**
      * The flavor of the Service.
      */
-    @NotNull
-    @NotBlank
-    String flavor;
+    private String flavor;
 
     /**
      * The Ocl object of the XpanseDeployTask.
@@ -86,7 +83,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
             joinColumns = @JoinColumn(name = "deployService_id", nullable = false))
     @MapKeyColumn(name = "p_key")
     @Column(name = "p_value")
-    Map<String, String> property = new HashMap<>();
+    private Map<String, String> property = new HashMap<>();
 
     @OneToMany(mappedBy = "deployService")
     private List<DeployResourceEntity> deployResourceEntity;

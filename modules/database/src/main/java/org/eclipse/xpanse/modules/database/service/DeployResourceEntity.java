@@ -30,14 +30,26 @@ public class DeployResourceEntity {
     @Id
     private String id;
 
-    String name;
+    /**
+     * The name of the deployed resource.
+     */
+    private String name;
 
-    DeployResourceKind kind;
+    /**
+     * The kind of the deployed resource.
+     */
+    private DeployResourceKind kind;
 
+    /**
+     * The deployService we belonged to.
+     */
     @ManyToOne
     @JoinColumn(name = "deployService_id")
     DeployServiceEntity deployService;
 
+    /**
+     * The properties of the deployed resource.
+     */
     @ElementCollection
     @CollectionTable(name = "deployResourceProperty",
             joinColumns = @JoinColumn(name = "deployResource_id", nullable = false))

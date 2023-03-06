@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  * Period for Billing.
  */
 public enum Category {
+    AI("ai"),
     COMPUTE("compute"),
     CONTAINER("container"),
     STORAGE("storage"),
@@ -21,7 +22,8 @@ public enum Category {
     DATABASE("database"),
     MEDIA_SERVICE("mediasService"),
     SECURITY("security"),
-    MIDDLEWARE("middleware");
+    MIDDLEWARE("middleware"),
+    OTHERS("others");
 
     private final String catalog;
 

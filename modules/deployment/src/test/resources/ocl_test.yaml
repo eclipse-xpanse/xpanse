@@ -1,5 +1,7 @@
 # The version of the OCL
 version: 2.0
+# The category of the service.
+category: middleware
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: kafka
 # The version of the service, if the end-user want to select the version when they want to deploy the service.
@@ -17,8 +19,8 @@ icon: |
 cloudServiceProvider:
   name: huawei
   regions:
-    - aws-ca-central-1
-    - aws-us-east-2
+    - cn-southwest-2
+    - cn-north-4
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat

@@ -89,6 +89,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
      */
     public void storeDeployService(DeployResult deployResult) {
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        deployServiceEntity.setCategory(deployResult.getTask().getCreateRequest().getCategory());
         deployServiceEntity.setVersion(deployResult.getTask().getCreateRequest().getVersion());
         deployServiceEntity.setName(deployResult.getTask().getCreateRequest().getName());
         deployServiceEntity.setId(deployResult.getTask().getCreateRequest().getId());
