@@ -4,18 +4,22 @@
  *
  */
 
-package org.eclipse.xpanse.modules.terraform.deployment.resource;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 import lombok.Data;
 
 /**
- * TfState class.
- */
+ * TfStateResource class.
+ **/
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class TfState {
+public class TfStateResource {
 
-    public List<TfStateResource> resources;
+    public String type;
+
+    public String name;
+
+    public List<TfStateResourceInstance> instances;
 }

@@ -265,7 +265,7 @@ public class OrchestratorApi {
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @GetMapping("/service")
     @ResponseStatus(HttpStatus.OK)
-    public ServiceStatus state(@RequestParam("id") String id) {
+    public ServiceStatus state(@PathVariable("id") String id) {
         return null;
     }
 

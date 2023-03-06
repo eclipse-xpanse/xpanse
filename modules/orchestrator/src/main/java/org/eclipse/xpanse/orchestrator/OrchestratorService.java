@@ -17,11 +17,12 @@ import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployResult;
 import org.eclipse.xpanse.modules.deployment.DeployTask;
+import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.CloudServiceProvider;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.TaskType;
 import org.eclipse.xpanse.modules.service.CreateRequest;
-import org.eclipse.xpanse.modules.terraform.deployment.TerraformDeployment;
 import org.eclipse.xpanse.service.RegisterServiceStorage;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,9 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     @Autowired
     private List<OrchestratorPlugin> pluginList;
+
+    @Autowired
+    private List<Deployment> deployers;
 
     @Getter
     private final List<OrchestratorPlugin> plugins = new ArrayList<>();
@@ -122,6 +126,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         deployTask.setOcl(ocl);
         deployTask.setId(deployRequest.getId());
         deployTask.setCreateRequest(deployRequest);
+
+        // Find the plugin.
         List<OrchestratorPlugin> plugins =
                 pluginList.stream()
                         .filter(plugin -> plugin.getCsp() == deployRequest.getCsp())
@@ -131,10 +137,21 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         }
         deployTask.setDeployResourceHandler(plugins.get(0).getResourceHandler());
 
-        TerraformDeployment terraformDeployment = new TerraformDeployment();
-        DeployResult deployResult = terraformDeployment.deploy(deployTask);
+        // Find the deployment.
+        DeployerKind deployerKind = ocl.getDeployment().getKind();
+        List<Deployment> deploymentList =
+                deployers.stream()
+                        .filter(deployer -> deployer.getDeployerKind() == deployerKind)
+                        .collect(Collectors.toList());
+        if (deploymentList.size() != 1) {
+            throw new RuntimeException("Can't find suitable deployer for the Task.");
+        }
+        Deployment deployment = deploymentList.get(0);
 
-        // Persist the deployservice.
+        // Start to deploy.
+        DeployResult deployResult = deployment.deploy(deployTask);
+
+        // Persist the deployer's service.
         storeDeployService(deployResult);
     }
 

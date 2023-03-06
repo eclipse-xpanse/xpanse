@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.terraform.deployment;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,12 +16,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.DeployResult;
 import org.eclipse.xpanse.modules.deployment.DeployTask;
 import org.eclipse.xpanse.modules.deployment.Deployment;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.enums.DeployState;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.DeployVariable;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployerKind;
-import org.eclipse.xpanse.modules.terraform.deployment.exceptions.TerraformExecutorException;
 import org.springframework.stereotype.Component;
 
 /**

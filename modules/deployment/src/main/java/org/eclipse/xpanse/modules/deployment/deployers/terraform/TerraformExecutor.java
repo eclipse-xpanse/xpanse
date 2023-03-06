@@ -4,15 +4,15 @@
  *
  */
 
-package org.eclipse.xpanse.modules.terraform.deployment;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.terraform.deployment.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.terraform.deployment.utils.SystemCmd;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
 
 /**
  * An executor for terraform.

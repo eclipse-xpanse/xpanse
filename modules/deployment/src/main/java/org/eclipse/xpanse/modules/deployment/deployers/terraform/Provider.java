@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.terraform.deployment;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 
@@ -13,8 +13,8 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
  */
 public interface Provider {
 
-    public String getProvider();
+    String getProvider();
 
-    public Csp getCsp();
+    Csp getCsp();
 
 }

@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum DeployResourceKind {
     Vm("vm"),
     Container("container"),
-    PublicIp("publicIp"),
+    PublicIp("public_ip"),
     Vpc("vpc");
 
     private final String kind;

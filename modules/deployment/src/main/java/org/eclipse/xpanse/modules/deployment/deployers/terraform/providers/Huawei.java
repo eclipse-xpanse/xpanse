@@ -4,23 +4,22 @@
  *
  */
 
-package org.eclipse.xpanse.modules.terraform.deployment.providers;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.providers;
 
-
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.Provider;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
-import org.eclipse.xpanse.modules.terraform.deployment.Provider;
 
 /**
- * Terraform provider information for AWS.
+ * Terraform provider information for Huawei.
  */
-public class Aws implements Provider {
+public class Huawei implements Provider {
 
     public static final String PROVIDER = """
             terraform {
               required_providers {
-                aws = {
-                  source  = "hashicorp/aws"
-                  version = "~> 4.0"
+                huaweicloud = {
+                  source = "huaweicloud/huaweicloud"
+                  version = ">= 1.20.0"
                 }
               }
             }
@@ -33,9 +32,7 @@ public class Aws implements Provider {
 
     @Override
     public Csp getCsp() {
-        return Csp.AWS;
+        return Csp.HUAWEI;
     }
 
 }
-
-

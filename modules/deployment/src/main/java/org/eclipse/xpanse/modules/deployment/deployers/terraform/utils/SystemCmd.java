@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.terraform.deployment.utils;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.utils;
 
 import java.io.BufferedReader;
 import java.io.File;

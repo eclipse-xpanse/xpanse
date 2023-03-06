@@ -7,12 +7,7 @@
 package org.eclipse.xpanse.modules.service;
 
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapKeyColumn;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -61,10 +56,5 @@ public class CreateRequest {
     /**
      * The property of the Service.
      */
-    @ElementCollection
-    @MapKeyColumn(name = "name")
-    @Column(name = "value")
-    @CollectionTable(
-            name = "deployServiceProperty", joinColumns = @JoinColumn(name = "deployService_id"))
     Map<String, String> property = new HashMap<>();
 }

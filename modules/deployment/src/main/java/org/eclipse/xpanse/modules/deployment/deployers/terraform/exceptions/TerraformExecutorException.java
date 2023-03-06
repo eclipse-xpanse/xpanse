@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.terraform.deployment.exceptions;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions;
 
 /**
  * Defines possible exceptions returned by Terraform execution.

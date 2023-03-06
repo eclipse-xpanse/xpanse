@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.terraform.deployment;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test for TerraformDeploy.
  */
-public class TerraformDeployTest {
+public class TerraformDeploymentTest {
 
     @Disabled
     @Test
