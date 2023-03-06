@@ -50,11 +50,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     @PersistenceContext
     EntityManager entityManager;
 
-    @Autowired
-    private List<OrchestratorPlugin> pluginList;
-
-    @Autowired
-    private List<Deployment> deployers;
+    @Getter
+    private final List<Deployment> deployers = new ArrayList<>();
 
     @Getter
     private final List<OrchestratorPlugin> plugins = new ArrayList<>();
@@ -76,6 +73,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             }
             if (plugins.isEmpty()) {
                 log.warn("No xpanse plugins loaded by the runtime.");
+            }
+
+            deployers.addAll(applicationContext.getBeansOfType(Deployment.class).values());
+            if (deployers.isEmpty()) {
+                log.warn("No deployer loaded by the runtime.");
             }
         }
     }
@@ -129,7 +131,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
         // Find the plugin.
         List<OrchestratorPlugin> plugins =
-                pluginList.stream()
+                this.plugins.stream()
                         .filter(plugin -> plugin.getCsp() == deployRequest.getCsp())
                         .collect(Collectors.toList());
         if (plugins.size() != 1) {
@@ -140,7 +142,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         // Find the deployment.
         DeployerKind deployerKind = ocl.getDeployment().getKind();
         List<Deployment> deploymentList =
-                deployers.stream()
+                this.deployers.stream()
                         .filter(deployer -> deployer.getDeployerKind() == deployerKind)
                         .collect(Collectors.toList());
         if (deploymentList.size() != 1) {
