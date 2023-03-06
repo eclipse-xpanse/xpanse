@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
@@ -19,6 +20,7 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisterServiceQuery;
+import org.eclipse.xpanse.modules.service.CreateRequest;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +67,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs for service vendors to manage the services they offer")
+            description = "APIs to manage register services.")
     @Operation(description = "Register new service using ocl model.")
     @PostMapping(value = "/register",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
@@ -88,7 +90,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs for service vendors to manage the services they offer")
+            description = "APIs to manage register services.")
     @Operation(description = "Update registered service using id and ocl model.")
     @PutMapping(value = "/register/{id}",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
@@ -113,7 +115,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs for service vendors to manage the services they offer")
+            description = "APIs to manage register services.")
     @Operation(description = "Register new service with URL of Ocl file.")
     @PostMapping(value = "/register/file",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -139,7 +141,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs for service vendors to manage the services they offer")
+            description = "APIs to manage register services.")
     @Operation(description = "Update registered service using id and ocl file url.")
     @PutMapping(value = "/register/file/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -166,7 +168,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs for service vendors to manage the services they offer")
+            description = "APIs to manage register services.")
     @Operation(description = "Unregister registered service using id.")
     @DeleteMapping("/register/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -191,7 +193,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs for service vendors to manage the services they offer")
+            description = "APIs to manage register services.")
     @Operation(description = "List registered service with query params.")
     @GetMapping(value = "/register",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -223,7 +225,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs for service vendors to manage the services they offer")
+            description = "APIs to manage register services.")
     @Operation(description = "Get registered service using id.")
     @GetMapping(value = "/register/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -261,10 +263,10 @@ public class OrchestratorApi {
      * @return Status of the managed service.
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @GetMapping("/service/{managedServiceName}")
+    @GetMapping("/service")
     @ResponseStatus(HttpStatus.OK)
-    public ServiceStatus state(@PathVariable("managedServiceName") String managedServiceName) {
-        return this.orchestratorService.getManagedServiceState(managedServiceName);
+    public ServiceStatus state(@PathVariable("id") String id) {
+        return null;
     }
 
     /**
@@ -276,42 +278,46 @@ public class OrchestratorApi {
     @GetMapping("/services")
     @ResponseStatus(HttpStatus.OK)
     public List<ServiceStatus> services() {
-        return this.orchestratorService.getStoredServices();
+        return null;
     }
 
     /**
      * Start registered managed service.
      *
-     * @param managedServiceName name of managed service
+     * @param deployRequest the managed service
      * @return response
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @PostMapping("/service/{managedServiceName}")
+    @PostMapping("/service")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Transactional
-    public Response start(@PathVariable("managedServiceName") String managedServiceName) {
-        log.info("Starting managed service with name {}", managedServiceName);
-        this.orchestratorService.startManagedService(managedServiceName);
+    public Response start(@RequestBody CreateRequest deployRequest) {
+        log.info("Starting managed service with name {}, version {}, csp {}",
+                deployRequest.getName(),
+                deployRequest.getVersion(), deployRequest.getCsp());
+        deployRequest.setId(UUID.randomUUID());
+        this.orchestratorService.startManagedService(deployRequest);
         String successMsg = String.format(
-                "Task of start managed service %s start running.", managedServiceName);
+                "Task of start managed service %s-%s-%s start running.", deployRequest.getName(),
+                deployRequest.getVersion(), deployRequest.getCsp());
         return Response.successResponse(successMsg);
     }
 
     /**
      * Stop started managed service.
      *
-     * @param managedServiceName name of managed service
+     * @param id name of managed service
      * @return response
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @DeleteMapping("/service/{managedServiceName}")
+    @DeleteMapping("/service/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Transactional
-    public Response stop(@PathVariable("managedServiceName") String managedServiceName) {
-        log.info("Stopping managed service with name {}", managedServiceName);
-        this.orchestratorService.stopManagedService(managedServiceName);
+    public Response stop(@PathVariable("id") String id) {
+        log.info("Stopping managed service with id {}", id);
+        this.orchestratorService.stopManagedService(id);
         String successMsg = String.format(
-                "Task of stop managed service %s start running.", managedServiceName);
+                "Task of stop managed service %s start running.", id);
         return Response.successResponse(successMsg);
     }
 

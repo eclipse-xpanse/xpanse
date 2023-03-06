@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.service.impl;
 
 import java.net.URL;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;

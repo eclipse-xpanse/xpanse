@@ -17,7 +17,8 @@ public enum Csp {
     AWS("aws"),
     AZURE("azure"),
     ALI("alibaba"),
-    HUAWEI("huawei");
+    HUAWEI("huawei"),
+    OPENSTACK("openstack");
 
     private final String name;
 
