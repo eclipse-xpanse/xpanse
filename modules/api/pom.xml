@@ -46,11 +46,6 @@
             <artifactId>orchestrator</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

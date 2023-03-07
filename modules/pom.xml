@@ -25,7 +25,6 @@
         <module>api</module>
         <module>database</module>
         <module>deployment</module>
-        <module>service</module>
     </modules>
 
 </project>

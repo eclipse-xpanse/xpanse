@@ -12,7 +12,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
-import org.eclipse.xpanse.modules.deployment.enums.DeployState;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployState;
 
 /**
  * The result of the deployment.

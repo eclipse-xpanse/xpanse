@@ -4,12 +4,12 @@
  *
  */
 
-package org.eclipse.xpanse.service;
+package org.eclipse.xpanse.orchestrator.register;
 
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisterServiceQuery;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisteredServiceQuery;
 
 /**
  * Interface to be implemented by register service database.
@@ -26,18 +26,10 @@ public interface RegisterServiceStorage {
     /**
      * Method to list database entry based registerServiceEntity.
      *
-     * @param registerServiceEntity registerServiceEntity.
-     * @return Returns the database entry for the provided arguments.
-     */
-    List<RegisterServiceEntity> listRegisterService(RegisterServiceEntity registerServiceEntity);
-
-    /**
-     * Method to list database entry based registerServiceEntity.
-     *
      * @param query query model for search register service entity.
      * @return Returns the database entry for the provided arguments.
      */
-    List<RegisterServiceEntity> queryRegisterService(RegisterServiceQuery query);
+    List<RegisterServiceEntity> queryRegisteredServices(RegisteredServiceQuery query);
 
     /**
      * Method to get database entry based registerServiceEntity.
@@ -50,10 +42,10 @@ public interface RegisterServiceStorage {
     /**
      * Method to list database entry based registerServiceEntity by query model.
      *
-     * @param registerServiceEntity registerServiceEntity.
+     * @param registerServiceEntity the model of registered service.
      * @return Returns the database entry for the provided arguments.
      */
-    RegisterServiceEntity getRegisterService(RegisterServiceEntity registerServiceEntity);
+    RegisterServiceEntity findRegisteredService(RegisterServiceEntity registerServiceEntity);
 
     /**
      * Method to get all stored database entries.

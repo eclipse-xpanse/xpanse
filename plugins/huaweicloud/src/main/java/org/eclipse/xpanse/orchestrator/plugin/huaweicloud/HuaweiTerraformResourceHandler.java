@@ -55,7 +55,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
             if (tfStateResource.getType().equals("huaweicloud_compute_instance")) {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
                     deployResourceEntity.setKind(DeployResourceKind.Vm);
-                    deployResourceEntity.setId((String) instance.getAttributes().get("id"));
+                    deployResourceEntity.setResourceId((String) instance.getAttributes().get("id"));
                     deployResourceEntity.setName((String) instance.getAttributes().get("name"));
 
                     deployResourceEntity.setProperty(new HashMap<>());
@@ -81,7 +81,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
                     DeployResourceEntity xpResource = new DeployResourceEntity();
                     xpResource.setKind(DeployResourceKind.Vpc);
-                    xpResource.setId((String) instance.getAttributes().get("id"));
+                    xpResource.setResourceId((String) instance.getAttributes().get("id"));
                     xpResource.setName((String) instance.getAttributes().get("name"));
                 }
             }
