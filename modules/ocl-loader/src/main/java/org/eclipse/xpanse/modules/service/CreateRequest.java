@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Category;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 
 /**
@@ -25,6 +26,12 @@ public class CreateRequest {
     @Hidden
     @Id
     private UUID id;
+
+    /**
+     * The category of the Service.
+     */
+    @NotNull
+    Category category;
 
     /**
      * The name of the Service.

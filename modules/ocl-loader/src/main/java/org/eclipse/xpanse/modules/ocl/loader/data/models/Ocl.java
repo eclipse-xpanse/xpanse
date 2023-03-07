@@ -17,6 +17,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import lombok.Data;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Category;
 
 /**
  * Defines for OCLv2.
@@ -26,6 +27,10 @@ import lombok.Data;
 public class Ocl {
 
     private static ObjectMapper theMapper = new ObjectMapper();
+
+    @NotNull
+    @Schema(description = "The catalog of the service")
+    private Category category;
 
     @NotNull
     @NotBlank

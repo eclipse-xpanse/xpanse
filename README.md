@@ -30,6 +30,8 @@ interacting with the fundamental APIs:
 ```yaml
 # The version of the OCL
 version: 2.0
+# The category of the service.
+category: middleware
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: kafka
 # The version of the service, if the end-user want to select the version when they want to deploy the service.
@@ -76,22 +78,22 @@ deployment:
   # kind, Supported values are terraform, pulumi, crossplane.
   kind: terraform
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix,variable.
-  # - env: The value of the fix parameters are defined by the ISV with the @value at the initial time.
-  # - variable: The value of the variable parameters are defined by the user on the console.
+  # - env: This kind of variable will be injected as environment variables to the runtime of the deployment.
+  # - variable: This kind of variable will be injected as parameters to the runtime of the deployment.
+  # - fix_env: like the @env, but the value of the variable will be settled in the OCL template.
+  # - fix_variable: like the @variable, but the value of the variable will be settled in the OCL template.
   # The parameters will be used to generate the API of the managed service.
   context:
     - name: AK
       description: Your access key.
-      kind: fix
+      kind: env
       type: string
-      value: xxxxxxxxxx
       mandatory: true
       validator: null
     - name: SK
       description: Your security key.
-      kind: fix
+      kind: env
       type: string
-      value: xxxxxxxxxxx
       mandatory: true
       validator: null
     - name: VPC

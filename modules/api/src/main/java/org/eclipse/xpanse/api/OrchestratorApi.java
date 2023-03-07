@@ -55,7 +55,7 @@ public class OrchestratorApi {
 
     @Autowired
     public OrchestratorApi(OrchestratorService orchestratorService,
-                           RegisterService registerService) {
+            RegisterService registerService) {
         this.orchestratorService = orchestratorService;
         this.registerService = registerService;
     }
@@ -283,22 +283,22 @@ public class OrchestratorApi {
     /**
      * Start registered managed service.
      *
-     * @param deployRequest the managed service
+     * @param createRequest the managed service to create.
      * @return response
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @PostMapping("/service")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Transactional
-    public Response start(@RequestBody CreateRequest deployRequest) {
+    public Response start(@Valid @RequestBody CreateRequest createRequest) {
         log.info("Starting managed service with name {}, version {}, csp {}",
-                deployRequest.getName(),
-                deployRequest.getVersion(), deployRequest.getCsp());
-        deployRequest.setId(UUID.randomUUID());
-        this.orchestratorService.startManagedService(deployRequest);
+                createRequest.getName(),
+                createRequest.getVersion(), createRequest.getCsp());
+        createRequest.setId(UUID.randomUUID());
+        this.orchestratorService.startManagedService(createRequest);
         String successMsg = String.format(
-                "Task of start managed service %s-%s-%s start running.", deployRequest.getName(),
-                deployRequest.getVersion(), deployRequest.getCsp());
+                "Task of start managed service %s-%s-%s start running.", createRequest.getName(),
+                createRequest.getVersion(), createRequest.getCsp());
         return Response.successResponse(successMsg);
     }
 
