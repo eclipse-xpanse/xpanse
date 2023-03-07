@@ -4,19 +4,20 @@
  *
  */
 
-package org.eclipse.xpanse.service.impl;
+package org.eclipse.xpanse.orchestrator.register.impl;
 
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.ServiceState;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisterServiceQuery;
-import org.eclipse.xpanse.service.RegisterService;
-import org.eclipse.xpanse.service.RegisterServiceStorage;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.orchestrator.register.RegisterService;
+import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,10 +66,14 @@ public class RegisterServiceImpl implements RegisterService {
     }
 
     private RegisterServiceEntity getNewRegisterServiceEntity(Ocl ocl) {
-        RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setOcl(ocl);
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
-        return registerServiceEntity;
+        RegisterServiceEntity entity = new RegisterServiceEntity();
+        entity.setName(StringUtils.lowerCase(ocl.getName()));
+        entity.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
+        entity.setCsp(ocl.getCloudServiceProvider().getName());
+        entity.setCategory(ocl.getCategory());
+        entity.setOcl(ocl);
+        entity.setServiceState(ServiceState.REGISTERED);
+        return entity;
     }
 
     /**
@@ -79,7 +84,7 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     public void registerService(Ocl ocl) {
         RegisterServiceEntity newEntity = getNewRegisterServiceEntity(ocl);
-        if (Objects.nonNull(storage.getRegisterService(newEntity))) {
+        if (Objects.nonNull(storage.findRegisteredService(newEntity))) {
             throw new IllegalArgumentException("Service already registered.");
         }
         storage.store(newEntity);
@@ -115,8 +120,8 @@ public class RegisterServiceImpl implements RegisterService {
      * @return list of RegisterServiceEntity
      */
     @Override
-    public List<RegisterServiceEntity> listRegisteredService(RegisterServiceQuery query) {
-        return storage.queryRegisterService(query);
+    public List<RegisterServiceEntity> queryRegisteredServices(RegisteredServiceQuery query) {
+        return storage.queryRegisteredServices(query);
     }
 
     /**

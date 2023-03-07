@@ -7,10 +7,8 @@
 package org.eclipse.xpanse.modules.service;
 
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
@@ -24,7 +22,6 @@ import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 public class CreateRequest {
 
     @Hidden
-    @Id
     private UUID id;
 
     /**
@@ -38,30 +35,30 @@ public class CreateRequest {
      */
     @NotNull
     @NotBlank
-    String name;
+    private String name;
 
     /**
      * The version of the Service.
      */
     @NotNull
     @NotBlank
-    String version;
+    private String version;
 
     /**
      * The csp of the Service.
      */
     @NotNull
-    Csp csp;
+    private Csp csp;
 
     /**
      * The flavor of the Service.
      */
     @NotNull
     @NotBlank
-    String flavor;
+    private String flavor;
 
     /**
      * The property of the Service.
      */
-    Map<String, String> property = new HashMap<>();
+    private Map<String, String> property;
 }

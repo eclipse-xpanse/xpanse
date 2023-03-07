@@ -13,16 +13,21 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
+import org.eclipse.xpanse.modules.deployment.DeployTask;
+import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Category;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisterServiceQuery;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.service.CreateRequest;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
-import org.eclipse.xpanse.service.RegisterService;
+import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -198,18 +203,26 @@ public class OrchestratorApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Response listRegisteredService(
+            @Parameter(name = "categoryName", description = "category of the service")
+            @RequestParam(name = "categoryName", required = false) String categoryName,
             @Parameter(name = "cspName", description = "name of the service provider")
             @RequestParam(name = "cspName", required = false) String cspName,
             @Parameter(name = "serviceName", description = "name of the service")
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
-        RegisterServiceQuery query = new RegisterServiceQuery();
-        query.setCspName(cspName);
+        RegisteredServiceQuery query = new RegisteredServiceQuery();
+        if (StringUtils.isNotBlank(cspName)) {
+            query.setCsp(Csp.valueOf(cspName));
+        }
+        if (StringUtils.isNotBlank(categoryName)) {
+            query.setCategory(Category.valueOf(categoryName));
+        }
         query.setServiceName(serviceName);
         query.setServiceVersion(serviceVersion);
         log.info("List registered service with query model {}", query);
-        List<RegisterServiceEntity> serviceEntities = registerService.listRegisteredService(query);
+        List<RegisterServiceEntity> serviceEntities =
+                registerService.queryRegisteredServices(query);
         String successMsg = String.format("List registered service with query model %s "
                 + "success.", query);
         log.info(successMsg);
@@ -283,22 +296,24 @@ public class OrchestratorApi {
     /**
      * Start registered managed service.
      *
-     * @param createRequest the managed service to create.
+     * @param deployRequest the managed service to create.
      * @return response
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @PostMapping("/service")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @Transactional
-    public Response start(@Valid @RequestBody CreateRequest createRequest) {
+    public Response start(@RequestBody CreateRequest deployRequest) {
         log.info("Starting managed service with name {}, version {}, csp {}",
-                createRequest.getName(),
-                createRequest.getVersion(), createRequest.getCsp());
-        createRequest.setId(UUID.randomUUID());
-        this.orchestratorService.startManagedService(createRequest);
+                deployRequest.getName(),
+                deployRequest.getVersion(), deployRequest.getCsp());
+        DeployTask deployTask = new DeployTask();
+        deployTask.setId(UUID.randomUUID());
+        deployTask.setCreateRequest(deployRequest);
+        Deployment deployment = this.orchestratorService.getDeployHandler(deployTask);
+        this.orchestratorService.asyncDeployService(deployment, deployTask);
         String successMsg = String.format(
-                "Task of start managed service %s-%s-%s start running.", createRequest.getName(),
-                createRequest.getVersion(), createRequest.getCsp());
+                "Task of start managed service %s-%s-%s start running.", deployRequest.getName(),
+                deployRequest.getVersion(), deployRequest.getCsp());
         return Response.successResponse(successMsg);
     }
 
@@ -311,10 +326,12 @@ public class OrchestratorApi {
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @DeleteMapping("/service/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @Transactional
     public Response stop(@PathVariable("id") String id) {
         log.info("Stopping managed service with id {}", id);
-        this.orchestratorService.stopManagedService(id);
+        DeployTask deployTask = new DeployTask();
+        deployTask.setId(UUID.fromString(id));
+        Deployment deployment = this.orchestratorService.getDestroyHandler(deployTask);
+        this.orchestratorService.asyncDestroyService(deployment, deployTask);
         String successMsg = String.format(
                 "Task of stop managed service %s start running.", id);
         return Response.successResponse(successMsg);

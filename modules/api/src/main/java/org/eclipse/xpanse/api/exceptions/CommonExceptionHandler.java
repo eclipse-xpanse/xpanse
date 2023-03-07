@@ -8,6 +8,7 @@ package org.eclipse.xpanse.api.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.api.response.ResultCode;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * Exception handler for the REST API.
  */
+@Slf4j
 @RestControllerAdvice
 public class CommonExceptionHandler {
 
@@ -90,6 +92,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Response handleException(Exception ex) {
+        log.error("handleException: ", ex);
         String failMessage = ex.getClass().getName() + ":" + ex.getMessage();
         return Response.errorResponse(ResultCode.RUNTIME_ERROR, failMessage);
     }
