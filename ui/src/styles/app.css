@@ -56,6 +56,33 @@
 }
 
 .header-menu-button {
-    box-shadow: none;
-    border: none;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.ocl-data-display {
+    margin-right: 10em;
+    margin-left: 10em;
+}
+
+.register-buttons {
+    display: flex;
+    align-items: baseline;
+    gap: 10px
+}
+
+.ocl-data-main-info {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.ocl-data-info-table {
+    width: auto;
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.ocl-data-hover {
+    padding: 0;
 }

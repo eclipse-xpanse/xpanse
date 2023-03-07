@@ -75,10 +75,9 @@ public class OrchestratorApi {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public Response register(@Valid @RequestBody Ocl ocl) {
-        log.info("Register new service with ocl {}", ocl);
         registerService.registerService(ocl);
         String successMsg = String.format(
-                "Register new service with ocl %s.", ocl);
+                "Registered new service with ocl %s.", ocl);
         log.info(successMsg);
         return Response.successResponse(successMsg);
     }
