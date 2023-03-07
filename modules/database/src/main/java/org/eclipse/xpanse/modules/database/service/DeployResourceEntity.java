@@ -10,7 +10,6 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
@@ -27,7 +26,9 @@ import org.eclipse.xpanse.modules.database.common.DeployResourceKind;
 @Entity
 public class DeployResourceEntity {
 
-    @Id
+    /**
+     * The id of the deployed resource.
+     */
     private String id;
 
     /**
