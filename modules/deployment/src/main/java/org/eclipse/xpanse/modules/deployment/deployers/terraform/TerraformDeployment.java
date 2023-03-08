@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.deployment.DeployTask;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.DeployVariable;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.Flavor;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployState;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployVariableKind;
@@ -138,7 +139,25 @@ public class TerraformDeployment implements Deployment {
             }
         }
 
+        variables.putAll(getFlavorVariables(task));
+
         return variables;
+    }
+
+    private Map<String, String> getFlavorVariables(DeployTask task) {
+        Map<String, String> variables = new HashMap<>();
+
+        variables.put("TF_VAR_flavor", task.getCreateRequest().getFlavor());
+        for (Flavor flavor : task.getOcl().getFlavors()) {
+            if (flavor.getName().equals(task.getCreateRequest().getFlavor())) {
+                for (Map.Entry<String, String> entry : flavor.getProperty().entrySet()) {
+                    variables.put(("TF_VAR_flavor_" + entry.getKey()), entry.getValue());
+                }
+                return variables;
+            }
+        }
+
+        throw new RuntimeException("Can not get an available flavor.");
     }
 
     /**
