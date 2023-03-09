@@ -11,42 +11,15 @@
   <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <Pattern>
-        %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} [%X{REQUEST_ID}]- %msg%n
+        %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} [%X{TASK_ID}]- %msg%n
       </Pattern>
     </encoder>
   </appender>
 
-  <appender name="SIFT_HTTP_FILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-    <discriminator>
-      <key>REQUEST_ID</key>
-      <defaultValue>xpanse</defaultValue>
-    </discriminator>
-    <sift>
-      <appender name="${requestId}" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/${REQUEST_ID}.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-          <fileNamePattern>${log.path}/${REQUEST_ID}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-          <timeBasedFileNamingAndTriggeringPolicy
-            class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-            <maxFileSize>10MB</maxFileSize>
-          </timeBasedFileNamingAndTriggeringPolicy>
-          <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <encoder>
-          <pattern>
-            %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} [%X{REQUEST_ID}]- %msg%n
-          </pattern>
-        </encoder>
-      </appender>
-    </sift>
-  </appender>
-
   <logger additivity="false" level="info" name="org.eclipse.xpanse">
     <appender-ref ref="Console"/>
-    <appender-ref ref="SIFT_HTTP_FILE"/>
   </logger>
-  <root level="info">
+  <root level="error">
     <appender-ref ref="Console"/>
-    <appender-ref ref="SIFT_HTTP_FILE"/>
   </root>
 </configuration>

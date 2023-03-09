@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
+import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -44,6 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Component
 public class OrchestratorService implements ApplicationListener<ApplicationEvent> {
+
+
+    private static final String TASK_ID = "TASK_ID";
 
     private final RegisterServiceStorage registerServiceStorage;
 
@@ -134,6 +138,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     @Async("taskExecutor")
     @Transactional
     public void asyncDeployService(Deployment deployment, DeployTask deployTask) {
+        MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
         try {
             deployServiceEntity.setServiceState(ServiceState.DEPLOYING);
@@ -191,6 +196,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     @Async("taskExecutor")
     @Transactional
     public void asyncDestroyService(Deployment deployment, DeployTask deployTask) {
+        MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
         if (Objects.isNull(deployServiceEntity)) {
