@@ -51,9 +51,11 @@ public class RegisterServiceEntity extends CreateModifiedTime {
     private String version;
 
     @Column(name = "CSP", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Csp csp;
 
     @Column(name = "CATEGORY")
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @Column(name = "OCL", columnDefinition = "json", nullable = false)

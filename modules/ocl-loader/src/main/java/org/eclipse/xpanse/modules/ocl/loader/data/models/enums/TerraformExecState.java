@@ -13,14 +13,16 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Deployment state.
  */
-public enum DeployState {
+public enum TerraformExecState {
     INIT("initial"),
-    SUCCESS("success"),
-    FAILED("failed");
+    DEPLOY_SUCCESS("success"),
+    DEPLOY_FAILED("failed"),
+    DESTROY_SUCCESS("destroy_success"),
+    DESTROY_FAILED("destroy_failed");
 
     private final String status;
 
-    DeployState(String status) {
+    TerraformExecState(String status) {
         this.status = status;
     }
 
@@ -28,8 +30,8 @@ public enum DeployState {
      * For XpanseDeployStatus serialize.
      */
     @JsonCreator
-    public DeployState getByValue(String period) {
-        for (DeployState xpanseDeployStatus : values()) {
+    public TerraformExecState getByValue(String period) {
+        for (TerraformExecState xpanseDeployStatus : values()) {
             if (xpanseDeployStatus.status.equals(StringUtils.lowerCase(period))) {
                 return xpanseDeployStatus;
             }

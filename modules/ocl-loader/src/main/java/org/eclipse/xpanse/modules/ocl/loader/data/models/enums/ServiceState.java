@@ -15,17 +15,14 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum ServiceState {
 
-    REGISTERING("registering"),
     REGISTERED("registered"),
-    STARTING("starting"),
-    STARTED("started"),
-    DELETING("deleting"),
-    DELETED("deleted"),
-    STOPPING("stopping"),
-    STOPPED("stopped"),
-    UPDATING("updating"),
-    UPDATED("updated"),
-    FAILED("failed");
+    DEPLOYING("deploying"),
+    DEPLOY_SUCCESS("deploy_success"),
+    DEPLOY_FAILED("deploy_failed"),
+    DESTROYING("destroying"),
+    DESTROY_SUCCESS("destroy_success"),
+    DESTROY_FAILED("destroy_failed");
+
 
     private final String serviceState;
 

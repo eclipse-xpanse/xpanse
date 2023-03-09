@@ -12,7 +12,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployState;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.TerraformExecState;
 
 /**
  * The result of the deployment.
@@ -28,7 +28,7 @@ public class DeployResult {
      */
     @Setter
     @Getter
-    private DeployState state;
+    private TerraformExecState state;
 
     /**
      * The XpanseDeployTask.

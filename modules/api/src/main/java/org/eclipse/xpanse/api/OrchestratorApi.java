@@ -10,24 +10,28 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployTask;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.ServiceStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Category;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.view.CategoryOclVo;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.view.ServiceVo;
 import org.eclipse.xpanse.modules.service.CreateRequest;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -68,6 +72,21 @@ public class OrchestratorApi {
     /**
      * Register new service using ocl model.
      *
+     * @return response
+     */
+    @Tag(name = "Service Vendor",
+            description = "APIs to manage register services.")
+    @Operation(description = "Get category list.")
+    @GetMapping(value = "/register/categories",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Category> listCategories() {
+        return Arrays.asList(Category.values());
+    }
+
+    /**
+     * Register new service using ocl model.
+     *
      * @param ocl model of Ocl.
      * @return response
      */
@@ -79,12 +98,12 @@ public class OrchestratorApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response register(@Valid @RequestBody Ocl ocl) {
-        registerService.registerService(ocl);
+    public UUID register(@Valid @RequestBody Ocl ocl) {
+        UUID uuid = registerService.registerService(ocl);
         String successMsg = String.format(
-                "Registered new service with ocl %s.", ocl);
+                "Registered new service success. uuid %s", uuid);
         log.info(successMsg);
-        return Response.successResponse(successMsg);
+        return uuid;
     }
 
     /**
@@ -107,7 +126,7 @@ public class OrchestratorApi {
         log.info("Update registered service with id {}", id);
         registerService.updateRegisteredService(id, ocl);
         String successMsg = String.format(
-                "Update registered service with id %s", id);
+                "Update registered service with id %s success.", id);
         log.info(successMsg);
         return Response.successResponse(successMsg);
     }
@@ -125,15 +144,16 @@ public class OrchestratorApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response fetch(@Parameter(name = "oclLocation", description = "URL of Ocl file")
-                          @RequestParam(name = "oclLocation") String oclLocation)
+    public UUID fetch(
+            @Parameter(name = "oclLocation", description = "URL of Ocl file")
+            @RequestParam(name = "oclLocation") String oclLocation)
             throws Exception {
         log.info("Register new service with Url {}", oclLocation);
-        registerService.registerServiceByUrl(oclLocation);
+        UUID uuid = registerService.registerServiceByUrl(oclLocation);
         String successMsg = String.format(
-                "Register new service with Url %s success.", oclLocation);
+                "Register new service with Url %s success.UUID: %s", oclLocation, uuid);
         log.info(successMsg);
-        return Response.successResponse(successMsg);
+        return uuid;
     }
 
 
@@ -192,8 +212,10 @@ public class OrchestratorApi {
     /**
      * List registered service with query params.
      *
-     * @param cspName     name of cloud service provider.
-     * @param serviceName name of registered service.
+     * @param categoryName   name of category.
+     * @param cspName        name of cloud service provider.
+     * @param serviceName    name of registered service.
+     * @param serviceVersion version of registered service.
      * @return response
      */
     @Tag(name = "Service Vendor",
@@ -202,7 +224,7 @@ public class OrchestratorApi {
     @GetMapping(value = "/register",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Response listRegisteredService(
+    public List<RegisterServiceEntity> listRegisteredServices(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) String categoryName,
             @Parameter(name = "cspName", description = "name of the service provider")
@@ -213,10 +235,10 @@ public class OrchestratorApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         if (StringUtils.isNotBlank(cspName)) {
-            query.setCsp(Csp.valueOf(cspName));
+            query.setCsp(Csp.valueOf(StringUtils.upperCase(cspName)));
         }
         if (StringUtils.isNotBlank(categoryName)) {
-            query.setCategory(Category.valueOf(categoryName));
+            query.setCategory(Category.valueOf(StringUtils.upperCase(categoryName)));
         }
         query.setServiceName(serviceName);
         query.setServiceVersion(serviceVersion);
@@ -226,7 +248,36 @@ public class OrchestratorApi {
         String successMsg = String.format("List registered service with query model %s "
                 + "success.", query);
         log.info(successMsg);
-        return Response.successResponse(serviceEntities);
+        return serviceEntities;
+    }
+
+
+    /**
+     * List registered service with category.
+     *
+     * @param categoryName name of category.
+     * @return response
+     */
+    @Tag(name = "Service Vendor",
+            description = "APIs to manage register services.")
+    @Operation(description = "List registered service group by serviceName, serviceVersion, "
+            + "cspName with category.")
+    @GetMapping(value = "/register/category/{categoryName}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<CategoryOclVo> listRegisteredServicesTree(
+            @Parameter(name = "categoryName", description = "category of the service")
+            @PathVariable(name = "categoryName", required = false) String categoryName) {
+        Category category = Category.valueOf(StringUtils.upperCase(categoryName));
+        RegisteredServiceQuery query = new RegisteredServiceQuery();
+        query.setCategory(category);
+        log.info("List registered service with query model {}", query);
+        List<CategoryOclVo> categoryOclList =
+                registerService.queryRegisteredServicesTree(query);
+        String successMsg = String.format("List registered service with query model %s "
+                + "success.", query);
+        log.info(successMsg);
+        return categoryOclList;
     }
 
 
@@ -242,7 +293,7 @@ public class OrchestratorApi {
     @GetMapping(value = "/register/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Response detail(
+    public Ocl detail(
             @Parameter(name = "id", description = "id of registered service")
             @PathVariable("id") String id) {
         log.info("Get detail of registered service with name {}.", id);
@@ -252,7 +303,7 @@ public class OrchestratorApi {
                 "Get detail of registered service with name %s success.",
                 id);
         log.info(successMsg);
-        return Response.successResponse(registerServiceEntity.getOcl());
+        return registerServiceEntity.getOcl();
     }
 
     /**
@@ -275,10 +326,11 @@ public class OrchestratorApi {
      * @return Status of the managed service.
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @GetMapping("/service")
+    @GetMapping("/service/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ServiceStatus state(@PathVariable("id") String id) {
-        return null;
+    public DeployServiceEntity serviceDetail(@PathVariable("id") String id) {
+
+        return this.orchestratorService.getDeployServiceDetail(UUID.fromString(id));
     }
 
     /**
@@ -289,8 +341,8 @@ public class OrchestratorApi {
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @GetMapping("/services")
     @ResponseStatus(HttpStatus.OK)
-    public List<ServiceStatus> services() {
-        return null;
+    public List<ServiceVo> services() {
+        return this.orchestratorService.listDeployServices();
     }
 
     /**
@@ -302,19 +354,22 @@ public class OrchestratorApi {
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @PostMapping("/service")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Response start(@RequestBody CreateRequest deployRequest) {
+    public UUID start(@RequestBody CreateRequest deployRequest) {
         log.info("Starting managed service with name {}, version {}, csp {}",
                 deployRequest.getName(),
                 deployRequest.getVersion(), deployRequest.getCsp());
         DeployTask deployTask = new DeployTask();
-        deployTask.setId(UUID.randomUUID());
+        UUID id = UUID.fromString(MDC.get("REQUEST_ID"));
+        deployTask.setId(id);
         deployTask.setCreateRequest(deployRequest);
         Deployment deployment = this.orchestratorService.getDeployHandler(deployTask);
         this.orchestratorService.asyncDeployService(deployment, deployTask);
         String successMsg = String.format(
-                "Task of start managed service %s-%s-%s start running.", deployRequest.getName(),
-                deployRequest.getVersion(), deployRequest.getCsp());
-        return Response.successResponse(successMsg);
+                "Task of start managed service %s-%s-%s start running. UUID %s",
+                deployRequest.getName(),
+                deployRequest.getVersion(), deployRequest.getCsp(), deployTask.getId());
+        log.info(successMsg);
+        return deployTask.getId();
     }
 
     /**

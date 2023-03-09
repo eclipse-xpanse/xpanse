@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,10 +20,12 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployResult;
 import org.eclipse.xpanse.modules.deployment.DeployTask;
 import org.eclipse.xpanse.modules.deployment.Deployment;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployState;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployerKind;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.ServiceState;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
@@ -40,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class OrchestratorService implements ApplicationListener<ApplicationEvent> {
 
-    private static final String TASK_TYPE = "TASK_TYPE";
+    private static final String TASK_ID = "TASK_ID";
 
     private final RegisterServiceStorage registerServiceStorage;
 
@@ -151,14 +155,16 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     @Transactional
     public void asyncDeployService(Deployment deployment, DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
-        DeployResult deployResult = null;
         try {
+            deployServiceEntity.setServiceState(ServiceState.DEPLOYING);
             deployServiceStorage.store(deployServiceEntity);
-            deployResult = deployment.deploy(deployTask);
+            DeployResult deployResult = deployment.deploy(deployTask);
+            deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
             deployServiceEntity.setDeployResourceEntity(deployResult.getResources());
             deployServiceStorage.store(deployServiceEntity);
         } catch (Exception e) {
             log.error("asyncDeployService failed.", e);
+            deployServiceEntity.setServiceState(ServiceState.DEPLOY_FAILED);
             deployServiceStorage.store(deployServiceEntity);
         }
 
@@ -170,14 +176,14 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
      * @param deployTask the task of deploy managed service name.
      */
     public Deployment getDestroyHandler(DeployTask deployTask) {
-
         // Find the deployed service.
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
         if (Objects.isNull(deployServiceEntity) || Objects.isNull(deployServiceEntity.getOcl())) {
             throw new RuntimeException(String.format("Deployed service with id %s not found",
-                    deployTask.getId().toString()));
+                    deployTask.getId()));
         }
+
         deployTask.setOcl(deployServiceEntity.getOcl());
 
         // Find the deployment plugin and resource handler
@@ -213,8 +219,51 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     @Async("taskExecutor")
     @Transactional
     public void asyncDestroyService(Deployment deployment, DeployTask deployTask) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(deployTask.getId());
+        if (Objects.isNull(deployServiceEntity)) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    deployTask.getId()));
+        }
+        try {
+            deployServiceEntity.setServiceState(ServiceState.DESTROYING);
+            deployServiceStorage.store(deployServiceEntity);
+            deployment.deploy(deployTask);
+            deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
+            deployServiceStorage.store(deployServiceEntity);
+        } catch (RuntimeException e) {
+            log.error("asyncDestroyService failed", e);
+            deployServiceEntity.setServiceState(ServiceState.DESTROY_FAILED);
+            deployServiceStorage.store(deployServiceEntity);
+        }
 
-        // Start to destroy.
-        DeployResult deployResult = deployment.deploy(deployTask);
+    }
+
+
+    /**
+     * List deploy services.
+     *
+     * @return serviceVos
+     */
+    public List<ServiceVo> listDeployServices() {
+        List<DeployServiceEntity> deployServices =
+                deployServiceStorage.services();
+        return deployServices.stream().map(service -> {
+            ServiceVo serviceVo = new ServiceVo();
+            BeanUtils.copyProperties(service, serviceVo);
+            return serviceVo;
+        }).collect(Collectors.toList());
+
+    }
+
+    /**
+     * Get deploy service detail by id.
+     *
+     * @param id ID of deploy service.
+     * @return deployService
+     */
+    public DeployServiceEntity getDeployServiceDetail(UUID id) {
+        return deployServiceStorage.findDeployServiceById(id);
+
     }
 }

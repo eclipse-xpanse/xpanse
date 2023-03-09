@@ -15,5 +15,7 @@ public interface Deployment {
 
     DeployResult deploy(DeployTask task);
 
+    DeployResult destroy(DeployTask task);
+
     DeployerKind getDeployerKind();
 }
