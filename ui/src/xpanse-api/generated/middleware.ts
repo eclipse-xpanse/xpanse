@@ -13,38 +13,34 @@ import { from, Observable } from './rxjsStub';
  *
  */
 export interface Middleware {
-  /**
-   * Modifies the request before the request is sent.
-   *
-   * @param context RequestContext of a request which is about to be sent to the server
-   * @returns an observable of the updated request context
-   *
-   */
-  pre(context: RequestContext): Observable<RequestContext>;
+    /**
+     * Modifies the request before the request is sent.
+     *
+     * @param context RequestContext of a request which is about to be sent to the server
+     * @returns an observable of the updated request context
+     *
+     */
+    pre(context: RequestContext): Observable<RequestContext>;
 
-  /**
-   * Modifies the returned response before it is deserialized.
-   *
-   * @param context ResponseContext of a sent request
-   * @returns an observable of the modified response context
-   */
-  post(context: ResponseContext): Observable<ResponseContext>;
+    /**
+     * Modifies the returned response before it is deserialized.
+     *
+     * @param context ResponseContext of a sent request
+     * @returns an observable of the modified response context
+     */
+    post(context: ResponseContext): Observable<ResponseContext>;
 }
 
 export class PromiseMiddlewareWrapper implements Middleware {
+    public constructor(private middleware: PromiseMiddleware) {}
 
-  public constructor(private middleware: PromiseMiddleware) {
+    pre(context: RequestContext): Observable<RequestContext> {
+        return from(this.middleware.pre(context));
+    }
 
-  }
-
-  pre(context: RequestContext): Observable<RequestContext> {
-    return from(this.middleware.pre(context));
-  }
-
-  post(context: ResponseContext): Observable<ResponseContext> {
-    return from(this.middleware.post(context));
-  }
-
+    post(context: ResponseContext): Observable<ResponseContext> {
+        return from(this.middleware.post(context));
+    }
 }
 
 /**
@@ -54,20 +50,20 @@ export class PromiseMiddlewareWrapper implements Middleware {
  *
  */
 export interface PromiseMiddleware {
-  /**
-   * Modifies the request before the request is sent.
-   *
-   * @param context RequestContext of a request which is about to be sent to the server
-   * @returns an observable of the updated request context
-   *
-   */
-  pre(context: RequestContext): Promise<RequestContext>;
+    /**
+     * Modifies the request before the request is sent.
+     *
+     * @param context RequestContext of a request which is about to be sent to the server
+     * @returns an observable of the updated request context
+     *
+     */
+    pre(context: RequestContext): Promise<RequestContext>;
 
-  /**
-   * Modifies the returned response before it is deserialized.
-   *
-   * @param context ResponseContext of a sent request
-   * @returns an observable of the modified response context
-   */
-  post(context: ResponseContext): Promise<ResponseContext>;
+    /**
+     * Modifies the returned response before it is deserialized.
+     *
+     * @param context ResponseContext of a sent request
+     * @returns an observable of the modified response context
+     */
+    post(context: ResponseContext): Promise<ResponseContext>;
 }

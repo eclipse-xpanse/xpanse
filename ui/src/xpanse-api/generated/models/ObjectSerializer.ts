@@ -4,71 +4,99 @@
  */
 
 import { Billing } from './Billing';
+import { CategoryOclVo } from './CategoryOclVo';
 import { CloudServiceProvider } from './CloudServiceProvider';
+import { CreateRequest } from './CreateRequest';
+import { DeployResourceEntity } from './DeployResourceEntity';
+import { DeployServiceEntity } from './DeployServiceEntity';
 import { DeployVariable } from './DeployVariable';
 import { Deployment } from './Deployment';
 import { Flavor } from './Flavor';
 import { Ocl } from './Ocl';
+import { OclDetailVo } from './OclDetailVo';
+import { ProviderOclVo } from './ProviderOclVo';
+import { RegisterServiceEntity } from './RegisterServiceEntity';
 import { Response } from './Response';
-import { ServiceStatus } from './ServiceStatus';
+import { ServiceVo } from './ServiceVo';
 import { SystemStatus } from './SystemStatus';
+import { VersionOclVo } from './VersionOclVo';
 import YAML from 'yaml';
 
-export * from '../models/Billing';
-export * from '../models/CloudServiceProvider';
-export * from '../models/DeployVariable';
-export * from '../models/Deployment';
-export * from '../models/Flavor';
-export * from '../models/Ocl';
-export * from '../models/Response';
-export * from '../models/ServiceStatus';
-export * from '../models/SystemStatus';
+export * from './Billing';
+export * from './CategoryOclVo';
+export * from './CloudServiceProvider';
+export * from './CreateRequest';
+export * from './DeployResourceEntity';
+export * from './DeployServiceEntity';
+export * from './DeployVariable';
+export * from './Deployment';
+export * from './Flavor';
+export * from './Ocl';
+export * from './OclDetailVo';
+export * from './ProviderOclVo';
+export * from './RegisterServiceEntity';
+export * from './Response';
+export * from './ServiceVo';
+export * from './SystemStatus';
+export * from './VersionOclVo';
 
 /* tslint:disable:no-unused-variable */
-let primitives = [
-    'string',
-    'boolean',
-    'double',
-    'integer',
-    'long',
-    'float',
-    'number',
-    'any'
-];
+let primitives = ['string', 'boolean', 'double', 'integer', 'long', 'float', 'number', 'any'];
 
 const supportedMediaTypes: { [mediaType: string]: number } = {
     'application/json': Infinity,
     'application/octet-stream': 0,
     'application/x-www-form-urlencoded': 0,
-    'application/x-yaml': 0
+    'application/x-yaml': 0,
 };
-
 
 let enumsMap: Set<string> = new Set<string>([
     'BillingPeriodEnum',
     'BillingCurrencyEnum',
     'CloudServiceProviderNameEnum',
+    'CreateRequestCategoryEnum',
+    'CreateRequestCspEnum',
+    'DeployResourceEntityKindEnum',
+    'DeployServiceEntityCategoryEnum',
+    'DeployServiceEntityCspEnum',
+    'DeployServiceEntityServiceStateEnum',
     'DeployVariableKindEnum',
     'DeploymentKindEnum',
-    'ServiceStatusServiceStateEnum',
-    'SystemStatusHealthStatusEnum'
+    'OclCategoryEnum',
+    'OclDetailVoCategoryEnum',
+    'ProviderOclVoNameEnum',
+    'RegisterServiceEntityCspEnum',
+    'RegisterServiceEntityCategoryEnum',
+    'RegisterServiceEntityServiceStateEnum',
+    'ServiceVoCategoryEnum',
+    'ServiceVoCspEnum',
+    'ServiceVoServiceStateEnum',
+    'SystemStatusHealthStatusEnum',
 ]);
 
 let typeMap: { [index: string]: any } = {
-    'Billing': Billing,
-    'CloudServiceProvider': CloudServiceProvider,
-    'DeployVariable': DeployVariable,
-    'Deployment': Deployment,
-    'Flavor': Flavor,
-    'Ocl': Ocl,
-    'Response': Response,
-    'ServiceStatus': ServiceStatus,
-    'SystemStatus': SystemStatus
+    Billing: Billing,
+    CategoryOclVo: CategoryOclVo,
+    CloudServiceProvider: CloudServiceProvider,
+    CreateRequest: CreateRequest,
+    DeployResourceEntity: DeployResourceEntity,
+    DeployServiceEntity: DeployServiceEntity,
+    DeployVariable: DeployVariable,
+    Deployment: Deployment,
+    Flavor: Flavor,
+    Ocl: Ocl,
+    OclDetailVo: OclDetailVo,
+    ProviderOclVo: ProviderOclVo,
+    RegisterServiceEntity: RegisterServiceEntity,
+    Response: Response,
+    ServiceVo: ServiceVo,
+    SystemStatus: SystemStatus,
+    VersionOclVo: VersionOclVo,
 };
 
 export class ObjectSerializer {
     public static findCorrectType(data: any, expectedType: string) {
-        if (data === undefined) {
+        if (data == undefined) {
             return expectedType;
         } else if (primitives.indexOf(expectedType.toLowerCase()) !== -1) {
             return expectedType;
@@ -103,11 +131,12 @@ export class ObjectSerializer {
     }
 
     public static serialize(data: any, type: string, format: string) {
-        if (data === undefined) {
+        if (data == undefined) {
             return data;
         } else if (primitives.indexOf(type.toLowerCase()) !== -1) {
             return data;
-        } else if (type.lastIndexOf('Array<', 0) === 0) { // string.startsWith pre es6
+        } else if (type.lastIndexOf('Array<', 0) === 0) {
+            // string.startsWith pre es6
             let subType: string = type.replace('Array<', ''); // Array<Type> => Type>
             subType = subType.substring(0, subType.length - 1); // Type> => Type
             let transformedData: any[] = [];
@@ -117,7 +146,7 @@ export class ObjectSerializer {
             }
             return transformedData;
         } else if (type === 'Date') {
-            if (format === 'date') {
+            if (format == 'date') {
                 let month = data.getMonth() + 1;
                 month = month < 10 ? '0' + month.toString() : month.toString();
                 let day = data.getDate();
@@ -131,7 +160,8 @@ export class ObjectSerializer {
             if (enumsMap.has(type)) {
                 return data;
             }
-            if (!typeMap[type]) { // in case we dont know the type
+            if (!typeMap[type]) {
+                // in case we dont know the type
                 return data;
             }
 
@@ -143,7 +173,11 @@ export class ObjectSerializer {
             let instance: { [index: string]: any } = {};
             for (let index in attributeTypes) {
                 let attributeType = attributeTypes[index];
-                instance[attributeType.baseName] = ObjectSerializer.serialize(data[attributeType.name], attributeType.type, attributeType.format);
+                instance[attributeType.baseName] = ObjectSerializer.serialize(
+                    data[attributeType.name],
+                    attributeType.type,
+                    attributeType.format
+                );
             }
             return instance;
         }
@@ -152,11 +186,12 @@ export class ObjectSerializer {
     public static deserialize(data: any, type: string, format: string) {
         // polymorphism may change the actual type.
         type = ObjectSerializer.findCorrectType(data, type);
-        if (data === undefined) {
+        if (data == undefined) {
             return data;
         } else if (primitives.indexOf(type.toLowerCase()) !== -1) {
             return data;
-        } else if (type.lastIndexOf('Array<', 0) === 0) { // string.startsWith pre es6
+        } else if (type.lastIndexOf('Array<', 0) === 0) {
+            // string.startsWith pre es6
             let subType: string = type.replace('Array<', ''); // Array<Type> => Type>
             subType = subType.substring(0, subType.length - 1); // Type> => Type
             let transformedData: any[] = [];
@@ -168,18 +203,24 @@ export class ObjectSerializer {
         } else if (type === 'Date') {
             return new Date(data);
         } else {
-            if (enumsMap.has(type)) {// is Enum
+            if (enumsMap.has(type)) {
+                // is Enum
                 return data;
             }
 
-            if (!typeMap[type]) { // dont know the type
+            if (!typeMap[type]) {
+                // dont know the type
                 return data;
             }
             let instance = new typeMap[type]();
             let attributeTypes = typeMap[type].getAttributeTypeMap();
             for (let index in attributeTypes) {
                 let attributeType = attributeTypes[index];
-                let value = ObjectSerializer.deserialize(data[attributeType.baseName], attributeType.type, attributeType.format);
+                let value = ObjectSerializer.deserialize(
+                    data[attributeType.baseName],
+                    attributeType.type,
+                    attributeType.format
+                );
                 if (value !== undefined) {
                     instance[attributeType.name] = value;
                 }
@@ -187,7 +228,6 @@ export class ObjectSerializer {
             return instance;
         }
     }
-
 
     /**
      * Normalize media type

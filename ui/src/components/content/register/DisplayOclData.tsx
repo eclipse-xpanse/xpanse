@@ -8,6 +8,7 @@ import { Button, Descriptions, Image, Popover } from 'antd';
 import YAML from 'yaml';
 
 function DisplayOclData({ ocl }: { ocl: Ocl }): JSX.Element | string {
+    const PLACE_HOLDER_UNKNOWN_VALUE: string = 'NOT PROVIDED';
     const getFlavoursText = (ocl: Ocl): JSX.Element => {
         if (ocl.flavors) {
             const yamlDocument = new YAML.Document();
@@ -32,10 +33,7 @@ function DisplayOclData({ ocl }: { ocl: Ocl }): JSX.Element | string {
             yamlDocument.contents = ocl.billing;
             return (
                 <Popover content={<pre>{yamlDocument.toString()}</pre>} title={'Billing'} trigger='hover'>
-                    <Button
-                        className={'ocl-data-hover'}
-                        type={'link'}
-                    >{`${ocl.billing.fixedPrice} ${ocl.billing.currency}`}</Button>
+                    <Button className={'ocl-data-hover'} type={'link'}>{`${ocl.billing.model}`}</Button>
                 </Popover>
             );
         }
@@ -95,18 +93,23 @@ function DisplayOclData({ ocl }: { ocl: Ocl }): JSX.Element | string {
                                 <br />
                                 {ocl.cloudServiceProvider && ocl.cloudServiceProvider.regions
                                     ? ocl.cloudServiceProvider.regions.join(', ')
-                                    : ''}
+                                    : PLACE_HOLDER_UNKNOWN_VALUE}
+                                <br />
+                                <br />
                             </div>
                         </div>
                     </div>
                     <div>
                         <Descriptions title={'Basic Information'} column={2} bordered className={'ocl-data-info-table'}>
-                            <Descriptions.Item label='Description'>{ocl.description}</Descriptions.Item>
+                            <Descriptions.Item label='Category'>
+                                {ocl.category ? ocl.category : PLACE_HOLDER_UNKNOWN_VALUE}
+                            </Descriptions.Item>
                             <Descriptions.Item label='Version'>{ocl.serviceVersion}</Descriptions.Item>
                             <Descriptions.Item label='Namespace'>{ocl.namespace}</Descriptions.Item>
                             <Descriptions.Item label='Flavors'>{<pre>{getFlavoursText(ocl)}</pre>}</Descriptions.Item>
                             <Descriptions.Item label='Billing'>{<pre>{getBillingText(ocl)}</pre>}</Descriptions.Item>
                             <Descriptions.Item label='Deployment'>{getDeploymentText(ocl)}</Descriptions.Item>
+                            <Descriptions.Item label='Description'>{ocl.description}</Descriptions.Item>
                         </Descriptions>
                     </div>
                 </div>

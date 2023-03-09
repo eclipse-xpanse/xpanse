@@ -15,46 +15,53 @@
  * Do not edit the class manually.
  */
 
-export class Response {
+import { OclDetailVo } from './OclDetailVo';
+
+/**
+ * List of the registered services group by service version.
+ */
+export class ProviderOclVo {
     /**
-     * The result code of response.
+     * The Cloud Service Provider.
      */
-    'code': string;
+    'name'?: ProviderOclVoNameEnum;
     /**
-     * The result message of response.
+     * The regions of the Cloud Service Provider.
      */
-    'message': string;
+    'regions'?: Array<string>;
     /**
-     * The success boolean of response.
+     * The list of the registered services.
      */
-    'success': boolean;
+    'details'?: Array<OclDetailVo>;
 
     static readonly discriminator: string | undefined = undefined;
 
     static readonly attributeTypeMap: Array<{ name: string; baseName: string; type: string; format: string }> = [
         {
-            name: 'code',
-            baseName: 'code',
-            type: 'string',
+            name: 'name',
+            baseName: 'name',
+            type: 'ProviderOclVoNameEnum',
             format: '',
         },
         {
-            name: 'message',
-            baseName: 'message',
-            type: 'string',
+            name: 'regions',
+            baseName: 'regions',
+            type: 'Array<string>',
             format: '',
         },
         {
-            name: 'success',
-            baseName: 'success',
-            type: 'boolean',
+            name: 'details',
+            baseName: 'details',
+            type: 'Array<OclDetailVo>',
             format: '',
         },
     ];
 
     static getAttributeTypeMap() {
-        return Response.attributeTypeMap;
+        return ProviderOclVo.attributeTypeMap;
     }
 
     public constructor() {}
 }
+
+export type ProviderOclVoNameEnum = 'aws' | 'azure' | 'alibaba' | 'huawei' | 'openstack';
