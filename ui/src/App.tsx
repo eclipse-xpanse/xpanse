@@ -18,7 +18,7 @@ function App(): JSX.Element {
                 path={homePageRoute}
                 element={
                     <Protected>
-                        <Home/>
+                        <Home />
                     </Protected>
                 }
             />
@@ -26,11 +26,11 @@ function App(): JSX.Element {
                 path={registerPageRoute}
                 element={
                     <Protected>
-                        <RegisterPanel/>
+                        <RegisterPanel />
                     </Protected>
                 }
             />
-            <Route path="*" element={<LoginScreen/>}/>
+            <Route path='*' element={<LoginScreen />} />
         </Routes>
     );
 }

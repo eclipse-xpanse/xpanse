@@ -68,7 +68,7 @@
 .register-buttons {
     display: flex;
     align-items: baseline;
-    gap: 10px
+    gap: 10px;
 }
 
 .ocl-data-main-info {

@@ -16,26 +16,24 @@
  */
 
 export class SystemStatus {
-  'healthStatus': SystemStatusHealthStatusEnum;
+    'healthStatus': SystemStatusHealthStatusEnum;
 
-  static readonly discriminator: string | undefined = undefined;
+    static readonly discriminator: string | undefined = undefined;
 
-  static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
-    {
-      'name': 'healthStatus',
-      'baseName': 'healthStatus',
-      'type': 'SystemStatusHealthStatusEnum',
-      'format': ''
-    }];
+    static readonly attributeTypeMap: Array<{ name: string; baseName: string; type: string; format: string }> = [
+        {
+            name: 'healthStatus',
+            baseName: 'healthStatus',
+            type: 'SystemStatusHealthStatusEnum',
+            format: '',
+        },
+    ];
 
-  static getAttributeTypeMap() {
-    return SystemStatus.attributeTypeMap;
-  }
+    static getAttributeTypeMap() {
+        return SystemStatus.attributeTypeMap;
+    }
 
-  public constructor() {
-  }
+    public constructor() {}
 }
 
-
 export type SystemStatusHealthStatusEnum = 'OK' | 'NOK';
-
