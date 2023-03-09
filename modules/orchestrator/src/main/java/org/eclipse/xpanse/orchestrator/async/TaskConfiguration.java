@@ -4,14 +4,12 @@
  *
  */
 
-
 package org.eclipse.xpanse.orchestrator.async;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * Customize the thread pool. Define ThreadPoolTaskExecutor named taskExecutor to replace @Async's
@@ -29,7 +27,7 @@ public class TaskConfiguration {
      */
     @Bean("taskExecutor")
     public Executor taskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        ServiceThreadPoolTaskExecutor executor = new ServiceThreadPoolTaskExecutor();
         executor.setCorePoolSize(CPU_COUNT * 2);
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(200);
