@@ -16,70 +16,68 @@
  */
 
 export class ServiceStatus {
-  /**
-   * The uuid of the service
-   */
-  'serviceId': string;
-  /**
-   * The name of the service
-   */
-  'serviceName': string;
-  /**
-   * Current status of the service
-   */
-  'serviceState': ServiceStatusServiceStateEnum;
-  /**
-   * Status message. Contains the reason in case the deployment has failed.
-   */
-  'statusMessage'?: string;
+    /**
+     * The uuid of the service
+     */
+    'serviceId': string;
+    /**
+     * The name of the service
+     */
+    'serviceName': string;
+    /**
+     * Current status of the service
+     */
+    'serviceState': ServiceStatusServiceStateEnum;
+    /**
+     * Status message. Contains the reason in case the deployment has failed.
+     */
+    'statusMessage'?: string;
 
-  static readonly discriminator: string | undefined = undefined;
+    static readonly discriminator: string | undefined = undefined;
 
-  static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
-    {
-      'name': 'serviceId',
-      'baseName': 'serviceId',
-      'type': 'string',
-      'format': 'uuid'
-    },
-    {
-      'name': 'serviceName',
-      'baseName': 'serviceName',
-      'type': 'string',
-      'format': ''
-    },
-    {
-      'name': 'serviceState',
-      'baseName': 'serviceState',
-      'type': 'ServiceStatusServiceStateEnum',
-      'format': ''
-    },
-    {
-      'name': 'statusMessage',
-      'baseName': 'statusMessage',
-      'type': 'string',
-      'format': ''
-    }];
+    static readonly attributeTypeMap: Array<{ name: string; baseName: string; type: string; format: string }> = [
+        {
+            name: 'serviceId',
+            baseName: 'serviceId',
+            type: 'string',
+            format: 'uuid',
+        },
+        {
+            name: 'serviceName',
+            baseName: 'serviceName',
+            type: 'string',
+            format: '',
+        },
+        {
+            name: 'serviceState',
+            baseName: 'serviceState',
+            type: 'ServiceStatusServiceStateEnum',
+            format: '',
+        },
+        {
+            name: 'statusMessage',
+            baseName: 'statusMessage',
+            type: 'string',
+            format: '',
+        },
+    ];
 
-  static getAttributeTypeMap() {
-    return ServiceStatus.attributeTypeMap;
-  }
+    static getAttributeTypeMap() {
+        return ServiceStatus.attributeTypeMap;
+    }
 
-  public constructor() {
-  }
+    public constructor() {}
 }
 
-
 export type ServiceStatusServiceStateEnum =
-  'registering'
-  | 'registered'
-  | 'starting'
-  | 'started'
-  | 'deleting'
-  | 'deleted'
-  | 'stopping'
-  | 'stopped'
-  | 'updating'
-  | 'updated'
-  | 'failed';
-
+    | 'registering'
+    | 'registered'
+    | 'starting'
+    | 'started'
+    | 'deleting'
+    | 'deleted'
+    | 'stopping'
+    | 'stopped'
+    | 'updating'
+    | 'updated'
+    | 'failed';

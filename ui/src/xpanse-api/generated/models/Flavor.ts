@@ -19,46 +19,45 @@
  * The flavors of the managed service
  */
 export class Flavor {
-  /**
-   * The flavor name
-   */
-  'name': string;
-  /**
-   * The price of the flavor
-   */
-  'fixedPrice': number;
-  /**
-   * The properties of the flavor
-   */
-  'property': { [key: string]: string; };
+    /**
+     * The flavor name
+     */
+    'name': string;
+    /**
+     * The price of the flavor
+     */
+    'fixedPrice': number;
+    /**
+     * The properties of the flavor
+     */
+    'property': { [key: string]: string };
 
-  static readonly discriminator: string | undefined = undefined;
+    static readonly discriminator: string | undefined = undefined;
 
-  static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
-    {
-      'name': 'name',
-      'baseName': 'name',
-      'type': 'string',
-      'format': ''
-    },
-    {
-      'name': 'fixedPrice',
-      'baseName': 'fixedPrice',
-      'type': 'number',
-      'format': 'int32'
-    },
-    {
-      'name': 'property',
-      'baseName': 'property',
-      'type': '{ [key: string]: string; }',
-      'format': ''
-    }];
+    static readonly attributeTypeMap: Array<{ name: string; baseName: string; type: string; format: string }> = [
+        {
+            name: 'name',
+            baseName: 'name',
+            type: 'string',
+            format: '',
+        },
+        {
+            name: 'fixedPrice',
+            baseName: 'fixedPrice',
+            type: 'number',
+            format: 'int32',
+        },
+        {
+            name: 'property',
+            baseName: 'property',
+            type: '{ [key: string]: string; }',
+            format: '',
+        },
+    ];
 
-  static getAttributeTypeMap() {
-    return Flavor.attributeTypeMap;
-  }
+    static getAttributeTypeMap() {
+        return Flavor.attributeTypeMap;
+    }
 
-  public constructor() {
-  }
+    public constructor() {}
 }
-

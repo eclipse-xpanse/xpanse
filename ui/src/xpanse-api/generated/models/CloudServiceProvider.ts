@@ -19,39 +19,37 @@
  * The cloud service provider of the managed service
  */
 export class CloudServiceProvider {
-  /**
-   * The Cloud Service Provider. valid values: aws, azure, alibaba, huawei
-   */
-  'name': CloudServiceProviderNameEnum;
-  /**
-   * The regions of the Cloud Service Provider
-   */
-  'regions': Array<string>;
+    /**
+     * The Cloud Service Provider. valid values: aws, azure, alibaba, huawei
+     */
+    'name': CloudServiceProviderNameEnum;
+    /**
+     * The regions of the Cloud Service Provider
+     */
+    'regions': Array<string>;
 
-  static readonly discriminator: string | undefined = undefined;
+    static readonly discriminator: string | undefined = undefined;
 
-  static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
-    {
-      'name': 'name',
-      'baseName': 'name',
-      'type': 'CloudServiceProviderNameEnum',
-      'format': ''
-    },
-    {
-      'name': 'regions',
-      'baseName': 'regions',
-      'type': 'Array<string>',
-      'format': ''
-    }];
+    static readonly attributeTypeMap: Array<{ name: string; baseName: string; type: string; format: string }> = [
+        {
+            name: 'name',
+            baseName: 'name',
+            type: 'CloudServiceProviderNameEnum',
+            format: '',
+        },
+        {
+            name: 'regions',
+            baseName: 'regions',
+            type: 'Array<string>',
+            format: '',
+        },
+    ];
 
-  static getAttributeTypeMap() {
-    return CloudServiceProvider.attributeTypeMap;
-  }
+    static getAttributeTypeMap() {
+        return CloudServiceProvider.attributeTypeMap;
+    }
 
-  public constructor() {
-  }
+    public constructor() {}
 }
 
-
-export type CloudServiceProviderNameEnum = 'aws' | 'azure' | 'alibaba' | 'huawei';
-
+export type CloudServiceProviderNameEnum = 'aws' | 'azure' | 'alibaba' | 'huawei' | 'openstack';

@@ -20,11 +20,14 @@ import { CloudServiceProvider } from './CloudServiceProvider';
 import { Deployment } from './Deployment';
 import { Flavor } from './Flavor';
 
-export class Ocl {
+/**
+ * The list of the registered services.
+ */
+export class OclDetailVo {
     /**
      * The catalog of the service
      */
-    'category': OclCategoryEnum;
+    'category': OclDetailVoCategoryEnum;
     /**
      * The version of the Ocl
      */
@@ -56,6 +59,10 @@ export class Ocl {
      */
     'flavors': Array<Flavor>;
     'billing': Billing;
+    /**
+     * ID of the registered service.
+     */
+    'id'?: string;
 
     static readonly discriminator: string | undefined = undefined;
 
@@ -63,7 +70,7 @@ export class Ocl {
         {
             name: 'category',
             baseName: 'category',
-            type: 'OclCategoryEnum',
+            type: 'OclDetailVoCategoryEnum',
             format: '',
         },
         {
@@ -126,16 +133,22 @@ export class Ocl {
             type: 'Billing',
             format: '',
         },
+        {
+            name: 'id',
+            baseName: 'id',
+            type: 'string',
+            format: 'uuid',
+        },
     ];
 
     static getAttributeTypeMap() {
-        return Ocl.attributeTypeMap;
+        return OclDetailVo.attributeTypeMap;
     }
 
     public constructor() {}
 }
 
-export type OclCategoryEnum =
+export type OclDetailVoCategoryEnum =
     | 'AI'
     | 'COMPUTE'
     | 'CONTAINER'

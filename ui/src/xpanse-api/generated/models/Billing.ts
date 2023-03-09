@@ -19,70 +19,48 @@
  * The billing policy of the managed service
  */
 export class Billing {
-  /**
-   * The business model of the managed service
-   */
-  'model': string;
-  /**
-   * The rental period of the managed service
-   */
-  'period': BillingPeriodEnum;
-  /**
-   * The billing currency of the managed service, valid values: euro,uso
-   */
-  'currency': BillingCurrencyEnum;
-  /**
-   * The fixed price during the period for the managed service
-   */
-  'fixedPrice': number;
-  /**
-   * The price depending of item volume for the managed service
-   */
-  'variablePrice': number;
+    /**
+     * The business model of the managed service
+     */
+    'model': string;
+    /**
+     * The rental period of the managed service
+     */
+    'period': BillingPeriodEnum;
+    /**
+     * The billing currency of the managed service, valid values: euro,uso
+     */
+    'currency': BillingCurrencyEnum;
 
-  static readonly discriminator: string | undefined = undefined;
+    static readonly discriminator: string | undefined = undefined;
 
-  static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
-    {
-      'name': 'model',
-      'baseName': 'model',
-      'type': 'string',
-      'format': ''
-    },
-    {
-      'name': 'period',
-      'baseName': 'period',
-      'type': 'BillingPeriodEnum',
-      'format': ''
-    },
-    {
-      'name': 'currency',
-      'baseName': 'currency',
-      'type': 'BillingCurrencyEnum',
-      'format': ''
-    },
-    {
-      'name': 'fixedPrice',
-      'baseName': 'fixedPrice',
-      'type': 'number',
-      'format': 'double'
-    },
-    {
-      'name': 'variablePrice',
-      'baseName': 'variablePrice',
-      'type': 'number',
-      'format': 'double'
-    }];
+    static readonly attributeTypeMap: Array<{ name: string; baseName: string; type: string; format: string }> = [
+        {
+            name: 'model',
+            baseName: 'model',
+            type: 'string',
+            format: '',
+        },
+        {
+            name: 'period',
+            baseName: 'period',
+            type: 'BillingPeriodEnum',
+            format: '',
+        },
+        {
+            name: 'currency',
+            baseName: 'currency',
+            type: 'BillingCurrencyEnum',
+            format: '',
+        },
+    ];
 
-  static getAttributeTypeMap() {
-    return Billing.attributeTypeMap;
-  }
+    static getAttributeTypeMap() {
+        return Billing.attributeTypeMap;
+    }
 
-  public constructor() {
-  }
+    public constructor() {}
 }
-
 
 export type BillingPeriodEnum = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
 export type BillingCurrencyEnum = 'usd' | 'euro' | 'gbp' | 'cad' | 'dem' | 'frf' | 'cny';
-

@@ -15,45 +15,40 @@
  * Do not edit the class manually.
  */
 
-export class Response {
+import { ProviderOclVo } from './ProviderOclVo';
+
+/**
+ * List of the registered service group by service version.
+ */
+export class VersionOclVo {
     /**
-     * The result code of response.
+     * Version of the registered service.
      */
-    'code': string;
+    'version'?: string;
     /**
-     * The result message of response.
+     * List of the registered services group by service version.
      */
-    'message': string;
-    /**
-     * The success boolean of response.
-     */
-    'success': boolean;
+    'cloudProvider'?: Array<ProviderOclVo>;
 
     static readonly discriminator: string | undefined = undefined;
 
     static readonly attributeTypeMap: Array<{ name: string; baseName: string; type: string; format: string }> = [
         {
-            name: 'code',
-            baseName: 'code',
+            name: 'version',
+            baseName: 'version',
             type: 'string',
             format: '',
         },
         {
-            name: 'message',
-            baseName: 'message',
-            type: 'string',
-            format: '',
-        },
-        {
-            name: 'success',
-            baseName: 'success',
-            type: 'boolean',
+            name: 'cloudProvider',
+            baseName: 'cloudProvider',
+            type: 'Array<ProviderOclVo>',
             format: '',
         },
     ];
 
     static getAttributeTypeMap() {
-        return Response.attributeTypeMap;
+        return VersionOclVo.attributeTypeMap;
     }
 
     public constructor() {}
