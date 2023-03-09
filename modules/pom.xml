@@ -20,7 +20,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>ocl-loader</module>
+        <module>models</module>
         <module>orchestrator</module>
         <module>api</module>
         <module>database</module>

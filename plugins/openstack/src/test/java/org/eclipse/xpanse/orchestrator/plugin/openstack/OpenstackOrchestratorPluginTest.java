@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.openstack;
 
-import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
+import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

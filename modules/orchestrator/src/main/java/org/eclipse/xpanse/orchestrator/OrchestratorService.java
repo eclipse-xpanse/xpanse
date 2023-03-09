@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.orchestrator;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,12 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.deployment.DeployResult;
-import org.eclipse.xpanse.modules.deployment.DeployTask;
 import org.eclipse.xpanse.modules.deployment.Deployment;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployerKind;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.ServiceState;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.view.ServiceVo;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
+import org.eclipse.xpanse.modules.models.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
 import org.springframework.beans.BeanUtils;
@@ -43,8 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Component
 public class OrchestratorService implements ApplicationListener<ApplicationEvent> {
-
-    private static final String TASK_ID = "TASK_ID";
 
     private final RegisterServiceStorage registerServiceStorage;
 
@@ -69,10 +68,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             ApplicationContext applicationContext =
                     ((ContextRefreshedEvent) event).getApplicationContext();
             plugins.addAll(applicationContext.getBeansOfType(OrchestratorPlugin.class).values());
-            if (plugins.size() > 1) {
-                throw new RuntimeException("More than one xpanse plugin found. "
-                        + "Only one plugin can be active at a time.");
-            }
             if (plugins.isEmpty()) {
                 log.warn("No xpanse plugins loaded by the runtime.");
             }
@@ -92,13 +87,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     public DeployServiceEntity getNewDeployServiceTask(DeployTask deployTask) {
         DeployServiceEntity entity = new DeployServiceEntity();
         entity.setId(deployTask.getId());
+        entity.setCreateTime(new Date());
         entity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
         entity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getName()));
         entity.setCsp(deployTask.getCreateRequest().getCsp());
         entity.setCategory(deployTask.getCreateRequest().getCategory());
         entity.setFlavor(deployTask.getCreateRequest().getFlavor());
-        entity.setProperty(deployTask.getCreateRequest().getProperty());
-        entity.setOcl(deployTask.getOcl());
+        entity.setCreateRequest(deployTask.getCreateRequest());
         return entity;
     }
 
@@ -109,7 +104,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
      */
     public Deployment getDeployHandler(DeployTask deployTask) {
 
-        // Find the registered service.
+        // Find the registered service and fill Ocl.
         RegisterServiceEntity serviceEntity = new RegisterServiceEntity();
         serviceEntity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getName()));
         serviceEntity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
@@ -119,30 +114,15 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
             throw new RuntimeException("Registered service not found");
         }
+        // Set Ocl and CreateRequest
         deployTask.setOcl(serviceEntity.getOcl());
-
-        // Find the deployment plugin and resource handler
-        Optional<OrchestratorPlugin> pluginOptional =
-                this.plugins.stream()
-                        .filter(plugin -> plugin.getCsp() == deployTask.getCreateRequest().getCsp())
-                        .findFirst();
-        if (pluginOptional.isEmpty() || Objects.isNull(pluginOptional.get().getResourceHandler())) {
-            throw new RuntimeException("Can't find suitable plugin and resource handler for the "
-                    + "Task.");
-        }
-        deployTask.setDeployResourceHandler(pluginOptional.get().getResourceHandler());
-
-        // Find the deployment.
-        DeployerKind deployerKind = serviceEntity.getOcl().getDeployment().getKind();
-        Optional<Deployment> deploymentOptional =
-                this.deployers.stream()
-                        .filter(deployer -> deployer.getDeployerKind() == deployerKind)
-                        .findFirst();
-        if (deploymentOptional.isEmpty()) {
-            throw new RuntimeException("Can't find suitable deployer for the Task.");
-        }
-        return deploymentOptional.get();
-
+        deployTask.getCreateRequest().setOcl(serviceEntity.getOcl());
+        // Check context validation
+        checkContextValidation(deployTask);
+        // Fill the handler
+        fillHandler(deployTask);
+        // get the deployment.
+        return getDeployment(deployTask);
     }
 
     /**
@@ -160,7 +140,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
-            deployServiceEntity.setDeployResourceEntity(deployResult.getResources());
+            deployServiceEntity.setDeployResult(deployResult);
             deployServiceStorage.store(deployServiceEntity);
         } catch (Exception e) {
             log.error("asyncDeployService failed.", e);
@@ -179,34 +159,26 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         // Find the deployed service.
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
-        if (Objects.isNull(deployServiceEntity) || Objects.isNull(deployServiceEntity.getOcl())) {
+        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
+                deployServiceEntity.getCreateRequest())) {
             throw new RuntimeException(String.format("Deployed service with id %s not found",
                     deployTask.getId()));
         }
-
-        deployTask.setOcl(deployServiceEntity.getOcl());
-
-        // Find the deployment plugin and resource handler
-        Optional<OrchestratorPlugin> pluginOptional =
-                this.plugins.stream()
-                        .filter(plugin -> plugin.getCsp() == deployTask.getCreateRequest().getCsp())
-                        .findFirst();
-        if (pluginOptional.isEmpty() || Objects.isNull(pluginOptional.get().getResourceHandler())) {
-            throw new RuntimeException("Can't find suitable plugin and resource handler for the "
-                    + "Task.");
+        // Get state of service.
+        ServiceState state = deployServiceEntity.getServiceState();
+        if (state.equals(ServiceState.DEPLOYING) || state.equals(ServiceState.DESTROYING)) {
+            throw new RuntimeException(String.format("Service with id %s is %s.",
+                    deployTask.getId(), state));
         }
-        deployTask.setDeployResourceHandler(pluginOptional.get().getResourceHandler());
-
-        // Find the deployment.
-        DeployerKind deployerKind = deployServiceEntity.getOcl().getDeployment().getKind();
-        Optional<Deployment> deploymentOptional =
-                this.deployers.stream()
-                        .filter(deployer -> deployer.getDeployerKind() == deployerKind)
-                        .findFirst();
-        if (deploymentOptional.isEmpty()) {
-            throw new RuntimeException("Can't find suitable deployer for the Task.");
-        }
-        return deploymentOptional.get();
+        // Set Ocl and CreateRequest
+        deployTask.setCreateRequest(deployServiceEntity.getCreateRequest());
+        deployTask.setOcl(deployServiceEntity.getCreateRequest().getOcl());
+        // Check context validation
+        checkContextValidation(deployTask);
+        // Fill the handler
+        fillHandler(deployTask);
+        // get the deployment.
+        return getDeployment(deployTask);
 
     }
 
@@ -228,8 +200,9 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         try {
             deployServiceEntity.setServiceState(ServiceState.DESTROYING);
             deployServiceStorage.store(deployServiceEntity);
-            deployment.deploy(deployTask);
+            DeployResult deployResult = deployment.destroy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
+            deployServiceEntity.setDeployResult(deployResult);
             deployServiceStorage.store(deployServiceEntity);
         } catch (RuntimeException e) {
             log.error("asyncDestroyService failed", e);
@@ -266,4 +239,35 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         return deployServiceStorage.findDeployServiceById(id);
 
     }
+
+
+    private void fillHandler(DeployTask deployTask) {
+        // Find the deployment plugin and resource handler
+        Optional<OrchestratorPlugin> pluginOptional =
+                this.plugins.stream()
+                        .filter(plugin -> plugin.getCsp() == deployTask.getCreateRequest().getCsp())
+                        .findFirst();
+        if (pluginOptional.isEmpty() || Objects.isNull(pluginOptional.get().getResourceHandler())) {
+            throw new RuntimeException("Can't find suitable plugin and resource handler for the "
+                    + "Task.");
+        }
+        deployTask.setDeployResourceHandler(pluginOptional.get().getResourceHandler());
+    }
+
+    private Deployment getDeployment(DeployTask deployTask) {
+        DeployerKind deployerKind = deployTask.getOcl().getDeployment().getKind();
+        Optional<Deployment> deploymentOptional =
+                this.deployers.stream()
+                        .filter(deployer -> deployer.getDeployerKind() == deployerKind)
+                        .findFirst();
+        if (deploymentOptional.isEmpty()) {
+            throw new RuntimeException("Can't find suitable deployer for the Task.");
+        }
+        return deploymentOptional.get();
+    }
+
+    private void checkContextValidation(DeployTask deployTask) {
+        // TODO check validation between ocl deployment context and createQuest property.
+    }
+
 }

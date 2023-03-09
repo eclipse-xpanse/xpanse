@@ -6,7 +6,9 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployerKind;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
+import org.eclipse.xpanse.modules.models.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.service.DeployResult;
 
 /**
  * Interface to produce a service.

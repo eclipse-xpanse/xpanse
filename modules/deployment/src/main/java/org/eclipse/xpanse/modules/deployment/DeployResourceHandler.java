@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import org.eclipse.xpanse.modules.models.service.DeployResult;
+
 /**
  * Handler for the DeployResource.
  */

@@ -13,16 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.deployment.DeployResult;
-import org.eclipse.xpanse.modules.deployment.DeployTask;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.DeployVariable;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Flavor;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployVariableKind;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployerKind;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.resource.DeployVariable;
+import org.eclipse.xpanse.modules.models.resource.Flavor;
+import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.springframework.stereotype.Component;
 
 /**
@@ -55,7 +54,7 @@ public class TerraformDeployment implements Deployment {
         executor.deploy();
         String tfState = executor.getTerraformState();
 
-        DeployResult deployResult = new DeployResult(task);
+        DeployResult deployResult = new DeployResult();
         if (StringUtils.isBlank(tfState)) {
             deployResult.setState(TerraformExecState.DEPLOY_FAILED);
         } else {
@@ -75,7 +74,8 @@ public class TerraformDeployment implements Deployment {
         String workspace = getWorkspacePath(task.getId().toString());
         TerraformExecutor executor =
                 new TerraformExecutor(getEnv(task), getVariables(task), workspace);
-        DeployResult result = new DeployResult(task);
+        DeployResult result = new DeployResult();
+        result.setId(task.getId());
         executor.destroy();
         result.setState(TerraformExecState.DESTROY_SUCCESS);
         return result;

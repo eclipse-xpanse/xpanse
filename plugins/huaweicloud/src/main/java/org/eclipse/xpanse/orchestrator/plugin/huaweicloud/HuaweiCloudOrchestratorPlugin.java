@@ -8,7 +8,7 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

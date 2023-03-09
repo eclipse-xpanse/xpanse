@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.orchestrator;
 
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 
 /**
  * This interface describes orchestrator plugin in charge of interacting with backend fundamental

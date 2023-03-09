@@ -75,7 +75,7 @@ public class TerraformExecutor {
      * false.
      */
     public boolean tfDestroy() {
-        return executeWithVariables(new StringBuilder("terraform destroy -auto-approve"));
+        return executeWithVariables(new StringBuilder("terraform destroy -auto-approve "));
     }
 
     /**
