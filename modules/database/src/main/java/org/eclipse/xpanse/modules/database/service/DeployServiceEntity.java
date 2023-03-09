@@ -31,7 +31,7 @@ import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Category;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.DeployState;
+import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.ServiceState;
 import org.hibernate.annotations.Type;
 
 /**
@@ -50,6 +50,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
     /**
      * The category of the Service.
      */
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     /**
@@ -65,12 +66,19 @@ public class DeployServiceEntity extends CreateModifiedTime {
     /**
      * The csp of the Service.
      */
+    @Enumerated(EnumType.STRING)
     private Csp csp;
 
     /**
      * The flavor of the Service.
      */
     private String flavor;
+
+    /**
+     * The state of the Service.
+     */
+    @Enumerated(EnumType.STRING)
+    private ServiceState serviceState;
 
     /**
      * The Ocl object of the XpanseDeployTask.

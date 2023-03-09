@@ -14,16 +14,16 @@ import org.apache.commons.lang3.StringUtils;
  * Period for Billing.
  */
 public enum Category {
-    AI("ai"),
-    COMPUTE("compute"),
-    CONTAINER("container"),
-    STORAGE("storage"),
-    NETWORK("network"),
-    DATABASE("database"),
-    MEDIA_SERVICE("mediasService"),
-    SECURITY("security"),
-    MIDDLEWARE("middleware"),
-    OTHERS("others");
+    AI("AI"),
+    COMPUTE("COMPUTE"),
+    CONTAINER("CONTAINER"),
+    STORAGE("STORAGE"),
+    NETWORK("NETWORK"),
+    DATABASE("DATABASE"),
+    MEDIA_SERVICE("MediaService"),
+    SECURITY("SECURITY"),
+    MIDDLEWARE("MIDDLEWARE"),
+    OTHERS("OTHERS");
 
     private final String catalog;
 
@@ -37,7 +37,7 @@ public enum Category {
     @JsonCreator
     public Category getByValue(String period) {
         for (Category category : values()) {
-            if (category.catalog.equals(StringUtils.lowerCase(period))) {
+            if (StringUtils.equalsIgnoreCase(category.catalog, period)) {
                 return category;
             }
         }

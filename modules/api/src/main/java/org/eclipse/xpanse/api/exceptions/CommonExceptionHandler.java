@@ -36,6 +36,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        log.error("handleMethodArgumentNotValidException: ", ex);
         BindingResult bindingResult = ex.getBindingResult();
         StringBuilder sb = new StringBuilder();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
@@ -52,6 +53,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleConstraintViolationException(ConstraintViolationException ex) {
+        log.error("handleConstraintViolationException: ", ex);
         String failMessage = ex.getMessage();
         return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
     }
@@ -63,6 +65,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Response handleRuntimeException(RuntimeException ex) {
         String failMessage = ex.getMessage();
+        log.error("handleRuntimeException: ", ex);
         return Response.errorResponse(ResultCode.RUNTIME_ERROR, failMessage);
     }
 
@@ -72,6 +75,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({HttpMessageConversionException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Response handleHttpMessageConversionException(HttpMessageConversionException ex) {
+        log.error("handleHttpMessageConversionException: ", ex);
         String failMessage = ex.getMessage();
         return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
     }
@@ -82,6 +86,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({EntityNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Response handleNotFoundException(EntityNotFoundException ex) {
+        log.error("handleNotFoundException: ", ex);
         String failMessage = ex.getMessage();
         return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
     }
