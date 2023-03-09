@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.providers;
 
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.Provider;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 
 /**
  * Terraform provider information for Huawei.

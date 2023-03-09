@@ -14,12 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.common.DeployResourceKind;
-import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.ocl.loader.OclLoader;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.service.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.DeployResource;
+import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,13 +45,11 @@ public class DatabaseDeployServiceStorageTest {
         Map<String, String> property = new HashMap<>();
         property.put("secgroup_id", "1234567890");
 
-        List<DeployResourceEntity> deployResourceEntityList = new ArrayList<>();
-        DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setResourceId("11111122222222333333333");
-        deployResourceEntity.setName("kafka-instance");
-        deployResourceEntity.setKind(DeployResourceKind.Vm);
-        deployResourceEntity.setProperty(property);
-        deployResourceEntityList.add(deployResourceEntity);
+        DeployResource deployResource = new DeployResource();
+        deployResource.setResourceId("11111122222222333333333");
+        deployResource.setName("kafka-instance");
+        deployResource.setKind(DeployResourceKind.Vm);
+        deployResource.setProperty(property);
 
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setVersion("V1.3");
@@ -57,9 +57,14 @@ public class DatabaseDeployServiceStorageTest {
         deployServiceEntity.setId(UUID.randomUUID());
         deployServiceEntity.setCsp(Csp.HUAWEI);
         deployServiceEntity.setFlavor("simple-slave");
-        deployServiceEntity.setProperty(property);
-        deployServiceEntity.setOcl(ocl);
-        deployServiceEntity.setDeployResourceEntity(deployResourceEntityList);
+
+        List<DeployResource> deployResources = new ArrayList<>();
+        deployResources.add(deployResource);
+        DeployResult deployResult = new DeployResult();
+        deployResult.setResources(deployResources);
+        deployServiceEntity.setDeployResult(deployResult);
+        CreateRequest request = new CreateRequest();
+        request.setOcl(ocl);
         this.entityManager.persist(deployServiceEntity);
     }
 }

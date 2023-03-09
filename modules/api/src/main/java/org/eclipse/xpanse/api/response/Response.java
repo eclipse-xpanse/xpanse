@@ -36,7 +36,7 @@ public class Response {
      * @param errMsg     error message
      * @return errorResponse
      */
-    public static  Response errorResponse(ResultCode resultCode, String errMsg) {
+    public static Response errorResponse(ResultCode resultCode, String errMsg) {
         Response response = new Response();
         response.success = false;
         response.code = resultCode.getCode();
@@ -50,7 +50,7 @@ public class Response {
      * @param successMsg success message
      * @return successResponse
      */
-    public static  Response successResponse(String successMsg) {
+    public static Response successResponse(String successMsg) {
         Response response = new Response();
         response.success = true;
         response.code = ResultCode.SUCCESS.getCode();

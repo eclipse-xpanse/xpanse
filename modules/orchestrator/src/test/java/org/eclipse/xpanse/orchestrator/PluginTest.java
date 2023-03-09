@@ -8,8 +8,8 @@ package org.eclipse.xpanse.orchestrator;
 
 import lombok.extern.java.Log;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.springframework.stereotype.Component;
 
 @Log

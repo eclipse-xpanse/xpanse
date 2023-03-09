@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>ocl-loader</artifactId>
+            <artifactId>models</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

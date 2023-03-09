@@ -18,20 +18,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.deployment.DeployTask;
 import org.eclipse.xpanse.modules.deployment.Deployment;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.SystemStatus;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Category;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.Csp;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.HealthStatus;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisteredServiceQuery;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.view.CategoryOclVo;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.view.ServiceVo;
-import org.eclipse.xpanse.modules.service.CreateRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
+import org.eclipse.xpanse.modules.models.SystemStatus;
+import org.eclipse.xpanse.modules.models.enums.Category;
+import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.HealthStatus;
+import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.service.CreateRequest;
+import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
+import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -358,8 +357,9 @@ public class OrchestratorApi {
         log.info("Starting managed service with name {}, version {}, csp {}",
                 deployRequest.getName(),
                 deployRequest.getVersion(), deployRequest.getCsp());
+        UUID id = UUID.randomUUID();
         DeployTask deployTask = new DeployTask();
-        UUID id = UUID.fromString(MDC.get("REQUEST_ID"));
+        deployRequest.setId(id);
         deployTask.setId(id);
         deployTask.setCreateRequest(deployRequest);
         Deployment deployment = this.orchestratorService.getDeployHandler(deployTask);
@@ -369,7 +369,7 @@ public class OrchestratorApi {
                 deployRequest.getName(),
                 deployRequest.getVersion(), deployRequest.getCsp(), deployTask.getId());
         log.info(successMsg);
-        return deployTask.getId();
+        return id;
     }
 
     /**

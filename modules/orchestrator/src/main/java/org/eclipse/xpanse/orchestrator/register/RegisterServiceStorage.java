@@ -9,7 +9,7 @@ package org.eclipse.xpanse.orchestrator.register;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 
 /**
  * Interface to be implemented by register service database.

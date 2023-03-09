@@ -15,7 +15,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceRepository;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;

@@ -18,27 +18,27 @@ You can create a basic plugin Maven `pom.xml` containing the OSC Orchestrator an
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>my-group</groupId>
-    <artifactId>my-plugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+  <groupId>my-group</groupId>
+  <artifactId>my-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>orchestrator</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>ocl-loader</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.xpanse.modules</groupId>
+      <artifactId>orchestrator</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.xpanse.modules</groupId>
+      <artifactId>models</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 
 </project>
 ```
