@@ -72,6 +72,7 @@ public class RegisterServiceImpl implements RegisterService {
                     + "existed.", id));
         }
         existedService.setOcl(ocl);
+        existedService.setServiceState(ServiceState.UPDATED);
         storage.store(existedService);
     }
 
@@ -119,9 +120,10 @@ public class RegisterServiceImpl implements RegisterService {
      * @return registerServiceEntity
      */
     @Override
-    public RegisterServiceEntity getRegisteredService(String managedServiceId) {
+    public OclDetailVo getRegisteredService(String managedServiceId) {
         UUID uuid = UUID.fromString(managedServiceId);
-        return storage.getRegisterServiceById(uuid);
+        RegisterServiceEntity serviceEntity = storage.getRegisterServiceById(uuid);
+        return convertToOclDetailVo(serviceEntity);
     }
 
     /**
@@ -167,12 +169,8 @@ public class RegisterServiceImpl implements RegisterService {
                 cspListMap.forEach((csp, cspList) -> {
                     ProviderOclVo providerOclVo = new ProviderOclVo();
                     providerOclVo.setName(csp);
-                    List<OclDetailVo> details = cspList.stream().map(cspVo -> {
-                        OclDetailVo oclDetailVo = new OclDetailVo();
-                        oclDetailVo.setId(cspVo.getId());
-                        BeanUtils.copyProperties(cspVo.getOcl(), oclDetailVo);
-                        return oclDetailVo;
-                    }).collect(Collectors.toList());
+                    List<OclDetailVo> details = cspList.stream().map(this::convertToOclDetailVo)
+                            .collect(Collectors.toList());
                     providerOclVo.setDetails(details);
                     providerOclVo.setRegions(
                             details.get(0).getCloudServiceProvider().getRegions());
@@ -198,4 +196,18 @@ public class RegisterServiceImpl implements RegisterService {
         UUID uuid = UUID.fromString(managedServiceId);
         storage.removeById(uuid);
     }
+
+    private OclDetailVo convertToOclDetailVo(RegisterServiceEntity serviceEntity) {
+        if (Objects.isNull(serviceEntity)) {
+            return null;
+        }
+        OclDetailVo oclDetailVo = new OclDetailVo();
+        oclDetailVo.setId(serviceEntity.getId());
+        BeanUtils.copyProperties(serviceEntity.getOcl(), oclDetailVo);
+        oclDetailVo.setCreateTime(serviceEntity.getCreateTime());
+        oclDetailVo.setLastModifiedTime(serviceEntity.getLastModifiedTime());
+        oclDetailVo.setServiceState(serviceEntity.getServiceState());
+        return oclDetailVo;
+    }
+
 }

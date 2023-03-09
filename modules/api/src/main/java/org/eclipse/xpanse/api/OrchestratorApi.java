@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
+import org.eclipse.xpanse.modules.models.view.OclDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
@@ -292,17 +293,17 @@ public class OrchestratorApi {
     @GetMapping(value = "/register/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Ocl detail(
+    public OclDetailVo detail(
             @Parameter(name = "id", description = "id of registered service")
             @PathVariable("id") String id) {
         log.info("Get detail of registered service with name {}.", id);
-        RegisterServiceEntity registerServiceEntity =
+        OclDetailVo oclDetailVo =
                 registerService.getRegisteredService(id);
         String successMsg = String.format(
                 "Get detail of registered service with name %s success.",
                 id);
         log.info(successMsg);
-        return registerServiceEntity.getOcl();
+        return oclDetailVo;
     }
 
     /**

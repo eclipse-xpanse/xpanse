@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum ServiceState {
 
     REGISTERED("registered"),
+    UPDATED("updated"),
     DEPLOYING("deploying"),
     DEPLOY_SUCCESS("deploy_success"),
     DEPLOY_FAILED("deploy_failed"),
@@ -48,6 +49,6 @@ public enum ServiceState {
      */
     @JsonValue
     public String toValue() {
-        return this.serviceState;
+        return this.name();
     }
 }

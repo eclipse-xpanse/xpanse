@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
+import org.eclipse.xpanse.modules.models.view.OclDetailVo;
 
 /**
  * This interface describes register service in charge of interacting with backend fundamental
@@ -59,7 +60,7 @@ public interface RegisterService {
      * @param registeredServiceId the ID of registered service.
      * @return registerServiceEntity
      */
-    RegisterServiceEntity getRegisteredService(String registeredServiceId);
+    OclDetailVo getRegisteredService(String registeredServiceId);
 
     /**
      * Search registered service by query model.
