@@ -33,7 +33,7 @@ function DisplayOclData({ ocl }: { ocl: Ocl }): JSX.Element | string {
             yamlDocument.contents = ocl.billing;
             return (
                 <Popover content={<pre>{yamlDocument.toString()}</pre>} title={'Billing'} trigger='hover'>
-                    <Button className={'ocl-data-hover'} type={'link'}>{`${ocl.billing.model}`}</Button>
+                    <Button className={'ocl-data-hover'} type={'link'}>{`${ocl.billing.period}`}</Button>
                 </Popover>
             );
         }
