@@ -24,3 +24,6 @@ jobs:
           java-version: 17
       - name: Build
         run: mvn --batch-mode --update-snapshots --no-transfer-progress verify
+      - name: Check UI code format
+        working-directory: ./ui
+        run: npx prettier --config .prettierrc --check .
