@@ -17,6 +17,7 @@ import { AdminApiRequestFactory, AdminApiResponseProcessor } from '../apis/Admin
 import { ServiceApiRequestFactory, ServiceApiResponseProcessor } from '../apis/ServiceApi';
 import { ServiceVendorApiRequestFactory, ServiceVendorApiResponseProcessor } from '../apis/ServiceVendorApi';
 import { CategoryOclVo } from '../models/CategoryOclVo';
+import { OclDetailVo } from '../models/OclDetailVo';
 
 export interface AdminApiHealthRequest {}
 
@@ -227,7 +228,7 @@ export class ObjectServiceVendorApi {
      * Get registered service using id.
      * @param param the request object
      */
-    public detail(param: ServiceVendorApiDetailRequest, options?: Configuration): Promise<Ocl> {
+    public detail(param: ServiceVendorApiDetailRequest, options?: Configuration): Promise<OclDetailVo> {
         return this.api.detail(param.id, options).toPromise();
     }
 

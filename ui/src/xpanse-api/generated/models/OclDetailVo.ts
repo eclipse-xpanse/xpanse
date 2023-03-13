@@ -20,9 +20,6 @@ import { CloudServiceProvider } from './CloudServiceProvider';
 import { Deployment } from './Deployment';
 import { Flavor } from './Flavor';
 
-/**
- * The list of the registered services.
- */
 export class OclDetailVo {
     /**
      * The catalog of the service
@@ -63,6 +60,18 @@ export class OclDetailVo {
      * ID of the registered service.
      */
     'id'?: string;
+    /**
+     * Time of register service.
+     */
+    'createTime'?: Date;
+    /**
+     * Time of update service.
+     */
+    'lastModifiedTime'?: Date;
+    /**
+     * State of service.
+     */
+    'serviceState'?: OclDetailVoServiceStateEnum;
 
     static readonly discriminator: string | undefined = undefined;
 
@@ -139,6 +148,24 @@ export class OclDetailVo {
             type: 'string',
             format: 'uuid',
         },
+        {
+            name: 'createTime',
+            baseName: 'createTime',
+            type: 'Date',
+            format: 'date-time',
+        },
+        {
+            name: 'lastModifiedTime',
+            baseName: 'lastModifiedTime',
+            type: 'Date',
+            format: 'date-time',
+        },
+        {
+            name: 'serviceState',
+            baseName: 'serviceState',
+            type: 'OclDetailVoServiceStateEnum',
+            format: '',
+        },
     ];
 
     static getAttributeTypeMap() {
@@ -149,13 +176,22 @@ export class OclDetailVo {
 }
 
 export type OclDetailVoCategoryEnum =
-    | 'AI'
-    | 'COMPUTE'
-    | 'CONTAINER'
-    | 'STORAGE'
-    | 'NETWORK'
-    | 'DATABASE'
-    | 'MEDIA_SERVICE'
-    | 'SECURITY'
-    | 'MIDDLEWARE'
-    | 'OTHERS';
+    | 'ai'
+    | 'compute'
+    | 'container'
+    | 'storage'
+    | 'network'
+    | 'database'
+    | 'media_service'
+    | 'security'
+    | 'middleware'
+    | 'others';
+export type OclDetailVoServiceStateEnum =
+    | 'REGISTERED'
+    | 'UPDATED'
+    | 'DEPLOYING'
+    | 'DEPLOY_SUCCESS'
+    | 'DEPLOY_FAILED'
+    | 'DESTROYING'
+    | 'DESTROY_SUCCESS'
+    | 'DESTROY_FAILED';

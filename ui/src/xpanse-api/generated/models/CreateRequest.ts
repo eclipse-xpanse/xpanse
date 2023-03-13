@@ -16,11 +16,33 @@
  */
 
 export class CreateRequest {
+    /**
+     * The category of the service
+     */
     'category': CreateRequestCategoryEnum;
+    /**
+     * The name of the service
+     */
     'name': string;
+    /**
+     * The version of service
+     */
     'version': string;
+    /**
+     * The region of the provider.
+     */
+    'region': string;
+    /**
+     * The csp of the Service.
+     */
     'csp': CreateRequestCspEnum;
+    /**
+     * The flavor of the Service.
+     */
     'flavor': string;
+    /**
+     * The property of the Service
+     */
     'property'?: { [key: string]: string };
 
     static readonly discriminator: string | undefined = undefined;
@@ -41,6 +63,12 @@ export class CreateRequest {
         {
             name: 'version',
             baseName: 'version',
+            type: 'string',
+            format: '',
+        },
+        {
+            name: 'region',
+            baseName: 'region',
             type: 'string',
             format: '',
         },
@@ -72,14 +100,14 @@ export class CreateRequest {
 }
 
 export type CreateRequestCategoryEnum =
-    | 'AI'
-    | 'COMPUTE'
-    | 'CONTAINER'
-    | 'STORAGE'
-    | 'NETWORK'
-    | 'DATABASE'
-    | 'MEDIA_SERVICE'
-    | 'SECURITY'
-    | 'MIDDLEWARE'
-    | 'OTHERS';
+    | 'ai'
+    | 'compute'
+    | 'container'
+    | 'storage'
+    | 'network'
+    | 'database'
+    | 'media_service'
+    | 'security'
+    | 'middleware'
+    | 'others';
 export type CreateRequestCspEnum = 'aws' | 'azure' | 'alibaba' | 'huawei' | 'openstack';

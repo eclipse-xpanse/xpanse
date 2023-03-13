@@ -96,21 +96,22 @@ export class RegisterServiceEntity {
 
 export type RegisterServiceEntityCspEnum = 'aws' | 'azure' | 'alibaba' | 'huawei' | 'openstack';
 export type RegisterServiceEntityCategoryEnum =
-    | 'AI'
-    | 'COMPUTE'
-    | 'CONTAINER'
-    | 'STORAGE'
-    | 'NETWORK'
-    | 'DATABASE'
-    | 'MEDIA_SERVICE'
-    | 'SECURITY'
-    | 'MIDDLEWARE'
-    | 'OTHERS';
+    | 'ai'
+    | 'compute'
+    | 'container'
+    | 'storage'
+    | 'network'
+    | 'database'
+    | 'media_service'
+    | 'security'
+    | 'middleware'
+    | 'others';
 export type RegisterServiceEntityServiceStateEnum =
-    | 'registered'
-    | 'deploying'
-    | 'deploy_success'
-    | 'deploy_failed'
-    | 'destroying'
-    | 'destroy_success'
-    | 'destroy_failed';
+    | 'REGISTERED'
+    | 'UPDATED'
+    | 'DEPLOYING'
+    | 'DEPLOY_SUCCESS'
+    | 'DEPLOY_FAILED'
+    | 'DESTROYING'
+    | 'DESTROY_SUCCESS'
+    | 'DESTROY_FAILED';
