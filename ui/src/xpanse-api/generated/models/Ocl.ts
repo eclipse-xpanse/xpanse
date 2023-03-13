@@ -136,13 +136,13 @@ export class Ocl {
 }
 
 export type OclCategoryEnum =
-    | 'AI'
-    | 'COMPUTE'
-    | 'CONTAINER'
-    | 'STORAGE'
-    | 'NETWORK'
-    | 'DATABASE'
-    | 'MEDIA_SERVICE'
-    | 'SECURITY'
-    | 'MIDDLEWARE'
-    | 'OTHERS';
+    | 'ai'
+    | 'compute'
+    | 'container'
+    | 'storage'
+    | 'network'
+    | 'database'
+    | 'media_service'
+    | 'security'
+    | 'middleware'
+    | 'others';

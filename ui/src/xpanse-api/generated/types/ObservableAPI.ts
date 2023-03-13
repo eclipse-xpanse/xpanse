@@ -18,6 +18,7 @@ import { SystemStatus } from '../models/SystemStatus';
 import { AdminApiRequestFactory, AdminApiResponseProcessor } from '../apis/AdminApi';
 import { ServiceApiRequestFactory, ServiceApiResponseProcessor } from '../apis/ServiceApi';
 import { ServiceVendorApiRequestFactory, ServiceVendorApiResponseProcessor } from '../apis/ServiceVendorApi';
+import { OclDetailVo } from '../models/OclDetailVo';
 
 export class ObservableAdminApi {
     private requestFactory: AdminApiRequestFactory;
@@ -223,7 +224,7 @@ export class ObservableServiceVendorApi {
      * Get registered service using id.
      * @param id id of registered service
      */
-    public detail(id: string, _options?: Configuration): Observable<Ocl> {
+    public detail(id: string, _options?: Configuration): Observable<OclDetailVo> {
         const requestContextPromise = this.requestFactory.detail(id, _options);
 
         // build promise chain

@@ -48,13 +48,13 @@ export class AdminApiResponseProcessor {
      */
     public async health(response: ResponseContext): Promise<SystemStatus> {
         const contentType = ObjectSerializer.normalizeMediaType(response.headers['content-type']);
-        if (isCodeInRange('404', response.httpStatusCode)) {
+        if (isCodeInRange('400', response.httpStatusCode)) {
             const body: Response = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
                 'Response',
                 ''
             ) as Response;
-            throw new ApiException<Response>(response.httpStatusCode, 'Not Found', body, response.headers);
+            throw new ApiException<Response>(response.httpStatusCode, 'Bad Request', body, response.headers);
         }
         if (isCodeInRange('500', response.httpStatusCode)) {
             const body: Response = ObjectSerializer.deserialize(
@@ -64,13 +64,13 @@ export class AdminApiResponseProcessor {
             ) as Response;
             throw new ApiException<Response>(response.httpStatusCode, 'Internal Server Error', body, response.headers);
         }
-        if (isCodeInRange('400', response.httpStatusCode)) {
+        if (isCodeInRange('404', response.httpStatusCode)) {
             const body: Response = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
                 'Response',
                 ''
             ) as Response;
-            throw new ApiException<Response>(response.httpStatusCode, 'Bad Request', body, response.headers);
+            throw new ApiException<Response>(response.httpStatusCode, 'Not Found', body, response.headers);
         }
         if (isCodeInRange('200', response.httpStatusCode)) {
             const body: SystemStatus = ObjectSerializer.deserialize(
