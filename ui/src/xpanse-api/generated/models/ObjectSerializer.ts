@@ -7,7 +7,6 @@ import { Billing } from './Billing';
 import { CategoryOclVo } from './CategoryOclVo';
 import { CloudServiceProvider } from './CloudServiceProvider';
 import { CreateRequest } from './CreateRequest';
-import { DeployResourceEntity } from './DeployResourceEntity';
 import { DeployServiceEntity } from './DeployServiceEntity';
 import { DeployVariable } from './DeployVariable';
 import { Deployment } from './Deployment';
@@ -21,6 +20,8 @@ import { ServiceVo } from './ServiceVo';
 import { SystemStatus } from './SystemStatus';
 import { VersionOclVo } from './VersionOclVo';
 import YAML from 'yaml';
+import { DeployResource } from './DeployResource';
+import { DeployResult } from './DeployResult';
 
 export * from './Billing';
 export * from './CategoryOclVo';
@@ -47,7 +48,6 @@ const supportedMediaTypes: { [mediaType: string]: number } = {
     'application/json': Infinity,
     'application/octet-stream': 0,
     'application/x-www-form-urlencoded': 0,
-    'application/x-yaml': 0,
 };
 
 let enumsMap: Set<string> = new Set<string>([
@@ -56,14 +56,16 @@ let enumsMap: Set<string> = new Set<string>([
     'CloudServiceProviderNameEnum',
     'CreateRequestCategoryEnum',
     'CreateRequestCspEnum',
-    'DeployResourceEntityKindEnum',
-    'DeployServiceEntityCategoryEnum',
+    'DeployResourceKindEnum',
+    'DeployResultStateEnum',
     'DeployServiceEntityCspEnum',
+    'DeployServiceEntityCategoryEnum',
     'DeployServiceEntityServiceStateEnum',
     'DeployVariableKindEnum',
     'DeploymentKindEnum',
     'OclCategoryEnum',
     'OclDetailVoCategoryEnum',
+    'OclDetailVoServiceStateEnum',
     'ProviderOclVoNameEnum',
     'RegisterServiceEntityCspEnum',
     'RegisterServiceEntityCategoryEnum',
@@ -79,7 +81,8 @@ let typeMap: { [index: string]: any } = {
     CategoryOclVo: CategoryOclVo,
     CloudServiceProvider: CloudServiceProvider,
     CreateRequest: CreateRequest,
-    DeployResourceEntity: DeployResourceEntity,
+    DeployResource: DeployResource,
+    DeployResult: DeployResult,
     DeployServiceEntity: DeployServiceEntity,
     DeployVariable: DeployVariable,
     Deployment: Deployment,

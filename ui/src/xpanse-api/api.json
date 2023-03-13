@@ -42,8 +42,8 @@
                     }
                 ],
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -62,8 +62,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -77,7 +77,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Ocl"
+                                    "$ref": "#/components/schemas/OclDetailVo"
                                 }
                             }
                         }
@@ -120,8 +120,8 @@
                     "required": true
                 },
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -140,8 +140,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -178,8 +178,8 @@
                     }
                 ],
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -198,8 +198,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -247,8 +247,8 @@
                     }
                 ],
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -267,8 +267,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -305,8 +305,8 @@
                     "required": true
                 },
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -325,8 +325,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -393,8 +393,8 @@
                     }
                 ],
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -413,8 +413,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -463,8 +463,8 @@
                     "required": true
                 },
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -483,8 +483,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -524,8 +524,8 @@
                     }
                 ],
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -544,8 +544,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -573,8 +573,8 @@
                 "tags": ["Service"],
                 "operationId": "services",
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -593,8 +593,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -634,8 +634,8 @@
                     }
                 ],
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -654,8 +654,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -690,8 +690,8 @@
                     }
                 ],
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -710,8 +710,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -750,8 +750,8 @@
                     }
                 ],
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -770,8 +770,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -802,8 +802,8 @@
                 "description": "Get category list.",
                 "operationId": "listCategories",
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -822,8 +822,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -841,16 +841,16 @@
                                     "items": {
                                         "type": "string",
                                         "enum": [
-                                            "AI",
-                                            "COMPUTE",
-                                            "CONTAINER",
-                                            "STORAGE",
-                                            "NETWORK",
-                                            "DATABASE",
-                                            "MediaService",
-                                            "SECURITY",
-                                            "MIDDLEWARE",
-                                            "OTHERS"
+                                            "ai",
+                                            "compute",
+                                            "container",
+                                            "storage",
+                                            "network",
+                                            "database",
+                                            "media_service",
+                                            "security",
+                                            "middleware",
+                                            "others"
                                         ]
                                     }
                                 }
@@ -865,8 +865,8 @@
                 "tags": ["Admin"],
                 "operationId": "health",
                 "responses": {
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -885,8 +885,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -1073,16 +1073,16 @@
                         "type": "string",
                         "description": "The catalog of the service",
                         "enum": [
-                            "AI",
-                            "COMPUTE",
-                            "CONTAINER",
-                            "STORAGE",
-                            "NETWORK",
-                            "DATABASE",
-                            "MediaService",
-                            "SECURITY",
-                            "MIDDLEWARE",
-                            "OTHERS"
+                            "ai",
+                            "compute",
+                            "container",
+                            "storage",
+                            "network",
+                            "database",
+                            "media_service",
+                            "security",
+                            "middleware",
+                            "others"
                         ]
                     },
                     "version": {
@@ -1128,42 +1128,53 @@
                 }
             },
             "CreateRequest": {
-                "required": ["category", "csp", "flavor", "name", "version"],
+                "required": ["category", "csp", "flavor", "name", "region", "version"],
                 "type": "object",
                 "properties": {
                     "category": {
                         "type": "string",
+                        "description": "The category of the service",
                         "enum": [
-                            "AI",
-                            "COMPUTE",
-                            "CONTAINER",
-                            "STORAGE",
-                            "NETWORK",
-                            "DATABASE",
-                            "MediaService",
-                            "SECURITY",
-                            "MIDDLEWARE",
-                            "OTHERS"
+                            "ai",
+                            "compute",
+                            "container",
+                            "storage",
+                            "network",
+                            "database",
+                            "media_service",
+                            "security",
+                            "middleware",
+                            "others"
                         ]
                     },
                     "name": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The name of the service"
                     },
                     "version": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The version of service"
+                    },
+                    "region": {
+                        "type": "string",
+                        "description": "The region of the provider."
                     },
                     "csp": {
                         "type": "string",
+                        "description": "The csp of the Service.",
                         "enum": ["aws", "azure", "alibaba", "huawei", "openstack"]
                     },
                     "flavor": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The flavor of the Service."
                     },
                     "property": {
                         "type": "object",
                         "additionalProperties": {
-                            "type": "string"
-                        }
+                            "type": "string",
+                            "description": "The property of the Service"
+                        },
+                        "description": "The property of the Service"
                     }
                 }
             },
@@ -1179,16 +1190,16 @@
                         "type": "string",
                         "description": "The catalog of the service",
                         "enum": [
-                            "AI",
-                            "COMPUTE",
-                            "CONTAINER",
-                            "STORAGE",
-                            "NETWORK",
-                            "DATABASE",
-                            "MediaService",
-                            "SECURITY",
-                            "MIDDLEWARE",
-                            "OTHERS"
+                            "ai",
+                            "compute",
+                            "container",
+                            "storage",
+                            "network",
+                            "database",
+                            "media_service",
+                            "security",
+                            "middleware",
+                            "others"
                         ]
                     },
                     "name": {
@@ -1212,32 +1223,21 @@
                         "type": "string",
                         "description": "The state of the service",
                         "enum": [
-                            "registered",
-                            "deploying",
-                            "deploy_success",
-                            "deploy_failed",
-                            "destroying",
-                            "destroy_success",
-                            "destroy_failed"
+                            "REGISTERED",
+                            "UPDATED",
+                            "DEPLOYING",
+                            "DEPLOY_SUCCESS",
+                            "DEPLOY_FAILED",
+                            "DESTROYING",
+                            "DESTROY_SUCCESS",
+                            "DESTROY_FAILED"
                         ]
                     }
                 }
             },
-            "DeployResourceEntity": {
+            "DeployResource": {
                 "type": "object",
                 "properties": {
-                    "createTime": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "lastModifiedTime": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
                     "resourceId": {
                         "type": "string"
                     },
@@ -1248,13 +1248,35 @@
                         "type": "string",
                         "enum": ["vm", "container", "public_ip", "vpc"]
                     },
-                    "deployService": {
-                        "$ref": "#/components/schemas/DeployServiceEntity"
-                    },
                     "property": {
                         "type": "object",
                         "additionalProperties": {
                             "type": "string"
+                        }
+                    }
+                }
+            },
+            "DeployResult": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "state": {
+                        "type": "string",
+                        "enum": ["initial", "success", "failed", "destroy_success", "destroy_failed"]
+                    },
+                    "resources": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DeployResource"
+                        }
+                    },
+                    "rawResources": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object"
                         }
                     }
                 }
@@ -1270,20 +1292,9 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "category": {
+                    "id": {
                         "type": "string",
-                        "enum": [
-                            "AI",
-                            "COMPUTE",
-                            "CONTAINER",
-                            "STORAGE",
-                            "NETWORK",
-                            "DATABASE",
-                            "MediaService",
-                            "SECURITY",
-                            "MIDDLEWARE",
-                            "OTHERS"
-                        ]
+                        "format": "uuid"
                     },
                     "name": {
                         "type": "string"
@@ -1295,35 +1306,42 @@
                         "type": "string",
                         "enum": ["aws", "azure", "alibaba", "huawei", "openstack"]
                     },
-                    "flavor": {
-                        "type": "string"
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "ai",
+                            "compute",
+                            "container",
+                            "storage",
+                            "network",
+                            "database",
+                            "media_service",
+                            "security",
+                            "middleware",
+                            "others"
+                        ]
                     },
                     "serviceState": {
                         "type": "string",
                         "enum": [
-                            "registered",
-                            "deploying",
-                            "deploy_success",
-                            "deploy_failed",
-                            "destroying",
-                            "destroy_success",
-                            "destroy_failed"
+                            "REGISTERED",
+                            "UPDATED",
+                            "DEPLOYING",
+                            "DEPLOY_SUCCESS",
+                            "DEPLOY_FAILED",
+                            "DESTROYING",
+                            "DESTROY_SUCCESS",
+                            "DESTROY_FAILED"
                         ]
                     },
-                    "ocl": {
-                        "$ref": "#/components/schemas/Ocl"
+                    "flavor": {
+                        "type": "string"
                     },
-                    "property": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        }
+                    "createRequest": {
+                        "$ref": "#/components/schemas/CreateRequest"
                     },
-                    "deployResourceEntity": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DeployResourceEntity"
-                        }
+                    "deployResult": {
+                        "$ref": "#/components/schemas/DeployResult"
                     }
                 }
             },
@@ -1355,16 +1373,16 @@
                     "category": {
                         "type": "string",
                         "enum": [
-                            "AI",
-                            "COMPUTE",
-                            "CONTAINER",
-                            "STORAGE",
-                            "NETWORK",
-                            "DATABASE",
-                            "MediaService",
-                            "SECURITY",
-                            "MIDDLEWARE",
-                            "OTHERS"
+                            "ai",
+                            "compute",
+                            "container",
+                            "storage",
+                            "network",
+                            "database",
+                            "media_service",
+                            "security",
+                            "middleware",
+                            "others"
                         ]
                     },
                     "ocl": {
@@ -1373,30 +1391,15 @@
                     "serviceState": {
                         "type": "string",
                         "enum": [
-                            "registered",
-                            "deploying",
-                            "deploy_success",
-                            "deploy_failed",
-                            "destroying",
-                            "destroy_success",
-                            "destroy_failed"
+                            "REGISTERED",
+                            "UPDATED",
+                            "DEPLOYING",
+                            "DEPLOY_SUCCESS",
+                            "DEPLOY_FAILED",
+                            "DESTROYING",
+                            "DESTROY_SUCCESS",
+                            "DESTROY_FAILED"
                         ]
-                    }
-                }
-            },
-            "CategoryOclVo": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the registered service."
-                    },
-                    "versions": {
-                        "type": "array",
-                        "description": "List of the registered service group by service version.",
-                        "items": {
-                            "$ref": "#/components/schemas/VersionOclVo"
-                        }
                     }
                 }
             },
@@ -1420,16 +1423,16 @@
                         "type": "string",
                         "description": "The catalog of the service",
                         "enum": [
-                            "AI",
-                            "COMPUTE",
-                            "CONTAINER",
-                            "STORAGE",
-                            "NETWORK",
-                            "DATABASE",
-                            "MediaService",
-                            "SECURITY",
-                            "MIDDLEWARE",
-                            "OTHERS"
+                            "ai",
+                            "compute",
+                            "container",
+                            "storage",
+                            "network",
+                            "database",
+                            "media_service",
+                            "security",
+                            "middleware",
+                            "others"
                         ]
                     },
                     "version": {
@@ -1476,9 +1479,48 @@
                         "type": "string",
                         "description": "ID of the registered service.",
                         "format": "uuid"
+                    },
+                    "createTime": {
+                        "type": "string",
+                        "description": "Time of register service.",
+                        "format": "date-time"
+                    },
+                    "lastModifiedTime": {
+                        "type": "string",
+                        "description": "Time of update service.",
+                        "format": "date-time"
+                    },
+                    "serviceState": {
+                        "type": "string",
+                        "description": "State of service.",
+                        "enum": [
+                            "REGISTERED",
+                            "UPDATED",
+                            "DEPLOYING",
+                            "DEPLOY_SUCCESS",
+                            "DEPLOY_FAILED",
+                            "DESTROYING",
+                            "DESTROY_SUCCESS",
+                            "DESTROY_FAILED"
+                        ]
                     }
-                },
-                "description": "The list of the registered services."
+                }
+            },
+            "CategoryOclVo": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the registered service."
+                    },
+                    "versions": {
+                        "type": "array",
+                        "description": "List of the registered service group by service version.",
+                        "items": {
+                            "$ref": "#/components/schemas/VersionOclVo"
+                        }
+                    }
+                }
             },
             "ProviderOclVo": {
                 "type": "object",

@@ -19,6 +19,7 @@ import { AdminApiRequestFactory, AdminApiResponseProcessor } from '../apis/Admin
 import { ServiceApiRequestFactory, ServiceApiResponseProcessor } from '../apis/ServiceApi';
 
 import { ServiceVendorApiRequestFactory, ServiceVendorApiResponseProcessor } from '../apis/ServiceVendorApi';
+import { OclDetailVo } from '../models/OclDetailVo';
 
 export class PromiseAdminApi {
     private api: ObservableAdminApi;
@@ -97,7 +98,7 @@ export class PromiseServiceVendorApi {
      * Get registered service using id.
      * @param id id of registered service
      */
-    public detail(id: string, _options?: Configuration): Promise<Ocl> {
+    public detail(id: string, _options?: Configuration): Promise<OclDetailVo> {
         const result = this.api.detail(id, _options);
         return result.toPromise();
     }
