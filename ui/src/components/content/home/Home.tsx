@@ -6,7 +6,11 @@
 import WelcomeCard from './WelcomeCard';
 
 function Home(): JSX.Element {
-    return <WelcomeCard />;
+    return (
+        <div className={'home-data-display'}>
+            <WelcomeCard />
+        </div>
+    );
 }
 
 export default Home;

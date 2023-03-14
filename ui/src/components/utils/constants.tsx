@@ -9,3 +9,6 @@ export const homePageRoute: string = '/home';
 export const registerPageRoute: string = '/register';
 export const loginPageRoute: string = '/login';
 export const footerText: string = '©2023 Eclipse Foundation - Xpanse';
+export const catalogPageRoute: string = '/catalog';
+export const catalogSubPageRoute: string = '/catalog#';
+export const catalogLabelName: string = 'Catalog';

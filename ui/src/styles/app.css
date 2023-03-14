@@ -31,7 +31,9 @@
 }
 
 .site-layout {
-    padding: 0 50px;
+    padding: 0 15px;
+    margin-top: 15px;
+    overflow-y: auto;
 }
 
 .ant-layout-sider-children > svg {
@@ -39,7 +41,7 @@
 }
 
 .site-layout-background {
-    padding: 24px;
+    height: 100%;
     min-height: 360px;
 }
 
@@ -59,16 +61,9 @@
     box-shadow: none !important;
     border: none !important;
 }
-
 .ocl-data-display {
     margin-right: 10em;
     margin-left: 10em;
-}
-
-.register-buttons {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
 }
 
 .ocl-data-main-info {
@@ -83,6 +78,15 @@
     overflow-x: auto;
 }
 
-.ocl-data-hover {
-    padding: 0;
+.home-data-display {
+    padding: 24px;
+}
+
+.site-layout-protect-height {
+    height: 15px;
+}
+
+.content-title {
+    font-size: 20px;
+    font-weight: bold;
 }

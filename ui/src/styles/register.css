@@ -1,0 +1,13 @@
+.register-content {
+    padding: 24px;
+}
+
+.register-buttons {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.ocl-data-hover {
+    padding: 0;
+}

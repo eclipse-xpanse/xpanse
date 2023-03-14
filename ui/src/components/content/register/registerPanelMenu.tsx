@@ -10,7 +10,7 @@ import { registerPageRoute } from '../../utils/constants';
 
 function registerPanelMenu(): MenuItemType {
     return {
-        key: 'register',
+        key: registerPageRoute,
         label: <Link to={registerPageRoute}>Register Panel</Link>,
         icon: <AppstoreAddOutlined />,
         title: 'RegisterPanel',
