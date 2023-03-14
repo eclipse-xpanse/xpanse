@@ -24,7 +24,7 @@ function SystemStatusBar(): JSX.Element {
     return (
         <Space>
             <Button
-                className='header-menu-button'
+                className={'header-menu-button'}
                 icon={<SystemStatusIcon isSystemUp={healthState === 'OK'} />}
                 onClick={() => setReloadSystemStatus(!isReloadSystemStatus)}
             >

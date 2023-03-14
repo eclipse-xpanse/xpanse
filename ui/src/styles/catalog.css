@@ -1,0 +1,43 @@
+.catalog-middleware {
+    height: 100%;
+}
+
+.catalog-middleware .container {
+    display: flex;
+    height: 100%;
+}
+
+.catalog-middleware .left-class {
+    height: 100%;
+    padding: 24px;
+    width: 300px;
+}
+
+.catalog-middleware .left-title-class {
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.catalog-middleware .right-class {
+    clear: both;
+    height: 100%;
+    padding: 24px;
+    width: calc(100% - 324px);
+}
+
+.catalog-middleware .middle-class {
+    width: 15px;
+    background: #f5f5f5;
+}
+
+.catalog-middleware .catalog-detail-class {
+    font-size: 16px;
+}
+
+.catalog-middleware .ant-tabs-tab-btn {
+    fontsize: 14px;
+    fontweight: bold;
+}

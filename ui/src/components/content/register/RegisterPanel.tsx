@@ -4,13 +4,14 @@
  */
 
 import { Alert, Button, Upload, UploadFile } from 'antd';
-import { CloudUploadOutlined, UploadOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { AppstoreAddOutlined, CloudUploadOutlined, HomeOutlined, UploadOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
 import { RcFile } from 'antd/es/upload';
 import { ObjectSerializer } from '../../../xpanse-api/generated/models/ObjectSerializer';
 import { serviceVendorApi } from '../../../xpanse-api/xpanseRestApiClient';
 import { Ocl } from '../../../xpanse-api/generated';
 import DisplayOclData from './DisplayOclData';
+import '../../../styles/register.css';
 
 function RegisterPanel(): JSX.Element {
     type FileValidationStatus = 'notStarted' | 'inProgress' | 'completed';
@@ -153,7 +154,11 @@ function RegisterPanel(): JSX.Element {
     };
 
     return (
-        <>
+        <div className={'register-content'}>
+            <div className={'content-title'}>
+                <AppstoreAddOutlined />
+                &ensp;Register Service
+            </div>
             {registrationResultDisplay}
             <br />
             <div className={'register-buttons'}>
@@ -189,7 +194,7 @@ function RegisterPanel(): JSX.Element {
                 {yamlSyntaxValidationResult}
             </div>
             <div>{oclDataDisplay}</div>
-        </>
+        </div>
     );
 }
 

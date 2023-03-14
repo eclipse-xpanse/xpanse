@@ -57,13 +57,13 @@ function LoginScreen(): JSX.Element {
                         label='Username'
                         rules={[{ required: true, message: 'Please input a persona username!' }]}
                     >
-                        <Input placeholder='username' prefix={<UserOutlined className='site-form-item-icon' />} />
+                        <Input placeholder='username' prefix={<UserOutlined className={'site-form-item-icon'} />} />
                     </Form.Item>
                     <Form.Item name='password' label='Password' rules={[{ required: true }]}>
                         <Input
                             type='password'
                             placeholder='password'
-                            prefix={<LockOutlined className='site-form-item-icon' />}
+                            prefix={<LockOutlined className={'site-form-item-icon'} />}
                         />
                     </Form.Item>
                 </Form>
