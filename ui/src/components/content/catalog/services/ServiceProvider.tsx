@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
 import ServiceDetail from './ServiceDetail';
 import { CategoryOclVo, OclDetailVo, ProviderOclVo, VersionOclVo } from '../../../../xpanse-api/generated';
