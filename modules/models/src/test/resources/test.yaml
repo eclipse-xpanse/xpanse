@@ -1,9 +1,11 @@
 # The version of the OCL
 version: 2.0
+# The category of the service.
+category: middleware
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: kafka
 # The version of the service, if the end-user want to select the version when they want to deploy the service.
-serviceVersion: v1.0
+serviceVersion: v1.8
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
 description: This is an ehanced kafka services by ISV-A.
 namespace: ISV-A
@@ -15,10 +17,10 @@ icon: |
   8lrmDMrpvBr+b6pUl+4XbkQdndqnzYGzfuJm1JmIWimIbe6dndd/bk7gVce/cJdo3uIeLJl7+I2xTnPek67mjtDeppE7b03Ov+kSfDe3JweW53njxeGfXkaz28VeYd86+af/H8a7hgJKaebILaFzakLfxyfQLTxVB6K1K9KQAAAABJRU5ErkJggg==
 # Reserved for CSP, aws,azure,ali,huawei and ...
 cloudServiceProvider:
-  name: aws
+  name: huawei
   regions:
-    - aws-ca-central-1
-    - aws-us-east-2
+    - cn-southwest-2
+    - cn-north-4
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat
@@ -50,48 +52,72 @@ deployment:
   # - variable: The value of the variable parameters are defined by the user on the console.
   # The parameters will be used to generate the API of the managed service.
   context:
-    - name: AK
-      description: Your access key.
+    - name: HW_REGION_NAME
+      description: huawei cloud region name.
+      kind: fix_variable
+      type: string
+      mandatory: true
+      validator: minLength=6|maxLength=26
+    - name: HW_ACCESS_KEY
+      description: huawei cloud access key.
       kind: env
       type: string
-      value: xxxxxxxxxx
       mandatory: true
       validator: null
-    - name: SK
-      description: Your security key.
+    - name: HW_SECRET_KEY
+      description: huawei cloud secret key.
       kind: env
       type: string
-      value: xxxxxxxxxxx
       mandatory: true
-      validator: null
-    - name: VPC
-      description: The vpc you want to deploy, If null, A new vpc will be created.
+      validator:
+    - name: secgroup_id
+      description: The secgroup id.
       kind: variable
       type: string
       mandatory: false
-      validator: length(1-256)
+      validator:
+    - name: number_test
+      description: Validator range for value of dataType number.
+      kind: variable
+      type: number
+      mandatory: true
+      validator: minimum=10|maximum=100
+    - name: string_test
+      description: Validator length for value of dataType string.
+      kind: variable
+      type: string
+      mandatory: true
+      validator: minLength=6|maxLength=16
+    - name: enum_test
+      description: Validator enum for value of dataType string.
+      kind: variable
+      type: string
+      mandatory: true
+      validator: enum=["red","yellow","green"]
+    - name: pattern_test
+      description: Validator pattern for value of dataType string.
+      kind: variable
+      type: string
+      mandatory: false
+      validator: pattern=*e*
   deployer: |
-    data "aws_ami" "ubuntu" {
-      most_recent = true
-
-      filter {
-        name   = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-      }
-
-      filter {
-        name   = "virtualization-type"
-        values = ["hvm"]
-      }
-
-      owners = ["099720109477"] # Canonical
+    variable "secgroup_id" {}
+    data "huaweicloud_availability_zones" "myaz" {}
+    data "huaweicloud_compute_flavors" "myflavor" {
+        availability_zone = data.huaweicloud_availability_zones.myaz.names[0]
+        performance_type  = "normal"
+        cpu_core_count    = 2
+        memory_size       = 4
     }
-
-    resource "aws_instance" "web" {
-      ami           = data.aws_ami.ubuntu.id
-      instance_type = "t3.micro"
-
-      tags = {
-        Name = "kafka"
-      }
+    data "huaweicloud_vpc_subnet" "mynet" {
+        name = "xpanse_subnet1"
+    }
+    resource "huaweicloud_compute_instance" "basic" {
+        name               = "basic"
+        image_id           = "a8601887-81d5-4eed-9338-382cf5b6d80b"
+        flavor_id          = data.huaweicloud_compute_flavors.myflavor.ids[0]
+        availability_zone  = data.huaweicloud_availability_zones.myaz.names[0]
+        network {
+            uuid = data.huaweicloud_vpc_subnet.mynet.id
+        }
     }

@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.models.service;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,20 +24,28 @@ public class DeployResult {
     /**
      * The id of the XpanseDeployTask.
      */
+    @NotNull
+    @Schema(description = "The id of the service task.")
     private UUID id;
     /**
      * The state of the XpanseDeployTask.
      */
+    @NotNull
+    @Schema(description = "The state of the service.")
     private TerraformExecState state;
 
     /**
      * The resources of the server.
      */
+    @NotNull
+    @Schema(description = "The deployed resources of the service.")
     private List<DeployResource> resources;
 
     /**
-     * The raw resources of the server.
+     * The result property of the service task.
      */
+    @NotNull
+    @Schema(description = "The result property of the service task.")
     private Map<String, String> property = new HashMap<>();
 
 }

@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.modules.models.view;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.enums.Category;
@@ -19,30 +21,38 @@ import org.eclipse.xpanse.modules.models.enums.ServiceState;
 @Data
 public class ServiceVo {
 
+    @NotNull
     @Schema(description = "The ID of the service")
     private UUID id;
 
     /**
      * The category of the Service.
      */
+    @NotNull
     @Schema(description = "The catalog of the service")
     private Category category;
 
     /**
      * The name of the Service.
      */
+    @NotNull
+    @NotBlank
     @Schema(description = "The name of the service")
     private String name;
 
     /**
      * The version of the Service.
      */
+    @NotNull
+    @NotBlank
     @Schema(description = "The version of the service")
     private String version;
 
     /**
      * The csp of the Service.
      */
+    @NotNull
+    @NotBlank
     @Schema(description = "The provider of the service")
     private Csp csp;
 
@@ -55,6 +65,7 @@ public class ServiceVo {
     /**
      * The state of the Service.
      */
+    @NotNull
     @Schema(description = "The state of the service")
     private ServiceState serviceState;
 }

@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.models.view;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.enums.Csp;
@@ -18,12 +19,15 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 @Data
 public class ProviderOclVo {
 
+    @NotNull
     @Schema(description = "The Cloud Service Provider.")
     private Csp name;
 
+    @NotNull
     @Schema(description = "The regions of the Cloud Service Provider.")
     private List<String> regions;
 
+    @NotNull
     @Schema(description = "The list of the registered services.")
     private List<OclDetailVo> details;
 

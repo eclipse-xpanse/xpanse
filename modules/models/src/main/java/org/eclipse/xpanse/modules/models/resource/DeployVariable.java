@@ -8,38 +8,36 @@ package org.eclipse.xpanse.modules.models.resource;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.enums.DeployVariableType;
 
 /**
  * Defines for the deploy variable.
  */
 @Data
 public class DeployVariable {
-
     @NotNull
     @NotBlank
-    @NotEmpty
     @Schema(description = "The name of the deploy variable")
     private String name;
-
-    @NotNull
-    @NotBlank
-    @NotEmpty
-    @Schema(description = "The description for the deploy variable")
-    private String description;
 
     @NotNull
     @Schema(description = "The kind of the deploy variable")
     private DeployVariableKind kind;
 
     @NotNull
-    @NotBlank
-    @NotEmpty
     @Schema(description = "The type of the deploy variable")
-    private String type;
+    private DeployVariableType type;
+
+    @Schema(description = "The example value for the deploy variable")
+    private String example;
+
+    @NotNull
+    @NotBlank
+    @Schema(description = "The description for the deploy variable")
+    private String description;
 
     @Schema(description = "The value of the deploy variable")
     private String value;
