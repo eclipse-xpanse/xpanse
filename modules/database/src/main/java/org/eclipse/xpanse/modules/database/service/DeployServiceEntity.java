@@ -7,13 +7,16 @@
 package org.eclipse.xpanse.modules.database.service;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,7 +26,8 @@ import org.eclipse.xpanse.modules.models.enums.Category;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
-import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 
 /**
@@ -35,42 +39,53 @@ import org.hibernate.annotations.Type;
 @EqualsAndHashCode(callSuper = true)
 public class DeployServiceEntity extends CreateModifiedTime {
 
+    @Hidden
     @Id
-    @Column(name = "ID", nullable = false)
     private UUID id;
 
-    @Column(name = "NAME", nullable = false)
-    private String name;
-
-    @Column(name = "VERSION", nullable = false)
-    private String version;
-
-    @Column(name = "CSP", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Csp csp;
-
-    @Column(name = "CATEGORY")
+    /**
+     * The category of the Service.
+     */
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @Column(name = "SERVICE_STATE")
+    /**
+     * The name of the Service.
+     */
+    private String name;
+
+    /**
+     * The version of the Service.
+     */
+    private String version;
+
+    /**
+     * The csp of the Service.
+     */
     @Enumerated(EnumType.STRING)
-    private ServiceState serviceState;
+    private Csp csp;
 
     /**
      * The flavor of the Service.
      */
-    @Column(name = "FLAVOR")
     private String flavor;
 
+    /**
+     * The state of the Service.
+     */
+    @Enumerated(EnumType.STRING)
+    private ServiceState serviceState;
+
+    /**
+     * The Ocl object of the XpanseDeployTask.
+     */
     @Column(columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private CreateRequest createRequest;
 
-    @Column(columnDefinition = "json")
-    @Type(value = JsonType.class)
-    @Convert(converter = ObjectJsonConverter.class)
-    private DeployResult deployResult;
+    @OneToMany(mappedBy = "deployService", orphanRemoval = true)
+    @Cascade({CascadeType.ALL})
+    private List<DeployResourceEntity> deployResourceEntity;
 
 }

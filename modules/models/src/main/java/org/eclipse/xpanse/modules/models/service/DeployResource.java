@@ -6,8 +6,6 @@
 
 package org.eclipse.xpanse.modules.models.service;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
@@ -29,7 +27,6 @@ public class DeployResource {
     /**
      * The kind of the deployed resource.
      */
-    @Enumerated(EnumType.STRING)
     private DeployResourceKind kind;
 
     /**
