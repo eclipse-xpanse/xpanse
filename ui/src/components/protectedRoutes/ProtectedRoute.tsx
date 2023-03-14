@@ -23,12 +23,12 @@ function Protected(protectedRouteProperties: ProtectedRouteProperties): JSX.Elem
         return <Navigate to={loginPageRoute} replace={true} state={{ from: location }} />;
     }
     return (
-        <Layout className='layout' hasSider={true}>
+        <Layout className={'layout'} hasSider={true}>
             <LayoutSider />
-            <Layout className='site-layout'>
+            <Layout>
                 <LayoutHeader />
-                <Layout.Content>
-                    <div className='site-layout-background'>{protectedRouteProperties.children}</div>
+                <Layout.Content className={'site-layout'}>
+                    <div className={'site-layout-background'}>{protectedRouteProperties.children}</div>
                 </Layout.Content>
                 <LayoutFooter />
             </Layout>
