@@ -59,7 +59,7 @@ public class TerraformDeployment implements Deployment {
             deployResult.setState(TerraformExecState.DEPLOY_FAILED);
         } else {
             deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
-            deployResult.getRawResources().put("stateFile", tfState);
+            deployResult.getProperty().put("stateFile", tfState);
         }
 
         if (task.getDeployResourceHandler() != null) {

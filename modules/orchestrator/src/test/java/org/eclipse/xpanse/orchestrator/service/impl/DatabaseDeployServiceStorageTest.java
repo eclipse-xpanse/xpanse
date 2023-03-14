@@ -62,7 +62,6 @@ public class DatabaseDeployServiceStorageTest {
         deployResources.add(deployResource);
         DeployResult deployResult = new DeployResult();
         deployResult.setResources(deployResources);
-        deployServiceEntity.setDeployResult(deployResult);
         CreateRequest request = new CreateRequest();
         request.setOcl(ocl);
         this.entityManager.persist(deployServiceEntity);

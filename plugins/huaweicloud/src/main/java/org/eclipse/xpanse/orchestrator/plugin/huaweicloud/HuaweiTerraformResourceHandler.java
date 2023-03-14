@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
@@ -41,7 +42,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
         List<DeployResource> xpResourceList = new ArrayList<>();
         TfState tfState;
         try {
-            var stateFile = deployResult.getRawResources().get("stateFile");
+            var stateFile = deployResult.getProperty().get("stateFile");
             if (!stateFile.getClass().equals(String.class)) {
                 throw new RuntimeException("stateFile is unsupported.");
             }
@@ -51,8 +52,9 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
             throw new TerraformExecutorException("Parse terraform state content failed.", ex);
         }
         for (TfStateResource tfStateResource : tfState.getResources()) {
-            DeployResource deployResource = new DeployResource();
+            DeployResource deployResource = null;
             if (tfStateResource.getType().equals("huaweicloud_compute_instance")) {
+                deployResource = new DeployResource();
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
                     deployResource.setKind(DeployResourceKind.Vm);
                     deployResource.setResourceId((String) instance.getAttributes().get("id"));
@@ -70,6 +72,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                 }
             }
             if (tfStateResource.getType().equals("huaweicloud_compute_eip_associate")) {
+                deployResource = new DeployResource();
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
                     deployResource.setProperty(new HashMap<>());
                     deployResource.getProperty()
@@ -78,6 +81,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                 }
             }
             if (tfStateResource.getType().equals("huaweicloud_vpc")) {
+                deployResource = new DeployResource();
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
                     DeployResource xpResource = new DeployResource();
                     xpResource.setKind(DeployResourceKind.Vpc);
@@ -85,9 +89,10 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                     xpResource.setName((String) instance.getAttributes().get("name"));
                 }
             }
-            xpResourceList.add(deployResource);
+            if (!Objects.isNull(deployResource)) {
+                xpResourceList.add(deployResource);
+            }
         }
-
         deployResult.setResources(xpResourceList);
     }
 }

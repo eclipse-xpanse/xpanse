@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
 
 /**
@@ -38,6 +36,6 @@ public class DeployResult {
     /**
      * The raw resources of the server.
      */
-    private Map<String, Object> rawResources = new HashMap<>();
+    private Map<String, String> property = new HashMap<>();
 
 }

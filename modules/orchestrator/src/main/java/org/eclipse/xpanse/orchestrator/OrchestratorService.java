@@ -17,14 +17,17 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
+import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +39,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Main class which orchestrates the OCL request processing. Calls the available plugins to deploy
@@ -53,6 +57,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     private final DeployServiceStorage deployServiceStorage;
 
+    private final DeployResourceStorage deployResourceStorage;
+
     @Getter
     private final List<Deployment> deployers = new ArrayList<>();
 
@@ -61,9 +67,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     @Autowired
     OrchestratorService(RegisterServiceStorage registerServiceStorage,
-            DeployServiceStorage deployServiceStorage) {
+            DeployServiceStorage deployServiceStorage,
+            DeployResourceStorage deployResourceStorage) {
         this.registerServiceStorage = registerServiceStorage;
         this.deployServiceStorage = deployServiceStorage;
+        this.deployResourceStorage = deployResourceStorage;
     }
 
     @Override
@@ -145,7 +153,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
-            deployServiceEntity.setDeployResult(deployResult);
+            deployServiceEntity.setDeployResourceEntity(
+                    getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
             deployServiceStorage.store(deployServiceEntity);
         } catch (Exception e) {
             log.error("asyncDeployService failed.", e);
@@ -153,6 +162,21 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployServiceStorage.store(deployServiceEntity);
         }
 
+    }
+
+    private List<DeployResourceEntity> getDeployResourceEntityList(
+            List<DeployResource> deployResources, DeployServiceEntity deployServiceEntity) {
+        List<DeployResourceEntity> deployResourceEntities = new ArrayList<>();
+        if (CollectionUtils.isEmpty(deployResources)) {
+            return deployResourceEntities;
+        }
+        for (DeployResource resource : deployResources) {
+            DeployResourceEntity deployResource = new DeployResourceEntity();
+            BeanUtils.copyProperties(resource, deployResource);
+            deployResource.setDeployService(deployServiceEntity);
+            deployResourceEntities.add(deployResource);
+        }
+        return deployResourceEntities;
     }
 
     /**
@@ -208,7 +232,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.destroy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
-            deployServiceEntity.setDeployResult(deployResult);
+            List<DeployResource> resources = deployResult.getResources();
+            if (CollectionUtils.isEmpty(resources)) {
+                deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
+            } else {
+                deployServiceEntity.setDeployResourceEntity(
+                        getDeployResourceEntityList(resources, deployServiceEntity));
+            }
             deployServiceStorage.store(deployServiceEntity);
         } catch (RuntimeException e) {
             log.error("asyncDestroyService failed", e);
