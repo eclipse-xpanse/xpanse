@@ -48,6 +48,7 @@ const supportedMediaTypes: { [mediaType: string]: number } = {
     'application/json': Infinity,
     'application/octet-stream': 0,
     'application/x-www-form-urlencoded': 0,
+    'application/x-yaml': 0,
 };
 
 let enumsMap: Set<string> = new Set<string>([
