@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-import { Image, Menu, Layout } from 'antd';
+import { Image, Layout, Menu } from 'antd';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { homePageRoute, usernameKey } from '../../utils/constants';
@@ -22,12 +22,17 @@ function LayoutSider(): JSX.Element {
     };
 
     useEffect(() => {
-        serviceVendorApi.listCategories().then((rsp) => {
-            if (localStorage.getItem(usernameKey) === 'csp') {
-                const data = rsp;
-                setItems([catalogMenu(data), registerPanelMenu()]);
-            }
-        });
+        if (localStorage.getItem(usernameKey) === 'csp') {
+            serviceVendorApi
+                .listCategories()
+                .then((rsp) => {
+                    setItems([catalogMenu(rsp), registerPanelMenu()]);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    setItems([catalogMenu([]), registerPanelMenu()]);
+                });
+        }
     }, []);
 
     return (
