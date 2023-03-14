@@ -23,8 +23,10 @@ import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
@@ -59,6 +61,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     private final DeployResourceStorage deployResourceStorage;
 
+    private final DeployVariableValidator deployVariableValidator;
+
     @Getter
     private final List<Deployment> deployers = new ArrayList<>();
 
@@ -68,10 +72,12 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     @Autowired
     OrchestratorService(RegisterServiceStorage registerServiceStorage,
             DeployServiceStorage deployServiceStorage,
-            DeployResourceStorage deployResourceStorage) {
+            DeployResourceStorage deployResourceStorage,
+            DeployVariableValidator variableValidator) {
         this.registerServiceStorage = registerServiceStorage;
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
+        this.deployVariableValidator = variableValidator;
     }
 
     @Override
@@ -126,11 +132,17 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
             throw new RuntimeException("Registered service not found");
         }
+        // Check context validation
+        if (Objects.nonNull(serviceEntity.getOcl().getDeployment()) && Objects.nonNull(
+                deployTask.getCreateRequest().getProperty())) {
+            List<DeployVariable> deployVariables = serviceEntity.getOcl().getDeployment()
+                    .getContext();
+            deployVariableValidator.isVariableValid(deployVariables,
+                    deployTask.getCreateRequest().getProperty());
+        }
         // Set Ocl and CreateRequest
         deployTask.setOcl(serviceEntity.getOcl());
         deployTask.getCreateRequest().setOcl(serviceEntity.getOcl());
-        // Check context validation
-        checkContextValidation(deployTask);
         // Fill the handler
         fillHandler(deployTask);
         // get the deployment.
@@ -202,8 +214,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         // Set Ocl and CreateRequest
         deployTask.setCreateRequest(deployServiceEntity.getCreateRequest());
         deployTask.setOcl(deployServiceEntity.getCreateRequest().getOcl());
-        // Check context validation
-        checkContextValidation(deployTask);
         // Fill the handler
         fillHandler(deployTask);
         // get the deployment.
@@ -302,8 +312,23 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         return deploymentOptional.get();
     }
 
-    private void checkContextValidation(DeployTask deployTask) {
-        // TODO check validation between ocl deployment context and createQuest property.
+
+    /**
+     * generate OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     * @return path of openapi.html
+     */
+    public String getOpenApiUrl(String id) {
+        UUID uuid = UUID.fromString(id);
+        RegisterServiceEntity registerService = registerServiceStorage.getRegisterServiceById(uuid);
+        if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
+            throw new IllegalArgumentException(String.format("Registered service with id %s not "
+                    + "existed.", id));
+        }
+        // TODO find the path of swagger-ui.html of the registered by id or generate swagger-ui.html
+        return null;
     }
+
 
 }

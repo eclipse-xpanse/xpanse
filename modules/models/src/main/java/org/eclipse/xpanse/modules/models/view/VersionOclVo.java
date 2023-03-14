@@ -8,6 +8,8 @@
 package org.eclipse.xpanse.modules.models.view;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 
@@ -17,9 +19,12 @@ import lombok.Data;
 @Data
 public class VersionOclVo {
 
+    @NotNull
+    @NotBlank
     @Schema(description = "Version of the registered service.")
     private String version;
 
+    @NotNull
     @Schema(description = "List of the registered services group by service version.")
     private List<ProviderOclVo> cloudProvider;
 
