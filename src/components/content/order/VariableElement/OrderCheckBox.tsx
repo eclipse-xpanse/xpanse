@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 import { Checkbox, Form } from 'antd';
 import { CheckBoxOnChangeHandler, OrderParam } from './OrderCommon';
 
