@@ -13,3 +13,7 @@ export const catalogPageRoute: string = '/catalog';
 export const catalogSubPageRoute: string = '/catalog#';
 export const catalogLabelName: string = 'Catalog';
 export const orderPageRoute: string = '/order';
+export const servicesPageRoute: string = '/services';
+export const servicesSubPageRoute: string = '/services#';
+export const servicesLabelName: string = 'Services';
+export const createServicePageRoute: string = '/createService';
