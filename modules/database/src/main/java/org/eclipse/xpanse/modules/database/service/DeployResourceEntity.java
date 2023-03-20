@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.database.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -61,6 +62,7 @@ public class DeployResourceEntity extends CreateModifiedTime {
      */
     @ManyToOne
     @JoinColumn(name = "deployService_id")
+    @JsonIgnoreProperties({"deployResourceEntity"})
     private DeployServiceEntity deployService;
 
     /**
