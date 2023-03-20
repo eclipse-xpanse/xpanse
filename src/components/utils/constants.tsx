@@ -12,3 +12,4 @@ export const footerText: string = '©2023 Eclipse Foundation - Xpanse';
 export const catalogPageRoute: string = '/catalog';
 export const catalogSubPageRoute: string = '/catalog#';
 export const catalogLabelName: string = 'Catalog';
+export const orderPageRoute: string = '/order';
