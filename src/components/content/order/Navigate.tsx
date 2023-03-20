@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 import { useNavigate, To } from 'react-router-dom';
 import '../../../styles/order.css';
 
