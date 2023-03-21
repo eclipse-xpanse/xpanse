@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.modules.models.resource.Area;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
@@ -172,8 +173,11 @@ public class RegisterServiceImpl implements RegisterService {
                     List<OclDetailVo> details = cspList.stream().map(this::convertToOclDetailVo)
                             .collect(Collectors.toList());
                     providerOclVo.setDetails(details);
-                    providerOclVo.setRegions(
-                            details.get(0).getCloudServiceProvider().getRegions());
+                    List<Area> areas = new ArrayList<>();
+                    for (OclDetailVo oclDetailVo : details) {
+                        areas.addAll(oclDetailVo.getCloudServiceProvider().getAreas());
+                    }
+                    providerOclVo.setAreas(areas);
                     cspVoList.add(providerOclVo);
                 });
                 versionOclVo.setCloudProvider(cspVoList);

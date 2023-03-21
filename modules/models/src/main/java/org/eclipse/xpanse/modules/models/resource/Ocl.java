@@ -80,6 +80,7 @@ public class Ocl {
 
     @Valid
     @NotNull
+    @NotEmpty
     @Schema(description = "The flavors of the managed service")
     private List<Flavor> flavors;
 

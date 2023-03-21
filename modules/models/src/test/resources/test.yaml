@@ -18,9 +18,15 @@ icon: |
 # Reserved for CSP, aws,azure,ali,huawei and ...
 cloudServiceProvider:
   name: huawei
-  regions:
-    - cn-southwest-2
-    - cn-north-4
+  areas:
+    # The area of the regions.Asia Pacific,middle East,North America,South America,Europe...
+    - name: Asia acific
+      regions:
+        - cn-southwest-2
+        - cn-north-4
+    - name: Middle East
+      regions:
+        - tr-west-1
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat

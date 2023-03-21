@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.models.resource;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
@@ -25,7 +24,7 @@ public class CloudServiceProvider {
     private Csp name;
 
     @Valid
-    @NotEmpty
-    @Schema(description = "The regions of the Cloud Service Provider")
-    private List<String> regions;
+    @NotNull
+    @Schema(description = "The area of the regions")
+    private List<Area> areas;
 }
