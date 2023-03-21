@@ -1,17 +1,18 @@
 # xpanse
 
-Xpanse is an Open Source project allowing to easily implement native managed service on any cloud
-service provider.
+Xpanse is an Open Source project allowing to easily implement native managed 
+service on any cloud service provider.
 
-Xpanse unleash your cloud services by removing vendor lock-in and lock out. It standardizes and
-exposes cloud service providers core services, meaning that your xpanse service is portable (
-multi-cloud) on any cloud topology and provider. It also avoids tight coupling of your service to
-other cloud service provider services.
+Xpanse unleash your cloud services by removing vendor lock-in and lock out. 
+It standardizes and exposes cloud service providers core services, meaning 
+that your xpanse service is portable (multi-cloud) on any cloud topology and 
+provider. It also avoids tight coupling of your service to other cloud service 
+provider services.
 
 ## APIs (core services)
 
-Xpanse interacts directly with the fundamental APIs used by the cloud service provider to create
-managed service:
+Xpanse interacts directly with the fundamental APIs used by the cloud service 
+provider to create managed service:
 
 * **identity** dealing with access, users, groups, roles, ...
 * **computing** abstracts the manipulation of virtual machines
@@ -22,21 +23,25 @@ managed service:
 
 ## Configuration Language
 
-A managed service is described using Open Services Cloud Configuration Language (OCL).
+A managed service is described using Open Services Cloud Configuration Language 
+(OCL).
 
-OCL is a json descriptor of a managed service, describing the expected final state of your service,
-interacting with the fundamental APIs:
+OCL is a json descriptor of a managed service, describing the expected final 
+state of your service, interacting with the fundamental APIs:
 
 ```yaml
 # The version of the OCL
 version: 2.0
 # The category of the service.
 category: middleware
-# The Service provided by the ISV, the name will be shown on the console as a service.
+# The Service provided by the ISV, the name will be shown on the console as a 
+service.
 name: kafka
-# The version of the service, if the end-user want to select the version when they want to deploy the service.
+# The version of the service, if the end-user want to select the version when 
+they want to deploy the service.
 serviceVersion: v1.8
-# For the users may have more than one service, the @namespace can be used to separate the clusters.
+# For the users may have more than one service, the @namespace can be used to 
+separate the clusters.
 description: This is an ehanced kafka services by ISV-A.
 namespace: ISV-A
 # Icon for the service.
@@ -58,17 +63,20 @@ billing:
    period: monthly
    # The billing currency (`euro`, `usd`, ...)
    currency: euro
-# The flavor of the service, the @name/@version/@flavor can locate the specific service to be deployed.
+# The flavor of the service, the @name/@version/@flavor can locate the 
+specific service to be deployed.
 flavors:
    - name: 3-node-without-zookeeper
-      # The fixed price during the period (the price applied one shot whatever is the service use)
+      # The fixed price during the period (the price applied one shot whatever 
+      is the service use)
      fixedPrice: 20
       # Properties for the service, which can be used by the deployment.
      property:
         node: 3
         zookeeper: false
    - name: 5-node-with-zookeeper
-      # The fixed price during the period (the price applied one shot whatever is the service use)
+      # The fixed price during the period (the price applied one shot whatever 
+      is the service use)
      fixedPrice: 30
       # Properties for the service, which can be used by the deployment.
      property:
@@ -77,9 +85,12 @@ flavors:
 deployment:
    # kind, Supported values are terraform, pulumi, crossplane.
    kind: terraform
-   # Context for deployment: the context including some kind of parameters for the deployment, such as fix,variable.
-   # - env: The value of the fix parameters are defined by the ISV with the @value at the initial time.
-   # - variable: The value of the variable parameters are defined by the user on the console.
+   # Context for deployment: the context including some kind of parameters for 
+   the deployment, such as fix,variable.
+   # - env: The value of the fix parameters are defined by the ISV with the 
+   @value at the initial time.
+   # - variable: The value of the variable parameters are defined by the user 
+   on the console.
    # The parameters will be used to generate the API of the managed service.
    context:
       - name: HW_REGION_NAME
@@ -111,14 +122,16 @@ deployment:
         kind: variable
         type: number
         mandatory: true
-        #minimum=10|maximum=100: The age must be greater than or equal to 10 and less than or equal to 100.
+        #minimum=10|maximum=100: The age must be greater than or equal to 10 
+        and less than or equal to 100.
         validator: minimum=10|maximum=100
       - name: string_test
         description: Validator length for value of dataType string.
         kind: variable
         type: string
         mandatory: true
-        # minLength=6|maxLength=16: The value must be at least 6 characters long and no more than 16 characters long.
+        # minLength=6|maxLength=16: The value must be at least 6 characters 
+        long and no more than 16 characters long.
         validator: minLength=6|maxLength=16
       - name: enum_test
         description: Validator enum for value of dataType string.
@@ -132,7 +145,8 @@ deployment:
         kind: variable
         type: string
         mandatory: false
-        # pattern=*e*: the value matches any string that contains the specified. 
+        # pattern=*e*: the value matches any string that contains the 
+        specified. 
         validator: pattern=*e*
    deployer: |
       variable "secgroup_id" {}
@@ -167,17 +181,18 @@ Xpanse provides different options to generate and provision OCL:
 
 ## Orchestrator & binding
 
-OCL descriptor is an abstract description of the final managed service state. It's generic enough to
-work with any cloud service provider.
+OCL descriptor is an abstract description of the final managed service state. 
+It's generic enough to work with any cloud service provider.
 
-Xpanse runtime embeds an orchestrator responsible to delegate the services management to plugins.
+Xpanse runtime embeds an orchestrator responsible to delegate the services 
+management to plugins.
 
-Each plugin is dedicated to handle a cloud provider infrastructure and do actions required to
-actually deal with the services' lifecycle:
+Each plugin is dedicated to handle a cloud provider infrastructure and do 
+actions required to actually deal with the services' lifecycle:
 
 1. to bind OCL to the concrete cloud provider internal APIs
-2. to generate the graph of actions required to reach the final expected state, specifically for a
-   target cloud provider
+2. to generate the graph of actions required to reach the final expected state, 
+specifically for a target cloud provider
 
 ## Runtime
 
@@ -191,9 +206,10 @@ The runtime embeds and run together:
 
 ## Database
 
-The default database attached to the runtime is the H2 in-memory database. The same can be replaced
-with other production ready database systems by replacing the configurations mentioned below and by
-adding relevant maven dependencies.
+The default database attached to the runtime is the H2 in-memory database. 
+The same can be replaced with other production ready database systems by 
+replacing the configurations mentioned below and by adding relevant maven 
+dependencies.
 
 ```
 spring.datasource.url=jdbc:h2:mem:testdb
@@ -208,8 +224,8 @@ spring.jpa.hibernate.ddl-auto= update
 
 ### Build and Package
 
-First, you can build the whole xpanse project, including all modules (orchestrator, OCL, runtime,
-plugins, etc), simply with:
+First, you can build the whole xpanse project, including all modules 
+(orchestrator, OCL, runtime, plugins, etc), simply with:
 
 ```shell
 $ mvn clean install
@@ -217,8 +233,9 @@ $ mvn clean install
 
 ### Run
 
-By default, the application will not activate any plugins. They must be activated via spring
-profiles. Also ensure that only one plugin is active at a time.
+By default, the application will not activate any plugins. They must be 
+activated via spring profiles. Also ensure that only one plugin is active at a 
+time.
 
 * for Huawei Cloud:
 
@@ -234,16 +251,16 @@ $ cd runtime/target
 $ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
-By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image
-adding `-Ddocker.skip=false` as build argument:
+By default, the runtime is built in "exploded mode". Additionally, you can also 
+build a Docker image adding `-Ddocker.skip=false` as build argument:
 
 ```shell
 $ cd runtime
 $ mvn clean install -Ddocker.skip=false
 ```
 
-We can start xpanse runtime with a specific plugin by passing the plugin name in the profile name.
-For example to start huaweicloud
+We can start xpanse runtime with a specific plugin by passing the plugin name 
+in the profile name. For example to start huaweicloud
 
 ```shell
 $ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-xpanse-runtime xpanse
@@ -251,19 +268,21 @@ $ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-xpanse-runtime xp
 
 ### Static Code Analysis using CheckStyle
 
-This project using `CheckStyle` framework to perform static code analysis. The configuration can be
-found in [CheckStyle](checkstyle.xml). The framework also checks the code format in accordance
-to `Google Java Format`.
+This project using `CheckStyle` framework to perform static code analysis. The 
+configuration can be found in [CheckStyle](checkstyle.xml). The framework also 
+checks the code format in accordance to `Google Java Format`.
 
-The same file can also be imported in IDE CheckStyle plugins to get the analysis results directly in
-IDE and also to perform code formatting directly in IDE.
+The same file can also be imported in IDE CheckStyle plugins to get the 
+analysis results directly in IDE and also to perform code formatting directly 
+in IDE.
 
-The framework is added as a maven plugin and is executed by default as part of the `verify` phase.
-Any violations will result in build failure.
+The framework is added as a maven plugin and is executed by default as part of 
+the `verify` phase. Any violations will result in build failure.
 
 ### License/Copyright Configuration
 
-All files in the repository must contain a license header in the format mentioned
-in [License Header](license.header).
+All files in the repository must contain a license header in the format 
+mentioned in [License Header](license.header).
 
-The static code analysis framework will also validate if the license exists in the specified format.
+The static code analysis framework will also validate if the license exists in 
+the specified format.
