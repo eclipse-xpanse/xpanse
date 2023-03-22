@@ -147,7 +147,7 @@ public class TerraformDeployment implements Deployment {
             }
 
             if (variable.getKind() == DeployVariableKind.FIX_ENV) {
-                variables.put(variable.getName(), request.get(variable.getValue()));
+                variables.put(variable.getName(), variable.getValue());
             }
         }
 
@@ -188,7 +188,7 @@ public class TerraformDeployment implements Deployment {
 
             if (variable.getKind() == DeployVariableKind.FIX_VARIABLE
                     && request.containsKey(variable.getName())) {
-                variables.put(variable.getName(), request.get(variable.getValue()));
+                variables.put(variable.getName(), variable.getValue());
             }
         }
 
