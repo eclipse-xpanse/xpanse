@@ -33,7 +33,7 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 3
-      flavor_id: s7.xlarge.4
+      flavor_id: c7.large.4
   - name: 1-master-with-3-woker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
@@ -47,7 +47,7 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 5
-      flavor_id: s7.xlarge.4
+      flavor_id: c7.large.4
   - name: 1-master-with-5-woker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
@@ -103,28 +103,37 @@ deployment:
   deployer: |
     data "huaweicloud_availability_zones" "osc-az" {}
 
+    variable "flavor_flavor_id" {
+    type = string
+    description = "The flavor_id of all nodes in the K8S cluster."
+    }
+    variable "flavor_worker_nodes_count" {
+    type = string
+    description = "The worker nodes count in the K8S cluster."
+    }
+
     variable "admin_passwd" {
     type = string
-    default=""
     description = "The root password of all nodes in the K8S cluster."
+    default=""
     }
 
     variable "vpc_id" {
     type = string
-    default=""
     description = "The vpc network id of all nodes in the K8S cluster."
+    default=""
     }
 
     variable "subnet_id" {
     type = string
-    default=""
     description = "The sub network id of all nodes in the K8S cluster."
+    default=""
     }
 
     variable "secgroup_id" {
     type = string
-    default=""
     description = "The security group id of all nodes in the K8S cluster."
+    default=""
     }
 
     data "huaweicloud_vpc" "existing" {
@@ -193,7 +202,7 @@ deployment:
     network {
         uuid = local.subnet_id
     }
-    security_group_ids = [ local.security_group_id ]
+    security_group_ids = [ local.secgroup_id ]
     image_id = data.huaweicloud_images_image.k8s-image.id
     user_data=<<EOF
     #!bin/bash
@@ -210,7 +219,7 @@ deployment:
     network {
         uuid = local.subnet_id
     }
-    security_group_ids = [ local.security_group_id ]
+    security_group_ids = [ local.secgroup_id ]
     image_id = data.huaweicloud_images_image.k8s-image.id
     user_data=<<EOF
     #!bin/bash
@@ -231,5 +240,5 @@ deployment:
     }
 
     output "master_admin_passwd" {
-    value = nonsensitive(local.admin_passwd)
+    value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd): local.admin_passwd
     }

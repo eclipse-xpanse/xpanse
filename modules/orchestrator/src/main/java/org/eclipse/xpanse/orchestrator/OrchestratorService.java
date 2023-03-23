@@ -180,7 +180,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
                 deployServiceStorage.findDeployServiceById(id);
         if (Objects.isNull(deployServiceEntity) || Objects.isNull(
                 deployServiceEntity.getCreateRequest()) || Objects.isNull(
-                deployServiceEntity.getDeployResourceEntity())) {
+                deployServiceEntity.getDeployResourceList())) {
             throw new RuntimeException(String.format("Deployed service with id %s not found",
                     id));
         }
@@ -221,7 +221,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
-            deployServiceEntity.setDeployResourceEntity(
+            deployServiceEntity.setProperty(deployResult.getProperty());
+            deployServiceEntity.setDeployResourceList(
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
             deployServiceStorage.store(deployServiceEntity);
         } catch (Exception e) {
@@ -300,10 +301,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             DeployResult deployResult = deployment.destroy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
             List<DeployResource> resources = deployResult.getResources();
+            deployServiceEntity.setProperty(deployResult.getProperty());
             if (CollectionUtils.isEmpty(resources)) {
                 deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
             } else {
-                deployServiceEntity.setDeployResourceEntity(
+                deployServiceEntity.setDeployResourceList(
                         getDeployResourceEntityList(resources, deployServiceEntity));
             }
             deployServiceStorage.store(deployServiceEntity);

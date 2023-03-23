@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
-    private static final int STATUS_MSG_MAX_LENGTH = 255;
 
     private final Environment environment;
 

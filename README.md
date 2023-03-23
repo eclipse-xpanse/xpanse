@@ -65,7 +65,7 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 3
-      flavor_id: s7.xlarge.4
+      flavor_id: c7.large.4
   - name: 1-master-with-3-woker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
@@ -134,6 +134,15 @@ deployment:
       mandatory: false
   deployer: |
     data "huaweicloud_availability_zones" "osc-az" {}
+
+    variable "flavor_flavor_id" {
+    type = string
+    description = "The flavor_id of all nodes in the K8S cluster."
+    }
+    variable "flavor_worker_nodes_count" {
+    type = string
+    description = "The worker nodes count in the K8S cluster."
+    }
 
     variable "admin_passwd" {
       type        = string
@@ -265,7 +274,7 @@ deployment:
     }
 
     output "master_admin_passwd" {
-      value = nonsensitive(local.admin_passwd)
+      value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd): local.admin_passwd
     }
 ```
 

@@ -8,15 +8,20 @@ package org.eclipse.xpanse.modules.database.service;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -86,6 +91,17 @@ public class DeployServiceEntity extends CreateModifiedTime {
 
     @OneToMany(mappedBy = "deployService", orphanRemoval = true)
     @Cascade({CascadeType.ALL})
-    private List<DeployResourceEntity> deployResourceEntity;
+    private List<DeployResourceEntity> deployResourceList;
+
+
+    /**
+     * The properties of the deployed service.
+     */
+    @ElementCollection
+    @CollectionTable(name = "DEPLOY_SERVICE_PROPERTIES",
+            joinColumns = @JoinColumn(name = "DEPLOY_SERVICE_ID", nullable = false))
+    @MapKeyColumn(name = "P_KEY")
+    @Column(name = "P_VALUE")
+    private Map<String, String> property;
 
 }

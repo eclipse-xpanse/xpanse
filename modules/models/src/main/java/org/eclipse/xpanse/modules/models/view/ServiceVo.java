@@ -6,9 +6,11 @@
 
 package org.eclipse.xpanse.modules.models.view;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.enums.Category;
@@ -68,4 +70,14 @@ public class ServiceVo {
     @NotNull
     @Schema(description = "The state of the service")
     private ServiceState serviceState;
+
+    @NotNull
+    @Schema(description = "Time of register service.")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
+
+    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "Time of update service.")
+    private Date lastModifiedTime;
 }
