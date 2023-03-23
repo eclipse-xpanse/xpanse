@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.orchestrator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,15 +25,18 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.eclipse.xpanse.modules.models.service.MonitorDataResponse;
 import org.eclipse.xpanse.modules.models.service.MonitorResource;
+import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.modules.monitor.Monitor;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
+import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,9 +67,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     private final DeployServiceStorage deployServiceStorage;
 
     private final DeployResourceStorage deployResourceStorage;
+
+    private final DeployVariableValidator deployVariableValidator;
+
+    private final OpenApiUtil openApiUtil;
+
     @Getter
     private final List<Deployment> deployers = new ArrayList<>();
-
     @Getter
     private final List<OrchestratorPlugin> plugins = new ArrayList<>();
     @Getter
@@ -76,10 +84,14 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     @Autowired
     OrchestratorService(RegisterServiceStorage registerServiceStorage,
             DeployServiceStorage deployServiceStorage,
-            DeployResourceStorage deployResourceStorage) {
+            DeployResourceStorage deployResourceStorage,
+            DeployVariableValidator deployVariableValidator,
+            OpenApiUtil openApiUtil) {
         this.registerServiceStorage = registerServiceStorage;
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
+        this.deployVariableValidator = deployVariableValidator;
+        this.openApiUtil = openApiUtil;
     }
 
     @Override
@@ -139,6 +151,15 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
             throw new RuntimeException("Registered service not found");
         }
+
+        // Check context validation
+        if (Objects.nonNull(serviceEntity.getOcl().getDeployment()) && Objects.nonNull(
+                deployTask.getCreateRequest().getProperty())) {
+            List<DeployVariable> deployVariables = serviceEntity.getOcl().getDeployment()
+                    .getContext();
+            deployVariableValidator.isVariableValid(deployVariables,
+                    deployTask.getCreateRequest().getProperty());
+        }
         // Set Ocl and CreateRequest
         deployTask.setOcl(serviceEntity.getOcl());
         deployTask.getCreateRequest().setOcl(serviceEntity.getOcl());
@@ -149,7 +170,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     }
 
     /**
-     * Async method to deploy service.
+     * Method to monitor service.
      *
      * @param id Deploy service UUID.
      */
@@ -246,6 +267,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             throw new RuntimeException(String.format("Service with id %s is %s.",
                     deployTask.getId(), state));
         }
+
         // Set Ocl and CreateRequest
         deployTask.setCreateRequest(deployServiceEntity.getCreateRequest());
         deployTask.setOcl(deployServiceEntity.getCreateRequest().getOcl());
@@ -362,7 +384,40 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
                     + "existed.", id));
         }
         // TODO find the path of swagger-ui.html of the registered by id or generate swagger-ui.html
-        return null;
+        String rootPath = System.getProperty("user.dir");
+        File folder = new File(rootPath + "/openapi");
+        File file = new File(folder, uuid + ".html");
+        if (file.exists()) {
+            return "http://localhost:8080/openapi/" + uuid + ".html";
+        } else {
+            return openApiUtil.creatServiceApi(registerService);
+        }
+    }
+
+    /**
+     * delete OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     */
+    @Async("taskExecutor")
+    public void deleteOpenApi(String id) {
+        openApiUtil.deleteServiceApi(id);
+    }
+
+    /**
+     * update OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     */
+    @Async("taskExecutor")
+    public void updateOpenApi(String id) {
+        UUID uuid = UUID.fromString(id);
+        RegisterServiceEntity registerService = registerServiceStorage.getRegisterServiceById(uuid);
+        if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
+            throw new IllegalArgumentException(String.format("Registered service with id %s not "
+                    + "existed.", id));
+        }
+        openApiUtil.updateServiceApi(registerService);
     }
 
 }
