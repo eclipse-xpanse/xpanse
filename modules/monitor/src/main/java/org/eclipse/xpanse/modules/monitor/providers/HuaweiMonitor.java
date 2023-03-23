@@ -74,7 +74,7 @@ public class HuaweiMonitor implements Monitor {
         MonitorResourceHandler monitorResourceHandler = new MonitorResourceHandler();
         List<MonitorDataResponse> monitorDataResponseList = new ArrayList<>();
         for (DeployResourceEntity deployResourceEntity :
-                deployServiceEntity.getDeployResourceEntity()) {
+                deployServiceEntity.getDeployResourceList()) {
             if (deployResourceEntity.getResourceId() != null) {
                 HuaweiMonitorResource huaweiMonitorResource = monitorResourceHandler.handler(
                         deployResourceEntity, fromTime, toTime);
@@ -119,7 +119,7 @@ public class HuaweiMonitor implements Monitor {
         MonitorResourceHandler monitorResourceHandler = new MonitorResourceHandler();
         List<MonitorDataResponse> monitorDataResponseList = new ArrayList<>();
         for (DeployResourceEntity deployResourceEntity :
-                deployServiceEntity.getDeployResourceEntity()) {
+                deployServiceEntity.getDeployResourceList()) {
             if (deployResourceEntity.getResourceId() != null) {
                 HuaweiMonitorResource huaweiMonitorResource = monitorResourceHandler.handler(
                         deployResourceEntity, fromTime, toTime);

@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.billing.BillingService;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -26,6 +27,7 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
+import org.eclipse.xpanse.modules.models.service.BillingDataResponse;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.eclipse.xpanse.modules.models.service.MonitorDataResponse;
@@ -73,11 +75,15 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     private final OpenApiUtil openApiUtil;
 
     @Getter
+    private final List<Monitor> monitors = new ArrayList<>();
+
+    @Getter
     private final List<Deployment> deployers = new ArrayList<>();
+
     @Getter
     private final List<OrchestratorPlugin> plugins = new ArrayList<>();
     @Getter
-    private final List<Monitor> monitors = new ArrayList<>();
+    private final List<BillingService> billings = new ArrayList<>();
     @Value("${monitor.data.agent.enable}")
     private Boolean monitorAgentEnabled;
 
@@ -112,6 +118,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             monitors.addAll(applicationContext.getBeansOfType(Monitor.class).values());
             if (monitors.isEmpty()) {
                 log.warn("No monitor loaded by the runtime.");
+            }
+
+            billings.addAll(applicationContext.getBeansOfType(BillingService.class).values());
+            if (billings.isEmpty()) {
+                log.warn("No billing loaded by the runtime.");
             }
         }
     }
@@ -151,7 +162,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
             throw new RuntimeException("Registered service not found");
         }
-
         // Check context validation
         if (Objects.nonNull(serviceEntity.getOcl().getDeployment()) && Objects.nonNull(
                 deployTask.getCreateRequest().getProperty())) {
@@ -202,6 +212,37 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         monitorResource.setCpu(cpu);
         monitorResource.setMem(mem);
         return monitorResource;
+
+    }
+
+    /**
+     * Method to get service billing.
+     *
+     * @param id Deploy service UUID.
+     */
+    public List<BillingDataResponse> billing(UUID id, Boolean unit) {
+        // Find the deployed service.
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
+                deployServiceEntity.getCreateRequest()) || Objects.isNull(
+                deployServiceEntity.getDeployResourceList())) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    id));
+        }
+        Csp csp = deployServiceEntity.getCreateRequest().getCsp();
+
+        Optional<BillingService> billingOptional =
+                this.billings.stream()
+                        .filter(billing -> billing.getCsp() == csp)
+                        .findFirst();
+        if (billingOptional.isEmpty()) {
+            throw new RuntimeException("Can't find suitable billing for the Task.");
+        }
+        BillingService billing = billingOptional.get();
+        List<BillingDataResponse> billingDataResponseList = billing.onDemandBilling(
+                deployServiceEntity, unit);
+        return billingDataResponseList;
 
     }
 
@@ -268,7 +309,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             throw new RuntimeException(String.format("Service with id %s is %s.",
                     deployTask.getId(), state));
         }
-
         // Set Ocl and CreateRequest
         deployTask.setCreateRequest(deployServiceEntity.getCreateRequest());
         deployTask.setOcl(deployServiceEntity.getCreateRequest().getOcl());
@@ -385,7 +425,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             throw new IllegalArgumentException(String.format("Registered service with id %s not "
                     + "existed.", id));
         }
-        // TODO find the path of swagger-ui.html of the registered by id or generate swagger-ui.html
         String rootPath = System.getProperty("user.dir");
         File folder = new File(rootPath + "/openapi");
         File file = new File(folder, uuid + ".html");

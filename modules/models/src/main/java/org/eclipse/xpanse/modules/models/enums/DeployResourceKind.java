@@ -18,7 +18,8 @@ public enum DeployResourceKind {
     Vm("vm"),
     Container("container"),
     PublicIp("public_ip"),
-    Vpc("vpc");
+    Vpc("vpc"),
+    Disk("disk");
 
     private final String kind;
 

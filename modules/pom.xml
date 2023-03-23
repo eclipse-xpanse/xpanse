@@ -26,6 +26,7 @@
         <module>database</module>
         <module>deployment</module>
         <module>monitor</module>
+        <module>billing</module>
     </modules>
 
 </project>

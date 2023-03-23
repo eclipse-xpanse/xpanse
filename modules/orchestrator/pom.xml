@@ -54,14 +54,20 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>database</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>deployment</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
+        <artifactId>database</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>deployment</artifactId>
+        <groupId>org.eclipse.xpanse.modules</groupId>
+        <scope>compile</scope>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>billing</artifactId>
+        <groupId>org.eclipse.xpanse.modules</groupId>
+        <scope>compile</scope>
+        <version>1.0.0-SNAPSHOT</version>
+      </dependency>
     </dependencies>
 </project>

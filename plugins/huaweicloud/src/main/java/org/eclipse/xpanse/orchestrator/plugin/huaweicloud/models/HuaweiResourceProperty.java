@@ -16,7 +16,8 @@ import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
  */
 public enum HuaweiResourceProperty {
     // TODO add all DeployResourceKind and Property like new HuaweiVmProperty() as enum.
-    HUAWEI_VM_PROPERTY(DeployResourceKind.Vm, new HuaweiVmProperty());
+    HUAWEI_VM_PROPERTY(DeployResourceKind.Vm, new HuaweiVmProperty()),
+    HUAWEI_DISK_PROPERTY(DeployResourceKind.Disk, new HuaweiDiskProperty());
 
 
     private final DeployResourceKind resourceKind;

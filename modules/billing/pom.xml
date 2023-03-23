@@ -8,7 +8,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <artifactId>monitor</artifactId>
+  <artifactId>billing</artifactId>
   <dependencies>
     <dependency>
       <artifactId>lombok</artifactId>
@@ -21,17 +21,17 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <artifactId>deployment</artifactId>
+      <artifactId>models</artifactId>
       <groupId>org.eclipse.xpanse.modules</groupId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <artifactId>huaweicloud-sdk-ces</artifactId>
+      <artifactId>huaweicloud-sdk-bss</artifactId>
       <groupId>com.huaweicloud.sdk</groupId>
       <version>3.1.32</version>
     </dependency>
     <dependency>
-      <artifactId>huaweicloud-sdk-aom</artifactId>
+      <artifactId>huaweicloud-sdk-iam</artifactId>
       <groupId>com.huaweicloud.sdk</groupId>
       <version>3.1.32</version>
     </dependency>

@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.service.BillingDataResponse;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.MonitorResource;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
@@ -129,6 +130,7 @@ public class OrchestratorApi {
         String successMsg = String.format(
                 "Update registered service with id %s success.", id);
         log.info(successMsg);
+        this.orchestratorService.updateOpenApi(id);
         return Response.successResponse(successMsg);
     }
 
@@ -183,6 +185,7 @@ public class OrchestratorApi {
         String successMsg = String.format(
                 "Update registered service %s with Url %s", id, oclLocation);
         log.info(successMsg);
+        this.orchestratorService.updateOpenApi(id);
         return Response.successResponse(successMsg);
     }
 
@@ -206,6 +209,7 @@ public class OrchestratorApi {
         String successMsg = String.format(
                 "Unregister registered service using id %s success.", id);
         log.info(successMsg);
+        this.orchestratorService.deleteOpenApi(id);
         return Response.successResponse(successMsg);
     }
 
@@ -300,7 +304,8 @@ public class OrchestratorApi {
         log.info("Get detail of registered service with name {}.", id);
         OclDetailVo oclDetailVo = registerService.getRegisteredService(id);
         String successMsg = String.format(
-                "Get detail of registered service with name %s success.", id);
+                "Get detail of registered service with name %s success.",
+                id);
         log.info(successMsg);
         return oclDetailVo;
     }
@@ -325,20 +330,24 @@ public class OrchestratorApi {
      * @return Status of the managed service.
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @GetMapping("/service/{id}")
+    @Operation(description = "Get deployed service using id.")
+    @GetMapping(value = "/service/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public DeployServiceEntity serviceDetail(@PathVariable("id") String id) {
+    public DeployServiceEntity serviceDetail(
+            @Parameter(name = "id", description = "Task id of deploy service")
+            @PathVariable("id") String id) {
 
         return this.orchestratorService.getDeployServiceDetail(UUID.fromString(id));
     }
 
     /**
-     * Profiles the names of the managed services currently deployed.
+     * List the deployed services.
      *
      * @return list of all services deployed.
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @GetMapping("/services")
+    @Operation(description = "List the deployed services.")
+    @GetMapping(value = "/services", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ServiceVo> services() {
         return this.orchestratorService.listDeployServices();
@@ -360,6 +369,22 @@ public class OrchestratorApi {
             @RequestParam(value = "toTime", required = false) String toTime) {
 
         return this.orchestratorService.monitor(id, fromTime, toTime);
+    }
+
+    /**
+     * Get billing data.
+     *
+     * @param id deploy service UUID.
+     * @return response
+     */
+    @Tag(name = "Service", description = "APIs to get billing data")
+    @GetMapping(value = "/service/billing/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<BillingDataResponse> billing(@PathVariable("id") UUID id,
+            @Parameter(name = "unit", description = "the unit of the unit price")
+            @RequestParam(value = "unit", required = false) Boolean unit) {
+
+        return this.orchestratorService.billing(id, unit);
     }
 
     /**
@@ -392,9 +417,9 @@ public class OrchestratorApi {
     }
 
     /**
-     * Stop started managed service.
+     * Start a task to destroy the deployed service using id.
      *
-     * @param id name of managed service
+     * @param id ID of deployed service.
      * @return response
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
@@ -412,14 +437,15 @@ public class OrchestratorApi {
         return Response.successResponse(successMsg);
     }
 
+
     /**
      * Get openapi of registered service by id.
      *
      * @param id id of registered service.
      * @return response
      */
-    @Tag(name = "Service Vendor", description = "APIs to get openapi of service deploy context")
-    @GetMapping(value = "/register/openapi/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "Service", description = "APIs to get openapi of service deploy context")
+    @GetMapping(value = "/service/openapi/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public String openApi(@PathVariable("id") String id) {
         log.info("Get openapi url of registered service with id {}", id);
