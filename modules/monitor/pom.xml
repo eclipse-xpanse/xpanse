@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ SPDX-FileCopyrightText: Huawei Inc.
+  ~
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <artifactId>monitor</artifactId>
+  <dependencies>
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <artifactId>database</artifactId>
+      <groupId>org.eclipse.xpanse.modules</groupId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>deployment</artifactId>
+      <groupId>org.eclipse.xpanse.modules</groupId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>huaweicloud-sdk-ces</artifactId>
+      <groupId>com.huaweicloud.sdk</groupId>
+      <version>3.1.26</version>
+    </dependency>
+    <dependency>
+      <artifactId>huaweicloud-sdk-aom</artifactId>
+      <groupId>com.huaweicloud.sdk</groupId>
+      <version>3.1.26</version>
+    </dependency>
+  </dependencies>
+  <groupId>org.eclipse.xpanse.modules</groupId>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>modules</artifactId>
+    <groupId>org.eclipse.xpanse</groupId>
+    <relativePath>../pom.xml</relativePath>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+</project>

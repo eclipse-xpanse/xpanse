@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.models.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.MonitorResource;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.OclDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
@@ -297,7 +298,8 @@ public class OrchestratorApi {
             @Parameter(name = "id", description = "id of registered service")
             @PathVariable("id") String id) {
         log.info("Get detail of registered service with name {}.", id);
-        OclDetailVo oclDetailVo = registerService.getRegisteredService(id);
+        OclDetailVo oclDetailVo =
+                registerService.getRegisteredService(id);
         String successMsg = String.format(
                 "Get detail of registered service with name %s success.",
                 id);
@@ -349,7 +351,25 @@ public class OrchestratorApi {
     }
 
     /**
-     * Start a task to deploy registered service.
+     * Get monitor data.
+     *
+     * @param id deploy service UUID.
+     * @return response
+     */
+    @Tag(name = "Service", description = "APIs to get monitor data")
+    @GetMapping(value = "/service/monitor/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public MonitorResource monitor(@PathVariable("id") UUID id,
+            @Parameter(name = "fromTime", description = "the start time of the monitoring range")
+            @RequestParam(value = "fromTime", required = false) String fromTime,
+            @Parameter(name = "toTime", description = "the end time of the monitoring range")
+            @RequestParam(value = "toTime", required = false) String toTime) {
+
+        return this.orchestratorService.monitor(id, fromTime, toTime);
+    }
+
+    /**
+     * Start registered managed service.
      *
      * @param deployRequest the managed service to create.
      * @return response

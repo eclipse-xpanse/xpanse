@@ -21,19 +21,22 @@ import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
-import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
+import org.eclipse.xpanse.modules.models.service.MonitorDataResponse;
+import org.eclipse.xpanse.modules.models.service.MonitorResource;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
+import org.eclipse.xpanse.modules.monitor.Monitor;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -60,24 +63,23 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     private final DeployServiceStorage deployServiceStorage;
 
     private final DeployResourceStorage deployResourceStorage;
-
-    private final DeployVariableValidator deployVariableValidator;
-
     @Getter
     private final List<Deployment> deployers = new ArrayList<>();
 
     @Getter
     private final List<OrchestratorPlugin> plugins = new ArrayList<>();
+    @Getter
+    private final List<Monitor> monitors = new ArrayList<>();
+    @Value("${monitor.data.agent.enable}")
+    private Boolean monitorAgentEnabled;
 
     @Autowired
     OrchestratorService(RegisterServiceStorage registerServiceStorage,
             DeployServiceStorage deployServiceStorage,
-            DeployResourceStorage deployResourceStorage,
-            DeployVariableValidator variableValidator) {
+            DeployResourceStorage deployResourceStorage) {
         this.registerServiceStorage = registerServiceStorage;
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
-        this.deployVariableValidator = variableValidator;
     }
 
     @Override
@@ -93,6 +95,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployers.addAll(applicationContext.getBeansOfType(Deployment.class).values());
             if (deployers.isEmpty()) {
                 log.warn("No deployer loaded by the runtime.");
+            }
+
+            monitors.addAll(applicationContext.getBeansOfType(Monitor.class).values());
+            if (monitors.isEmpty()) {
+                log.warn("No monitor loaded by the runtime.");
             }
         }
     }
@@ -132,14 +139,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
             throw new RuntimeException("Registered service not found");
         }
-        // Check context validation
-        if (Objects.nonNull(serviceEntity.getOcl().getDeployment()) && Objects.nonNull(
-                deployTask.getCreateRequest().getProperty())) {
-            List<DeployVariable> deployVariables = serviceEntity.getOcl().getDeployment()
-                    .getContext();
-            deployVariableValidator.isVariableValid(deployVariables,
-                    deployTask.getCreateRequest().getProperty());
-        }
         // Set Ocl and CreateRequest
         deployTask.setOcl(serviceEntity.getOcl());
         deployTask.getCreateRequest().setOcl(serviceEntity.getOcl());
@@ -147,6 +146,42 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         fillHandler(deployTask);
         // get the deployment.
         return getDeployment(deployTask);
+    }
+
+    /**
+     * Async method to deploy service.
+     *
+     * @param id Deploy service UUID.
+     */
+    public MonitorResource monitor(UUID id, String fromTime, String toTime) {
+        // Find the deployed service.
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
+                deployServiceEntity.getCreateRequest()) || Objects.isNull(
+                deployServiceEntity.getDeployResourceEntity())) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    id));
+        }
+        Csp csp = deployServiceEntity.getCreateRequest().getCsp();
+
+        Optional<Monitor> monitorOptional =
+                this.monitors.stream()
+                        .filter(monitor -> monitor.getCsp() == csp)
+                        .findFirst();
+        if (monitorOptional.isEmpty()) {
+            throw new RuntimeException("Can't find suitable monitor for the Task.");
+        }
+        Monitor monitor = monitorOptional.get();
+        MonitorResource monitorResource = new MonitorResource();
+        List<MonitorDataResponse> cpu = monitor.cpuUsage(deployServiceEntity, monitorAgentEnabled,
+                fromTime, toTime);
+        List<MonitorDataResponse> mem = monitor.memUsage(deployServiceEntity, monitorAgentEnabled,
+                fromTime, toTime);
+        monitorResource.setCpu(cpu);
+        monitorResource.setMem(mem);
+        return monitorResource;
+
     }
 
     /**
@@ -329,6 +364,5 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         // TODO find the path of swagger-ui.html of the registered by id or generate swagger-ui.html
         return null;
     }
-
 
 }

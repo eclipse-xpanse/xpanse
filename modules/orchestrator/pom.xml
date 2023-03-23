@@ -18,37 +18,42 @@
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>orchestrator</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>models</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
+      <dependency>
+        <artifactId>lombok</artifactId>
+        <groupId>org.projectlombok</groupId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <artifactId>models</artifactId>
+        <groupId>org.eclipse.xpanse.modules</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>monitor</artifactId>
+        <groupId>org.eclipse.xpanse.modules</groupId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <artifactId>slf4j-api</artifactId>
+        <groupId>org.slf4j</groupId>
+      </dependency>
+      <dependency>
+        <artifactId>junit-jupiter-api</artifactId>
+        <groupId>org.junit.jupiter</groupId>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-params</artifactId>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>database</artifactId>
             <version>${project.version}</version>
         </dependency>
