@@ -46,4 +46,5 @@ public class DeployResource {
     @NotNull
     @Schema(description = "The property of the deployed resource.")
     private Map<String, String> property;
+
 }

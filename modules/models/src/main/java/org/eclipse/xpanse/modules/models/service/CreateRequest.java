@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.service;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.eclipse.xpanse.modules.models.resource.Ocl;
 /**
  * Request body for service creation.
  */
+@Valid
 @Data
 public class CreateRequest {
 

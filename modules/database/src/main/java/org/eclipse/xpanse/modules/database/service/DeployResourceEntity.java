@@ -61,7 +61,7 @@ public class DeployResourceEntity extends CreateModifiedTime {
      * The deployService we belonged to.
      */
     @ManyToOne
-    @JoinColumn(name = "deployService_id")
+    @JoinColumn(name = "DEPLOY_SERVICE_ID")
     @JsonIgnoreProperties({"deployResourceEntity"})
     private DeployServiceEntity deployService;
 
@@ -69,9 +69,9 @@ public class DeployResourceEntity extends CreateModifiedTime {
      * The properties of the deployed resource.
      */
     @ElementCollection
-    @CollectionTable(name = "DEPLOY_RESOURCE_PROPERTY",
-            joinColumns = @JoinColumn(name = "deployResource_id", nullable = false))
-    @MapKeyColumn(name = "p_key")
-    @Column(name = "p_value")
+    @CollectionTable(name = "DEPLOY_RESOURCE_PROPERTIES",
+            joinColumns = @JoinColumn(name = "DEPLOY_RESOURCE_ID", nullable = false))
+    @MapKeyColumn(name = "P_KEY")
+    @Column(name = "P_VALUE")
     private Map<String, String> property;
 }

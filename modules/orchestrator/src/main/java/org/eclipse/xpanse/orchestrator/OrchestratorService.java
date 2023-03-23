@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.orchestrator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,24 +17,32 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.billing.BillingService;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
+import org.eclipse.xpanse.modules.models.service.BillingDataResponse;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.service.MonitorDataResponse;
+import org.eclipse.xpanse.modules.models.service.MonitorResource;
 import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
+import org.eclipse.xpanse.modules.monitor.Monitor;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
+import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -63,21 +72,32 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     private final DeployVariableValidator deployVariableValidator;
 
+    private final OpenApiUtil openApiUtil;
+
+    @Getter
+    private final List<Monitor> monitors = new ArrayList<>();
+
     @Getter
     private final List<Deployment> deployers = new ArrayList<>();
 
     @Getter
     private final List<OrchestratorPlugin> plugins = new ArrayList<>();
+    @Getter
+    private final List<BillingService> billings = new ArrayList<>();
+    @Value("${monitor.data.agent.enable}")
+    private Boolean monitorAgentEnabled;
 
     @Autowired
     OrchestratorService(RegisterServiceStorage registerServiceStorage,
             DeployServiceStorage deployServiceStorage,
             DeployResourceStorage deployResourceStorage,
-            DeployVariableValidator variableValidator) {
+            DeployVariableValidator deployVariableValidator,
+            OpenApiUtil openApiUtil) {
         this.registerServiceStorage = registerServiceStorage;
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
-        this.deployVariableValidator = variableValidator;
+        this.deployVariableValidator = deployVariableValidator;
+        this.openApiUtil = openApiUtil;
     }
 
     @Override
@@ -93,6 +113,16 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployers.addAll(applicationContext.getBeansOfType(Deployment.class).values());
             if (deployers.isEmpty()) {
                 log.warn("No deployer loaded by the runtime.");
+            }
+
+            monitors.addAll(applicationContext.getBeansOfType(Monitor.class).values());
+            if (monitors.isEmpty()) {
+                log.warn("No monitor loaded by the runtime.");
+            }
+
+            billings.addAll(applicationContext.getBeansOfType(BillingService.class).values());
+            if (billings.isEmpty()) {
+                log.warn("No billing loaded by the runtime.");
             }
         }
     }
@@ -150,6 +180,73 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     }
 
     /**
+     * Method to monitor service.
+     *
+     * @param id Deploy service UUID.
+     */
+    public MonitorResource monitor(UUID id, String fromTime, String toTime) {
+        // Find the deployed service.
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
+                deployServiceEntity.getCreateRequest()) || Objects.isNull(
+                deployServiceEntity.getDeployResourceList())) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    id));
+        }
+        Csp csp = deployServiceEntity.getCreateRequest().getCsp();
+
+        Optional<Monitor> monitorOptional =
+                this.monitors.stream()
+                        .filter(monitor -> monitor.getCsp() == csp)
+                        .findFirst();
+        if (monitorOptional.isEmpty()) {
+            throw new RuntimeException("Can't find suitable monitor for the Task.");
+        }
+        Monitor monitor = monitorOptional.get();
+        MonitorResource monitorResource = new MonitorResource();
+        List<MonitorDataResponse> cpu = monitor.cpuUsage(deployServiceEntity, monitorAgentEnabled,
+                fromTime, toTime);
+        List<MonitorDataResponse> mem = monitor.memUsage(deployServiceEntity, monitorAgentEnabled,
+                fromTime, toTime);
+        monitorResource.setCpu(cpu);
+        monitorResource.setMem(mem);
+        return monitorResource;
+
+    }
+
+    /**
+     * Method to get service billing.
+     *
+     * @param id Deploy service UUID.
+     */
+    public List<BillingDataResponse> billing(UUID id, Boolean unit) {
+        // Find the deployed service.
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
+                deployServiceEntity.getCreateRequest()) || Objects.isNull(
+                deployServiceEntity.getDeployResourceList())) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    id));
+        }
+        Csp csp = deployServiceEntity.getCreateRequest().getCsp();
+
+        Optional<BillingService> billingOptional =
+                this.billings.stream()
+                        .filter(billing -> billing.getCsp() == csp)
+                        .findFirst();
+        if (billingOptional.isEmpty()) {
+            throw new RuntimeException("Can't find suitable billing for the Task.");
+        }
+        BillingService billing = billingOptional.get();
+        List<BillingDataResponse> billingDataResponseList = billing.onDemandBilling(
+                deployServiceEntity, unit);
+        return billingDataResponseList;
+
+    }
+
+    /**
      * Async method to deploy service.
      *
      * @param deployment deployment
@@ -165,7 +262,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
-            deployServiceEntity.setDeployResourceEntity(
+            deployServiceEntity.setProperty(deployResult.getProperty());
+            deployServiceEntity.setDeployResourceList(
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
             deployServiceStorage.store(deployServiceEntity);
         } catch (Exception e) {
@@ -243,10 +341,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             DeployResult deployResult = deployment.destroy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
             List<DeployResource> resources = deployResult.getResources();
+            deployServiceEntity.setProperty(deployResult.getProperty());
             if (CollectionUtils.isEmpty(resources)) {
                 deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
             } else {
-                deployServiceEntity.setDeployResourceEntity(
+                deployServiceEntity.setDeployResourceList(
                         getDeployResourceEntityList(resources, deployServiceEntity));
             }
             deployServiceStorage.store(deployServiceEntity);
@@ -326,9 +425,40 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             throw new IllegalArgumentException(String.format("Registered service with id %s not "
                     + "existed.", id));
         }
-        // TODO find the path of swagger-ui.html of the registered by id or generate swagger-ui.html
-        return null;
+        String rootPath = System.getProperty("user.dir");
+        File folder = new File(rootPath + "/openapi");
+        File file = new File(folder, uuid + ".html");
+        if (file.exists()) {
+            return "http://localhost:8080/openapi/" + uuid + ".html";
+        } else {
+            return openApiUtil.creatServiceApi(registerService);
+        }
     }
 
+    /**
+     * delete OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     */
+    @Async("taskExecutor")
+    public void deleteOpenApi(String id) {
+        openApiUtil.deleteServiceApi(id);
+    }
+
+    /**
+     * update OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     */
+    @Async("taskExecutor")
+    public void updateOpenApi(String id) {
+        UUID uuid = UUID.fromString(id);
+        RegisterServiceEntity registerService = registerServiceStorage.getRegisterServiceById(uuid);
+        if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
+            throw new IllegalArgumentException(String.format("Registered service with id %s not "
+                    + "existed.", id));
+        }
+        openApiUtil.updateServiceApi(registerService);
+    }
 
 }

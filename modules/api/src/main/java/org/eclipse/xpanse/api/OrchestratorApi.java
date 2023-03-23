@@ -26,7 +26,9 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.service.BillingDataResponse;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.MonitorResource;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.OclDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
@@ -128,6 +130,7 @@ public class OrchestratorApi {
         String successMsg = String.format(
                 "Update registered service with id %s success.", id);
         log.info(successMsg);
+        this.orchestratorService.updateOpenApi(id);
         return Response.successResponse(successMsg);
     }
 
@@ -182,6 +185,7 @@ public class OrchestratorApi {
         String successMsg = String.format(
                 "Update registered service %s with Url %s", id, oclLocation);
         log.info(successMsg);
+        this.orchestratorService.updateOpenApi(id);
         return Response.successResponse(successMsg);
     }
 
@@ -205,6 +209,7 @@ public class OrchestratorApi {
         String successMsg = String.format(
                 "Unregister registered service using id %s success.", id);
         log.info(successMsg);
+        this.orchestratorService.deleteOpenApi(id);
         return Response.successResponse(successMsg);
     }
 
@@ -349,7 +354,41 @@ public class OrchestratorApi {
     }
 
     /**
-     * Start a task to deploy registered service.
+     * Get monitor data.
+     *
+     * @param id deploy service UUID.
+     * @return response
+     */
+    @Tag(name = "Service", description = "APIs to get monitor data")
+    @GetMapping(value = "/service/monitor/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public MonitorResource monitor(@PathVariable("id") UUID id,
+            @Parameter(name = "fromTime", description = "the start time of the monitoring range")
+            @RequestParam(value = "fromTime", required = false) String fromTime,
+            @Parameter(name = "toTime", description = "the end time of the monitoring range")
+            @RequestParam(value = "toTime", required = false) String toTime) {
+
+        return this.orchestratorService.monitor(id, fromTime, toTime);
+    }
+
+    /**
+     * Get billing data.
+     *
+     * @param id deploy service UUID.
+     * @return response
+     */
+    @Tag(name = "Service", description = "APIs to get billing data")
+    @GetMapping(value = "/service/billing/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<BillingDataResponse> billing(@PathVariable("id") UUID id,
+            @Parameter(name = "unit", description = "the unit of the unit price")
+            @RequestParam(value = "unit", required = false) Boolean unit) {
+
+        return this.orchestratorService.billing(id, unit);
+    }
+
+    /**
+     * Start registered managed service.
      *
      * @param deployRequest the managed service to create.
      * @return response
