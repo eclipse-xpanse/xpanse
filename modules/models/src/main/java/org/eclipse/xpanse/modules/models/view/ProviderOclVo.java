@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.resource.Region;
 
 
 /**
@@ -25,7 +26,7 @@ public class ProviderOclVo {
 
     @NotNull
     @Schema(description = "The regions of the Cloud Service Provider.")
-    private List<String> regions;
+    private List<Region> regions;
 
     @NotNull
     @Schema(description = "The list of the registered services.")
