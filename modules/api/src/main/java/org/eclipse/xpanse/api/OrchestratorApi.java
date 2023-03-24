@@ -358,7 +358,7 @@ public class OrchestratorApi {
     @Operation(description = "Start a task to deploy registered service.")
     @PostMapping(value = "/service", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public UUID deploy(@RequestBody CreateRequest deployRequest) {
+    public UUID deploy(@Valid @RequestBody CreateRequest deployRequest) {
         log.info("Starting managed service with name {}, version {}, csp {}",
                 deployRequest.getName(),
                 deployRequest.getVersion(), deployRequest.getCsp());
