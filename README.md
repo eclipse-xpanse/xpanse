@@ -136,12 +136,13 @@ deployment:
     data "huaweicloud_availability_zones" "osc-az" {}
 
     variable "flavor_flavor_id" {
-    type = string
-    description = "The flavor_id of all nodes in the K8S cluster."
+      type        = string
+      description = "The flavor_id of all nodes in the K8S cluster."
     }
+
     variable "flavor_worker_nodes_count" {
-    type = string
-    description = "The worker nodes count in the K8S cluster."
+      type        = string
+      description = "The worker nodes count in the K8S cluster."
     }
 
     variable "admin_passwd" {
@@ -202,21 +203,22 @@ deployment:
       gateway_ip = "192.168.10.1"
     }
 
-    data "huaweicloud_networking_secgroups" "existing" {
+    data "huaweicloud_networking_secgroup" "existing" {
       secgroup_id = var.secgroup_id
+      count       = length(data.huaweicloud_networking_secgroup.existing)
     }
 
     resource "huaweicloud_networking_secgroup" "new" {
-      count       = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+      count       = length(data.huaweicloud_networking_secgroup.existing) == 0 ? 1 : 0
       name        = "K8S_secgroup-${random_id.new.hex}"
       description = "K8S cluster security group"
     }
 
     locals {
       admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
-      vpc_id       = length(data.huaweicloud_vpcs.existing.vpcs) > 0 ? data.huaweicloud_vpcs.existing.vpcs[0].id : huaweicloud_vpcs.new[0].id
+      vpc_id       = length(data.huaweicloud_vpcs.existing.vpcs) > 0 ? data.huaweicloud_vpcs.existing.vpcs[0].id : huaweicloud_vpc.new[0].id
       subnet_id    = length(data.huaweicloud_vpc_subnets.existing.subnets) > 0 ? data.huaweicloud_vpc_subnets.existing.subnets[0].id : huaweicloud_vpc_subnet.new[0].id
-      secgroup_id  = length(data.huaweicloud_networking_secgroups.existing.security_groups) > 0 ? data.huaweicloud_networking_secgroups.existing.security_groups[0].id : huaweicloud_networking_secgroup.new[0].id
+      secgroup_id  = length(data.huaweicloud_networking_secgroup.existing) > 0 ? data.huaweicloud_networking_secgroup.existing[0].id : huaweicloud_networking_secgroup.new[0].id
     }
 
     data "huaweicloud_images_image" "k8s-image" {
@@ -228,7 +230,7 @@ deployment:
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
       name               = "k8s-master"
       flavor_id          = var.flavor_flavor_id
-      security_group_ids = [ local.security_group_id ]
+      security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.k8s-image.id
 
       network {
@@ -247,7 +249,7 @@ deployment:
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
       name               = "k8s-node-${count.index}"
       flavor_id          = var.flavor_flavor_id
-      security_group_ids = [ local.security_group_id ]
+      security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.k8s-image.id
 
       network {
@@ -274,7 +276,7 @@ deployment:
     }
 
     output "master_admin_passwd" {
-      value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd): local.admin_passwd
+      value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
     }
 ```
 
