@@ -27,5 +27,5 @@ public class CloudServiceProvider {
     @Valid
     @NotEmpty
     @Schema(description = "The regions of the Cloud Service Provider")
-    private List<String> regions;
+    private List<Region> regions;
 }

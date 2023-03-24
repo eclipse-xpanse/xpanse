@@ -48,8 +48,10 @@ icon: |
 cloudServiceProvider:
   name: huawei
   regions:
-    - cn-southwest-2
-    - cn-north-4
+    - name: cn-southwest-2
+      area: Asia Pacific
+    - name: cn-north-4
+      area: North America
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat

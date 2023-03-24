@@ -3,7 +3,7 @@ version: 2.0
 # The category of the service.
 category: middleware
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: kafka
+name: kafka3
 # The version of the service, if the end-user want to select the version when they want to deploy the service.
 serviceVersion: v1.8
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
@@ -59,7 +59,8 @@ deployment:
       kind: fix_variable
       type: string
       mandatory: true
-      validator: minLength=6|maxLength=26
+      validator: minLength=1|maxLength=11
+      value: 111
     - name: HW_ACCESS_KEY
       description: huawei cloud access key.
       kind: env

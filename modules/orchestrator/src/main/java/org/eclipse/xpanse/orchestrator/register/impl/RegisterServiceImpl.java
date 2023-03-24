@@ -172,6 +172,7 @@ public class RegisterServiceImpl implements RegisterService {
                     List<OclDetailVo> details = cspList.stream().map(this::convertToOclDetailVo)
                             .collect(Collectors.toList());
                     providerOclVo.setDetails(details);
+
                     providerOclVo.setRegions(
                             details.get(0).getCloudServiceProvider().getRegions());
                     cspVoList.add(providerOclVo);
