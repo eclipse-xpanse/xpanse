@@ -15,7 +15,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum DeployVariableType {
     STRING("string"),
-    NUMBER("number");
+    NUMBER("number"),
+    BOOLEAN("boolean");
 
     private final String type;
 
