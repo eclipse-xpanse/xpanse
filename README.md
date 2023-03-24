@@ -1,17 +1,18 @@
 # xpanse
 
-Xpanse is an Open Source project allowing to easily implement native managed service on any cloud
-service provider.
+Xpanse is an Open Source project allowing to easily implement native managed 
+service on any cloud service provider.
 
-Xpanse unleash your cloud services by removing vendor lock-in and lock out. It standardizes and
-exposes cloud service providers core services, meaning that your xpanse service is portable (
-multi-cloud) on any cloud topology and provider. It also avoids tight coupling of your service to
-other cloud service provider services.
+Xpanse unleash your cloud services by removing vendor lock-in and lock out. 
+It standardizes and exposes cloud service providers core services, meaning 
+that your xpanse service is portable (multi-cloud) on any cloud topology and 
+provider. It also avoids tight coupling of your service to other cloud service 
+provider services.
 
 ## APIs (core services)
 
-Xpanse interacts directly with the fundamental APIs used by the cloud service provider to create
-managed service:
+Xpanse interacts directly with the fundamental APIs used by the cloud service 
+provider to create managed service:
 
 * **identity** dealing with access, users, groups, roles, ...
 * **computing** abstracts the manipulation of virtual machines
@@ -22,29 +23,27 @@ managed service:
 
 ## Configuration Language
 
-A managed service is described using Open Services Cloud Configuration Language (OCL).
+A managed service is described using Open Services Cloud Configuration Language 
+(OCL).
 
-OCL is a json descriptor of a managed service, describing the expected final state of your service,
-interacting with the fundamental APIs:
+OCL is a json descriptor of a managed service, describing the expected final 
+state of your service, interacting with the fundamental APIs:
 
 ```yaml
 # The version of the OCL
 version: 2.0
 # The category of the service.
-category: middleware
+category: container
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: kafka
+name: K8S cluster
 # The version of the service, if the end-user want to select the version when they want to deploy the service.
-serviceVersion: v1.8
+serviceVersion: v1.26.2
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an ehanced kafka services by ISV-A.
+description: This is an ehanced K8S cluster services by ISV-A.
 namespace: ISV-A
 # Icon for the service.
 icon: |
-  data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACRAQMAAAAPc4+9AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+/v7Hh8gVD0A0wAAAcVJREFUeJzNlc1twzAMhSX44KNH0CgaTd6gK3kUd4McDVTwq/hjiUyaIk
-  V7qNA2/QCFIh+ppxB+svLNEqqBGTC0ANugBOwmCGDCFOAwIWGDOoqoODtN2BdL6wxD9NMTO9tXPa1PqL5M30W5p8lm5vNcF0t7ahSrVguqNqmMokRW4YQucVjBCBWH1Z2g3WDlW2skoYU+2x8JOtGedBF3k2iXMO0j16iUiI6gxzPdQhnU/s2G9pCO57QY2r6hvj
-  PbKJHq7DRTRXT60avtuTRdbrFJI3mSZhNOqYjVbd99YyK1QKWzEqSWrE0k07U60uPaelflMzaaeu1KBuurHSsn572I1KWy2joX5ZBfWbS/VEt50H5P6aL4JxTuyJ/+QCNPX4PWF3Q8Xe1eF9FsLdD2VaOnaP2hWvs+zI58/7i3vH3nRFtDZpyTUNaZkON5XnBNsp
-  8lrmDMrpvBr+b6pUl+4XbkQdndqnzYGzfuJm1JmIWimIbe6dndd/bk7gVce/cJdo3uIeLJl7+I2xTnPek67mjtDeppE7b03Ov+kSfDe3JweW53njxeGfXkaz28VeYd86+af/H8a7hgJKaebILaFzakLfxyfQLTxVB6K1K9KQAAAABJRU5ErkJggg==
+  data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAmCAYAAACoPemuAAAACXBIWXMAAAsTAAALEwEAmpwYAAAEyUlEQVR4nO1XW2geVRA+52yrVrS2hGjFineleKNVSrHgXVD0RSWgVaoijVJaa0l2Zv+GslBERLw81Ae1XkB8ihaxlZhkZ3ZpUqOFasVLRVG0oGjVqFjx1ja/zNnN/tez+dNEC9KBJcnJmdlvbt/MKnVEDof4g+do5IcM8Hq1jk5Rh12Az9dILxmg/Qa5bB/gv+RMwP73gJAvtoCQD+SA6h/ggxq4V8Hggn8fEPBlGnmrQRpzAmoGEHmr8pNLpx2P58fXaOCkCIAG3qSRNrvv0JhGel0BLZ4inLL2/Ogmg/R2K5FRQIs9jG9t5a5GHlTIl08eEyTzDfKOltOFXDYB3W87cxI6GqlfrUnmtIxLIz07KVBoa2mFRtpwCHrrWwZmgL+org0D9GWB8T0a6FVVGmpXPp+ngbcYpG/dQGhf3d/bWkPVncyrK+o3pd400gu15zSgSvFS+V+DjY5ezwui6w3QO3Wp26zCZIZBHqpy/HfVuXPmhLg84FvqPPrDAIEKorYsxaMG6W57uWvgDI30sAZ6vlIG/JpNT4lOEtAmIBQCtpSxJpkjugbp1/rGmRCYBn7MkYJPVLjlWBWGJkt3SVg+67KteRkg7cpTFsSd9hCjE1TYe5QBHnHYfnBCYE5l5LLQQX6xFC81wJ9mwJ6uRIzeyO5LZO+sAOZlzu6UCVEoYXKMQf7TYWC31IcKonPz+2tHZmnkxw1QWBXxTTaC67adnN+zEeubbYC+d3Tm18XAJAqubvLjlRnwvQaop0Zv7cisinN9s6sbIovUcAb6EZd91cWnOXEZZN+p2NN/qod0c1Vd1IJrIl7AHeObh8JoYaHjAd/uNGQ7qnmof0w9pker2vxvGepWMRieq5H7LIUEUVsKytJFZR1CXq3C5DhnnSFvdEcM+DuH4mcZsGdkENuilrrJ9ainiqs25Aa7+SwDtEoAjzO8pZ/m73i3OaogObugaxJ7J0ypoiFlQNdl0TngYXxjUXoN0lsOytgvEW2iwMvrQvuk8JAQblNmLg21q266KC90TE5XQXRm/v+ugRNtFzdIWStIlng+XWWA7q2lI7664Xpt/XBZ+bRIVhPhGDvP/PgK5W8/3iB9VJWO0aYvD0NjgH4ar0/blenZbVZfVingFbY5aqIWP9AYMeB7nB2TRrDPOoC8seosJ1Y7VqpGS92G4tvxBPRh0Tu8ILq2McJhaOTlbkUas4o2avxBRgFXWt2OXs8AvW+A35Pf5UjupvVJbAd3XdqaOP6cckowPNcgfV5gYI/9POtO5mnkVypzk1ZVFfF9qaPJDA38ojiiSskFBunnArs71Oq+o1WhYHShQf6twMhu2SoqzkRttS+lH1L2z+0tNMjfFNjbK+StWpG0SN1hN8i/1MxMiaKQLSRLbLeOi0+LCngrpQhpqsmIc/3BrGthcIHxozs08FPyU+pNvqYMRHfJfibjS5qh0MFW1p0GsTVC3LxQqV8iVvjBa0dWMt8AbXcU+8vqkKU01G6Qvqrzcp899+OVE6RbnmVCvAKyDvQuu3ROSYL4kpo6Abu1LhdqaAHYUMqPNV/uozXNMxWRod0CiPKED/BBD+gGNZ1iixynCCwgVNMunTtnaqAn7J4v352Tez5O154mn3pH5P8u/wCL4t6vwR2T7QAAAABJRU5ErkJggg==
 # Reserved for CSP, aws,azure,ali,huawei and ...
 cloudServiceProvider:
   name: huawei
@@ -60,22 +59,36 @@ billing:
   period: monthly
   # The billing currency (`euro`, `usd`, ...)
   currency: euro
-# The flavor of the service, the @name/@version/@flavor can locate the specific service to be deployed.
+# The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 3-node-without-zookeeper
+  - name: 1-master-with-3-woker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 20
+    fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
     property:
-      node: 3
-      zookeeper: false
-  - name: 5-node-with-zookeeper
+      worker_nodes_count: 3
+      flavor_id: s7.xlarge.4
+  - name: 1-master-with-3-woker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 30
+    fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
     property:
-      node: 5
-      zookeeper: true
+      worker_nodes_count: 3
+      flavor_id: c7.xlarge.4
+  - name: 1-master-with-5-woker-nodes-normal
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 40
+    # Properties for the service, which can be used by the deployment.
+    property:
+      worker_nodes_count: 5
+      flavor_id: s7.xlarge.4
+  - name: 1-master-with-5-woker-nodes-performance
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 40
+    # Properties for the service, which can be used by the deployment.
+    property:
+      worker_nodes_count: 5
+      flavor_id: c7.xlarge.4
 deployment:
   # kind, Supported values are terraform, pulumi, crossplane.
   kind: terraform
@@ -86,76 +99,175 @@ deployment:
   context:
     - name: HW_REGION_NAME
       description: huawei cloud region name.
-      kind: fix_variable
+      kind: env
       type: string
       mandatory: true
       validator: minLength=6|maxLength=26
     - name: HW_ACCESS_KEY
-      description: huawei cloud access key.
+      description: Huawei cloud access key.
       kind: env
       type: string
       mandatory: true
-      validator: null
     - name: HW_SECRET_KEY
-      description: huawei cloud secret key.
+      description: Huawei cloud secret key.
       kind: env
       type: string
       mandatory: true
-      validator:
+    - name: admin_passwd
+      description: The admin password of all nodes in the K8S cluster. If the value is empty, will create a random password.
+      kind: variable
+      type: string
+      mandatory: false
+      validator: minLength=8|maxLength=16|pattern=^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+    - name: vpc_id
+      description: The sub network id of all nodes in the K8S cluster. If the value is empty, will create a new VPC.
+      kind: variable
+      type: string
+      mandatory: false
+    - name: subnet_id
+      description: The sub network id of all nodes in the K8S cluster. If the value is empty, will create a new subnet.
+      kind: variable
+      type: string
+      mandatory: false
     - name: secgroup_id
-      description: The secgroup id.
+      description: The security group id of all nodes in the K8S cluster. If the value is empty, will create a new security group.
       kind: variable
       type: string
       mandatory: false
-      validator:
-    - name: number_test
-      description: Validator range for value of dataType number.
-      kind: variable
-      type: number
-      mandatory: true
-      #minimum=10|maximum=100: The age must be greater than or equal to 10 and less than or equal to 100.
-      validator: minimum=10|maximum=100
-    - name: string_test
-      description: Validator length for value of dataType string.
-      kind: variable
-      type: string
-      mandatory: true
-      # minLength=6|maxLength=16: The value must be at least 6 characters long and no more than 16 characters long.
-      validator: minLength=6|maxLength=16
-    - name: enum_test
-      description: Validator enum for value of dataType string.
-      kind: variable
-      type: string
-      mandatory: true
-      # enum=["red","yellow","green"]: the value must be in the list of enum. 
-      validator: enum=["red","yellow","green"]
-    - name: pattern_test
-      description: Validator pattern for value of dataType string.
-      kind: variable
-      type: string
-      mandatory: false
-      # pattern=*e*: the value matches any string that contains the specified. 
-      validator: pattern=*e*
   deployer: |
-    variable "secgroup_id" {}
-    data "huaweicloud_availability_zones" "myaz" {}
-    data "huaweicloud_compute_flavors" "myflavor" {
-        availability_zone = data.huaweicloud_availability_zones.myaz.names[0]
-        performance_type  = "normal"
-        cpu_core_count    = 2
-        memory_size       = 4
+    data "huaweicloud_availability_zones" "osc-az" {}
+
+    variable "admin_passwd" {
+      type        = string
+      default     = ""
+      description = "The root password of all nodes in the K8S cluster."
     }
-    data "huaweicloud_vpc_subnet" "mynet" {
-        name = "xpanse_subnet1"
+
+    variable "vpc_id" {
+      type        = string
+      default     = ""
+      description = "The vpc id of all nodes in the K8S cluster."
     }
-    resource "huaweicloud_compute_instance" "basic" {
-        name               = "basic"
-        image_id           = "a8601887-81d5-4eed-9338-382cf5b6d80b"
-        flavor_id          = data.huaweicloud_compute_flavors.myflavor.ids[0]
-        availability_zone  = data.huaweicloud_availability_zones.myaz.names[0]
-        network {
-            uuid = data.huaweicloud_vpc_subnet.mynet.id
-        }
+
+    variable "subnet_id" {
+      type        = string
+      default     = ""
+      description = "The subnet id of all nodes in the K8S cluster."
+    }
+
+    variable "secgroup_id" {
+      type        = string
+      default     = ""
+      description = "The security group id of all nodes in the K8S cluster."
+    }
+
+    data "huaweicloud_vpcs" "existing" {
+      id = var.vpc_id
+    }
+
+    resource "random_id" "new" {
+      byte_length = 8
+    }
+
+    resource "random_password" "password" {
+      length  = 12
+      special = true
+      upper   = true
+      lower   = true
+      numeric = true
+    }
+
+    resource "huaweicloud_vpc" "new" {
+      count = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
+      name  = "K8S-vpc-web-${random_id.new.hex}"
+      cidr  = "192.168.0.0/16"
+    }
+
+    data "huaweicloud_vpc_subnets" "existing" {
+      id = var.subnet_id
+    }
+
+    resource "huaweicloud_vpc_subnet" "new" {
+      count      = length(data.huaweicloud_vpc_subnets.existing.subnets) == 0 ? 1 : 0
+      vpc_id     = local.vpc_id
+      name       = "K8S-subnet-${random_id.new.hex}"
+      cidr       = "192.168.10.0/24"
+      gateway_ip = "192.168.10.1"
+    }
+
+    data "huaweicloud_networking_secgroups" "existing" {
+      secgroup_id = var.secgroup_id
+    }
+
+    resource "huaweicloud_networking_secgroup" "new" {
+      count       = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+      name        = "K8S_secgroup-${random_id.new.hex}"
+      description = "K8S cluster security group"
+    }
+
+    locals {
+      admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
+      vpc_id       = length(data.huaweicloud_vpcs.existing.vpcs) > 0 ? data.huaweicloud_vpcs.existing.vpcs[0].id : huaweicloud_vpcs.new[0].id
+      subnet_id    = length(data.huaweicloud_vpc_subnets.existing.subnets) > 0 ? data.huaweicloud_vpc_subnets.existing.subnets[0].id : huaweicloud_vpc_subnet.new[0].id
+      secgroup_id  = length(data.huaweicloud_networking_secgroups.existing.security_groups) > 0 ? data.huaweicloud_networking_secgroups.existing.security_groups[0].id : huaweicloud_networking_secgroup.new[0].id
+    }
+
+    data "huaweicloud_images_image" "k8s-image" {
+      name        = "K8S-v1.26.2_Centos-7.9"
+      most_recent = true
+    }
+
+    resource "huaweicloud_compute_instance" "k8s-master" {
+      availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
+      name               = "k8s-master"
+      flavor_id          = var.flavor_flavor_id
+      security_group_ids = [ local.security_group_id ]
+      image_id           = data.huaweicloud_images_image.k8s-image.id
+
+      network {
+        uuid = local.subnet_id
+      }
+
+      user_data = <<EOF
+        #!bin/bash
+        echo root:${local.admin_passwd} | sudo chpasswd
+        sh /root/k8s-init.sh true ${local.admin_passwd} ${var.flavor_worker_nodes_count} > /root/init.log
+      EOF
+    }
+
+    resource "huaweicloud_compute_instance" "k8s-node" {
+      count              = var.flavor_worker_nodes_count
+      availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
+      name               = "k8s-node-${count.index}"
+      flavor_id          = var.flavor_flavor_id
+      security_group_ids = [ local.security_group_id ]
+      image_id           = data.huaweicloud_images_image.k8s-image.id
+
+      network {
+        uuid = local.subnet_id
+      }
+
+      user_data = <<EOF
+        #!bin/bash
+        echo root:${local.admin_passwd} | sudo chpasswd
+        sh /root/k8s-init.sh false ${local.admin_passwd} ${var.flavor_worker_nodes_count} ${huaweicloud_compute_instance.k8s-master.access_ip_v4} > /root/init.log
+      EOF
+
+      depends_on = [
+        huaweicloud_compute_instance.k8s-master
+      ]
+    }
+
+    output "k8s_master_endpoint" {
+      value = "${huaweicloud_compute_instance.k8s-master.access_ip_v4}:22"
+    }
+
+    output "k8s_master_host" {
+      value = huaweicloud_compute_instance.k8s-master.access_ip_v4
+    }
+
+    output "master_admin_passwd" {
+      value = nonsensitive(local.admin_passwd)
     }
 ```
 
@@ -169,17 +281,18 @@ Xpanse provides different options to generate and provision OCL:
 
 ## Orchestrator & binding
 
-OCL descriptor is an abstract description of the final managed service state. It's generic enough to
-work with any cloud service provider.
+OCL descriptor is an abstract description of the final managed service state. 
+It's generic enough to work with any cloud service provider.
 
-Xpanse runtime embeds an orchestrator responsible to delegate the services management to plugins.
+Xpanse runtime embeds an orchestrator responsible to delegate the services 
+management to plugins.
 
-Each plugin is dedicated to handle a cloud provider infrastructure and do actions required to
-actually deal with the services' lifecycle:
+Each plugin is dedicated to handle a cloud provider infrastructure and do 
+actions required to actually deal with the services' lifecycle:
 
 1. to bind OCL to the concrete cloud provider internal APIs
-2. to generate the graph of actions required to reach the final expected state, specifically for a
-   target cloud provider
+2. to generate the graph of actions required to reach the final expected state, 
+specifically for a target cloud provider
 
 ## Runtime
 
@@ -193,9 +306,10 @@ The runtime embeds and run together:
 
 ## Database
 
-The default database attached to the runtime is the H2 in-memory database. The same can be replaced
-with other production ready database systems by replacing the configurations mentioned below and by
-adding relevant maven dependencies.
+The default database attached to the runtime is the H2 in-memory database. 
+The same can be replaced with other production ready database systems by 
+replacing the configurations mentioned below and by adding relevant maven 
+dependencies.
 
 ```
 spring.datasource.url=jdbc:h2:mem:testdb
@@ -210,8 +324,8 @@ spring.jpa.hibernate.ddl-auto= update
 
 ### Build and Package
 
-First, you can build the whole xpanse project, including all modules (orchestrator, OCL, runtime,
-plugins, etc), simply with:
+First, you can build the whole xpanse project, including all modules 
+(orchestrator, OCL, runtime, plugins, etc), simply with:
 
 ```shell
 $ mvn clean install
@@ -219,8 +333,9 @@ $ mvn clean install
 
 ### Run
 
-By default, the application will not activate any plugins. They must be activated via spring
-profiles. Also ensure that only one plugin is active at a time.
+By default, the application will not activate any plugins. They must be 
+activated via spring profiles. Also ensure that only one plugin is active at a 
+time.
 
 * for Huawei Cloud:
 
@@ -236,16 +351,16 @@ $ cd runtime/target
 $ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
-By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image
-adding `-Ddocker.skip=false` as build argument:
+By default, the runtime is built in "exploded mode". Additionally, you can also 
+build a Docker image adding `-Ddocker.skip=false` as build argument:
 
 ```shell
 $ cd runtime
 $ mvn clean install -Ddocker.skip=false
 ```
 
-We can start xpanse runtime with a specific plugin by passing the plugin name in the profile name.
-For example to start huaweicloud
+We can start xpanse runtime with a specific plugin by passing the plugin name 
+in the profile name. For example to start huaweicloud
 
 ```shell
 $ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-xpanse-runtime xpanse
@@ -253,19 +368,21 @@ $ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-xpanse-runtime xp
 
 ### Static Code Analysis using CheckStyle
 
-This project using `CheckStyle` framework to perform static code analysis. The configuration can be
-found in [CheckStyle](checkstyle.xml). The framework also checks the code format in accordance
-to `Google Java Format`.
+This project using `CheckStyle` framework to perform static code analysis. The 
+configuration can be found in [CheckStyle](checkstyle.xml). The framework also 
+checks the code format in accordance to `Google Java Format`.
 
-The same file can also be imported in IDE CheckStyle plugins to get the analysis results directly in
-IDE and also to perform code formatting directly in IDE.
+The same file can also be imported in IDE CheckStyle plugins to get the 
+analysis results directly in IDE and also to perform code formatting directly 
+in IDE.
 
-The framework is added as a maven plugin and is executed by default as part of the `verify` phase.
-Any violations will result in build failure.
+The framework is added as a maven plugin and is executed by default as part of 
+the `verify` phase. Any violations will result in build failure.
 
 ### License/Copyright Configuration
 
-All files in the repository must contain a license header in the format mentioned
-in [License Header](license.header).
+All files in the repository must contain a license header in the format 
+mentioned in [License Header](license.header).
 
-The static code analysis framework will also validate if the license exists in the specified format.
+The static code analysis framework will also validate if the license exists in 
+the specified format.

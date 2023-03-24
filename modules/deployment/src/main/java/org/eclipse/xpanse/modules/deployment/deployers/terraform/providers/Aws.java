@@ -24,11 +24,15 @@ public class Aws implements Provider {
                 }
               }
             }
+            
+            provider "aws" {
+              region = "%s"
+            }
             """;
 
     @Override
-    public String getProvider() {
-        return PROVIDER;
+    public String getProvider(String region) {
+        return String.format(PROVIDER, region);
     }
 
     @Override

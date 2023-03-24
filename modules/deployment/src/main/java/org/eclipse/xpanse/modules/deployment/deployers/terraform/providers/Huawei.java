@@ -23,11 +23,15 @@ public class Huawei implements Provider {
                 }
               }
             }
+                        
+            provider "huaweicloud" {
+              region = "%s"
+            }
             """;
 
     @Override
-    public String getProvider() {
-        return PROVIDER;
+    public String getProvider(String region) {
+        return String.format(PROVIDER, region);
     }
 
     @Override

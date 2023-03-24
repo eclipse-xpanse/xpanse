@@ -46,8 +46,8 @@ public class TerraformDeployment implements Deployment {
         String workspace = getWorkspacePath(task.getId().toString());
         // Create the workspace.
         buildWorkspace(workspace);
-        createScriptFile(task.getCreateRequest().getCsp(), workspace,
-                task.getOcl().getDeployment().getDeployer());
+        createScriptFile(task.getCreateRequest().getCsp(), task.getCreateRequest().getRegion(),
+                workspace, task.getOcl().getDeployment().getDeployer());
         // Execute the terraform command.
         TerraformExecutor executor =
                 new TerraformExecutor(getEnv(task), getVariables(task), workspace);
@@ -88,14 +88,14 @@ public class TerraformDeployment implements Deployment {
      * @param workspace the workspace for the terraform.
      * @param script    the terraform scripts of the task.
      */
-    private void createScriptFile(Csp csp, String workspace, String script) {
+    private void createScriptFile(Csp csp, String region, String workspace, String script) {
         log.info("start create terraform script");
         String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
         try {
             try (FileWriter verWriter = new FileWriter(verScriptPath);
                     FileWriter scriptWriter = new FileWriter(scriptPath)) {
-                verWriter.write(TerraformProviders.getProvider(csp).getProvider());
+                verWriter.write(TerraformProviders.getProvider(csp).getProvider(region));
                 scriptWriter.write(script);
             }
             log.info("terraform script create success");
@@ -147,7 +147,7 @@ public class TerraformDeployment implements Deployment {
             }
 
             if (variable.getKind() == DeployVariableKind.FIX_ENV) {
-                variables.put(variable.getName(), request.get(variable.getValue()));
+                variables.put(variable.getName(), variable.getValue());
             }
         }
 
@@ -188,7 +188,7 @@ public class TerraformDeployment implements Deployment {
 
             if (variable.getKind() == DeployVariableKind.FIX_VARIABLE
                     && request.containsKey(variable.getName())) {
-                variables.put(variable.getName(), request.get(variable.getValue()));
+                variables.put(variable.getName(), variable.getValue());
             }
         }
 
