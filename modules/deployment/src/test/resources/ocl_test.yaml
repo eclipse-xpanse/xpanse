@@ -97,16 +97,6 @@ deployment:
             uuid = data.huaweicloud_vpc_subnet.mynet.id
         }
     }
-    resource "huaweicloud_evs_volume" "myvol" {
-        name              = "volume"
-        availability_zone = data.huaweicloud_availability_zones.myaz.names[0]
-        volume_type       = "SAS"
-        size              = 10
-    }
-    resource "huaweicloud_compute_volume_attach" "attached" {
-        instance_id = huaweicloud_compute_instance.basic.id
-        volume_id   = huaweicloud_evs_volume.myvol.id
-    }
     resource "huaweicloud_vpc_eip" "myeip" {
         publicip {
             type = "5_sbgp"
