@@ -10,46 +10,70 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.service.DeployResult;
-import org.eclipse.xpanse.modules.models.utils.OclLoader;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test for TerraformDeploy.
  */
+@Slf4j
 public class TerraformDeploymentTest {
 
-    @Disabled
-    @Test
-    public void basicTest() throws Exception {
+    private static OclLoader oclLoader;
+    private static CreateRequest createRequest;
+    private static DeployTask deployTask;
+    private final TerraformDeployment terraformDeployment = new TerraformDeployment();
 
-        OclLoader oclLoader = new OclLoader();
+    @BeforeAll
+    public static void initData() throws Exception {
+        oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test.yaml"));
 
-        CreateRequest deployRequest = new CreateRequest();
-        deployRequest.setName(ocl.getName());
-        deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
-        deployRequest.setVersion(ocl.getVersion());
-        deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
-
+        createRequest = new CreateRequest();
+        createRequest.setName(ocl.getName());
+        createRequest.setCsp(ocl.getCloudServiceProvider().getName());
+        createRequest.setVersion(ocl.getVersion());
+        createRequest.setFlavor(ocl.getFlavors().get(0).getName());
+        createRequest.setRegion(ocl.getCloudServiceProvider().getRegions().get(0));
         Map<String, String> property = new HashMap<>();
-        property.put("secgroup_id", "1234567890");
-        deployRequest.setProperty(property);
+        // The secgroup_id use already exists.
+        property.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
+        createRequest.setProperty(property);
 
-        DeployTask xpanseDeployTask = new DeployTask();
-        xpanseDeployTask.setId(UUID.randomUUID());
-        xpanseDeployTask.setOcl(ocl);
-        xpanseDeployTask.setDeployResourceHandler(null);
-        xpanseDeployTask.setCreateRequest(deployRequest);
-        TerraformDeployment terraformDeployment = new TerraformDeployment();
-
-        DeployResult deployResult = terraformDeployment.deploy(xpanseDeployTask);
-
-        Assertions.assertNotNull(deployResult);
-
+        deployTask = new DeployTask();
+        deployTask.setId(UUID.randomUUID());
+        deployTask.setCreateRequest(createRequest);
+        deployTask.setOcl(ocl);
+        deployTask.setDeployResourceHandler(null);
     }
+
+    @Test
+    public void deploy_test() throws Exception {
+        DeployResult deployResult = terraformDeployment.deploy(deployTask);
+        log.error(deployResult.getProperty().get("stateFile"));
+        Assertions.assertEquals(TerraformExecState.DEPLOY_SUCCESS, deployResult.getState());
+    }
+
+    @Test
+    public void destroy_test() throws Exception {
+        // The tastId use the resource ID that has been successfully deployed.
+        deployTask.setId(UUID.fromString("b4c10f12-7d49-43c7-951f-04d2509c4dd7"));
+        DeployResult deployResult = terraformDeployment.destroy(deployTask);
+        Assertions.assertEquals(TerraformExecState.DESTROY_SUCCESS, deployResult.getState());
+    }
+
+    @Test
+    public void getDeployerKind_test() {
+        DeployerKind deployerKind = terraformDeployment.getDeployerKind();
+        Assertions.assertEquals(DeployerKind.TERRAFORM, deployerKind);
+    }
+
 }
