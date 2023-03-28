@@ -15,11 +15,11 @@ import org.apache.commons.lang3.StringUtils;
  * The kind of the Resources.
  */
 public enum DeployResourceKind {
-    Vm("vm"),
-    Container("container"),
-    PublicIp("public_ip"),
-    Vpc("vpc"),
-    Disk("disk");
+    VM("vm"),
+    CONTAINER("container"),
+    PUBLICIP("public_ip"),
+    VPC("vpc"),
+    DISK("disk");
 
     private final String kind;
 

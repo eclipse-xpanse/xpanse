@@ -4,7 +4,6 @@
  *
  */
 
-
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.models;
 
 import java.util.HashMap;
@@ -12,15 +11,14 @@ import java.util.HashMap;
 /**
  * Huawei cloud vm property.
  */
-public class HuaweiDiskProperty extends HashMap<String, String> {
+public class HuaweiPublicIpProperty extends HashMap<String, String> {
 
     /**
      * Init method to put property key and value.
      */
-    public HuaweiDiskProperty() {
+    public HuaweiPublicIpProperty() {
 
-        this.put("size", "size");
-        this.put("type", "volume_type");
+        this.put("ip", "address");
 
     }
 

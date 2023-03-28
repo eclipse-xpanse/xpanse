@@ -119,6 +119,11 @@ public class HuaweiBillingService implements BillingService {
         return Csp.HUAWEI;
     }
 
+    /**
+     * Get project id for billing.
+     *
+     * @param deployServiceEntity the deploy service entity.
+     */
     private String getProjectId(DeployServiceEntity deployServiceEntity) {
 
         Map<String, String> variables = this.getEnv(deployServiceEntity);
@@ -145,7 +150,7 @@ public class HuaweiBillingService implements BillingService {
     }
 
     /**
-     * Get environment variable for monitor.
+     * Get environment variable for billing.
      *
      * @param deployServiceEntity the deploy service entity.
      */

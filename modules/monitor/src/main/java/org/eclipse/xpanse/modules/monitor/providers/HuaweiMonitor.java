@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.MonitorDataResponse;
@@ -75,12 +76,14 @@ public class HuaweiMonitor implements Monitor {
         List<MonitorDataResponse> monitorDataResponseList = new ArrayList<>();
         for (DeployResourceEntity deployResourceEntity :
                 deployServiceEntity.getDeployResourceList()) {
-            if (deployResourceEntity.getResourceId() != null) {
+            if (deployResourceEntity.getResourceId() != null && deployResourceEntity.getKind()
+                    .equals(DeployResourceKind.VM)) {
                 HuaweiMonitorResource huaweiMonitorResource = monitorResourceHandler.handler(
                         deployResourceEntity, fromTime, toTime);
                 CesClient client = CesClient.newBuilder()
                         .withCredential(this.getEnv(deployServiceEntity))
-                        .withRegion(CesRegion.valueOf(huaweiMonitorResource.getRegion()))
+                        .withRegion(CesRegion.valueOf(
+                                deployServiceEntity.getCreateRequest().getRegion()))
                         .build();
                 ShowMetricDataRequest request = new ShowMetricDataRequest()
                         .withDim0(huaweiMonitorResource.getDim0())
@@ -120,12 +123,14 @@ public class HuaweiMonitor implements Monitor {
         List<MonitorDataResponse> monitorDataResponseList = new ArrayList<>();
         for (DeployResourceEntity deployResourceEntity :
                 deployServiceEntity.getDeployResourceList()) {
-            if (deployResourceEntity.getResourceId() != null) {
+            if (deployResourceEntity.getResourceId() != null && deployResourceEntity.getKind()
+                    .equals(DeployResourceKind.VM)) {
                 HuaweiMonitorResource huaweiMonitorResource = monitorResourceHandler.handler(
                         deployResourceEntity, fromTime, toTime);
                 CesClient client = CesClient.newBuilder()
                         .withCredential(this.getEnv(deployServiceEntity))
-                        .withRegion(CesRegion.valueOf(huaweiMonitorResource.getRegion()))
+                        .withRegion(CesRegion.valueOf(
+                                deployServiceEntity.getCreateRequest().getRegion()))
                         .build();
                 ShowMetricDataRequest request = new ShowMetricDataRequest()
                         .withDim0(huaweiMonitorResource.getDim0())

@@ -28,6 +28,8 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStat
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.service.Disk;
+import org.eclipse.xpanse.modules.models.service.PublicIp;
 import org.eclipse.xpanse.modules.models.service.Vm;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.models.HuaweiResourceProperty;
 import org.springframework.stereotype.Component;
@@ -47,6 +49,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
      * @param deployResult the result of the deployment.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void handler(DeployResult deployResult) {
         List<DeployResource> deployResourceList = new ArrayList<>();
         TfState tfState;
@@ -66,33 +69,81 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                 }
             }
             for (TfStateResource tfStateResource : tfState.getResources()) {
-                if (tfStateResource.getType().equals("huaweicloud_compute_instance")) {
+                String serviceType = tfStateResource.getType();
+                Boolean create = true;
+                if (StringUtils.equals(tfStateResource.getMode(), "data")){
+                    create = false;
+                }
+                if (StringUtils.equals(serviceType, "huaweicloud_compute_instance")) {
                     for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
                         DeployResource deployResource = new Vm();
-                        deployResource.setKind(DeployResourceKind.Vm);
-                        fillResourceInfo(instance, deployResource);
-
-                        deployResourceList.add(deployResource);
-                    }
-                }
-                if (tfStateResource.getType().equals("huaweicloud_compute_eip_associate")) {
-
-                    for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                        DeployResource deployResource = new DeployResource();
+                        deployResource.setKind(DeployResourceKind.VM);
                         deployResource.setProperty(new HashMap<>());
                         deployResource.getProperty()
-                                .put("ip", (String) instance.getAttributes().get("public_ip"));
-                        deployResource.setKind(DeployResourceKind.PublicIp);
+                                .put("create", String.valueOf(create));
+                        deployResource.getProperty()
+                                .put("service_type", serviceType);
+                        fillResourceInfo(instance, deployResource);
                         deployResourceList.add(deployResource);
                     }
                 }
-                if (tfStateResource.getType().equals("huaweicloud_vpc")) {
+                if (StringUtils.equals(serviceType, "huaweicloud_evs_volume")) {
                     for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                        DeployResource deployResource = new DeployResource();
-                        deployResource.setKind(DeployResourceKind.Vpc);
-                        deployResource.setResourceId((String) instance.getAttributes().get("id"));
-                        deployResource.setName((String) instance.getAttributes().get("name"));
+                        DeployResource deployResource = new Disk();
+                        deployResource.setProperty(new HashMap<>());
+                        deployResource.getProperty()
+                                .put("create", String.valueOf(create));
+                        deployResource.getProperty()
+                                .put("service_type", serviceType);
+                        deployResource.setKind(DeployResourceKind.DISK);
+                        fillResourceInfo(instance, deployResource);
                         deployResourceList.add(deployResource);
+                    }
+                }
+                if (StringUtils.equals(serviceType, "huaweicloud_vpc_eip")) {
+                    if (create){
+                        for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                            List<Map<String, Object>> publicIp =
+                                    (List<Map<String, Object>>) instance.getAttributes().get(
+                                            "publicip");
+                            String type = (String) publicIp.get(0).get("type");
+                            List<Map<String, Object>> bandwidth =
+                                    (List<Map<String, Object>>) instance.getAttributes().get(
+                                            "bandwidth");
+                            String shareType = (String) bandwidth.get(0).get("share_type");
+                            String size = bandwidth.get(0).get("size").toString();
+                            String chargeMode = bandwidth.get(0).get("charge_mode").toString();
+
+                            DeployResource deployResource = new PublicIp();
+                            deployResource.setProperty(new HashMap<>());
+                            deployResource.getProperty()
+                                    .put("create", String.valueOf(create));
+                            deployResource.getProperty()
+                                    .put("service_type", serviceType);
+                            deployResource.getProperty()
+                                    .put("public_ip_type", type);
+                            deployResource.getProperty()
+                                    .put("bandwidth_share_type", shareType);
+                            deployResource.getProperty()
+                                    .put("bandwidth_size", size);
+                            deployResource.getProperty()
+                                    .put("charge_mode", chargeMode);
+                            deployResource.setKind(DeployResourceKind.PUBLICIP);
+                            fillResourceInfo(instance, deployResource);
+                            deployResourceList.add(deployResource);
+                        }
+                    } else {
+                        for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                            DeployResource deployResource = new PublicIp();
+                            deployResource.setProperty(new HashMap<>());
+                            deployResource.getProperty()
+                                    .put("create", String.valueOf(create));
+                            deployResource.getProperty()
+                                    .put("service_type", serviceType);
+                            deployResource.setKind(DeployResourceKind.PUBLICIP);
+                            fillResourceInfo(instance, deployResource);
+                            deployResourceList.add(deployResource);
+                        }
                     }
                 }
             }
@@ -104,7 +155,6 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
 
     private void fillResourceInfo(TfStateResourceInstance instance,
             DeployResource deployResource) {
-        deployResource.setProperty(new HashMap<>());
         Map<String, Object> instanceAttributes = instance.getAttributes();
         if (Objects.isNull(instanceAttributes) || instanceAttributes.isEmpty()) {
             return;
