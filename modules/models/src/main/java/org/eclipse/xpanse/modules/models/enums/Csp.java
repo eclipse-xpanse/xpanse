@@ -18,7 +18,8 @@ public enum Csp {
     AZURE("azure"),
     ALI("alibaba"),
     HUAWEI("huawei"),
-    OPENSTACK("openstack");
+    OPENSTACK("openstack"),
+    FLEXIBLE("flexible");
 
     private final String name;
 

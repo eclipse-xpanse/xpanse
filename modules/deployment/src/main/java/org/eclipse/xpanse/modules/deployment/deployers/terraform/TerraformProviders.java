@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
 import java.util.Objects;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Aws;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Flexible;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Huawei;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 
@@ -16,7 +17,8 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
  */
 public enum TerraformProviders {
     AWS(Csp.AWS, new Aws()),
-    HUAWEI(Csp.HUAWEI, new Huawei());
+    HUAWEI(Csp.HUAWEI, new Huawei()),
+    FLEXIBLE(Csp.FLEXIBLE, new Flexible());
 
     Csp csp;
 
