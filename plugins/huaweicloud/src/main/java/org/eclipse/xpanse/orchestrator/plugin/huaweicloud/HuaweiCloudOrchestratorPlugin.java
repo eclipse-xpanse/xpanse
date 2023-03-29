@@ -19,10 +19,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
+    private final DeployResourceHandler resourceHandler = new HuaweiTerraformResourceHandler();
 
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return new HuaweiTerraformResourceHandler();
+        return resourceHandler;
     }
 
     @Override

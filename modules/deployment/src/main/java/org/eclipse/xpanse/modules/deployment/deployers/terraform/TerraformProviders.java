@@ -10,6 +10,7 @@ import java.util.Objects;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Aws;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.FlexibleEngine;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Huawei;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Openstack;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 
 /**
@@ -18,11 +19,12 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 public enum TerraformProviders {
     AWS(Csp.AWS, new Aws()),
     HUAWEI(Csp.HUAWEI, new Huawei()),
-    FLEXIBLE_ENGINE(Csp.FLEXIBLE_ENGINE, new FlexibleEngine());
+    FLEXIBLE_ENGINE(Csp.FLEXIBLE_ENGINE, new FlexibleEngine()),
+    OPENSTACK(Csp.OPENSTACK, new Openstack());
 
-    Csp csp;
+    final Csp csp;
 
-    Provider provider;
+    final Provider provider;
 
     /**
      * Constructor for TerraformProviders.
