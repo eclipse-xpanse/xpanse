@@ -85,7 +85,7 @@ public class TerraformDeployment implements Deployment {
      * Create terraform script.
      *
      * @param csp       the cloud service provider.
-     * @param workspace the workspace for the terraform.
+     * @param workspace the workspace for terraform.
      * @param script    the terraform scripts of the task.
      */
     private void createScriptFile(Csp csp, String region, String workspace, String script) {

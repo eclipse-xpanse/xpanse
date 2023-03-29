@@ -20,13 +20,15 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile(value = "openstack")
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
-    
+
+    private final DeployResourceHandler resourceHandler = new OpenstackTerraformResourceHandler();
+
     /**
      * Get the resource handler for OpenStack.
      */
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return null;
+        return resourceHandler;
     }
 
     /**
