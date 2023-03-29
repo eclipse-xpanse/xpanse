@@ -27,6 +27,5 @@ public class Region {
     @NotEmpty
     @NotBlank
     @Description("The area which the region belongs to, such as Asia, Europe, Africa")
-    private String area;
-
+    private String area = "Others";
 }
