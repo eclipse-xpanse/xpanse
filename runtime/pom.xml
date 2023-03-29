@@ -48,6 +48,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.xpanse.plugins</groupId>
+            <artifactId>flexibleengine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>database</artifactId>
             <version>${project.version}</version>

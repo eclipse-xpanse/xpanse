@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Profile(value = "openstack")
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     
     /**

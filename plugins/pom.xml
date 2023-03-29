@@ -19,6 +19,7 @@
     <modules>
         <module>openstack</module>
         <module>huaweicloud</module>
+        <module>flexibleengine</module>
     </modules>
 
 </project>
