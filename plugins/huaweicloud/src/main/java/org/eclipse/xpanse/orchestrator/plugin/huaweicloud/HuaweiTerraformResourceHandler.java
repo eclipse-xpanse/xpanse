@@ -71,7 +71,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
             for (TfStateResource tfStateResource : tfState.getResources()) {
                 String serviceType = tfStateResource.getType();
                 Boolean create = true;
-                if (StringUtils.equals(tfStateResource.getMode(), "data")){
+                if (StringUtils.equals(tfStateResource.getMode(), "data")) {
                     create = false;
                 }
                 if (StringUtils.equals(serviceType, "huaweicloud_compute_instance")) {
@@ -101,31 +101,31 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                     }
                 }
                 if (StringUtils.equals(serviceType, "huaweicloud_vpc_eip")) {
-                    if (create){
+                    if (create) {
                         for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                            List<Map<String, Object>> publicIp =
-                                    (List<Map<String, Object>>) instance.getAttributes().get(
-                                            "publicip");
-                            String type = (String) publicIp.get(0).get("type");
-                            List<Map<String, Object>> bandwidth =
-                                    (List<Map<String, Object>>) instance.getAttributes().get(
-                                            "bandwidth");
-                            String shareType = (String) bandwidth.get(0).get("share_type");
-                            String size = bandwidth.get(0).get("size").toString();
-                            String chargeMode = bandwidth.get(0).get("charge_mode").toString();
 
                             DeployResource deployResource = new PublicIp();
                             deployResource.setProperty(new HashMap<>());
                             deployResource.getProperty()
                                     .put("create", String.valueOf(create));
+                            List<Map<String, Object>> bandwidth =
+                                    (List<Map<String, Object>>) instance.getAttributes().get(
+                                            "bandwidth");
+                            String shareType = (String) bandwidth.get(0).get("share_type");
                             deployResource.getProperty()
                                     .put("service_type", serviceType);
+                            List<Map<String, Object>> publicIp =
+                                    (List<Map<String, Object>>) instance.getAttributes().get(
+                                            "publicip");
+                            String type = (String) publicIp.get(0).get("type");
                             deployResource.getProperty()
                                     .put("public_ip_type", type);
                             deployResource.getProperty()
                                     .put("bandwidth_share_type", shareType);
+                            String size = bandwidth.get(0).get("size").toString();
                             deployResource.getProperty()
                                     .put("bandwidth_size", size);
+                            String chargeMode = bandwidth.get(0).get("charge_mode").toString();
                             deployResource.getProperty()
                                     .put("charge_mode", chargeMode);
                             deployResource.setKind(DeployResourceKind.PUBLICIP);

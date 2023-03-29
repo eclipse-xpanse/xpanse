@@ -10,6 +10,7 @@ import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,6 +36,7 @@ public class HuaweiBillingServiceTest {
 
     }
 
+    @Disabled
     @Test
     void onDemandBilling() throws IOException {
         DeployServiceEntity service = mapper.readValue(

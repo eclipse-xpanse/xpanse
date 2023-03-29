@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.SystemStatus;
@@ -31,6 +30,7 @@ import org.eclipse.xpanse.modules.models.service.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.MonitorResource;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.OclDetailVo;
+import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
@@ -333,7 +333,7 @@ public class OrchestratorApi {
     @Operation(description = "Get deployed service using id.")
     @GetMapping(value = "/service/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public DeployServiceEntity serviceDetail(
+    public ServiceDetailVo serviceDetail(
             @Parameter(name = "id", description = "Task id of deploy service")
             @PathVariable("id") String id) {
 
