@@ -71,9 +71,9 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     @Autowired
     OrchestratorService(RegisterServiceStorage registerServiceStorage,
-            DeployServiceStorage deployServiceStorage,
-            DeployResourceStorage deployResourceStorage,
-            DeployVariableValidator variableValidator) {
+                        DeployServiceStorage deployServiceStorage,
+                        DeployResourceStorage deployResourceStorage,
+                        DeployVariableValidator variableValidator) {
         this.registerServiceStorage = registerServiceStorage;
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
@@ -293,6 +293,7 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
                 this.plugins.stream()
                         .filter(plugin -> plugin.getCsp() == deployTask.getCreateRequest().getCsp())
                         .findFirst();
+
         if (pluginOptional.isEmpty() || Objects.isNull(pluginOptional.get().getResourceHandler())) {
             throw new RuntimeException("Can't find suitable plugin and resource handler for the "
                     + "Task.");

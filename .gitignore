@@ -13,3 +13,4 @@ dependency-reduced-pom.xml
 node_modules
 .history
 *.db
+xpanse_deploy_ws
