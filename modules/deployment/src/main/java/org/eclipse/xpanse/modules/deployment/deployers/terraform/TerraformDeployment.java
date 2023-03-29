@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.resource.Flavor;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +35,13 @@ public class TerraformDeployment implements Deployment {
     public static final String VERSION_FILE_NAME = "version.tf";
     public static final String SCRIPT_FILE_NAME = "resources.tf";
 
-    private static final String WORKSPACE = "xpanse_deploy_ws";
+
+    private final String workspaceDirectory;
+
+    public TerraformDeployment(
+            @Value("${terraform.workspace.directory}") String workspaceDirectory) {
+        this.workspaceDirectory = workspaceDirectory;
+    }
 
     /**
      * Deploy the DeployTask.
@@ -126,7 +133,8 @@ public class TerraformDeployment implements Deployment {
      * @param taskId The id of the task.
      */
     private String getWorkspacePath(String taskId) {
-        return WORKSPACE + File.separator + File.separator + taskId;
+        return System.getProperty("java.io.tmpdir")
+                + this.workspaceDirectory + File.separator + File.separator + taskId;
     }
 
     /**
