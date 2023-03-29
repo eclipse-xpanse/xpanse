@@ -21,9 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HuaweiBillingHandler {
 
-    @Autowired
-    private HuaweiBillingService huaweiBilling;
-
     /**
      * Get type code by resourceType.
      *
@@ -52,7 +49,8 @@ public class HuaweiBillingHandler {
             value = Double.parseDouble(String.format("%.1f", time));
         }
         List<DemandProductInfo> demandProductInfoList = new ArrayList<>();
-        if (deployResourceEntity.getProperty().get("service_type") != null) {
+        if (deployResourceEntity.getProperty().get("service_type") != null
+                && deployResourceEntity.getProperty().get("create").equals("true")) {
             if (deployResourceEntity.getProperty().get("service_type")
                     .equals("huaweicloud_compute_instance")) {
                 demandProductInfoList.add(
@@ -167,10 +165,10 @@ public class HuaweiBillingHandler {
                                 .withResourceType(resourceType.get(
                                         resourceType.get("huaweicloud_evs_volume")))
                                 .withResourceSpec(
-                                        deployResourceEntity.getProperty().get("volume_type"))
+                                        deployResourceEntity.getProperty().get("type"))
                                 .withRegion(region)
                                 .withResourceSize(Integer.valueOf(
-                                        deployResourceEntity.getProperty().get("volume_size")))
+                                        deployResourceEntity.getProperty().get("size")))
                                 .withSizeMeasureId(17)
                                 .withUsageFactor("Duration")
                                 .withUsageValue(value)

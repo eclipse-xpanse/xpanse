@@ -17,9 +17,12 @@ import lombok.Data;
 @Data
 public class TfStateResource {
 
+    public String mode;
+
     public String type;
 
     public String name;
 
     public List<TfStateResourceInstance> instances;
+
 }

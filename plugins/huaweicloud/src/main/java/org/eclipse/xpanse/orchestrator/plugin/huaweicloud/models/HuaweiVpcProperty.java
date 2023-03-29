@@ -12,15 +12,15 @@ import java.util.HashMap;
 /**
  * Huawei cloud vm property.
  */
-public class HuaweiDiskProperty extends HashMap<String, String> {
+public class HuaweiVpcProperty extends HashMap<String, String> {
 
     /**
      * Init method to put property key and value.
      */
-    public HuaweiDiskProperty() {
+    public HuaweiVpcProperty() {
 
-        this.put("size", "size");
-        this.put("type", "volume_type");
+        this.put("subnet", "subnet_id");
+        this.put("vpc", "vpc_id");
 
     }
 

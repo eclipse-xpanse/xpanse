@@ -25,6 +25,7 @@ public interface BillingService {
      * Method to git on demand billing.
      *
      * @param deployServiceEntity the resource of the deployment.
+     * @param unit query method, true is the unit price, false is the total price.
      */
     List<BillingDataResponse> onDemandBilling(DeployServiceEntity deployServiceEntity,
             Boolean unit);

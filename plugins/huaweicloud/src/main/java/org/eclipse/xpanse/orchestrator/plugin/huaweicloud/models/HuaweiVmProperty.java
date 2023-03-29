@@ -18,11 +18,16 @@ public class HuaweiVmProperty extends HashMap<String, String> {
      * Init method to put property key and value.
      */
     public HuaweiVmProperty() {
-        // TODO put all Vm filed Name and tfStateFile key like this.
-        this.put("ip", "access_ip_v4");
 
-        // TODO put tfStateFile key except all filed Name in Vm.
-        this.put("aaaa", null);
+        this.put("ip", "access_ip_v4");
+        this.put("region", "region");
+
+        this.put("flavor_name", "flavor_name");
+        this.put("image_name", "image_name");
+        this.put("image_id", "image_id");
+        this.put("system_disk_size", "system_disk_size");
+        this.put("system_disk_type", "system_disk_type");
+
     }
 
 
