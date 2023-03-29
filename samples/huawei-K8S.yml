@@ -16,8 +16,10 @@ icon: |
 cloudServiceProvider:
   name: huawei
   regions:
-    - cn-southwest-2
-    - cn-north-4
+    - name: cn-southwest-2
+      area: Asia Pacific
+    - name: cn-north-4
+      area: North America
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat
@@ -27,28 +29,28 @@ billing:
   currency: euro
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 1-master-with-3-woker-nodes-normal
+  - name: 1-master-with-3-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 3
       flavor_id: c7.large.4
-  - name: 1-master-with-3-woker-nodes-performance
+  - name: 1-master-with-3-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 3
       flavor_id: c7.xlarge.4
-  - name: 1-master-with-5-woker-nodes-normal
+  - name: 1-master-with-5-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 5
-      flavor_id: s7.xlarge.4
-  - name: 1-master-with-5-woker-nodes-performance
+      flavor_id: c7.large.4
+  - name: 1-master-with-5-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
@@ -137,34 +139,38 @@ deployment:
       description = "The security group id of all nodes in the K8S cluster."
     }
 
-    data "huaweicloud_vpcs" "existing" {
-      id = var.vpc_id
-    }
-
     resource "random_id" "new" {
       byte_length = 8
     }
 
     resource "random_password" "password" {
-      length  = 12
-      special = true
-      upper   = true
-      lower   = true
-      numeric = true
+      length           = 12
+      upper            = true
+      lower            = true
+      numeric          = true
+      special          = true
+      min_special      = 1
+      override_special = "#%@"
+    }
+
+    data "huaweicloud_vpc" "existing" {
+      id    = var.vpc_id
+      count = length(data.huaweicloud_vpc.existing)
     }
 
     resource "huaweicloud_vpc" "new" {
-      count = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
+      count = length(data.huaweicloud_vpc.existing) == 0 ? 1 : 0
       name  = "K8S-vpc-web-${random_id.new.hex}"
       cidr  = "192.168.0.0/16"
     }
 
-    data "huaweicloud_vpc_subnets" "existing" {
-      id = var.subnet_id
+    data "huaweicloud_vpc_subnet" "existing" {
+      id     = var.subnet_id
+      count  = length(data.huaweicloud_vpc_subnet.existing)
     }
 
     resource "huaweicloud_vpc_subnet" "new" {
-      count      = length(data.huaweicloud_vpc_subnets.existing.subnets) == 0 ? 1 : 0
+      count      = length(data.huaweicloud_vpc_subnet.existing) == 0 ? 1 : 0
       vpc_id     = local.vpc_id
       name       = "K8S-subnet-${random_id.new.hex}"
       cidr       = "192.168.10.0/24"
@@ -182,10 +188,20 @@ deployment:
       description = "K8S cluster security group"
     }
 
+    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_0" {
+      direction         = "ingress"
+      ethertype         = "IPv4"
+      protocol          = "tcp"
+      port_range_min    = 22
+      port_range_max    = 22
+      remote_ip_prefix  = "121.37.117.211/32"
+      security_group_id = local.secgroup_id
+    }
+
     locals {
       admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
-      vpc_id       = length(data.huaweicloud_vpcs.existing.vpcs) > 0 ? data.huaweicloud_vpcs.existing.vpcs[0].id : huaweicloud_vpc.new[0].id
-      subnet_id    = length(data.huaweicloud_vpc_subnets.existing.subnets) > 0 ? data.huaweicloud_vpc_subnets.existing.subnets[0].id : huaweicloud_vpc_subnet.new[0].id
+      vpc_id       = length(data.huaweicloud_vpc.existing) > 0 ? data.huaweicloud_vpc.existing[0].id : huaweicloud_vpc.new[0].id
+      subnet_id    = length(data.huaweicloud_vpc_subnet.existing) > 0 ? data.huaweicloud_vpc_subnet.existing[0].id : huaweicloud_vpc_subnet.new[0].id
       secgroup_id  = length(data.huaweicloud_networking_secgroup.existing) > 0 ? data.huaweicloud_networking_secgroup.existing[0].id : huaweicloud_networking_secgroup.new[0].id
     }
 
@@ -200,15 +216,13 @@ deployment:
       flavor_id          = var.flavor_flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.k8s-image.id
-
       network {
         uuid = local.subnet_id
       }
-
       user_data = <<EOF
         #!bin/bash
         echo root:${local.admin_passwd} | sudo chpasswd
-        sh /root/k8s-init.sh true ${local.admin_passwd} ${var.flavor_worker_nodes_count} > /root/init.log
+        sudo sh /root/k8s-init.sh true ${local.admin_passwd} ${var.flavor_worker_nodes_count} > /root/init.log
       EOF
     }
 
@@ -219,17 +233,14 @@ deployment:
       flavor_id          = var.flavor_flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.k8s-image.id
-
       network {
         uuid = local.subnet_id
       }
-
       user_data = <<EOF
         #!bin/bash
         echo root:${local.admin_passwd} | sudo chpasswd
-        sh /root/k8s-init.sh false ${local.admin_passwd} ${var.flavor_worker_nodes_count} ${huaweicloud_compute_instance.k8s-master.access_ip_v4} > /root/init.log
+        sudo sh /root/k8s-init.sh false ${local.admin_passwd} ${var.flavor_worker_nodes_count} ${huaweicloud_compute_instance.k8s-master.access_ip_v4} > /root/init.log
       EOF
-
       depends_on = [
         huaweicloud_compute_instance.k8s-master
       ]
@@ -243,6 +254,6 @@ deployment:
       value = huaweicloud_compute_instance.k8s-master.access_ip_v4
     }
 
-    output "master_admin_passwd" {
+    output "admin_passwd" {
       value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
     }

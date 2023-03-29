@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.plugin.openstack;
+package org.eclipse.xpanse.orchestrator.plugin.flexibleengine;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
@@ -13,27 +13,21 @@ import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.springframework.stereotype.Component;
 
 /**
- * xpanse plugin implementation for openstack cloud.
+ * Plugin to deploy managed services on FlexibleEngine cloud.
  */
 @Slf4j
 @Component
-public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
+public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final DeployResourceHandler resourceHandler = new OpenstackTerraformResourceHandler();
 
-    /**
-     * Get the resource handler for OpenStack.
-     */
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return resourceHandler;
+        return new FlexibleTerraformResourceHandler();
     }
 
-    /**
-     * Get the cloud service provider.
-     */
     @Override
     public Csp getCsp() {
-        return Csp.OPENSTACK;
+        return Csp.FLEXIBLE_ENGINE;
     }
 }
+

@@ -6,14 +6,15 @@
 
 package org.eclipse.xpanse.orchestrator;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
@@ -21,6 +22,7 @@ import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
@@ -33,11 +35,8 @@ import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,53 +47,48 @@ import org.springframework.util.CollectionUtils;
  * managed service in the respective infrastructure as defined in the OCL.
  */
 @Slf4j
-@Transactional
 @Component
-public class OrchestratorService implements ApplicationListener<ApplicationEvent> {
-
+public class OrchestratorService {
 
     private static final String TASK_ID = "TASK_ID";
 
-    private final RegisterServiceStorage registerServiceStorage;
+    private final Map<Csp, OrchestratorPlugin> pluginMap = new ConcurrentHashMap<>();
 
-    private final DeployServiceStorage deployServiceStorage;
+    private final Map<DeployerKind, Deployment> deploymentMap = new ConcurrentHashMap<>();
 
-    private final DeployResourceStorage deployResourceStorage;
+    @Resource
+    private ApplicationContext applicationContext;
+    @Resource
+    private RegisterServiceStorage registerServiceStorage;
+    @Resource
+    private DeployServiceStorage deployServiceStorage;
+    @Resource
+    private DeployResourceStorage deployResourceStorage;
+    @Resource
+    private DeployVariableValidator deployVariableValidator;
 
-    private final DeployVariableValidator deployVariableValidator;
-
-    @Getter
-    private final List<Deployment> deployers = new ArrayList<>();
-
-    @Getter
-    private final List<OrchestratorPlugin> plugins = new ArrayList<>();
-
-    @Autowired
-    OrchestratorService(RegisterServiceStorage registerServiceStorage,
-                        DeployServiceStorage deployServiceStorage,
-                        DeployResourceStorage deployResourceStorage,
-                        DeployVariableValidator variableValidator) {
-        this.registerServiceStorage = registerServiceStorage;
-        this.deployServiceStorage = deployServiceStorage;
-        this.deployResourceStorage = deployResourceStorage;
-        this.deployVariableValidator = variableValidator;
+    /**
+     * Get all OrchestratorPlugin group by Csp.
+     *
+     * @return pluginMap
+     */
+    @Bean
+    public Map<Csp, OrchestratorPlugin> pluginMap() {
+        applicationContext.getBeansOfType(OrchestratorPlugin.class)
+                .forEach((key, value) -> pluginMap.put(value.getCsp(), value));
+        return pluginMap;
     }
 
-    @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof ContextRefreshedEvent) {
-            ApplicationContext applicationContext =
-                    ((ContextRefreshedEvent) event).getApplicationContext();
-            plugins.addAll(applicationContext.getBeansOfType(OrchestratorPlugin.class).values());
-            if (plugins.isEmpty()) {
-                log.warn("No xpanse plugins loaded by the runtime.");
-            }
-
-            deployers.addAll(applicationContext.getBeansOfType(Deployment.class).values());
-            if (deployers.isEmpty()) {
-                log.warn("No deployer loaded by the runtime.");
-            }
-        }
+    /**
+     * Get all Deployment group by DeployerKind.
+     *
+     * @return deployerMap
+     */
+    @Bean
+    public Map<DeployerKind, Deployment> deploymentMap() {
+        applicationContext.getBeansOfType(Deployment.class)
+                .forEach((key, value) -> deploymentMap.put(value.getDeployerKind(), value));
+        return deploymentMap;
     }
 
     /**
@@ -289,28 +283,21 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     private void fillHandler(DeployTask deployTask) {
         // Find the deployment plugin and resource handler
-        Optional<OrchestratorPlugin> pluginOptional =
-                this.plugins.stream()
-                        .filter(plugin -> plugin.getCsp() == deployTask.getCreateRequest().getCsp())
-                        .findFirst();
-
-        if (pluginOptional.isEmpty() || Objects.isNull(pluginOptional.get().getResourceHandler())) {
+        OrchestratorPlugin plugin = pluginMap.get(deployTask.getCreateRequest().getCsp());
+        if (Objects.isNull(plugin) || Objects.isNull(plugin.getResourceHandler())) {
             throw new RuntimeException("Can't find suitable plugin and resource handler for the "
                     + "Task.");
         }
-        deployTask.setDeployResourceHandler(pluginOptional.get().getResourceHandler());
+        deployTask.setDeployResourceHandler(plugin.getResourceHandler());
     }
 
     private Deployment getDeployment(DeployTask deployTask) {
         DeployerKind deployerKind = deployTask.getOcl().getDeployment().getKind();
-        Optional<Deployment> deploymentOptional =
-                this.deployers.stream()
-                        .filter(deployer -> deployer.getDeployerKind() == deployerKind)
-                        .findFirst();
-        if (deploymentOptional.isEmpty()) {
+        Deployment deployment = deploymentMap.get(deployerKind);
+        if (Objects.isNull(deployment)) {
             throw new RuntimeException("Can't find suitable deployer for the Task.");
         }
-        return deploymentOptional.get();
+        return deployment;
     }
 
 
