@@ -10,10 +10,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.service.DeployResult;
-import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ public class TerraformDeploymentTest {
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setCreateRequest(deployRequest);
-        TerraformDeployment terraformDeployment = new TerraformDeployment();
+        TerraformDeployment terraformDeployment = new TerraformDeployment("test");
 
         DeployResult deployResult = terraformDeployment.deploy(xpanseDeployTask);
 
