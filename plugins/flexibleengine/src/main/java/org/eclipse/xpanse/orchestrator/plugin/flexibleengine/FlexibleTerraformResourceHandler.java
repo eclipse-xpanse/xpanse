@@ -52,7 +52,7 @@ public class FlexibleTerraformResourceHandler implements DeployResourceHandler {
             if (tfStateResource.getType().equals("flexibleengine_compute_instance_v2")) {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
                     DeployResource deployResource = new DeployResource();
-                    deployResource.setKind(DeployResourceKind.Vm);
+                    deployResource.setKind(DeployResourceKind.VM);
                     deployResource.setResourceId((String) instance.getAttributes().get("id"));
                     deployResource.setName((String) instance.getAttributes().get("name"));
 
@@ -74,14 +74,14 @@ public class FlexibleTerraformResourceHandler implements DeployResourceHandler {
                     deployResource.setProperty(new HashMap<>());
                     deployResource.getProperty()
                             .put("ip", (String) instance.getAttributes().get("public_ip"));
-                    deployResource.setKind(DeployResourceKind.PublicIp);
+                    deployResource.setKind(DeployResourceKind.PUBLIC_IP);
                     xpResourceList.add(deployResource);
                 }
             }
             if (tfStateResource.getType().equals("flexibleengine_vpc_v1")) {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
                     DeployResource xpResource = new DeployResource();
-                    xpResource.setKind(DeployResourceKind.Vpc);
+                    xpResource.setKind(DeployResourceKind.VPC);
                     xpResource.setResourceId((String) instance.getAttributes().get("id"));
                     xpResource.setName((String) instance.getAttributes().get("name"));
                     xpResourceList.add(xpResource);

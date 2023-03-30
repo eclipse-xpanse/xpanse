@@ -53,7 +53,7 @@ public class OpenstackTerraformResourceHandler implements DeployResourceHandler 
             if (tfStateResource.getType().equals("openstack_compute_instance_v2")) {
                 deployResource = new DeployResource();
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    deployResource.setKind(DeployResourceKind.Vm);
+                    deployResource.setKind(DeployResourceKind.VM);
                     deployResource.setResourceId((String) instance.getAttributes().get("id"));
                     deployResource.setName((String) instance.getAttributes().get("name"));
 
