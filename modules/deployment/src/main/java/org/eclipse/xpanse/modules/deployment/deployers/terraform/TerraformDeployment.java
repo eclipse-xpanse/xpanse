@@ -39,7 +39,7 @@ public class TerraformDeployment implements Deployment {
     private final String workspaceDirectory;
 
     public TerraformDeployment(
-            @Value("${terraform.workspace.directory}") String workspaceDirectory) {
+            @Value("${terraform.workspace.directory:xpanse_deploy_ws}") String workspaceDirectory) {
         this.workspaceDirectory = workspaceDirectory;
     }
 
