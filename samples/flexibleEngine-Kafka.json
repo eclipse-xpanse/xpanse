@@ -1,0 +1,10 @@
+{
+    "name": "kafka-cluster",
+    "version": "v3.3.2",
+    "csp": "flexibleEngine",
+    "category": "middleware",
+    "flavor": "1-zookeeper-with-3-worker-nodes-normal",
+    "region": "eu-west-0",
+    "property": {
+    }
+}

@@ -240,10 +240,10 @@ public class OrchestratorApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         if (StringUtils.isNotBlank(cspName)) {
-            query.setCsp(Csp.valueOf(StringUtils.upperCase(cspName)));
+            query.setCsp(Csp.getCspByValue(cspName));
         }
         if (StringUtils.isNotBlank(categoryName)) {
-            query.setCategory(Category.valueOf(StringUtils.upperCase(categoryName)));
+            query.setCategory(Category.getCategoryByCatalog(categoryName));
         }
         query.setServiceName(serviceName);
         query.setServiceVersion(serviceVersion);
@@ -273,7 +273,7 @@ public class OrchestratorApi {
     public List<CategoryOclVo> listRegisteredServicesTree(
             @Parameter(name = "categoryName", description = "category of the service")
             @PathVariable(name = "categoryName", required = false) String categoryName) {
-        Category category = Category.valueOf(StringUtils.upperCase(categoryName));
+        Category category = Category.getCategoryByCatalog(categoryName);
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         query.setCategory(category);
         log.info("List registered service with query model {}", query);

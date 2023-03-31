@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Period for Billing.
+ * Service Category enums.
  */
 public enum Category {
     AI("ai"),
@@ -20,7 +20,7 @@ public enum Category {
     STORAGE("storage"),
     NETWORK("network"),
     DATABASE("database"),
-    MEDIA_SERVICE("media_service"),
+    MEDIA_SERVICE("mediaService"),
     SECURITY("security"),
     MIDDLEWARE("middleware"),
     OTHERS("others");
@@ -31,13 +31,29 @@ public enum Category {
         this.catalog = catalog;
     }
 
+
+    /**
+     * Get Category by value.
+     *
+     * @param catalog catalog
+     * @return category
+     */
+    public static Category getCategoryByCatalog(String catalog) {
+        for (Category category : values()) {
+            if (StringUtils.equalsIgnoreCase(category.catalog, catalog)) {
+                return category;
+            }
+        }
+        return null;
+    }
+
     /**
      * For Category serialize.
      */
     @JsonCreator
     public Category getByValue(String period) {
         for (Category category : values()) {
-            if (category.catalog.equals(StringUtils.lowerCase(period))) {
+            if (StringUtils.equalsIgnoreCase(category.catalog, catalog)) {
                 return category;
             }
         }
