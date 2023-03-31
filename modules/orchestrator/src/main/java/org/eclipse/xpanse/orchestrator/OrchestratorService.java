@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.enums.Csp;
@@ -29,6 +30,7 @@ import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
+import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
@@ -159,7 +161,7 @@ public class OrchestratorService {
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
-            deployServiceEntity.setDeployResourceEntity(
+            deployServiceEntity.setDeployResourceList(
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
             deployServiceStorage.store(deployServiceEntity);
         } catch (Exception e) {
@@ -240,7 +242,7 @@ public class OrchestratorService {
             if (CollectionUtils.isEmpty(resources)) {
                 deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
             } else {
-                deployServiceEntity.setDeployResourceEntity(
+                deployServiceEntity.setDeployResourceList(
                         getDeployResourceEntityList(resources, deployServiceEntity));
             }
             deployServiceStorage.store(deployServiceEntity);
@@ -273,11 +275,22 @@ public class OrchestratorService {
      * Get deploy service detail by id.
      *
      * @param id ID of deploy service.
-     * @return deployService
+     * @return serviceDetailVo
      */
-    public DeployServiceEntity getDeployServiceDetail(UUID id) {
-        return deployServiceStorage.findDeployServiceById(id);
-
+    public ServiceDetailVo getDeployServiceDetail(UUID id) {
+        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity)) {
+            return null;
+        }
+        ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
+        BeanUtils.copyProperties(deployServiceEntity, serviceDetailVo);
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
+            List<DeployResource> deployResources =
+                    EntityTransUtils.transResourceEntity(
+                            deployServiceEntity.getDeployResourceList());
+            serviceDetailVo.setDeployResources(deployResources);
+        }
+        return serviceDetailVo;
     }
 
 

@@ -86,6 +86,6 @@ public class DeployServiceEntity extends CreateModifiedTime {
 
     @OneToMany(mappedBy = "deployService", orphanRemoval = true)
     @Cascade({CascadeType.ALL})
-    private List<DeployResourceEntity> deployResourceEntity;
+    private List<DeployResourceEntity> deployResourceList;
 
 }
