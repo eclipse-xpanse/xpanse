@@ -1,1 +1,114 @@
-{}
+{
+  "id": "7eadc775-1af8-4aea-8ea2-8954e4979418",
+  "createTime": "2023-03-29 10:15: 02.459",
+  "lastModifiedTime": "2023-03-29 10: 16: 37.554",
+  "category": "middleware",
+  "createRequest": {
+    "id": "7eadc775-1af8-4aea-8ea2-8954e4979418",
+    "category": "middleware",
+    "name": "kafka",
+    "version": "v1.0",
+    "region": "cn-southwest-2",
+    "csp": "huawei",
+    "flavor": "3-node-without-zookeeper",
+    "ocl": {
+      "category": "middleware",
+      "version": "2.0",
+      "name": "kafka",
+      "serviceVersion": "v1.0",
+      "description": "This is an ehanced kafka services by ISV-A.",
+      "namespace": "ISV-A",
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACRAQMAAAAPc4+9AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+/v7Hh8gVD0A0wAAAcVJREFUeJzNlc1twzAMhSX44KNH0CgaTd6gK3kUd4McDVTwq/hjiUyaIk\nV7qNA2/QCFIh+ppxB+svLNEqqBGTC0ANugBOwmCGDCFOAwIWGDOoqoODtN2BdL6wxD9NMTO9tXPa1PqL5M30W5p8lm5vNcF0t7ahSrVguqNqmMokRW4YQucVjBCBWH1Z2g3WDlW2skoYU+2x8JOtGedBF3k2iXMO0j16iUiI6gxzPdQhnU/s2G9pCO57QY2r6hvj\nPbKJHq7DRTRXT60avtuTRdbrFJI3mSZhNOqYjVbd99YyK1QKWzEqSWrE0k07U60uPaelflMzaaeu1KBuurHSsn572I1KWy2joX5ZBfWbS/VEt50H5P6aL4JxTuyJ/+QCNPX4PWF3Q8Xe1eF9FsLdD2VaOnaP2hWvs+zI58/7i3vH3nRFtDZpyTUNaZkON5XnBNsp\n8lrmDMrpvBr+b6pUl+4XbkQdndqnzYGzfuJm1JmIWimIbe6dndd/bk7gVce/cJdo3uIeLJl7+I2xTnPek67mjtDeppE7b03Ov+kSfDe3JweW53njxeGfXkaz28VeYd86+af/H8a7hgJKaebILaFzakLfxyfQLTxVB6K1K9KQAAAABJRU5ErkJggg==\n",
+      "cloudServiceProvider": {
+        "name": "huawei",
+        "regions": [
+          {
+            "name": "cn-southwest-2",
+            "area": "Asia Pacific"
+          },
+          {
+            "name": "cn-north-4",
+            "area": "North America"
+          }
+        ]
+      },
+      "deployment": {
+        "kind": "terraform",
+        "context": [
+          {
+            "name": "HW_REGION_NAME",
+            "kind": "env",
+            "type": "string",
+            "example": null,
+            "description": "Your access key.",
+            "value": null,
+            "mandatory": true,
+            "validator": null
+          },
+          {
+            "name": "HW_ACCESS_KEY",
+            "kind": "env",
+            "type": "string",
+            "example": null,
+            "description": "Your security key.",
+            "value": null,
+            "mandatory": true,
+            "validator": null
+          },
+          {
+            "name": "HW_SECRET_KEY",
+            "kind": "env",
+            "type": "string",
+            "example": null,
+            "description": "The vpc you want to deploy, If null, A new vpc will be created.",
+            "value": null,
+            "mandatory": false,
+            "validator": "length(1-256)"
+          },
+          {
+            "name": "secgroup_id",
+            "kind": "variable",
+            "type": "string",
+            "example": null,
+            "description": "The secgroup id.",
+            "value": null,
+            "mandatory": false,
+            "validator": "length(1-256)"
+          }
+        ],
+        "deployer": "variable \"secgroup_id\" {}\ndata \"huaweicloud_availability_zones\" \"myaz\" {}\ndata \"huaweicloud_compute_flavors\" \"myflavor\" {\n    availability_zone = data.huaweicloud_availability_zones.myaz.names[0]\n    performance_type  = \"normal\"\n    cpu_core_count    = 2\n    memory_size       = 4\n}\ndata \"huaweicloud_vpc_subnet\" \"mynet\" {\n    name = \"subnet-20a3-wmm\"\n}\nresource \"huaweicloud_compute_instance\" \"basic\" {\n    name               = \"basic-wmm\"\n    image_id           = \"a8601887-81d5-4eed-9338-382cf5b6d80b\"\n    flavor_id          = data.huaweicloud_compute_flavors.myflavor.ids[0]\n    availability_zone  = data.huaweicloud_availability_zones.myaz.names[0]\n    network {\n        uuid = data.huaweicloud_vpc_subnet.mynet.id\n    }\n}\nresource \"huaweicloud_evs_volume\" \"myvol\" {\n    name              = \"volume\"\n    availability_zone = data.huaweicloud_availability_zones.myaz.names[0]\n    volume_type       = \"SAS\"\n    size              = 10\n}\nresource \"huaweicloud_compute_volume_attach\" \"attached\" {\n    instance_id = huaweicloud_compute_instance.basic.id\n    volume_id   = huaweicloud_evs_volume.myvol.id\n}\nresource \"huaweicloud_vpc_eip\" \"myeip\" {\n    publicip {\n        type = \"5_sbgp\"\n    }\n    bandwidth {\n        name        = \"wmm\"\n        size        = 5\n        share_type  = \"PER\"\n        charge_mode = \"traffic\"\n    }\n}\nresource \"huaweicloud_compute_eip_associate\" \"associated\" {\n    public_ip   = huaweicloud_vpc_eip.myeip.address\n    instance_id = huaweicloud_compute_instance.basic.id\n}"
+      },
+      "flavors": [
+        {
+          "name": "3-node-without-zookeeper",
+          "fixedPrice": 20,
+          "property": {
+            "node": "3",
+            "zookeeper": "false"
+          }
+        },
+        {
+          "name": "5-node-with-zookeeper",
+          "fixedPrice": 30,
+          "property": {
+            "node": "5",
+            "zookeeper": "true"
+          }
+        }
+      ],
+      "billing": {
+        "model": "flat",
+        "period": "monthly",
+        "currency": "euro"
+      }
+    },
+    "property": {
+      "secgroup_id": "e2d4de73-1518-40f7-8de1-60f184ea6e1d"
+    }
+  },
+  "csp": "huawei",
+  "flavor": "3-node-without-zookeeper",
+  "name": "kafka",
+  "serviceState": "DEPLOY_SUCCESS",
+  "version": "v1.0"
+}
