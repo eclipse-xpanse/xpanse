@@ -230,6 +230,9 @@ public class DeployVariableValidator {
                 Map<VariableValidator, String> validatorMap = variableInfoMap.get(userKey);
                 if (Objects.nonNull(validatorMap) && !validatorMap.isEmpty()) {
                     String userPutValue = deployProperty.get(userKey);
+                    if (StringUtils.isEmpty(userPutValue) && !requiredKeys.contains(userKey)) {
+                        continue;
+                    }
                     for (VariableValidator validator : validatorMap.keySet()) {
                         validVariable(userPutValue, userKey, validator,
                                 validatorMap.get(validator));

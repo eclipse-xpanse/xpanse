@@ -31,7 +31,7 @@ public class DeployVariable {
     @Schema(description = "The type of the deploy variable")
     private DeployVariableType type;
 
-    @Schema(description = "The example value for the deploy variable")
+    @Schema(description = "The default value for the deploy variable")
     private String example;
 
     @NotNull

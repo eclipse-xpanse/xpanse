@@ -21,19 +21,21 @@ public enum Csp {
     OPENSTACK("openstack"),
     FLEXIBLE("flexible");
 
-    private final String name;
+    private final String value;
 
-    Csp(String name) {
-        this.name = name;
+    Csp(String value) {
+        this.value = value;
     }
 
     /**
-     * For CSP serialize.
+     * Get Csp by value.
+     *
+     * @param value value
+     * @return csp
      */
-    @JsonCreator
-    public Csp getByValue(String name) {
+    public static Csp getCspByValue(String value) {
         for (Csp csp : values()) {
-            if (csp.name.equals(StringUtils.lowerCase(name))) {
+            if (csp.value.equals(StringUtils.lowerCase(value))) {
                 return csp;
             }
         }
@@ -45,6 +47,19 @@ public enum Csp {
      */
     @JsonValue
     public String toValue() {
-        return this.name;
+        return this.value;
+    }
+
+    /**
+     * For CSP serialize.
+     */
+    @JsonCreator
+    public Csp getByValue(String name) {
+        for (Csp csp : values()) {
+            if (csp.value.equals(StringUtils.lowerCase(name))) {
+                return csp;
+            }
+        }
+        return null;
     }
 }

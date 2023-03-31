@@ -3,7 +3,7 @@ version: 2.0
 # The category of the service.
 category: container
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: K8S cluster
+name: K8S-cluster
 # The version of the service, if the end-user want to select the version when they want to deploy the service.
 serviceVersion: v1.26.2
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
@@ -29,30 +29,30 @@ billing:
   currency: euro
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 1-master-with-3-woker-nodes-normal
+  - name: 1-master-with-3-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 3
       flavor_id: c7.large.4
-  - name: 1-master-with-3-woker-nodes-performance
+  - name: 1-master-with-3-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
+    fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 3
       flavor_id: c7.xlarge.4
-  - name: 1-master-with-5-woker-nodes-normal
+  - name: 1-master-with-5-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
+    fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 5
       flavor_id: c7.large.4
-  - name: 1-master-with-5-woker-nodes-performance
+  - name: 1-master-with-5-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
+    fixedPrice: 80
     # Properties for the service, which can be used by the deployment.
     property:
       worker_nodes_count: 5
@@ -65,12 +65,6 @@ deployment:
   # - variable: The value of the variable parameters are defined by the user on the console.
   # The parameters will be used to generate the API of the managed service.
   context:
-    - name: HW_REGION_NAME
-      description: huawei cloud region name.
-      kind: env
-      type: string
-      mandatory: true
-      validator: minLength=6|maxLength=26
     - name: HW_ACCESS_KEY
       description: Huawei cloud access key.
       kind: env
@@ -87,164 +81,178 @@ deployment:
       type: string
       mandatory: false
       validator: minLength=8|maxLength=16|pattern=^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
-    - name: vpc_id
-      description: The sub network id of all nodes in the K8S cluster. If the value is empty, will create a new VPC.
+    - name: vpc_name
+      description: The vpc name of all nodes in the K8S cluster. If the value is empty, will use the example value to find or create VPC.
       kind: variable
       type: string
+      example: "k8s-vpc-default"
       mandatory: false
-    - name: subnet_id
-      description: The sub network id of all nodes in the K8S cluster. If the value is empty, will create a new subnet.
+    - name: subnet_name
+      description: The sub network name of all nodes in the K8S cluster. If the value is empty, will use the example value to find or create subnet.
       kind: variable
       type: string
+      example: "k8s-subnet-default"
       mandatory: false
-    - name: secgroup_id
-      description: The security group id of all nodes in the K8S cluster. If the value is empty, will create a new security group.
+    - name: secgroup_name
+      description: The security group name of all nodes in the K8S cluster. If the value is empty, will use the example value to find or create security group.
       kind: variable
       type: string
+      example: "k8s-secgroup-default"
       mandatory: false
   deployer: |
-    data "huaweicloud_availability_zones" "osc-az" {}
-
     variable "flavor_flavor_id" {
       type        = string
-      description = "The flavor_id of all nodes in the K8S cluster."
+      default     = "c7.large.2"
+      description = "The flavor_id of all nodes in the k8s cluster."
     }
 
     variable "flavor_worker_nodes_count" {
       type        = string
-      description = "The worker nodes count in the K8S cluster."
+      default     = 3
+      description = "The worker nodes count in the k8s cluster."
     }
 
     variable "admin_passwd" {
       type        = string
       default     = ""
-      description = "The root password of all nodes in the K8S cluster."
+      description = "The root password of all nodes in the k8s cluster."
     }
 
-    variable "vpc_id" {
+    variable "vpc_name" {
       type        = string
-      default     = ""
-      description = "The vpc id of all nodes in the K8S cluster."
+      default     = "k8s-vpc-default"
+      description = "The vpc name of all nodes in the k8s cluster."
     }
 
-    variable "subnet_id" {
+    variable "subnet_name" {
       type        = string
-      default     = ""
-      description = "The subnet id of all nodes in the K8S cluster."
+      default     = "k8s-subnet-default"
+      description = "The subnet name of all nodes in the k8s cluster."
     }
 
-    variable "secgroup_id" {
+    variable "secgroup_name" {
       type        = string
-      default     = ""
-      description = "The security group id of all nodes in the K8S cluster."
+      default     = "k8s-secgroup-default"
+      description = "The security group name of all nodes in the k8s cluster."
     }
 
     data "huaweicloud_vpcs" "existing" {
-      id = var.vpc_id
-    }
-
-    resource "random_id" "new" {
-      byte_length = 8
-    }
-
-    resource "random_password" "password" {
-      length  = 12
-      special = true
-      upper   = true
-      lower   = true
-      numeric = true
-    }
-
-    resource "huaweicloud_vpc" "new" {
-      count = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
-      name  = "K8S-vpc-web-${random_id.new.hex}"
-      cidr  = "192.168.0.0/16"
+      name = var.vpc_name
     }
 
     data "huaweicloud_vpc_subnets" "existing" {
-      id = var.subnet_id
+      name = var.subnet_name
     }
 
-    resource "huaweicloud_vpc_subnet" "new" {
-      count      = length(data.huaweicloud_vpc_subnets.existing.subnets) == 0 ? 1 : 0
-      vpc_id     = local.vpc_id
-      name       = "K8S-subnet-${random_id.new.hex}"
-      cidr       = "192.168.10.0/24"
-      gateway_ip = "192.168.10.1"
-    }
-
-    data "huaweicloud_networking_secgroup" "existing" {
-      secgroup_id = var.secgroup_id
-      count       = length(data.huaweicloud_networking_secgroup.existing)
-    }
-
-    resource "huaweicloud_networking_secgroup" "new" {
-      count       = length(data.huaweicloud_networking_secgroup.existing) == 0 ? 1 : 0
-      name        = "K8S_secgroup-${random_id.new.hex}"
-      description = "K8S cluster security group"
+    data "huaweicloud_networking_secgroups" "existing" {
+      name = var.secgroup_name
     }
 
     locals {
       admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
       vpc_id       = length(data.huaweicloud_vpcs.existing.vpcs) > 0 ? data.huaweicloud_vpcs.existing.vpcs[0].id : huaweicloud_vpc.new[0].id
-      subnet_id    = length(data.huaweicloud_vpc_subnets.existing.subnets) > 0 ? data.huaweicloud_vpc_subnets.existing.subnets[0].id : huaweicloud_vpc_subnet.new[0].id
-      secgroup_id  = length(data.huaweicloud_networking_secgroup.existing) > 0 ? data.huaweicloud_networking_secgroup.existing[0].id : huaweicloud_networking_secgroup.new[0].id
+      subnet_id    = length(data.huaweicloud_vpc_subnets.existing.subnets)> 0 ? data.huaweicloud_vpc_subnets.existing.subnets[0].id : huaweicloud_vpc_subnet.new[0].id
+      secgroup_id  = length(data.huaweicloud_networking_secgroups.existing.security_groups) > 0 ? data.huaweicloud_networking_secgroups.existing.security_groups[0].id : huaweicloud_networking_secgroup.new[0].id
     }
 
-    data "huaweicloud_images_image" "k8s-image" {
+    resource "huaweicloud_vpc" "new" {
+      count = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
+      name  = var.vpc_name
+      cidr  = "192.168.0.0/16"
+    }
+
+    resource "huaweicloud_vpc_subnet" "new" {
+      count      = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
+      vpc_id     = local.vpc_id
+      name       = var.subnet_name
+      cidr       = "192.168.10.0/24"
+      gateway_ip = "192.168.10.1"
+    }
+
+    resource "huaweicloud_networking_secgroup" "new" {
+      count       = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+      name        = var.secgroup_name
+      description = "k8s cluster security group"
+    }
+
+    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_0" {
+      count             = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+      direction         = "ingress"
+      ethertype         = "IPv4"
+      protocol          = "tcp"
+      port_range_min    = 22
+      port_range_max    = 22
+      remote_ip_prefix  = "121.37.117.211/32"
+      security_group_id = local.secgroup_id
+    }
+
+    data "huaweicloud_availability_zones" "osc-az" {}
+
+    resource "random_id" "new" {
+      byte_length = 4
+    }
+
+    resource "random_password" "password" {
+      length           = 12
+      upper            = true
+      lower            = true
+      numeric          = true
+      special          = true
+      min_special      = 1
+      override_special = "#%@"
+    }
+
+    resource "huaweicloud_compute_keypair" "keypair" {
+      name = "keypair-k8s-${random_id.new.hex}"
+    }
+
+    data "huaweicloud_images_image" "image" {
       name        = "K8S-v1.26.2_Centos-7.9"
       most_recent = true
     }
 
     resource "huaweicloud_compute_instance" "k8s-master" {
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
-      name               = "k8s-master"
+      name               = "k8s-master-${random_id.new.hex}"
       flavor_id          = var.flavor_flavor_id
       security_group_ids = [ local.secgroup_id ]
-      image_id           = data.huaweicloud_images_image.k8s-image.id
-
+      image_id           = data.huaweicloud_images_image.image.id
+      key_pair           = huaweicloud_compute_keypair.keypair.name
       network {
         uuid = local.subnet_id
       }
-
       user_data = <<EOF
         #!bin/bash
         echo root:${local.admin_passwd} | sudo chpasswd
-        sh /root/k8s-init.sh true ${local.admin_passwd} ${var.flavor_worker_nodes_count} > /root/init.log
+        sudo sh /root/k8s-init.sh true ${local.admin_passwd} ${var.flavor_worker_nodes_count} > /root/init.log
       EOF
     }
 
     resource "huaweicloud_compute_instance" "k8s-node" {
       count              = var.flavor_worker_nodes_count
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
-      name               = "k8s-node-${count.index}"
+      name               = "k8s-node-${random_id.new.hex}-${count.index}"
       flavor_id          = var.flavor_flavor_id
       security_group_ids = [ local.secgroup_id ]
-      image_id           = data.huaweicloud_images_image.k8s-image.id
-
+      image_id           = data.huaweicloud_images_image.image.id
+      key_pair           = huaweicloud_compute_keypair.keypair.name
       network {
         uuid = local.subnet_id
       }
-
       user_data = <<EOF
         #!bin/bash
         echo root:${local.admin_passwd} | sudo chpasswd
-        sh /root/k8s-init.sh false ${local.admin_passwd} ${var.flavor_worker_nodes_count} ${huaweicloud_compute_instance.k8s-master.access_ip_v4} > /root/init.log
+        sudo sh /root/k8s-init.sh false ${local.admin_passwd} ${var.flavor_worker_nodes_count} ${huaweicloud_compute_instance.k8s-master.access_ip_v4} > /root/init.log
       EOF
-
       depends_on = [
         huaweicloud_compute_instance.k8s-master
       ]
-    }
-
-    output "k8s_master_endpoint" {
-      value = "${huaweicloud_compute_instance.k8s-master.access_ip_v4}:22"
     }
 
     output "k8s_master_host" {
       value = huaweicloud_compute_instance.k8s-master.access_ip_v4
     }
 
-    output "master_admin_passwd" {
+    output "admin_passwd" {
       value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
     }
