@@ -1,5 +1,5 @@
 {
-    "name": "K8S cluster",
+    "name": "K8S-cluster",
     "version": "v1.26.2",
     "csp": "huawei",
     "category": "container",

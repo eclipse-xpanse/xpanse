@@ -1,5 +1,5 @@
 {
-    "name": "Kafka cluster",
+    "name": "Kafka-cluster",
     "version": "v3.3.2",
     "csp": "huawei",
     "category": "middleware",
