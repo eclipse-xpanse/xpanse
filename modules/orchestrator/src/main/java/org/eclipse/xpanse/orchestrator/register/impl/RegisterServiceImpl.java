@@ -130,11 +130,16 @@ public class RegisterServiceImpl implements RegisterService {
      * Search registered service by query model.
      *
      * @param query the query model for search registered service.
-     * @return list of RegisterServiceEntity
+     * @return list of OclDetailVo
      */
     @Override
-    public List<RegisterServiceEntity> queryRegisteredServices(RegisteredServiceQuery query) {
-        return storage.queryRegisteredServices(query);
+    public List<OclDetailVo> queryRegisteredServices(RegisteredServiceQuery query) {
+        List<RegisterServiceEntity> registeredServices = storage.queryRegisteredServices(query);
+        if (CollectionUtils.isEmpty(registeredServices)) {
+            return new ArrayList<>();
+        }
+        return registeredServices.stream().map(
+                this::convertToOclDetailVo).collect(Collectors.toList());
     }
 
     /**
