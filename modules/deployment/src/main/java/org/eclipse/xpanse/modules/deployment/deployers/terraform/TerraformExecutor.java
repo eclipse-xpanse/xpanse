@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
@@ -85,11 +86,13 @@ public class TerraformExecutor {
      */
     private boolean executeWithVariables(StringBuilder command) {
         for (Map.Entry<String, String> entry : this.variables.entrySet()) {
-            command.append("-var=\"")
-                    .append(entry.getKey())
-                    .append("=")
-                    .append(entry.getValue())
-                    .append("\" ");
+            if (Objects.nonNull(entry.getKey()) && Objects.nonNull(entry.getValue())) {
+                command.append("-var=\"")
+                        .append(entry.getKey())
+                        .append("=")
+                        .append(entry.getValue())
+                        .append("\" ");
+            }
         }
         StringBuilder out = new StringBuilder();
         boolean exeRet = execute(command.toString(), out);
