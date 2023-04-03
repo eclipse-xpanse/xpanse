@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.OclDetailVo;
+import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 
 /**
  * This interface describes register service in charge of interacting with backend fundamental
@@ -67,7 +68,7 @@ public interface RegisterService {
      * @param query the query model for search registered service.
      * @return list of RegisterVo
      */
-    List<OclDetailVo> queryRegisteredServices(RegisteredServiceQuery query);
+    List<RegisteredServiceVo> queryRegisteredServices(RegisteredServiceQuery query);
 
     /**
      * Search registered service tree by query model.

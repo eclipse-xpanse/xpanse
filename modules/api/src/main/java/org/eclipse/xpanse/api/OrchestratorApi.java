@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.OclDetailVo;
+import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
@@ -223,7 +224,7 @@ public class OrchestratorApi {
     @GetMapping(value = "/register",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<OclDetailVo> listRegisteredServices(
+    public List<RegisteredServiceVo> listRegisteredServices(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) String categoryName,
             @Parameter(name = "cspName", description = "name of the service provider")
@@ -242,7 +243,7 @@ public class OrchestratorApi {
         query.setServiceName(serviceName);
         query.setServiceVersion(serviceVersion);
         log.info("List registered service with query model {}", query);
-        List<OclDetailVo> registerVos =
+        List<RegisteredServiceVo> registerVos =
                 registerService.queryRegisteredServices(query);
         String successMsg = String.format("List registered service with query model %s "
                 + "success.", query);

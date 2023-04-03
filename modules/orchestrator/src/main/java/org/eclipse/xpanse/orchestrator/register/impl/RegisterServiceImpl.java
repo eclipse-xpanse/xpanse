@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.OclDetailVo;
 import org.eclipse.xpanse.modules.models.view.ProviderOclVo;
+import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.view.VersionOclVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
@@ -130,16 +131,16 @@ public class RegisterServiceImpl implements RegisterService {
      * Search registered service by query model.
      *
      * @param query the query model for search registered service.
-     * @return list of OclDetailVo
+     * @return list of RegisteredServiceVo
      */
     @Override
-    public List<OclDetailVo> queryRegisteredServices(RegisteredServiceQuery query) {
+    public List<RegisteredServiceVo> queryRegisteredServices(RegisteredServiceQuery query) {
         List<RegisterServiceEntity> registeredServices = storage.queryRegisteredServices(query);
         if (CollectionUtils.isEmpty(registeredServices)) {
             return new ArrayList<>();
         }
         return registeredServices.stream().map(
-                this::convertToOclDetailVo).collect(Collectors.toList());
+                this::convertToRegisteredServiceVo).collect(Collectors.toList());
     }
 
     /**
@@ -214,6 +215,15 @@ public class RegisterServiceImpl implements RegisterService {
         oclDetailVo.setLastModifiedTime(serviceEntity.getLastModifiedTime());
         oclDetailVo.setServiceState(serviceEntity.getServiceState());
         return oclDetailVo;
+    }
+
+    private RegisteredServiceVo convertToRegisteredServiceVo(RegisterServiceEntity serviceEntity) {
+        if (Objects.isNull(serviceEntity)) {
+            return null;
+        }
+        RegisteredServiceVo registeredServiceVo = new RegisteredServiceVo();
+        BeanUtils.copyProperties(serviceEntity, registeredServiceVo);
+        return registeredServiceVo;
     }
 
 }
