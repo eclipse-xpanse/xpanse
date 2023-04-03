@@ -93,7 +93,7 @@ public class RegisterServiceImpl implements RegisterService {
         compare(oldName, newName);
 
         String oldVersion = existedService.getVersion();
-        String newVersion = ocl.getVersion();
+        String newVersion = ocl.getServiceVersion();
         compare(oldVersion, newVersion);
 
         String oldCsp = existedService.getCsp().name();
@@ -106,7 +106,7 @@ public class RegisterServiceImpl implements RegisterService {
             log.error("Update service failed, Field {} cannot changed with update request",
                     oldParams);
             throw new IllegalArgumentException(String.format(
-                    "Update service failed, Field {} cannot changed with update request",
+                    "Update service failed, Field %s cannot changed with update request",
                     oldParams));
         }
     }
