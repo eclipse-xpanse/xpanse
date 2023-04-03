@@ -25,7 +25,7 @@ public enum VariableValidator {
     MAXIMUM("maximum"),
     // pattern=*e*
     PATTERN("pattern"),
-    // enum=["AWS","ALI","HUAWEI"]
+    // enum=["AWS","AZURE", "ALICLOUD","HUAWEI", "FLEXIBLE_ENGINE"]
     ENUM("enum");
 
     private final String type;
