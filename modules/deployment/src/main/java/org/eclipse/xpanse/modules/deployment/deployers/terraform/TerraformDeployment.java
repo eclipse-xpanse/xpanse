@@ -15,12 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.enums.Csp;
-import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
-import org.eclipse.xpanse.modules.models.resource.DeployVariable;
-import org.eclipse.xpanse.modules.models.resource.Flavor;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -56,8 +54,7 @@ public class TerraformDeployment implements Deployment {
         createScriptFile(task.getCreateRequest().getCsp(), task.getCreateRequest().getRegion(),
                 workspace, task.getOcl().getDeployment().getDeployer());
         // Execute the terraform command.
-        TerraformExecutor executor =
-                new TerraformExecutor(getEnv(task), getVariables(task), workspace);
+        TerraformExecutor executor = getExecutor(task, workspace);
         executor.deploy();
         String tfState = executor.getTerraformState();
 
@@ -76,16 +73,38 @@ public class TerraformDeployment implements Deployment {
     }
 
 
+    /**
+     * Destroy the DeployTask.
+     *
+     * @param task the task for the deployment.
+     */
     @Override
     public DeployResult destroy(DeployTask task) {
         String workspace = getWorkspacePath(task.getId().toString());
-        TerraformExecutor executor =
-                new TerraformExecutor(getEnv(task), getVariables(task), workspace);
+        TerraformExecutor executor = getExecutor(task, workspace);
         DeployResult result = new DeployResult();
         result.setId(task.getId());
         executor.destroy();
         result.setState(TerraformExecState.DESTROY_SUCCESS);
         return result;
+    }
+
+    /**
+     * Get a TerraformExecutor.
+     *
+     * @param task      the task for the deployment.
+     * @param workspace the workspace of the deployment.
+     */
+    private TerraformExecutor getExecutor(DeployTask task, String workspace) {
+        Map<String, String> envVariables = DeployEnvironments.getEnv(task);
+        Map<String, String> flavorVariables = DeployEnvironments.getFlavorVariables(task);
+        Map<String, String> tfFlavorVariables = new HashMap<>();
+        for (String key : flavorVariables.keySet()) {
+            tfFlavorVariables.put("TF_VAR_" + key, flavorVariables.get(key));
+        }
+        envVariables.putAll(tfFlavorVariables);
+        return new TerraformExecutor(envVariables, DeployEnvironments.getVariables(task),
+                workspace);
     }
 
     /**
@@ -137,71 +156,6 @@ public class TerraformDeployment implements Deployment {
                 + this.workspaceDirectory + File.separator + File.separator + taskId;
     }
 
-    /**
-     * Get environment variable for terraform.
-     *
-     * @param task the context of the task.
-     */
-    public Map<String, String> getEnv(DeployTask task) {
-        Map<String, String> variables = new HashMap<>();
-        Map<String, String> request = task.getCreateRequest().getProperty();
-        for (DeployVariable variable : task.getOcl().getDeployment().getContext()) {
-            if (variable.getKind() == DeployVariableKind.ENV) {
-                if (request.containsKey(variable.getName())) {
-                    variables.put(variable.getName(), request.get(variable.getName()));
-                } else {
-                    variables.put(variable.getName(), System.getenv(variable.getName()));
-                }
-            }
-
-            if (variable.getKind() == DeployVariableKind.FIX_ENV) {
-                variables.put(variable.getName(), variable.getValue());
-            }
-        }
-
-        variables.putAll(getFlavorVariables(task));
-
-        return variables;
-    }
-
-    private Map<String, String> getFlavorVariables(DeployTask task) {
-        Map<String, String> variables = new HashMap<>();
-
-        variables.put("TF_VAR_flavor", task.getCreateRequest().getFlavor());
-        for (Flavor flavor : task.getOcl().getFlavors()) {
-            if (flavor.getName().equals(task.getCreateRequest().getFlavor())) {
-                for (Map.Entry<String, String> entry : flavor.getProperty().entrySet()) {
-                    variables.put(("TF_VAR_flavor_" + entry.getKey()), entry.getValue());
-                }
-                return variables;
-            }
-        }
-
-        throw new RuntimeException("Can not get an available flavor.");
-    }
-
-    /**
-     * Get terraform variables.
-     *
-     * @param task the DeployTask.
-     */
-    public Map<String, String> getVariables(DeployTask task) {
-        Map<String, String> variables = new HashMap<>();
-        Map<String, String> request = task.getCreateRequest().getProperty();
-        for (DeployVariable variable : task.getOcl().getDeployment().getContext()) {
-            if (variable.getKind() == DeployVariableKind.VARIABLE
-                    && request.containsKey(variable.getName())) {
-                variables.put(variable.getName(), request.get(variable.getName()));
-            }
-
-            if (variable.getKind() == DeployVariableKind.FIX_VARIABLE
-                    && request.containsKey(variable.getName())) {
-                variables.put(variable.getName(), variable.getValue());
-            }
-        }
-
-        return variables;
-    }
 
     /**
      * Get the deployer kind.

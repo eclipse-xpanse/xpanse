@@ -109,7 +109,8 @@ public class DeployVariableValidator {
             for (DeployVariable deployVariable : deployVariables) {
                 DeployVariableKind kind = deployVariable.getKind();
                 // filter kind variable
-                if (Objects.equals(kind, DeployVariableKind.VARIABLE) || deployVariable.getKind()
+                if (Objects.equals(kind, DeployVariableKind.VARIABLE)
+                        || deployVariable.getKind()
                         .equals(DeployVariableKind.VARIABLE)) {
                     if (deployVariable.getMandatory()) {
                         requiredKeys.add(deployVariable.getName());
