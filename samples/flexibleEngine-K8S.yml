@@ -60,9 +60,13 @@ flavors:
 deployment:
   # kind, Supported values are terraform, pulumi, crossplane.
   kind: terraform
-  # Context for deployment: the context including some kind of parameters for the deployment, such as fix,variable.
-  # - env: The value of the fix parameters are defined by the ISV with the @value at the initial time.
-  # - variable: The value of the variable parameters are defined by the user on the console.
+  # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
+  # - fix_env: This kind of variables must be settled in the OCL template, and will be injected to the deployment as environment variables.
+  # - fix_variable: This kind of variables must be settled in the OCL template, and will be injected to the deployment as variables.
+  # - env: This kind of variables can be settled by the API or the xpanse runtime environment(The API takes higher priority), and will be injected to the deployment as environment variables.
+  # - variable: This kind of variables can be settled by the API or the xpanse runtime environment(The API takes higher priority), and will be injected to the deployment as variables.
+  # - env_env: This kind of variables must be settled by the xpanse runtime environment, and will be injected to the deployment as environment variables.
+  # - env_variable: This kind of variables must be settled by the xpanse runtime environment, and will be injected to the deployment as variables.
   # The parameters will be used to generate the API of the managed service.
   context:
     - name: OS_ACCESS_KEY
