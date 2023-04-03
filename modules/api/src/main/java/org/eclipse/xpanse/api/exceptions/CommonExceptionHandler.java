@@ -92,6 +92,17 @@ public class CommonExceptionHandler {
     }
 
     /**
+     * Exception handler for IllegalArgumentException.
+     */
+    @ExceptionHandler({IllegalArgumentException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.error("handleNotFoundException: ", ex);
+        String failMessage = ex.getMessage();
+        return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
+    }
+
+    /**
      * Exception handler for Exception.
      */
     @ExceptionHandler({Exception.class})
