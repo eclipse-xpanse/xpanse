@@ -9,10 +9,12 @@ package org.eclipse.xpanse.orchestrator.register.impl;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.enums.Csp;
@@ -34,6 +36,7 @@ import org.springframework.util.CollectionUtils;
 /**
  * Implement Interface to manage register service entity in database.
  */
+@Slf4j
 @Component
 public class RegisterServiceImpl implements RegisterService {
 
@@ -68,12 +71,43 @@ public class RegisterServiceImpl implements RegisterService {
     public void updateRegisteredService(String id, Ocl ocl) {
         RegisterServiceEntity existedService = storage.getRegisterServiceById(UUID.fromString(id));
         if (Objects.isNull(existedService)) {
+            log.error("Registered service with id {} not existing.", id);
             throw new IllegalArgumentException(String.format("Registered service with id %s not "
                     + "existed.", id));
         }
+        checkParams(existedService, ocl);
         existedService.setOcl(ocl);
         existedService.setServiceState(ServiceState.UPDATED);
         storage.store(existedService);
+    }
+
+    private void checkParams(RegisterServiceEntity existedService, Ocl ocl) {
+
+        String oldCategory = existedService.getCategory().name();
+        String newCategory = ocl.getCategory().name();
+        compare(oldCategory, newCategory);
+
+        String oldName = existedService.getName();
+        String newName = ocl.getName();
+        compare(oldName, newName);
+
+        String oldVersion = existedService.getVersion();
+        String newVersion = ocl.getVersion();
+        compare(oldVersion, newVersion);
+
+        String oldCsp = existedService.getCsp().name();
+        String newCsp = ocl.getCloudServiceProvider().getName().name();
+        compare(oldCsp, newCsp);
+    }
+
+    private void compare(String oldParams, String newParams) {
+        if (!newParams.toLowerCase(Locale.ROOT).equals(oldParams.toLowerCase(Locale.ROOT))) {
+            log.error("Update service failed, Field {} cannot changed with update request",
+                    oldParams);
+            throw new IllegalArgumentException(String.format(
+                    "Update service failed, Field {} cannot changed with update request",
+                    oldParams));
+        }
     }
 
     private RegisterServiceEntity getNewRegisterServiceEntity(Ocl ocl) {
@@ -96,6 +130,7 @@ public class RegisterServiceImpl implements RegisterService {
     public UUID registerService(Ocl ocl) {
         RegisterServiceEntity newEntity = getNewRegisterServiceEntity(ocl);
         if (Objects.nonNull(storage.findRegisteredService(newEntity))) {
+            log.error("Service already registered.");
             throw new IllegalArgumentException("Service already registered.");
         }
         storage.store(newEntity);
