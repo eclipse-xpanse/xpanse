@@ -49,9 +49,9 @@ cloudServiceProvider:
   name: huawei
   regions:
     - name: cn-southwest-2
-      area: Asia Pacific
+      area: Asia China
     - name: cn-north-4
-      area: North America
+      area: Asia China
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat
