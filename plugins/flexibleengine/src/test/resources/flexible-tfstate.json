@@ -1,0 +1,776 @@
+{
+  "version": 4,
+  "terraform_version": "1.3.8",
+  "serial": 50,
+  "lineage": "917d13bb-93f7-8823-7235-deec5dd1280f",
+  "outputs": {
+    "admin_passwd": {
+      "value": "xxxxxxxxx",
+      "type": "string"
+    },
+    "zookeeper_server": {
+      "value": "192.168.10.138:22",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "flexibleengine_availability_zones",
+      "name": "osc-az",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "3064487008",
+            "names": [
+              "eu-west-0a",
+              "eu-west-0b",
+              "eu-west-0c"
+            ],
+            "region": "eu-west-0",
+            "state": "available"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "flexibleengine_images_image_v2",
+      "name": "myImage",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "checksum": "bcd7dd7dab80ca42e125a389f986404e",
+            "container_format": "bare",
+            "created_at": "2023-03-29T04:59:48Z",
+            "disk_format": "zvhd2",
+            "file": "/v2/images/0e806f37-7f98-447c-9fec-6dc489338edb/file",
+            "id": "0e806f37-7f98-447c-9fec-6dc489338edb",
+            "metadata": {},
+            "min_disk_gb": 40,
+            "min_ram_mb": 0,
+            "most_recent": true,
+            "name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "owner": "cddffdf04cf441c8b94aac85dfdc2a69",
+            "protected": false,
+            "region": null,
+            "schema": "/v2/schemas/image",
+            "size_bytes": 18,
+            "size_max": null,
+            "size_min": null,
+            "sort_direction": "asc",
+            "sort_key": "name",
+            "tag": null,
+            "updated_at": "2023-03-29T05:04:29Z",
+            "visibility": "private"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_blockstorage_volume_v2",
+      "name": "volume",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "attachment": [],
+            "availability_zone": "eu-west-0a",
+            "cascade": false,
+            "consistency_group_id": null,
+            "description": "my volume",
+            "id": "dfa9c658-c398-4366-a7ae-29113a829e8c",
+            "image_id": null,
+            "metadata": {},
+            "multiattach": false,
+            "name": "volume",
+            "region": "eu-west-0",
+            "size": 20,
+            "snapshot_id": "",
+            "source_replica": null,
+            "source_vol_id": "",
+            "tags": null,
+            "timeouts": null,
+            "volume_type": "SAS"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_availability_zones.osc-az"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_compute_instance_v2",
+      "name": "kafka-broker",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.146",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "all_metadata": {
+              "charging_mode": "0",
+              "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+              "metering.image_id": "0e806f37-7f98-447c-9fec-6dc489338edb",
+              "metering.imagetype": "private",
+              "metering.resourcespeccode": "s6.large.4.linux",
+              "os_bit": "64",
+              "vpc_id": "a8501808-dcd2-4316-9ba9-accac35c3cee"
+            },
+            "auto_recovery": true,
+            "availability_zone": "eu-west-0a",
+            "block_device": [],
+            "config_drive": null,
+            "flavor_id": "s6.large.4",
+            "flavor_name": "s6.large.4",
+            "floating_ip": null,
+            "id": "f7bf2d07-24c8-4e06-a827-8c9f5a5f3ce7",
+            "image_id": "0e806f37-7f98-447c-9fec-6dc489338edb",
+            "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "key_pair": "keypair-kafka-5c1a3dbf",
+            "metadata": null,
+            "name": "kafka-broker-0-5c1a3dbf",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.146",
+                "fixed_ip_v6": "",
+                "mac": "xxxxxxxx",
+                "name": "",
+                "port": "xxxxxxxx",
+                "uuid": "xxxxxxxx"
+              }
+            ],
+            "personality": [],
+            "region": "eu-west-0",
+            "scheduler_hints": [],
+            "security_groups": [
+              "Kafka_secgroup-5c1a3dbf"
+            ],
+            "status": "ACTIVE",
+            "stop_before_destroy": false,
+            "system_disk_id": "4ae952b0-0cee-49a8-8177-aaae5c23f416",
+            "tags": null,
+            "timeouts": null,
+            "user_data": "625c3535a4576168a4c8abc1b0530c8bedd821a7",
+            "volume_attached": [
+              {
+                "boot_index": 0,
+                "pci_address": "0000:02:01.0",
+                "size": 40,
+                "type": "SAS",
+                "uuid": "4ae952b0-0cee-49a8-8177-aaae5c23f416"
+              }
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_availability_zones.osc-az",
+            "data.flexibleengine_images_image_v2.myImage",
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "data.flexibleengine_vpc_subnet_v1.existing",
+            "data.flexibleengine_vpc_v1.existing",
+            "flexibleengine_compute_instance_v2.zookeeper",
+            "flexibleengine_compute_keypair_v2.keypair",
+            "flexibleengine_networking_secgroup_v2.new",
+            "flexibleengine_vpc_subnet_v1.new",
+            "flexibleengine_vpc_v1.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        },
+        {
+          "index_key": 1,
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.216",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "all_metadata": {
+              "charging_mode": "0",
+              "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+              "metering.image_id": "0e806f37-7f98-447c-9fec-6dc489338edb",
+              "metering.imagetype": "private",
+              "metering.resourcespeccode": "s6.large.4.linux",
+              "os_bit": "64",
+              "vpc_id": "a8501808-dcd2-4316-9ba9-accac35c3cee"
+            },
+            "auto_recovery": true,
+            "availability_zone": "eu-west-0a",
+            "block_device": [],
+            "config_drive": null,
+            "flavor_id": "s6.large.4",
+            "flavor_name": "s6.large.4",
+            "floating_ip": null,
+            "id": "52b03c50-989d-4c60-8a2f-5b109f2c98ca",
+            "image_id": "0e806f37-7f98-447c-9fec-6dc489338edb",
+            "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "key_pair": "keypair-kafka-5c1a3dbf",
+            "metadata": null,
+            "name": "kafka-broker-1-5c1a3dbf",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.216",
+                "fixed_ip_v6": "",
+                "mac": "fa:16:3e:96:f8:c6",
+                "name": "",
+                "port": "091bceba-146f-424e-acc3-ad008996868e",
+                "uuid": "12"
+              }
+            ],
+            "personality": [],
+            "region": "eu-west-0",
+            "scheduler_hints": [],
+            "security_groups": [
+              "Kafka_secgroup-5c1a3dbf"
+            ],
+            "status": "ACTIVE",
+            "stop_before_destroy": false,
+            "system_disk_id": "b7a92f61-ba42-46d1-8b50-12f33fe79b7c",
+            "tags": null,
+            "timeouts": null,
+            "user_data": "058cbec96abc25a1e10790ccf35f17b0cdc08bc6",
+            "volume_attached": [
+              {
+                "boot_index": 0,
+                "pci_address": "0000:02:01.0",
+                "size": 40,
+                "type": "SAS",
+                "uuid": "b7a92f61-ba42-46d1-8b50-12f33fe79b7c"
+              }
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_availability_zones.osc-az",
+            "data.flexibleengine_images_image_v2.myImage",
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "data.flexibleengine_vpc_subnet_v1.existing",
+            "data.flexibleengine_vpc_v1.existing",
+            "flexibleengine_compute_instance_v2.zookeeper",
+            "flexibleengine_compute_keypair_v2.keypair",
+            "flexibleengine_networking_secgroup_v2.new",
+            "flexibleengine_vpc_subnet_v1.new",
+            "flexibleengine_vpc_v1.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_compute_instance_v2",
+      "name": "zookeeper",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.138",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "all_metadata": {
+              "charging_mode": "0",
+              "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+              "metering.image_id": "0e806f37-7f98-447c-9fec-6dc489338edb",
+              "metering.imagetype": "private",
+              "metering.resourcespeccode": "s6.large.4.linux",
+              "os_bit": "64",
+              "vpc_id": "a8501808-dcd2-4316-9ba9-accac35c3cee"
+            },
+            "auto_recovery": true,
+            "availability_zone": "eu-west-0a",
+            "block_device": [],
+            "config_drive": null,
+            "flavor_id": "s6.large.4",
+            "flavor_name": "s6.large.4",
+            "floating_ip": null,
+            "id": "95b02e90-08a0-49c5-b2f0-c6ef2284186e",
+            "image_id": "0e806f37-7f98-447c-9fec-6dc489338edb",
+            "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "key_pair": "keypair-kafka-5c1a3dbf",
+            "metadata": null,
+            "name": "kafka-zookeeper-5c1a3dbf",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.138",
+                "fixed_ip_v6": "",
+                "mac": "fa:16:3e:96:f8:78",
+                "name": "",
+                "port": "e56bc082-2c02-4c28-b57a-92a99dbde4b8",
+                "uuid": "12"
+              }
+            ],
+            "personality": [],
+            "region": "eu-west-0",
+            "scheduler_hints": [],
+            "security_groups": [
+              "Kafka_secgroup-5c1a3dbf"
+            ],
+            "status": "ACTIVE",
+            "stop_before_destroy": false,
+            "system_disk_id": "df8a9db6-d12f-4931-9a71-d4e05c72038d",
+            "tags": null,
+            "timeouts": null,
+            "user_data": "52b88479c2f2c99dc95cc0ac32ef2de52b2a96e2",
+            "volume_attached": [
+              {
+                "boot_index": 0,
+                "pci_address": "0000:02:01.0",
+                "size": 40,
+                "type": "SAS",
+                "uuid": "df8a9db6-d12f-4931-9a71-d4e05c72038d"
+              }
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_availability_zones.osc-az",
+            "data.flexibleengine_images_image_v2.myImage",
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "data.flexibleengine_vpc_subnet_v1.existing",
+            "data.flexibleengine_vpc_v1.existing",
+            "flexibleengine_compute_keypair_v2.keypair",
+            "flexibleengine_networking_secgroup_v2.new",
+            "flexibleengine_vpc_subnet_v1.new",
+            "flexibleengine_vpc_v1.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_compute_keypair_v2",
+      "name": "keypair",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "keypair-kafka-5c1a3dbf",
+            "name": "keypair-kafka-5c1a3dbf",
+            "private_key_path": "keypair-kafka-5c1a3dbf.pem",
+            "public_key": "xxxxxxxxx",
+            "region": "eu-west-0"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_compute_volume_attach_v2",
+      "name": "attached",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "device": "/dev/vdb",
+            "id": "95b02e90-08a0-49c5-b2f0-c6ef2284186e/dfa9c658-c398-4366-a7ae-29113a829e8c",
+            "instance_id": "95b02e90-08a0-49c5-b2f0-c6ef2284186e",
+            "region": "eu-west-0",
+            "timeouts": null,
+            "volume_id": "dfa9c658-c398-4366-a7ae-29113a829e8c"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_availability_zones.osc-az",
+            "data.flexibleengine_images_image_v2.myImage",
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "data.flexibleengine_vpc_subnet_v1.existing",
+            "data.flexibleengine_vpc_v1.existing",
+            "flexibleengine_blockstorage_volume_v2.volume",
+            "flexibleengine_compute_instance_v2.zookeeper",
+            "flexibleengine_compute_keypair_v2.keypair",
+            "flexibleengine_networking_secgroup_v2.new",
+            "flexibleengine_vpc_subnet_v1.new",
+            "flexibleengine_vpc_v1.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_networking_secgroup_rule_v2",
+      "name": "secgroup_rule_0",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "38d3a8c0-d68c-4ee6-bcc5-2db3c1081521",
+            "port_range_max": 22,
+            "port_range_min": 22,
+            "protocol": "tcp",
+            "region": "eu-west-0",
+            "remote_group_id": "",
+            "remote_ip_prefix": "127.0.0.1/32",
+            "security_group_id": "27722ba6-2b31-4817-8b06-184f7f6bcab4",
+            "tenant_id": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "flexibleengine_networking_secgroup_v2.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_networking_secgroup_rule_v2",
+      "name": "secgroup_rule_1",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "b86f01e1-a05b-4a70-b576-5643c4100a8f",
+            "port_range_max": 2181,
+            "port_range_min": 2181,
+            "protocol": "tcp",
+            "region": "eu-west-0",
+            "remote_group_id": "",
+            "remote_ip_prefix": "127.0.0.1/32",
+            "security_group_id": "27722ba6-2b31-4817-8b06-184f7f6bcab4",
+            "tenant_id": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "flexibleengine_networking_secgroup_v2.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_networking_secgroup_rule_v2",
+      "name": "secgroup_rule_2",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "8932bf63-c06d-400a-9ea1-558729a02549",
+            "port_range_max": 9093,
+            "port_range_min": 9092,
+            "protocol": "tcp",
+            "region": "eu-west-0",
+            "remote_group_id": "",
+            "remote_ip_prefix": "127.0.0.1/32",
+            "security_group_id": "27722ba6-2b31-4817-8b06-184f7f6bcab4",
+            "tenant_id": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "flexibleengine_networking_secgroup_v2.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_networking_secgroup_v2",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "delete_default_rules": null,
+            "description": "Kafka cluster security group",
+            "id": "27722ba6-2b31-4817-8b06-184f7f6bcab4",
+            "name": "Kafka_secgroup-5c1a3dbf",
+            "region": "eu-west-0",
+            "tenant_id": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_vpc_eip",
+      "name": "osc-eip-kafka-zookeeper",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": "127.0.0.1",
+            "bandwidth": [
+              {
+                "charge_mode": "traffic",
+                "name": "osc-eip-kafka-zookeeper-5c1a3dbf",
+                "share_type": "PER",
+                "size": 5
+              }
+            ],
+            "id": "94831192-ed88-4702-8e3c-db750c9a9e44",
+            "publicip": [
+              {
+                "ip_address": "127.0.0.1",
+                "port_id": "",
+                "type": "5_bgp"
+              }
+            ],
+            "region": "eu-west-0",
+            "status": "UNBOUND",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_vpc_eip_associate",
+      "name": "osc-eip-associated-kafka-zookeeper",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "fixed_ip": "192.168.10.138",
+            "id": "94831192-ed88-4702-8e3c-db750c9a9e44",
+            "mac_address": "fa:16:3e:96:f8:78",
+            "network_id": "12",
+            "port_id": "e56bc082-2c02-4c28-b57a-92a99dbde4b8",
+            "public_ip": "127.0.0.1",
+            "region": "eu-west-0",
+            "status": "BOUND",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_availability_zones.osc-az",
+            "data.flexibleengine_images_image_v2.myImage",
+            "data.flexibleengine_networking_secgroup_v2.existing",
+            "data.flexibleengine_vpc_subnet_v1.existing",
+            "data.flexibleengine_vpc_v1.existing",
+            "flexibleengine_compute_instance_v2.zookeeper",
+            "flexibleengine_compute_keypair_v2.keypair",
+            "flexibleengine_networking_secgroup_v2.new",
+            "flexibleengine_vpc_eip.osc-eip-kafka-zookeeper",
+            "flexibleengine_vpc_subnet_v1.new",
+            "flexibleengine_vpc_v1.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_vpc_subnet_v1",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "availability_zone": "",
+            "cidr": "192.168.10.0/24",
+            "description": "",
+            "dhcp_enable": true,
+            "dns_list": [],
+            "gateway_ip": "192.168.10.1",
+            "id": "12",
+            "ipv4_subnet_id": "93d120ac-baea-49bf-8e69-e28e664f667c",
+            "ipv6_cidr": "",
+            "ipv6_enable": false,
+            "ipv6_gateway": "",
+            "ipv6_subnet_id": "",
+            "name": "Kafka-subnet-5c1a3dbf",
+            "primary_dns": "",
+            "region": "eu-west-0",
+            "secondary_dns": "",
+            "subnet_id": "93d120ac-baea-49bf-8e69-e28e664f667c",
+            "tags": null,
+            "timeouts": null,
+            "vpc_id": "a8501808-dcd2-4316-9ba9-accac35c3cee"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_vpc_subnet_v1.existing",
+            "data.flexibleengine_vpc_v1.existing",
+            "flexibleengine_vpc_v1.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "flexibleengine_vpc_v1",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/flexibleenginecloud/flexibleengine\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "cidr": "192.168.0.0/16",
+            "description": "",
+            "enterprise_project_id": "0",
+            "id": "a8501808-dcd2-4316-9ba9-accac35c3cee",
+            "name": "Kafka-vpc-web-5c1a3dbf",
+            "region": "eu-west-0",
+            "routes": [],
+            "secondary_cidr": null,
+            "status": "OK",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.flexibleengine_vpc_v1.existing",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "random_id",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "b64_std": "XBo9vw==",
+            "b64_url": "XBo9vw",
+            "byte_length": 4,
+            "dec": "1545223615",
+            "hex": "5c1a3dbf",
+            "id": "XBo9vw",
+            "keepers": null,
+            "prefix": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "random_password",
+      "name": "password",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+      "instances": [
+        {
+          "schema_version": 3,
+          "attributes": {
+            "bcrypt_hash": "$2a$10$P680FjWJ4Bt05fbVwC8lMeGAOSGA3QVuO6M1lmz0ZVc4CeCF10JKK",
+            "id": "none",
+            "keepers": null,
+            "length": 12,
+            "lower": true,
+            "min_lower": 0,
+            "min_numeric": 0,
+            "min_special": 1,
+            "min_upper": 0,
+            "number": true,
+            "numeric": true,
+            "override_special": "#%@",
+            "result": "xxxxxxxxx",
+            "special": true,
+            "upper": true
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

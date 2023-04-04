@@ -9,7 +9,6 @@ package org.eclipse.xpanse.orchestrator.plugin.flexibleengine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
@@ -17,9 +16,15 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.Terr
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfState;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResource;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResourceInstance;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.service.PublicIp;
+import org.eclipse.xpanse.modules.models.service.Vm;
+import org.eclipse.xpanse.modules.models.service.Volume;
+import org.eclipse.xpanse.modules.models.service.Vpc;
+import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.models.FlexibleEngineResourceProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,7 +32,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class FlexibleTerraformResourceHandler implements DeployResourceHandler {
+public class FlexibleEngineTerraformResourceHandler implements DeployResourceHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -38,7 +43,7 @@ public class FlexibleTerraformResourceHandler implements DeployResourceHandler {
      */
     @Override
     public void handler(DeployResult deployResult) {
-        List<DeployResource> xpResourceList = new ArrayList<>();
+        List<DeployResource> deployResourceList = new ArrayList<>();
         TfState tfState;
         try {
             var stateFile = deployResult.getProperty().get("stateFile");
@@ -51,52 +56,44 @@ public class FlexibleTerraformResourceHandler implements DeployResourceHandler {
         for (TfStateResource tfStateResource : tfState.getResources()) {
             if (tfStateResource.getType().equals("flexibleengine_compute_instance_v2")) {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource deployResource = new DeployResource();
+                    DeployResource deployResource = new Vm();
                     deployResource.setKind(DeployResourceKind.VM);
-                    deployResource.setResourceId((String) instance.getAttributes().get("id"));
-                    deployResource.setName((String) instance.getAttributes().get("name"));
-
-                    deployResource.setProperty(new HashMap<>());
-                    deployResource.getProperty()
-                            .put("ipv4", (String) instance.getAttributes().get("access_ip_v4"));
-                    deployResource.getProperty()
-                            .put("image_id", (String) instance.getAttributes().get("image_id"));
-                    deployResource.getProperty()
-                            .put("image_name", (String) instance.getAttributes().get("image_name"));
-                    deployResource.getProperty()
-                            .put("region", (String) instance.getAttributes().get("region"));
-                    xpResourceList.add(deployResource);
+                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                            FlexibleEngineResourceProperty.getProperties(
+                                    DeployResourceKind.VM));
+                    deployResourceList.add(deployResource);
                 }
             }
             if (tfStateResource.getType().equals("flexibleengine_vpc_eip")) {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource deployResource = new DeployResource();
-                    deployResource.setProperty(new HashMap<>());
-                    deployResource.getProperty()
-                            .put("ip", (String) instance.getAttributes().get("public_ip"));
+                    DeployResource deployResource = new PublicIp();
                     deployResource.setKind(DeployResourceKind.PUBLIC_IP);
-                    xpResourceList.add(deployResource);
+                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                            FlexibleEngineResourceProperty.getProperties(
+                                    DeployResourceKind.PUBLIC_IP));
+                    deployResourceList.add(deployResource);
                 }
             }
-            if (tfStateResource.getType().equals("flexibleengine_vpc_v1")) {
+            if (tfStateResource.getType().equals("flexibleengine_vpc_subnet_v1")) {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource xpResource = new DeployResource();
-                    xpResource.setKind(DeployResourceKind.VPC);
-                    xpResource.setResourceId((String) instance.getAttributes().get("id"));
-                    xpResource.setName((String) instance.getAttributes().get("name"));
-                    xpResourceList.add(xpResource);
+                    DeployResource deployResource = new Vpc();
+                    deployResource.setKind(DeployResourceKind.VPC);
+                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                            FlexibleEngineResourceProperty.getProperties(DeployResourceKind.VPC));
+                    deployResourceList.add(deployResource);
                 }
             }
-
             if (tfStateResource.getType().equals("flexibleengine_blockstorage_volume_v2")) {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource xpResource = new DeployResource();
-                    xpResource.setResourceId((String) instance.getAttributes().get("id"));
-                    xpResource.setName((String) instance.getAttributes().get("name"));
-                    xpResourceList.add(xpResource);
+                    DeployResource deployResource = new Volume();
+                    deployResource.setKind(DeployResourceKind.VOLUME);
+                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                            FlexibleEngineResourceProperty.getProperties(
+                                    DeployResourceKind.VOLUME));
+                    deployResourceList.add(deployResource);
                 }
             }
         }
-        deployResult.setResources(xpResourceList);
+        deployResult.setResources(deployResourceList);
     }
 }

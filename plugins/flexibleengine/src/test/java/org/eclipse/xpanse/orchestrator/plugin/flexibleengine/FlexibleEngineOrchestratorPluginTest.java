@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.junit.jupiter.api.Test;
 
-public class FlexibleEngineEngineOrchestratorPluginTest {
+public class FlexibleEngineOrchestratorPluginTest {
 
     private final FlexibleEngineOrchestratorPlugin plugin = new FlexibleEngineOrchestratorPlugin();
 
     @Test
     void getResourceHandler() {
-        assertTrue(plugin.getResourceHandler() instanceof FlexibleTerraformResourceHandler);
+        assertTrue(plugin.getResourceHandler() instanceof FlexibleEngineTerraformResourceHandler);
     }
 
     @Test
