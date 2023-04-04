@@ -73,12 +73,12 @@ deployment:
       description: The access key of the FlexibleEngine cloud to use.
       kind: env
       type: string
-      mandatory: true
+      mandatory: false
     - name: OS_SECRET_KEY
       description: The secret key of the FlexibleEngine cloud to use.
       kind: env
       type: string
-      mandatory: true
+      mandatory: false
     - name: admin_passwd
       description: The admin password of all nodes in the Kafka cluster. If the value is empty, will create a random password.
       kind: variable

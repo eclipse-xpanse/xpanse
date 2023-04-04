@@ -1,10 +1,10 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
- * SPDX-FileCopyrightText: Huawei Inc.
+ * SPDX-FileCopyrightText: Openstack Inc.
  *
  */
 
-package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.models;
+package org.eclipse.xpanse.orchestrator.plugin.openstack.models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,18 +12,18 @@ import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 
 
 /**
- * Enum for DeployResourceKind and Huawei Resource Property.
+ * Enum for DeployResourceKind and Openstack Resource Property.
  */
-public enum HuaweiResourceProperty {
-    HUAWEI_VM_PROPERTY(DeployResourceKind.VM, new HuaweiVmProperty()),
-    HUAWEI_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new HuaweiVolumeProperty()),
-    HUAWEI_VPC_PROPERTY(DeployResourceKind.VPC, new HuaweiVpcProperty()),
-    HUAWEI_PUBLICIP_PROPERTY(DeployResourceKind.PUBLIC_IP, new HuaweiPublicIpProperty());
+public enum OpenstackResourceProperty {
+    Openstack_VM_PROPERTY(DeployResourceKind.VM, new OpenstackVmProperty()),
+    Openstack_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new OpenstackVolumeProperty()),
+    Openstack_VPC_PROPERTY(DeployResourceKind.VPC, new OpenstackVpcProperty()),
+    Openstack_PUBLICIP_PROPERTY(DeployResourceKind.PUBLIC_IP, new OpenstackPublicIpProperty());
 
     private final DeployResourceKind resourceKind;
     private final Map<String, String> properties;
 
-    HuaweiResourceProperty(DeployResourceKind resourceKind,
+    OpenstackResourceProperty(DeployResourceKind resourceKind,
             Map<String, String> resourceProperties) {
         this.resourceKind = resourceKind;
         this.properties = resourceProperties;
@@ -36,7 +36,7 @@ public enum HuaweiResourceProperty {
      * @return property map
      */
     public static Map<String, String> getProperties(DeployResourceKind resourceKind) {
-        for (HuaweiResourceProperty property : values()) {
+        for (OpenstackResourceProperty property : values()) {
             if (property.resourceKind.equals(resourceKind)) {
                 return property.properties;
             }
@@ -45,14 +45,14 @@ public enum HuaweiResourceProperty {
     }
 
     /**
-     * Huawei cloud vm property.
+     * Openstack cloud vm property.
      */
-    static class HuaweiVmProperty extends HashMap<String, String> {
+    static class OpenstackVmProperty extends HashMap<String, String> {
 
         /**
          * Init method to put property key and value.
          */
-        public HuaweiVmProperty() {
+        public OpenstackVmProperty() {
             this.put("ip", "access_ip_v4");
             this.put("image_id", "image_id");
             this.put("image_name", "image_name");
@@ -61,43 +61,43 @@ public enum HuaweiResourceProperty {
     }
 
     /**
-     * Huawei cloud publicIp property.
+     * Openstack cloud publicIp property.
      */
-    static class HuaweiPublicIpProperty extends HashMap<String, String> {
+    static class OpenstackPublicIpProperty extends HashMap<String, String> {
 
         /**
          * Init method to put property key and value.
          */
-        public HuaweiPublicIpProperty() {
+        public OpenstackPublicIpProperty() {
             this.put("ip", "address");
         }
     }
 
     /**
-     * Huawei cloud volume property.
+     * Openstack cloud volume property.
      */
-    static class HuaweiVolumeProperty extends HashMap<String, String> {
+    static class OpenstackVolumeProperty extends HashMap<String, String> {
 
         /**
          * Init method to put property key and value.
          */
-        public HuaweiVolumeProperty() {
+        public OpenstackVolumeProperty() {
             this.put("size", "size");
             this.put("type", "volume_type");
         }
     }
 
     /**
-     * Huawei cloud vpc property.
+     * Openstack cloud vpc property.
      */
-    static class HuaweiVpcProperty extends HashMap<String, String> {
+    static class OpenstackVpcProperty extends HashMap<String, String> {
 
         /**
          * Init method to put property key and value.
          */
-        public HuaweiVpcProperty() {
-            this.put("vpc", "vpc_id");
-            this.put("subnet", "subnet_id");
+        public OpenstackVpcProperty() {
+            this.put("vpc", "network_id");
+            this.put("subnet", "subnetpool_id");
         }
     }
 }

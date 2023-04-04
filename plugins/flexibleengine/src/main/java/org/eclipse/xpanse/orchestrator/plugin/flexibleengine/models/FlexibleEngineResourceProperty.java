@@ -1,10 +1,10 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
- * SPDX-FileCopyrightText: Huawei Inc.
+ * SPDX-FileCopyrightText: FlexibleEngine Inc.
  *
  */
 
-package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.models;
+package org.eclipse.xpanse.orchestrator.plugin.flexibleengine.models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,18 +12,19 @@ import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 
 
 /**
- * Enum for DeployResourceKind and Huawei Resource Property.
+ * Enum for DeployResourceKind and FlexibleEngine Resource Property.
  */
-public enum HuaweiResourceProperty {
-    HUAWEI_VM_PROPERTY(DeployResourceKind.VM, new HuaweiVmProperty()),
-    HUAWEI_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new HuaweiVolumeProperty()),
-    HUAWEI_VPC_PROPERTY(DeployResourceKind.VPC, new HuaweiVpcProperty()),
-    HUAWEI_PUBLICIP_PROPERTY(DeployResourceKind.PUBLIC_IP, new HuaweiPublicIpProperty());
+public enum FlexibleEngineResourceProperty {
+    FlexibleEngine_VM_PROPERTY(DeployResourceKind.VM, new FlexibleEngineVmProperty()),
+    FlexibleEngine_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new FlexibleEngineVolumeProperty()),
+    FlexibleEngine_VPC_PROPERTY(DeployResourceKind.VPC, new FlexibleEngineVpcProperty()),
+    FlexibleEngine_PUBLICIP_PROPERTY(DeployResourceKind.PUBLIC_IP,
+            new FlexibleEnginePublicIpProperty());
 
     private final DeployResourceKind resourceKind;
     private final Map<String, String> properties;
 
-    HuaweiResourceProperty(DeployResourceKind resourceKind,
+    FlexibleEngineResourceProperty(DeployResourceKind resourceKind,
             Map<String, String> resourceProperties) {
         this.resourceKind = resourceKind;
         this.properties = resourceProperties;
@@ -36,7 +37,7 @@ public enum HuaweiResourceProperty {
      * @return property map
      */
     public static Map<String, String> getProperties(DeployResourceKind resourceKind) {
-        for (HuaweiResourceProperty property : values()) {
+        for (FlexibleEngineResourceProperty property : values()) {
             if (property.resourceKind.equals(resourceKind)) {
                 return property.properties;
             }
@@ -45,14 +46,14 @@ public enum HuaweiResourceProperty {
     }
 
     /**
-     * Huawei cloud vm property.
+     * FlexibleEngine cloud vm property.
      */
-    static class HuaweiVmProperty extends HashMap<String, String> {
+    static class FlexibleEngineVmProperty extends HashMap<String, String> {
 
         /**
          * Init method to put property key and value.
          */
-        public HuaweiVmProperty() {
+        public FlexibleEngineVmProperty() {
             this.put("ip", "access_ip_v4");
             this.put("image_id", "image_id");
             this.put("image_name", "image_name");
@@ -61,41 +62,41 @@ public enum HuaweiResourceProperty {
     }
 
     /**
-     * Huawei cloud publicIp property.
+     * FlexibleEngine cloud publicIp property.
      */
-    static class HuaweiPublicIpProperty extends HashMap<String, String> {
+    static class FlexibleEnginePublicIpProperty extends HashMap<String, String> {
 
         /**
          * Init method to put property key and value.
          */
-        public HuaweiPublicIpProperty() {
+        public FlexibleEnginePublicIpProperty() {
             this.put("ip", "address");
         }
     }
 
     /**
-     * Huawei cloud volume property.
+     * FlexibleEngine cloud volume property.
      */
-    static class HuaweiVolumeProperty extends HashMap<String, String> {
+    static class FlexibleEngineVolumeProperty extends HashMap<String, String> {
 
         /**
          * Init method to put property key and value.
          */
-        public HuaweiVolumeProperty() {
+        public FlexibleEngineVolumeProperty() {
             this.put("size", "size");
             this.put("type", "volume_type");
         }
     }
 
     /**
-     * Huawei cloud vpc property.
+     * FlexibleEngine cloud vpc property.
      */
-    static class HuaweiVpcProperty extends HashMap<String, String> {
+    static class FlexibleEngineVpcProperty extends HashMap<String, String> {
 
         /**
          * Init method to put property key and value.
          */
-        public HuaweiVpcProperty() {
+        public FlexibleEngineVpcProperty() {
             this.put("vpc", "vpc_id");
             this.put("subnet", "subnet_id");
         }

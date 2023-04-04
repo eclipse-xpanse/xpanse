@@ -1,0 +1,1103 @@
+{
+  "version": 4,
+  "terraform_version": "1.3.8",
+  "serial": 18,
+  "lineage": "54129695-e0c2-807f-9494-8bf9dfb0265f",
+  "outputs": {
+    "admin_passwd": {
+      "value": "xxxxxxxxx",
+      "type": "string"
+    },
+    "kafka-zookeeper_server": {
+      "value": "192.168.10.52:2181",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "huaweicloud_availability_zones",
+      "name": "osc-az",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "1873816262",
+            "names": [
+              "cn-southwest-2a",
+              "cn-southwest-2d",
+              "cn-southwest-2e"
+            ],
+            "region": null,
+            "state": "available"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "huaweicloud_images_image",
+      "name": "image",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architecture": null,
+            "checksum": "bcd7dd7dab80ca42e125a389f986404e",
+            "container_format": "bare",
+            "created_at": "2023-03-28T05:56:16Z",
+            "disk_format": "zvhd2",
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "file": "/v2/images/0ef06411-1b86-4828-9f98-f777b05d9fbd/file",
+            "flavor_id": null,
+            "id": "0ef06411-1b86-4828-9f98-f777b05d9fbd",
+            "image_type": "FusionCompute",
+            "metadata": null,
+            "min_disk_gb": 40,
+            "min_ram_mb": 0,
+            "most_recent": true,
+            "name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "name_regex": null,
+            "os": "Ubuntu",
+            "os_version": "Ubuntu 20.04 server 64bit",
+            "owner": "09711ed50380f4882fc4c0037b80fcf4",
+            "protected": false,
+            "region": null,
+            "schema": "/v2/schemas/image",
+            "size_bytes": 3424731136,
+            "size_max": null,
+            "size_min": null,
+            "sort_direction": "asc",
+            "sort_key": "name",
+            "status": "active",
+            "tag": null,
+            "updated_at": "2023-03-28T07:59:56Z",
+            "visibility": "private"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "huaweicloud_networking_secgroups",
+      "name": "existing",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "description": null,
+            "enterprise_project_id": null,
+            "id": "0",
+            "name": "kafka-secgroup-default-1",
+            "region": "cn-southwest-2",
+            "security_groups": []
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "huaweicloud_vpc_subnets",
+      "name": "existing",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "availability_zone": null,
+            "cidr": null,
+            "gateway_ip": null,
+            "id": "0",
+            "name": "kafka-subnet-default-1",
+            "primary_dns": null,
+            "region": null,
+            "secondary_dns": null,
+            "status": null,
+            "subnets": [],
+            "tags": null,
+            "vpc_id": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "huaweicloud_vpcs",
+      "name": "existing",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cidr": null,
+            "enterprise_project_id": null,
+            "id": "0",
+            "name": "kafka-vpc-default-1",
+            "region": null,
+            "status": null,
+            "tags": null,
+            "vpcs": []
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_compute_eip_associate",
+      "name": "osc-eip-associated-kafka-zookeeper",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bandwidth_id": null,
+            "fixed_ip": "192.168.10.52",
+            "id": "127.0.0.1/11278b01-6015-42d2-9cba-112f306259f9/192.168.10.52",
+            "instance_id": "11278b01-6015-42d2-9cba-112f306259f9",
+            "port_id": "d0402160-eabc-4170-925f-eefcc645bf22",
+            "public_ip": "127.0.0.1",
+            "region": "cn-southwest-2",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_availability_zones.osc-az",
+            "data.huaweicloud_images_image.image",
+            "data.huaweicloud_networking_secgroups.existing",
+            "data.huaweicloud_vpc_subnets.existing",
+            "data.huaweicloud_vpcs.existing",
+            "huaweicloud_compute_instance.zookeeper",
+            "huaweicloud_compute_keypair.keypair",
+            "huaweicloud_networking_secgroup.new",
+            "huaweicloud_vpc.new",
+            "huaweicloud_vpc_eip.osc-eip-kafka-zookeeper",
+            "huaweicloud_vpc_subnet.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_compute_instance",
+      "name": "kafka-broker",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.174",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "agency_name": "",
+            "agent_list": "",
+            "auto_pay": null,
+            "auto_renew": null,
+            "availability_zone": "cn-southwest-2a",
+            "bandwidth": [],
+            "block_device": [],
+            "charging_mode": "postPaid",
+            "created_at": "2023-04-04T02:41:38Z",
+            "data_disks": [],
+            "delete_disks_on_termination": null,
+            "delete_eip_on_termination": true,
+            "description": "",
+            "eip_id": null,
+            "eip_type": null,
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "flavor_id": "c7.large.2",
+            "flavor_name": "c7.large.2",
+            "id": "95ccb431-9b5c-4d0a-bfdd-efa210074bd1",
+            "image_id": "0ef06411-1b86-4828-9f98-f777b05d9fbd",
+            "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "key_pair": "keypair-kafka-27e7c494",
+            "metadata": null,
+            "name": "kafka-broker-27e7c494-0",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.174",
+                "fixed_ip_v6": "",
+                "ipv6_enable": false,
+                "mac": "fa:16:3e:87:e9:8d",
+                "port": "f299f87a-376b-4f8f-b969-fc4d152e9b05",
+                "source_dest_check": true,
+                "uuid": "14fdfb15-6eb8-47db-b593-e9617fc3e61a"
+              }
+            ],
+            "period": null,
+            "period_unit": null,
+            "power_action": null,
+            "private_key": null,
+            "public_ip": null,
+            "region": "cn-southwest-2",
+            "scheduler_hints": [],
+            "security_group_ids": [
+              "2723a367-2a58-4580-868b-ae92b103c451"
+            ],
+            "security_groups": [
+              "kafka_secgroup-27e7c494"
+            ],
+            "spot_duration": null,
+            "spot_duration_count": null,
+            "spot_maximum_price": null,
+            "status": "ACTIVE",
+            "stop_before_destroy": false,
+            "system_disk_id": "3da94a5b-5b5f-4072-8901-dad1cdc3e438",
+            "system_disk_size": 40,
+            "system_disk_type": "GPSSD",
+            "tags": null,
+            "timeouts": null,
+            "updated_at": "2023-04-04T02:42:26Z",
+            "user_data": "57749bfa832460654c25270533c1421ef175e044",
+            "user_id": null,
+            "volume_attached": [
+              {
+                "boot_index": 0,
+                "kms_key_id": "",
+                "pci_address": "688860300000d9f4fa168b9c37703679",
+                "size": 40,
+                "type": "GPSSD",
+                "volume_id": "3da94a5b-5b5f-4072-8901-dad1cdc3e438"
+              }
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_availability_zones.osc-az",
+            "data.huaweicloud_images_image.image",
+            "data.huaweicloud_networking_secgroups.existing",
+            "data.huaweicloud_vpc_subnets.existing",
+            "data.huaweicloud_vpcs.existing",
+            "huaweicloud_compute_instance.zookeeper",
+            "huaweicloud_compute_keypair.keypair",
+            "huaweicloud_networking_secgroup.new",
+            "huaweicloud_vpc.new",
+            "huaweicloud_vpc_subnet.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        },
+        {
+          "index_key": 1,
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.80",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "agency_name": "",
+            "agent_list": "",
+            "auto_pay": null,
+            "auto_renew": null,
+            "availability_zone": "cn-southwest-2a",
+            "bandwidth": [],
+            "block_device": [],
+            "charging_mode": "postPaid",
+            "created_at": "2023-04-04T02:41:37Z",
+            "data_disks": [],
+            "delete_disks_on_termination": null,
+            "delete_eip_on_termination": true,
+            "description": "",
+            "eip_id": null,
+            "eip_type": null,
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "flavor_id": "c7.large.2",
+            "flavor_name": "c7.large.2",
+            "id": "e8b57003-63b2-41be-9518-67b6912d7162",
+            "image_id": "0ef06411-1b86-4828-9f98-f777b05d9fbd",
+            "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "key_pair": "keypair-kafka-27e7c494",
+            "metadata": null,
+            "name": "kafka-broker-27e7c494-1",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.80",
+                "fixed_ip_v6": "",
+                "ipv6_enable": false,
+                "mac": "fa:16:3e:87:e9:2f",
+                "port": "7b7dfbec-853c-401c-8ee3-05f7febce709",
+                "source_dest_check": true,
+                "uuid": "14fdfb15-6eb8-47db-b593-e9617fc3e61a"
+              }
+            ],
+            "period": null,
+            "period_unit": null,
+            "power_action": null,
+            "private_key": null,
+            "public_ip": null,
+            "region": "cn-southwest-2",
+            "scheduler_hints": [],
+            "security_group_ids": [
+              "2723a367-2a58-4580-868b-ae92b103c451"
+            ],
+            "security_groups": [
+              "kafka_secgroup-27e7c494"
+            ],
+            "spot_duration": null,
+            "spot_duration_count": null,
+            "spot_maximum_price": null,
+            "status": "ACTIVE",
+            "stop_before_destroy": false,
+            "system_disk_id": "2ac5060a-8ffa-4a5d-885f-adb12bc4ad5e",
+            "system_disk_size": 40,
+            "system_disk_type": "GPSSD",
+            "tags": null,
+            "timeouts": null,
+            "updated_at": "2023-04-04T02:42:28Z",
+            "user_data": "bbd8b434c09d91296994f5f20f38389bdcc4d1a5",
+            "user_id": null,
+            "volume_attached": [
+              {
+                "boot_index": 0,
+                "kms_key_id": "",
+                "pci_address": "688860300000da76fa168b9c37703679",
+                "size": 40,
+                "type": "GPSSD",
+                "volume_id": "2ac5060a-8ffa-4a5d-885f-adb12bc4ad5e"
+              }
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_availability_zones.osc-az",
+            "data.huaweicloud_images_image.image",
+            "data.huaweicloud_networking_secgroups.existing",
+            "data.huaweicloud_vpc_subnets.existing",
+            "data.huaweicloud_vpcs.existing",
+            "huaweicloud_compute_instance.zookeeper",
+            "huaweicloud_compute_keypair.keypair",
+            "huaweicloud_networking_secgroup.new",
+            "huaweicloud_vpc.new",
+            "huaweicloud_vpc_subnet.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        },
+        {
+          "index_key": 2,
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.42",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "agency_name": "",
+            "agent_list": "",
+            "auto_pay": null,
+            "auto_renew": null,
+            "availability_zone": "cn-southwest-2a",
+            "bandwidth": [],
+            "block_device": [],
+            "charging_mode": "postPaid",
+            "created_at": "2023-04-04T02:41:37Z",
+            "data_disks": [],
+            "delete_disks_on_termination": null,
+            "delete_eip_on_termination": true,
+            "description": "",
+            "eip_id": null,
+            "eip_type": null,
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "flavor_id": "c7.large.2",
+            "flavor_name": "c7.large.2",
+            "id": "4d1b44a7-100d-470e-acfe-4f77d6a84e6d",
+            "image_id": "0ef06411-1b86-4828-9f98-f777b05d9fbd",
+            "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "key_pair": "keypair-kafka-27e7c494",
+            "metadata": null,
+            "name": "kafka-broker-27e7c494-2",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.42",
+                "fixed_ip_v6": "",
+                "ipv6_enable": false,
+                "mac": "fa:16:3e:87:e9:09",
+                "port": "accf3b00-0776-4bad-b4aa-1b7ae9eab0cc",
+                "source_dest_check": true,
+                "uuid": "14fdfb15-6eb8-47db-b593-e9617fc3e61a"
+              }
+            ],
+            "period": null,
+            "period_unit": null,
+            "power_action": null,
+            "private_key": null,
+            "public_ip": null,
+            "region": "cn-southwest-2",
+            "scheduler_hints": [],
+            "security_group_ids": [
+              "2723a367-2a58-4580-868b-ae92b103c451"
+            ],
+            "security_groups": [
+              "kafka_secgroup-27e7c494"
+            ],
+            "spot_duration": null,
+            "spot_duration_count": null,
+            "spot_maximum_price": null,
+            "status": "ACTIVE",
+            "stop_before_destroy": false,
+            "system_disk_id": "7ada05e5-8af7-4e5b-bcfd-e7f17f745817",
+            "system_disk_size": 40,
+            "system_disk_type": "GPSSD",
+            "tags": null,
+            "timeouts": null,
+            "updated_at": "2023-04-04T02:42:26Z",
+            "user_data": "38931fa3171331cdb168c67ee61ea1e75693487d",
+            "user_id": null,
+            "volume_attached": [
+              {
+                "boot_index": 0,
+                "kms_key_id": "",
+                "pci_address": "688860300000d9a9fa168b9c37703679",
+                "size": 40,
+                "type": "GPSSD",
+                "volume_id": "7ada05e5-8af7-4e5b-bcfd-e7f17f745817"
+              }
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_availability_zones.osc-az",
+            "data.huaweicloud_images_image.image",
+            "data.huaweicloud_networking_secgroups.existing",
+            "data.huaweicloud_vpc_subnets.existing",
+            "data.huaweicloud_vpcs.existing",
+            "huaweicloud_compute_instance.zookeeper",
+            "huaweicloud_compute_keypair.keypair",
+            "huaweicloud_networking_secgroup.new",
+            "huaweicloud_vpc.new",
+            "huaweicloud_vpc_subnet.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_compute_instance",
+      "name": "zookeeper",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.52",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "agency_name": "",
+            "agent_list": "",
+            "auto_pay": null,
+            "auto_renew": null,
+            "availability_zone": "cn-southwest-2a",
+            "bandwidth": [],
+            "block_device": [],
+            "charging_mode": "postPaid",
+            "created_at": "2023-04-04T02:40:31Z",
+            "data_disks": [],
+            "delete_disks_on_termination": null,
+            "delete_eip_on_termination": true,
+            "description": "",
+            "eip_id": null,
+            "eip_type": null,
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "flavor_id": "c7.large.2",
+            "flavor_name": "c7.large.2",
+            "id": "11278b01-6015-42d2-9cba-112f306259f9",
+            "image_id": "0ef06411-1b86-4828-9f98-f777b05d9fbd",
+            "image_name": "Kafka-v3.3.2_Ubuntu-20.04",
+            "key_pair": "keypair-kafka-27e7c494",
+            "metadata": null,
+            "name": "kafka-zookeeper-27e7c494",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.52",
+                "fixed_ip_v6": "",
+                "ipv6_enable": false,
+                "mac": "fa:16:3e:87:e9:13",
+                "port": "d0402160-eabc-4170-925f-eefcc645bf22",
+                "source_dest_check": true,
+                "uuid": "14fdfb15-6eb8-47db-b593-e9617fc3e61a"
+              }
+            ],
+            "period": null,
+            "period_unit": null,
+            "power_action": null,
+            "private_key": null,
+            "public_ip": null,
+            "region": "cn-southwest-2",
+            "scheduler_hints": [],
+            "security_group_ids": [
+              "2723a367-2a58-4580-868b-ae92b103c451"
+            ],
+            "security_groups": [
+              "kafka_secgroup-27e7c494"
+            ],
+            "spot_duration": null,
+            "spot_duration_count": null,
+            "spot_maximum_price": null,
+            "status": "ACTIVE",
+            "stop_before_destroy": false,
+            "system_disk_id": "9e8ec2eb-2433-42e6-9cd8-48b44c3446a5",
+            "system_disk_size": 40,
+            "system_disk_type": "GPSSD",
+            "tags": null,
+            "timeouts": null,
+            "updated_at": "2023-04-04T02:41:19Z",
+            "user_data": "415555a4eca07740a228e025f6a5aecb4f3e177d",
+            "user_id": null,
+            "volume_attached": [
+              {
+                "boot_index": 0,
+                "kms_key_id": "",
+                "pci_address": "688860300000d6a8fa168b9c37703679",
+                "size": 40,
+                "type": "GPSSD",
+                "volume_id": "9e8ec2eb-2433-42e6-9cd8-48b44c3446a5"
+              }
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_availability_zones.osc-az",
+            "data.huaweicloud_images_image.image",
+            "data.huaweicloud_networking_secgroups.existing",
+            "data.huaweicloud_vpc_subnets.existing",
+            "data.huaweicloud_vpcs.existing",
+            "huaweicloud_compute_keypair.keypair",
+            "huaweicloud_networking_secgroup.new",
+            "huaweicloud_vpc.new",
+            "huaweicloud_vpc_subnet.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_compute_keypair",
+      "name": "keypair",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "keypair-kafka-27e7c494",
+            "key_file": "keypair-kafka-27e7c494.pem",
+            "name": "keypair-kafka-27e7c494",
+            "public_key": "ssh-rsa xxxxxxxx\n",
+            "region": "cn-southwest-2"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_compute_volume_attach",
+      "name": "attached",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "device": "/dev/sdb",
+            "id": "11278b01-6015-42d2-9cba-112f306259f9/dd061b89-90d4-4833-b985-383e035a807a",
+            "instance_id": "11278b01-6015-42d2-9cba-112f306259f9",
+            "pci_address": "68886030000023dffa168b9c37703679",
+            "region": "cn-southwest-2",
+            "timeouts": null,
+            "volume_id": "dd061b89-90d4-4833-b985-383e035a807a"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_availability_zones.osc-az",
+            "data.huaweicloud_images_image.image",
+            "data.huaweicloud_networking_secgroups.existing",
+            "data.huaweicloud_vpc_subnets.existing",
+            "data.huaweicloud_vpcs.existing",
+            "huaweicloud_compute_instance.zookeeper",
+            "huaweicloud_compute_keypair.keypair",
+            "huaweicloud_evs_volume.volume",
+            "huaweicloud_networking_secgroup.new",
+            "huaweicloud_vpc.new",
+            "huaweicloud_vpc_subnet.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_evs_volume",
+      "name": "volume",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "attachment": [],
+            "auto_pay": null,
+            "auto_renew": null,
+            "availability_zone": "cn-southwest-2a",
+            "backup_id": null,
+            "cascade": false,
+            "charging_mode": null,
+            "description": "my volume",
+            "device_type": "VBD",
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "id": "dd061b89-90d4-4833-b985-383e035a807a",
+            "image_id": null,
+            "kms_id": null,
+            "multiattach": false,
+            "name": "volume",
+            "period": null,
+            "period_unit": null,
+            "region": "cn-southwest-2",
+            "size": 20,
+            "snapshot_id": "",
+            "tags": null,
+            "timeouts": null,
+            "volume_type": "SAS",
+            "wwn": "68886030000023dffa168b9c37703679"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_availability_zones.osc-az"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2023-04-04T02:40:13Z",
+            "delete_default_rules": null,
+            "description": "Kafka cluster security group",
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "id": "2723a367-2a58-4580-868b-ae92b103c451",
+            "name": "kafka_secgroup-27e7c494",
+            "region": "cn-southwest-2",
+            "rules": [
+              {
+                "action": "allow",
+                "description": "",
+                "direction": "ingress",
+                "ethertype": "IPv6",
+                "id": "89ee676e-be15-4cde-8ea1-920f4f64898c",
+                "port_range_max": 0,
+                "port_range_min": 0,
+                "ports": "",
+                "priority": 100,
+                "protocol": "",
+                "remote_address_group_id": "",
+                "remote_group_id": "2723a367-2a58-4580-868b-ae92b103c451",
+                "remote_ip_prefix": ""
+              },
+              {
+                "action": "allow",
+                "description": "",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "id": "e31d3dc1-a460-409e-ab91-722546fd426f",
+                "port_range_max": 0,
+                "port_range_min": 0,
+                "ports": "",
+                "priority": 100,
+                "protocol": "",
+                "remote_address_group_id": "",
+                "remote_group_id": "2723a367-2a58-4580-868b-ae92b103c451",
+                "remote_ip_prefix": ""
+              },
+              {
+                "action": "allow",
+                "description": "",
+                "direction": "egress",
+                "ethertype": "IPv6",
+                "id": "44054588-2a76-47c3-866c-698b4e9b6178",
+                "port_range_max": 0,
+                "port_range_min": 0,
+                "ports": "",
+                "priority": 100,
+                "protocol": "",
+                "remote_address_group_id": "",
+                "remote_group_id": "",
+                "remote_ip_prefix": ""
+              },
+              {
+                "action": "allow",
+                "description": "",
+                "direction": "egress",
+                "ethertype": "IPv4",
+                "id": "ac9c3755-dfb2-4652-857b-df807fc589d3",
+                "port_range_max": 0,
+                "port_range_min": 0,
+                "ports": "",
+                "priority": 100,
+                "protocol": "",
+                "remote_address_group_id": "",
+                "remote_group_id": "",
+                "remote_ip_prefix": ""
+              }
+            ],
+            "timeouts": null,
+            "updated_at": "2023-04-04T02:40:13Z"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_networking_secgroups.existing",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "secgroup_rule_0",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "ae3f3d5f-3c7d-4db0-b904-bb394d48f7f1",
+            "port_range_max": 22,
+            "port_range_min": 22,
+            "ports": "22",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-southwest-2",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "12127.0.0.1/32",
+            "security_group_id": "2723a367-2a58-4580-868b-ae92b103c451",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_networking_secgroups.existing",
+            "huaweicloud_networking_secgroup.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "secgroup_rule_1",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "93c426b9-0080-4a1c-a6dd-586f293bcfe8",
+            "port_range_max": 2181,
+            "port_range_min": 2181,
+            "ports": "2181",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-southwest-2",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "12127.0.0.1/32",
+            "security_group_id": "2723a367-2a58-4580-868b-ae92b103c451",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_networking_secgroups.existing",
+            "huaweicloud_networking_secgroup.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_networking_secgroup_rule",
+      "name": "secgroup_rule_2",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "action": "allow",
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "845cf263-492c-40bc-885b-c199c872694d",
+            "port_range_max": 9093,
+            "port_range_min": 9092,
+            "ports": "9092-9093",
+            "priority": 1,
+            "protocol": "tcp",
+            "region": "cn-southwest-2",
+            "remote_address_group_id": "",
+            "remote_group_id": "",
+            "remote_ip_prefix": "12127.0.0.1/32",
+            "security_group_id": "2723a367-2a58-4580-868b-ae92b103c451",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_networking_secgroups.existing",
+            "huaweicloud_networking_secgroup.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_vpc",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "cidr": "192.168.0.0/16",
+            "description": "",
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "id": "88cd9538-8db0-45da-8bee-ebd3916500df",
+            "name": "kafka-vpc-web-27e7c494",
+            "region": "cn-southwest-2",
+            "routes": [],
+            "secondary_cidr": null,
+            "status": "OK",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_vpcs.existing",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_vpc_eip",
+      "name": "osc-eip-kafka-zookeeper",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": "127.0.0.1",
+            "auto_pay": null,
+            "auto_renew": null,
+            "bandwidth": [
+              {
+                "charge_mode": "traffic",
+                "id": "a8299462-3a3a-4385-89f1-d9b8f1173831",
+                "name": "osc-eip-kafka-zookeeper-27e7c494",
+                "share_type": "PER",
+                "size": 5
+              }
+            ],
+            "charging_mode": null,
+            "enterprise_project_id": "bad95a97-9c31-4f29-ab4f-7bfe934ae7ab",
+            "id": "db9a443b-a59c-48e2-9d48-911d13b4c744",
+            "ipv6_address": "",
+            "name": "",
+            "period": null,
+            "period_unit": null,
+            "port_id": "",
+            "private_ip": "",
+            "publicip": [
+              {
+                "ip_address": "127.0.0.1",
+                "ip_version": 4,
+                "port_id": "",
+                "type": "5_sbgp"
+              }
+            ],
+            "region": "cn-southwest-2",
+            "status": "UNBOUND",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "huaweicloud_vpc_subnet",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/huaweicloud/huaweicloud\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "availability_zone": "",
+            "cidr": "192.168.10.0/24",
+            "description": "",
+            "dhcp_enable": true,
+            "dns_list": [
+              "100.125.1.250",
+              "100.125.129.250"
+            ],
+            "gateway_ip": "192.168.10.1",
+            "id": "14fdfb15-6eb8-47db-b593-e9617fc3e61a",
+            "ipv4_subnet_id": "c383f15a-7f9c-4a20-8ab7-1f90d73f5532",
+            "ipv6_cidr": "",
+            "ipv6_enable": false,
+            "ipv6_gateway": "",
+            "ipv6_subnet_id": "",
+            "name": "kafka-subnet-27e7c494",
+            "primary_dns": "100.125.1.250",
+            "region": "cn-southwest-2",
+            "secondary_dns": "100.125.129.250",
+            "subnet_id": "c383f15a-7f9c-4a20-8ab7-1f90d73f5532",
+            "tags": null,
+            "timeouts": null,
+            "vpc_id": "88cd9538-8db0-45da-8bee-ebd3916500df"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.huaweicloud_vpcs.existing",
+            "huaweicloud_vpc.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "random_id",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "b64_std": "J+fElA==",
+            "b64_url": "J-fElA",
+            "byte_length": 4,
+            "dec": "669500564",
+            "hex": "27e7c494",
+            "id": "J-fElA",
+            "keepers": null,
+            "prefix": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "random_password",
+      "name": "password",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+      "instances": [
+        {
+          "schema_version": 3,
+          "attributes": {
+            "bcrypt_hash": "$2a$10$REasoBcb6os5iB5H1RdN1.iDD5MmL3/Dj077CHfYtWX.6hDSxwLsG",
+            "id": "none",
+            "keepers": null,
+            "length": 12,
+            "lower": true,
+            "min_lower": 0,
+            "min_numeric": 0,
+            "min_special": 1,
+            "min_upper": 0,
+            "number": true,
+            "numeric": true,
+            "override_special": "#%@",
+            "result": "xxxxxxxxx",
+            "special": true,
+            "upper": true
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

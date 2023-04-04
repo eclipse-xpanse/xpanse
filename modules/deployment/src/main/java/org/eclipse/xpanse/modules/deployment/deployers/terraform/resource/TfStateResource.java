@@ -17,9 +17,23 @@ import lombok.Data;
 @Data
 public class TfStateResource {
 
-    public String type;
+    /**
+     * Tf Resource type.
+     */
+    private String type;
 
-    public String name;
+    /**
+     * Tf Resource name.
+     */
+    private String name;
 
-    public List<TfStateResourceInstance> instances;
+    /**
+     * Tf Resource mode. data: data resource; managed: new create resource.
+     */
+    private String mode;
+
+    /**
+     * List of Tf Resource instance.
+     */
+    private List<TfStateResourceInstance> instances;
 }
