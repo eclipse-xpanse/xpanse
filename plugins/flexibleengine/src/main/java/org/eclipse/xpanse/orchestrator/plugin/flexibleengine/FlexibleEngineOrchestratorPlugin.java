@@ -22,7 +22,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return new FlexibleTerraformResourceHandler();
+        return new FlexibleEngineTerraformResourceHandler();
     }
 
     @Override
