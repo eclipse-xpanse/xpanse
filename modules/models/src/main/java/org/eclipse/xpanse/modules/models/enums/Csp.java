@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum Csp {
     AWS("aws"),
     AZURE("azure"),
-    ALI("alibaba"),
+    ALICLOUD("alicloud"),
     HUAWEI("huawei"),
     OPENSTACK("openstack"),
     FLEXIBLE_ENGINE("flexibleEngine");

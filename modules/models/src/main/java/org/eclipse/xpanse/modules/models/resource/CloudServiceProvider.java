@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 public class CloudServiceProvider {
 
     @NotNull
-    @Schema(description = "The Cloud Service Provider. valid values: aws, azure, alibaba, huawei")
+    @Schema(description = "The Cloud Service Provider.")
     private Csp name;
 
     @Valid
