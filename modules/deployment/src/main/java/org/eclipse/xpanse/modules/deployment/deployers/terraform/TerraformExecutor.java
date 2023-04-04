@@ -106,7 +106,7 @@ public class TerraformExecutor {
      * @return true if finished without exceptions, else false.
      */
     private boolean execute(String cmd, StringBuilder stdOut) {
-        log.info("Will executing cmd: " + String.join(" ", cmd));
+        log.info("Will execute cmd: " + String.join(" ", cmd));
         SystemCmd systemCmd = new SystemCmd();
         systemCmd.setEnv(env);
         systemCmd.setWorkDir(workspace);

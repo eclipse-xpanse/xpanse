@@ -153,7 +153,7 @@ public class TerraformDeployment implements Deployment {
      */
     private String getWorkspacePath(String taskId) {
         return System.getProperty("java.io.tmpdir")
-                + this.workspaceDirectory + File.separator + File.separator + taskId;
+                + File.separator + this.workspaceDirectory  + File.separator + taskId;
     }
 
 
