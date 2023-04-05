@@ -12,8 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.modules.deployment.Deployment;
@@ -64,7 +66,7 @@ public class OrchestratorApi {
 
     @Autowired
     public OrchestratorApi(OrchestratorService orchestratorService,
-            RegisterService registerService) {
+                           RegisterService registerService) {
         this.orchestratorService = orchestratorService;
         this.registerService = registerService;
     }
@@ -360,9 +362,12 @@ public class OrchestratorApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public UUID deploy(@Valid @RequestBody CreateRequest deployRequest) {
         log.info("Starting managed service with name {}, version {}, csp {}",
-                deployRequest.getName(),
+                deployRequest.getServiceName(),
                 deployRequest.getVersion(), deployRequest.getCsp());
         UUID id = UUID.randomUUID();
+        if (Objects.isNull(deployRequest.getCustomerServiceName())) {
+            deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
+        }
         DeployTask deployTask = new DeployTask();
         deployRequest.setId(id);
         deployTask.setId(id);
@@ -371,7 +376,7 @@ public class OrchestratorApi {
         this.orchestratorService.asyncDeployService(deployment, deployTask);
         String successMsg = String.format(
                 "Task of start managed service %s-%s-%s start running. UUID %s",
-                deployRequest.getName(),
+                deployRequest.getServiceName(),
                 deployRequest.getVersion(), deployRequest.getCsp(), deployTask.getId());
         log.info(successMsg);
         return id;
@@ -417,6 +422,16 @@ public class OrchestratorApi {
                 "Get openapi of registered service success with Url %s.", apiUrl);
         log.info(successMsg);
         return apiUrl;
+    }
+
+    private String generateCustomerServiceName(CreateRequest createRequest) {
+        if (createRequest.getServiceName().length() > 5) {
+            return createRequest.getServiceName().substring(0, 4) + "-"
+                    + RandomStringUtils.randomAlphanumeric(5);
+        } else {
+            return createRequest.getServiceName() + "-"
+                    + RandomStringUtils.randomAlphanumeric(5);
+        }
     }
 
 }

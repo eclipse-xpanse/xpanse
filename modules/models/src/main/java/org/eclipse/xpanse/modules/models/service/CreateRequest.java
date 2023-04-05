@@ -35,13 +35,20 @@ public class CreateRequest {
     private Category category;
 
     /**
-     * The name of the Service.
+     * The name of the Service ordered.
      */
     @NotNull
     @NotBlank
     @NotEmpty
-    @Schema(description = "The name of the service")
-    private String name;
+    @Schema(description = "The name of the service ordered.")
+    private String serviceName;
+
+    /**
+     * Customer provided name for the service.
+     */
+    @Schema(description = "Customer's name for the service. Used only for customer's reference."
+            + "If not provided, this value will be auto-generated")
+    private String customerServiceName;
 
     /**
      * The version of the Service.

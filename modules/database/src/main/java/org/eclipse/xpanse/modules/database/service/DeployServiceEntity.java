@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.database.service;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -44,7 +43,6 @@ import org.hibernate.annotations.Type;
 @EqualsAndHashCode(callSuper = true)
 public class DeployServiceEntity extends CreateModifiedTime {
 
-    @Hidden
     @Id
     private UUID id;
 
@@ -58,6 +56,11 @@ public class DeployServiceEntity extends CreateModifiedTime {
      * The name of the Service.
      */
     private String name;
+
+    /**
+     * The customer provided name for the service deployed.
+     */
+    private String customerServiceName;
 
     /**
      * The version of the Service.
