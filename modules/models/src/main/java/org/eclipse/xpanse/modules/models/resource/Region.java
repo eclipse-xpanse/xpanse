@@ -6,10 +6,10 @@
 
 package org.eclipse.xpanse.modules.models.resource;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jdk.jfr.Description;
 import lombok.Data;
 
 /**
@@ -21,11 +21,11 @@ public class Region {
     @NotNull
     @NotBlank
     @NotEmpty
-    @Description("The name of the Region")
+    @Schema(description = "The name of the Region")
     private String name;
 
     @NotEmpty
     @NotBlank
-    @Description("The area which the region belongs to, such as Asia, Europe, Africa")
+    @Schema(description = "The area which the region belongs to, such as Asia, Europe, Africa")
     private String area = "Others";
 }

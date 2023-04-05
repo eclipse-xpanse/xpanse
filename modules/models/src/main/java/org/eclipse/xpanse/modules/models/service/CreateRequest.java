@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.models.service;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.UUID;
@@ -38,6 +39,7 @@ public class CreateRequest {
      */
     @NotNull
     @NotBlank
+    @NotEmpty
     @Schema(description = "The name of the service")
     private String name;
 
@@ -46,12 +48,14 @@ public class CreateRequest {
      */
     @NotNull
     @NotBlank
+    @NotEmpty
     @Schema(description = "The version of service")
     private String version;
 
 
     @NotNull
     @NotBlank
+    @NotEmpty
     @Schema(description = "The region of the provider.")
     private String region;
 
@@ -67,6 +71,7 @@ public class CreateRequest {
      */
     @NotNull
     @NotBlank
+    @NotEmpty
     @Schema(description = "The flavor of the Service.")
     private String flavor;
 
