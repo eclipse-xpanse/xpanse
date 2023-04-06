@@ -43,6 +43,13 @@ public class ServiceVo {
     private String name;
 
     /**
+     * Customer provided name for the service.
+     */
+    @Schema(description = "Customer's name for the service. Used only for customer's reference."
+            + "If not provided, this value will be auto-generated")
+    private String customerServiceName;
+
+    /**
      * The version of the Service.
      */
     @NotNull
