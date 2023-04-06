@@ -103,9 +103,10 @@ public class OrchestratorService {
         entity.setId(deployTask.getId());
         entity.setCreateTime(new Date());
         entity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
-        entity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getName()));
+        entity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getServiceName()));
         entity.setCsp(deployTask.getCreateRequest().getCsp());
         entity.setCategory(deployTask.getCreateRequest().getCategory());
+        entity.setCustomerServiceName(deployTask.getCreateRequest().getCustomerServiceName());
         entity.setFlavor(deployTask.getCreateRequest().getFlavor());
         entity.setCreateRequest(deployTask.getCreateRequest());
         return entity;
@@ -120,7 +121,8 @@ public class OrchestratorService {
 
         // Find the registered service and fill Ocl.
         RegisterServiceEntity serviceEntity = new RegisterServiceEntity();
-        serviceEntity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getName()));
+        serviceEntity.setName(
+                StringUtils.lowerCase(deployTask.getCreateRequest().getServiceName()));
         serviceEntity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
         serviceEntity.setCsp(deployTask.getCreateRequest().getCsp());
         serviceEntity.setCategory(deployTask.getCreateRequest().getCategory());

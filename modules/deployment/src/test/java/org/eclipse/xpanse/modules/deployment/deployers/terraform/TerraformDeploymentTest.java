@@ -31,7 +31,8 @@ public class TerraformDeploymentTest {
         Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test.yaml"));
 
         CreateRequest deployRequest = new CreateRequest();
-        deployRequest.setName(ocl.getName());
+        deployRequest.setServiceName(ocl.getName());
+        deployRequest.setCustomerServiceName("test");
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
         deployRequest.setVersion(ocl.getVersion());
         deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
