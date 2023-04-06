@@ -24,6 +24,7 @@ public class HuaweiTerraformResourceHandlerTest {
         deployResult.getProperty().put("stateFile", objectMapper.writeValueAsString(tfState));
         huaweiHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(deployResult.getResources()));
+        Assertions.assertFalse(deployResult.getProperty().isEmpty());
     }
 
 
@@ -35,5 +36,6 @@ public class HuaweiTerraformResourceHandlerTest {
         deployResult.getProperty().put("stateFile", objectMapper.writeValueAsString(tfState));
         huaweiHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isEmpty(deployResult.getResources()));
+        Assertions.assertTrue(deployResult.getProperty().isEmpty());
     }
 }

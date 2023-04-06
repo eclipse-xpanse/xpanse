@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 
 /**
@@ -17,5 +18,7 @@ import lombok.Data;
 @Data
 public class TfState {
 
-    public List<TfStateResource> resources;
+    private Map<String, TfOutput> outputs;
+
+    private List<TfStateResource> resources;
 }

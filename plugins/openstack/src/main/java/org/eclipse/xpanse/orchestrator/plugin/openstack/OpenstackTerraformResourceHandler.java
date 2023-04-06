@@ -10,9 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfOutput;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfState;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResource;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResourceInstance;
@@ -48,45 +50,55 @@ public class OpenstackTerraformResourceHandler implements DeployResourceHandler 
         try {
             var stateFile = deployResult.getProperty().get("stateFile");
             tfState = objectMapper.readValue(stateFile, TfState.class);
+            deployResult.getProperty().remove("stateFile");
         } catch (IOException ex) {
             log.error("Parse terraform state content failed.");
             throw new TerraformExecutorException("Parse terraform state content failed.", ex);
         }
-        for (TfStateResource tfStateResource : tfState.getResources()) {
-            if (tfStateResource.getType().equals("openstack_compute_instance_v2")) {
-                for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource deployResource = new Vm();
-                    deployResource.setKind(DeployResourceKind.VM);
-                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
-                            OpenstackResourceProperty.getProperties(DeployResourceKind.VM));
-                    deployResourceList.add(deployResource);
+        if (Objects.nonNull(tfState)) {
+            if (Objects.nonNull(tfState.getOutputs()) && !tfState.getOutputs().isEmpty()) {
+                for (String outputKey : tfState.getOutputs().keySet()) {
+                    TfOutput tfOutput = tfState.getOutputs().get(outputKey);
+                    deployResult.getProperty().put(outputKey, tfOutput.getValue());
                 }
             }
-            if (tfStateResource.getType().equals("openstack_networking_floatingip_v2")) {
-                for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource deployResource = new PublicIp();
-                    deployResource.setKind(DeployResourceKind.PUBLIC_IP);
-                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
-                            OpenstackResourceProperty.getProperties(DeployResourceKind.PUBLIC_IP));
-                    deployResourceList.add(deployResource);
+            for (TfStateResource tfStateResource : tfState.getResources()) {
+                if (tfStateResource.getType().equals("openstack_compute_instance_v2")) {
+                    for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                        DeployResource deployResource = new Vm();
+                        deployResource.setKind(DeployResourceKind.VM);
+                        TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                                OpenstackResourceProperty.getProperties(DeployResourceKind.VM));
+                        deployResourceList.add(deployResource);
+                    }
                 }
-            }
-            if (tfStateResource.getType().equals("openstack_networking_subnet_v2")) {
-                for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource deployResource = new Vpc();
-                    deployResource.setKind(DeployResourceKind.VPC);
-                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
-                            OpenstackResourceProperty.getProperties(DeployResourceKind.VPC));
-                    deployResourceList.add(deployResource);
+                if (tfStateResource.getType().equals("openstack_networking_floatingip_v2")) {
+                    for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                        DeployResource deployResource = new PublicIp();
+                        deployResource.setKind(DeployResourceKind.PUBLIC_IP);
+                        TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                                OpenstackResourceProperty.getProperties(
+                                        DeployResourceKind.PUBLIC_IP));
+                        deployResourceList.add(deployResource);
+                    }
                 }
-            }
-            if (tfStateResource.getType().equals("openstack_blockstorage_volume_v3")) {
-                for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource deployResource = new Volume();
-                    deployResource.setKind(DeployResourceKind.VOLUME);
-                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
-                            OpenstackResourceProperty.getProperties(DeployResourceKind.VOLUME));
-                    deployResourceList.add(deployResource);
+                if (tfStateResource.getType().equals("openstack_networking_subnet_v2")) {
+                    for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                        DeployResource deployResource = new Vpc();
+                        deployResource.setKind(DeployResourceKind.VPC);
+                        TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                                OpenstackResourceProperty.getProperties(DeployResourceKind.VPC));
+                        deployResourceList.add(deployResource);
+                    }
+                }
+                if (tfStateResource.getType().equals("openstack_blockstorage_volume_v3")) {
+                    for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                        DeployResource deployResource = new Volume();
+                        deployResource.setKind(DeployResourceKind.VOLUME);
+                        TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                                OpenstackResourceProperty.getProperties(DeployResourceKind.VOLUME));
+                        deployResourceList.add(deployResource);
+                    }
                 }
             }
         }

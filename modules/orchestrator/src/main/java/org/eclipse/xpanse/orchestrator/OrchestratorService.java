@@ -161,6 +161,7 @@ public class OrchestratorService {
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
+            deployServiceEntity.setDeployedServiceProperties(deployResult.getProperty());
             deployServiceEntity.setDeployResourceList(
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
             deployServiceStorage.store(deployServiceEntity);
@@ -238,6 +239,7 @@ public class OrchestratorService {
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.destroy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
+            deployServiceEntity.setDeployedServiceProperties(deployResult.getProperty());
             List<DeployResource> resources = deployResult.getResources();
             if (CollectionUtils.isEmpty(resources)) {
                 deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
