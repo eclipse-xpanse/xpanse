@@ -85,4 +85,12 @@ public interface RegisterService {
      */
     void unregisterService(String registeredServiceId);
 
+    /**
+     * generate OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     * @return path of openapi.html
+     */
+    String getOpenApiUrl(String id);
+
 }

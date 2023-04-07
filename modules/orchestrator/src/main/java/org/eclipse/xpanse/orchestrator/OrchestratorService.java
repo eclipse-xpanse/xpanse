@@ -35,6 +35,7 @@ import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
+import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
@@ -68,6 +69,8 @@ public class OrchestratorService {
     private DeployResourceStorage deployResourceStorage;
     @Resource
     private DeployVariableValidator deployVariableValidator;
+    @Resource
+    private OpenApiUtil openApiUtil;
 
     /**
      * Get all OrchestratorPlugin group by Csp.
@@ -316,24 +319,5 @@ public class OrchestratorService {
         }
         return deployment;
     }
-
-
-    /**
-     * generate OpenApi for registered service using the ID.
-     *
-     * @param id ID of registered service.
-     * @return path of openapi.html
-     */
-    public String getOpenApiUrl(String id) {
-        UUID uuid = UUID.fromString(id);
-        RegisterServiceEntity registerService = registerServiceStorage.getRegisterServiceById(uuid);
-        if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
-            throw new IllegalArgumentException(String.format("Registered service with id %s not "
-                    + "existed.", id));
-        }
-        // TODO find the path of swagger-ui.html of the registered by id or generate swagger-ui.html
-        return null;
-    }
-
 
 }

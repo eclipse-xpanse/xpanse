@@ -9,10 +9,11 @@ package org.eclipse.xpanse.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -365,7 +366,7 @@ public class OrchestratorApi {
                 deployRequest.getServiceName(),
                 deployRequest.getVersion(), deployRequest.getCsp());
         UUID id = UUID.randomUUID();
-        if (Objects.isNull(deployRequest.getCustomerServiceName())) {
+        if (StringUtils.isBlank(deployRequest.getCustomerServiceName())) {
             deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
         }
         DeployTask deployTask = new DeployTask();
@@ -408,20 +409,20 @@ public class OrchestratorApi {
      * Get openapi of registered service by id.
      *
      * @param id id of registered service.
-     * @return response
      */
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
-    @GetMapping(value = "/service/openapi/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(value = "/register/openapi/{id}")
+    @ResponseStatus(HttpStatus.MOVED_PERMANENTLY)
     @Operation(description = "API to get openapi of service deploy context")
-    public String openApi(@PathVariable("id") String id) {
+    public void openApi(@PathVariable("id") String id, HttpServletResponse response)
+            throws IOException {
         log.info("Get openapi url of registered service with id {}", id);
-        String apiUrl = this.orchestratorService.getOpenApiUrl(id);
+        String apiUrl = this.registerService.getOpenApiUrl(id);
         String successMsg = String.format(
                 "Get openapi of registered service success with Url %s.", apiUrl);
         log.info(successMsg);
-        return apiUrl;
+        response.sendRedirect(apiUrl);
     }
 
     private String generateCustomerServiceName(CreateRequest createRequest) {
@@ -433,5 +434,6 @@ public class OrchestratorApi {
                     + RandomStringUtils.randomAlphanumeric(5);
         }
     }
+
 
 }

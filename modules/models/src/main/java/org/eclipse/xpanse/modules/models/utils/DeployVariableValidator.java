@@ -37,9 +37,9 @@ public class DeployVariableValidator {
      * @param deployVariables list of DeployVariable entity.
      * @return variable validator map
      */
-    public Map<String, Map<String, String>> getVariableApiInfoMap(
+    public Map<String, Map<String, Object>> getVariableApiInfoMap(
             List<DeployVariable> deployVariables) {
-        Map<String, Map<String, String>> varInfoMap = new HashMap<>();
+        Map<String, Map<String, Object>> varInfoMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(deployVariables)) {
             for (DeployVariable deployVariable : deployVariables) {
                 DeployVariableKind kind = deployVariable.getKind();
@@ -47,20 +47,35 @@ public class DeployVariableValidator {
                 if (Objects.equals(kind, DeployVariableKind.VARIABLE)
                         || Objects.equals(kind, DeployVariableKind.FIX_VARIABLE)) {
                     DeployVariableType type = deployVariable.getType();
-                    Map<String, String> infoMap = new HashMap<>();
+                    Map<String, Object> infoMap = new HashMap<>();
                     infoMap.put("type", type.toValue());
                     infoMap.put("description", deployVariable.getDescription());
                     infoMap.put("example", deployVariable.getValue());
                     if (StringUtils.isNotBlank(deployVariable.getValidator())) {
                         Map<VariableValidator, String> validatorMap = getValidatorMap(
-                                deployVariable.getName(),
-                                deployVariable.getValidator(), type);
+                                deployVariable.getName(), deployVariable.getValidator(), type);
                         if (!validatorMap.isEmpty()) {
                             for (VariableValidator validator : validatorMap.keySet()) {
-                                infoMap.put(validator.toValue(), validatorMap.get(validator));
+                                String valueStr = validatorMap.get(validator);
+                                if (validator.equals(VariableValidator.MINIMUM)
+                                        || validator.equals(VariableValidator.MAXIMUM)) {
+                                    if (valueStr.contains(".")) {
+                                        infoMap.put(validator.toValue(),
+                                                Double.parseDouble(valueStr));
+                                    } else {
+                                        infoMap.put(validator.toValue(),
+                                                Long.parseLong(valueStr));
+                                    }
+                                } else if (validator.equals(VariableValidator.MINLENGTH)
+                                        || validator.equals(VariableValidator.MAXLENGTH)) {
+                                    infoMap.put(validator.toValue(),
+                                            Integer.parseInt(valueStr));
+                                } else {
+                                    infoMap.put(validator.toValue(), validatorMap.get(validator));
+                                }
+
                             }
                         }
-
                     }
                     varInfoMap.put(deployVariable.getName(), infoMap);
                 }
