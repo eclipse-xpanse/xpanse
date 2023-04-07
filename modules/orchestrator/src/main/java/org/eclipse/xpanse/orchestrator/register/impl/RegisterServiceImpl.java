@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.orchestrator.register.impl;
 
+import jakarta.annotation.Resource;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +30,8 @@ import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.view.VersionOclVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
+import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -41,14 +42,13 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class RegisterServiceImpl implements RegisterService {
 
-    private final RegisterServiceStorage storage;
-    private final OclLoader oclLoader;
+    @Resource
+    private RegisterServiceStorage storage;
+    @Resource
+    private OclLoader oclLoader;
+    @Resource
+    private OpenApiUtil openApiUtil;
 
-    @Autowired
-    public RegisterServiceImpl(RegisterServiceStorage registerServiceStorage, OclLoader oclLoader) {
-        this.storage = registerServiceStorage;
-        this.oclLoader = oclLoader;
-    }
 
     /**
      * Update registered service using id and the ocl file url.
@@ -80,6 +80,7 @@ public class RegisterServiceImpl implements RegisterService {
         existedService.setOcl(ocl);
         existedService.setServiceState(ServiceState.UPDATED);
         storage.store(existedService);
+        openApiUtil.updateServiceApi(existedService);
     }
 
     private void checkParams(RegisterServiceEntity existedService, Ocl ocl) {
@@ -135,6 +136,7 @@ public class RegisterServiceImpl implements RegisterService {
             throw new IllegalArgumentException("Service already registered.");
         }
         storage.store(newEntity);
+        openApiUtil.generateServiceApi(newEntity);
         return newEntity.getId();
     }
 
@@ -231,12 +233,35 @@ public class RegisterServiceImpl implements RegisterService {
     /**
      * Unregister service using the ID of registered service.
      *
-     * @param managedServiceId ID of registered service.
+     * @param registeredServiceId ID of registered service.
+     */
+
+    public void unregisterService(String registeredServiceId) {
+        UUID uuid = UUID.fromString(registeredServiceId);
+        storage.removeById(uuid);
+        openApiUtil.deleteServiceApi(registeredServiceId);
+    }
+
+
+    /**
+     * generate OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     * @return path of openapi.html
      */
     @Override
-    public void unregisterService(String managedServiceId) {
-        UUID uuid = UUID.fromString(managedServiceId);
-        storage.removeById(uuid);
+    public String getOpenApiUrl(String id) {
+        UUID uuid = UUID.fromString(id);
+        RegisterServiceEntity registerService = storage.getRegisterServiceById(uuid);
+        if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
+            throw new IllegalArgumentException(String.format("Registered service with id %s not "
+                    + "existed.", id));
+        }
+        String openApiUrl = openApiUtil.getOpenApi(registerService);
+        if (StringUtils.isBlank(openApiUrl)) {
+            throw new RuntimeException("Get openApi Url is Empty.");
+        }
+        return openApiUrl;
     }
 
     private OclDetailVo convertToOclDetailVo(RegisterServiceEntity serviceEntity) {
