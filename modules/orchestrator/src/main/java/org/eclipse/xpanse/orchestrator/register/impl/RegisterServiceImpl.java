@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.view.VersionOclVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
+import org.eclipse.xpanse.orchestrator.utils.IconProcessorUtil;
 import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -76,6 +77,7 @@ public class RegisterServiceImpl implements RegisterService {
             throw new IllegalArgumentException(String.format("Registered service with id %s not "
                     + "existed.", id));
         }
+        iconUpdate(existedService, ocl);
         checkParams(existedService, ocl);
         existedService.setOcl(ocl);
         existedService.setServiceState(ServiceState.UPDATED);
@@ -123,6 +125,14 @@ public class RegisterServiceImpl implements RegisterService {
         return entity;
     }
 
+    private void iconUpdate(RegisterServiceEntity registerService, Ocl ocl) {
+        try {
+            ocl.setIcon(IconProcessorUtil.processImage(ocl));
+        } catch (Exception e) {
+            ocl.setIcon(registerService.getOcl().getIcon());
+        }
+    }
+
     /**
      * Register service using the ocl.
      *
@@ -130,6 +140,7 @@ public class RegisterServiceImpl implements RegisterService {
      */
     @Override
     public UUID registerService(Ocl ocl) {
+        ocl.setIcon(IconProcessorUtil.processImage(ocl));
         RegisterServiceEntity newEntity = getNewRegisterServiceEntity(ocl);
         if (Objects.nonNull(storage.findRegisteredService(newEntity))) {
             log.error("Service already registered.");
