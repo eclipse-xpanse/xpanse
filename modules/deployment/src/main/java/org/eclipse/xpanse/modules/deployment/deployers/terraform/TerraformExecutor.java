@@ -33,7 +33,7 @@ public class TerraformExecutor {
      * @param workspace workspace for the terraform command line.
      */
     TerraformExecutor(Map<String, String> env, Map<String, String> variables,
-            String workspace) {
+                      String workspace) {
         this.env = env;
         this.variables = variables;
         this.workspace = workspace;
@@ -57,7 +57,7 @@ public class TerraformExecutor {
      * @return true if terraform plan creation is successful. else false.
      */
     public boolean tfPlan() {
-        return executeWithVariables(new StringBuilder("terraform plan "));
+        return executeWithVariables(new StringBuilder("terraform plan -input=false "));
     }
 
     /**
@@ -66,7 +66,8 @@ public class TerraformExecutor {
      * @return true if changes are successfully applied. else false.
      */
     public boolean tfApply() {
-        return executeWithVariables(new StringBuilder("terraform apply -auto-approve "));
+        return executeWithVariables(
+                new StringBuilder("terraform apply -auto-approve -input=false "));
     }
 
     /**
@@ -76,7 +77,8 @@ public class TerraformExecutor {
      * false.
      */
     public boolean tfDestroy() {
-        return executeWithVariables(new StringBuilder("terraform destroy -auto-approve "));
+        return executeWithVariables(
+                new StringBuilder("terraform destroy -auto-approve -input=false "));
     }
 
     /**

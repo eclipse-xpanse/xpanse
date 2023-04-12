@@ -244,7 +244,7 @@ deployment:
     resource "flexibleengine_compute_instance_v2" "zookeeper" {
       availability_zone  = data.flexibleengine_availability_zones.osc-az.names[0]
       name               = "kafka-zookeeper-${random_id.new.hex}"
-      flavor_id          = var.flavor_flavor_id
+      flavor_id          = var.flavor_id
       security_groups    = [ local.secgroup_name ]
       image_id           = data.flexibleengine_images_image_v2.image.id
       key_pair           = flexibleengine_compute_keypair_v2.keypair.name
@@ -261,10 +261,10 @@ deployment:
     }
 
     resource "flexibleengine_compute_instance_v2" "kafka-broker" {
-      count              = var.flavor_worker_nodes_count
+      count              = var.worker_nodes_count
       availability_zone  = data.flexibleengine_availability_zones.osc-az.names[0]
       name               = "kafka-broker-${count.index}-${random_id.new.hex}"
-      flavor_id          = var.flavor_flavor_id
+      flavor_id          = var.flavor_id
       security_groups    = [ local.secgroup_name ]
       image_id           = data.flexibleengine_images_image_v2.image.id
       key_pair           = flexibleengine_compute_keypair_v2.keypair.name

@@ -9,7 +9,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -97,14 +96,10 @@ public class TerraformDeployment implements Deployment {
      */
     private TerraformExecutor getExecutor(DeployTask task, String workspace) {
         Map<String, String> envVariables = DeployEnvironments.getEnv(task);
-        Map<String, String> flavorVariables = DeployEnvironments.getFlavorVariables(task);
-        Map<String, String> tfFlavorVariables = new HashMap<>();
-        for (String key : flavorVariables.keySet()) {
-            tfFlavorVariables.put("TF_VAR_" + key, flavorVariables.get(key));
-        }
-        envVariables.putAll(tfFlavorVariables);
-        return new TerraformExecutor(envVariables, DeployEnvironments.getVariables(task),
-                workspace);
+        Map<String, String> inputVariables = DeployEnvironments.getVariables(task);
+        // load flavor variables also as input variables for terraform executor.
+        inputVariables.putAll(DeployEnvironments.getFlavorVariables(task));
+        return new TerraformExecutor(envVariables, inputVariables, workspace);
     }
 
     /**
@@ -153,7 +148,7 @@ public class TerraformDeployment implements Deployment {
      */
     private String getWorkspacePath(String taskId) {
         return System.getProperty("java.io.tmpdir")
-                + File.separator + this.workspaceDirectory  + File.separator + taskId;
+                + File.separator + this.workspaceDirectory + File.separator + taskId;
     }
 
 

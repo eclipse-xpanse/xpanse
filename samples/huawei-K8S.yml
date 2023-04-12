@@ -218,7 +218,7 @@ deployment:
     resource "huaweicloud_compute_instance" "k8s-master" {
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
       name               = "k8s-master-${random_id.new.hex}"
-      flavor_id          = var.flavor_flavor_id
+      flavor_id          = var.flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.image.id
       key_pair           = huaweicloud_compute_keypair.keypair.name
@@ -228,15 +228,15 @@ deployment:
       user_data = <<EOF
         #!bin/bash
         echo root:${local.admin_passwd} | sudo chpasswd
-        sudo sh /root/k8s-init.sh true ${local.admin_passwd} ${var.flavor_worker_nodes_count} > /root/init.log
+        sudo sh /root/k8s-init.sh true ${local.admin_passwd} ${var.worker_nodes_count} > /root/init.log
       EOF
     }
 
     resource "huaweicloud_compute_instance" "k8s-node" {
-      count              = var.flavor_worker_nodes_count
+      count              = var.worker_nodes_count
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
       name               = "k8s-node-${random_id.new.hex}-${count.index}"
-      flavor_id          = var.flavor_flavor_id
+      flavor_id          = var.flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.image.id
       key_pair           = huaweicloud_compute_keypair.keypair.name
@@ -246,7 +246,7 @@ deployment:
       user_data = <<EOF
         #!bin/bash
         echo root:${local.admin_passwd} | sudo chpasswd
-        sudo sh /root/k8s-init.sh false ${local.admin_passwd} ${var.flavor_worker_nodes_count} ${huaweicloud_compute_instance.k8s-master.access_ip_v4} > /root/init.log
+        sudo sh /root/k8s-init.sh false ${local.admin_passwd} ${var.worker_nodes_count} ${huaweicloud_compute_instance.k8s-master.access_ip_v4} > /root/init.log
       EOF
       depends_on = [
         huaweicloud_compute_instance.k8s-master
