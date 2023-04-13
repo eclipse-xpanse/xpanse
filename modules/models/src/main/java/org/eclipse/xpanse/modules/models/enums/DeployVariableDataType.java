@@ -13,14 +13,14 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Deploy variable data types.
  */
-public enum DeployVariableType {
+public enum DeployVariableDataType {
     STRING("string"),
     NUMBER("number"),
     BOOLEAN("boolean");
 
     private final String type;
 
-    DeployVariableType(String type) {
+    DeployVariableDataType(String type) {
         this.type = type;
     }
 
@@ -28,8 +28,8 @@ public enum DeployVariableType {
      * For DeployVariableKind serialize.
      */
     @JsonCreator
-    public DeployVariableType getByValue(String type) {
-        for (DeployVariableType deployVariableType : values()) {
+    public DeployVariableDataType getByValue(String type) {
+        for (DeployVariableDataType deployVariableType : values()) {
             if (StringUtils.equalsIgnoreCase(deployVariableType.type, type)) {
                 return deployVariableType;
             }

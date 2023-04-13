@@ -39,7 +39,7 @@ public class TerraformDeploymentTest {
 
         Map<String, String> property = new HashMap<>();
         property.put("secgroup_id", "1234567890");
-        deployRequest.setProperty(property);
+        deployRequest.setServiceRequestProperties(property);
 
         DeployTask xpanseDeployTask = new DeployTask();
         xpanseDeployTask.setId(UUID.randomUUID());

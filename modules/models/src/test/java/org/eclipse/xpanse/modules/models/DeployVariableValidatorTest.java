@@ -13,8 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.eclipse.xpanse.modules.models.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
-import org.eclipse.xpanse.modules.models.enums.DeployVariableType;
 import org.eclipse.xpanse.modules.models.enums.VariableValidator;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
@@ -39,7 +39,7 @@ public class DeployVariableValidatorTest {
 
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.yaml").toURI().toURL());
-        List<DeployVariable> variables = ocl.getDeployment().getContext();
+        List<DeployVariable> variables = ocl.getDeployment().getVariables();
         Map<String, String> property = new HashMap<>();
         property.put("HW_REGION_NAME", "cn-southwest-2");
         property.put("cpv_id", "");
@@ -79,7 +79,7 @@ public class DeployVariableValidatorTest {
         deployVariable.setKind(DeployVariableKind.VARIABLE);
         deployVariable.setName("string_test");
         deployVariable.setMandatory(true);
-        deployVariable.setType(DeployVariableType.STRING);
+        deployVariable.setDataType(DeployVariableDataType.STRING);
         deployVariable.setValidator("minLength=4|maxLength=10");
         List<DeployVariable> variables = new ArrayList<>();
         variables.add(deployVariable);
@@ -110,7 +110,7 @@ public class DeployVariableValidatorTest {
         deployVariable.setKind(DeployVariableKind.VARIABLE);
         deployVariable.setName("number_test");
         deployVariable.setMandatory(true);
-        deployVariable.setType(DeployVariableType.NUMBER);
+        deployVariable.setDataType(DeployVariableDataType.NUMBER);
         deployVariable.setValidator("minimum=10|maximum=100");
         List<DeployVariable> variables = new ArrayList<>();
         variables.add(deployVariable);
@@ -140,7 +140,7 @@ public class DeployVariableValidatorTest {
         deployVariable.setKind(DeployVariableKind.VARIABLE);
         deployVariable.setName("enum_test");
         deployVariable.setMandatory(true);
-        deployVariable.setType(DeployVariableType.STRING);
+        deployVariable.setDataType(DeployVariableDataType.STRING);
         deployVariable.setValidator("enum=[\"red\",\"yellow\",\"green\"]");
         List<DeployVariable> variables = new ArrayList<>();
         variables.add(deployVariable);
@@ -166,7 +166,7 @@ public class DeployVariableValidatorTest {
         deployVariable.setKind(DeployVariableKind.VARIABLE);
         deployVariable.setName("pattern_test");
         deployVariable.setMandatory(true);
-        deployVariable.setType(DeployVariableType.STRING);
+        deployVariable.setDataType(DeployVariableDataType.STRING);
         deployVariable.setValidator("pattern=*abc*");
         List<DeployVariable> variables = new ArrayList<>();
         variables.add(deployVariable);

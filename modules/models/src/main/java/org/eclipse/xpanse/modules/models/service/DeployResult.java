@@ -46,6 +46,6 @@ public class DeployResult {
      */
     @NotNull
     @Schema(description = "The result property of the service task.")
-    private Map<String, String> property = new HashMap<>();
+    private Map<String, String> properties = new HashMap<>();
 
 }

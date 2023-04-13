@@ -88,6 +88,6 @@ public class CreateRequest {
     /**
      * The property of the Service.
      */
-    @Schema(description = "The property of the Service")
-    private Map<String, String> property;
+    @Schema(description = "The properties for the requested service")
+    private Map<String, String> serviceRequestProperties;
 }

@@ -273,7 +273,7 @@ public class OpenApiUtil {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         List<DeployVariable> deployVariables = registerService.getOcl().getDeployment()
-                .getContext();
+                .getVariables();
         try {
             createRequiredStr = mapper.writeValueAsString(getRequiredFields(new CreateRequest()));
             propertiesStr =

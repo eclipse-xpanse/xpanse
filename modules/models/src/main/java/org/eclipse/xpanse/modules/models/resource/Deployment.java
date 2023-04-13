@@ -22,13 +22,13 @@ import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 public class Deployment {
 
     @NotNull
-    @Schema(description = "The type of the Deployment, valid values: terraform...")
+    @Schema(description = "The type of the Deployer which will handle the service deployment")
     private DeployerKind kind;
 
     @Valid
     @NotNull
     @Schema(description = "The variables for the deployment, which will be passed to the deployer")
-    private List<DeployVariable> context;
+    private List<DeployVariable> variables;
 
     @NotNull
     @NotBlank

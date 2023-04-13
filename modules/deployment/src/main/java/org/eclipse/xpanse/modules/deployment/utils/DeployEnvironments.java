@@ -28,8 +28,8 @@ public class DeployEnvironments {
      */
     public static Map<String, String> getEnv(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-        Map<String, String> request = task.getCreateRequest().getProperty();
-        for (DeployVariable variable : task.getOcl().getDeployment().getContext()) {
+        Map<String, String> request = task.getCreateRequest().getServiceRequestProperties();
+        for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {
             if (variable.getKind() == DeployVariableKind.ENV) {
                 if (request.containsKey(variable.getName())
                         && request.get(variable.getName()) != null) {
@@ -60,7 +60,7 @@ public class DeployEnvironments {
         Map<String, String> variables = new HashMap<>();
         for (Flavor flavor : task.getOcl().getFlavors()) {
             if (flavor.getName().equals(task.getCreateRequest().getFlavor())) {
-                for (Map.Entry<String, String> entry : flavor.getProperty().entrySet()) {
+                for (Map.Entry<String, String> entry : flavor.getProperties().entrySet()) {
                     variables.put((entry.getKey()), entry.getValue());
                 }
                 return variables;
@@ -77,8 +77,8 @@ public class DeployEnvironments {
      */
     public static Map<String, String> getVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-        Map<String, String> request = task.getCreateRequest().getProperty();
-        for (DeployVariable variable : task.getOcl().getDeployment().getContext()) {
+        Map<String, String> request = task.getCreateRequest().getServiceRequestProperties();
+        for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {
             if (variable.getKind() == DeployVariableKind.VARIABLE) {
                 if (request.containsKey(variable.getName())
                         && request.get(variable.getName()) != null) {

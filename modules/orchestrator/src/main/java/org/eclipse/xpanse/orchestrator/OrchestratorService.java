@@ -135,11 +135,11 @@ public class OrchestratorService {
         }
         // Check context validation
         if (Objects.nonNull(serviceEntity.getOcl().getDeployment()) && Objects.nonNull(
-                deployTask.getCreateRequest().getProperty())) {
+                deployTask.getCreateRequest().getServiceRequestProperties())) {
             List<DeployVariable> deployVariables = serviceEntity.getOcl().getDeployment()
-                    .getContext();
+                    .getVariables();
             deployVariableValidator.isVariableValid(deployVariables,
-                    deployTask.getCreateRequest().getProperty());
+                    deployTask.getCreateRequest().getServiceRequestProperties());
         }
         // Set Ocl and CreateRequest
         deployTask.setOcl(serviceEntity.getOcl());
@@ -166,7 +166,7 @@ public class OrchestratorService {
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
-            deployServiceEntity.setDeployedServiceProperties(deployResult.getProperty());
+            deployServiceEntity.setDeployedServiceProperties(deployResult.getProperties());
             deployServiceEntity.setDeployResourceList(
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
             deployServiceStorage.store(deployServiceEntity);
@@ -244,7 +244,7 @@ public class OrchestratorService {
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.destroy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
-            deployServiceEntity.setDeployedServiceProperties(deployResult.getProperty());
+            deployServiceEntity.setDeployedServiceProperties(deployResult.getProperties());
             List<DeployResource> resources = deployResult.getResources();
             if (CollectionUtils.isEmpty(resources)) {
                 deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
