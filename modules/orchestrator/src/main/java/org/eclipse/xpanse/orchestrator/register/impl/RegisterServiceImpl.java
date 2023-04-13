@@ -26,7 +26,6 @@ import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.OclDetailVo;
 import org.eclipse.xpanse.modules.models.view.ProviderOclVo;
-import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.view.VersionOclVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
@@ -56,11 +55,13 @@ public class RegisterServiceImpl implements RegisterService {
      *
      * @param id          id of the registered service.
      * @param oclLocation url of the ocl file.
+     * @return Returns registered service DB entity.
      */
     @Override
-    public void updateRegisteredServiceByUrl(String id, String oclLocation) throws Exception {
+    public RegisterServiceEntity updateRegisteredServiceByUrl(String id, String oclLocation)
+            throws Exception {
         Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
-        updateRegisteredService(id, ocl);
+        return updateRegisteredService(id, ocl);
     }
 
     /**
@@ -68,9 +69,10 @@ public class RegisterServiceImpl implements RegisterService {
      *
      * @param id  id of the registered service.
      * @param ocl the Ocl model describing the register service.
+     * @return Returns registered service DB entity.
      */
     @Override
-    public void updateRegisteredService(String id, Ocl ocl) {
+    public RegisterServiceEntity updateRegisteredService(String id, Ocl ocl) {
         RegisterServiceEntity existedService = storage.getRegisterServiceById(UUID.fromString(id));
         if (Objects.isNull(existedService)) {
             log.error("Registered service with id {} not existing.", id);
@@ -83,6 +85,7 @@ public class RegisterServiceImpl implements RegisterService {
         existedService.setServiceState(ServiceState.UPDATED);
         storage.store(existedService);
         openApiUtil.updateServiceApi(existedService);
+        return existedService;
     }
 
     private void checkParams(RegisterServiceEntity existedService, Ocl ocl) {
@@ -137,9 +140,10 @@ public class RegisterServiceImpl implements RegisterService {
      * Register service using the ocl.
      *
      * @param ocl the Ocl model describing the register service.
+     * @return Returns registered service DB entity.
      */
     @Override
-    public UUID registerService(Ocl ocl) {
+    public RegisterServiceEntity registerService(Ocl ocl) {
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
         RegisterServiceEntity newEntity = getNewRegisterServiceEntity(ocl);
         if (Objects.nonNull(storage.findRegisteredService(newEntity))) {
@@ -148,16 +152,17 @@ public class RegisterServiceImpl implements RegisterService {
         }
         storage.store(newEntity);
         openApiUtil.generateServiceApi(newEntity);
-        return newEntity.getId();
+        return newEntity;
     }
 
     /**
      * Register service using the url of ocl file.
      *
      * @param oclLocation the url of the ocl file.
+     * @return Returns registered service DB entity.
      */
     @Override
-    public UUID registerServiceByUrl(String oclLocation) throws Exception {
+    public RegisterServiceEntity registerServiceByUrl(String oclLocation) throws Exception {
         Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
         return registerService(ocl);
     }
@@ -166,36 +171,30 @@ public class RegisterServiceImpl implements RegisterService {
      * Get detail of registered service using ID.
      *
      * @param managedServiceId the ID of
-     * @return registerServiceEntity
+     * @return Returns registered service DB entity.
      */
     @Override
-    public OclDetailVo getRegisteredService(String managedServiceId) {
+    public RegisterServiceEntity getRegisteredService(String managedServiceId) {
         UUID uuid = UUID.fromString(managedServiceId);
-        RegisterServiceEntity serviceEntity = storage.getRegisterServiceById(uuid);
-        return convertToOclDetailVo(serviceEntity);
+        return storage.getRegisterServiceById(uuid);
     }
 
     /**
      * Search registered service by query model.
      *
      * @param query the query model for search registered service.
-     * @return list of RegisteredServiceVo
+     * @return Returns list of registered service entity.
      */
     @Override
-    public List<RegisteredServiceVo> queryRegisteredServices(RegisteredServiceQuery query) {
-        List<RegisterServiceEntity> registeredServices = storage.queryRegisteredServices(query);
-        if (CollectionUtils.isEmpty(registeredServices)) {
-            return new ArrayList<>();
-        }
-        return registeredServices.stream().map(
-                this::convertToRegisteredServiceVo).collect(Collectors.toList());
+    public List<RegisterServiceEntity> queryRegisteredServices(RegisteredServiceQuery query) {
+        return storage.queryRegisteredServices(query);
     }
 
     /**
      * Search registered service tree by query model.
      *
      * @param query the query model for search registered service.
-     * @return Returns Tree of RegisterServiceEntity
+     * @return Returns Tree of RegisterService View
      */
     @Override
     public List<CategoryOclVo> queryRegisteredServicesTree(RegisteredServiceQuery query) {
@@ -223,10 +222,10 @@ public class RegisterServiceImpl implements RegisterService {
                 cspListMap.forEach((csp, cspList) -> {
                     ProviderOclVo providerOclVo = new ProviderOclVo();
                     providerOclVo.setName(csp);
-                    List<OclDetailVo> details = cspList.stream().map(this::convertToOclDetailVo)
+                    List<OclDetailVo> details = cspList.stream()
+                            .map(this::convertToOclDetailVo)
                             .collect(Collectors.toList());
                     providerOclVo.setDetails(details);
-
                     providerOclVo.setRegions(
                             details.get(0).getCloudServiceProvider().getRegions());
                     cspVoList.add(providerOclVo);
@@ -288,13 +287,5 @@ public class RegisterServiceImpl implements RegisterService {
         return oclDetailVo;
     }
 
-    private RegisteredServiceVo convertToRegisteredServiceVo(RegisterServiceEntity serviceEntity) {
-        if (Objects.isNull(serviceEntity)) {
-            return null;
-        }
-        RegisteredServiceVo registeredServiceVo = new RegisteredServiceVo();
-        BeanUtils.copyProperties(serviceEntity, registeredServiceVo);
-        return registeredServiceVo;
-    }
 
 }

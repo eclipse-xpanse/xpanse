@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * OpenApiUtil.
@@ -44,7 +45,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpenApiUtil {
 
-    private static final String HTTP = "http://";
     private final DeployVariableValidator deployVariableValidator;
     private final String openapiPath;
     private final Integer port;
@@ -107,15 +107,20 @@ public class OpenApiUtil {
      *
      * @return serviceUrl
      */
-    private String getServiceUrl() {
-        String ip = "localhost";
+    public String getServiceUrl() {
+        try {
+            return ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        } catch (Exception e) {
+            log.error("Get BaseUrl form CurrentContextPath error.");
+        }
+        String host = "localhost";
         try {
             InetAddress address = InetAddress.getLocalHost();
-            ip = address.getHostAddress();
+            host = address.getHostAddress();
         } catch (UnknownHostException e) {
             log.error("Get localHost error,");
         }
-        return HTTP + ip + ":" + port;
+        return "http://" + host + ":" + port;
     }
 
     /**
@@ -123,7 +128,7 @@ public class OpenApiUtil {
      *
      * @return openApiUrl
      */
-    private String getOpenApiUrl(String id) {
+    public String getOpenApiUrl(String id) {
         if (openapiPath.endsWith("/")) {
             return getServiceUrl() + "/" + openapiPath + id + ".html";
         }
