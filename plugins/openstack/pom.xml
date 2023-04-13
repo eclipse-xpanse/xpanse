@@ -34,15 +34,6 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <artifactId>openstack4j</artifactId>
-        <groupId>com.github.openstack4j.core</groupId>
-        <version>3.10</version>
-      </dependency>
-      <dependency>
-        <artifactId>guava</artifactId>
-        <groupId>com.google.guava</groupId>
-      </dependency>
-      <dependency>
         <artifactId>slf4j-api</artifactId>
         <groupId>org.slf4j</groupId>
       </dependency>
