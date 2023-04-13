@@ -9,9 +9,7 @@ package org.eclipse.xpanse.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -412,17 +410,16 @@ public class OrchestratorApi {
      */
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
-    @GetMapping(value = "/register/openapi/{id}")
-    @ResponseStatus(HttpStatus.MOVED_PERMANENTLY)
+    @GetMapping(value = "/register/openapi/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @Operation(description = "API to get openapi of service deploy context")
-    public void openApi(@PathVariable("id") String id, HttpServletResponse response)
-            throws IOException {
+    public Object openApi(@PathVariable("id") String id) {
         log.info("Get openapi url of registered service with id {}", id);
         String apiUrl = this.registerService.getOpenApiUrl(id);
         String successMsg = String.format(
                 "Get openapi of registered service success with Url %s.", apiUrl);
         log.info(successMsg);
-        response.sendRedirect(apiUrl);
+        return apiUrl;
     }
 
     private String generateCustomerServiceName(CreateRequest createRequest) {
