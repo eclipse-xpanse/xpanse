@@ -240,7 +240,7 @@ deployment:
     resource "huaweicloud_compute_instance" "zookeeper" {
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
       name               = "kafka-zookeeper-${random_id.new.hex}"
-      flavor_id          = var.flavor_flavor_id
+      flavor_id          = var.flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.image.id
       key_pair           = huaweicloud_compute_keypair.keypair.name
@@ -257,10 +257,10 @@ deployment:
     }
 
     resource "huaweicloud_compute_instance" "kafka-broker" {
-      count              = var.flavor_worker_nodes_count
+      count              = var.worker_nodes_count
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
       name               = "kafka-broker-${random_id.new.hex}-${count.index}"
-      flavor_id          = var.flavor_flavor_id
+      flavor_id          = var.flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.image.id
       key_pair           = huaweicloud_compute_keypair.keypair.name

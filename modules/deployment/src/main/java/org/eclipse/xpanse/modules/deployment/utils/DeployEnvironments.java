@@ -58,12 +58,10 @@ public class DeployEnvironments {
      */
     public static Map<String, String> getFlavorVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-
-        variables.put("flavor", task.getCreateRequest().getFlavor());
         for (Flavor flavor : task.getOcl().getFlavors()) {
             if (flavor.getName().equals(task.getCreateRequest().getFlavor())) {
                 for (Map.Entry<String, String> entry : flavor.getProperty().entrySet()) {
-                    variables.put(("flavor_" + entry.getKey()), entry.getValue());
+                    variables.put((entry.getKey()), entry.getValue());
                 }
                 return variables;
             }
@@ -99,7 +97,6 @@ public class DeployEnvironments {
                 variables.put(variable.getName(), variable.getValue());
             }
         }
-
         return variables;
     }
 }
