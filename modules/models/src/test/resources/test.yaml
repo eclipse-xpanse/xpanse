@@ -36,14 +36,14 @@ flavors:
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 20
     # Properties for the service, which can be used by the deployment.
-    property:
+    properties:
       node: 3
       zookeeper: false
   - name: 5-node-with-zookeeper
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 30
     # Properties for the service, which can be used by the deployment.
-    property:
+    properties:
       node: 5
       zookeeper: true
 deployment:
@@ -57,53 +57,53 @@ deployment:
   # - env_env: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a environment variable to the deployer. End user cannot see or change this variable.
   # - env_variable: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a regular variable to the deployer. End user cannot see or change this variable.
   # The parameters will be used to generate the API of the managed service.
-  context:
+  variables:
     - name: HW_REGION_NAME
       description: huawei cloud region name.
       kind: fix_variable
-      type: string
+      dataType: string
       mandatory: true
       validator: minLength=6|maxLength=26
     - name: HW_ACCESS_KEY
       description: huawei cloud access key.
       kind: env
-      type: string
+      dataType: string
       mandatory: true
       validator: null
     - name: HW_SECRET_KEY
       description: huawei cloud secret key.
       kind: env
-      type: string
+      dataType: string
       mandatory: true
       validator:
     - name: secgroup_id
       description: The secgroup id.
       kind: variable
-      type: string
+      dataType: string
       mandatory: false
       validator:
     - name: number_test
       description: Validator range for value of dataType number.
       kind: variable
-      type: number
+      dataType: number
       mandatory: true
       validator: minimum=10|maximum=100
     - name: string_test
       description: Validator length for value of dataType string.
       kind: variable
-      type: string
+      dataType: string
       mandatory: true
       validator: minLength=6|maxLength=16
     - name: enum_test
       description: Validator enum for value of dataType string.
       kind: variable
-      type: string
+      dataType: string
       mandatory: true
       validator: enum=["red","yellow","green"]
     - name: pattern_test
       description: Validator pattern for value of dataType string.
       kind: variable
-      type: string
+      dataType: string
       mandatory: false
       validator: pattern=*e*
   deployer: |

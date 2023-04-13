@@ -10,8 +10,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.eclipse.xpanse.modules.models.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
-import org.eclipse.xpanse.modules.models.enums.DeployVariableType;
 
 /**
  * Defines for the deploy variable.
@@ -29,21 +29,22 @@ public class DeployVariable {
 
     @NotNull
     @Schema(description = "The type of the deploy variable")
-    private DeployVariableType type;
+    private DeployVariableDataType dataType;
 
-    @Schema(description = "The default value for the deploy variable")
+    @Schema(description = "The default value of the deploy variable")
     private String example;
 
     @NotNull
     @NotBlank
-    @Schema(description = "The description for the deploy variable")
+    @Schema(description = "The description of the deploy variable")
     private String description;
 
-    @Schema(description = "The value of the deploy variable")
+    @Schema(description = "The value of the deploy variable. "
+            + "Value can be provided for default variables")
     private String value;
 
     @NotNull
-    @Schema(description = "Indicate the variable if is mandatory")
+    @Schema(description = "Indicates if the variable is mandatory")
     private Boolean mandatory;
 
     @Schema(description = "Validator of the variable")

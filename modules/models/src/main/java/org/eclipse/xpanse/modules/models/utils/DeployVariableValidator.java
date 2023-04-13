@@ -15,8 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
-import org.eclipse.xpanse.modules.models.enums.DeployVariableType;
 import org.eclipse.xpanse.modules.models.enums.VariableValidator;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.springframework.stereotype.Component;
@@ -46,7 +46,7 @@ public class DeployVariableValidator {
                 // filter kind variable
                 if (Objects.equals(kind, DeployVariableKind.VARIABLE)
                         || Objects.equals(kind, DeployVariableKind.FIX_VARIABLE)) {
-                    DeployVariableType type = deployVariable.getType();
+                    DeployVariableDataType type = deployVariable.getDataType();
                     Map<String, Object> infoMap = new HashMap<>();
                     infoMap.put("type", type.toValue());
                     infoMap.put("description", deployVariable.getDescription());
@@ -99,7 +99,7 @@ public class DeployVariableValidator {
                 // filter kind variable
                 if (Objects.equals(kind, DeployVariableKind.VARIABLE)
                         || Objects.equals(kind, DeployVariableKind.FIX_VARIABLE)) {
-                    DeployVariableType type = deployVariable.getType();
+                    DeployVariableDataType type = deployVariable.getDataType();
                     if (StringUtils.isNotBlank(deployVariable.getValidator())) {
                         Map<VariableValidator, String> validatorMap = getValidatorMap(
                                 deployVariable.getName(),
@@ -145,7 +145,7 @@ public class DeployVariableValidator {
      * @return Map of validators.
      */
     public Map<VariableValidator, String> getValidatorMap(String variableName, String validatorStr,
-            DeployVariableType type) {
+            DeployVariableDataType type) {
         Map<VariableValidator, String> validatorMap = new HashMap<>();
         if (StringUtils.isNotBlank(validatorStr)) {
             String[] validStrArray = StringUtils.split(validatorStr, "|");
@@ -159,14 +159,14 @@ public class DeployVariableValidator {
                         VariableValidator validator =
                                 VariableValidator.valueOf(StringUtils.upperCase(key));
                         // check number validator.
-                        if (DeployVariableType.NUMBER.equals(type)) {
+                        if (DeployVariableDataType.NUMBER.equals(type)) {
                             if (validator.equals(VariableValidator.MINIMUM)
                                     || validator.equals(VariableValidator.MAXIMUM)) {
                                 if (value.matches(NUMBER_REGEX)) {
                                     validatorMap.put(validator, value);
                                 }
                             } // check string validator.
-                        } else if (DeployVariableType.STRING.equals(type)) {
+                        } else if (DeployVariableDataType.STRING.equals(type)) {
                             if (validator.equals(VariableValidator.MINLENGTH)
                                     || validator.equals(VariableValidator.MAXLENGTH)) {
                                 if (Integer.parseInt(value) >= 0) {

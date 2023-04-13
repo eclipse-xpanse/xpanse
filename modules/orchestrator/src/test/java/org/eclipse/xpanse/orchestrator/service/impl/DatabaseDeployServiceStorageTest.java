@@ -49,7 +49,7 @@ public class DatabaseDeployServiceStorageTest {
         deployResource.setResourceId("11111122222222333333333");
         deployResource.setName("kafka-instance");
         deployResource.setKind(DeployResourceKind.VM);
-        deployResource.setProperty(property);
+        deployResource.setProperties(property);
 
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setVersion("V1.3");

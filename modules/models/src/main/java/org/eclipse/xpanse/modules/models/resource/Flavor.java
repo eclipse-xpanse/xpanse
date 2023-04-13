@@ -32,6 +32,6 @@ public class Flavor {
     @NotNull
     @NotEmpty
     @Schema(description = "The properties of the flavor")
-    private Map<String, String> property;
+    private Map<String, String> properties;
 
 }

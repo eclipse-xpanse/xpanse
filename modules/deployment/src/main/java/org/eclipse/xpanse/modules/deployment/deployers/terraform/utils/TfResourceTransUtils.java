@@ -42,7 +42,7 @@ public class TfResourceTransUtils {
         if (Objects.isNull(keyProperty) || keyProperty.isEmpty()) {
             return;
         }
-        deployResource.setProperty(new HashMap<>());
+        deployResource.setProperties(new HashMap<>());
         Field[] fields = deployResource.getClass().getFields();
         Set<String> fieldSet =
                 Arrays.stream(fields).map(Field::getName).collect(Collectors.toSet());
@@ -54,14 +54,14 @@ public class TfResourceTransUtils {
                     String value = getValue(instanceAttributes, key);
                     field.setAccessible(true);
                     field.set(deployResource, value);
-                    deployResource.getProperty().put(fieldName, value);
+                    deployResource.getProperties().put(fieldName, value);
                 }
             }
             for (String key : keyProperty.keySet()) {
                 if (!fieldSet.contains(key)) {
                     String value = instanceAttributes.getOrDefault(key, StringUtils.EMPTY)
                             .toString();
-                    deployResource.getProperty().put(key, value);
+                    deployResource.getProperties().put(key, value);
                 }
             }
         } catch (IllegalAccessException e) {

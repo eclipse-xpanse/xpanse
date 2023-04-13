@@ -40,21 +40,21 @@ flavors:
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
-    property:
+    properties:
       worker_nodes_count: 3
       flavor_id: cirrors512
   - name: 1-zookeeper-with-5-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
-    property:
+    properties:
       worker_nodes_count: 5
       flavor_id: cirrors256
   - name: 1-zookeeper-with-5-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 80
     # Properties for the service, which can be used by the deployment.
-    property:
+    properties:
       worker_nodes_count: 5
       flavor_id: cirrors512
 deployment:
@@ -64,54 +64,54 @@ deployment:
   # - env: The value of the fix parameters are defined by the ISV with the @value at the initial time.
   # - variable: The value of the variable parameters are defined by the user on the console.
   # The parameters will be used to generate the API of the managed service.
-  context:
+  variables:
     - name: OS_AUTH_URL
       description: The Identity authentication URL.
       kind: env
-      type: string
+      dataType: string
       mandatory: true
     - name: OS_USER_NAME
       description: The User Name to login with.
       kind: env
-      type: string
+      dataType: string
       mandatory: false
     - name: OS_PASSWORD
       description: The User password to login with.
       kind: env
-      type: string
+      dataType: string
       mandatory: false
     - name: OS_REGION_NAME
       description: The region of the OpenStack cloud to use.
       kind: env
-      type: string
+      dataType: string
       mandatory: false
     - name: OS_PROJECT_NAME
       description: The name of the Tenant (Identity v2) or Project (Identity v3) to login with.
       kind: env
-      type: string
+      dataType: string
       mandatory: false
     - name: admin_passwd
       description: The admin password of all nodes in the Kafka cluster. If the value is empty, will create a random password.
       kind: variable
-      type: string
+      dataType: string
       mandatory: false
       validator: minLength=8|maxLength=16|pattern=^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
     - name: vpc_name
       description: The vpc name of all nodes in the Kafka cluster. If the value is empty, will use the example value to find or create VPC.
       kind: variable
-      type: string
+      dataType: string
       example: "kafka-vpc-default"
       mandatory: false
     - name: subnet_name
       description: The sub network name of all nodes in the Kafka cluster. If the value is empty, will use the example value to find or create subnet.
       kind: variable
-      type: string
+      dataType: string
       example: "kafka-subnet-default"
       mandatory: false
     - name: secgroup_name
       description: The security group name of all nodes in the Kafka cluster. If the value is empty, will use the example value to find or create security group.
       kind: variable
-      type: string
+      dataType: string
       example: "kafka-secgroup-default"
       mandatory: false
   deployer: |
