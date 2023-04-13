@@ -6,19 +6,22 @@
 
 package org.eclipse.xpanse.api;
 
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.response.Response;
+import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.SystemStatus;
@@ -29,13 +32,13 @@ import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
-import org.eclipse.xpanse.modules.models.view.OclDetailVo;
 import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,16 +64,10 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 public class OrchestratorApi {
 
-    private final OrchestratorService orchestratorService;
-
-    private final RegisterService registerService;
-
-    @Autowired
-    public OrchestratorApi(OrchestratorService orchestratorService,
-                           RegisterService registerService) {
-        this.orchestratorService = orchestratorService;
-        this.registerService = registerService;
-    }
+    @Resource
+    private RegisterService registerService;
+    @Resource
+    private OrchestratorService orchestratorService;
 
     /**
      * Register new service using ocl model.
@@ -101,12 +98,11 @@ public class OrchestratorApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public UUID register(@Valid @RequestBody Ocl ocl) {
-        UUID uuid = registerService.registerService(ocl);
-        String successMsg = String.format(
-                "Registered new service success. uuid %s", uuid);
-        log.info(successMsg);
-        return uuid;
+    public RegisteredServiceVo register(@Valid @RequestBody Ocl ocl) {
+        RegisteredServiceVo registeredServiceVo = convertToRegisteredServiceVo(
+                registerService.registerService(ocl));
+        log.info("Register new service success.");
+        return registeredServiceVo;
     }
 
     /**
@@ -123,15 +119,15 @@ public class OrchestratorApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response update(
+    public RegisteredServiceVo update(
             @Parameter(name = "id", description = "id of registered service")
             @PathVariable("id") String id, @Valid @RequestBody Ocl ocl) {
-        log.info("Update registered service with id {}", id);
-        registerService.updateRegisteredService(id, ocl);
+        RegisteredServiceVo registeredServiceVo = convertToRegisteredServiceVo(
+                registerService.updateRegisteredService(id, ocl));
         String successMsg = String.format(
                 "Update registered service with id %s success.", id);
         log.info(successMsg);
-        return Response.successResponse(successMsg);
+        return registeredServiceVo;
     }
 
     /**
@@ -147,16 +143,14 @@ public class OrchestratorApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public UUID fetch(
+    public RegisteredServiceVo fetch(
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation)
             throws Exception {
-        log.info("Register new service with Url {}", oclLocation);
-        UUID uuid = registerService.registerServiceByUrl(oclLocation);
-        String successMsg = String.format(
-                "Register new service with Url %s success.UUID: %s", oclLocation, uuid);
-        log.info(successMsg);
-        return uuid;
+        RegisteredServiceVo registeredServiceVo =
+                convertToRegisteredServiceVo(registerService.registerServiceByUrl(oclLocation));
+        log.info("Register new service by file success.");
+        return registeredServiceVo;
     }
 
 
@@ -174,18 +168,20 @@ public class OrchestratorApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public Response fetchUpdate(
+    public RegisteredServiceVo fetchUpdate(
             @Parameter(name = "id", description = "id of registered service")
             @PathVariable(name = "id") String id,
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation)
             throws Exception {
         log.info("Update registered service {} with Url {}", id, oclLocation);
-        registerService.updateRegisteredServiceByUrl(id, oclLocation);
+        RegisteredServiceVo registeredServiceVo = convertToRegisteredServiceVo(
+                registerService.updateRegisteredServiceByUrl(id,
+                        oclLocation));
         String successMsg = String.format(
                 "Update registered service %s with Url %s", id, oclLocation);
         log.info(successMsg);
-        return Response.successResponse(successMsg);
+        return registeredServiceVo;
     }
 
     /**
@@ -225,7 +221,7 @@ public class OrchestratorApi {
             description = "APIs to manage register services.")
     @Operation(description = "List registered service with query params.")
     @GetMapping(value = "/register",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     @ResponseStatus(HttpStatus.OK)
     public List<RegisteredServiceVo> listRegisteredServices(
             @Parameter(name = "categoryName", description = "category of the service")
@@ -246,12 +242,15 @@ public class OrchestratorApi {
         query.setServiceName(serviceName);
         query.setServiceVersion(serviceVersion);
         log.info("List registered service with query model {}", query);
-        List<RegisteredServiceVo> registerVos =
+        List<RegisterServiceEntity> serviceEntities =
                 registerService.queryRegisteredServices(query);
         String successMsg = String.format("List registered service with query model %s "
                 + "success.", query);
+        List<RegisteredServiceVo> registeredServiceVos =
+                serviceEntities.stream().map(this::convertToRegisteredServiceVo)
+                        .collect(Collectors.toList());
         log.info(successMsg);
-        return registerVos;
+        return registeredServiceVos;
     }
 
 
@@ -296,16 +295,16 @@ public class OrchestratorApi {
     @GetMapping(value = "/register/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public OclDetailVo detail(
+    public RegisteredServiceVo detail(
             @Parameter(name = "id", description = "id of registered service")
             @PathVariable("id") String id) {
         log.info("Get detail of registered service with name {}.", id);
-        OclDetailVo oclDetailVo = registerService.getRegisteredService(id);
+        RegisteredServiceVo registeredServiceVo = convertToRegisteredServiceVo(
+                registerService.getRegisteredService(id));
         String successMsg = String.format(
-                "Get detail of registered service with name %s success.",
-                id);
+                "Get detail of registered service with name %s success.", id);
         log.info(successMsg);
-        return oclDetailVo;
+        return registeredServiceVo;
     }
 
     /**
@@ -412,17 +411,16 @@ public class OrchestratorApi {
      */
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
-    @GetMapping(value = "/register/openapi/{id}")
-    @ResponseStatus(HttpStatus.MOVED_PERMANENTLY)
+    @GetMapping(value = "/register/openapi/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     @Operation(description = "API to get openapi of service deploy context")
-    public void openApi(@PathVariable("id") String id, HttpServletResponse response)
-            throws IOException {
+    public Object openApi(@PathVariable("id") String id) {
         log.info("Get openapi url of registered service with id {}", id);
         String apiUrl = this.registerService.getOpenApiUrl(id);
         String successMsg = String.format(
                 "Get openapi of registered service success with Url %s.", apiUrl);
         log.info(successMsg);
-        response.sendRedirect(apiUrl);
+        return apiUrl;
     }
 
     private String generateCustomerServiceName(CreateRequest createRequest) {
@@ -435,5 +433,16 @@ public class OrchestratorApi {
         }
     }
 
+    private RegisteredServiceVo convertToRegisteredServiceVo(RegisterServiceEntity serviceEntity) {
+        if (Objects.isNull(serviceEntity)) {
+            return null;
+        }
+        RegisteredServiceVo registeredServiceVo = new RegisteredServiceVo();
+        BeanUtils.copyProperties(serviceEntity, registeredServiceVo);
+        registeredServiceVo.add(
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrchestratorApi.class)
+                        .openApi(serviceEntity.getId().toString())).withRel("openApi"));
+        return registeredServiceVo;
+    }
 
 }

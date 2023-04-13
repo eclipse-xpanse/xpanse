@@ -14,16 +14,19 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.models.enums.Category;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.springframework.hateoas.RepresentationModel;
 
 /**
- * Define view object for UI Client query registered service.
+ * Defines view object for query registered service.
  */
 @Data
-public class RegisteredServiceVo {
+@EqualsAndHashCode(callSuper = true)
+public class RegisteredServiceVo extends RepresentationModel<RegisteredServiceVo> {
 
     @NotNull
     @Schema(description = "ID of the registered service.")
@@ -44,25 +47,25 @@ public class RegisteredServiceVo {
     private Csp csp;
 
     @NotNull
-    @Schema(description = "ID of the registered service.")
+    @Schema(description = "Category of the registered service.")
     private Category category;
+
     @NotNull
-    @Schema(description = "ID of the registered service.")
+    @Schema(description = "Ocl model of the registered service.")
     private Ocl ocl;
 
     @NotNull
-    @Schema(description = "Time of register service.")
+    @Schema(description = "createTime of the registered service.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "Time of update service.")
+    @Schema(description = "Last updateTime of the registered service.")
     private Date lastModifiedTime;
 
     @NotNull
     @Schema(description = "State of service.")
     private ServiceState serviceState;
-
 
 }
