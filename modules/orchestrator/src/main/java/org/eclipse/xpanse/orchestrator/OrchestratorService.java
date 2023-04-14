@@ -35,7 +35,6 @@ import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
-import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
@@ -69,8 +68,6 @@ public class OrchestratorService {
     private DeployResourceStorage deployResourceStorage;
     @Resource
     private DeployVariableValidator deployVariableValidator;
-    @Resource
-    private OpenApiUtil openApiUtil;
 
     /**
      * Get all OrchestratorPlugin group by Csp.
@@ -147,7 +144,7 @@ public class OrchestratorService {
         // Fill the handler
         fillHandler(deployTask);
         // get the deployment.
-        return getDeployment(deployTask);
+        return getDeployment(deployTask.getOcl().getDeployment().getKind());
     }
 
     /**
@@ -220,7 +217,7 @@ public class OrchestratorService {
         // Fill the handler
         fillHandler(deployTask);
         // get the deployment.
-        return getDeployment(deployTask);
+        return getDeployment(deployTask.getOcl().getDeployment().getKind());
 
     }
 
@@ -314,8 +311,13 @@ public class OrchestratorService {
         deployTask.setDeployResourceHandler(plugin.getResourceHandler());
     }
 
-    private Deployment getDeployment(DeployTask deployTask) {
-        DeployerKind deployerKind = deployTask.getOcl().getDeployment().getKind();
+    /**
+     * Get Deployment bean available for the requested DeployerKind.
+     *
+     * @param deployerKind Deployer for which the Deployment bean is required.
+     * @return Deployment bean for the provided deployerKind.
+     */
+    public Deployment getDeployment(DeployerKind deployerKind) {
         Deployment deployment = deploymentMap.get(deployerKind);
         if (Objects.isNull(deployment)) {
             throw new RuntimeException("Can't find suitable deployer for the Task.");

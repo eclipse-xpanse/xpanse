@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -205,7 +206,7 @@ public class OrchestratorApi {
         String successMsg = String.format(
                 "Unregister registered service using id %s success.", id);
         log.info(successMsg);
-        return Response.successResponse(successMsg);
+        return Response.successResponse(Collections.singletonList(successMsg));
     }
 
 
@@ -400,7 +401,7 @@ public class OrchestratorApi {
         this.orchestratorService.asyncDestroyService(deployment, deployTask);
         String successMsg = String.format(
                 "Task of stop managed service %s start running.", id);
-        return Response.successResponse(successMsg);
+        return Response.successResponse(Collections.singletonList(successMsg));
     }
 
 

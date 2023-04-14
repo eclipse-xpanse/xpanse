@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidationResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmdResult;
 
@@ -166,4 +169,25 @@ public class TerraformExecutor {
             throw new TerraformExecutorException("Read state file failed.", ex);
         }
     }
+
+    /**
+     * Executes terraform validate command.
+     *
+     * @return TfValidationResult.
+     */
+    public TfValidationResult tfValidate() {
+        if (!tfInit()) {
+            log.error("TFExecutor.tfInit failed.");
+            throw new TerraformExecutorException("TFExecutor.tfInit failed.");
+        }
+        SystemCmdResult systemCmdResult = execute("terraform validate -json");
+        log.info(systemCmdResult.getCommandOutput());
+        try {
+            return new ObjectMapper().readValue(systemCmdResult.getCommandOutput(),
+                    TfValidationResult.class);
+        } catch (JsonProcessingException ex) {
+            throw new IllegalStateException("Serialising string to object failed.", ex);
+        }
+    }
+
 }
