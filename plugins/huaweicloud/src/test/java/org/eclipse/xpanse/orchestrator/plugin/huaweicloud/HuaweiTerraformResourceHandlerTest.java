@@ -21,7 +21,8 @@ public class HuaweiTerraformResourceHandlerTest {
         TfState tfState = objectMapper.readValue(
                 new URL("file:./target/test-classes/huawei-tfstate.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getProperties().put("stateFile", objectMapper.writeValueAsString(tfState));
+        deployResult.getPrivateProperties()
+                .put("stateFile", objectMapper.writeValueAsString(tfState));
         huaweiHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(deployResult.getResources()));
         Assertions.assertFalse(deployResult.getProperties().isEmpty());
@@ -33,7 +34,8 @@ public class HuaweiTerraformResourceHandlerTest {
         TfState tfState = objectMapper.readValue(
                 new URL("file:./target/test-classes/huawei-tfstate-destroy.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getProperties().put("stateFile", objectMapper.writeValueAsString(tfState));
+        deployResult.getPrivateProperties()
+                .put("stateFile", objectMapper.writeValueAsString(tfState));
         huaweiHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isEmpty(deployResult.getResources()));
         Assertions.assertTrue(deployResult.getProperties().isEmpty());

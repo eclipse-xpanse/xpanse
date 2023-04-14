@@ -21,7 +21,7 @@ public class OpenstackTerraformResourceHandlerTest {
         TfState tfState = objectMapper.readValue(
                 new URL("file:./target/test-classes/openstack-tfstate.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getProperties().put("stateFile", objectMapper.writeValueAsString(tfState));
+        deployResult.getPrivateProperties().put("stateFile", objectMapper.writeValueAsString(tfState));
         openstackHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(deployResult.getResources()));
         Assertions.assertFalse(deployResult.getProperties().isEmpty());
@@ -34,7 +34,7 @@ public class OpenstackTerraformResourceHandlerTest {
                 new URL("file:./target/test-classes/openstack-tfstate-destroy.json"),
                 TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getProperties().put("stateFile", objectMapper.writeValueAsString(tfState));
+        deployResult.getPrivateProperties().put("stateFile", objectMapper.writeValueAsString(tfState));
         openstackHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isEmpty(deployResult.getResources()));
         Assertions.assertTrue(deployResult.getProperties().isEmpty());
