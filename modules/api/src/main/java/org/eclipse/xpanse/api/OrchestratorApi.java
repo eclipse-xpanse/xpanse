@@ -35,6 +35,7 @@ import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.springframework.beans.BeanUtils;
@@ -220,8 +221,7 @@ public class OrchestratorApi {
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
     @Operation(description = "List registered service with query params.")
-    @GetMapping(value = "/register",
-            produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
+    @GetMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<RegisteredServiceVo> listRegisteredServices(
             @Parameter(name = "categoryName", description = "category of the service")
@@ -275,7 +275,7 @@ public class OrchestratorApi {
         query.setCategory(category);
         log.info("List registered service with query model {}", query);
         List<CategoryOclVo> categoryOclList =
-                registerService.queryRegisteredServicesTree(query);
+                registerService.getManagedServicesTree(query);
         String successMsg = String.format("List registered service with query model %s "
                 + "success.", query);
         log.info(successMsg);
@@ -421,6 +421,143 @@ public class OrchestratorApi {
                 "Get openapi of registered service success with Url %s.", apiUrl);
         log.info(successMsg);
         return apiUrl;
+    }
+
+    /**
+     * List the available services.
+     *
+     * @param categoryName   name of category.
+     * @param cspName        name of cloud service provider.
+     * @param serviceName    name of registered service.
+     * @param serviceVersion version of registered service.
+     * @return response
+     */
+    @Tag(name = "Services Available",
+            description = "APIs to query the available services.")
+    @Operation(description = "List the available services.")
+    @GetMapping(value = "/services/available",
+            produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserAvailableServiceVo> listAvailableServices(
+            @Parameter(name = "categoryName", description = "category of the service")
+            @RequestParam(name = "categoryName", required = false) String categoryName,
+            @Parameter(name = "cspName", description = "name of the service provider")
+            @RequestParam(name = "cspName", required = false) String cspName,
+            @Parameter(name = "serviceName", description = "name of the service")
+            @RequestParam(name = "serviceName", required = false) String serviceName,
+            @Parameter(name = "serviceVersion", description = "version of the service")
+            @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
+        RegisteredServiceQuery query = new RegisteredServiceQuery();
+        if (StringUtils.isNotBlank(cspName)) {
+            query.setCsp(Csp.getCspByValue(cspName));
+        }
+        if (StringUtils.isNotBlank(categoryName)) {
+            query.setCategory(Category.getCategoryByCatalog(categoryName));
+        }
+        query.setServiceName(serviceName);
+        query.setServiceVersion(serviceVersion);
+        List<RegisterServiceEntity> serviceEntities =
+                registerService.queryRegisteredServices(query);
+        String successMsg = String.format("List available services with query model %s "
+                + "success.", query);
+        List<UserAvailableServiceVo> userAvailableServiceVos =
+                serviceEntities.stream().map(this::convertToUserAvailableServiceVo)
+                        .collect(Collectors.toList());
+        log.info(successMsg);
+        return userAvailableServiceVos;
+    }
+
+
+    /**
+     * Get the available services by tree.
+     *
+     * @param categoryName name of category.
+     * @return response
+     */
+    @Tag(name = "Services Available",
+            description = "APIs to query available services.")
+    @Operation(description = "Get the available services by tree.")
+    @GetMapping(value = "/services/available/category/{categoryName}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<CategoryOclVo> getAvailableServicesTree(
+            @Parameter(name = "categoryName", description = "category of the service")
+            @PathVariable(name = "categoryName", required = false) String categoryName) {
+        Category category = Category.getCategoryByCatalog(categoryName);
+        RegisteredServiceQuery query = new RegisteredServiceQuery();
+        query.setCategory(category);
+        List<CategoryOclVo> categoryOclList =
+                registerService.getManagedServicesTree(query);
+        String successMsg = String.format(
+                "Get the tree of available services with category %s "
+                        + "success.", categoryName);
+        log.info(successMsg);
+        return categoryOclList;
+    }
+
+
+    /**
+     * Get available service by id.
+     *
+     * @param id The id of available service.
+     * @return userAvailableServiceVo
+     */
+    @Tag(name = "Services Available",
+            description = "APIs to query available services.")
+    @Operation(description = "Get available service by id.")
+    @GetMapping(value = "/services/available/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public UserAvailableServiceVo availableServiceDetail(
+            @Parameter(name = "id", description = "The id of available service.")
+            @PathVariable("id") String id) {
+        UserAvailableServiceVo userAvailableServiceVo = convertToUserAvailableServiceVo(
+                registerService.getRegisteredService(id));
+        String successMsg = String.format(
+                "Get available service with id %s success.", id);
+        log.info(successMsg);
+        return userAvailableServiceVo;
+    }
+
+    /**
+     * Get the API document of the available service.
+     *
+     * @param id The id of available service.
+     */
+    @Tag(name = "Services Available",
+            description = "APIs to query available services.")
+    @GetMapping(value = "/services/available/openapi/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(description = "Get the API document of the available service.")
+    public Object availableServiceOpenApi(@PathVariable("id") String id) {
+        String apiUrl = this.registerService.getOpenApiUrl(id);
+        String successMsg = String.format(
+                "Get API document of the available service success with Url %s.", apiUrl);
+        log.info(successMsg);
+        return apiUrl;
+    }
+
+
+    private UserAvailableServiceVo convertToUserAvailableServiceVo(
+            RegisterServiceEntity serviceEntity) {
+        if (Objects.isNull(serviceEntity)) {
+            return null;
+        }
+        UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
+        BeanUtils.copyProperties(serviceEntity, userAvailableServiceVo);
+        userAvailableServiceVo.setIcon(serviceEntity.getOcl().getIcon());
+        userAvailableServiceVo.setDescription(serviceEntity.getOcl().getDescription());
+        userAvailableServiceVo.setNamespace(serviceEntity.getOcl().getNamespace());
+        userAvailableServiceVo.setBilling(serviceEntity.getOcl().getBilling());
+        userAvailableServiceVo.setFlavors(serviceEntity.getOcl().getFlavors());
+        userAvailableServiceVo.setVariables(serviceEntity.getOcl().getDeployment().getVariables());
+        userAvailableServiceVo.setRegions(
+                serviceEntity.getOcl().getCloudServiceProvider().getRegions());
+        userAvailableServiceVo.add(
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrchestratorApi.class)
+                                .availableServiceOpenApi(serviceEntity.getId().toString()))
+                        .withRel("openApi"));
+        return userAvailableServiceVo;
     }
 
     private String generateCustomerServiceName(CreateRequest createRequest) {

@@ -74,10 +74,10 @@ public interface RegisterService {
     /**
      * Search registered service tree by query model.
      *
-     * @param query the query model for search registered service.
+     * @param query the query model for search managed service.
      * @return Returns Tree of RegisterServiceEntity
      */
-    List<CategoryOclVo> queryRegisteredServicesTree(RegisteredServiceQuery query);
+    List<CategoryOclVo> getManagedServicesTree(RegisteredServiceQuery query);
 
     /**
      * Unregister service using the ID of registered service.

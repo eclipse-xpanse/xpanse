@@ -15,7 +15,7 @@ import org.eclipse.xpanse.modules.models.resource.Region;
 
 
 /**
- * Define view object for UI Client query registered service by csp.
+ * View object for list available services group by csp.
  */
 @Data
 public class ProviderOclVo {
@@ -29,7 +29,7 @@ public class ProviderOclVo {
     private List<Region> regions;
 
     @NotNull
-    @Schema(description = "The list of the registered services.")
-    private List<OclDetailVo> details;
+    @Schema(description = "The list of the available services.")
+    private List<UserAvailableServiceVo> details;
 
 }
