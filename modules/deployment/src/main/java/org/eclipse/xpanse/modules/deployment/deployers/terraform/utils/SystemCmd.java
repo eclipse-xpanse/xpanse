@@ -31,19 +31,20 @@ public class SystemCmd {
     @Getter
     private String workDir = "";
 
-    public boolean execute(String cmd, StringBuilder stdErrOut) {
-        return execute(cmd, stdErrOut, 0);
+    public SystemCmdResult execute(String cmd) {
+        return execute(cmd, 0);
     }
 
     /**
      * Executes operating system command.
      *
      * @param cmd        command to be executed.
-     * @param stdErrOut  object to which the output of the command is appended to.
      * @param waitSecond time to wait for the command to be completed.
-     * @return returns true if command was successfully executed else returns false.
+     * @return returns SystemCmdResult object which has all the execution details.
      */
-    public boolean execute(String cmd, StringBuilder stdErrOut, long waitSecond) {
+    public SystemCmdResult execute(String cmd, int waitSecond) {
+        SystemCmdResult systemCmdResult = new SystemCmdResult();
+        systemCmdResult.setCommandExecuted(cmd);
         log.info("SystemCmd executing cmd: " + String.join(" ", cmd));
         try {
             String[] safeCmd = cmd.split(" +");
@@ -59,33 +60,33 @@ public class SystemCmd {
             BufferedReader outputReader =
                     new BufferedReader(new InputStreamReader((process.getInputStream())));
             String line;
+            StringBuilder stringBuilder = new StringBuilder();
             while ((line = outputReader.readLine()) != null) {
-                stdErrOut.append(line).append("\n");
-                log.info(line);
+                stringBuilder.append(line).append("\n");
             }
+            systemCmdResult.setCommandOutput(stringBuilder.toString());
 
-            if (waitSecond == 0) {
+            if (waitSecond <= 0) {
                 process.waitFor();
             } else {
                 if (!process.waitFor(waitSecond, TimeUnit.SECONDS)) {
-                    log.error("SystemCmd wait process failed. {}", String.join(" ", cmd));
-                    throw new IllegalStateException("SystemCmd wait process failed. \nCmd:\n" + cmd
-                            + "\nOutput:\n" + stdErrOut.toString());
+                    log.error("SystemCmd wait process failed");
+                    systemCmdResult.setCommandSuccessful(false);
                 }
             }
             if (process.exitValue() != 0) {
                 log.error("SystemCmd process finished with abnormal value.");
-                throw new IllegalStateException(
-                        "SystemCmd process finished with abnormal value. \nCmd:\n" + cmd
-                                + "\nOutput:" + stdErrOut.toString());
+                systemCmdResult.setCommandSuccessful(false);
+            } else {
+                systemCmdResult.setCommandSuccessful(true);
             }
         } catch (final IOException ex) {
-            throw new IllegalStateException(cmd + stdErrOut.toString(), ex);
+            systemCmdResult.setCommandSuccessful(false);
         } catch (final InterruptedException ex) {
             log.error("SystemCmd process be interrupted.");
             Thread.currentThread().interrupt();
+            systemCmdResult.setCommandSuccessful(false);
         }
-
-        return true;
+        return systemCmdResult;
     }
 }

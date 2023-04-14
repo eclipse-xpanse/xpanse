@@ -14,6 +14,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmdResult;
 
 /**
  * An executor for terraform.
@@ -45,10 +46,9 @@ public class TerraformExecutor {
      * @return true if initialization of terraform is successful. else false.
      */
     public boolean tfInit() {
-        StringBuilder out = new StringBuilder();
-        boolean exeRet = execute("terraform init", out);
-        log.info(out.toString());
-        return exeRet;
+        SystemCmdResult systemCmdResult = execute("terraform init");
+        log.info(systemCmdResult.getCommandOutput());
+        return systemCmdResult.isCommandSuccessful();
     }
 
     /**
@@ -96,23 +96,21 @@ public class TerraformExecutor {
                         .append("\" ");
             }
         }
-        StringBuilder out = new StringBuilder();
-        boolean exeRet = execute(command.toString(), out);
-        log.info(out.toString());
-        return exeRet;
+        SystemCmdResult systemCmdResult = execute(command.toString());
+        log.info(systemCmdResult.getCommandOutput());
+        return systemCmdResult.isCommandSuccessful();
     }
 
     /**
      * Executes terraform commands.
      *
-     * @return true if finished without exceptions, else false.
+     * @return SystemCmdResult
      */
-    private boolean execute(String cmd, StringBuilder stdOut) {
-        log.info("Will execute cmd: " + String.join(" ", cmd));
+    private SystemCmdResult execute(String cmd) {
         SystemCmd systemCmd = new SystemCmd();
         systemCmd.setEnv(env);
         systemCmd.setWorkDir(workspace);
-        return systemCmd.execute(cmd, stdOut);
+        return systemCmd.execute(cmd);
     }
 
     /**
