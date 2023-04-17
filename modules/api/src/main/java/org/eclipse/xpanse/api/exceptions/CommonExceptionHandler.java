@@ -10,7 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
-import org.eclipse.xpanse.api.response.ResultCode;
+import org.eclipse.xpanse.api.response.ResultType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindingResult;
@@ -43,7 +43,7 @@ public class CommonExceptionHandler {
             sb.append(fieldError.getField()).append("：").append(fieldError.getDefaultMessage())
                 .append(", ");
         }
-        return Response.errorResponse(ResultCode.BAD_PARAMETERS, sb.toString());
+        return Response.errorResponse(ResultType.BAD_PARAMETERS, sb.toString());
     }
 
     /**
@@ -55,7 +55,7 @@ public class CommonExceptionHandler {
     public Response handleConstraintViolationException(ConstraintViolationException ex) {
         log.error("handleConstraintViolationException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultType.BAD_PARAMETERS, failMessage);
     }
 
     /**
@@ -66,7 +66,7 @@ public class CommonExceptionHandler {
     public Response handleRuntimeException(RuntimeException ex) {
         String failMessage = ex.getMessage();
         log.error("handleRuntimeException: ", ex);
-        return Response.errorResponse(ResultCode.RUNTIME_ERROR, failMessage);
+        return Response.errorResponse(ResultType.RUNTIME_ERROR, failMessage);
     }
 
     /**
@@ -77,7 +77,7 @@ public class CommonExceptionHandler {
     public Response handleHttpMessageConversionException(HttpMessageConversionException ex) {
         log.error("handleHttpMessageConversionException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultType.BAD_PARAMETERS, failMessage);
     }
 
     /**
@@ -88,7 +88,7 @@ public class CommonExceptionHandler {
     public Response handleNotFoundException(EntityNotFoundException ex) {
         log.error("handleNotFoundException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultType.BAD_PARAMETERS, failMessage);
     }
 
     /**
@@ -99,7 +99,7 @@ public class CommonExceptionHandler {
     public Response handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("handleNotFoundException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultCode.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultType.BAD_PARAMETERS, failMessage);
     }
 
     /**
@@ -110,6 +110,6 @@ public class CommonExceptionHandler {
     public Response handleException(Exception ex) {
         log.error("handleException: ", ex);
         String failMessage = ex.getClass().getName() + ":" + ex.getMessage();
-        return Response.errorResponse(ResultCode.RUNTIME_ERROR, failMessage);
+        return Response.errorResponse(ResultType.RUNTIME_ERROR, failMessage);
     }
 }

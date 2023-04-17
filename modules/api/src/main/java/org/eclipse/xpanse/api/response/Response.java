@@ -21,12 +21,12 @@ public class Response {
 
     @NotNull
     @Schema(description = "The result code of response.")
-    private String code;
+    private ResultType resultType;
     @NotNull
-    @Schema(description = "The result message of response.")
-    private String message;
+    @Schema(description = "Details of the error occurred")
+    private String details;
     @NotNull
-    @Schema(description = "The success boolean of response.")
+    @Schema(description = "Describes if the request is successful")
     private Boolean success;
 
     /**
@@ -36,11 +36,11 @@ public class Response {
      * @param errMsg     error message
      * @return errorResponse
      */
-    public static Response errorResponse(ResultCode resultCode, String errMsg) {
+    public static Response errorResponse(ResultType resultCode, String errMsg) {
         Response response = new Response();
         response.success = false;
-        response.code = resultCode.getCode();
-        response.message = resultCode.getMessage() + ". -- " + errMsg;
+        response.resultType = resultCode;
+        response.details =  errMsg;
         return response;
     }
 
@@ -53,8 +53,8 @@ public class Response {
     public static Response successResponse(String successMsg) {
         Response response = new Response();
         response.success = true;
-        response.code = ResultCode.SUCCESS.getCode();
-        response.message = ResultCode.SUCCESS.getMessage() + ". -- " + successMsg;
+        response.resultType = ResultType.SUCCESS;
+        response.details =  successMsg;
         return response;
     }
 
