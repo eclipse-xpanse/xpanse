@@ -24,8 +24,8 @@ import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
-import org.eclipse.xpanse.modules.models.view.OclDetailVo;
 import org.eclipse.xpanse.modules.models.view.ProviderOclVo;
+import org.eclipse.xpanse.modules.models.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.models.view.VersionOclVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
@@ -197,7 +197,7 @@ public class RegisterServiceImpl implements RegisterService {
      * @return Returns Tree of RegisterService View
      */
     @Override
-    public List<CategoryOclVo> queryRegisteredServicesTree(RegisteredServiceQuery query) {
+    public List<CategoryOclVo> getManagedServicesTree(RegisteredServiceQuery query) {
         List<RegisterServiceEntity> serviceList = storage.queryRegisteredServices(query);
         if (CollectionUtils.isEmpty(serviceList)) {
             return new ArrayList<>();
@@ -222,12 +222,10 @@ public class RegisterServiceImpl implements RegisterService {
                 cspListMap.forEach((csp, cspList) -> {
                     ProviderOclVo providerOclVo = new ProviderOclVo();
                     providerOclVo.setName(csp);
-                    List<OclDetailVo> details = cspList.stream()
-                            .map(this::convertToOclDetailVo)
+                    List<UserAvailableServiceVo> details = cspList.stream()
+                            .map(this::convertToRegisteredServiceUserVo)
                             .collect(Collectors.toList());
                     providerOclVo.setDetails(details);
-                    providerOclVo.setRegions(
-                            details.get(0).getCloudServiceProvider().getRegions());
                     cspVoList.add(providerOclVo);
                 });
                 versionOclVo.setCloudProvider(cspVoList);
@@ -274,17 +272,22 @@ public class RegisterServiceImpl implements RegisterService {
         return openApiUrl;
     }
 
-    private OclDetailVo convertToOclDetailVo(RegisterServiceEntity serviceEntity) {
+    private UserAvailableServiceVo convertToRegisteredServiceUserVo(
+            RegisterServiceEntity serviceEntity) {
         if (Objects.isNull(serviceEntity)) {
             return null;
         }
-        OclDetailVo oclDetailVo = new OclDetailVo();
-        oclDetailVo.setId(serviceEntity.getId());
-        BeanUtils.copyProperties(serviceEntity.getOcl(), oclDetailVo);
-        oclDetailVo.setCreateTime(serviceEntity.getCreateTime());
-        oclDetailVo.setLastModifiedTime(serviceEntity.getLastModifiedTime());
-        oclDetailVo.setServiceState(serviceEntity.getServiceState());
-        return oclDetailVo;
+        UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
+        BeanUtils.copyProperties(serviceEntity, userAvailableServiceVo);
+        userAvailableServiceVo.setIcon(serviceEntity.getOcl().getIcon());
+        userAvailableServiceVo.setDescription(serviceEntity.getOcl().getDescription());
+        userAvailableServiceVo.setNamespace(serviceEntity.getOcl().getNamespace());
+        userAvailableServiceVo.setBilling(serviceEntity.getOcl().getBilling());
+        userAvailableServiceVo.setFlavors(serviceEntity.getOcl().getFlavors());
+        userAvailableServiceVo.setVariables(serviceEntity.getOcl().getDeployment().getVariables());
+        userAvailableServiceVo.setRegions(
+                serviceEntity.getOcl().getCloudServiceProvider().getRegions());
+        return userAvailableServiceVo;
     }
 
 
