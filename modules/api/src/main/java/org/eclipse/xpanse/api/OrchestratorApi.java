@@ -76,9 +76,9 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to manage register services.")
+            description = "APIs to manage services.")
     @Operation(description = "Get category list.")
-    @GetMapping(value = "/register/categories",
+    @GetMapping(value = "/services/categories",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<Category> listCategories() {
@@ -94,7 +94,7 @@ public class OrchestratorApi {
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
     @Operation(description = "Register new service using ocl model.")
-    @PostMapping(value = "/register",
+    @PostMapping(value = "/services/register",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -115,7 +115,7 @@ public class OrchestratorApi {
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
     @Operation(description = "Update registered service using id and ocl model.")
-    @PutMapping(value = "/register/{id}",
+    @PutMapping(value = "/services/register/{id}",
             consumes = {"application/x-yaml", "application/yml", "application/yaml"},
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -140,7 +140,7 @@ public class OrchestratorApi {
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
     @Operation(description = "Register new service with URL of Ocl file.")
-    @PostMapping(value = "/register/file",
+    @PostMapping(value = "/services/register/file",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
@@ -165,7 +165,7 @@ public class OrchestratorApi {
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
     @Operation(description = "Update registered service using id and ocl file url.")
-    @PutMapping(value = "/register/file/{id}",
+    @PutMapping(value = "/services/register/file/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
@@ -194,7 +194,7 @@ public class OrchestratorApi {
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
     @Operation(description = "Unregister registered service using id.")
-    @DeleteMapping("/register/{id}")
+    @DeleteMapping("/services/register/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public Response unregister(
@@ -221,7 +221,7 @@ public class OrchestratorApi {
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
     @Operation(description = "List registered service with query params.")
-    @GetMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/services/register", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<RegisteredServiceVo> listRegisteredServices(
             @Parameter(name = "categoryName", description = "category of the service")
@@ -232,16 +232,8 @@ public class OrchestratorApi {
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
-        RegisteredServiceQuery query = new RegisteredServiceQuery();
-        if (StringUtils.isNotBlank(cspName)) {
-            query.setCsp(Csp.getCspByValue(cspName));
-        }
-        if (StringUtils.isNotBlank(categoryName)) {
-            query.setCategory(Category.getCategoryByCatalog(categoryName));
-        }
-        query.setServiceName(serviceName);
-        query.setServiceVersion(serviceVersion);
-        log.info("List registered service with query model {}", query);
+        RegisteredServiceQuery query = getServicesQueryModel(categoryName, cspName, serviceName,
+                serviceVersion);
         List<RegisterServiceEntity> serviceEntities =
                 registerService.queryRegisteredServices(query);
         String successMsg = String.format("List registered service with query model %s "
@@ -253,36 +245,6 @@ public class OrchestratorApi {
         return registeredServiceVos;
     }
 
-
-    /**
-     * List registered service with category.
-     *
-     * @param categoryName name of category.
-     * @return response
-     */
-    @Tag(name = "Service Vendor",
-            description = "APIs to manage register services.")
-    @Operation(description = "List registered service group by serviceName, serviceVersion, "
-            + "cspName with category.")
-    @GetMapping(value = "/register/category/{categoryName}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public List<CategoryOclVo> listRegisteredServicesTree(
-            @Parameter(name = "categoryName", description = "category of the service")
-            @PathVariable(name = "categoryName", required = false) String categoryName) {
-        Category category = Category.getCategoryByCatalog(categoryName);
-        RegisteredServiceQuery query = new RegisteredServiceQuery();
-        query.setCategory(category);
-        log.info("List registered service with query model {}", query);
-        List<CategoryOclVo> categoryOclList =
-                registerService.getManagedServicesTree(query);
-        String successMsg = String.format("List registered service with query model %s "
-                + "success.", query);
-        log.info(successMsg);
-        return categoryOclList;
-    }
-
-
     /**
      * Get registered service using id.
      *
@@ -292,7 +254,7 @@ public class OrchestratorApi {
     @Tag(name = "Service Vendor",
             description = "APIs to manage register services.")
     @Operation(description = "Get registered service using id.")
-    @GetMapping(value = "/register/{id}",
+    @GetMapping(value = "/services/register/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public RegisteredServiceVo detail(
@@ -328,7 +290,7 @@ public class OrchestratorApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Get deployed service using id.")
-    @GetMapping(value = "/service/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/services/deployed/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ServiceDetailVo serviceDetail(
             @Parameter(name = "id", description = "Task id of deploy service")
@@ -344,9 +306,9 @@ public class OrchestratorApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "List the deployed services.")
-    @GetMapping(value = "/services", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/services/deployed", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ServiceVo> services() {
+    public List<ServiceVo> listDeployedServices() {
         return this.orchestratorService.listDeployServices();
     }
 
@@ -358,7 +320,7 @@ public class OrchestratorApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Start a task to deploy registered service.")
-    @PostMapping(value = "/service", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/services/deploy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public UUID deploy(@Valid @RequestBody CreateRequest deployRequest) {
         log.info("Starting managed service with name {}, version {}, csp {}",
@@ -390,7 +352,7 @@ public class OrchestratorApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Start a task to destroy the deployed service using id.")
-    @DeleteMapping(value = "/service/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/services/destroy/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Response destroy(@PathVariable("id") String id) {
         log.info("Stopping managed service with id {}", id);
@@ -403,25 +365,6 @@ public class OrchestratorApi {
         return Response.successResponse(successMsg);
     }
 
-
-    /**
-     * Get openapi of registered service by id.
-     *
-     * @param id id of registered service.
-     */
-    @Tag(name = "Service Vendor",
-            description = "APIs to manage register services.")
-    @GetMapping(value = "/register/openapi/{id}", produces = MediaType.TEXT_HTML_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "API to get openapi of service deploy context")
-    public Object openApi(@PathVariable("id") String id) {
-        log.info("Get openapi url of registered service with id {}", id);
-        String apiUrl = this.registerService.getOpenApiUrl(id);
-        String successMsg = String.format(
-                "Get openapi of registered service success with Url %s.", apiUrl);
-        log.info(successMsg);
-        return apiUrl;
-    }
 
     /**
      * List the available services.
@@ -447,15 +390,8 @@ public class OrchestratorApi {
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
-        RegisteredServiceQuery query = new RegisteredServiceQuery();
-        if (StringUtils.isNotBlank(cspName)) {
-            query.setCsp(Csp.getCspByValue(cspName));
-        }
-        if (StringUtils.isNotBlank(categoryName)) {
-            query.setCategory(Category.getCategoryByCatalog(categoryName));
-        }
-        query.setServiceName(serviceName);
-        query.setServiceVersion(serviceVersion);
+        RegisteredServiceQuery query = getServicesQueryModel(categoryName, cspName, serviceName,
+                serviceVersion);
         List<RegisterServiceEntity> serviceEntities =
                 registerService.queryRegisteredServices(query);
         String successMsg = String.format("List available services with query model %s "
@@ -526,10 +462,10 @@ public class OrchestratorApi {
      */
     @Tag(name = "Services Available",
             description = "APIs to query available services.")
-    @GetMapping(value = "/services/available/openapi/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "/services/available/{id}/openapi", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the available service.")
-    public Object availableServiceOpenApi(@PathVariable("id") String id) {
+    public Object openApi(@PathVariable("id") String id) {
         String apiUrl = this.registerService.getOpenApiUrl(id);
         String successMsg = String.format(
                 "Get API document of the available service success with Url %s.", apiUrl);
@@ -538,26 +474,48 @@ public class OrchestratorApi {
     }
 
 
+    private RegisteredServiceQuery getServicesQueryModel(String categoryName, String cspName,
+            String serviceName, String serviceVersion) {
+        RegisteredServiceQuery query = new RegisteredServiceQuery();
+        if (StringUtils.isNotBlank(cspName)) {
+            query.setCsp(Csp.getCspByValue(cspName));
+        }
+        if (StringUtils.isNotBlank(categoryName)) {
+            query.setCategory(Category.getCategoryByCatalog(categoryName));
+        }
+        if (StringUtils.isNotBlank(serviceName)) {
+            query.setServiceName(serviceName);
+        }
+        if (StringUtils.isNotBlank(serviceVersion)) {
+            query.setServiceVersion(serviceVersion);
+        }
+        return query;
+
+    }
+
+
     private UserAvailableServiceVo convertToUserAvailableServiceVo(
             RegisterServiceEntity serviceEntity) {
-        if (Objects.isNull(serviceEntity)) {
+        if (Objects.nonNull(serviceEntity)) {
+            UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
+            BeanUtils.copyProperties(serviceEntity, userAvailableServiceVo);
+            userAvailableServiceVo.setIcon(serviceEntity.getOcl().getIcon());
+            userAvailableServiceVo.setDescription(serviceEntity.getOcl().getDescription());
+            userAvailableServiceVo.setNamespace(serviceEntity.getOcl().getNamespace());
+            userAvailableServiceVo.setBilling(serviceEntity.getOcl().getBilling());
+            userAvailableServiceVo.setFlavors(serviceEntity.getOcl().getFlavors());
+            userAvailableServiceVo.setVariables(
+                    serviceEntity.getOcl().getDeployment().getVariables());
+            userAvailableServiceVo.setRegions(
+                    serviceEntity.getOcl().getCloudServiceProvider().getRegions());
+            userAvailableServiceVo.add(
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrchestratorApi.class)
+                                    .openApi(serviceEntity.getId().toString()))
+                            .withRel("openApi"));
+            return userAvailableServiceVo;
+        } else {
             return null;
         }
-        UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
-        BeanUtils.copyProperties(serviceEntity, userAvailableServiceVo);
-        userAvailableServiceVo.setIcon(serviceEntity.getOcl().getIcon());
-        userAvailableServiceVo.setDescription(serviceEntity.getOcl().getDescription());
-        userAvailableServiceVo.setNamespace(serviceEntity.getOcl().getNamespace());
-        userAvailableServiceVo.setBilling(serviceEntity.getOcl().getBilling());
-        userAvailableServiceVo.setFlavors(serviceEntity.getOcl().getFlavors());
-        userAvailableServiceVo.setVariables(serviceEntity.getOcl().getDeployment().getVariables());
-        userAvailableServiceVo.setRegions(
-                serviceEntity.getOcl().getCloudServiceProvider().getRegions());
-        userAvailableServiceVo.add(
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrchestratorApi.class)
-                                .availableServiceOpenApi(serviceEntity.getId().toString()))
-                        .withRel("openApi"));
-        return userAvailableServiceVo;
     }
 
     private String generateCustomerServiceName(CreateRequest createRequest) {
@@ -571,15 +529,15 @@ public class OrchestratorApi {
     }
 
     private RegisteredServiceVo convertToRegisteredServiceVo(RegisterServiceEntity serviceEntity) {
-        if (Objects.isNull(serviceEntity)) {
-            return null;
+        if (Objects.nonNull(serviceEntity)) {
+            RegisteredServiceVo registeredServiceVo = new RegisteredServiceVo();
+            BeanUtils.copyProperties(serviceEntity, registeredServiceVo);
+            registeredServiceVo.add(
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrchestratorApi.class)
+                            .openApi(serviceEntity.getId().toString())).withRel("openApi"));
+            return registeredServiceVo;
         }
-        RegisteredServiceVo registeredServiceVo = new RegisteredServiceVo();
-        BeanUtils.copyProperties(serviceEntity, registeredServiceVo);
-        registeredServiceVo.add(
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrchestratorApi.class)
-                        .openApi(serviceEntity.getId().toString())).withRel("openApi"));
-        return registeredServiceVo;
+        return null;
     }
 
 }
