@@ -212,7 +212,7 @@ public class OrchestratorApi {
     /**
      * List registered service with query params.
      *
-     * @param categoryName   name of category.
+     * @param category   name of category.
      * @param cspName        name of cloud service provider.
      * @param serviceName    name of registered service.
      * @param serviceVersion version of registered service.
@@ -225,14 +225,14 @@ public class OrchestratorApi {
     @ResponseStatus(HttpStatus.OK)
     public List<RegisteredServiceVo> listRegisteredServices(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) String categoryName,
+            @RequestParam(name = "categoryName", required = false) Category category,
             @Parameter(name = "cspName", description = "name of the service provider")
             @RequestParam(name = "cspName", required = false) String cspName,
             @Parameter(name = "serviceName", description = "name of the service")
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
-        RegisteredServiceQuery query = getServicesQueryModel(categoryName, cspName, serviceName,
+        RegisteredServiceQuery query = getServicesQueryModel(category, cspName, serviceName,
                 serviceVersion);
         List<RegisterServiceEntity> serviceEntities =
                 registerService.queryRegisteredServices(query);
@@ -369,7 +369,7 @@ public class OrchestratorApi {
     /**
      * List the available services.
      *
-     * @param categoryName   name of category.
+     * @param category   name of category.
      * @param cspName        name of cloud service provider.
      * @param serviceName    name of registered service.
      * @param serviceVersion version of registered service.
@@ -383,14 +383,14 @@ public class OrchestratorApi {
     @ResponseStatus(HttpStatus.OK)
     public List<UserAvailableServiceVo> listAvailableServices(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) String categoryName,
+            @RequestParam(name = "categoryName", required = false) Category category,
             @Parameter(name = "cspName", description = "name of the service provider")
             @RequestParam(name = "cspName", required = false) String cspName,
             @Parameter(name = "serviceName", description = "name of the service")
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
-        RegisteredServiceQuery query = getServicesQueryModel(categoryName, cspName, serviceName,
+        RegisteredServiceQuery query = getServicesQueryModel(category, cspName, serviceName,
                 serviceVersion);
         List<RegisterServiceEntity> serviceEntities =
                 registerService.queryRegisteredServices(query);
@@ -407,7 +407,7 @@ public class OrchestratorApi {
     /**
      * Get the available services by tree.
      *
-     * @param categoryName name of category.
+     * @param category name of category.
      * @return response
      */
     @Tag(name = "Services Available",
@@ -418,15 +418,14 @@ public class OrchestratorApi {
     @ResponseStatus(HttpStatus.OK)
     public List<CategoryOclVo> getAvailableServicesTree(
             @Parameter(name = "categoryName", description = "category of the service")
-            @PathVariable(name = "categoryName", required = false) String categoryName) {
-        Category category = Category.getCategoryByCatalog(categoryName);
+            @PathVariable(name = "categoryName", required = false) Category category) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         query.setCategory(category);
         List<CategoryOclVo> categoryOclList =
                 registerService.getManagedServicesTree(query);
         String successMsg = String.format(
                 "Get the tree of available services with category %s "
-                        + "success.", categoryName);
+                        + "success.", category.toValue());
         log.info(successMsg);
         return categoryOclList;
     }
@@ -474,15 +473,14 @@ public class OrchestratorApi {
     }
 
 
-    private RegisteredServiceQuery getServicesQueryModel(String categoryName, String cspName,
+    private RegisteredServiceQuery getServicesQueryModel(Category category, String cspName,
             String serviceName, String serviceVersion) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         if (StringUtils.isNotBlank(cspName)) {
             query.setCsp(Csp.getCspByValue(cspName));
         }
-        if (StringUtils.isNotBlank(categoryName)) {
-            query.setCategory(Category.getCategoryByCatalog(categoryName));
-        }
+        query.setCategory(category);
+
         if (StringUtils.isNotBlank(serviceName)) {
             query.setServiceName(serviceName);
         }

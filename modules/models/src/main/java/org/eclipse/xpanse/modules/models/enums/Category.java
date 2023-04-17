@@ -31,14 +31,11 @@ public enum Category {
         this.catalog = catalog;
     }
 
-
     /**
-     * Get Category by value.
-     *
-     * @param catalog catalog
-     * @return category
+     * For Category deserialize.
      */
-    public static Category getCategoryByCatalog(String catalog) {
+    @JsonCreator
+    public static Category getByValue(String catalog) {
         for (Category category : values()) {
             if (StringUtils.equalsIgnoreCase(category.catalog, catalog)) {
                 return category;
@@ -49,19 +46,6 @@ public enum Category {
 
     /**
      * For Category serialize.
-     */
-    @JsonCreator
-    public Category getByValue(String period) {
-        for (Category category : values()) {
-            if (StringUtils.equalsIgnoreCase(category.catalog, catalog)) {
-                return category;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * For Category deserialize.
      */
     @JsonValue
     public String toValue() {
