@@ -73,5 +73,5 @@ public class DeployResourceEntity extends CreateModifiedTime {
             joinColumns = @JoinColumn(name = "deployResource_id", nullable = false))
     @MapKeyColumn(name = "p_key")
     @Column(name = "p_value")
-    private Map<String, String> property;
+    private Map<String, String> properties;
 }

@@ -39,7 +39,7 @@ public class EntityTransUtils {
             for (DeployResourceEntity entity : entities) {
                 DeployResource deployResource = ResourceKindInstance.getInstance(entity.getKind());
                 BeanUtils.copyProperties(entity, deployResource);
-                fillChildFields(deployResource, entity.getProperty());
+                fillChildFields(deployResource, entity.getProperties());
                 resources.add(deployResource);
             }
         }

@@ -104,6 +104,16 @@ public class DeployServiceEntity extends CreateModifiedTime {
             joinColumns = @JoinColumn(name = "DEPLOY_SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE")
-    private Map<String, String> deployedServiceProperties;
+    private Map<String, String> properties;
+
+    /**
+     * The properties of the deployed service.
+     */
+    @ElementCollection
+    @CollectionTable(name = "DEPLOY_RESULT_PROPERTY",
+            joinColumns = @JoinColumn(name = "DEPLOY_SERVICE_ID", nullable = false))
+    @MapKeyColumn(name = "P_KEY")
+    @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
+    private Map<String, String> privateProperties;
 
 }

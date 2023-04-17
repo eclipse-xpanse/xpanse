@@ -17,7 +17,7 @@ public interface Deployment {
 
     DeployResult deploy(DeployTask task);
 
-    DeployResult destroy(DeployTask task);
+    DeployResult destroy(DeployTask task, String tfState);
 
     DeployerKind getDeployerKind();
 }
