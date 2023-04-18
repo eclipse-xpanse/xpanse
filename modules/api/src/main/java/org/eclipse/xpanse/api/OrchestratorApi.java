@@ -76,7 +76,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Service Vendor",
-            description = "APIs to manage services.")
+            description = "APIs to manage register services.")
     @Operation(description = "Get category list.")
     @GetMapping(value = "/services/categories",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -411,7 +411,7 @@ public class OrchestratorApi {
      * @return response
      */
     @Tag(name = "Services Available",
-            description = "APIs to query available services.")
+            description = "APIs to query the available services.")
     @Operation(description = "Get the available services by tree.")
     @GetMapping(value = "/services/available/category/{categoryName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -439,7 +439,7 @@ public class OrchestratorApi {
      * @return userAvailableServiceVo
      */
     @Tag(name = "Services Available",
-            description = "APIs to query available services.")
+            description = "APIs to query the available services.")
     @Operation(description = "Get available service by id.")
     @GetMapping(value = "/services/available/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -461,7 +461,7 @@ public class OrchestratorApi {
      * @param id The id of available service.
      */
     @Tag(name = "Services Available",
-            description = "APIs to query available services.")
+            description = "APIs to query the available services.")
     @GetMapping(value = "/services/available/{id}/openapi", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the available service.")
