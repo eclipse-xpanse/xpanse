@@ -8,9 +8,13 @@ package org.eclipse.xpanse.api.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.api.response.ResultType;
+import org.eclipse.xpanse.modules.models.exceptions.TerraformScriptFormatInvalidException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindingResult;
@@ -38,12 +42,11 @@ public class CommonExceptionHandler {
     public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.error("handleMethodArgumentNotValidException: ", ex);
         BindingResult bindingResult = ex.getBindingResult();
-        StringBuilder sb = new StringBuilder();
+        List<String> errors = new ArrayList<>();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            sb.append(fieldError.getField()).append("：").append(fieldError.getDefaultMessage())
-                .append(", ");
+            errors.add(fieldError.getField() + ":" + fieldError.getDefaultMessage());
         }
-        return Response.errorResponse(ResultType.BAD_PARAMETERS, sb.toString());
+        return Response.errorResponse(ResultType.BAD_PARAMETERS, errors);
     }
 
     /**
@@ -55,7 +58,8 @@ public class CommonExceptionHandler {
     public Response handleConstraintViolationException(ConstraintViolationException ex) {
         log.error("handleConstraintViolationException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultType.BAD_PARAMETERS,
+                Collections.singletonList(failMessage));
     }
 
     /**
@@ -66,7 +70,8 @@ public class CommonExceptionHandler {
     public Response handleRuntimeException(RuntimeException ex) {
         String failMessage = ex.getMessage();
         log.error("handleRuntimeException: ", ex);
-        return Response.errorResponse(ResultType.RUNTIME_ERROR, failMessage);
+        return Response.errorResponse(ResultType.RUNTIME_ERROR,
+                Collections.singletonList(failMessage));
     }
 
     /**
@@ -77,7 +82,8 @@ public class CommonExceptionHandler {
     public Response handleHttpMessageConversionException(HttpMessageConversionException ex) {
         log.error("handleHttpMessageConversionException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultType.BAD_PARAMETERS,
+                Collections.singletonList(failMessage));
     }
 
     /**
@@ -88,7 +94,8 @@ public class CommonExceptionHandler {
     public Response handleNotFoundException(EntityNotFoundException ex) {
         log.error("handleNotFoundException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultType.BAD_PARAMETERS,
+                Collections.singletonList(failMessage));
     }
 
     /**
@@ -97,9 +104,10 @@ public class CommonExceptionHandler {
     @ExceptionHandler({IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Response handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error("handleNotFoundException: ", ex);
+        log.error("handleIllegalArgumentException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS, failMessage);
+        return Response.errorResponse(ResultType.BAD_PARAMETERS,
+                Collections.singletonList(failMessage));
     }
 
     /**
@@ -110,6 +118,18 @@ public class CommonExceptionHandler {
     public Response handleException(Exception ex) {
         log.error("handleException: ", ex);
         String failMessage = ex.getClass().getName() + ":" + ex.getMessage();
-        return Response.errorResponse(ResultType.RUNTIME_ERROR, failMessage);
+        return Response.errorResponse(ResultType.RUNTIME_ERROR,
+                Collections.singletonList(failMessage));
+    }
+
+    /**
+     * Exception handler for IllegalArgumentException.
+     */
+    @ExceptionHandler({TerraformScriptFormatInvalidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleTerraformScriptFormatInvalidException(
+            TerraformScriptFormatInvalidException ex) {
+        return Response.errorResponse(ResultType.TERRAFORM_SCRIPT_INVALID, ex.getErrorReasons());
     }
 }

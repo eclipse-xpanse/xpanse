@@ -15,9 +15,10 @@ import org.apache.commons.lang3.StringUtils;
  * Result codes for the REST API.
  */
 public enum ResultType {
-    SUCCESS("success"),
-    RUNTIME_ERROR("Runtime failure"),
-    BAD_PARAMETERS("Parameters invalid");
+    SUCCESS("Success"),
+    RUNTIME_ERROR("Runtime Failure"),
+    BAD_PARAMETERS("Parameters Invalid"),
+    TERRAFORM_SCRIPT_INVALID("Terraform Script Invalid");
 
     private final String value;
 

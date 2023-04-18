@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -23,8 +24,8 @@ public class Response {
     @Schema(description = "The result code of response.")
     private ResultType resultType;
     @NotNull
-    @Schema(description = "Details of the error occurred")
-    private String details;
+    @Schema(description = "Details of the errors occurred")
+    private List<String> details;
     @NotNull
     @Schema(description = "Describes if the request is successful")
     private Boolean success;
@@ -36,7 +37,7 @@ public class Response {
      * @param errMsg     error message
      * @return errorResponse
      */
-    public static Response errorResponse(ResultType resultCode, String errMsg) {
+    public static Response errorResponse(ResultType resultCode, List<String> errMsg) {
         Response response = new Response();
         response.success = false;
         response.resultType = resultCode;
@@ -50,7 +51,7 @@ public class Response {
      * @param successMsg success message
      * @return successResponse
      */
-    public static Response successResponse(String successMsg) {
+    public static Response successResponse(List<String> successMsg) {
         Response response = new Response();
         response.success = true;
         response.resultType = ResultType.SUCCESS;

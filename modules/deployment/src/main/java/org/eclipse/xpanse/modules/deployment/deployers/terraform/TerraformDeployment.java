@@ -13,15 +13,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidationResult;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -58,7 +62,7 @@ public class TerraformDeployment implements Deployment {
         createScriptFile(task.getCreateRequest().getCsp(), task.getCreateRequest().getRegion(),
                 workspace, task.getOcl().getDeployment().getDeployer());
         // Execute the terraform command.
-        TerraformExecutor executor = getExecutor(task, workspace);
+        TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
         executor.deploy();
         String tfState = executor.getTerraformState();
 
@@ -96,7 +100,7 @@ public class TerraformDeployment implements Deployment {
         try {
             createDestroyScriptFile(task.getCreateRequest().getCsp(),
                     task.getCreateRequest().getRegion(), workspace, tfState);
-            TerraformExecutor executor = getExecutor(task, workspace);
+            TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
             executor.destroy();
             deleteWorkSpace(workspace);
             result.setId(task.getId());
@@ -129,11 +133,16 @@ public class TerraformDeployment implements Deployment {
      * @param task      the task for the deployment.
      * @param workspace the workspace of the deployment.
      */
-    private TerraformExecutor getExecutor(DeployTask task, String workspace) {
+    private TerraformExecutor getExecutorForDeployTask(DeployTask task, String workspace) {
         Map<String, String> envVariables = DeployEnvironments.getEnv(task);
         Map<String, String> inputVariables = DeployEnvironments.getVariables(task);
         // load flavor variables also as input variables for terraform executor.
         inputVariables.putAll(DeployEnvironments.getFlavorVariables(task));
+        return getExecutor(envVariables, inputVariables, workspace);
+    }
+
+    private TerraformExecutor getExecutor(Map<String, String> envVariables,
+                                          Map<String, String> inputVariables, String workspace) {
         return new TerraformExecutor(envVariables, inputVariables, workspace);
     }
 
@@ -217,5 +226,19 @@ public class TerraformDeployment implements Deployment {
     @Override
     public DeployerKind getDeployerKind() {
         return DeployerKind.TERRAFORM;
+    }
+
+    /**
+     * Validates the Terraform script.
+     */
+    public TfValidationResult validate(Ocl ocl) {
+        String workspace = getWorkspacePath(UUID.randomUUID().toString());
+        // Create the workspace.
+        buildWorkspace(workspace);
+        createScriptFile(ocl.getCloudServiceProvider().getName(),
+                ocl.getCloudServiceProvider().getRegions().get(0).getName(), workspace,
+                ocl.getDeployment().getDeployer());
+        TerraformExecutor executor = getExecutor(new HashMap<>(), new HashMap<>(), workspace);
+        return executor.tfValidate();
     }
 }

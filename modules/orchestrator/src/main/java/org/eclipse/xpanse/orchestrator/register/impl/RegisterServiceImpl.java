@@ -18,8 +18,12 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidateDiagnostics;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidationResult;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.utils.OclLoader;
@@ -27,6 +31,7 @@ import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.ProviderOclVo;
 import org.eclipse.xpanse.modules.models.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.models.view.VersionOclVo;
+import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.utils.IconProcessorUtil;
@@ -48,6 +53,9 @@ public class RegisterServiceImpl implements RegisterService {
     private OclLoader oclLoader;
     @Resource
     private OpenApiUtil openApiUtil;
+
+    @Resource
+    private OrchestratorService orchestratorService;
 
 
     /**
@@ -81,6 +89,7 @@ public class RegisterServiceImpl implements RegisterService {
         }
         iconUpdate(existedService, ocl);
         checkParams(existedService, ocl);
+        validateTerraformScript(ocl);
         existedService.setOcl(ocl);
         existedService.setServiceState(ServiceState.UPDATED);
         storage.store(existedService);
@@ -150,6 +159,7 @@ public class RegisterServiceImpl implements RegisterService {
             log.error("Service already registered.");
             throw new IllegalArgumentException("Service already registered.");
         }
+        validateTerraformScript(ocl);
         storage.store(newEntity);
         openApiUtil.generateServiceApi(newEntity);
         return newEntity;
@@ -288,6 +298,20 @@ public class RegisterServiceImpl implements RegisterService {
         userAvailableServiceVo.setRegions(
                 serviceEntity.getOcl().getCloudServiceProvider().getRegions());
         return userAvailableServiceVo;
+    }
+
+    private void validateTerraformScript(Ocl ocl) {
+        if (ocl.getDeployment().getKind() == DeployerKind.TERRAFORM) {
+            TfValidationResult tfValidationResult =
+                    this.orchestratorService.getDeployment(ocl.getDeployment().getKind())
+                            .validate(ocl);
+            if (!tfValidationResult.isValid()) {
+                throw new TerraformScriptFormatInvalidException(
+                        tfValidationResult.getDiagnostics().stream()
+                                .map(TfValidateDiagnostics::getDetail)
+                                .collect(Collectors.toList()));
+            }
+        }
     }
 
 

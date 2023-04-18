@@ -7,7 +7,9 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidationResult;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
 
 /**
@@ -20,4 +22,6 @@ public interface Deployment {
     DeployResult destroy(DeployTask task, String tfState);
 
     DeployerKind getDeployerKind();
+
+    TfValidationResult validate(Ocl ocl);
 }
