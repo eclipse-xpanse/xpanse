@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.api.response.ResultType;
+import org.eclipse.xpanse.modules.models.exceptions.ResponseInvalidException;
 import org.eclipse.xpanse.modules.models.exceptions.TerraformScriptFormatInvalidException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -37,7 +38,7 @@ public class CommonExceptionHandler {
      * Exception handler for MethodArgumentNotValidException.
      */
     @ExceptionHandler({MethodArgumentNotValidException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.error("handleMethodArgumentNotValidException: ", ex);
@@ -46,7 +47,7 @@ public class CommonExceptionHandler {
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             errors.add(fieldError.getField() + ":" + fieldError.getDefaultMessage());
         }
-        return Response.errorResponse(ResultType.BAD_PARAMETERS, errors);
+        return Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY, errors);
     }
 
     /**
@@ -131,5 +132,16 @@ public class CommonExceptionHandler {
     public Response handleTerraformScriptFormatInvalidException(
             TerraformScriptFormatInvalidException ex) {
         return Response.errorResponse(ResultType.TERRAFORM_SCRIPT_INVALID, ex.getErrorReasons());
+    }
+
+    /**
+     * Exception handler for ResponseInvalidException.
+     */
+    @ExceptionHandler({ResponseInvalidException.class})
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseBody
+    public Response handleResponseInvalidException(
+            ResponseInvalidException ex) {
+        return Response.errorResponse(ResultType.INVALID_RESPONSE, ex.getErrorReasons());
     }
 }

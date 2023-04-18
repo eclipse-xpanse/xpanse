@@ -18,7 +18,9 @@ public enum ResultType {
     SUCCESS("Success"),
     RUNTIME_ERROR("Runtime Failure"),
     BAD_PARAMETERS("Parameters Invalid"),
-    TERRAFORM_SCRIPT_INVALID("Terraform Script Invalid");
+    TERRAFORM_SCRIPT_INVALID("Terraform Script Invalid"),
+    UNPROCESSABLE_ENTITY("Unprocessable Entity"),
+    INVALID_RESPONSE("Response Not Valid");
 
     private final String value;
 

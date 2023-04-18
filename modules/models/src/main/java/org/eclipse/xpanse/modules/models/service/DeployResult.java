@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.models.service;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +40,7 @@ public class DeployResult {
      */
     @NotNull
     @Schema(description = "The deployed resources of the service.")
-    private List<DeployResource> resources;
+    private List<@Valid DeployResource> resources;
 
     /**
      * The result property of the service task.
