@@ -253,8 +253,6 @@ public class OpenApiUtil {
         if (Objects.isNull(registerService)) {
             return StringUtils.EMPTY;
         }
-        // version of OCL.
-        String oclVersion = registerService.getOcl().getVersion();
         // service url.
         String serviceUrl = getServiceUrl();
         // string of required fields list.
@@ -454,7 +452,7 @@ public class OpenApiUtil {
                                }
                            }
                           """,
-                oclVersion, serviceUrl, createRequiredStr, category, categoryValuesStr, serviceName,
+                serviceVersion, serviceUrl, createRequiredStr, category, categoryValuesStr, serviceName,
                 serviceVersion, csp, cspValuesStr, propertiesRequiredStr, propertiesStr);
     }
 
