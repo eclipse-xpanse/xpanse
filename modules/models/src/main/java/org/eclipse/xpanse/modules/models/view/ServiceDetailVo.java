@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.models.view;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class ServiceDetailVo extends ServiceVo {
     private CreateRequest createRequest;
 
     @Schema(description = "The resource list of the deployed service.")
-    private List<DeployResource> deployResources;
+    private List<@Valid DeployResource> deployResources;
 
     @Schema(description = "The properties of the deployed service.")
     private Map<String, String> deployedServiceProperties;

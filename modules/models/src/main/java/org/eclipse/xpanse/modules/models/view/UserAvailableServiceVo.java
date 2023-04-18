@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.models.view;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -57,7 +58,7 @@ public class UserAvailableServiceVo extends RepresentationModel<UserAvailableSer
 
     @NotEmpty
     @Schema(description = "The regions of the Cloud Service Provider.")
-    private List<Region> regions;
+    private List<@Valid Region> regions;
 
     @NotNull
     @NotBlank
@@ -76,11 +77,11 @@ public class UserAvailableServiceVo extends RepresentationModel<UserAvailableSer
 
     @NotNull
     @Schema(description = "The variables for the deployment, which will be passed to the deployer.")
-    private List<DeployVariable> variables;
+    private List<@Valid DeployVariable> variables;
 
     @NotNull
     @Schema(description = "The flavors of the available service.")
-    private List<Flavor> flavors;
+    private List<@Valid Flavor> flavors;
 
     @NotNull
     @Schema(description = "The billing policy of the available service.")

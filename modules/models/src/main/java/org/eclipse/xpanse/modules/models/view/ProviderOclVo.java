@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.models.view;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
@@ -26,10 +27,10 @@ public class ProviderOclVo {
 
     @NotNull
     @Schema(description = "The regions of the Cloud Service Provider.")
-    private List<Region> regions;
+    private List<@Valid Region> regions;
 
     @NotNull
     @Schema(description = "The list of the available services.")
-    private List<UserAvailableServiceVo> details;
+    private List<@Valid UserAvailableServiceVo> details;
 
 }
