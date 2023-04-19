@@ -61,7 +61,6 @@ public class ServiceVo {
      * The csp of the Service.
      */
     @NotNull
-    @NotBlank
     @Schema(description = "The provider of the service")
     private Csp csp;
 
