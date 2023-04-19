@@ -115,7 +115,7 @@ public class CommonExceptionHandler {
      * Exception handler for Exception.
      */
     @ExceptionHandler({Exception.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Response handleException(Exception ex) {
         log.error("handleException: ", ex);
         String failMessage = ex.getClass().getName() + ":" + ex.getMessage();

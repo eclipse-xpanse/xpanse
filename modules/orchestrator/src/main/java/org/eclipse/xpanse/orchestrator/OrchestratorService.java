@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.orchestrator;
 
 import jakarta.annotation.Resource;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -287,7 +288,7 @@ public class OrchestratorService {
     public ServiceDetailVo getDeployServiceDetail(UUID id) {
         DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
         if (Objects.isNull(deployServiceEntity)) {
-            return null;
+            throw new EntityNotFoundException("Service not found.");
         }
         ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
         BeanUtils.copyProperties(deployServiceEntity, serviceDetailVo);

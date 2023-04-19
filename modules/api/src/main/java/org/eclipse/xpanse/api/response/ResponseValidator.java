@@ -10,6 +10,7 @@ import jakarta.validation.Validator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -40,28 +41,30 @@ public class ResponseValidator {
     }
 
     private void validateResponse(Object object) {
-        List<String> errors = new ArrayList<>();
-        if (object instanceof Collection<?>) {
-            ((Collection<?>) object).forEach(item -> {
-                Set<ConstraintViolation<Object>> validationResults = validator.validate(item);
+        if (!Objects.isNull(object)) {
+            List<String> errors = new ArrayList<>();
+            if (object instanceof Collection<?>) {
+                ((Collection<?>) object).forEach(item -> {
+                    Set<ConstraintViolation<Object>> validationResults = validator.validate(item);
+                    if (validationResults.size() > 0) {
+                        for (ConstraintViolation<Object> error : validationResults) {
+                            errors.add(error.getPropertyPath() + ":" + error.getMessage());
+                        }
+                    }
+
+                });
+            } else {
+                Set<ConstraintViolation<Object>> validationResults = validator.validate(object);
                 if (validationResults.size() > 0) {
                     for (ConstraintViolation<Object> error : validationResults) {
                         errors.add(error.getPropertyPath() + ":" + error.getMessage());
                     }
                 }
-
-            });
-        } else {
-            Set<ConstraintViolation<Object>> validationResults = validator.validate(object);
-            if (validationResults.size() > 0) {
-                for (ConstraintViolation<Object> error : validationResults) {
-                    errors.add(error.getPropertyPath() + ":" + error.getMessage());
-                }
             }
-        }
 
-        if (!errors.isEmpty()) {
-            throw new ResponseInvalidException(errors);
+            if (!errors.isEmpty()) {
+                throw new ResponseInvalidException(errors);
+            }
         }
     }
 }
