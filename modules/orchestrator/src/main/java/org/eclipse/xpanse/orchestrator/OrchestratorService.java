@@ -298,6 +298,9 @@ public class OrchestratorService {
                             deployServiceEntity.getDeployResourceList());
             serviceDetailVo.setDeployResources(deployResources);
         }
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
+            serviceDetailVo.setDeployedServiceProperties(deployServiceEntity.getProperties());
+        }
         return serviceDetailVo;
     }
 
