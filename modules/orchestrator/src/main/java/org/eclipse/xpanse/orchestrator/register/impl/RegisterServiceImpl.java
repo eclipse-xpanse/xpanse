@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.resource.Region;
 import org.eclipse.xpanse.modules.models.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.ProviderOclVo;
@@ -236,6 +237,11 @@ public class RegisterServiceImpl implements RegisterService {
                             .map(this::convertToRegisteredServiceUserVo)
                             .collect(Collectors.toList());
                     providerOclVo.setDetails(details);
+                    List<Region> regions = new ArrayList<>();
+                    for (UserAvailableServiceVo userAvailableServiceVo : details) {
+                        regions.addAll(userAvailableServiceVo.getRegions());
+                    }
+                    providerOclVo.setRegions(regions);
                     cspVoList.add(providerOclVo);
                 });
                 versionOclVo.setCloudProvider(cspVoList);
