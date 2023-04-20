@@ -40,6 +40,7 @@ import org.eclipse.xpanse.modules.models.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -463,15 +464,16 @@ public class OrchestratorApi {
      */
     @Tag(name = "Services Available",
             description = "APIs to query the available services.")
-    @GetMapping(value = "/services/available/{id}/openapi", produces = MediaType.TEXT_HTML_VALUE)
+    @GetMapping(value = "/services/available/{id}/openapi",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the available service.")
-    public Object openApi(@PathVariable("id") String id) {
+    public Link openApi(@PathVariable("id") String id) {
         String apiUrl = this.registerService.getOpenApiUrl(id);
         String successMsg = String.format(
                 "Get API document of the available service success with Url %s.", apiUrl);
         log.info(successMsg);
-        return apiUrl;
+        return Link.of(apiUrl, "OpenApi");
     }
 
 
