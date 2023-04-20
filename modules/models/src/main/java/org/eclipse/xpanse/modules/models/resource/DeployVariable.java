@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.enums.SensitiveScope;
 
 /**
  * Defines for the deploy variable.
@@ -49,4 +50,8 @@ public class DeployVariable {
 
     @Schema(description = "Validator of the variable")
     private String validator;
+
+    @NotNull
+    @Schema(description = "Sensitive scope of variable storage")
+    private SensitiveScope scope;
 }
