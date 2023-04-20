@@ -213,7 +213,7 @@ public class OrchestratorApi {
     /**
      * List registered service with query params.
      *
-     * @param category   name of category.
+     * @param category       name of category.
      * @param cspName        name of cloud service provider.
      * @param serviceName    name of registered service.
      * @param serviceVersion version of registered service.
@@ -290,11 +290,12 @@ public class OrchestratorApi {
      * @return Status of the managed service.
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @Operation(description = "Get deployed service using id.")
-    @GetMapping(value = "/services/deployed/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(description = "Get deployed service details by id.")
+    @GetMapping(value = "/services/deployed/{id}/details",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ServiceDetailVo serviceDetail(
-            @Parameter(name = "id", description = "Task id of deploy service")
+    public ServiceDetailVo getDeployedServiceDetailsById(
+            @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
 
         return this.orchestratorService.getDeployServiceDetail(UUID.fromString(id));
@@ -370,7 +371,7 @@ public class OrchestratorApi {
     /**
      * List the available services.
      *
-     * @param category   name of category.
+     * @param category       name of category.
      * @param cspName        name of cloud service provider.
      * @param serviceName    name of registered service.
      * @param serviceVersion version of registered service.
@@ -475,7 +476,8 @@ public class OrchestratorApi {
 
 
     private RegisteredServiceQuery getServicesQueryModel(Category category, String cspName,
-            String serviceName, String serviceVersion) {
+                                                         String serviceName,
+                                                         String serviceVersion) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         if (StringUtils.isNotBlank(cspName)) {
             query.setCsp(Csp.getCspByValue(cspName));
