@@ -104,13 +104,13 @@ deployment:
       example: "k8s-secgroup-default"
       mandatory: false
   deployer: |
-    variable "flavor_flavor_id" {
+    variable "flavor_id" {
       type        = string
       default     = "c7.large.2"
       description = "The flavor_id of all nodes in the k8s cluster."
     }
 
-    variable "flavor_worker_nodes_count" {
+    variable "worker_nodes_count" {
       type        = string
       default     = 3
       description = "The worker nodes count in the k8s cluster."
