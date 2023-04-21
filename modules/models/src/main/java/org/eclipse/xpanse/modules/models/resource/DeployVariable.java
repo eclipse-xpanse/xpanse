@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.models.enums.SensitiveScope;
  */
 @Data
 public class DeployVariable {
+
     @NotNull
     @NotBlank
     @Schema(description = "The name of the deploy variable")
@@ -51,7 +52,6 @@ public class DeployVariable {
     @Schema(description = "Validator of the variable")
     private String validator;
 
-    @NotNull
     @Schema(description = "Sensitive scope of variable storage")
-    private SensitiveScope scope;
+    private SensitiveScope sensitiveScope = SensitiveScope.NONE;
 }
