@@ -12,7 +12,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -55,16 +59,9 @@ public class SystemCmd {
             if (!Objects.equals(workDir, "")) {
                 processBuilder.directory(new File(workDir));
             }
-            processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-            BufferedReader outputReader =
-                    new BufferedReader(new InputStreamReader((process.getInputStream())));
-            String line;
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((line = outputReader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
-            }
-            systemCmdResult.setCommandOutput(stringBuilder.toString());
+            systemCmdResult.setCommandStdError(readStdError(process));
+            systemCmdResult.setCommandStdOutput(readStdOut(process));
 
             if (waitSecond <= 0) {
                 process.waitFor();
@@ -80,13 +77,39 @@ public class SystemCmd {
             } else {
                 systemCmdResult.setCommandSuccessful(true);
             }
+            log.info("stdout of the command: " + systemCmdResult.getCommandStdOutput());
+            log.info("stderr of the command: " + systemCmdResult.getCommandStdError());
         } catch (final IOException ex) {
             systemCmdResult.setCommandSuccessful(false);
         } catch (final InterruptedException ex) {
             log.error("SystemCmd process be interrupted.");
             Thread.currentThread().interrupt();
             systemCmdResult.setCommandSuccessful(false);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         }
         return systemCmdResult;
     }
+
+    private String readStream(BufferedReader bufferedReader) {
+        return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+    }
+
+    private String readStdError(Process process) throws IOException {
+        BufferedReader errorStreamReader =
+                new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        return readStream(errorStreamReader);
+    }
+
+    private String readStdOut(Process process)
+            throws IOException, ExecutionException, InterruptedException {
+        BufferedReader outputReader =
+                new BufferedReader(new InputStreamReader(process.getInputStream()));
+        // Stdout needs a separate thread read the output stream.
+        ExecutorService service =  Executors.newSingleThreadExecutor();
+        String stdOut = service.submit(() -> readStream(outputReader)).get();
+        service.shutdown();
+        return stdOut;
+    }
+
 }
