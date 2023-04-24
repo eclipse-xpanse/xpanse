@@ -40,13 +40,25 @@ public class TerraformDeployment implements Deployment {
     public static final String VERSION_FILE_NAME = "version.tf";
     public static final String SCRIPT_FILE_NAME = "resources.tf";
     public static final String STATE_FILE_NAME = "terraform.tfstate";
-
-
+    public static final String TF_DEBUG_FLAG = "TF_LOG";
     private final String workspaceDirectory;
+    private final String debugLogLevel;
+    private final boolean isDebugEnabled;
 
+    /**
+     * Initializes the Terraform deployer.
+     *
+     * @param workspaceDirectory workspace directory from where Terraform CLI is executed.
+     * @param isDebugEnabled Runs Terraform CLI with debug if enabled.
+     * @param debugLogLevel Level of debug level logs when debug is enabled.
+     */
     public TerraformDeployment(
-            @Value("${terraform.workspace.directory:xpanse_deploy_ws}") String workspaceDirectory) {
+            @Value("${terraform.workspace.directory:xpanse_deploy_ws}") String workspaceDirectory,
+            @Value("${terraform.debug.enabled:false}") boolean isDebugEnabled,
+            @Value("${terraform.debug.level:DEBUG}") String debugLogLevel) {
         this.workspaceDirectory = workspaceDirectory;
+        this.isDebugEnabled = isDebugEnabled;
+        this.debugLogLevel = debugLogLevel;
     }
 
     /**
@@ -107,7 +119,7 @@ public class TerraformDeployment implements Deployment {
             result.setState(TerraformExecState.DESTROY_SUCCESS);
             return result;
         } catch (Exception e) {
-            log.error("Destroy error, {}", e);
+            log.error("Destroy error, {}", e.getMessage());
             result.setId(task.getId());
             result.setState(TerraformExecState.DESTROY_FAILED);
             return result;
@@ -143,6 +155,10 @@ public class TerraformDeployment implements Deployment {
 
     private TerraformExecutor getExecutor(Map<String, String> envVariables,
                                           Map<String, String> inputVariables, String workspace) {
+        if (this.isDebugEnabled) {
+            log.info("Debug enabled for Terraform CLI with level {}", this.debugLogLevel);
+            envVariables.put(TF_DEBUG_FLAG, this.debugLogLevel);
+        }
         return new TerraformExecutor(envVariables, inputVariables, workspace);
     }
 

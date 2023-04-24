@@ -15,6 +15,7 @@ public class SystemCmdResult {
 
     private String commandExecuted;
     private boolean isCommandSuccessful;
-    private String commandOutput;
+    private String commandStdOutput;
+    private String commandStdError;
 
 }

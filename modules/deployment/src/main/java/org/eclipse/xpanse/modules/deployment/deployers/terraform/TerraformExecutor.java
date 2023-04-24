@@ -50,7 +50,6 @@ public class TerraformExecutor {
      */
     public boolean tfInit() {
         SystemCmdResult systemCmdResult = execute("terraform init");
-        log.info(systemCmdResult.getCommandOutput());
         return systemCmdResult.isCommandSuccessful();
     }
 
@@ -100,7 +99,6 @@ public class TerraformExecutor {
             }
         }
         SystemCmdResult systemCmdResult = execute(command.toString());
-        log.info(systemCmdResult.getCommandOutput());
         return systemCmdResult.isCommandSuccessful();
     }
 
@@ -181,9 +179,8 @@ public class TerraformExecutor {
             throw new TerraformExecutorException("TFExecutor.tfInit failed.");
         }
         SystemCmdResult systemCmdResult = execute("terraform validate -json");
-        log.info(systemCmdResult.getCommandOutput());
         try {
-            return new ObjectMapper().readValue(systemCmdResult.getCommandOutput(),
+            return new ObjectMapper().readValue(systemCmdResult.getCommandStdOutput(),
                     TfValidationResult.class);
         } catch (JsonProcessingException ex) {
             throw new IllegalStateException("Serialising string to object failed.", ex);
