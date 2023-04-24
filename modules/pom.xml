@@ -20,11 +20,13 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>models</module>
-        <module>orchestrator</module>
         <module>api</module>
+        <module>models</module>
         <module>database</module>
         <module>deployment</module>
+        <module>orchestrator</module>
+        <module>monitor</module>
+        <module>credential</module>
     </modules>
 
 </project>

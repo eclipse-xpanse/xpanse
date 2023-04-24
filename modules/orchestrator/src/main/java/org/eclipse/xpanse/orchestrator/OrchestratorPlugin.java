@@ -6,14 +6,16 @@
 
 package org.eclipse.xpanse.orchestrator;
 
+import org.eclipse.xpanse.modules.credential.CredentialAbility;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.monitor.MetricsExporter;
 
 /**
  * This interface describes orchestrator plugin in charge of interacting with backend fundamental
  * APIs.
  */
-public interface OrchestratorPlugin {
+public interface OrchestratorPlugin extends CredentialAbility, MetricsExporter {
 
     /**
      * get the resource handler of the CSP plugin.
