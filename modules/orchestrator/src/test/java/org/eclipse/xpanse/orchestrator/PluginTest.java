@@ -6,21 +6,19 @@
 
 package org.eclipse.xpanse.orchestrator;
 
+import java.util.List;
 import lombok.extern.java.Log;
+import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.DeployResource;
+import org.eclipse.xpanse.modules.monitor.Metric;
 import org.springframework.stereotype.Component;
 
 @Log
 @Component
 public class PluginTest implements OrchestratorPlugin {
-
-    private Ocl ocl;
-
-    public Ocl getOcl() {
-        return this.ocl;
-    }
 
     @Override
     public DeployResourceHandler getResourceHandler() {
@@ -32,4 +30,19 @@ public class PluginTest implements OrchestratorPlugin {
         return Csp.OPENSTACK;
     }
 
+    @Override
+    public List<CredentialType> getAvailableCredentialTypes() {
+        return null;
+    }
+
+    @Override
+    public List<AbstractCredentialInfo> getCredentialDefinitions() {
+        return null;
+    }
+
+    @Override
+    public List<Metric> getMetrics(AbstractCredentialInfo credential,
+            DeployResource deployResource) {
+        return null;
+    }
 }

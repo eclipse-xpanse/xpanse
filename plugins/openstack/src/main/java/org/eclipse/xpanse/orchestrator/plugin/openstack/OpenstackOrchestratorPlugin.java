@@ -6,9 +6,14 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.openstack;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.DeployResource;
+import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.springframework.stereotype.Component;
 
@@ -35,5 +40,21 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public Csp getCsp() {
         return Csp.OPENSTACK;
+    }
+
+    @Override
+    public List<CredentialType> getAvailableCredentialTypes() {
+        return null;
+    }
+
+    @Override
+    public List<AbstractCredentialInfo> getCredentialDefinitions() {
+        return null;
+    }
+
+    @Override
+    public List<Metric> getMetrics(AbstractCredentialInfo credential,
+            DeployResource deployResource) {
+        return null;
     }
 }
