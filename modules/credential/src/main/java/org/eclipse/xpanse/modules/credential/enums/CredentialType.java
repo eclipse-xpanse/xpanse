@@ -11,10 +11,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * The type of the credential.
+ * The credential types.
  */
 public enum CredentialType {
-    INPUT("input"),
+    AK_SK("ak_sk"),
+    HTTP_AUTHENTICATION("http_authentication"),
+    API_KEY("api_key"),
     OAUTH2("oauth2");
 
     private final String type;

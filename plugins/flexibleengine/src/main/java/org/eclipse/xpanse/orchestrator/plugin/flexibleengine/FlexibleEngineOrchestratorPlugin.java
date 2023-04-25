@@ -8,7 +8,7 @@ package org.eclipse.xpanse.orchestrator.plugin.flexibleengine;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.credential.Credential;
+import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
@@ -36,17 +36,18 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public List<CredentialType> getCredentialAbilities() {
+    public List<CredentialType> getAvailableCredentialTypes() {
         return null;
     }
 
     @Override
-    public List<Credential> getCredentials() {
+    public List<AbstractCredentialInfo> getCredentialDefinitions() {
         return null;
     }
 
     @Override
-    public List<Metric> getMetrics(Credential credential, DeployResource deployResource) {
+    public List<Metric> getMetrics(AbstractCredentialInfo credential,
+            DeployResource deployResource) {
         return null;
     }
 }

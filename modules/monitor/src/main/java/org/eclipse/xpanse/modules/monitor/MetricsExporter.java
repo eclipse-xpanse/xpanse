@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.monitor;
 
 import java.util.List;
-import org.eclipse.xpanse.modules.credential.Credential;
+import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 
 /**
@@ -20,6 +20,6 @@ public interface MetricsExporter {
      *
      * @param deployResource the deployed resource of the service.
      */
-    List<Metric> getMetrics(Credential credential, DeployResource deployResource);
+    List<Metric> getMetrics(AbstractCredentialInfo credential, DeployResource deployResource);
 
 }

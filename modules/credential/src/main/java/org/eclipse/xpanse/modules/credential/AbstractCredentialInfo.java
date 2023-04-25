@@ -9,9 +9,9 @@ package org.eclipse.xpanse.modules.credential;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 
 /**
- * The credential object.
+ * The Abstract class which defines the credential basic information required by a cloud provider.
  */
-public class Credential {
+public abstract class AbstractCredentialInfo {
 
     /**
      * The name of the credential, this field is provided by the plugins.
@@ -21,7 +21,12 @@ public class Credential {
     /**
      * The userId of the credential.
      */
-    String userId;
+    String userId = "default";
+
+    /**
+     * The description of the credential.
+     */
+    String description;
 
     /**
      * The type of the credential.

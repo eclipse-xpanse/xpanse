@@ -7,11 +7,14 @@
 package org.eclipse.xpanse.modules.credential;
 
 import java.util.List;
+import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.springframework.stereotype.Component;
 
 /**
  * The credential center.
  */
+@Component
 public class CredentialCenter {
 
     /**
@@ -19,7 +22,7 @@ public class CredentialCenter {
      *
      * @param csp The csp to get.
      */
-    List<Credential> getCredentialAbility(Csp csp) {
+    List<AbstractCredentialInfo> getCredentialAbilities(Csp csp) {
         return null;
     }
 
@@ -30,7 +33,7 @@ public class CredentialCenter {
      * @param userName   The userName to create for.
      * @param credential The credential to create.
      */
-    boolean createCredential(Csp csp, String userName, Credential credential) {
+    boolean createCredential(Csp csp, String userName, AbstractCredentialInfo credential) {
         return false;
     }
 
@@ -45,12 +48,33 @@ public class CredentialCenter {
     }
 
     /**
+     * Delete credential for the @Csp with @userName.
+     *
+     * @param csp      The csp  to delete.
+     * @param userName The userName to delete.
+     */
+    boolean deleteCredentialByType(Csp csp, String userName, CredentialType credentialType) {
+        return false;
+    }
+
+    /**
      * Get credential for the @Csp with @userName.
      *
      * @param csp      The csp  to get.
      * @param userName The userName to get.
      */
-    Credential getCredential(Csp csp, String userName) {
+    AbstractCredentialInfo getCredential(Csp csp, String userName) {
+        return null;
+    }
+
+    /**
+     * Get credential for the @Csp with @userName.
+     *
+     * @param csp      The csp  to get.
+     * @param userName The userName to get.
+     */
+    AbstractCredentialInfo getCredentialByType(Csp csp, String userName,
+            CredentialType credentialType) {
         return null;
     }
 }

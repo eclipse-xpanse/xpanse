@@ -7,22 +7,22 @@
 package org.eclipse.xpanse.modules.credential;
 
 /**
- * The class object for the CredentialInput.
+ * The class object for the CredentialVariable.
  */
-public class InputVariable {
+public class CredentialVariable {
 
     /**
-     * The name of the InputVariable.
+     * The name of the CredentialVariable.
      */
     String name;
 
     /**
-     * The description of the InputVariable.
+     * The description of the CredentialVariable.
      */
     String description;
 
     /**
-     * The value of the InputVariable.
+     * The value of the CredentialVariable.
      */
     String value;
 
