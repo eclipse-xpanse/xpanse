@@ -12,13 +12,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotNull;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +52,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class OpenApiUtil {
 
     private final DeployVariableValidator deployVariableValidator;
+    private final String clientDownLoadUrl;
     private final String openapiPath;
     private final Integer port;
 
@@ -54,9 +61,13 @@ public class OpenApiUtil {
      */
     @Autowired
     public OpenApiUtil(DeployVariableValidator deployVariableValidator,
+            @Value("${openapi.download-generator-client-url:https://repo1.maven.org/maven2/org/"
+                    + "openapitools/openapi-generator-cli/6.5.0/openapi-generator-cli.6.5.0.jar}")
+                    String clientDownLoadUrl,
             @Value("${openapi.path:openapi/}") String openapiPath,
             @Value("${server.port:8080}") Integer port) {
         this.deployVariableValidator = deployVariableValidator;
+        this.clientDownLoadUrl = clientDownLoadUrl;
         this.openapiPath = openapiPath;
         this.port = port;
     }
@@ -94,7 +105,7 @@ public class OpenApiUtil {
             throw new IllegalArgumentException("Registered service is null.");
         }
         String id = registerServiceEntity.getId().toString();
-        File apiFile = new File(getOpenApiDir(), id + ".html");
+        File apiFile = new File(getOpenApiWorkdir(), id + ".html");
         if (apiFile.exists()) {
             return getOpenApiUrl(id);
         } else {
@@ -111,16 +122,16 @@ public class OpenApiUtil {
         try {
             return ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         } catch (Exception e) {
-            log.error("Get BaseUrl form CurrentContextPath error.");
+            String host = "localhost";
+            try {
+                InetAddress address = InetAddress.getLocalHost();
+                host = address.getHostAddress();
+            } catch (UnknownHostException ex) {
+                log.error("Get localHost error.", ex);
+            }
+            return "http://" + host + ":" + port;
         }
-        String host = "localhost";
-        try {
-            InetAddress address = InetAddress.getLocalHost();
-            host = address.getHostAddress();
-        } catch (UnknownHostException e) {
-            log.error("Get localHost error,");
-        }
-        return "http://" + host + ":" + port;
+
     }
 
     /**
@@ -136,13 +147,40 @@ public class OpenApiUtil {
     }
 
     /**
-     * Get openApi file path.
+     * Update OpenApi document for registered service.
      *
-     * @return openApiUrl
+     * @param registerService Registered services.
      */
-    private String getOpenApiDir() {
-        String rootPath = System.getProperty("user.dir");
-        return rootPath + File.separator + openapiPath;
+    @Async("taskExecutor")
+    public void updateServiceApi(RegisterServiceEntity registerService) {
+        File file = new File(getOpenApiWorkdir(), registerService.getId() + ".html");
+        if (file.exists()) {
+            log.info("Delete old openApi file:{}, success:{}", file.getName(), file.delete());
+        }
+        createServiceApi(registerService);
+    }
+
+    /**
+     * Generate OpenApi document for registered service.
+     *
+     * @param registerService Registered services.
+     */
+    @Async("taskExecutor")
+    public void generateServiceApi(RegisterServiceEntity registerService) {
+        createServiceApi(registerService);
+    }
+
+    /**
+     * Delete OpenApi document for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     */
+    @Async("taskExecutor")
+    public void deleteServiceApi(String id) {
+        File file = new File(getOpenApiWorkdir(), id + ".html");
+        if (file.exists()) {
+            log.info("Delete openApi html file:{}, success:{}", file.getName(), file.delete());
+        }
     }
 
     /**
@@ -154,11 +192,7 @@ public class OpenApiUtil {
         // ID of registered service.
         String serviceId = registerService.getId().toString();
         String yamlFileName = serviceId + ".yaml";
-        String openApiDir = getOpenApiDir();
-        File dir = new File(openApiDir);
-        if (!dir.exists()) {
-            log.info("Create service openApi dir:{} success:{}", openApiDir, dir.mkdirs());
-        }
+        String openApiDir = getOpenApiWorkdir();
         File yamlFile = new File(openApiDir, yamlFileName);
         File htmlFile = new File(openApiDir, serviceId + ".html");
         try {
@@ -168,39 +202,44 @@ public class OpenApiUtil {
                 if (htmlFile.exists()) {
                     return getOpenApiUrl(serviceId);
                 }
+            } else {
+                String apiDocsJson = getApiDocsJson(registerService);
+                try (FileWriter apiWriter = new FileWriter(yamlFile.getPath())) {
+                    apiWriter.write(apiDocsJson);
+                }
+                log.info("Service openApi yamlFile:{} create success.", yamlFile.getPath());
             }
-            String apiDocsJson = getApiDocsJson(registerService);
-            StringBuilder stdErrOut = new StringBuilder();
-            try (FileWriter apiWriter =
-                    new FileWriter(openApiDir + File.separator + yamlFileName)) {
-                apiWriter.write(apiDocsJson);
-            }
-            String comm = String.format("java -jar ./lib/openapi-generator-cli.jar generate -i "
-                    + "%s" + yamlFileName + " -g html2 -o %s", openApiDir, openApiDir);
-            Process exec = Runtime.getRuntime().exec(comm);
-            BufferedReader outputReader =
-                    new BufferedReader(new InputStreamReader((exec.getErrorStream())));
-            String line;
-            while ((line = outputReader.readLine()) != null) {
-                stdErrOut.append(line);
-                log.error(line);
-            }
-            exec.waitFor();
-            if (exec.exitValue() != 0) {
-                log.error("Create service openApi html file failed." + stdErrOut);
-            }
-            // Modify the file name to serviceId.html
-            File tempHtmlFile = new File(openApiDir, "index.html");
-            if (tempHtmlFile.exists()) {
-                if (tempHtmlFile.renameTo(htmlFile)) {
-                    log.info("Create service openApi html file:{} success.", htmlFile.getName());
-                    if (htmlFile.exists()) {
-                        return getOpenApiUrl(serviceId);
+            if (yamlFile.exists() && downloadClientJar(openApiDir)) {
+                File jarPath = new File(openApiDir, "openapi-generator-cli.jar");
+                String comm = String.format("java -jar %s generate -g html2 "
+                        + "-i %s -o %s", jarPath.getPath(), yamlFile.getPath(), openApiDir);
+                Process exec = Runtime.getRuntime().exec(comm);
+                StringBuilder stdErrOut = new StringBuilder();
+                BufferedReader outputReader =
+                        new BufferedReader(new InputStreamReader(exec.getErrorStream()));
+                String line;
+                while ((line = outputReader.readLine()) != null) {
+                    stdErrOut.append(line);
+                    log.error(line);
+                }
+                exec.waitFor();
+                if (exec.exitValue() != 0) {
+                    log.error("Create service openApi html file failed." + stdErrOut);
+                }
+                // Modify the file name to serviceId.html
+                File tempHtmlFile = new File(openApiDir, "index.html");
+                if (tempHtmlFile.exists()) {
+                    if (tempHtmlFile.renameTo(htmlFile)) {
+                        log.info("Create service openApi html file:{} success.",
+                                htmlFile.getName());
+                        if (htmlFile.exists()) {
+                            return getOpenApiUrl(serviceId);
+                        }
                     }
                 }
             }
             return StringUtils.EMPTY;
-        } catch (IOException | InterruptedException ex) {
+        } catch (IOException | InterruptedException | RuntimeException ex) {
             log.error("Create service openApi html file error:", ex);
             throw new RuntimeException("Create service openApi html file error.", ex);
         } finally {
@@ -211,41 +250,74 @@ public class OpenApiUtil {
         }
     }
 
+
     /**
-     * update OpenApi for registered service .
+     * Get the work directory of the openApi.
      *
-     * @param registerService Registered services.
+     * @return workdir  The work directory of the openApi.
      */
-    @Async("taskExecutor")
-    public void updateServiceApi(RegisterServiceEntity registerService) {
-        File file = new File(getOpenApiDir(), registerService.getId() + ".html");
-        if (file.exists()) {
-            log.info("Delete old openApi file:{}, success:{}", file.getName(), file.delete());
+    public String getOpenApiWorkdir() {
+        String rootPath = System.getProperty("user.dir");
+        try {
+            int modulesIndex = rootPath.indexOf("modules");
+            if (modulesIndex > 1) {
+                rootPath = rootPath.substring(0, modulesIndex);
+            }
+            File openApiDir = new File(rootPath, openapiPath);
+            if (!openApiDir.exists() && !openApiDir.mkdirs()) {
+                throw new FileNotFoundException("Create open API workspace failed!");
+            }
+            return openApiDir.getPath();
+
+        } catch (IOException e) {
+            log.error("Create open API workdir failed!", e);
         }
-        createServiceApi(registerService);
+        return rootPath;
+
     }
 
     /**
-     * update OpenApi for registered service .
+     * Download openapi-generator-cli.jar from the maven repository or the URL specified by the
+     * `@openapi.download-generator-client-url` into the work directory.
      *
-     * @param registerService Registered services.
+     * @param workdir The work directory of the openApi.
      */
-    @Async("taskExecutor")
-    public void generateServiceApi(RegisterServiceEntity registerService) {
-        createServiceApi(registerService);
-    }
-
-    /**
-     * delete OpenApi for registered service using the ID.
-     *
-     * @param id ID of registered service.
-     */
-    @Async("taskExecutor")
-    public void deleteServiceApi(String id) {
-        File file = new File(getOpenApiDir(), id + ".html");
-        if (file.exists()) {
-            log.info("Delete openApi html file:{}, success:{}", file.getName(), file.delete());
+    private boolean downloadClientJar(String workdir) throws IOException {
+        File workDir = new File(workdir);
+        if (!workDir.exists() && !workDir.mkdirs()) {
+            throw new RuntimeException("Download client jar failed.");
         }
+        String execJarName = "openapi-generator-cli.jar";
+        File execJarFile = new File(workdir, execJarName);
+        if (!execJarFile.exists() && !execJarFile.canExecute()) {
+            log.info("Download openapi client:{} from URL:{} start.",
+                    execJarFile.getPath(), clientDownLoadUrl);
+            String jarTempFile = execJarName + ".temp";
+            File downloadTemp = new File(workDir, jarTempFile);
+            FileOutputStream fos = null;
+            boolean downloadEnd = false;
+            try {
+                URL url = new URL(clientDownLoadUrl);
+                URLConnection con = url.openConnection();
+                ReadableByteChannel rbc = Channels.newChannel(con.getInputStream());
+                fos = new FileOutputStream(downloadTemp);
+                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                downloadEnd = true;
+                log.info("Download openapi client:{} from URL:{} end.",
+                        execJarFile.getPath(), clientDownLoadUrl);
+            } finally {
+                if (Objects.nonNull(fos)) {
+                    fos.close();
+                }
+            }
+            if (downloadEnd && downloadTemp.renameTo(execJarFile)) {
+                log.info("Download openapi client:{} from URL:{} success.",
+                        execJarFile.getPath(), clientDownLoadUrl);
+                return true;
+            }
+
+        }
+        return true;
     }
 
 
