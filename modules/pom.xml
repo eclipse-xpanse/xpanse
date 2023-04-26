@@ -27,6 +27,7 @@
         <module>orchestrator</module>
         <module>monitor</module>
         <module>credential</module>
+        <module>logging</module>
     </modules>
 
 </project>
