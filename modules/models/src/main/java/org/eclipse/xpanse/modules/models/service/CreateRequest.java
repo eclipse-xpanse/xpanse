@@ -31,6 +31,13 @@ public class CreateRequest {
      * The category of the Service.
      */
     @NotNull
+    @Schema(description = "User who ordered the service")
+    private String userName;
+
+    /**
+     * The category of the Service.
+     */
+    @NotNull
     @Schema(description = "The category of the service")
     private Category category;
 

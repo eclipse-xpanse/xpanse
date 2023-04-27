@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 
 /**
- * Define view object for UI Client query registered service by category.
+ * Define view object for UI Client to query deployed services.
  */
 @Data
 public class ServiceVo {
@@ -26,6 +26,13 @@ public class ServiceVo {
     @NotNull
     @Schema(description = "The ID of the service")
     private UUID id;
+
+    /**
+     * The name of the user who deployed the service.
+     */
+    @NotNull
+    @Schema(description = "User who ordered the service")
+    private String userName;
 
     /**
      * The category of the Service.

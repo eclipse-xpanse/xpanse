@@ -109,6 +109,7 @@ public class OrchestratorService {
         entity.setCategory(deployTask.getCreateRequest().getCategory());
         entity.setCustomerServiceName(deployTask.getCreateRequest().getCustomerServiceName());
         entity.setFlavor(deployTask.getCreateRequest().getFlavor());
+        entity.setUserName(deployTask.getCreateRequest().getUserName());
         entity.setCreateRequest(deployTask.getCreateRequest());
         return entity;
     }
@@ -262,13 +263,12 @@ public class OrchestratorService {
 
     }
 
-
     /**
      * List deploy services.
      *
      * @return serviceVos
      */
-    public List<ServiceVo> listDeployServices() {
+    public List<ServiceVo> getDeployedServices() {
         List<DeployServiceEntity> deployServices =
                 deployServiceStorage.services();
         return deployServices.stream().map(service -> {
@@ -285,9 +285,10 @@ public class OrchestratorService {
      * @param id ID of deploy service.
      * @return serviceDetailVo
      */
-    public ServiceDetailVo getDeployServiceDetail(UUID id) {
+    public ServiceDetailVo getDeployServiceDetails(UUID id, String user) {
         DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
-        if (Objects.isNull(deployServiceEntity)) {
+        if (Objects.isNull(deployServiceEntity)
+                || !deployServiceEntity.getUserName().equals(user)) {
             throw new EntityNotFoundException("Service not found.");
         }
         ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
