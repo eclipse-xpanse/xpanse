@@ -6,9 +6,12 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.credential.CredentialDefinition;
+import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
@@ -38,12 +41,25 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<CredentialType> getAvailableCredentialTypes() {
-        return null;
+        List<CredentialType> credentialTypes = new ArrayList<>();
+        credentialTypes.add(CredentialType.VARIABLES);
+        return credentialTypes;
     }
 
     @Override
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
-        return null;
+        List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
+
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        CredentialDefinition accessKey = new CredentialDefinition("AKSK",
+                "The access key and security key.",
+                CredentialType.VARIABLES, credentialVariables);
+        credentialVariables.add(new CredentialVariable("HW_ACCESS_KEY", "The access key."));
+        credentialVariables.add(new CredentialVariable("HW_SECRET_KEY", "The security key."));
+
+        credentialInfos.add(accessKey);
+
+        return credentialInfos;
     }
 
     @Override

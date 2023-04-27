@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  * The credential types.
  */
 public enum CredentialType {
-    AK_SK("ak_sk"),
+    VARIABLES("variables"),
     HTTP_AUTHENTICATION("http_authentication"),
     API_KEY("api_key"),
     OAUTH2("oauth2");
