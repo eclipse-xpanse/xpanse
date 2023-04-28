@@ -10,15 +10,6 @@ that your xpanse service is portable (multi-cloud) on any cloud topology and
 provider. It also avoids tight coupling of your service to other cloud service
 provider services.
 
-## APIs (core services)
-
-Xpanse interacts directly with the fundamental APIs used by the cloud service
-provider to create managed service:
-
-* **identity** dealing with access, users, groups, roles, ...
-* **billing** registers the business model in the cloud provider billing system
-* ...
-
 ## Configuration Language
 
 A managed service is described using Open Services Cloud Configuration Language
