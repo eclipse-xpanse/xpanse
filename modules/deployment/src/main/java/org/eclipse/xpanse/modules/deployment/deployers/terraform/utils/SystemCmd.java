@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Objects;
@@ -60,8 +61,8 @@ public class SystemCmd {
                 processBuilder.directory(new File(workDir));
             }
             Process process = processBuilder.start();
-            systemCmdResult.setCommandStdError(readStdError(process));
-            systemCmdResult.setCommandStdOutput(readStdOut(process));
+            systemCmdResult.setCommandStdOutput(readInputStream(process.getInputStream()));
+            systemCmdResult.setCommandStdError(readInputStream(process.getErrorStream()));
 
             if (waitSecond <= 0) {
                 process.waitFor();
@@ -91,25 +92,24 @@ public class SystemCmd {
         return systemCmdResult;
     }
 
+
     private String readStream(BufferedReader bufferedReader) {
         return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
     }
 
-    private String readStdError(Process process) throws IOException {
-        BufferedReader errorStreamReader =
-                new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        return readStream(errorStreamReader);
+    private String readInputStream(InputStream inputStream)
+            throws IOException, ExecutionException, InterruptedException {
+        if (Objects.isNull(inputStream)) {
+            return null;
+        }
+        BufferedReader streamReader =
+                new BufferedReader(new InputStreamReader(inputStream));
+        // Stream Data needs a separate thread read the stream.
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        String streamData = service.submit(() -> readStream(streamReader)).get();
+        service.shutdown();
+        return streamData;
     }
 
-    private String readStdOut(Process process)
-            throws IOException, ExecutionException, InterruptedException {
-        BufferedReader outputReader =
-                new BufferedReader(new InputStreamReader(process.getInputStream()));
-        // Stdout needs a separate thread read the output stream.
-        ExecutorService service =  Executors.newSingleThreadExecutor();
-        String stdOut = service.submit(() -> readStream(outputReader)).get();
-        service.shutdown();
-        return stdOut;
-    }
 
 }
