@@ -49,7 +49,7 @@ public class TerraformExecutor {
      * @return true if initialization of terraform is successful. else false.
      */
     public boolean tfInit() {
-        SystemCmdResult systemCmdResult = execute("terraform init");
+        SystemCmdResult systemCmdResult = execute("terraform init -no-color");
         return systemCmdResult.isCommandSuccessful();
     }
 
@@ -59,7 +59,7 @@ public class TerraformExecutor {
      * @return true if terraform plan creation is successful. else false.
      */
     public boolean tfPlan() {
-        return executeWithVariables(new StringBuilder("terraform plan -input=false "));
+        return executeWithVariables(new StringBuilder("terraform plan -input=false -no-color "));
     }
 
     /**
@@ -69,7 +69,7 @@ public class TerraformExecutor {
      */
     public boolean tfApply() {
         return executeWithVariables(
-                new StringBuilder("terraform apply -auto-approve -input=false "));
+                new StringBuilder("terraform apply -auto-approve -input=false -no-color "));
     }
 
     /**
@@ -80,7 +80,7 @@ public class TerraformExecutor {
      */
     public boolean tfDestroy() {
         return executeWithVariables(
-                new StringBuilder("terraform destroy -auto-approve -input=false "));
+                new StringBuilder("terraform destroy -auto-approve -input=false -no-color "));
     }
 
     /**
@@ -178,7 +178,7 @@ public class TerraformExecutor {
             log.error("TFExecutor.tfInit failed.");
             throw new TerraformExecutorException("TFExecutor.tfInit failed.");
         }
-        SystemCmdResult systemCmdResult = execute("terraform validate -json");
+        SystemCmdResult systemCmdResult = execute("terraform validate -json -no-color");
         try {
             return new ObjectMapper().readValue(systemCmdResult.getCommandStdOutput(),
                     TfValidationResult.class);

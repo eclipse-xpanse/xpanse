@@ -9,18 +9,19 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 /**
  * Executes operating system commands.
@@ -61,8 +62,7 @@ public class SystemCmd {
                 processBuilder.directory(new File(workDir));
             }
             Process process = processBuilder.start();
-            systemCmdResult.setCommandStdOutput(readInputStream(process.getInputStream()));
-            systemCmdResult.setCommandStdError(readInputStream(process.getErrorStream()));
+            readProcessOutput(process, systemCmdResult);
 
             if (waitSecond <= 0) {
                 process.waitFor();
@@ -78,8 +78,8 @@ public class SystemCmd {
             } else {
                 systemCmdResult.setCommandSuccessful(true);
             }
-            log.info("stdout of the command: " + systemCmdResult.getCommandStdOutput());
-            log.info("stderr of the command: " + systemCmdResult.getCommandStdError());
+            log.debug("stdout of the command: " + systemCmdResult.getCommandStdOutput());
+            log.debug("stderr of the command: " + systemCmdResult.getCommandStdError());
         } catch (final IOException ex) {
             systemCmdResult.setCommandSuccessful(false);
         } catch (final InterruptedException ex) {
@@ -93,22 +93,49 @@ public class SystemCmd {
     }
 
 
-    private String readStream(BufferedReader bufferedReader) {
-        return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+    private String readStream(BufferedReader bufferedReader, Map<String, String> contextMap) {
+        //copying MDC context of the main deployment thread to the stream reader thread.
+        MDC.setContextMap(contextMap);
+        StringBuilder stringBuilder = new StringBuilder();
+        bufferedReader.lines().forEach(line -> {
+            log.info(line);
+            stringBuilder.append(line);
+            stringBuilder.append(System.lineSeparator());
+        });
+        return stringBuilder.toString();
     }
 
-    private String readInputStream(InputStream inputStream)
+    private void readProcessOutput(Process process, SystemCmdResult systemCmdResult)
             throws IOException, ExecutionException, InterruptedException {
-        if (Objects.isNull(inputStream)) {
-            return null;
+        if (Objects.isNull(process)) {
+            return;
         }
-        BufferedReader streamReader =
-                new BufferedReader(new InputStreamReader(inputStream));
-        // Stream Data needs a separate thread read the stream.
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        String streamData = service.submit(() -> readStream(streamReader)).get();
-        service.shutdown();
-        return streamData;
+        final Map<String, String> contextMap = new HashMap<>(MDC.getCopyOfContextMap());
+
+        // Starting threads in parallel to read stdout and stderr. This is needed because in
+        // some cases reading stdout first works and in some cases reading stderr works.
+        // we now let both stdout and stderr streams to be fully read in parallel and then read
+        // the output after the buffers are fully read.
+        BufferedReader stdoutReader =
+                new BufferedReader(new InputStreamReader(process.getInputStream()));
+        ExecutorService threadToReadStdout = Executors.newSingleThreadExecutor();
+        Future<String> stdOutFuture =
+                threadToReadStdout.submit(() -> readStream(stdoutReader, contextMap));
+
+        BufferedReader stdErrorReader =
+                new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        ExecutorService threadToReadStdErr = Executors.newSingleThreadExecutor();
+        Future<String> stdErrFuture =
+                threadToReadStdErr.submit(() -> readStream(stdErrorReader, contextMap));
+
+        while (!stdOutFuture.isDone() || !stdErrFuture.isDone()) {
+            log.debug("Waiting for streams to be read");
+        }
+
+        systemCmdResult.setCommandStdError(stdErrFuture.get());
+        systemCmdResult.setCommandStdOutput(stdOutFuture.get());
+        threadToReadStdout.shutdown();
+        threadToReadStdErr.shutdown();
     }
 
 
