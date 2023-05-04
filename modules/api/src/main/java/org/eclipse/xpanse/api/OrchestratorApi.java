@@ -104,7 +104,7 @@ public class OrchestratorApi {
     public RegisteredServiceVo register(@Valid @RequestBody Ocl ocl) {
         RegisteredServiceVo registeredServiceVo = convertToRegisteredServiceVo(
                 registerService.registerService(ocl));
-        log.info("Register new service success.");
+        log.info("Registering new service successful.");
         return registeredServiceVo;
     }
 
@@ -128,7 +128,7 @@ public class OrchestratorApi {
         RegisteredServiceVo registeredServiceVo = convertToRegisteredServiceVo(
                 registerService.updateRegisteredService(id, ocl));
         String successMsg = String.format(
-                "Update registered service with id %s success.", id);
+                "Update registered service with id %s successful.", id);
         log.info(successMsg);
         return registeredServiceVo;
     }
@@ -152,7 +152,7 @@ public class OrchestratorApi {
             throws Exception {
         RegisteredServiceVo registeredServiceVo =
                 convertToRegisteredServiceVo(registerService.registerServiceByUrl(oclLocation));
-        log.info("Register new service by file success.");
+        log.info("Register new service by file successful.");
         return registeredServiceVo;
     }
 
@@ -205,7 +205,7 @@ public class OrchestratorApi {
         log.info("Unregister registered service using id {}", id);
         registerService.unregisterService(id);
         String successMsg = String.format(
-                "Unregister registered service using id %s success.", id);
+                "Unregister registered service using id %s successful.", id);
         log.info(successMsg);
         return Response.successResponse(Collections.singletonList(successMsg));
     }
@@ -238,8 +238,8 @@ public class OrchestratorApi {
                 serviceVersion);
         List<RegisterServiceEntity> serviceEntities =
                 registerService.queryRegisteredServices(query);
-        String successMsg = String.format("List registered service with query model %s "
-                + "success.", query);
+        String successMsg = String.format("Listing registered service with query model %s "
+                + "successful.", query);
         List<RegisteredServiceVo> registeredServiceVos =
                 serviceEntities.stream().map(this::convertToRegisteredServiceVo)
                         .collect(Collectors.toList());
@@ -292,27 +292,49 @@ public class OrchestratorApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Get deployed service details by id.")
-    @GetMapping(value = "/services/deployed/{id}/details",
+    @GetMapping(value = "/services/deployed/{id}/details/{userName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ServiceDetailVo getDeployedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
-            @PathVariable("id") String id) {
-
-        return this.orchestratorService.getDeployServiceDetail(UUID.fromString(id));
+            @PathVariable("id") String id,
+            @Parameter(name = "userName", description = "User who deployed the service")
+            @PathVariable("userName") String userName) {
+        return this.orchestratorService.getDeployServiceDetails(UUID.fromString(id), userName);
     }
 
     /**
-     * List the deployed services.
+     * List all deployed services.
      *
      * @return list of all services deployed.
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @Operation(description = "List the deployed services.")
+    @Operation(description = "Lists all deployed services.")
     @GetMapping(value = "/services/deployed", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ServiceVo> listDeployedServices() {
-        return this.orchestratorService.listDeployServices();
+        return this.orchestratorService.getDeployedServices();
+    }
+
+    /**
+     * List all deployed services by a user.
+     *
+     * @return list of all services deployed by a user.
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "List all deployed services by a user.")
+    @GetMapping(value = "/services/deployed/{userName}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<ServiceVo> getDeployedServicesByUser(
+            @Parameter(name = "userName", description = "User who deployed the service")
+            @PathVariable("userName") String userName) {
+        return this.orchestratorService
+                .getDeployedServices()
+                .stream()
+                .filter(serviceVo -> serviceVo.getUserName().equals(userName))
+                .collect(Collectors.toList());
+
     }
 
     /**
@@ -397,8 +419,8 @@ public class OrchestratorApi {
                 serviceVersion);
         List<RegisterServiceEntity> serviceEntities =
                 registerService.queryRegisteredServices(query);
-        String successMsg = String.format("List available services with query model %s "
-                + "success.", query);
+        String successMsg = String.format("Listing available services with query model %s "
+                + "successful.", query);
         List<UserAvailableServiceVo> userAvailableServiceVos =
                 serviceEntities.stream().map(this::convertToUserAvailableServiceVo)
                         .collect(Collectors.toList());
@@ -428,7 +450,7 @@ public class OrchestratorApi {
                 registerService.getManagedServicesTree(query);
         String successMsg = String.format(
                 "Get the tree of available services with category %s "
-                        + "success.", category.toValue());
+                        + "successful.", category.toValue());
         log.info(successMsg);
         return categoryOclList;
     }
@@ -446,13 +468,13 @@ public class OrchestratorApi {
     @GetMapping(value = "/services/available/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public UserAvailableServiceVo availableServiceDetail(
+    public UserAvailableServiceVo availableServiceDetails(
             @Parameter(name = "id", description = "The id of available service.")
             @PathVariable("id") String id) {
         UserAvailableServiceVo userAvailableServiceVo = convertToUserAvailableServiceVo(
                 registerService.getRegisteredService(id));
         String successMsg = String.format(
-                "Get available service with id %s success.", id);
+                "Get available service with id %s successful.", id);
         log.info(successMsg);
         return userAvailableServiceVo;
     }
@@ -471,7 +493,7 @@ public class OrchestratorApi {
     public Link openApi(@PathVariable("id") String id) {
         String apiUrl = this.registerService.getOpenApiUrl(id);
         String successMsg = String.format(
-                "Get API document of the available service success with Url %s.", apiUrl);
+                "Get API document of the available service successful with Url %s.", apiUrl);
         log.info(successMsg);
         return Link.of(apiUrl, "OpenApi");
     }
