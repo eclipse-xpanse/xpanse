@@ -1,10 +1,16 @@
-# xpanse  [![xpanse](https://github.com/eclipse-xpanse/xpanse/actions/workflows/osc.yml/badge.svg)](https://github.com/eclipse-xpanse/xpanse/actions/workflows/osc.yml)
-
+<p align='center'>
+    <img src="static/logo.png" alt='xpanse-logo' style='align-content: center'>
+</p>
+<p align='center'>
+<a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/osc.yml" target="_blank">
+    <img src="https://github.com/eclipse-xpanse/xpanse/actions/workflows/osc.yml/badge.svg" alt="build">
+</a>
+</p>
 
 Xpanse is an Open Source project allowing to easily implement native managed
 service on any cloud service provider.
 
-Xpanse unleash your cloud services by removing vendor lock-in and lock out.
+Xpanse unleashes your cloud services by removing vendor lock-in and lock out.
 It standardizes and exposes cloud service providers core services, meaning
 that your xpanse service is portable (multi-cloud) on any cloud topology and
 provider. It also avoids tight coupling of your service to other cloud service
@@ -322,14 +328,17 @@ End user can then select the flavor of their preference for the service while or
 
 ### Flavor properties
 
-Flavors can have properties which can be simply declared and referred in the deployment script too with the same property
+Flavors can have properties which can be simply declared and referred in the deployment script too with the same
+property
 names.
 Runtime wil ensure tht these variables are automatically available for the deployment scripts
 
 ### Deployment Variables
 
-As part of the OCL, the managed service provider can define variables that can be either entered by the user or available as defaults. 
-All possible types of variables are defined here [Deployment Variables](modules/models/src/main/java/org/eclipse/xpanse/modules/models/resource/DeployVariable.java)
+As part of the OCL, the managed service provider can define variables that can be either entered by the user or
+available as defaults.
+All possible types of variables are defined
+here [Deployment Variables](modules/models/src/main/java/org/eclipse/xpanse/modules/models/resource/DeployVariable.java)
 The variables can then be used in the deployment scripts.
 
 ## OCL loading
