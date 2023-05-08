@@ -8,7 +8,7 @@
 </p>
 
 Xpanse is an Open Source project allowing to easily implement native managed
-service on any cloud service provider.
+service on any cloud service provider. This project is part of the Open Services Cloud (OSC) charter.
 
 Xpanse unleashes your cloud services by removing vendor lock-in and lock out.
 It standardizes and exposes cloud service providers core services, meaning
@@ -24,13 +24,15 @@ A managed service is described using Open Services Cloud Configuration Language
 OCL is a yaml descriptor of a managed service, describing the expected final
 state of your service, interacting with the fundamental APIs:
 
+Here is an example to show how OCL can be used to provide a managed Kafka service on an Openstack based cloud.
+
 ```yaml
 # The version of the OCL
 version: 2.0
 # The category of the service.
 category: middleware
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: Kafka-cluster
+name: kafka-cluster
 # The version of the service, if the end-user want to select the version when they want to deploy the service.
 serviceVersion: v3.3.2
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
@@ -41,12 +43,12 @@ icon: |
   data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACRAQMAAAAPc4+9AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+/v7Hh8gVD0A0wAAAcVJREFUeJzNlc1twzAMhSX44KNH0CgaTd6gK3kUd4McDVTwq/hjiUyaIkV7qNA2/QCFIh+ppxB+svLNEqqBGTC0ANugBOwmCGDCFOAwIWGDOoqoODtN2BdL6wxD9NMTO9tXPa1PqL5M30W5p8lm5vNcF0t7ahSrVguqNqmMokRW4YQucVjBCBWH1Z2g3WDlW2skoYU+2x8JOtGedBF3k2iXMO0j16iUiI6gxzPdQhnU/s2G9pCO57QY2r6hvjPbKJHq7DRTRXT60avtuTRdbrFJI3mSZhNOqYjVbd99YyK1QKWzEqSWrE0k07U60uPaelflMzaaeu1KBuurHSsn572I1KWy2joX5ZBfWbS/VEt50H5P6aL4JxTuyJ/+QCNPX4PWF3Q8Xe1eF9FsLdD2VaOnaP2hWvs+zI58/7i3vH3nRFtDZpyTUNaZkON5XnBNsp8lrmDMrpvBr+b6pUl+4XbkQdndqnzYGzfuJm1JmIWimIbe6dndd/bk7gVce/cJdo3uIeLJl7+I2xTnPek67mjtDeppE7b03Ov+kSfDe3JweW53njxeGfXkaz28VeYd86+af/H8a7hgJKaebILaFzakLfxyfQLTxVB6K1K9KQAAAABJRU5ErkJggg==
 # Reserved for CSP, aws,azure,ali,huawei and ...
 cloudServiceProvider:
-  name: huawei
+  name: openstack
   regions:
-    - name: cn-southwest-2
-      area: Asia China
-    - name: cn-north-4
-      area: Asia China
+    - name: RegionOne
+      area: Western Europe
+    - name: RegionTwo
+      area: Western Europe
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat
@@ -60,52 +62,63 @@ flavors:
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
-    properties:
+    property:
       worker_nodes_count: 3
-      flavor_id: c7.large.4
+      flavor_id: cirrors256
   - name: 1-zookeeper-with-3-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 3
-      flavor_id: c7.xlarge.4
+      flavor_id: cirrors512
   - name: 1-zookeeper-with-5-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 5
-      flavor_id: c7.large.4
+      flavor_id: cirrors256
   - name: 1-zookeeper-with-5-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 80
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 5
-      flavor_id: c7.xlarge.4
+      flavor_id: cirrors512
 deployment:
   # kind, Supported values are terraform, pulumi, crossplane.
   kind: terraform
-  # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
-  # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
-  # - fix_variable: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as usual variables. This variable is not visible to the end user.
-  # - env: Value for a variable of this type can be provided by end user. If marked as mandatory then end user must provide value to this variable. If marked as optional and if end user does not provided it, then the fallback value to this variable is read by runtime (it can read from other sources, e.g., OS env variables). This variable is injected as a environment variable to the deployer.
-  # - variable: Value for a variable of this type can be provided by end user. . If marked as mandatory then end user must provide value to this variable. If marked as optional and if end user does not provided it, then the fallback value to this variable is read by runtime (it can read from other sources, e.g., OS env variables). This variable is injected as a regular variable to the deployer.
-  # - env_env: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a environment variable to the deployer. End user cannot see or change this variable.
-  # - env_variable: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a regular variable to the deployer. End user cannot see or change this variable.
+  # Context for deployment: the context including some kind of parameters for the deployment, such as fix,variable.
+  # - env: The value of the fix parameters are defined by the ISV with the @value at the initial time.
+  # - variable: The value of the variable parameters are defined by the user on the console.
   # The parameters will be used to generate the API of the managed service.
   variables:
-    - name: HW_ACCESS_KEY
-      description: Huawei cloud access key.
+    - name: OS_AUTH_URL
+      description: The Identity authentication URL.
       kind: env
       dataType: string
       mandatory: true
-    - name: HW_SECRET_KEY
-      description: Huawei cloud secret key.
+    - name: OS_USER_NAME
+      description: The User Name to login with.
       kind: env
       dataType: string
-      mandatory: true
+      mandatory: false
+    - name: OS_PASSWORD
+      description: The User password to login with.
+      kind: env
+      dataType: string
+      mandatory: false
+    - name: OS_REGION_NAME
+      description: The region of the OpenStack cloud to use.
+      kind: env
+      dataType: string
+      mandatory: false
+    - name: OS_PROJECT_NAME
+      description: The name of the Tenant (Identity v2) or Project (Identity v3) to login with.
+      kind: env
+      dataType: string
+      mandatory: false
     - name: admin_passwd
       description: The admin password of all nodes in the Kafka cluster. If the value is empty, will create a random password.
       kind: variable
@@ -133,7 +146,7 @@ deployment:
   deployer: |
     variable "flavor_id" {
       type        = string
-      default     = "c7.large.2"
+      default     = "cirros256"
       description = "The flavor_id of all nodes in the Kafka cluster."
     }
 
@@ -144,8 +157,8 @@ deployment:
     }
 
     variable "admin_passwd" {
-      type        = string
-      default     = ""
+      type= string
+      default = ""
       description = "The root password of all nodes in the Kafka cluster."
     }
 
@@ -167,47 +180,50 @@ deployment:
       description = "The security group name of all nodes in the Kafka cluster."
     }
 
-    data "huaweicloud_vpcs" "existing" {
-      name = var.vpc_name
+    data "openstack_networking_network_v2" "existing" {
+      name  = var.vpc_name
+      count = length(data.openstack_networking_network_v2.existing)
     }
 
-    data "huaweicloud_vpc_subnets" "existing" {
-      name = var.subnet_name
+    data "openstack_networking_subnet_v2" "existing" {
+      name  = var.subnet_name
+      count = length(data.openstack_networking_subnet_v2.existing)
     }
 
-    data "huaweicloud_networking_secgroups" "existing" {
-      name = var.secgroup_name
+    data "openstack_networking_secgroup_v2" "existing" {
+      name  = var.secgroup_name
+      count = length(data.openstack_networking_secgroup_v2.existing)
     }
 
     locals {
-      admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
-      vpc_id       = length(data.huaweicloud_vpcs.existing.vpcs) > 0 ? data.huaweicloud_vpcs.existing.vpcs[0].id : huaweicloud_vpc.new[0].id
-      subnet_id    = length(data.huaweicloud_vpc_subnets.existing.subnets)> 0 ? data.huaweicloud_vpc_subnets.existing.subnets[0].id : huaweicloud_vpc_subnet.new[0].id
-      secgroup_id  = length(data.huaweicloud_networking_secgroups.existing.security_groups) > 0 ? data.huaweicloud_networking_secgroups.existing.security_groups[0].id : huaweicloud_networking_secgroup.new[0].id
+      admin_passwd  = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
+      vpc_id        = length(data.openstack_networking_network_v2.existing) > 0 ? data.openstack_networking_network_v2.existing[0].id : openstack_networking_network_v2.new[0].id
+      subnet_id     = length(data.openstack_networking_subnet_v2.existing) > 0 ? data.openstack_networking_subnet_v2.existing[0].id : openstack_networking_subnet_v2.new[0].id
+      secgroup_id   = length(data.openstack_networking_secgroup_v2.existing) > 0 ? data.openstack_networking_secgroup_v2.existing[0].id : openstack_networking_secgroup_v2.new[0].id
+      secgroup_name = length(data.openstack_networking_secgroup_v2.existing) > 0 ? data.openstack_networking_secgroup_v2.existing[0].name : openstack_networking_secgroup_v2.new[0].name
     }
 
-    resource "huaweicloud_vpc" "new" {
-      count = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
-      name  = var.vpc_name
-      cidr  = "192.168.0.0/16"
+    resource "openstack_networking_network_v2" "new" {
+      count = length(data.openstack_networking_network_v2.existing) == 0 ? 1 : 0
+      name  = "${var.vpc_name}-${random_id.new.hex}"
     }
 
-    resource "huaweicloud_vpc_subnet" "new" {
-      count      = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
-      vpc_id     = local.vpc_id
-      name       = var.subnet_name
+    resource "openstack_networking_subnet_v2" "new" {
+      count      = length(data.openstack_networking_subnet_v2.existing) == 0 ? 1 : 0
+      network_id     = local.vpc_id
+      name       = "${var.subnet_name}-${random_id.new.hex}"
       cidr       = "192.168.10.0/24"
       gateway_ip = "192.168.10.1"
     }
 
-    resource "huaweicloud_networking_secgroup" "new" {
-      count       = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
-      name        = var.secgroup_name
+    resource "openstack_networking_secgroup_v2" "new" {
+      count       = length(data.openstack_networking_secgroup_v2.existing) == 0 ? 1 : 0
+      name        = "${var.secgroup_name}-${random_id.new.hex}"
       description = "Kafka cluster security group"
     }
 
-    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_0" {
-      count             = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+    resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_0" {
+      count             = length(data.openstack_networking_secgroup_v2.existing) == 0 ? 1 : 0
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
@@ -217,8 +233,8 @@ deployment:
       security_group_id = local.secgroup_id
     }
 
-    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_1" {
-      count             = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+    resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_1" {
+      count             = length(data.openstack_networking_secgroup_v2.existing) == 0 ? 1 : 0
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
@@ -228,8 +244,8 @@ deployment:
       security_group_id = local.secgroup_id
     }
 
-    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_2" {
-      count             = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+    resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_2" {
+      count             = length(data.openstack_networking_secgroup_v2.existing) == 0 ? 1 : 0
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
@@ -239,7 +255,7 @@ deployment:
       security_group_id = local.secgroup_id
     }
 
-    data "huaweicloud_availability_zones" "osc-az" {}
+    data "openstack_compute_availability_zones_v2" "osc-az" {}
 
     resource "random_id" "new" {
       byte_length = 4
@@ -255,24 +271,24 @@ deployment:
       override_special = "#%@"
     }
 
-    resource "huaweicloud_compute_keypair" "keypair" {
-      name = "keypair-kafka-${random_id.new.hex}"
+    resource "openstack_compute_keypair_v2" "keypair" {
+      name = "keypair-k8s-${random_id.new.hex}"
     }
 
-    data "huaweicloud_images_image" "image" {
-      name        = "Kafka-v3.3.2_Ubuntu-20.04"
+    data "openstack_images_image_v2" "image" {
+      name        = "cirros-0.5.2-x86_64-disk"
       most_recent = true
     }
 
-    resource "huaweicloud_compute_instance" "zookeeper" {
-      availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
+    resource "openstack_compute_instance_v2" "zookeeper" {
+      availability_zone  = data.openstack_compute_availability_zones_v2.osc-az.names[0]
       name               = "kafka-zookeeper-${random_id.new.hex}"
-      flavor_id          = var.flavor_id
-      security_group_ids = [ local.secgroup_id ]
-      image_id           = data.huaweicloud_images_image.image.id
-      key_pair           = huaweicloud_compute_keypair.keypair.name
+      flavor_name        = var.flavor_id
+      security_groups    = [ local.secgroup_name ]
+      image_id           = data.openstack_images_image_v2.image.id
+      key_pair           = openstack_compute_keypair_v2.keypair.name
       network {
-        uuid = local.subnet_id
+        uuid = local.vpc_id
       }
       user_data = <<EOF
         #!bin/bash
@@ -283,16 +299,16 @@ deployment:
       EOF
     }
 
-    resource "huaweicloud_compute_instance" "kafka-broker" {
+    resource "openstack_compute_instance_v2" "kafka-broker" {
       count              = var.worker_nodes_count
-      availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
-      name               = "kafka-broker-${random_id.new.hex}-${count.index}"
-      flavor_id          = var.flavor_id
-      security_group_ids = [ local.secgroup_id ]
-      image_id           = data.huaweicloud_images_image.image.id
-      key_pair           = huaweicloud_compute_keypair.keypair.name
+      availability_zone  = data.openstack_compute_availability_zones_v2.osc-az.names[0]
+      name               = "kafka-broker-${count.index}-${random_id.new.hex}"
+      flavor_name        = var.flavor_id
+      security_groups    = [ local.secgroup_name ]
+      image_id           = data.openstack_images_image_v2.image.id
+      key_pair           = openstack_compute_keypair_v2.keypair.name
       network {
-        uuid = local.subnet_id
+        uuid = local.vpc_id
       }
       user_data = <<EOF
         #!bin/bash
@@ -300,20 +316,21 @@ deployment:
         sudo systemctl start docker
         sudo systemctl enable docker
         private_ip=$(ifconfig | grep -A1 "eth0" | grep 'inet' | awk -F ' ' ' {print $2}'|awk ' {print $1}')
-        sudo docker run -d --name kafka-server --restart always -p 9092:9092 -p 9093:9093  -e KAFKA_BROKER_ID=${count.index}  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://$private_ip:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=${huaweicloud_compute_instance.zookeeper.access_ip_v4}:2181 bitnami/kafka:3.3.2
+        sudo docker run -d --name kafka-server --restart always -p 9092:9092 -p 9093:9093  -e KAFKA_BROKER_ID=${count.index}  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://$private_ip:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=${openstack_compute_instance_v2.zookeeper.access_ip_v4}:2181 bitnami/kafka:3.3.2
       EOF
       depends_on = [
-        huaweicloud_compute_instance.zookeeper
+        openstack_compute_instance_v2.zookeeper
       ]
     }
 
     output "zookeeper_server" {
-      value = "${huaweicloud_compute_instance.zookeeper.access_ip_v4}:2181"
+      value = "${openstack_compute_instance_v2.zookeeper.access_ip_v4}:2181"
     }
 
     output "admin_passwd" {
       value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
     }
+
 ```
 
 ### Deployment Scripts
@@ -404,16 +421,7 @@ $ mvn clean install
 
 By default, the application will not activate any plugins. They must be
 activated via spring profiles. Also ensure that only one plugin is active at a
-time.
-
-* for Huawei Cloud:
-
-```shell
-$ cd runtime/target
-$ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=huaweicloud
-```
-
-* for Openstack:
+time. For example, openstack plugin can be activated as below
 
 ```shell
 $ cd runtime/target
@@ -429,10 +437,10 @@ $ mvn clean install -Ddocker.skip=false
 ```
 
 We can start xpanse runtime with a specific plugin by passing the plugin name
-in the profile name. For example to start huaweicloud
+in the profile name. For example to start openstack
 
 ```shell
-$ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-xpanse-runtime xpanse
+$ docker run -e "SPRING_PROFILES_ACTIVE=openstack" --name my-xpanse-runtime xpanse
 ```
 
 ### Static Code Analysis using CheckStyle
