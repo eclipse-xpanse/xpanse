@@ -15,9 +15,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum MonitorResourceType {
     CPU("cpu"),
-    MEM("mem"),
-    NETWORK("network"),
-    DISK("disk");
+    MEM("mem");
 
     private final String value;
 
