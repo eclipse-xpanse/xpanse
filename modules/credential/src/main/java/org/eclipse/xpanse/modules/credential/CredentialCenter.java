@@ -63,7 +63,7 @@ public class CredentialCenter {
      * @param csp      The csp  to get.
      * @param userName The userName to get.
      */
-    AbstractCredentialInfo getCredential(Csp csp, String userName) {
+    public AbstractCredentialInfo getCredential(Csp csp, String userName) {
         return null;
     }
 
