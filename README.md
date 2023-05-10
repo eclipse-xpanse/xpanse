@@ -1,5 +1,5 @@
 <p align='center'>
-    <img src="static/logo.png" alt='xpanse-logo' style='align-content: center'>
+    <img src="static/full-logo.png" alt='xpanse-logo' style='align-content: center'>
 </p>
 <p align='center'>
 <a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/osc.yml" target="_blank">
