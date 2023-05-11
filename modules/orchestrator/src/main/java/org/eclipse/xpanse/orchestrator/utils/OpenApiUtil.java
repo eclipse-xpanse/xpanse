@@ -282,7 +282,7 @@ public class OpenApiUtil {
      *
      * @param workdir The work directory of the openApi.
      */
-    private boolean downloadClientJar(String workdir) throws IOException {
+    public boolean downloadClientJar(String workdir) throws IOException {
         File workDir = new File(workdir);
         if (!workDir.exists() && !workDir.mkdirs()) {
             throw new RuntimeException("Download client jar failed.");
