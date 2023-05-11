@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.models.enums.ResourceKindInstance;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.springframework.beans.BeanUtils;
@@ -48,7 +48,7 @@ public class EntityTransUtils {
 
 
     private static void fillChildFields(DeployResource deployResource,
-            Map<String, String> properties) {
+                                        Map<String, String> properties) {
         if (Objects.isNull(deployResource) || properties.isEmpty()) {
             return;
         }

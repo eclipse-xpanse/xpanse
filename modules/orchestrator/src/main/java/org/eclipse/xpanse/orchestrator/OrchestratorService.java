@@ -19,8 +19,11 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
@@ -33,9 +36,6 @@ import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
-import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
-import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
-import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
@@ -328,6 +328,20 @@ public class OrchestratorService {
             throw new RuntimeException("Can't find suitable deployer for the Task.");
         }
         return deployment;
+    }
+
+    /**
+     * Get available plugin bean implements OrchestratorPlugin by the @csp.
+     *
+     * @param csp The cloud service provider.
+     * @return available plugin bean.
+     */
+    public OrchestratorPlugin getOrchestratorPlugin(Csp csp) {
+        OrchestratorPlugin plugin = pluginMap.get(csp);
+        if (Objects.isNull(plugin)) {
+            throw new RuntimeException("Can't find suitable plugin for the Csp " + csp.name());
+        }
+        return plugin;
     }
 
 }

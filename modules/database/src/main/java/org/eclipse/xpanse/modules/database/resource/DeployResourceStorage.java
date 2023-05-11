@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.service;
+package org.eclipse.xpanse.modules.database.resource;
 
 import java.util.UUID;
 

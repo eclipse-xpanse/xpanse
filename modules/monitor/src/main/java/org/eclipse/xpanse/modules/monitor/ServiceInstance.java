@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.monitor;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
@@ -40,7 +40,6 @@ public class ServiceInstance {
 
     /**
      * Get deployResources.
-     *
      */
     public List<DeployResource> getDeployResources() {
         List<DeployResourceEntity> deployResourceList = serviceEntity.getDeployResourceList();

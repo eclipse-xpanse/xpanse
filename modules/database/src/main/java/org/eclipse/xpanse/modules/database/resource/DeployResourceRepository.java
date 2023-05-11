@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.service;
+package org.eclipse.xpanse.modules.database.resource;
 
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

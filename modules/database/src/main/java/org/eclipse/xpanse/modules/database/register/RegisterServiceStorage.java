@@ -4,15 +4,14 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.register;
+package org.eclipse.xpanse.modules.database.register;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 
 /**
- * Interface to be implemented by register service database.
+ * Interface for persist of RegisterResource.
  */
 public interface RegisterServiceStorage {
 
