@@ -99,8 +99,11 @@ public class SystemCmd {
         StringBuilder stringBuilder = new StringBuilder();
         bufferedReader.lines().forEach(line -> {
             log.info(line);
+            // skip adding new line for the first line.
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append(System.lineSeparator());
+            }
             stringBuilder.append(line);
-            stringBuilder.append(System.lineSeparator());
         });
         return stringBuilder.toString();
     }
@@ -110,10 +113,13 @@ public class SystemCmd {
         if (Objects.isNull(process)) {
             return;
         }
-        final Map<String, String> contextMap = new HashMap<>(MDC.getCopyOfContextMap());
+        final Map<String, String> contextMap = new HashMap<>(
+                Objects.nonNull(MDC.getCopyOfContextMap()) ? MDC.getCopyOfContextMap() :
+                        new HashMap<>());
+
 
         // Starting threads in parallel to read stdout and stderr. This is needed because in
-        // some cases reading stdout first works and in some cases reading stderr works.
+        // some cases reading stdout first works and in some cases reading stderr first works.
         // we now let both stdout and stderr streams to be fully read in parallel and then read
         // the output after the buffers are fully read.
         BufferedReader stdoutReader =
@@ -129,7 +135,7 @@ public class SystemCmd {
                 threadToReadStdErr.submit(() -> readStream(stdErrorReader, contextMap));
 
         while (!stdOutFuture.isDone() || !stdErrFuture.isDone()) {
-            log.debug("Waiting for streams to be read");
+            log.debug("Command output and error streams are still being read.");
         }
 
         systemCmdResult.setCommandStdError(stdErrFuture.get());
