@@ -9,15 +9,14 @@ package org.eclipse.xpanse.orchestrator.monitor;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.credential.CredentialCenter;
-import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ServiceInstance;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
+import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,14 +25,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class Monitor {
 
-    @Autowired
-    private CredentialCenter credentialCenter;
+    private final CredentialCenter credentialCenter;
+
+    public Monitor(CredentialCenter credentialCenter) {
+        this.credentialCenter = credentialCenter;
+    }
 
     /**
      * Get metrics of the service instance.
      */
     public List<Metric> getMetrics(OrchestratorPlugin plugin,
-            ServiceInstance serviceInstance) {
+                                   ServiceInstance serviceInstance) {
 
         List<DeployResourceEntity> deployResourceList =
                 serviceInstance.getServiceEntity().getDeployResourceList();

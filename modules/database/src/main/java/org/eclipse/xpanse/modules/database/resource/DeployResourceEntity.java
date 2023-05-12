@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.service;
+package org.eclipse.xpanse.modules.database.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CollectionTable;
@@ -25,6 +25,7 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 
 /**

@@ -4,11 +4,9 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.service.impl;
+package org.eclipse.xpanse.modules.database.resource;
 
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployResourceRepository;
-import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
