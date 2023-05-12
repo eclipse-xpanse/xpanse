@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
+import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -42,7 +43,7 @@ public class PluginTest implements OrchestratorPlugin {
 
     @Override
     public List<Metric> getMetrics(AbstractCredentialInfo credential,
-            DeployResource deployResource) {
+            DeployResource deployResource, MonitorResourceType monitorResourceType) {
         return null;
     }
 }
