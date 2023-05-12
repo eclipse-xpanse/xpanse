@@ -7,7 +7,12 @@
 package org.eclipse.xpanse.orchestrator.credential;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.credential.CredentialDefinition;
+import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
@@ -21,6 +26,9 @@ import org.springframework.stereotype.Component;
 public class CredentialCenter {
 
     private final OrchestratorService orchestratorService;
+
+    private final Map<Csp, AbstractCredentialInfo> credentialInfoMap =
+            new ConcurrentHashMap<>();
 
     public CredentialCenter(
             OrchestratorService orchestratorService) {
@@ -75,7 +83,19 @@ public class CredentialCenter {
      * @param userName The userName to get.
      */
     public AbstractCredentialInfo getCredential(Csp csp, String userName) {
-        return null;
+        AbstractCredentialInfo abstractCredentialInfo = credentialInfoMap.get(csp);
+        if (abstractCredentialInfo != null) {
+            return abstractCredentialInfo;
+        }
+        AbstractCredentialInfo credentialInfo = findCredentialInfoFromEnv(csp);
+        if (credentialInfo == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "No credential information found for the given Csp:%s.",
+                            csp));
+        }
+        credentialInfoMap.put(csp, credentialInfo);
+        return credentialInfo;
     }
 
     /**
@@ -88,4 +108,31 @@ public class CredentialCenter {
                                                CredentialType credentialType) {
         return null;
     }
+
+    /**
+     * Get credentialInfo from the environment using Csp.
+     *
+     * @param csp The csp to get.
+     */
+    private AbstractCredentialInfo findCredentialInfoFromEnv(Csp csp) {
+        List<AbstractCredentialInfo> credentialAbilities = getCredentialAbilities(csp);
+        for (AbstractCredentialInfo credentialAbility : credentialAbilities) {
+            CredentialDefinition credentialDefinition = (CredentialDefinition) credentialAbility;
+            List<CredentialVariable> variables = credentialDefinition.getVariables();
+            int credentialVariableSetValueCount = 0;
+            for (CredentialVariable variable : variables) {
+                String envValue = System.getenv(variable.getName());
+                if (StringUtils.isNotBlank(envValue)) {
+                    variable.setValue(envValue);
+                    credentialVariableSetValueCount++;
+                }
+            }
+            // Check if all variables have been successfully set.
+            if (credentialVariableSetValueCount == variables.size()) {
+                return credentialAbility;
+            }
+        }
+        return null;
+    }
+
 }
