@@ -332,7 +332,8 @@ public class OrchestratorApi {
         return this.orchestratorService
                 .getDeployedServices()
                 .stream()
-                .filter(serviceVo -> serviceVo.getUserName().equals(userName))
+                .filter(serviceVo -> Objects.nonNull(serviceVo.getUserName())
+                        && serviceVo.getUserName().equals(userName))
                 .collect(Collectors.toList());
 
     }
