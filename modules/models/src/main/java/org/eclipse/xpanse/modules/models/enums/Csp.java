@@ -28,14 +28,12 @@ public enum Csp {
     }
 
     /**
-     * Get Csp by value.
-     *
-     * @param value value
-     * @return csp
+     * For CSP serialize.
      */
-    public static Csp getCspByValue(String value) {
+    @JsonCreator
+    public static Csp getByValue(String name) {
         for (Csp csp : values()) {
-            if (csp.value.equals(StringUtils.lowerCase(value))) {
+            if (StringUtils.equalsIgnoreCase(csp.value, name)) {
                 return csp;
             }
         }
@@ -48,18 +46,5 @@ public enum Csp {
     @JsonValue
     public String toValue() {
         return this.value;
-    }
-
-    /**
-     * For CSP serialize.
-     */
-    @JsonCreator
-    public Csp getByValue(String name) {
-        for (Csp csp : values()) {
-            if (csp.value.equals(StringUtils.lowerCase(name))) {
-                return csp;
-            }
-        }
-        return null;
     }
 }

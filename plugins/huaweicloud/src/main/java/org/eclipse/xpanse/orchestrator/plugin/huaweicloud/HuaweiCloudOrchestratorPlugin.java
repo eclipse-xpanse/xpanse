@@ -67,8 +67,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         List<CredentialVariable> credentialVariables = new ArrayList<>();
-        CredentialDefinition accessKey = new CredentialDefinition(HuaweiCloudMonitorConstants.IAM,
-                "The access key and security key.",
+        CredentialDefinition accessKey = new CredentialDefinition(
+                getCsp(), HuaweiCloudMonitorConstants.IAM, "The access key and security key.",
                 CredentialType.VARIABLES, credentialVariables);
         credentialVariables.add(
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
@@ -83,7 +83,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<Metric> getMetrics(AbstractCredentialInfo credential,
-            DeployResource deployResource, MonitorResourceType monitorResourceType) {
+                                   DeployResource deployResource,
+                                   MonitorResourceType monitorResourceType) {
         List<Metric> metrics = new ArrayList<>();
         try {
             clearExpiredMetricCache(deployResource.getResourceId());
