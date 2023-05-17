@@ -6,20 +6,17 @@
 
 package org.eclipse.xpanse.orchestrator.utils;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
@@ -29,10 +26,10 @@ import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
-import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,34 +39,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class CredentialApiUtil implements ApplicationRunner {
 
-    private static final String TASK_ID = "TASK_ID";
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private final String appVersion;
+    private final OpenApiUtil openApiUtil;
+    private final OrchestratorService orchestratorService;
 
-    @Resource
-    OpenApiUtil openApiUtil;
-    @Resource
-    OrchestratorService orchestratorService;
-
-    @Override
-    public void run(ApplicationArguments args) {
-        Map<Csp, OrchestratorPlugin> cspOrchestratorPluginMap = orchestratorService.pluginMap();
-        cspOrchestratorPluginMap.keySet().forEach(csp -> {
-            OrchestratorPlugin orchestratorPlugin = cspOrchestratorPluginMap.get(csp);
-            List<CredentialType> availableCredentialTypes =
-                    orchestratorPlugin.getAvailableCredentialTypes();
-            List<AbstractCredentialInfo> credentialDefinitions =
-                    orchestratorPlugin.getCredentialDefinitions();
-            if (!Objects.isNull(availableCredentialTypes) && !Objects.isNull(
-                    credentialDefinitions)) {
-                Map<CredentialType, CredentialDefinition> credentialMap =
-                        credentialDefinitions.stream()
-                                .filter(credentialDefinition -> availableCredentialTypes.contains(
-                                        credentialDefinition.getType()))
-                                .collect(Collectors.toMap(AbstractCredentialInfo::getType,
-                                        cd -> (CredentialDefinition) cd));
-                deleteCredentialApi(csp);
-                generateCredentialApi(credentialMap, csp);
-            }
-        });
+    /**
+     * Constructor of CredentialApiUtil.
+     */
+    @Autowired
+    public CredentialApiUtil(OrchestratorService orchestratorService,
+                             OpenApiUtil openApiUtil,
+                             @Value("${app.version:1.0.0}")
+                                     String appVersion) {
+        this.orchestratorService = orchestratorService;
+        this.openApiUtil = openApiUtil;
+        this.appVersion = appVersion;
     }
 
     /**
@@ -90,29 +75,59 @@ public class CredentialApiUtil implements ApplicationRunner {
         return openApiUtil.getOpenApiWorkdir();
     }
 
+
+    @Override
+    public void run(ApplicationArguments args) {
+        Map<Csp, OrchestratorPlugin> cspOrchestratorPluginMap = orchestratorService.pluginMap();
+        for (Csp csp : cspOrchestratorPluginMap.keySet()) {
+            OrchestratorPlugin orchestratorPlugin = cspOrchestratorPluginMap.get(csp);
+            List<AbstractCredentialInfo> credentialDefinitions =
+                    orchestratorPlugin.getCredentialDefinitions();
+            if (Objects.nonNull(credentialDefinitions)) {
+                Map<CredentialType, AbstractCredentialInfo> typeCredentialInfoMap =
+                        credentialDefinitions.stream().filter(Objects::nonNull)
+                                .collect(Collectors.toMap(AbstractCredentialInfo::getType,
+                                        Function.identity(), (existing, replacement) -> existing));
+                typeCredentialInfoMap.keySet().forEach(type -> {
+                    CredentialDefinition credentialDefinition =
+                            (CredentialDefinition) typeCredentialInfoMap.get(type);
+                    createCredentialApi(credentialDefinition);
+                });
+            } else {
+                log.info("Not found credential definition of the cloud service provider:{}",
+                        csp.toValue());
+            }
+        }
+    }
+
     /**
      * create credentialApi for plugins.
+     *
+     * @param credentialDefinition credentialDefinition
      */
-    public void createCredentialApi(Map<CredentialType, CredentialDefinition> credentialMap,
-                                    Csp csp) {
-        String yamlFileName = csp + "_" + "credentialApi" + ".yaml";
+    public void createCredentialApi(CredentialDefinition credentialDefinition) {
+        String jsonFileName = getCredentialApiFileName(credentialDefinition.getCsp(),
+                credentialDefinition.getType(), ".json");
+        String htmlFileName = getCredentialApiFileName(credentialDefinition.getCsp(),
+                credentialDefinition.getType(), ".html");
         String credentialApiDir = getCredentialApiDir();
         File dir = new File(credentialApiDir);
         if (!dir.exists()) {
-            log.info("Create service openApi dir:{} success", credentialApiDir);
+            log.info("Create service openApi dir:{} successfully.", credentialApiDir);
         }
-        File yamlFile = new File(credentialApiDir, yamlFileName);
-        File htmlFile = new File(credentialApiDir, csp + "_" + "credentialApi" + ".html");
+        File jsonFile = new File(credentialApiDir, jsonFileName);
+        File htmlFile = new File(credentialApiDir, htmlFileName);
+        htmlFile.deleteOnExit();
         try {
-            String apiDocsJson = getApiDocsJson(credentialMap, csp);
-            try (FileWriter apiWriter = new FileWriter(yamlFile.getPath())) {
+            String apiDocsJson = getApiDocsJson(credentialDefinition);
+            try (FileWriter apiWriter = new FileWriter(jsonFile.getPath())) {
                 apiWriter.write(apiDocsJson);
             }
-            log.info("credentialApi yamlFile:{} creation successful.", yamlFile.getName());
-            if (yamlFile.exists() && openApiUtil.downloadClientJar(credentialApiDir)) {
+            log.info("credentialApi jsonFile:{} creation successful.", jsonFile.getName());
+            if (jsonFile.exists() && openApiUtil.downloadClientJar(credentialApiDir)) {
                 File jarPath = new File(credentialApiDir, "openapi-generator-cli.jar");
                 String comm = String.format("java -jar %s generate -g html2 "
-                        + "-i %s -o %s", jarPath.getPath(), yamlFile.getPath(), credentialApiDir);
+                        + "-i %s -o %s", jarPath.getPath(), jsonFile.getPath(), credentialApiDir);
                 ProcessBuilder processBuilder = new ProcessBuilder(comm.split("\\s+"));
                 processBuilder.redirectErrorStream(true);
                 Process process = processBuilder.start();
@@ -126,7 +141,8 @@ public class CredentialApiUtil implements ApplicationRunner {
                 }
                 int exitCode = process.waitFor();
                 if (exitCode != 0) {
-                    log.error("{} credentialApi html file creation failed." + stdErrOut, csp);
+                    log.error("credentialApi htmlFile:{} creation failed.{}",
+                            htmlFile.getName(), stdErrOut);
                 }
                 File tempHtmlFile = new File(credentialApiDir, "index.html");
                 if (tempHtmlFile.exists()) {
@@ -137,150 +153,303 @@ public class CredentialApiUtil implements ApplicationRunner {
                 }
             }
         } catch (IOException | InterruptedException ex) {
-            log.error("credentialApi html file creation failed.", ex);
+            log.error("credentialApi html file:{} creation failed.", htmlFile.getName(), ex);
             throw new RuntimeException("credentialApi html file creation failed.", ex);
         } finally {
-            // Delete the temp file named ${Csp}_credentialApi.yaml
-            if (yamlFile.exists()) {
-                if (yamlFile.delete()) {
-                    log.info("credentialApi temp yaml file deletion successful.");
+            // Delete the json file named ${Csp}_credentialApi.yaml
+            if (jsonFile.exists()) {
+                if (jsonFile.delete()) {
+                    log.info("Delete temp json file:{} successfully.", jsonFile.getName());
                 }
             }
         }
     }
 
     /**
-     * generate credentialApi for plugins.
+     * Get credential openApi Url.
+     *
+     * @param csp  The cloud service provider.
+     * @param type The type of credential.
+     * @return Returns credential openApi Url.
      */
-    @Async("taskExecutor")
-    public void generateCredentialApi(
-            Map<CredentialType, CredentialDefinition> credentialMap, Csp csp) {
-        MDC.put(TASK_ID, UUID.randomUUID().toString());
-        createCredentialApi(credentialMap, csp);
-    }
-
-    /**
-     * delete credentialApi for plugins.
-     */
-    public void deleteCredentialApi(Csp csp) {
-        File file = new File(getCredentialApiDir(), csp + "_" + "credentialApi" + ".html");
-        if (file.exists()) {
-            if (file.delete()) {
-                log.info("credentialApi html file:{} deletion successful.", file.getName());
+    public String getCredentialOpenApiUrl(Csp csp, CredentialType type) {
+        String htmlFileName = getCredentialApiFileName(csp, type, ".html");
+        String credentialApiDir = getCredentialApiDir();
+        File htmlFile = new File(credentialApiDir, htmlFileName);
+        if (!htmlFile.exists()) {
+            boolean findCredentialInfo = false;
+            OrchestratorPlugin orchestratorPlugin = orchestratorService.getOrchestratorPlugin(csp);
+            List<AbstractCredentialInfo> credentialDefinitions =
+                    orchestratorPlugin.getCredentialDefinitions();
+            if (Objects.nonNull(credentialDefinitions)) {
+                AbstractCredentialInfo abstractCredentialInfo = credentialDefinitions.stream()
+                        .filter(credentialInfo -> Objects.equals(type, credentialInfo.getType()))
+                        .findFirst().orElse(null);
+                if (Objects.nonNull(abstractCredentialInfo)) {
+                    findCredentialInfo = true;
+                    createCredentialApi((CredentialDefinition) abstractCredentialInfo);
+                }
+            }
+            if (!findCredentialInfo) {
+                String errorMsg = String.format(
+                        "Not found credential definition with type %s of the cloud service "
+                                + "provider %s", type.toValue(), csp.toValue());
+                log.error(errorMsg);
+                throw new RuntimeException(errorMsg);
             }
         }
-    }
-
-    private Map<String, Map<String, String>> getVariablePropertiesMap(
-            List<CredentialVariable> credentialVariables) {
-        Map<String, Map<String, String>> variablePropertiesMap = new HashMap<>();
-        for (CredentialVariable credentialVariable : credentialVariables) {
-            Map<String, String> credentialVariableMap = new HashMap<>();
-            credentialVariableMap.put("example", credentialVariable.getValue());
-            credentialVariableMap.put("type", "string");
-            credentialVariableMap.put("description", credentialVariable.getDescription());
-            variablePropertiesMap.put(credentialVariable.getName(), credentialVariableMap);
+        if (openApiUtil.getOpenapiPath().endsWith("/")) {
+            return getServiceUrl() + "/" + openApiUtil.getOpenapiPath() + htmlFileName;
         }
-        return variablePropertiesMap;
+        return getServiceUrl() + "/" + openApiUtil.getOpenapiPath() + "/" + htmlFileName;
     }
 
-    private String getApiDocsJson(Map<CredentialType, CredentialDefinition> credentialMap,
-                                  Csp csp) {
-        String serviceUrl = getServiceUrl();
-        String variableNamesStr = null;
-        String variablePropertiesStr = null;
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        CredentialDefinition credentialDefinition = credentialMap.get(CredentialType.VARIABLES);
-        List<CredentialVariable> variables = credentialDefinition.getVariables();
-        List<String> variableNames = variables.stream().map(CredentialVariable::getName)
-                .collect(Collectors.toList());
-        Map<String, Map<String, String>> variablePropertiesMap =
-                getVariablePropertiesMap(variables);
-        String operationName = csp + "-" + credentialDefinition.getName();
+    private String getCredentialApiFileName(Csp csp, CredentialType type, String suffix) {
+        return csp.toValue() + "_" + type.toValue() + "_credentialApi" + suffix;
+    }
+
+    private String getVariablesExampleStr(List<CredentialVariable> variables) {
+        variables.forEach(credentialVariable -> credentialVariable.setValue(
+                credentialVariable.getDescription()));
+        String exampleString = "";
         try {
-            variableNamesStr = mapper.writeValueAsString(variableNames);
-            variablePropertiesStr = mapper.writeValueAsString(variablePropertiesMap);
+            exampleString = mapper.writeValueAsString(variables);
         } catch (JsonProcessingException e) {
             log.error("Failed to write value as string.", e);
         }
+        return exampleString;
+    }
+
+    private String getApiDocsJson(CredentialDefinition credentialDefinition) {
+        String serviceUrl = getServiceUrl();
+        String csp = credentialDefinition.getCsp().toValue();
+        String type = credentialDefinition.getType().toValue();
+        String variablesExampleStr = getVariablesExampleStr(credentialDefinition.getVariables());
         //CHECKSTYLE OFF: LineLength
         return String.format("""
-                        openapi: 3.0.1
-                        info:
-                          title: %s plugin credentials definition
-                          version: v1.16
-                          description: CredentialApi document of user add credentials for %s plugin.
-                        servers:
-                          - url: %s
-                            description: Generated server url
-                        tags:
-                          - name: Service Available
-                            description: APIs to query the credential capabilities supported by CSP.
-                        paths:
-                          /xpanse/service/%s:
-                            post:
-                              tags:
-                                - Service
-                              description: %s credentialType supported by the %s plugin.
-                              operationId: %s
-                              requestBody:
-                                content:
-                                  application/json:
-                                    schema:
-                                      $ref: '#/components/schemas/%s'
-                                required: true
-                              responses:
-                                '202':
-                                  description: Accepted
-                                  content:
-                                    application/json:
-                                      schema:
-                                        type: string
-                                        format: uuid
-                                '400':
-                                  description: Bad Request
-                                  content:
-                                    '*/*':
-                                      schema:
-                                        $ref: '#/components/schemas/Response'
-                                '404':
-                                  description: Not Found
-                                  content:
-                                    '*/*':
-                                      schema:
-                                        $ref: '#/components/schemas/Response'
-                                '500':
-                                  description: Internal Server Error
-                                  content:
-                                    '*/*':
-                                      schema:
-                                        $ref: '#/components/schemas/Response'
-                        components:
-                          schemas:
-                            Response:
-                              required:
-                                - code
-                                - message
-                                - success
-                              type: object
-                              properties:
-                                code:
-                                  type: string
-                                  description: The result code of response.
-                                message:
-                                  type: string
-                                  description: The result message of response.
-                                success:
-                                  type: boolean
-                                  description: The success boolean of response.
-                            %s:
-                              required: %s
-                              type: object
-                              properties: %s
+                        {
+                            "openapi": "3.0.1",
+                            "info": {
+                                "title": "OpenAPI definition",
+                                "description": "OpenAPI for user adding credential of the cloud service provider %s",
+                                "version": "%s"
+                            },
+                            "servers": [
+                                {
+                                    "url": "%s",
+                                    "description": "Generated server url"
+                                }
+                            ],
+                            "tags": [
+                                {
+                                    "name": "Credentials Management",
+                                    "description": "APIs to manage credentials for authentication."
+                                }
+                            ],
+                            "paths": {
+                                "/xpanse/auth/csp/%s/credential": {
+                                    "post": {
+                                        "tags": [
+                                            "Credentials Management"
+                                        ],
+                                        "description": "Add credential with type %s of the cloud service provider %s.",
+                                        "operationId": "addCredential",
+                                        "requestBody": {
+                                            "content": {
+                                                "application/json": {
+                                                    "schema": {
+                                                        "$ref": "#/components/schemas/CreateCredential"
+                                                    }
+                                                }
+                                            },
+                                            "required": true
+                                        },
+                                        "responses": {
+                                            "200": {
+                                                "description": "OK",
+                                                "content": {
+                                                    "application/json": {
+                                                        "schema": {
+                                                            "type": "boolean"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "400": {
+                                                "description": "Bad Request",
+                                                "content": {
+                                                    "*/*": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "404": {
+                                                "description": "Not Found",
+                                                "content": {
+                                                    "*/*": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "422": {
+                                                "description": "Unprocessable Entity",
+                                                "content": {
+                                                    "*/*": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "500": {
+                                                "description": "Internal Server Error",
+                                                "content": {
+                                                    "*/*": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "components": {
+                                "schemas": {
+                                    "Response": {
+                                        "required": [
+                                            "details",
+                                            "resultType",
+                                            "success"
+                                        ],
+                                        "type": "object",
+                                        "properties": {
+                                            "resultType": {
+                                                "type": "string",
+                                                "description": "The result code of response.",
+                                                "enum": [
+                                                    "Success",
+                                                    "Runtime Failure",
+                                                    "Parameters Invalid",
+                                                    "Terraform Script Invalid",
+                                                    "Unprocessable Entity",
+                                                    "Response Not Valid"
+                                                ]
+                                            },
+                                            "details": {
+                                                "type": "array",
+                                                "description": "Details of the errors occurred",
+                                                "items": {
+                                                    "type": "string",
+                                                    "description": "Details of the errors occurred"
+                                                }
+                                            },
+                                            "success": {
+                                                "type": "boolean",
+                                                "description": "Describes if the request is successful"
+                                            }
+                                        }
+                                    },
+                                    "CreateCredential": {
+                                        "required": [
+                                            "csp",
+                                            "name",
+                                            "timeToLive",
+                                            "type",
+                                            "userName",
+                                            "variables"
+                                        ],
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "%s",
+                                                "description": "The name of the credential"
+                                            },
+                                            "userName": {
+                                                "type": "string",
+                                                "example": "%s",
+                                                "description": "User who create the credential."
+                                            },
+                                            "csp": {
+                                                "type": "string",
+                                                "example": "%s",
+                                                "description": "The cloud service provider of the credential.",
+                                                "enum": [
+                                                    "aws",
+                                                    "azure",
+                                                    "alicloud",
+                                                    "huawei",
+                                                    "openstack",
+                                                    "flexibleEngine"
+                                                ]
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "%s",
+                                                "description": "The description of the credential"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "%s",
+                                                "description": "The type of the credential",
+                                                "enum": [
+                                                    "variables",
+                                                    "http_authentication",
+                                                    "api_key",
+                                                    "oauth2"
+                                                ]
+                                            },
+                                            "variables": {
+                                                "type": "array",
+                                                "example": %s,
+                                                "description": "The variables list of the credential",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/CredentialVariable"
+                                                }
+                                            },
+                                            "timeToLive": {
+                                                "type": "integer",
+                                                "description": "The time in seconds to live of the credential",
+                                                "format": "int32",
+                                                "example": 3600
+                                            }
+                                        }
+                                    },
+                                    "CredentialVariable": {
+                                        "required": [
+                                            "description",
+                                            "name",
+                                            "value"
+                                        ],
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "description": "The name of the CredentialVariable,this field is provided by the the plugin of cloud service provider."
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "description": "The description of the CredentialVariable,this field is provided by the plugin of cloud service provider."
+                                            },
+                                            "value": {
+                                                "type": "string",
+                                                "description": "The value of the CredentialVariable, this field is filled by the user."
+                                            }
+                                        },
+                                        "description": "The variables list of the credential"
+                                    }
+                                }
+                            }
+                        }
                         """,
-                csp, csp, serviceUrl, operationName, credentialDefinition.getName(),
-                csp, operationName, credentialDefinition.getName(),
-                credentialDefinition.getName(), variableNamesStr, variablePropertiesStr);
+                csp, appVersion, serviceUrl, csp, type, csp, credentialDefinition.getName(),
+                credentialDefinition.getUserName(), csp, credentialDefinition.getDescription(),
+                type, variablesExampleStr);
     }
 }

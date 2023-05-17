@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
+import org.eclipse.xpanse.orchestrator.utils.CredentialApiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -41,6 +42,7 @@ public class CredentialCenter {
     private final OrchestratorService orchestratorService;
     private final CredentialCacheManager credentialCacheManager;
     private final DeployServiceStorage deployServiceStorage;
+    private final CredentialApiUtil credentialApiUtil;
 
     /**
      * Constructor of CredentialCenter.
@@ -49,10 +51,34 @@ public class CredentialCenter {
     public CredentialCenter(
             OrchestratorService orchestratorService,
             CredentialCacheManager credentialCacheManager,
-            DeployServiceStorage deployServiceStorage) {
+            DeployServiceStorage deployServiceStorage,
+            CredentialApiUtil credentialApiUtil) {
         this.orchestratorService = orchestratorService;
         this.credentialCacheManager = credentialCacheManager;
         this.deployServiceStorage = deployServiceStorage;
+        this.credentialApiUtil = credentialApiUtil;
+    }
+
+    /**
+     * List the available credential types by @Csp.
+     *
+     * @param csp The cloud service provider.
+     * @return Returns list of credential types.
+     */
+    public List<CredentialType> getAvailableCredentialTypesByCsp(Csp csp) {
+        OrchestratorPlugin plugin = orchestratorService.getOrchestratorPlugin(csp);
+        return plugin.getAvailableCredentialTypes();
+    }
+
+    /**
+     * List the available credential types by @id.
+     *
+     * @param id The UUID of the deployed service.
+     * @return Returns list of credential types.
+     */
+    public List<CredentialType> getAvailableCredentialTypesByServiceId(String id) {
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
+        return getAvailableCredentialTypesByCsp(deployServiceEntity.getCsp());
     }
 
     /**
@@ -84,6 +110,29 @@ public class CredentialCenter {
                                                                              CredentialType type) {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
         return getCredentialCapabilitiesByCsp(deployServiceEntity.getCsp(), type);
+    }
+
+    /**
+     * Get credential openApi Url.
+     *
+     * @param csp  The cloud service provider.
+     * @param type The type of credential.
+     * @return Returns credential openApi Url.
+     */
+    public String getCredentialOpenApiUrl(Csp csp, CredentialType type) {
+        return credentialApiUtil.getCredentialOpenApiUrl(csp, type);
+    }
+
+    /**
+     * Get credential openApi Url.
+     *
+     * @param id   The UUID of the deployed service.
+     * @param type The type of credential.
+     * @return Returns credential openApi Url.
+     */
+    public String getCredentialOpenApiUrlByServiceId(String id, CredentialType type) {
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
+        return credentialApiUtil.getCredentialOpenApiUrl(deployServiceEntity.getCsp(), type);
     }
 
     /**
