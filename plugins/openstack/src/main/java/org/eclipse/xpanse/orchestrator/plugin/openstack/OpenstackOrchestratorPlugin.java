@@ -6,9 +6,12 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.openstack;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.credential.CredentialDefinition;
+import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
@@ -45,17 +48,42 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<CredentialType> getAvailableCredentialTypes() {
-        return null;
+        List<CredentialType> credentialTypes = new ArrayList<>();
+        credentialTypes.add(CredentialType.HTTP_AUTHENTICATION);
+        return credentialTypes;
     }
 
     @Override
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
-        return null;
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        credentialVariables.add(
+                new CredentialVariable("OS_AUTH_URL",
+                        "The Identity authentication URL."));
+        credentialVariables.add(
+                new CredentialVariable("OS_REGION_NAME",
+                        "The region of the OpenStack cloud to use."));
+        credentialVariables.add(
+                new CredentialVariable("OS_TENANT_NAME",
+                        "The Name of the Tenant or Project to login with."));
+        credentialVariables.add(
+                new CredentialVariable("USER_NAME",
+                        "The Username to login with."));
+        credentialVariables.add(
+                new CredentialVariable("OS_PASSWORD",
+                        "The Password to login with."));
+        CredentialDefinition httpAuth = new CredentialDefinition(
+                getCsp(), "HTTP_AUTH",
+                "Authenticate at the specified URL using an account and password.",
+                CredentialType.HTTP_AUTHENTICATION, credentialVariables);
+        List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
+        credentialInfos.add(httpAuth);
+        return credentialInfos;
     }
 
     @Override
     public List<Metric> getMetrics(AbstractCredentialInfo credential,
-            DeployResource deployResource, MonitorResourceType monitorResourceType) {
+                                   DeployResource deployResource,
+                                   MonitorResourceType monitorResourceType) {
         return null;
     }
 }
