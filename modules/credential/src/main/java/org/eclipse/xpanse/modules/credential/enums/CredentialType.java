@@ -29,7 +29,7 @@ public enum CredentialType {
      * For CredentialType serialize.
      */
     @JsonCreator
-    public CredentialType getByValue(String type) {
+    public static CredentialType getByValue(String type) {
         for (CredentialType credentialType : values()) {
             if (credentialType.type.equals(StringUtils.lowerCase(type))) {
                 return credentialType;

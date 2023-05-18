@@ -6,32 +6,40 @@
 
 package org.eclipse.xpanse.modules.credential;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * The class object for the CredentialVariable.
  */
+@Data
 public class CredentialVariable {
 
     /**
      * The name of the CredentialVariable.
      */
-    @Getter
-    String name;
+    @NotNull
+    @Schema(description = "The name of the CredentialVariable,"
+            + "this field is provided by the the plugin of cloud service provider.")
+    private final String name;
 
     /**
      * The description of the CredentialVariable.
      */
-    @Getter
-    String description;
+    @NotNull
+    @Schema(description = "The description of the CredentialVariable,"
+            + "this field is provided by the plugin of cloud service provider.")
+    private final String description;
 
     /**
      * The value of the CredentialVariable.
      */
-    @Getter
-    @Setter
-    String value;
+    @NotNull
+    @NotBlank
+    @Schema(description = "The value of the CredentialVariable, this field is filled by the user.")
+    private String value;
 
     /**
      * The constructor.

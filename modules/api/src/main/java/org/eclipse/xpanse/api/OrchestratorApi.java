@@ -505,7 +505,7 @@ public class OrchestratorApi {
                                                          String serviceVersion) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         if (StringUtils.isNotBlank(cspName)) {
-            query.setCsp(Csp.getCspByValue(cspName));
+            query.setCsp(Csp.getByValue(cspName));
         }
         query.setCategory(category);
 

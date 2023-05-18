@@ -6,9 +6,13 @@
 
 package org.eclipse.xpanse.modules.credential;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 
 /**
  * The Abstract class which defines the credential basic information required by a cloud provider.
@@ -16,34 +20,57 @@ import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 public abstract class AbstractCredentialInfo {
 
     /**
-     * The name of the credential, this field is provided by the plugins.
+     * The cloud service provider of the credential, this field is provided by the plugins.
      */
     @Getter
-    String name;
+    @Setter
+    @NotNull
+    @Schema(description = "The cloud service provider of the credential.")
+    Csp csp;
 
     /**
      * The userId of the credential.
      */
     @Getter
     @Setter
-    String userId = "default";
+    @NotNull
+    @Schema(description = "The userId of the credential.", defaultValue = "default")
+    String userName = "default";
+
+    /**
+     * The name of the credential, this field is provided by the plugins.
+     */
+    @Getter
+    @NotNull
+    @NotBlank
+    @Schema(description = "The name of the credential,"
+            + "this field is provided by  he the plugin of cloud service provider.")
+    String name;
 
     /**
      * The description of the credential.
      */
     @Getter
+    @NotNull
+    @NotBlank
+    @Schema(description = "The description of the credential,"
+            + "this field is provided by  he the plugin of cloud service provider.")
     String description;
 
     /**
      * The type of the credential.
      */
     @Getter
+    @NotNull
+    @Schema(description = "The type of the credential,"
+            + "this field is provided by  he the plugin of cloud service provider.")
     CredentialType type;
 
     /**
      * The constructor.
      */
-    AbstractCredentialInfo(String name, String description, CredentialType type) {
+    AbstractCredentialInfo(Csp csp, String name, String description, CredentialType type) {
+        this.csp = csp;
         this.name = name;
         this.description = description;
         this.type = type;
