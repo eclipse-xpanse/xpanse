@@ -49,7 +49,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<CredentialType> getAvailableCredentialTypes() {
         List<CredentialType> credentialTypes = new ArrayList<>();
-        credentialTypes.add(CredentialType.HTTP_AUTHENTICATION);
+        credentialTypes.add(CredentialType.VARIABLES);
         return credentialTypes;
     }
 
