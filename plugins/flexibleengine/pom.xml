@@ -68,6 +68,11 @@
       <artifactId>commons-validator</artifactId>
       <version>1.6</version>
     </dependency>
+    <dependency>
+      <groupId>com.huawei.apigateway</groupId>
+      <artifactId>java-sdk-core</artifactId>
+      <version>3.1.2</version>
+    </dependency>
   </dependencies>
 
 </project>
