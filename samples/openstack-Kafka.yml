@@ -74,7 +74,7 @@ deployment:
       kind: env
       dataType: string
       mandatory: true
-    - name: OS_USER_NAME
+    - name: OS_USERNAME
       description: The User Name to login with.
       kind: env
       dataType: string

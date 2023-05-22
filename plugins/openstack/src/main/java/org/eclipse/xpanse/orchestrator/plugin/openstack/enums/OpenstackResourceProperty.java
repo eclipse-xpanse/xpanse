@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.plugin.openstack.models;
+package org.eclipse.xpanse.orchestrator.plugin.openstack.enums;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ public enum OpenstackResourceProperty {
     private final Map<String, String> properties;
 
     OpenstackResourceProperty(DeployResourceKind resourceKind,
-            Map<String, String> resourceProperties) {
+                              Map<String, String> resourceProperties) {
         this.resourceKind = resourceKind;
         this.properties = resourceProperties;
     }
