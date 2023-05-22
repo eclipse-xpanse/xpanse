@@ -35,7 +35,7 @@ public enum MonitorResourceType {
      * For MonitorResourceType deserialize.
      */
     @JsonCreator
-    public MonitorResourceType getByValue(String name) {
+    public static MonitorResourceType getByValue(String name) {
         for (MonitorResourceType monitorEnum : values()) {
             if (monitorEnum.value.equals(StringUtils.lowerCase(name))) {
                 return monitorEnum;
