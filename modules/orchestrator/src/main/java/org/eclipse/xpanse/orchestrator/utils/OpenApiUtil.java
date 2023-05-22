@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
@@ -53,6 +54,7 @@ public class OpenApiUtil {
 
     private final DeployVariableValidator deployVariableValidator;
     private final String clientDownLoadUrl;
+    @Getter
     private final String openapiPath;
     private final Integer port;
 
@@ -61,11 +63,12 @@ public class OpenApiUtil {
      */
     @Autowired
     public OpenApiUtil(DeployVariableValidator deployVariableValidator,
-            @Value("${openapi.download-generator-client-url:https://repo1.maven.org/maven2/org/"
-                    + "openapitools/openapi-generator-cli/6.5.0/openapi-generator-cli.6.5.0.jar}")
-                    String clientDownLoadUrl,
-            @Value("${openapi.path:openapi/}") String openapiPath,
-            @Value("${server.port:8080}") Integer port) {
+                       @Value("${openapi.download-generator-client-url:https://repo1.maven.org/"
+                               + "maven2/org/openapitools/openapi-generator-cli/6.5.0/"
+                               + "openapi-generator-cli.6.5.0.jar}")
+                               String clientDownLoadUrl,
+                       @Value("${openapi.path:openapi/}") String openapiPath,
+                       @Value("${server.port:8080}") Integer port) {
         this.deployVariableValidator = deployVariableValidator;
         this.clientDownLoadUrl = clientDownLoadUrl;
         this.openapiPath = openapiPath;
@@ -524,7 +527,8 @@ public class OpenApiUtil {
                                }
                            }
                           """,
-                serviceVersion, serviceUrl, createRequiredStr, category, categoryValuesStr, serviceName,
+                serviceVersion, serviceUrl, createRequiredStr, category, categoryValuesStr,
+                serviceName,
                 serviceVersion, csp, cspValuesStr, propertiesRequiredStr, propertiesStr);
     }
 
