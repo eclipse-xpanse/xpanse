@@ -49,7 +49,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<CredentialType> getAvailableCredentialTypes() {
         List<CredentialType> credentialTypes = new ArrayList<>();
-        credentialTypes.add(CredentialType.HTTP_AUTHENTICATION);
+        credentialTypes.add(CredentialType.VARIABLES);
         return credentialTypes;
     }
 
@@ -66,15 +66,15 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                 new CredentialVariable("OS_TENANT_NAME",
                         "The Name of the Tenant or Project to login with."));
         credentialVariables.add(
-                new CredentialVariable("USER_NAME",
+                new CredentialVariable("OS_USER_NAME",
                         "The Username to login with."));
         credentialVariables.add(
                 new CredentialVariable("OS_PASSWORD",
                         "The Password to login with."));
         CredentialDefinition httpAuth = new CredentialDefinition(
-                getCsp(), "HTTP_AUTH",
+                getCsp(), "Variables",
                 "Authenticate at the specified URL using an account and password.",
-                CredentialType.HTTP_AUTHENTICATION, credentialVariables);
+                CredentialType.VARIABLES, credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(httpAuth);
         return credentialInfos;
