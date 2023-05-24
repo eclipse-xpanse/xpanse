@@ -122,4 +122,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
     private Map<String, String> privateProperties;
 
+
+    @Column(name = "RESULT_MESSAGE", length = Integer.MAX_VALUE)
+    private String resultMessage;
 }

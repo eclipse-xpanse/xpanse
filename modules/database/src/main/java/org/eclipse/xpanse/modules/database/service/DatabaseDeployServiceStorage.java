@@ -26,13 +26,23 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
     }
 
     /**
-     * Add or update managed service data to database.
+     * Store the entity to the database.
      *
      * @param deployServiceEntity the model of registered service.
      */
     @Override
     public void store(DeployServiceEntity deployServiceEntity) {
         this.deployServiceRepository.save(deployServiceEntity);
+    }
+
+    /**
+     * Store the entity to the database and flush the data immediately.
+     *
+     * @param deployServiceEntity the model of registered service.
+     */
+    @Override
+    public void storeAndFlush(DeployServiceEntity deployServiceEntity) {
+        this.deployServiceRepository.saveAndFlush(deployServiceEntity);
     }
 
     @Override

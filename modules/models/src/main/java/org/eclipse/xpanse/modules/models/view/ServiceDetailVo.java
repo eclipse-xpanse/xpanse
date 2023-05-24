@@ -32,4 +32,7 @@ public class ServiceDetailVo extends ServiceVo {
 
     @Schema(description = "The properties of the deployed service.")
     private Map<String, String> deployedServiceProperties;
+
+    @Schema(description = "The result message of the deployed service.")
+    private String resultMessage;
 }

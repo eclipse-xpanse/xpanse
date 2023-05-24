@@ -42,7 +42,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -111,6 +110,7 @@ public class OrchestratorService {
         entity.setFlavor(deployTask.getCreateRequest().getFlavor());
         entity.setUserName(deployTask.getCreateRequest().getUserName());
         entity.setCreateRequest(deployTask.getCreateRequest());
+        entity.setDeployResourceList(new ArrayList<>());
         return entity;
     }
 
@@ -156,24 +156,24 @@ public class OrchestratorService {
      * @param deployTask deployTask
      */
     @Async("taskExecutor")
-    @Transactional
     public void asyncDeployService(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
         try {
             deployServiceEntity.setServiceState(ServiceState.DEPLOYING);
-            deployServiceStorage.store(deployServiceEntity);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
             deployServiceEntity.setProperties(deployResult.getProperties());
             deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
             deployServiceEntity.setDeployResourceList(
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
-            deployServiceStorage.store(deployServiceEntity);
-        } catch (Exception e) {
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+        } catch (RuntimeException e) {
             log.error("asyncDeployService failed.", e);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_FAILED);
-            deployServiceStorage.store(deployServiceEntity);
+            deployServiceEntity.setResultMessage(e.getMessage());
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
         }
 
     }
@@ -230,7 +230,6 @@ public class OrchestratorService {
      * @param deployTask deployTask
      */
     @Async("taskExecutor")
-    @Transactional
     public void asyncDestroyService(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity =
@@ -241,7 +240,7 @@ public class OrchestratorService {
         }
         try {
             deployServiceEntity.setServiceState(ServiceState.DESTROYING);
-            deployServiceStorage.store(deployServiceEntity);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
             DeployResult deployResult = deployment.destroy(deployTask,
                     deployServiceEntity.getPrivateProperties().get("stateFile"));
             deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
@@ -254,11 +253,12 @@ public class OrchestratorService {
                 deployServiceEntity.setDeployResourceList(
                         getDeployResourceEntityList(resources, deployServiceEntity));
             }
-            deployServiceStorage.store(deployServiceEntity);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
         } catch (RuntimeException e) {
             log.error("asyncDestroyService failed", e);
+            deployServiceEntity.setResultMessage(e.getMessage());
             deployServiceEntity.setServiceState(ServiceState.DESTROY_FAILED);
-            deployServiceStorage.store(deployServiceEntity);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
         }
 
     }
