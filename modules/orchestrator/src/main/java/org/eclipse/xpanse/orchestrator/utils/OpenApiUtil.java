@@ -266,6 +266,10 @@ public class OpenApiUtil {
             if (modulesIndex > 1) {
                 rootPath = rootPath.substring(0, modulesIndex);
             }
+            int runtimeIndex = rootPath.indexOf("runtime");
+            if (runtimeIndex > 1) {
+                rootPath = rootPath.substring(0, runtimeIndex);
+            }
             File openApiDir = new File(rootPath, openapiPath);
             if (!openApiDir.exists() && !openApiDir.mkdirs()) {
                 throw new FileNotFoundException("Create open API workspace failed!");
