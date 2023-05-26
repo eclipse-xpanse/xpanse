@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.models.service.PublicIp;
 import org.eclipse.xpanse.modules.models.service.Vm;
 import org.eclipse.xpanse.modules.models.service.Volume;
 import org.eclipse.xpanse.modules.models.service.Vpc;
-import org.eclipse.xpanse.orchestrator.plugin.openstack.models.OpenstackResourceProperty;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.enums.OpenstackResourceProperty;
 import org.springframework.stereotype.Component;
 
 /**

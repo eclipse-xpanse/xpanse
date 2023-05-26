@@ -19,6 +19,9 @@ import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.constants.OpenstackEnvironmentConstants;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.utils.MetricsManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +32,13 @@ import org.springframework.stereotype.Component;
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     private final DeployResourceHandler resourceHandler = new OpenstackTerraformResourceHandler();
+
+    private final MetricsManager metricsManager;
+
+    @Autowired
+    public OpenstackOrchestratorPlugin(MetricsManager metricsManager) {
+        this.metricsManager = metricsManager;
+    }
 
     /**
      * Get the resource handler for OpenStack.
@@ -57,19 +67,19 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable("OS_AUTH_URL",
+                new CredentialVariable(OpenstackEnvironmentConstants.AUTH_URL,
                         "The Identity authentication URL."));
         credentialVariables.add(
-                new CredentialVariable("OS_REGION_NAME",
-                        "The region of the OpenStack cloud to use."));
-        credentialVariables.add(
-                new CredentialVariable("OS_TENANT_NAME",
+                new CredentialVariable(OpenstackEnvironmentConstants.TENANT,
                         "The Name of the Tenant or Project to login with."));
         credentialVariables.add(
-                new CredentialVariable("OS_USER_NAME",
+                new CredentialVariable(OpenstackEnvironmentConstants.USERNAME,
                         "The Username to login with."));
         credentialVariables.add(
-                new CredentialVariable("OS_PASSWORD",
+                new CredentialVariable(OpenstackEnvironmentConstants.PASSWORD,
+                        "The Password to login with."));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN,
                         "The Password to login with."));
         CredentialDefinition httpAuth = new CredentialDefinition(
                 getCsp(), "Variables",
@@ -84,6 +94,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     public List<Metric> getMetrics(AbstractCredentialInfo credential,
                                    DeployResource deployResource,
                                    MonitorResourceType monitorResourceType) {
-        return null;
+        return this.metricsManager.getMetrics(credential, deployResource, monitorResourceType);
     }
+
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.monitor.enums.MetricType;
+import org.eclipse.xpanse.modules.monitor.enums.MetricUnit;
 
 /**
  * One kind of metric.
@@ -31,6 +32,11 @@ public class Metric {
      * The type of the metric.
      */
     MetricType type;
+
+    /**
+     * The type of the metric.
+     */
+    MetricUnit unit;
 
     /**
      * The labels of the metric.
