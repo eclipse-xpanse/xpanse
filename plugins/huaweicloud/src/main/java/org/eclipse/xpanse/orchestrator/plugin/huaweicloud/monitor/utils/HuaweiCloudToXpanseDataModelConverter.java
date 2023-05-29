@@ -7,6 +7,9 @@
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.utils;
 
 import com.huaweicloud.sdk.ces.v1.model.Datapoint;
+import com.huaweicloud.sdk.ces.v1.model.ListMetricsRequest;
+import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
+import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest.FilterEnum;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
@@ -15,6 +18,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
@@ -34,40 +39,79 @@ import org.springframework.util.CollectionUtils;
 public class HuaweiCloudToXpanseDataModelConverter {
 
     /**
+     * Build ListMetricsRequest for HuaweiCloud Monitor client.
+     */
+    public static ListMetricsRequest buildListMetricsRequest(
+            DeployResource deployResource) {
+        String resourceId = deployResource.getResourceId();
+        return getListMetricsRequest(resourceId);
+    }
+
+    /**
      * Build ShowMetricDataRequest for HuaweiCloud Monitor client.
      */
     public static List<ShowMetricDataRequest> buildMetricDataRequest(
-            DeployResource deployResource, MonitorResourceType monitorResourceType) {
+            DeployResource deployResource, MonitorResourceType monitorResourceType,
+            HuaweiCloudNameSpaceKind huaweiCloudNameSpaceKind) {
         List<ShowMetricDataRequest> requestList = new ArrayList<>();
         String resourceId = deployResource.getResourceId();
         if (monitorResourceType == null) {
             for (MonitorResourceType resourceType : MonitorResourceType.values()) {
                 ShowMetricDataRequest request =
-                        getShowMetricDataRequest(resourceId, resourceType);
+                        getShowMetricDataRequest(resourceId, resourceType,
+                                huaweiCloudNameSpaceKind);
                 requestList.add(request);
             }
             return requestList;
         }
         if (monitorResourceType == MonitorResourceType.CPU) {
-            requestList = List.of(getShowMetricDataRequest(resourceId, MonitorResourceType.CPU));
+            requestList = List.of(getShowMetricDataRequest(resourceId, MonitorResourceType.CPU,
+                    huaweiCloudNameSpaceKind));
+
         } else if (monitorResourceType == MonitorResourceType.MEM) {
-            requestList = List.of(getShowMetricDataRequest(resourceId, MonitorResourceType.MEM));
+            requestList = List.of(getShowMetricDataRequest(resourceId, MonitorResourceType.MEM,
+                    huaweiCloudNameSpaceKind));
+
         }
         return requestList;
     }
 
-    private static String getNameSpace() {
-        return HuaweiCloudNameSpaceKind.ECS_SYS.toValue();
+    private static String getNameSpace(HuaweiCloudNameSpaceKind huaweiCloudNameSpaceKind) {
+        return huaweiCloudNameSpaceKind.toValue();
     }
 
-    private static String getMetricName(MonitorResourceType monitorResourceType) {
+    private static String getMetricName(MonitorResourceType monitorResourceType,
+                                        HuaweiCloudNameSpaceKind huaweiCloudNameSpaceKind) {
         String metricName = null;
-        if (MonitorResourceType.CPU == monitorResourceType) {
-            metricName = HuaweiCloudMonitorMetrics.CPU_UTILIZED;
-        } else if (MonitorResourceType.MEM == monitorResourceType) {
-            metricName = HuaweiCloudMonitorMetrics.MEM_UTILIZED;
+        switch (monitorResourceType) {
+            case CPU:
+                if (huaweiCloudNameSpaceKind == HuaweiCloudNameSpaceKind.ECS_SYS) {
+                    metricName = HuaweiCloudMonitorMetrics.CPU_UTILIZED;
+                } else {
+                    metricName = HuaweiCloudMonitorMetrics.CPU_USAGEIZED;
+                }
+                break;
+            case MEM:
+                if (huaweiCloudNameSpaceKind == HuaweiCloudNameSpaceKind.ECS_SYS) {
+                    metricName = HuaweiCloudMonitorMetrics.MEM_UTILIZED;
+                } else {
+                    metricName = HuaweiCloudMonitorMetrics.MEM_usedPercentIZED;
+                }
+                break;
+            default:
+                break;
         }
         return metricName;
+    }
+
+    /**
+     * Extract the namespace from the response and add it to the set.
+     */
+    public static Set<String> getResponseNamespaces(
+            ListMetricsResponse listMetricsResponse) {
+        return listMetricsResponse.getMetrics().stream()
+                .map(MetricInfoList::getNamespace)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -97,14 +141,20 @@ public class HuaweiCloudToXpanseDataModelConverter {
     }
 
     private static ShowMetricDataRequest getShowMetricDataRequest(String resourceId,
-            MonitorResourceType monitorResourceType) {
+            MonitorResourceType monitorResourceType,
+            HuaweiCloudNameSpaceKind huaweiCloudNameSpaceKind) {
         return new ShowMetricDataRequest()
                 .withDim0(HuaweiCloudMonitorConstants.DIM0_PREFIX + resourceId)
                 .withFilter(FilterEnum.valueOf(HuaweiCloudMonitorConstants.AVERAGE))
                 .withPeriod(HuaweiCloudMonitorConstants.PERIOD)
                 .withFrom(0L)
                 .withTo(System.currentTimeMillis())
-                .withNamespace(getNameSpace()).withMetricName(getMetricName(monitorResourceType));
+                .withNamespace(getNameSpace(huaweiCloudNameSpaceKind))
+                .withMetricName(getMetricName(monitorResourceType, huaweiCloudNameSpaceKind));
     }
 
+    private static ListMetricsRequest getListMetricsRequest(String resourceId) {
+        return new ListMetricsRequest()
+                .withDim0(HuaweiCloudMonitorConstants.DIM0_PREFIX + resourceId);
+    }
 }

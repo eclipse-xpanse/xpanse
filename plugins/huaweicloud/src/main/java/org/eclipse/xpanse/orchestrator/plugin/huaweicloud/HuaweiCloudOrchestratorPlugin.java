@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.orchestrator.plugin.huaweicloud;
 
 import com.huaweicloud.sdk.ces.v1.CesClient;
+import com.huaweicloud.sdk.ces.v1.model.ListMetricsRequest;
+import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.auth.ICredential;
@@ -14,6 +16,7 @@ import com.huaweicloud.sdk.core.exception.ServiceResponseException;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialDefinition;
@@ -26,6 +29,7 @@ import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.models.HuaweiCloudNameSpaceKind;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.utils.HuaweiCloudMonitorCache;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.utils.HuaweiCloudMonitorClient;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.utils.HuaweiCloudToXpanseDataModelConverter;
@@ -45,6 +49,24 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Resource
     private HuaweiCloudMonitorCache huaweiCloudMonitorCache;
+
+    /**
+     * get HuaweiCloud monitor indicator data and add it to the list.
+     */
+    private static void processMetricData(DeployResource deployResource,
+                                          MonitorResourceType monitorResourceType,
+                                          HuaweiCloudNameSpaceKind nameSpaceKind,
+                                          List<Metric> metrics, CesClient client) {
+        List<ShowMetricDataRequest> requestList = HuaweiCloudToXpanseDataModelConverter
+                .buildMetricDataRequest(deployResource, monitorResourceType, nameSpaceKind);
+        for (ShowMetricDataRequest request : requestList) {
+            ShowMetricDataResponse response = client.showMetricData(request);
+            Metric metric =
+                    HuaweiCloudToXpanseDataModelConverter.convertResponseToMetric(deployResource,
+                            request, response);
+            metrics.add(metric);
+        }
+    }
 
     @Override
     public DeployResourceHandler getResourceHandler() {
@@ -91,14 +113,18 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
             ICredential icredential = getIcredential((CredentialDefinition) credential);
             CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
                     deployResource.getProperties().get("region"));
-            List<ShowMetricDataRequest> requestList = HuaweiCloudToXpanseDataModelConverter
-                    .buildMetricDataRequest(deployResource, monitorResourceType);
-            for (ShowMetricDataRequest request : requestList) {
-                ShowMetricDataResponse response = client.showMetricData(request);
-                Metric metric = HuaweiCloudToXpanseDataModelConverter.convertResponseToMetric(
-                        deployResource,
-                        request, response);
-                metrics.add(metric);
+            ListMetricsRequest listMetricsRequest =
+                    HuaweiCloudToXpanseDataModelConverter.buildListMetricsRequest(deployResource);
+            ListMetricsResponse listMetricsResponse = client.listMetrics(listMetricsRequest);
+            Set<String> nameSpaceSet =
+                    HuaweiCloudToXpanseDataModelConverter.getResponseNamespaces(
+                            listMetricsResponse);
+            if (nameSpaceSet.contains(HuaweiCloudNameSpaceKind.ECS_AGT.toValue())) {
+                processMetricData(deployResource, monitorResourceType,
+                        HuaweiCloudNameSpaceKind.ECS_AGT, metrics, client);
+            } else {
+                processMetricData(deployResource, monitorResourceType,
+                        HuaweiCloudNameSpaceKind.ECS_SYS, metrics, client);
             }
             huaweiCloudMonitorCache.set(deployResource.getResourceId(), metrics);
         } catch (ServiceResponseException e) {
@@ -148,4 +174,3 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         return huaweiCloudMonitorClient.getIcredentialWithAkSk(accessKey, securityKey);
     }
 }
-
