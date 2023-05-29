@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.monitor;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
@@ -18,34 +20,25 @@ import org.eclipse.xpanse.modules.monitor.enums.MetricUnit;
 @Data
 public class Metric {
 
-    /**
-     * The name of the metric.
-     */
+    @NotNull
+    @Schema(description = "The name of the metric.")
     String name;
 
-    /**
-     * The description of the metric.
-     */
+    @Schema(description = "The description of the metric.")
     String description;
 
-    /**
-     * The type of the metric.
-     */
+    @NotNull
+    @Schema(description = "The type of the metric.")
     MetricType type;
 
-    /**
-     * The type of the metric.
-     */
+    @NotNull
+    @Schema(description = "The unit of the metric.")
     MetricUnit unit;
 
-    /**
-     * The labels of the metric.
-     */
+    @Schema(description = "The labels of the metric.")
     Map<String, String> labels;
 
-    /**
-     * The list of the metric items.
-     */
+    @Schema(description = "The list of the metric items.")
     List<MetricItem> metrics;
 
 }
