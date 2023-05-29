@@ -11,10 +11,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions;
  */
 public class TerraformExecutorException extends RuntimeException {
 
-    public TerraformExecutorException() {
-        super("TFExecutor Exception");
-    }
-
     public TerraformExecutorException(String message) {
         super("TFExecutor Exception:" + message);
     }
@@ -23,21 +19,7 @@ public class TerraformExecutorException extends RuntimeException {
         super(message, ex);
     }
 
-    /**
-     * Exception thrown.
-     *
-     * @param cmd    command that was executed in Terraform.
-     * @param output Output of the command execution.
-     * @param ex     Type of the exception thrown.
-     */
-    public TerraformExecutorException(String cmd, String output, Throwable ex) {
-        super("Executor Exception:\n"
-                        + "\n** Cmd:\n" + cmd + "\n** Output:\n" + output,
-                ex);
-    }
-
-    public TerraformExecutorException(String cmd, String output) {
-        super("Executor Exception:\n"
-                + "\n** Cmd:\n" + cmd + "\n** Output:\n" + output);
+    public TerraformExecutorException(String message, String output) {
+        super("Executor Exception:" + message + System.lineSeparator() + output);
     }
 }

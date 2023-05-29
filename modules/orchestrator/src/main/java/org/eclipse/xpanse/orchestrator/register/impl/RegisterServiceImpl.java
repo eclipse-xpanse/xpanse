@@ -156,9 +156,13 @@ public class RegisterServiceImpl implements RegisterService {
     public RegisterServiceEntity registerService(Ocl ocl) {
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
         RegisterServiceEntity newEntity = getNewRegisterServiceEntity(ocl);
-        if (Objects.nonNull(storage.findRegisteredService(newEntity))) {
-            log.error("Service already registered.");
-            throw new IllegalArgumentException("Service already registered.");
+        RegisterServiceEntity existedEntity = storage.findRegisteredService(newEntity);
+        if (Objects.nonNull(existedEntity)) {
+            String errorMsg =
+                    String.format("Service already registered. registered service id: %s.",
+                            existedEntity.getId());
+            log.error(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
         validateTerraformScript(ocl);
         storage.store(newEntity);

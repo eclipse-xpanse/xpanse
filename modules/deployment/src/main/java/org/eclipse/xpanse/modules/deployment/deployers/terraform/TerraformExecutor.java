@@ -46,28 +46,27 @@ public class TerraformExecutor {
     /**
      * Executes terraform init command.
      *
-     * @return true if initialization of terraform is successful. else false.
+     * @return Returns result of SystemCmd executes.
      */
-    public boolean tfInit() {
-        SystemCmdResult systemCmdResult = execute("terraform init -no-color");
-        return systemCmdResult.isCommandSuccessful();
+    public SystemCmdResult tfInit() {
+        return execute("terraform init -no-color");
     }
 
     /**
      * Executes terraform plan command.
      *
-     * @return true if terraform plan creation is successful. else false.
+     * @return Returns result of SystemCmd executes.
      */
-    public boolean tfPlan() {
+    public SystemCmdResult tfPlan() {
         return executeWithVariables(new StringBuilder("terraform plan -input=false -no-color "));
     }
 
     /**
      * Executes terraform apply command.
      *
-     * @return true if changes are successfully applied. else false.
+     * @return Returns result of SystemCmd executes.
      */
-    public boolean tfApply() {
+    public SystemCmdResult tfApply() {
         return executeWithVariables(
                 new StringBuilder("terraform apply -auto-approve -input=false -no-color "));
     }
@@ -75,10 +74,9 @@ public class TerraformExecutor {
     /**
      * Executes terraform destroy command.
      *
-     * @return true if all resources are successfully destroyed on the target infrastructure. else
-     * false.
+     * @return Returns result of SystemCmd executes.
      */
-    public boolean tfDestroy() {
+    public SystemCmdResult tfDestroy() {
         return executeWithVariables(
                 new StringBuilder("terraform destroy -auto-approve -input=false -no-color "));
     }
@@ -86,9 +84,9 @@ public class TerraformExecutor {
     /**
      * Executes terraform commands with parameters.
      *
-     * @return true if finished without exceptions, else false.
+     * @return Returns result of SystemCmd executes.
      */
-    private boolean executeWithVariables(StringBuilder command) {
+    private SystemCmdResult executeWithVariables(StringBuilder command) {
         for (Map.Entry<String, String> entry : this.variables.entrySet()) {
             if (Objects.nonNull(entry.getKey()) && Objects.nonNull(entry.getValue())) {
                 command.append("-var=")
@@ -98,8 +96,7 @@ public class TerraformExecutor {
                         .append(" ");
             }
         }
-        SystemCmdResult systemCmdResult = execute(command.toString());
-        return systemCmdResult.isCommandSuccessful();
+        return execute(command.toString());
     }
 
     /**
@@ -118,17 +115,23 @@ public class TerraformExecutor {
      * Deploy source by terraform.
      */
     public void deploy() {
-        if (!tfInit()) {
+        SystemCmdResult initResult = tfInit();
+        if (!initResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfInit failed.");
-            throw new TerraformExecutorException("TFExecutor.tfInit failed.");
+            throw new TerraformExecutorException("TFExecutor.tfInit failed.",
+                    initResult.getCommandStdError());
         }
-        if (!tfPlan()) {
+        SystemCmdResult planResult = tfPlan();
+        if (!planResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfPlan failed.");
-            throw new TerraformExecutorException("TFExecutor.tfPlan failed.");
+            throw new TerraformExecutorException("TFExecutor.tfPlan failed.",
+                    planResult.getCommandStdError());
         }
-        if (!tfApply()) {
+        SystemCmdResult applyResult = tfApply();
+        if (!applyResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfApply failed.");
-            throw new TerraformExecutorException("TFExecutor.tfApply failed.");
+            throw new TerraformExecutorException("TFExecutor.tfApply failed.",
+                    applyResult.getCommandStdError());
         }
     }
 
@@ -136,17 +139,23 @@ public class TerraformExecutor {
      * Destroy resource of the service.
      */
     public void destroy() {
-        if (!tfInit()) {
+        SystemCmdResult initResult = tfInit();
+        if (!initResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfInit failed.");
-            throw new TerraformExecutorException("TFExecutor.tfInit failed.");
+            throw new TerraformExecutorException("TFExecutor.tfInit failed.",
+                    initResult.getCommandStdError());
         }
-        if (!tfPlan()) {
+        SystemCmdResult planResult = tfPlan();
+        if (!planResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfPlan failed.");
-            throw new TerraformExecutorException("TFExecutor.tfPlan failed.");
+            throw new TerraformExecutorException("TFExecutor.tfPlan failed.",
+                    planResult.getCommandStdError());
         }
-        if (!tfDestroy()) {
+        SystemCmdResult destroyResult = tfDestroy();
+        if (!destroyResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfDestroy failed.");
-            throw new TerraformExecutorException("TFExecutor.tfDestroy failed.");
+            throw new TerraformExecutorException("TFExecutor.tfDestroy failed.",
+                    destroyResult.getCommandStdError());
         }
     }
 
@@ -174,9 +183,11 @@ public class TerraformExecutor {
      * @return TfValidationResult.
      */
     public TfValidationResult tfValidate() {
-        if (!tfInit()) {
+        SystemCmdResult initResult = tfInit();
+        if (!initResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfInit failed.");
-            throw new TerraformExecutorException("TFExecutor.tfInit failed.");
+            throw new TerraformExecutorException("TFExecutor.tfInit failed.",
+                    initResult.getCommandStdError());
         }
         SystemCmdResult systemCmdResult = execute("terraform validate -json -no-color");
         try {
@@ -186,5 +197,6 @@ public class TerraformExecutor {
             throw new IllegalStateException("Serialising string to object failed.", ex);
         }
     }
+
 
 }
