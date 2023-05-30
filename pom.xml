@@ -51,6 +51,74 @@
         <checkstyle-maven-plugin.version>3.2.1</checkstyle-maven-plugin.version>
         <logbook.version>3.0.0-RC.2</logbook.version>
     </properties>
+    <scm>
+        <connection>scm:git:git@github.com:https://github.com/swaroopar/osc.git</connection>
+        <developerConnection>scm:git:git@github.com:https://github.com/swaroopar/osc.git</developerConnection>
+        <url>https://github.com/swaroopar/osc.git</url>
+        <tag>HEAD</tag>
+    </scm>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadoc</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-source</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jreleaser</groupId>
+                        <artifactId>jreleaser-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <jreleaser>
+                                <signing>
+                                    <active>ALWAYS</active>
+                                    <armored>true</armored>
+                                </signing>
+                                <deploy>
+                                    <maven>
+                                        <nexus2>
+                                            <maven-central>
+                                                <active>ALWAYS</active>
+                                                <url>https://s01.oss.sonatype.org/service/local</url>;
+                                                <closeRepository>false</closeRepository>
+                                                <releaseRepository>false</releaseRepository>
+                                                <stagingRepositories>target/staging-deploy</stagingRepositories>
+                                            </maven-central>
+                                        </nexus2>
+                                    </maven>
+                                </deploy>
+                            </jreleaser>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -135,7 +203,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <repositories>
         <repository>
             <id>apache.snapshots</id>
@@ -159,6 +226,13 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
         </pluginRepository>
     </pluginRepositories>
     <build>
