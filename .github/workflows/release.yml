@@ -1,0 +1,90 @@
+---
+name: Xpanse Release Workflow
+on:
+  workflow_dispatch:
+    inputs:
+      ReleaseType:
+        type: choice
+        description: Select the version to be incremented
+        options:
+          - Major Version
+          - Minor Version
+          - Patch Version
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set Up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Set current version env variable
+        run: |
+          echo "CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed s/-SNAPSHOT/""/g)" >> $GITHUB_ENV
+
+      - name: Map input to next action
+        run: |
+          if [ "${{github.event.inputs.ReleaseType}}" = "Major Version" ]; then
+            echo "VERSION_FRAGMENT=major" >> $GITHUB_ENV
+          elif [ "${{github.event.inputs.ReleaseType}}" = "Minor Version" ]; then
+            echo "VERSION_FRAGMENT=feature" >> $GITHUB_ENV
+          elif [ "${{github.event.inputs.ReleaseType}}" = "Patch Version" ]; then
+            echo "VERSION_FRAGMENT=bug" >> $GITHUB_ENV
+          else
+            echo "No matching feature type  found"
+          fi
+
+      - name: Set new version env variable
+        id: new_version
+        uses: christian-draeger/increment-semantic-version@1.1.0
+        with:
+          current-version: ${{ env.CURRENT_VERSION }}
+          version-fragment: ${{ env.VERSION_FRAGMENT }}
+
+      - name: Set new version
+        run: echo ${{ steps.new_version.outputs.next-version }}
+
+      #      - name: Set new version
+      #        run: mvn versions:set -DnewVersion=${{ steps.new_version.outputs.next-version }}
+
+      - name: Release to Maven Central
+        env:
+          JRELEASER_NEXUS2_USERNAME: ${{ secrets.ORG_OSSRH_USERNAME }}
+          JRELEASER_NEXUS2_PASSWORD: ${{ secrets.ORG_OSSRH_PASSWORD }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.ORG_GPG_PASSPHRASE }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.ORG_GPG_PRIVATE_KEY }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export GPG_TTY=$(tty)
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          mvn -Prelease jreleaser:full-release
+
+      #      - name: Run JReleaser
+      #        uses: jreleaser/release-action@v2
+      #        env:
+      #          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: JReleaser release output
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: jreleaser-release
+          path: |
+            out/jreleaser/trace.log
+            out/jreleaser/output.properties  
+
+#      - name: Update release version
+#        uses: EndBug/add-and-commit@v9
+#        with:
+#          message: "[GitHub Action] Update release version"
+#          committer_name: GitHub Actions
+#          committer_email: actions@github.com
+#      - name: Build
+#        run: mvn --batch-mode --update-snapshots --no-transfer-progress verify
