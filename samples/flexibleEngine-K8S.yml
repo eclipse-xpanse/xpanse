@@ -175,6 +175,7 @@ deployment:
       name       = "${var.subnet_name}-${random_id.new.hex}"
       cidr       = "192.168.10.0/24"
       gateway_ip = "192.168.10.1"
+      dns_list   = ["100.125.0.41","100.125.12.161"]
     }
 
     resource "flexibleengine_networking_secgroup_v2" "new" {

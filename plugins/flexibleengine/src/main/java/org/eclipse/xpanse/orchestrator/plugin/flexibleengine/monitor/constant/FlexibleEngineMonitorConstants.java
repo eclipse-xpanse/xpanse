@@ -12,14 +12,18 @@ package org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant;
 public class FlexibleEngineMonitorConstants {
 
     public static final String PROTOCOL_HTTPS = "https://";
-    public static final String PROJECT_ID = "16812e5f4aef455c8eb0161c1e6a56c2";//System.getenv("OS_PROJECT_ID");
-    public static final String ENDPOINT_PREFIX = "ces.";
-    public static final String ENDPOINT_SUFFIX=".prod-cloud-ocb.orange-business.com";
+    public static final String CES_ENDPOINT_PREFIX = "ces.";
+    public static final String IAM_ENDPOINT_PREFIX = "iam.";
+    public static final String ENDPOINT_SUFFIX = ".prod-cloud-ocb.orange-business.com";
     public static final String OS_ACCESS_KEY = "OS_ACCESS_KEY";
     public static final String OS_SECRET_KEY = "OS_SECRET_KEY";
-    public static final int PERIOD = 1;
+    public static final String IAM_API_VERSION = "v3";
+    public static final String CES_API_VERSION = "V1.0";
+    public static final int DEFAULT_PERIOD = 1;
+    public static final long DEFAULT_DURATION = 30 * 60 * 1000;
     public static final String AVERAGE = "average";
     public static final String DIM0_PREFIX = "instance_id,";
-
+    public static final String METRIC_PATH = "metric-data";
+    public static final String PROJECT_PATH = "projects";
 
 }
