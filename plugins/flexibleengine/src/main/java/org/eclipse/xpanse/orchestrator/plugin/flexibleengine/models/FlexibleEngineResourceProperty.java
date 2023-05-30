@@ -25,7 +25,7 @@ public enum FlexibleEngineResourceProperty {
     private final Map<String, String> properties;
 
     FlexibleEngineResourceProperty(DeployResourceKind resourceKind,
-            Map<String, String> resourceProperties) {
+                                   Map<String, String> resourceProperties) {
         this.resourceKind = resourceKind;
         this.properties = resourceProperties;
     }
@@ -58,6 +58,7 @@ public enum FlexibleEngineResourceProperty {
             this.put("image_id", "image_id");
             this.put("image_name", "image_name");
             this.put("region", "region");
+            this.put("project_id", "owner");
         }
     }
 

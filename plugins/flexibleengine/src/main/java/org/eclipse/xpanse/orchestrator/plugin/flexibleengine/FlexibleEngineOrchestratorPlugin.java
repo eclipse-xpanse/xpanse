@@ -19,6 +19,9 @@ import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
+import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.MetricsService;
+import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +31,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
+    private final MetricsService metricsService;
+
+    @Autowired
+    public FlexibleEngineOrchestratorPlugin(MetricsService metricsService) {
+        this.metricsService = metricsService;
+    }
 
     @Override
     public DeployResourceHandler getResourceHandler() {
@@ -53,10 +62,10 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
                 getCsp(), "AK_SK", "The access key and security key.",
                 CredentialType.VARIABLES, credentialVariables);
         credentialVariables.add(
-                new CredentialVariable("OS_ACCESS_KEY",
+                new CredentialVariable(FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
                         "The access key."));
         credentialVariables.add(
-                new CredentialVariable("OS_SECRET_KEY",
+                new CredentialVariable(FlexibleEngineMonitorConstants.OS_SECRET_KEY,
                         "The security key."));
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(accessKey);
@@ -67,7 +76,6 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     public List<Metric> getMetrics(AbstractCredentialInfo credential,
                                    DeployResource deployResource,
                                    MonitorResourceType monitorResourceType) {
-        return null;
+        return metricsService.getMetrics(credential, deployResource, monitorResourceType);
     }
 }
-
