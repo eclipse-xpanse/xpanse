@@ -20,12 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
+import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.utils.FlexibleEngineMonitorCache;
@@ -138,26 +138,26 @@ public class MetricsService {
     /**
      * Get metrics of the @deployResource.
      *
-     * @param credential          Credentials required for monitoring queries.
-     * @param deployResource      the deployed resource of the service.
-     * @param monitorResourceType Monitor Resource Type.
+     * @param resourceMetricRequest The request model to query metrics.
+     * @return Returns list of metric result.
      */
-    public List<Metric> getMetrics(AbstractCredentialInfo credential,
-                                   DeployResource deployResource,
-                                   MonitorResourceType monitorResourceType) {
+    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
-        String region = deployResource.getProperties().get("region");
+        String region = resourceMetricRequest.getDeployResource().getProperties().get("region");
+        CredentialDefinition credential = resourceMetricRequest.getCredential();
+        DeployResource deployResource = resourceMetricRequest.getDeployResource();
         if (StringUtils.isNotBlank(region)) {
             String projectQueryUrl =
                     flexibleEngineMonitorConverter.buildProjectQueryUrl(region).toString();
-            Project project = queryProjectInfo((CredentialDefinition) credential, projectQueryUrl);
+            Project project =
+                    queryProjectInfo(resourceMetricRequest.getCredential(), projectQueryUrl);
             if (Objects.nonNull(project) && StringUtils.isNotBlank(project.getId())) {
                 Map<String, MonitorResourceType> urlTypeMap =
-                        flexibleEngineMonitorConverter.buildMonitorMetricUrls(deployResource,
-                                monitorResourceType, project.getId());
+                        flexibleEngineMonitorConverter.buildMonitorMetricUrls(resourceMetricRequest,
+                                project.getId());
                 for (Map.Entry<String, MonitorResourceType> entry : urlTypeMap.entrySet()) {
                     ShowMetricDataResponse response =
-                            queryMetricsInfo((CredentialDefinition) credential, entry.getKey());
+                            queryMetricsInfo(credential, entry.getKey());
                     Metric metric =
                             flexibleEngineMonitorConverter.convertResponseToMetric(deployResource,
                                     entry.getValue(), response);
@@ -166,17 +166,13 @@ public class MetricsService {
                         flexibleEngineMonitorCache.set(deployResource.getResourceId(), metrics);
                     } else {
                         metrics.addAll(
-                                flexibleEngineMonitorCache.get(deployResource.getResourceId(),
-                                        monitorResourceType));
+                                flexibleEngineMonitorCache.get(
+                                        resourceMetricRequest.getDeployResource()
+                                                .getResourceId(),
+                                        resourceMetricRequest.getMonitorResourceType()));
                     }
                 }
-            } else {
-                log.error("GetMetrics param project_id is blank. resource id:{}",
-                        deployResource.getResourceId());
             }
-        } else {
-            log.error("GetMetrics param region is blank. resource id:{}",
-                    deployResource.getResourceId());
         }
         return metrics;
     }

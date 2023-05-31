@@ -19,11 +19,48 @@ public class FlexibleEngineMonitorConstants {
     public static final String OS_SECRET_KEY = "OS_SECRET_KEY";
     public static final String IAM_API_VERSION = "v3";
     public static final String CES_API_VERSION = "V1.0";
-    public static final int DEFAULT_PERIOD = 1;
-    public static final long DEFAULT_DURATION = 30 * 60 * 1000;
-    public static final String AVERAGE = "average";
     public static final String DIM0_PREFIX = "instance_id,";
     public static final String METRIC_PATH = "metric-data";
     public static final String PROJECT_PATH = "projects";
+
+    /**
+     * Aggregation method of indicator monitoring data: average.
+     */
+    public static final String FILTER_AVERAGE = "average";
+
+    /*
+     * Aggregation method of indicator monitoring data: max.
+     */
+    public static final String FILTER_MAX = "max";
+
+    /**
+     * Aggregation time period of indicator monitoring data: real-time.
+     */
+    public static final int PERIOD_REAL_TIME_INT = 1;
+
+    /**
+     * Aggregation time period of indicator monitoring data: five minutes.
+     */
+    public static final int PERIOD_FIVE_MINUTES_INT = 300;
+
+    /**
+     * Aggregation time period of indicator monitoring data: twenty minutes.
+     */
+    public static final int PERIOD_TWENTY_MINUTES_INT = 1200;
+
+    /**
+     * Aggregation time period of indicator monitoring data: one hour.
+     */
+    public static final int PERIOD_ONE_HOUR_INT = 3600;
+
+    /**
+     * Aggregation time period of indicator monitoring data: four hours.
+     */
+    public static final int PERIOD_FOUR_HOURS_INT = 14400;
+
+    /**
+     * Aggregation time period of indicator monitoring data: one day.
+     */
+    public static final int PERIOD_ONE_DAY_INT = 86400;
 
 }

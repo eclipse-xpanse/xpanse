@@ -40,6 +40,7 @@ public class MonitorApi {
         this.monitor = monitor;
     }
 
+
     /**
      * Get Monitor Metric.
      *
@@ -57,5 +58,59 @@ public class MonitorApi {
             @RequestParam(name = "monitorResourceType", required = false)
                     MonitorResourceType monitorResourceType) {
         return monitor.getMetrics(UUID.fromString(id), monitorResourceType);
+    }
+
+    /**
+     * Get Monitor Metric.
+     *
+     * @param id Service ID.
+     */
+    @Tag(name = "Monitor",
+            description = "APIs to get metrics of deployed services.")
+    @Operation(description = "Get metrics of the deployed service.")
+    @GetMapping(value = "/monitor/metric/service/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Metric> getMetricsByServiceId(
+            @Parameter(name = "id", description = "Id of the deployed service")
+            @PathVariable(name = "id") String id,
+            @Parameter(name = "monitorResourceType", description = "Types of the monitor resource.")
+            @RequestParam(name = "monitorResourceType", required = false)
+                    MonitorResourceType monitorResourceType,
+            @Parameter(name = "from", description = "Start UNIX timestamp in milliseconds.")
+            @RequestParam(name = "from") Long from,
+            @Parameter(name = "to", description = "End UNIX timestamp in milliseconds.")
+            @RequestParam(name = "to") Long to,
+            @Parameter(name = "period", description = "Monitor data granularity.")
+            @RequestParam(name = "period", required = false, defaultValue = "1") Integer period) {
+        return monitor.getMetricsByServiceId(id, monitorResourceType, from, to,
+                period);
+    }
+
+
+    /**
+     * Get Monitor Metric.
+     *
+     * @param id Service ID.
+     */
+    @Tag(name = "Monitor",
+            description = "APIs to get metrics of deployed services.")
+    @Operation(description = "Get metrics of the deployed resource.")
+    @GetMapping(value = "/monitor/metric/resource/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Metric> getMetricsByResourceId(
+            @Parameter(name = "id", description = "Id of the deployed resource.")
+            @PathVariable(name = "id") String id,
+            @Parameter(name = "monitorResourceType", description = "Types of the monitor resource.")
+            @RequestParam(name = "monitorResourceType", required = false)
+                    MonitorResourceType monitorResourceType,
+            @Parameter(name = "from", description = "Start UNIX timestamp in milliseconds.")
+            @RequestParam(name = "from") Long from,
+            @Parameter(name = "to", description = "End UNIX timestamp in milliseconds.")
+            @RequestParam(name = "to") Long to,
+            @Parameter(name = "period", description = "Monitor data granularity.")
+            @RequestParam(name = "period", required = false, defaultValue = "1") Integer period) {
+        return monitor.getMetricsByResourceId(id, monitorResourceType, from, to,
+                period);
     }
 }

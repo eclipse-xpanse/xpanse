@@ -9,10 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
+import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.AggregationService;
@@ -61,20 +60,17 @@ public class MetricsManager {
     }
 
     /**
-     * Method which does the actual implementation for
+     * Method which does the actual implementation for MetricsExporter.
      * {@link org.eclipse.xpanse.modules.monitor.MetricsExporter#getMetrics(
-     *AbstractCredentialInfo, DeployResource, MonitorResourceType)}
-     * AbstractCredentialInfo, DeployResource, MonitorResourceType) ().
+     *ResourceMetricRequest metricQueryRequest)}().
      *
-     * @param credential          credential object with connect to Openstack API
-     * @param deployResource      Deployed resource for which the metrics are required.
-     * @param monitorResourceType Type of the resource to be monitored.
      * @return returns list of Metrics.
      */
-    public List<Metric> getMetrics(AbstractCredentialInfo credential,
-                                   DeployResource deployResource,
-                                   MonitorResourceType monitorResourceType) {
-        keystoneManager.authenticate((CredentialDefinition) credential);
+    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
+
+        keystoneManager.authenticate(resourceMetricRequest.getCredential());
+        DeployResource deployResource = resourceMetricRequest.getDeployResource();
+        MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
         Resource resource =
                 this.resourcesService.getInstanceResourceInfoById(deployResource.getResourceId());
         List<Metric> metrics = new ArrayList<>();
