@@ -7,12 +7,16 @@
 package org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.utils;
 
 import com.huaweicloud.sdk.ces.v1.model.Datapoint;
+import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
+import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
@@ -20,6 +24,7 @@ import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.MetricItem;
 import org.eclipse.xpanse.modules.monitor.enums.MetricItemType;
 import org.eclipse.xpanse.modules.monitor.enums.MetricType;
+import org.eclipse.xpanse.modules.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
@@ -48,6 +53,42 @@ public class FlexibleEngineMonitorConverter {
     }
 
     /**
+     * Get request url for query monitor listMetrics.
+     *
+     * @param deployResource The deployed resource.
+     * @param projectId      The id of project.
+     * @return Return request url.
+     */
+    public String buildListMetricsUrl(DeployResource deployResource, String projectId) {
+        String region = deployResource.getProperties().get("region");
+        StringBuilder listMetricsBasicUrl = getQueryListMetricsBasicUrl(region, projectId);
+        Map<String, String> listMetricParams = getListMetricsParams(deployResource.getResourceId());
+        for (Map.Entry<String, String> entry : listMetricParams.entrySet()) {
+            listMetricsBasicUrl.append(entry.getKey())
+                    .append("=").append(entry.getValue()).append("&");
+        }
+        listMetricsBasicUrl.deleteCharAt(listMetricsBasicUrl.length() - 1);
+        return listMetricsBasicUrl.toString();
+
+    }
+
+    private StringBuilder getQueryListMetricsBasicUrl(String region, String projectId) {
+        return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
+                .append(FlexibleEngineMonitorConstants.CES_ENDPOINT_PREFIX)
+                .append(region)
+                .append(FlexibleEngineMonitorConstants.ENDPOINT_SUFFIX).append("/")
+                .append(FlexibleEngineMonitorConstants.CES_API_VERSION).append("/")
+                .append(projectId).append("/")
+                .append(FlexibleEngineMonitorConstants.LISTMETRICS_PATH).append("?");
+    }
+
+    private Map<String, String> getListMetricsParams(String resourceId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("dim.0", FlexibleEngineMonitorConstants.DIM0_PREFIX + resourceId);
+        return params;
+    }
+
+    /**
      * Get list of request url for query monitor metric.
      *
      * @param resource  The deployed resource.
@@ -57,7 +98,8 @@ public class FlexibleEngineMonitorConverter {
      */
     public Map<String, MonitorResourceType> buildMonitorMetricUrls(DeployResource resource,
                                                                    MonitorResourceType type,
-                                                                   String projectId) {
+                                                                   String projectId,
+                                    FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind) {
         Map<String, MonitorResourceType> urlTypeMap = new HashMap<>();
         String region = resource.getProperties().get("region");
         String basicUrl = getQueryMetricBasicUrl(region, projectId).toString();
@@ -67,7 +109,7 @@ public class FlexibleEngineMonitorConverter {
                     StringBuilder url = new StringBuilder(basicUrl);
                     Map<String, String> paramsMap =
                             getFlexibleEngineMonitorParams(resource.getResourceId(),
-                                    resourceType);
+                                    resourceType, flexibleEngineNameSpaceKind);
                     for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
                         url.append(entry.getKey())
                                 .append("=").append(entry.getValue()).append("&");
@@ -79,7 +121,7 @@ public class FlexibleEngineMonitorConverter {
                 StringBuilder url = new StringBuilder(basicUrl);
                 Map<String, String> paramsMap =
                         getFlexibleEngineMonitorParams(resource.getResourceId(),
-                                type);
+                                type, flexibleEngineNameSpaceKind);
                 for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
                     url.append(entry.getKey())
                             .append("=").append(entry.getValue()).append("&");
@@ -91,6 +133,15 @@ public class FlexibleEngineMonitorConverter {
         return urlTypeMap;
     }
 
+    /**
+     * Extract the metrics namespaces from the response and add them to the set.
+     */
+    public Set<String> getMetricsNamespaces(
+            ListMetricsResponse listMetricsResponse) {
+        return listMetricsResponse.getMetrics().stream()
+                .map(MetricInfoList::getNamespace)
+                .collect(Collectors.toSet());
+    }
 
     /**
      * Convert response body to Metric object.
@@ -102,9 +153,10 @@ public class FlexibleEngineMonitorConverter {
      */
     public Metric convertResponseToMetric(DeployResource deployResource,
                                           MonitorResourceType type,
-                                          ShowMetricDataResponse response) {
+                                          ShowMetricDataResponse response,
+                                          FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind) {
         Metric metric = new Metric();
-        metric.setName(getMetricName(type));
+        metric.setName(getMetricName(type, flexibleEngineNameSpaceKind));
         Map<String, String> labels = new HashMap<>();
         labels.put("id", deployResource.getResourceId());
         labels.put("name", deployResource.getName());
@@ -117,6 +169,9 @@ public class FlexibleEngineMonitorConverter {
             metricItem.setType(MetricItemType.VALUE);
             metricItem.setValue(datapointList.get(0).getAverage());
             metric.setMetrics(List.of(metricItem));
+            if (datapointList.get(0).getUnit().equals("%")) {
+                metric.setUnit(MetricUnit.PERCENTAGE);
+            }
         }
         return metric;
     }
@@ -149,10 +204,11 @@ public class FlexibleEngineMonitorConverter {
     }
 
     private Map<String, String> getFlexibleEngineMonitorParams(String resourceId,
-                                                               MonitorResourceType type) {
+                                                               MonitorResourceType type,
+                                FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind) {
         Map<String, String> params = new HashMap<>();
-        params.put("namespace", FlexibleEngineNameSpaceKind.ECS_SYS.toValue());
-        params.put("metric_name", getMetricName(type));
+        params.put("namespace", flexibleEngineNameSpaceKind.toValue());
+        params.put("metric_name", getMetricName(type, flexibleEngineNameSpaceKind));
         params.put("from", String.valueOf(
                 System.currentTimeMillis() - FlexibleEngineMonitorConstants.DEFAULT_DURATION));
         params.put("to", String.valueOf(System.currentTimeMillis()));
@@ -162,12 +218,26 @@ public class FlexibleEngineMonitorConverter {
         return params;
     }
 
-    private String getMetricName(MonitorResourceType monitorResourceType) {
+    private String getMetricName(MonitorResourceType monitorResourceType,
+                                 FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind) {
         String metricName = null;
-        if (MonitorResourceType.CPU == monitorResourceType) {
-            metricName = FlexibleEngineMonitorMetrics.CPU_UTILIZED;
-        } else if (MonitorResourceType.MEM == monitorResourceType) {
-            metricName = FlexibleEngineMonitorMetrics.MEM_UTILIZED;
+        switch (monitorResourceType) {
+            case CPU:
+                if (flexibleEngineNameSpaceKind == FlexibleEngineNameSpaceKind.ECS_AGT) {
+                    metricName = FlexibleEngineMonitorMetrics.CPU_USAGE;
+                } else {
+                    metricName = FlexibleEngineMonitorMetrics.CPU_UTILIZED;
+                }
+                break;
+            case MEM:
+                if (flexibleEngineNameSpaceKind == FlexibleEngineNameSpaceKind.ECS_AGT) {
+                    metricName = FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE;
+                } else {
+                    metricName = FlexibleEngineMonitorMetrics.MEM_UTILIZED;
+                }
+                break;
+            default:
+                break;
         }
         return metricName;
     }

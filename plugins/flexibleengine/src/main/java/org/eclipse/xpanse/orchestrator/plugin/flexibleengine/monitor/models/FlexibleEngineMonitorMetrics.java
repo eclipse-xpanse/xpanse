@@ -14,4 +14,8 @@ public class FlexibleEngineMonitorMetrics {
     public static final String CPU_UTILIZED = "cpu_util";
 
     public static final String MEM_UTILIZED = "mem_util";
+
+    public static final String CPU_USAGE = "cpu_usage";
+
+    public static final String MEM_USED_IN_PERCENTAGE = "mem_usedPercent";
 }
