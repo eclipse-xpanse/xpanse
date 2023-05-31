@@ -25,5 +25,6 @@ public class FlexibleEngineMonitorConstants {
     public static final String DIM0_PREFIX = "instance_id,";
     public static final String METRIC_PATH = "metric-data";
     public static final String PROJECT_PATH = "projects";
+    public static final String LISTMETRICS_PATH = "metrics";
 
 }
