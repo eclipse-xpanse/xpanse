@@ -26,6 +26,8 @@ import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
+import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
+import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
@@ -53,16 +55,16 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     /**
      * get HuaweiCloud monitor indicator data and add it to the list.
      */
-    private static void processMetricData(DeployResource deployResource,
-                                          MonitorResourceType monitorResourceType,
+    private static void processMetricData(ResourceMetricRequest resourceMetricRequest,
                                           HuaweiCloudNameSpaceKind nameSpaceKind,
                                           List<Metric> metrics, CesClient client) {
         List<ShowMetricDataRequest> requestList = HuaweiCloudToXpanseDataModelConverter
-                .buildMetricDataRequest(deployResource, monitorResourceType, nameSpaceKind);
+                .buildMetricDataRequest(resourceMetricRequest, nameSpaceKind);
         for (ShowMetricDataRequest request : requestList) {
             ShowMetricDataResponse response = client.showMetricData(request);
             Metric metric =
-                    HuaweiCloudToXpanseDataModelConverter.convertResponseToMetric(deployResource,
+                    HuaweiCloudToXpanseDataModelConverter.convertResponseToMetric(
+                            resourceMetricRequest.getDeployResource(),
                             request, response);
             metrics.add(metric);
         }
@@ -104,13 +106,14 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public List<Metric> getMetrics(AbstractCredentialInfo credential,
-                                   DeployResource deployResource,
-                                   MonitorResourceType monitorResourceType) {
+    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
+        DeployResource deployResource = resourceMetricRequest.getDeployResource();
+        CredentialDefinition credential = resourceMetricRequest.getCredential();
+        MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
         try {
             clearExpiredMetricCache(deployResource.getResourceId());
-            ICredential icredential = getIcredential((CredentialDefinition) credential);
+            ICredential icredential = getIcredential(credential);
             CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
                     deployResource.getProperties().get("region"));
             ListMetricsRequest listMetricsRequest =
@@ -120,10 +123,10 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
                     HuaweiCloudToXpanseDataModelConverter.getResponseNamespaces(
                             listMetricsResponse);
             if (nameSpaceSet.contains(HuaweiCloudNameSpaceKind.ECS_AGT.toValue())) {
-                processMetricData(deployResource, monitorResourceType,
+                processMetricData(resourceMetricRequest,
                         HuaweiCloudNameSpaceKind.ECS_AGT, metrics, client);
             } else {
-                processMetricData(deployResource, monitorResourceType,
+                processMetricData(resourceMetricRequest,
                         HuaweiCloudNameSpaceKind.ECS_SYS, metrics, client);
             }
             huaweiCloudMonitorCache.set(deployResource.getResourceId(), metrics);
@@ -135,6 +138,28 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
                     monitorResourceType);
         }
         return metrics;
+    }
+
+    /**
+     * Get metrics for resource instance by the @resourceMetricRequest.
+     *
+     * @param resourceMetricRequest The request model to query metrics for resource instance.
+     * @return Returns list of metric result.
+     */
+    @Override
+    public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
+        return null;
+    }
+
+    /**
+     * Get metrics for service instance by the @serviceMetricRequest.
+     *
+     * @param serviceMetricRequest The request model to query metrics for service instance.
+     * @return Returns list of metric result.
+     */
+    @Override
+    public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
+        return null;
     }
 
     /**

@@ -380,6 +380,7 @@ public class CredentialCenter {
         CredentialDefinition credential = new CredentialDefinition(createCredential.getCsp(),
                 createCredential.getName(), createCredential.getDescription(),
                 createCredential.getType(), createCredential.getVariables());
+        credential.setUserName(createCredential.getUserName());
         if (Objects.isNull(createCredential.getTimeToLive())) {
             createCredential.setTimeToLive(DEFAULT_TIMEOUT_SECONDS);
         }

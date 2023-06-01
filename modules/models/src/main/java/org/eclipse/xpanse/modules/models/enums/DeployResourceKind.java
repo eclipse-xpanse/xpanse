@@ -9,6 +9,11 @@ package org.eclipse.xpanse.modules.models.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.service.DeployResource;
+import org.eclipse.xpanse.modules.models.service.PublicIp;
+import org.eclipse.xpanse.modules.models.service.Vm;
+import org.eclipse.xpanse.modules.models.service.Volume;
+import org.eclipse.xpanse.modules.models.service.Vpc;
 
 
 /**
@@ -26,6 +31,22 @@ public enum DeployResourceKind {
 
     DeployResourceKind(String kind) {
         this.kind = kind;
+    }
+
+    /**
+     * get resourceInstance by resourceKind.
+     *
+     * @param resourceKind deployResourceKind
+     * @return resourceInstance
+     */
+    public static DeployResource getInstanceByKind(DeployResourceKind resourceKind) {
+        return switch (resourceKind) {
+            case VM -> new Vm();
+            case VPC -> new Vpc();
+            case VOLUME -> new Volume();
+            case PUBLIC_IP -> new PublicIp();
+            default -> new DeployResource();
+        };
     }
 
     /**

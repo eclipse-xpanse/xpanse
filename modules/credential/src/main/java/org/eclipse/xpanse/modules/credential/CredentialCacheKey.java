@@ -24,4 +24,23 @@ public record CredentialCacheKey(Csp csp,
     public String toString() {
         return this.csp.toValue() + "_" + this.userName;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CredentialCacheKey key) {
+            return key.csp.equals(this.csp) && key.userName.equals(this.userName);
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((csp == null) ? 0 : csp.hashCode());
+        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+        return result;
+    }
 }

@@ -8,6 +8,7 @@ package org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor;
 
 import com.cloud.apigateway.sdk.utils.Client;
 import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
+import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.internal.model.KeystoneListProjectsResponse;
 import com.huaweicloud.sdk.core.internal.model.Project;
@@ -16,18 +17,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
+import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
@@ -133,9 +134,16 @@ public class MetricsService {
     private ListMetricsResponse queryListMetricsInfo(CredentialDefinition credential, String url) {
         HttpRequestBase requestBase = buildGetRequest(credential, url);
         HttpEntity<String> entity = new HttpEntity<>("parameters", getHttpHeaders(requestBase));
-        ResponseEntity<ListMetricsResponse> result =
-                restTemplate.exchange(url, HttpMethod.GET, entity, ListMetricsResponse.class);
-        return result.getBody();
+        ListMetricsResponse result = null;
+        try {
+
+            ResponseEntity<ListMetricsResponse> responseEntity =
+                    restTemplate.exchange(url, HttpMethod.GET, entity, ListMetricsResponse.class);
+            result = responseEntity.getBody();
+        } catch (RestClientException e) {
+            log.error("query metrics list info by url:{} error.", url, e);
+        }
+        return result;
     }
 
     private HttpHeaders getHttpHeaders(HttpRequestBase httpRequestBase) {
@@ -146,74 +154,72 @@ public class MetricsService {
         return headers;
     }
 
-    private void processMetricDataWithNamespace(DeployResource deployResource,
-                                                MonitorResourceType monitorResourceType,
-                                                FlexibleEngineNameSpaceKind nameSpaceKind,
-                                                List<Metric> metrics,
-                                                CredentialDefinition credential,
-                                                Project project) {
-        Map<String, MonitorResourceType> urlTypeMap =
-                flexibleEngineMonitorConverter.buildMonitorMetricUrls(deployResource,
-                        monitorResourceType, project.getId(), nameSpaceKind);
-        for (Map.Entry<String, MonitorResourceType> entry : urlTypeMap.entrySet()) {
-            ShowMetricDataResponse response =
-                    queryMetricsInfo(credential, entry.getKey());
-            Metric metric =
-                    flexibleEngineMonitorConverter.convertResponseToMetric(deployResource,
-                            entry.getValue(), response, nameSpaceKind);
-            metrics.add(metric);
-            if (!CollectionUtils.isEmpty(metrics)) {
-                flexibleEngineMonitorCache.set(deployResource.getResourceId(), metrics);
-            } else {
-                metrics.addAll(
-                        flexibleEngineMonitorCache.get(deployResource.getResourceId(),
-                                monitorResourceType));
-            }
-        }
-    }
-
     /**
      * Get metrics of the @deployResource.
      *
-     * @param credential          Credentials required for monitoring queries.
-     * @param deployResource      the deployed resource of the service.
-     * @param monitorResourceType Monitor Resource Type.
+     * @param resourceMetricRequest The request model to query metrics.
+     * @return Returns list of metric result.
      */
-    public List<Metric> getMetrics(AbstractCredentialInfo credential,
-                                   DeployResource deployResource,
-                                   MonitorResourceType monitorResourceType) {
+    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
-        String region = deployResource.getProperties().get("region");
+        String region = resourceMetricRequest.getDeployResource().getProperties().get("region");
+        CredentialDefinition credential = resourceMetricRequest.getCredential();
+        DeployResource deployResource = resourceMetricRequest.getDeployResource();
         if (StringUtils.isNotBlank(region)) {
             String projectQueryUrl =
                     flexibleEngineMonitorConverter.buildProjectQueryUrl(region).toString();
-            Project project = queryProjectInfo((CredentialDefinition) credential, projectQueryUrl);
+            Project project =
+                    queryProjectInfo(resourceMetricRequest.getCredential(), projectQueryUrl);
+
             if (Objects.nonNull(project) && StringUtils.isNotBlank(project.getId())) {
-                String listMetricUrl =
-                        flexibleEngineMonitorConverter.buildListMetricsUrl(deployResource,
-                                project.getId());
-                ListMetricsResponse listMetricsResponse =
-                        queryListMetricsInfo((CredentialDefinition) credential, listMetricUrl);
-                Set<String> responseNamespaces =
-                        flexibleEngineMonitorConverter.getMetricsNamespaces(listMetricsResponse);
-                if (responseNamespaces.contains(FlexibleEngineNameSpaceKind.ECS_AGT.toValue())) {
-                    processMetricDataWithNamespace(deployResource, monitorResourceType,
-                            FlexibleEngineNameSpaceKind.ECS_AGT, metrics,
-                            (CredentialDefinition) credential, project);
-                } else {
-                    processMetricDataWithNamespace(deployResource, monitorResourceType,
-                            FlexibleEngineNameSpaceKind.ECS_SYS, metrics,
-                            (CredentialDefinition) credential, project);
+
+                FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind =
+                        getMetricNameSpace(deployResource, credential, project);
+                Map<String, MonitorResourceType> urlTypeMap =
+                        flexibleEngineMonitorConverter.buildMonitorMetricUrls(resourceMetricRequest,
+                                project.getId(), flexibleEngineNameSpaceKind);
+                for (Map.Entry<String, MonitorResourceType> entry : urlTypeMap.entrySet()) {
+                    ShowMetricDataResponse response =
+                            queryMetricsInfo(credential, entry.getKey());
+                    Metric metric =
+                            flexibleEngineMonitorConverter.convertResponseToMetric(deployResource,
+                                    entry.getValue(), response, flexibleEngineNameSpaceKind);
+                    metrics.add(metric);
+                    if (!CollectionUtils.isEmpty(metrics)) {
+                        flexibleEngineMonitorCache.set(deployResource.getResourceId(), metrics);
+                    } else {
+                        metrics.addAll(
+                                flexibleEngineMonitorCache.get(
+                                        resourceMetricRequest.getDeployResource()
+                                                .getResourceId(),
+                                        resourceMetricRequest.getMonitorResourceType()));
+                    }
                 }
-            } else {
-                log.error("GetMetrics param project_id is blank. resource id:{}",
-                        deployResource.getResourceId());
             }
-        } else {
-            log.error("GetMetrics param region is blank. resource id:{}",
-                    deployResource.getResourceId());
         }
         return metrics;
+    }
+
+
+    private FlexibleEngineNameSpaceKind getMetricNameSpace(DeployResource deployResource,
+                                                           CredentialDefinition credential,
+                                                           Project project) {
+        String url =
+                flexibleEngineMonitorConverter.buildListMetricsUrl(deployResource,
+                        project.getId());
+        ListMetricsResponse listMetricsResponse =
+                queryListMetricsInfo(credential, url);
+        if (Objects.nonNull(listMetricsResponse)) {
+            List<MetricInfoList> metrics = listMetricsResponse.getMetrics();
+            Optional<MetricInfoList> agentMetricOptions = metrics.stream()
+                    .filter(metricInfoList -> FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(
+                            metricInfoList.getMetricName())).findFirst();
+            if (agentMetricOptions.isPresent()) {
+                return FlexibleEngineNameSpaceKind.ECS_AGT;
+            }
+        }
+        return FlexibleEngineNameSpaceKind.ECS_SYS;
+
     }
 
 
