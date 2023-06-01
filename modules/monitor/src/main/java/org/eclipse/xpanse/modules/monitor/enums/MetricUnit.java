@@ -16,7 +16,9 @@ public enum MetricUnit {
 
     MB("mb"),
     KB("kb"),
-    PERCENTAGE("percentage");
+    PERCENTAGE("percentage"),
+    BITS_PER_SECOND("bit/s"),
+    BYTES_PER_SECOND("Byte/s");
 
     private final String type;
 
