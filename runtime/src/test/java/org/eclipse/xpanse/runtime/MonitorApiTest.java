@@ -36,6 +36,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class MonitorApiTest {
 
+    private final Long from = System.currentTimeMillis() - 5 * 60 * 1000;
+
+    private final Long to = System.currentTimeMillis();
+
     @Mock
     private Monitor mockMonitor;
 
@@ -49,6 +53,7 @@ class MonitorApiTest {
 
     @Test
     void testGetMetrics() {
+
         // Setup
         final Metric metric = new Metric();
         metric.setName("name");
@@ -69,12 +74,12 @@ class MonitorApiTest {
         metric1.setMetrics(List.of(metricItem1));
         final List<Metric> metrics = List.of(metric1);
         when(mockMonitor.getMetrics(UUID.fromString("e034af0c-be03-453e-92cd-fd69acbfe526"),
-                MonitorResourceType.CPU)).thenReturn(metrics);
+                MonitorResourceType.CPU, from, to, 1)).thenReturn(metrics);
 
         // Run the test
         final List<Metric> result =
                 monitorApiUnderTest.getMetrics("e034af0c-be03-453e-92cd-fd69acbfe526",
-                        MonitorResourceType.CPU);
+                        MonitorResourceType.CPU, from, to, 1);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -84,12 +89,12 @@ class MonitorApiTest {
     void testGetMetrics_MonitorReturnsNoItems() {
         // Setup
         when(mockMonitor.getMetrics(UUID.fromString("e034af0c-be03-453e-92cd-fd69acbfe526"),
-                MonitorResourceType.CPU)).thenReturn(Collections.emptyList());
+                MonitorResourceType.CPU, from, to, 1)).thenReturn(Collections.emptyList());
 
         // Run the test
         final List<Metric> result =
                 monitorApiUnderTest.getMetrics("e034af0c-be03-453e-92cd-fd69acbfe526",
-                        MonitorResourceType.CPU);
+                        MonitorResourceType.CPU, from, to, 1);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());

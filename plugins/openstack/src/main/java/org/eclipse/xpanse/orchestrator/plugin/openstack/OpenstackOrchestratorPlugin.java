@@ -15,9 +15,9 @@ import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
-import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
+import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.utils.MetricsManager;
@@ -91,10 +91,30 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public List<Metric> getMetrics(AbstractCredentialInfo credential,
-                                   DeployResource deployResource,
-                                   MonitorResourceType monitorResourceType) {
-        return this.metricsManager.getMetrics(credential, deployResource, monitorResourceType);
+    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
+        return this.metricsManager.getMetrics(resourceMetricRequest);
+    }
+
+    /**
+     * Get metrics for resource instance by the @resourceMetricRequest.
+     *
+     * @param resourceMetricRequest The request model to query metrics for resource instance.
+     * @return Returns list of metric result.
+     */
+    @Override
+    public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
+        return null;
+    }
+
+    /**
+     * Get metrics for service instance by the @serviceMetricRequest.
+     *
+     * @param serviceMetricRequest The request model to query metrics for service instance.
+     * @return Returns list of metric result.
+     */
+    @Override
+    public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
+        return null;
     }
 
 }
