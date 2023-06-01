@@ -15,7 +15,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum MonitorResourceType {
     CPU("cpu"),
-    MEM("mem");
+    MEM("mem"),
+    VM_NETWORK_INCOMING("vm_network_incoming"),
+    VM_NETWORK_OUTGOING("vm_network_outgoing");
 
     private final String value;
 
