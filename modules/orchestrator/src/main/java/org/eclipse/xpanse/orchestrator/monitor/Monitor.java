@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
@@ -24,7 +23,6 @@ import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
@@ -105,7 +103,7 @@ public class Monitor {
                 EntityTransUtils.transResourceEntity(deployResourceList);
         List<DeployResource> vmResources = deployResources.stream()
                 .filter(deployResource -> DeployResourceKind.VM.equals(deployResource.getKind()))
-                .collect(Collectors.toList());
+                .toList();
         if (CollectionUtils.isEmpty(vmResources)) {
             throw new EntityNotFoundException("No resource found in the service.");
         }
@@ -115,12 +113,16 @@ public class Monitor {
 
         OrchestratorPlugin orchestratorPlugin =
                 orchestratorService.getOrchestratorPlugin(serviceEntity.getCsp());
-
-        ServiceMetricRequest serviceMetricRequest =
-                getServiceMetricRequest(vmResources, credential, monitorType, from,
-                        to, granularity);
-
-        return orchestratorPlugin.getMetricsForService(serviceMetricRequest);
+        List<Metric> metrics = new ArrayList<>();
+        for (DeployResource vmResource : vmResources) {
+            ResourceMetricRequest resourceMetricRequest =
+                    getResourceMetricRequest(vmResource, credential, monitorType, from, to,
+                            granularity);
+            List<Metric> metricList =
+                    orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
+            metrics.addAll(metricList);
+        }
+        return metrics;
     }
 
 
@@ -188,20 +190,6 @@ public class Monitor {
             to = System.currentTimeMillis();
         }
         return new ResourceMetricRequest(deployResource, credential, monitorType, from, to,
-                granularity);
-    }
-
-    private ServiceMetricRequest getServiceMetricRequest(List<DeployResource> deployResources,
-                                                         CredentialDefinition credential,
-                                                         MonitorResourceType monitorType,
-                                                         Long from, Long to, Integer granularity) {
-        if (Objects.isNull(from)) {
-            from = System.currentTimeMillis() - FIVE_MINUTES_MILLISECONDS;
-        }
-        if (Objects.isNull(to)) {
-            to = System.currentTimeMillis();
-        }
-        return new ServiceMetricRequest(deployResources, credential, monitorType, from, to,
                 granularity);
     }
 

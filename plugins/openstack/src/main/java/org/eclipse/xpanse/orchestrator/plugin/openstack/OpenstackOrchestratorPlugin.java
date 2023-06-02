@@ -17,7 +17,6 @@ import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.utils.MetricsManager;
@@ -103,17 +102,6 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
-        return null;
-    }
-
-    /**
-     * Get metrics for service instance by the @serviceMetricRequest.
-     *
-     * @param serviceMetricRequest The request model to query metrics for service instance.
-     * @return Returns list of metric result.
-     */
-    @Override
-    public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
         return null;
     }
 

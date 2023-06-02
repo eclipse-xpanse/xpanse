@@ -14,7 +14,6 @@ import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -44,7 +43,7 @@ public class PluginTest implements OrchestratorPlugin {
     /**
      * Get metrics for resource instance by the @resourceMetricRequest.
      *
-     * @param resourceMetricRequest
+     * @param resourceMetricRequest ResourceMetricRequest object.
      */
     @Override
     public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
@@ -59,17 +58,6 @@ public class PluginTest implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
-        return null;
-    }
-
-    /**
-     * Get metrics for service instance by the @serviceMetricRequest.
-     *
-     * @param serviceMetricRequest The request model to query metrics for service instance.
-     * @return Returns list of metric result.
-     */
-    @Override
-    public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
         return null;
     }
 }

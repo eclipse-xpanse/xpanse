@@ -26,13 +26,4 @@ public interface MetricsExporter {
      */
     List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest);
 
-
-    /**
-     * Get metrics for service instance by the @serviceMetricRequest.
-     *
-     * @param serviceMetricRequest The request model to query metrics for service instance.
-     * @return Returns list of metric result.
-     */
-    List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest);
-
 }
