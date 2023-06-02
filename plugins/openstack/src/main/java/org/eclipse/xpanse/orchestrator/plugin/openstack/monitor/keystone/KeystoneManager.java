@@ -77,7 +77,6 @@ public class KeystoneManager {
                 .builderV3()
                 .withConfig(buildClientConfig(url))
                 .credentials(userName, password, Identifier.byName("default"))
-                .scopeToProject(Identifier.byName(tenant), Identifier.byId("default"))
                 .endpoint(url)
                 .authenticate();
     }

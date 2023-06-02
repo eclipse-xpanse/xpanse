@@ -182,7 +182,7 @@ public class FlexibleEngineMonitorConverter {
         params.put("metric_name", metricInfo.getMetricName());
         params.put("from", String.valueOf(resourceMetricRequest.getFrom()));
         params.put("to", String.valueOf(resourceMetricRequest.getTo()));
-        params.put("period", String.valueOf(resourceMetricRequest.getPeriod()));
+        params.put("period", String.valueOf(resourceMetricRequest.getGranularity()));
         params.put("filter", FlexibleEngineMonitorConstants.FILTER_AVERAGE);
         params.put("dim.0", FlexibleEngineMonitorConstants.DIM0_PREFIX
                 + resourceMetricRequest.getDeployResource().getResourceId());
@@ -197,8 +197,8 @@ public class FlexibleEngineMonitorConverter {
         if (Objects.isNull(resourceMetricRequest.getTo())) {
             resourceMetricRequest.setTo(System.currentTimeMillis());
         }
-        if (Objects.isNull(resourceMetricRequest.getPeriod())) {
-            resourceMetricRequest.setPeriod(PERIOD_REAL_TIME_INT);
+        if (Objects.isNull(resourceMetricRequest.getGranularity())) {
+            resourceMetricRequest.setGranularity(PERIOD_REAL_TIME_INT);
         }
     }
 }

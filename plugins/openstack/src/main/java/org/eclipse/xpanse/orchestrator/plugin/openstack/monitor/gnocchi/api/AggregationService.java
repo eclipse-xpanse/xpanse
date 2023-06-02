@@ -5,8 +5,11 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api;
 
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.utils.MetricsQueryBuilder;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.aggregates.AggregatedMeasures;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.aggregates.AggregationRequest;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.filter.MetricsFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,9 +18,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class AggregationService extends BaseGnocchiServices {
 
+    private final MetricsQueryBuilder metricsQueryBuilder;
+
+    @Autowired
+    public AggregationService(MetricsQueryBuilder metricsQueryBuilder) {
+        this.metricsQueryBuilder = metricsQueryBuilder;
+    }
+
+    /**
+     * Queries Gnocchi aggregates API based on the operation and filter provided.
+     *
+     * @param aggregationRequest AggregationRequest object.
+     * @param metricsFilter MetricsFilter object
+     * @return AggregatedMeasures
+     */
     public AggregatedMeasures getAggregatedMeasuresByOperation(
-            AggregationRequest aggregationRequest) {
-        return post(AggregatedMeasures.class, "/v1/aggregates").entity(aggregationRequest)
+            AggregationRequest aggregationRequest, MetricsFilter metricsFilter) {
+        String requestUri =
+                "/v1/aggregates" + this.metricsQueryBuilder.build(metricsFilter);
+        return post(AggregatedMeasures.class, requestUri).entity(aggregationRequest)
                 .execute();
     }
 }

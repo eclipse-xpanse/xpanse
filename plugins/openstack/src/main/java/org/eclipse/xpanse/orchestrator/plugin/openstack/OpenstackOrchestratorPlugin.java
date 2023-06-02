@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
@@ -103,7 +104,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
-        return null;
+        return this.metricsManager.getMetrics(resourceMetricRequest);
     }
 
     /**
@@ -114,7 +115,19 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
-        return null;
+        List<Metric> metrics = new ArrayList<>();
+        for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
+            ResourceMetricRequest resourceMetricRequest = new ResourceMetricRequest(
+                    deployResource,
+                    serviceMetricRequest.getCredential(),
+                    serviceMetricRequest.getMonitorResourceType(),
+                    serviceMetricRequest.getFrom(),
+                    serviceMetricRequest.getTo(),
+                    serviceMetricRequest.getGranularity()
+            );
+            metrics.addAll(this.metricsManager.getMetrics(resourceMetricRequest));
+        }
+        return metrics;
     }
 
 }

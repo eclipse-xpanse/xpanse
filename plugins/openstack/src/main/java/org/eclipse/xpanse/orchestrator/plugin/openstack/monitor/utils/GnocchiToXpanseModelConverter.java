@@ -5,17 +5,21 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.utils;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.MetricItem;
+import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MetricItemType;
 import org.eclipse.xpanse.modules.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.aggregates.AggregationRequest;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.filter.MetricsFilter;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.measures.Measure;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -42,10 +46,14 @@ public class GnocchiToXpanseModelConverter {
         metric.setLabels(labels);
         metric.setType(MetricType.GAUGE);
         if (!CollectionUtils.isEmpty(measures)) {
-            MetricItem metricItem = new MetricItem();
-            metricItem.setType(MetricItemType.VALUE);
-            metricItem.setValue(measures.get(measures.size() - 1).getValue());
-            metric.setMetrics(List.of(metricItem));
+            metric.setMetrics(new ArrayList<>());
+            for (Measure measure : measures) {
+                MetricItem metricItem = new MetricItem();
+                metricItem.setType(MetricItemType.VALUE);
+                metricItem.setValue(measure.getValue());
+                metricItem.setTimeStamp(Instant.parse(measure.getTimestamp()).getEpochSecond());
+                metric.getMetrics().add(metricItem);
+            }
         }
         return metric;
     }
@@ -65,6 +73,20 @@ public class GnocchiToXpanseModelConverter {
         AggregationRequest aggregationRequest = new AggregationRequest();
         aggregationRequest.setOperations(operationString);
         return aggregationRequest;
+    }
+
+    /**
+     * Converts Xpanse metric filter to Gnocchi MetricsFilter object.
+     *
+     * @param resourceMetricRequest ResourceMetricRequest object
+     * @return Returns Gnocchi MetricsFilter object.
+     */
+    public MetricsFilter buildMetricsFilter(ResourceMetricRequest resourceMetricRequest) {
+        return MetricsFilter.builder()
+                .end(resourceMetricRequest.getTo())
+                .start(resourceMetricRequest.getFrom())
+                .granularity(resourceMetricRequest.getGranularity())
+                .build();
     }
 }
 
