@@ -85,8 +85,8 @@ public class MonitorApi {
             @Parameter(name = "granularity",
                     description = "Return metrics collected in provided time interval. This"
                             + " depends on how the source systems have generated/collected"
-                            + "metrics.")
-            @RequestParam(name = "granularity", required = false, defaultValue = "1")
+                            + " metrics.")
+            @RequestParam(name = "granularity", required = false)
             Integer granularity) {
 
         return monitor.getMetrics(UUID.fromString(id), monitorResourceType, from, to, granularity);
@@ -108,17 +108,21 @@ public class MonitorApi {
             @Parameter(name = "monitorResourceType", description = "Types of the monitor resource.")
             @RequestParam(name = "monitorResourceType", required = false)
             MonitorResourceType monitorResourceType,
-            @Parameter(name = "from", description = "Start UNIX timestamp in milliseconds.")
-            @RequestParam(name = "from")
+            @Parameter(name = "from", description = "Start UNIX timestamp in milliseconds. "
+                    + "If no value filled,the default value is the UNIX timestamp in milliseconds"
+                    + " of the five minutes ago.")
+            @RequestParam(name = "from", required = false)
             @Min(value = 0, message = "The value cannot be less than 0") Long from,
-            @Parameter(name = "to", description = "End UNIX timestamp in milliseconds.")
-            @RequestParam(name = "to")
+            @Parameter(name = "to", description = "End UNIX timestamp in milliseconds. "
+                    + "If no value filled,the default value is the UNIX timestamp in milliseconds "
+                    + "of the current time.")
+            @RequestParam(name = "to", required = false)
             @Min(value = 0, message = "The value cannot be less than 0") Long to,
             @Parameter(name = "granularity",
                     description = "Return metrics collected in provided time interval. This"
                             + " depends on how the source systems have generated/collected"
-                            + "metrics.")
-            @RequestParam(name = "granularity", required = false, defaultValue = "1")
+                            + " metrics.")
+            @RequestParam(name = "granularity", required = false)
             Integer granularity) {
         return monitor.getMetricsByServiceId(id, monitorResourceType, from, to,
                 granularity);
@@ -142,17 +146,21 @@ public class MonitorApi {
             @Parameter(name = "monitorResourceType", description = "Types of the monitor resource.")
             @RequestParam(name = "monitorResourceType", required = false)
             MonitorResourceType monitorResourceType,
-            @Parameter(name = "from", description = "Start UNIX timestamp in milliseconds.")
-            @RequestParam(name = "from")
+            @Parameter(name = "from", description = "Start UNIX timestamp in milliseconds. "
+                    + "If no value filled,the default value is the UNIX timestamp in milliseconds"
+                    + " of the five minutes ago.")
+            @RequestParam(name = "from", required = false)
             @Min(value = 0, message = "The value cannot be less than 0") Long from,
-            @Parameter(name = "to", description = "End UNIX timestamp in milliseconds.")
-            @RequestParam(name = "to")
+            @Parameter(name = "to", description = "End UNIX timestamp in milliseconds. "
+                    + "If no value filled,the default value is the UNIX timestamp in milliseconds "
+                    + "of the current time.")
+            @RequestParam(name = "to", required = false)
             @Min(value = 0, message = "The value cannot be less than 0") Long to,
             @Parameter(name = "granularity",
                     description = "Return metrics collected in provided time interval. This"
                             + " depends on how the source systems have generated/collected"
-                            + "metrics.")
-            @RequestParam(name = "granularity", required = false, defaultValue = "1")
+                            + " metrics.")
+            @RequestParam(name = "granularity", required = false)
             Integer granularity) {
         return monitor.getMetricsByResourceId(id, monitorResourceType, from, to,
                 granularity);
