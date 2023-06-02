@@ -6,28 +6,30 @@
 
 package org.eclipse.xpanse.modules.monitor;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.monitor.enums.MetricItemType;
 
 /**
- * The one item of the metric.
+ * Defines metric at a specific timestamp.
  */
 @Data
 public class MetricItem {
 
-    /**
-     * The labels for the MetricItem.
-     */
+    @Schema(description = "The labels for the MetricItem.")
     public Map<String, String> labels;
 
-    /**
-     * The type of the MetricItem.
-     */
+    @NotNull
+    @Schema(description = "Type of the MetricItem.")
     public MetricItemType type;
 
-    /**
-     * The value of the MetricItem.
-     */
+    @NotNull
+    @Schema(description = "Timestamp of the recorded metric.")
+    public Long timeStamp;
+
+    @NotNull
+    @Schema(description = "value of the MetricItem.")
     public Number value;
 }
