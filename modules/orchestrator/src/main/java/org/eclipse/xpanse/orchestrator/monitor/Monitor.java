@@ -64,7 +64,7 @@ public class Monitor {
      * Get metrics of the service instance.
      */
     public List<Metric> getMetrics(UUID id, MonitorResourceType monitorType, Long from, Long to,
-                                   Integer period) {
+                                   Integer granularity) {
         DeployServiceEntity serviceEntity = deployServiceStorage.findDeployServiceById(id);
         if (Objects.isNull(serviceEntity)) {
             throw new EntityNotFoundException("Service not found.");
@@ -82,7 +82,7 @@ public class Monitor {
             if (DeployResourceKind.VM.equals(deployResource.getKind())) {
                 ResourceMetricRequest resourceMetricRequest =
                         getResourceMetricRequest(deployResource, credential, monitorType, from, to,
-                                period);
+                                granularity);
                 List<Metric> metricList = orchestratorPlugin.getMetrics(resourceMetricRequest);
                 metrics.addAll(metricList);
             }
@@ -96,7 +96,7 @@ public class Monitor {
      */
     public List<Metric> getMetricsByServiceId(String id, MonitorResourceType monitorType,
                                               Long from,
-                                              Long to, Integer period) {
+                                              Long to, Integer granularity) {
         validateToAndFromValues(from, to);
         DeployServiceEntity serviceEntity = findDeployServiceEntity(UUID.fromString(id));
 
@@ -118,7 +118,7 @@ public class Monitor {
 
         ServiceMetricRequest serviceMetricRequest =
                 getServiceMetricRequest(vmResources, credential, monitorType, from,
-                        to, period);
+                        to, granularity);
 
         return orchestratorPlugin.getMetricsForService(serviceMetricRequest);
     }
@@ -129,7 +129,7 @@ public class Monitor {
      */
     public List<Metric> getMetricsByResourceId(String id, MonitorResourceType monitorType,
                                                Long from,
-                                               Long to, Integer period) {
+                                               Long to, Integer granularity) {
         validateToAndFromValues(from, to);
         DeployResourceEntity resourceEntity =
                 deployResourceStorage.findDeployResourceByResourceId(id);
@@ -152,7 +152,7 @@ public class Monitor {
                 orchestratorService.getOrchestratorPlugin(serviceEntity.getCsp());
         ResourceMetricRequest resourceMetricRequest =
                 getResourceMetricRequest(deployResource, credential, monitorType, from,
-                        to, period);
+                        to, granularity);
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
     }
 
@@ -179,27 +179,30 @@ public class Monitor {
     private ResourceMetricRequest getResourceMetricRequest(DeployResource deployResource,
                                                            CredentialDefinition credential,
                                                            MonitorResourceType monitorType,
-                                                           Long from, Long to, Integer period) {
+                                                           Long from, Long to,
+                                                           Integer granularity) {
         if (Objects.isNull(from)) {
             from = System.currentTimeMillis() - FIVE_MINUTES_MILLISECONDS;
         }
         if (Objects.isNull(to)) {
             to = System.currentTimeMillis();
         }
-        return new ResourceMetricRequest(deployResource, credential, monitorType, from, to, period);
+        return new ResourceMetricRequest(deployResource, credential, monitorType, from, to,
+                granularity);
     }
 
     private ServiceMetricRequest getServiceMetricRequest(List<DeployResource> deployResources,
                                                          CredentialDefinition credential,
                                                          MonitorResourceType monitorType,
-                                                         Long from, Long to, Integer period) {
+                                                         Long from, Long to, Integer granularity) {
         if (Objects.isNull(from)) {
             from = System.currentTimeMillis() - FIVE_MINUTES_MILLISECONDS;
         }
         if (Objects.isNull(to)) {
             to = System.currentTimeMillis();
         }
-        return new ServiceMetricRequest(deployResources, credential, monitorType, from, to, period);
+        return new ServiceMetricRequest(deployResources, credential, monitorType, from, to,
+                granularity);
     }
 
     private void validateToAndFromValues(Long from, Long to) {
