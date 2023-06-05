@@ -125,8 +125,8 @@ public class CredentialManageApi {
      * @param type The type of credential.
      * @return Link of credential openApi url.
      */
-    @Tag(name = "Services Available",
-            description = "APIs for user query the available services.")
+    @Tag(name = "Credentials Management",
+            description = "APIs to manage credentials for authentication.")
     @GetMapping(value = "/auth/csp/{cspName}/openapi/{type}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
