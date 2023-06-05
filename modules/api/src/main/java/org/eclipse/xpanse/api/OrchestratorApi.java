@@ -14,6 +14,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -423,7 +424,11 @@ public class OrchestratorApi {
         String successMsg = String.format("Listing available services with query model %s "
                 + "successful.", query);
         List<UserAvailableServiceVo> userAvailableServiceVos =
-                serviceEntities.stream().map(this::convertToUserAvailableServiceVo)
+                serviceEntities.stream().map(this::convertToUserAvailableServiceVo).sorted(
+                                Comparator.comparingInt(o -> {
+                                    assert o != null;
+                                    return o.getCsp().ordinal();
+                                }))
                         .collect(Collectors.toList());
         log.info(successMsg);
         return userAvailableServiceVos;

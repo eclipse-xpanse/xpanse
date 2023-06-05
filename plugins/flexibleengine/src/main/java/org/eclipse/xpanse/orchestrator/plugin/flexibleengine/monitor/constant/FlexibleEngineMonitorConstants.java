@@ -64,4 +64,7 @@ public class FlexibleEngineMonitorConstants {
      */
     public static final int PERIOD_ONE_DAY_INT = 86400;
 
+
+    public static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
+
 }

@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models;
 
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.xpanse.modules.monitor.Metric;
@@ -22,10 +21,10 @@ public class FlexibleEngineMetric {
 
     @Setter
     @Getter
-    private List<Metric> metrics;
+    private Metric metric;
 
-    public FlexibleEngineMetric(List<Metric> metrics) {
-        this.metrics = metrics;
+    public FlexibleEngineMetric(Metric metric) {
+        this.metric = metric;
     }
 
 }

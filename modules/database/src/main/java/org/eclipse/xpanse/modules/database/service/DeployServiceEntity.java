@@ -14,6 +14,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
@@ -105,7 +106,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
     /**
      * The properties of the deployed service.
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "DEPLOY_SERVICE_PROPERTY",
             joinColumns = @JoinColumn(name = "DEPLOY_SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
@@ -115,7 +116,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
     /**
      * The properties of the deployed service.
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "DEPLOY_RESULT_PROPERTY",
             joinColumns = @JoinColumn(name = "DEPLOY_SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")

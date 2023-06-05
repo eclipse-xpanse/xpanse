@@ -248,7 +248,11 @@ public class RegisterServiceImpl implements RegisterService {
                     providerOclVo.setRegions(regions);
                     cspVoList.add(providerOclVo);
                 });
-                versionOclVo.setCloudProvider(cspVoList);
+                List<ProviderOclVo> sortedCspOclList =
+                        cspVoList.stream().sorted(
+                                        (o1, o2) -> o1.getName().ordinal() - o2.getName().ordinal())
+                                .collect(Collectors.toList());
+                versionOclVo.setCloudProvider(sortedCspOclList);
                 versionVoList.add(versionOclVo);
             });
             categoryOclVo.setVersions(versionVoList);

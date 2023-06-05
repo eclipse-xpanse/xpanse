@@ -6,7 +6,11 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.utils;
 
+import static org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants.FIVE_MINUTES_MILLISECONDS;
+import static org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants.PERIOD_REAL_TIME_INT;
+
 import com.huaweicloud.sdk.ces.v1.model.Datapoint;
+import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -22,10 +26,7 @@ import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MetricItemType;
 import org.eclipse.xpanse.modules.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.monitor.enums.MetricUnit;
-import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
-import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
-import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -83,78 +84,66 @@ public class FlexibleEngineMonitorConverter {
      * @param projectId             The id of project.
      * @return Returns list of request url.
      */
-    public Map<String, MonitorResourceType> buildMonitorMetricUrls(
+    public String buildMonitorMetricUrl(
             ResourceMetricRequest resourceMetricRequest,
             String projectId,
-            FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind) {
-        Map<String, MonitorResourceType> urlTypeMap = new HashMap<>();
+            MetricInfoList metricInfo) {
         DeployResource resource = resourceMetricRequest.getDeployResource();
-        MonitorResourceType type = resourceMetricRequest.getMonitorResourceType();
         String region = resource.getProperties().get("region");
         String basicUrl = getQueryMetricBasicUrl(region, projectId).toString();
         if (StringUtils.isNotBlank(region)) {
-            if (Objects.isNull(type)) {
-                for (MonitorResourceType monitorType : MonitorResourceType.values()) {
-                    StringBuilder url = new StringBuilder(basicUrl);
-                    resourceMetricRequest.setMonitorResourceType(monitorType);
-                    Map<String, String> paramsMap =
-                            getFlexibleEngineMonitorParams(resourceMetricRequest,
-                                    flexibleEngineNameSpaceKind);
-                    for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
-                        url.append(entry.getKey())
-                                .append("=").append(entry.getValue()).append("&");
-                    }
-                    url.deleteCharAt(url.length() - 1);
-                    urlTypeMap.put(url.toString(), monitorType);
-                }
-            } else {
-                StringBuilder url = new StringBuilder(basicUrl);
-                Map<String, String> paramsMap =
-                        getFlexibleEngineMonitorParams(resourceMetricRequest,
-                                flexibleEngineNameSpaceKind);
-                for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
-                    url.append(entry.getKey())
-                            .append("=").append(entry.getValue()).append("&");
-                }
-                url.deleteCharAt(url.length() - 1);
-                urlTypeMap.put(url.toString(), type);
+            StringBuilder url = new StringBuilder(basicUrl);
+            Map<String, String> paramsMap =
+                    getFlexibleEngineMonitorParams(resourceMetricRequest,
+                            metricInfo);
+            for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
+                url.append(entry.getKey())
+                        .append("=").append(entry.getValue()).append("&");
             }
+            url.deleteCharAt(url.length() - 1);
+            return url.toString();
         }
-        return urlTypeMap;
+        return basicUrl;
     }
 
     /**
      * Convert response body to Metric object.
      *
      * @param deployResource The deployed resource.
-     * @param type           MonitorResourceType.
      * @param response       ShowMetricDataResponse.
      * @return Returns Metric object.
      */
     public Metric convertResponseToMetric(DeployResource deployResource,
-                                          MonitorResourceType type,
                                           ShowMetricDataResponse response,
-                                          FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind) {
+                                          MetricInfoList metricInfo) {
         Metric metric = new Metric();
-        metric.setName(getMetricName(type, flexibleEngineNameSpaceKind));
+        metric.setName(metricInfo.getMetricName());
         Map<String, String> labels = new HashMap<>();
         labels.put("id", deployResource.getResourceId());
         labels.put("name", deployResource.getName());
         metric.setLabels(labels);
         metric.setType(MetricType.GAUGE);
+        if (metricInfo.getUnit().equals("%")) {
+            metric.setUnit(MetricUnit.PERCENTAGE);
+        } else {
+            metric.setUnit(MetricUnit.getByValue(metricInfo.getUnit()));
+        }
         if (Objects.nonNull(response) && !CollectionUtils.isEmpty(response.getDatapoints())) {
             List<Datapoint> datapointList = response.getDatapoints();
             datapointList.sort(Comparator.comparing(Datapoint::getTimestamp).reversed());
-            MetricItem metricItem = new MetricItem();
-            metricItem.setType(MetricItemType.VALUE);
-            metricItem.setValue(datapointList.get(0).getAverage());
-            metric.setMetrics(List.of(metricItem));
-            if (datapointList.get(0).getUnit().equals("%")) {
-                metric.setUnit(MetricUnit.PERCENTAGE);
-            }
+            metric.setMetrics(List.of(convertDataPointToMetricItem(datapointList.get(0))));
         }
         return metric;
     }
+
+    private MetricItem convertDataPointToMetricItem(Datapoint datapoint) {
+        MetricItem metricItem = new MetricItem();
+        metricItem.setValue(datapoint.getAverage());
+        metricItem.setType(MetricItemType.VALUE);
+        metricItem.setTimeStamp(datapoint.getTimestamp());
+        return metricItem;
+    }
+
 
     private StringBuilder getQueryMetricBasicUrl(String region, String projectId) {
         return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
@@ -186,11 +175,11 @@ public class FlexibleEngineMonitorConverter {
 
     private Map<String, String> getFlexibleEngineMonitorParams(
             ResourceMetricRequest resourceMetricRequest,
-            FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind) {
+            MetricInfoList metricInfo) {
+        checkNullParamAndFillValue(resourceMetricRequest);
         Map<String, String> params = new HashMap<>();
-        params.put("namespace", FlexibleEngineNameSpaceKind.ECS_SYS.toValue());
-        params.put("metric_name", getMetricName(resourceMetricRequest.getMonitorResourceType(),
-                flexibleEngineNameSpaceKind));
+        params.put("namespace", metricInfo.getNamespace());
+        params.put("metric_name", metricInfo.getMetricName());
         params.put("from", String.valueOf(resourceMetricRequest.getFrom()));
         params.put("to", String.valueOf(resourceMetricRequest.getTo()));
         params.put("period", String.valueOf(resourceMetricRequest.getPeriod()));
@@ -200,27 +189,16 @@ public class FlexibleEngineMonitorConverter {
         return params;
     }
 
-    private String getMetricName(MonitorResourceType monitorResourceType,
-                                 FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind) {
-        String metricName = null;
-        switch (monitorResourceType) {
-            case CPU:
-                if (flexibleEngineNameSpaceKind == FlexibleEngineNameSpaceKind.ECS_AGT) {
-                    metricName = FlexibleEngineMonitorMetrics.CPU_USAGE;
-                } else {
-                    metricName = FlexibleEngineMonitorMetrics.CPU_UTILIZED;
-                }
-                break;
-            case MEM:
-                if (flexibleEngineNameSpaceKind == FlexibleEngineNameSpaceKind.ECS_AGT) {
-                    metricName = FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE;
-                } else {
-                    metricName = FlexibleEngineMonitorMetrics.MEM_UTILIZED;
-                }
-                break;
-            default:
-                break;
+
+    private void checkNullParamAndFillValue(ResourceMetricRequest resourceMetricRequest) {
+        if (Objects.isNull(resourceMetricRequest.getFrom())) {
+            resourceMetricRequest.setFrom(System.currentTimeMillis() - FIVE_MINUTES_MILLISECONDS);
         }
-        return metricName;
+        if (Objects.isNull(resourceMetricRequest.getTo())) {
+            resourceMetricRequest.setTo(System.currentTimeMillis());
+        }
+        if (Objects.isNull(resourceMetricRequest.getPeriod())) {
+            resourceMetricRequest.setPeriod(PERIOD_REAL_TIME_INT);
+        }
     }
 }
