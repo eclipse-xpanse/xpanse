@@ -14,12 +14,13 @@ import org.apache.commons.lang3.StringUtils;
  * Cloud service providers.
  */
 public enum Csp {
+    HUAWEI("huawei"),
+    FLEXIBLE_ENGINE("flexibleEngine"),
+    OPENSTACK("openstack"),
+    ALICLOUD("alicloud"),
     AWS("aws"),
     AZURE("azure"),
-    ALICLOUD("alicloud"),
-    HUAWEI("huawei"),
-    OPENSTACK("openstack"),
-    FLEXIBLE_ENGINE("flexibleEngine");
+    GOOGLE("google");
 
     private final String value;
 

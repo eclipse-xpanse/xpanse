@@ -30,7 +30,7 @@ public enum MetricUnit {
      * For MetricUnit deserialize.
      */
     @JsonCreator
-    public MetricUnit getByValue(String type) {
+    public static MetricUnit getByValue(String type) {
         for (MetricUnit metricUnit : values()) {
             if (metricUnit.type.equals(StringUtils.lowerCase(type))) {
                 return metricUnit;

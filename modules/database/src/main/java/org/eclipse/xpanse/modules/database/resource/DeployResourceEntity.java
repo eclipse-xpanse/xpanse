@@ -13,6 +13,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -69,7 +70,7 @@ public class DeployResourceEntity extends CreateModifiedTime {
     /**
      * The properties of the deployed resource.
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "DEPLOY_RESOURCE_PROPERTY",
             joinColumns = @JoinColumn(name = "deployResource_id", nullable = false))
     @MapKeyColumn(name = "p_key")
