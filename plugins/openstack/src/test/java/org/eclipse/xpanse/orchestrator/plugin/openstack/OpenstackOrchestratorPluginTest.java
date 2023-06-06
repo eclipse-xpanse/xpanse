@@ -13,6 +13,7 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.MeasuresService;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.ResourcesService;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.utils.MetricsQueryBuilder;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.keystone.KeystoneManager;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.utils.GnocchiToXpanseModelConverter;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.utils.MetricsManager;
@@ -22,8 +23,8 @@ public class OpenstackOrchestratorPluginTest {
 
     private final OpenstackOrchestratorPlugin plugin = new OpenstackOrchestratorPlugin(
             new MetricsManager(new KeystoneManager(), new ResourcesService(),
-                    new GnocchiToXpanseModelConverter(), new AggregationService(),
-                    new MeasuresService()));
+                    new GnocchiToXpanseModelConverter(), new AggregationService(new MetricsQueryBuilder()),
+                    new MeasuresService(new MetricsQueryBuilder())));
 
     @Test
     void getResourceHandler() {

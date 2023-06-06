@@ -22,9 +22,9 @@ public class Measure {
     /**
      * Constructor to deserialize a tuple to a Java object.
      *
-     * @param timestamp time when the measure was recorded.
+     * @param timestamp   time when the measure was recorded.
      * @param granularity time difference between two measures.
-     * @param value actual value measures.
+     * @param value       actual value measures.
      */
     @JsonCreator
     public Measure(@JsonProperty("timestamp") String timestamp,

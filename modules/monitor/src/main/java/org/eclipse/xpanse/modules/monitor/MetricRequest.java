@@ -28,5 +28,5 @@ public class MetricRequest {
 
     private Long to;
 
-    private Integer period;
+    private Integer granularity;
 }

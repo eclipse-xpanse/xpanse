@@ -57,7 +57,7 @@ public class DatabaseDeployResourceStorage implements DeployResourceStorage {
         Specification<DeployResourceEntity> specification =
                 ((root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
-                    predicateList.add(criteriaBuilder.equal(root.get("resource_id"),
+                    predicateList.add(criteriaBuilder.equal(root.get("resourceId"),
                             resourceId));
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();

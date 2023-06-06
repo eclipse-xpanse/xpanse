@@ -145,7 +145,8 @@ public class Monitor {
         }
         DeployResource deployResource = new DeployResource();
         BeanUtils.copyProperties(resourceEntity, deployResource);
-        DeployServiceEntity serviceEntity = findDeployServiceEntity(resourceEntity.getId());
+        DeployServiceEntity serviceEntity = findDeployServiceEntity(
+                resourceEntity.getDeployService().getId());
         CredentialDefinition credential =
                 getCredential(serviceEntity.getCsp(), serviceEntity.getUserName());
         OrchestratorPlugin orchestratorPlugin =

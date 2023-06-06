@@ -81,22 +81,22 @@ public class HuaweiCloudToXpanseDataModelConverter {
                                         HuaweiCloudNameSpaceKind huaweiCloudNameSpaceKind) {
         String metricName = null;
         switch (monitorResourceType) {
-            case CPU:
+            case CPU -> {
                 if (huaweiCloudNameSpaceKind == HuaweiCloudNameSpaceKind.ECS_SYS) {
                     metricName = HuaweiCloudMonitorMetrics.CPU_UTILIZED;
                 } else {
                     metricName = HuaweiCloudMonitorMetrics.CPU_USAGEIZED;
                 }
-                break;
-            case MEM:
+            }
+            case MEM -> {
                 if (huaweiCloudNameSpaceKind == HuaweiCloudNameSpaceKind.ECS_SYS) {
                     metricName = HuaweiCloudMonitorMetrics.MEM_UTILIZED;
                 } else {
                     metricName = HuaweiCloudMonitorMetrics.MEM_usedPercentIZED;
                 }
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         return metricName;
     }
@@ -147,7 +147,7 @@ public class HuaweiCloudToXpanseDataModelConverter {
                 .withDim0(HuaweiCloudMonitorConstants.DIM0_PREFIX
                         + resourceMetricRequest.getDeployResource().getResourceId())
                 .withFilter(FilterEnum.valueOf(HuaweiCloudMonitorConstants.FILTER_AVERAGE))
-                .withPeriod(resourceMetricRequest.getPeriod())
+                .withPeriod(resourceMetricRequest.getGranularity())
                 .withFrom(resourceMetricRequest.getFrom())
                 .withTo(resourceMetricRequest.getTo())
                 .withNamespace(getNameSpace(huaweiCloudNameSpaceKind))
