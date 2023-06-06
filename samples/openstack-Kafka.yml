@@ -35,28 +35,28 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 3
-      flavor_id: cirrors256
+      flavor_id: cirros256
   - name: 1-zookeeper-with-3-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 3
-      flavor_id: cirrors512
+      flavor_id: cirros512
   - name: 1-zookeeper-with-5-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 5
-      flavor_id: cirrors256
+      flavor_id: cirros256
   - name: 1-zookeeper-with-5-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 80
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 5
-      flavor_id: cirrors512
+      flavor_id: cirros512
 deployment:
   # kind, Supported values are terraform, pulumi, crossplane.
   kind: terraform
@@ -73,7 +73,7 @@ deployment:
       description: The Identity authentication URL.
       kind: env
       dataType: string
-      mandatory: true
+      mandatory: false
     - name: OS_USERNAME
       description: The User Name to login with.
       kind: env
