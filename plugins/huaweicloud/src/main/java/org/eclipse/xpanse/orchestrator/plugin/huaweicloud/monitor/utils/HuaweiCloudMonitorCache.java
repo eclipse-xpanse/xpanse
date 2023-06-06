@@ -9,16 +9,14 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.monitor.Metric;
-import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.models.HuaweiCloudMetric;
-import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.models.HuaweiCloudMonitorMetrics;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -33,7 +31,8 @@ public class HuaweiCloudMonitorCache {
 
     public static final int DEFAULT_CACHE_CLEAR_TIME = 12 * 60 * 60 * 1000;
     private static final int DEFAULT_TIME_DIFFERENCE = 30 * 60 * 1000;
-    private static final Map<String, HuaweiCloudMetric> METRIC_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, List<HuaweiCloudMetric>> METRIC_MAP =
+            new ConcurrentHashMap<>();
     @Setter
     @Getter
     private long lastClearTime = 0L;
@@ -41,12 +40,17 @@ public class HuaweiCloudMonitorCache {
     /**
      * Set Metric Cache.
      */
-    public void set(String resourceId, List<Metric> metrics) {
-        if (StringUtils.isBlank(resourceId) || CollectionUtils.isEmpty(metrics)) {
-            return;
+    public void set(String resourceId, Metric metric) {
+        if (StringUtils.isNotBlank(resourceId) && Objects.nonNull(metric)
+                && !CollectionUtils.isEmpty(metric.getMetrics())) {
+            if (METRIC_MAP.containsKey(resourceId)) {
+                METRIC_MAP.get(resourceId).add(new HuaweiCloudMetric(metric));
+            } else {
+                List<HuaweiCloudMetric> metrics = new ArrayList<>();
+                metrics.add(new HuaweiCloudMetric(metric));
+                METRIC_MAP.put(resourceId, metrics);
+            }
         }
-        HuaweiCloudMetric huaweiCloudMetric = new HuaweiCloudMetric(metrics);
-        METRIC_MAP.put(resourceId, huaweiCloudMetric);
     }
 
     /**
@@ -59,31 +63,27 @@ public class HuaweiCloudMonitorCache {
     /**
      * Get the Metrics of the resource from the Cache.
      */
-    public List<Metric> get(String resourceId, MonitorResourceType monitorResourceType) {
+    public List<Metric> get(String resourceId, String metricName) {
+        List<Metric> metrics = new ArrayList<>();
         if (StringUtils.isBlank(resourceId) || isEmpty()) {
-            return new ArrayList<>();
-        }
-        HuaweiCloudMetric huaweiCloudMetric = METRIC_MAP.get(resourceId);
-
-        if (System.currentTimeMillis() - huaweiCloudMetric.getTime() > DEFAULT_TIME_DIFFERENCE) {
-            return new ArrayList<>();
+            return metrics;
         }
 
-        if (monitorResourceType != null) {
-            if (monitorResourceType == MonitorResourceType.CPU) {
-                return huaweiCloudMetric.getMetrics().stream()
-                        .filter(metric -> HuaweiCloudMonitorMetrics.CPU_UTILIZED
-                                == metric.getName())
-                        .collect(Collectors.toList());
-            } else if (monitorResourceType == MonitorResourceType.MEM) {
-                return huaweiCloudMetric.getMetrics().stream()
-                        .filter(metric -> HuaweiCloudMonitorMetrics.MEM_UTILIZED
-                                == metric.getName())
-                        .collect(Collectors.toList());
+        List<HuaweiCloudMetric> huaweiCloudMetrics = METRIC_MAP.get(resourceId);
+        List<HuaweiCloudMetric> expiredCache = new ArrayList<>();
+        for (HuaweiCloudMetric metricCache : huaweiCloudMetrics) {
+            if (System.currentTimeMillis() - metricCache.getTime() > DEFAULT_TIME_DIFFERENCE) {
+                expiredCache.add(metricCache);
+            } else {
+                if (StringUtils.isNotEmpty(metricName)) {
+                    if (metricName.equals(metricCache.getMetric().getName())) {
+                        metrics.add(metricCache.getMetric());
+                    }
+                }
             }
-
         }
-        return huaweiCloudMetric.getMetrics();
+        METRIC_MAP.get(resourceId).removeAll(expiredCache);
+        return metrics;
     }
 
     /**
@@ -95,10 +95,13 @@ public class HuaweiCloudMonitorCache {
         if (METRIC_MAP.isEmpty()) {
             return;
         }
-        HuaweiCloudMetric huaweiCloudMetric = METRIC_MAP.get(resourceId);
-        if (System.currentTimeMillis() - huaweiCloudMetric.getTime() > DEFAULT_TIME_DIFFERENCE) {
-            METRIC_MAP.remove(resourceId);
-            log.info("The cache resource with resourceId {} is cleared ", resourceId);
+        List<HuaweiCloudMetric> huaweiCloudMetrics = METRIC_MAP.get(resourceId);
+        for (HuaweiCloudMetric huaweiCloudMetric : huaweiCloudMetrics) {
+            if (System.currentTimeMillis() - huaweiCloudMetric.getTime()
+                    > DEFAULT_TIME_DIFFERENCE) {
+                METRIC_MAP.remove(resourceId);
+                log.info("The cache resource with resourceId {} is cleared ", resourceId);
+            }
         }
     }
 }

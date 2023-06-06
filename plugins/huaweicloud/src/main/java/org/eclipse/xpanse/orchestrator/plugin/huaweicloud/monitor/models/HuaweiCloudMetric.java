@@ -22,10 +22,10 @@ public class HuaweiCloudMetric {
 
     @Setter
     @Getter
-    private List<Metric> metrics;
+    private Metric metric;
 
-    public HuaweiCloudMetric(List<Metric> metrics) {
-        this.metrics = metrics;
+    public HuaweiCloudMetric(Metric metric) {
+        this.metric = metric;
     }
 
 }

@@ -27,6 +27,11 @@ public class HuaweiCloudMonitorConstants {
     public static final String FILTER_MAX = "max";
 
     /**
+     * Dimension name for identifying the instance ID of an ECS.
+     */
+    public static final String VM_DIMENSION_NAME = "instance_id";
+
+    /**
      * Dim0 prefix to query ECS data for monitoring resources.
      */
     public static final String DIM0_PREFIX = "instance_id,";
@@ -61,5 +66,6 @@ public class HuaweiCloudMonitorConstants {
      */
     public static final int PERIOD_ONE_DAY_INT = 86400;
 
+    public static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
 
 }
