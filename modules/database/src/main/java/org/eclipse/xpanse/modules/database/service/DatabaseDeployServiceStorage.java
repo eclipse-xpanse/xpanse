@@ -11,11 +11,13 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the DeployServiceStorage.
  */
 @Component
+@Transactional
 public class DatabaseDeployServiceStorage implements DeployServiceStorage {
 
     private final DeployServiceRepository deployServiceRepository;
