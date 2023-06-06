@@ -17,11 +17,14 @@ import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Bean to manage all service task to database.
  */
+
 @Component
+@Transactional
 public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
 
     private final RegisterServiceRepository repository;

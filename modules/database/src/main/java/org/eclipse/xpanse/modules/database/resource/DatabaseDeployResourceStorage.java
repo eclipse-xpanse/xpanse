@@ -13,12 +13,14 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
  * Implementation of the DeployResourceStorage.
  */
 @Component
+@Transactional
 public class DatabaseDeployResourceStorage implements DeployResourceStorage {
 
     private final DeployResourceRepository deployResourceRepository;
