@@ -59,7 +59,7 @@ public class CredentialManageApi {
      * @return Returns list of the available credential types of the cloud service provider.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
+            description = "APIs for user manage credentials for authentication.")
     @GetMapping(value = "/auth/csp/{cspName}/credential/types",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -79,7 +79,7 @@ public class CredentialManageApi {
      * @return Returns list of credential capabilities of the cloud service provider.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
+            description = "APIs for user manage credentials for authentication.")
     @GetMapping(value = "/auth/csp/{cspName}/credential/capabilities",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -102,7 +102,7 @@ public class CredentialManageApi {
      * @return Returns credentials of the cloud service provider and the user.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
+            description = "APIs for user manage credentials for authentication.")
     @GetMapping(value = "/auth/csp/{cspName}/credentials",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -126,7 +126,7 @@ public class CredentialManageApi {
      * @return Link of credential openApi url.
      */
     @Tag(name = "Services Available",
-            description = "APIs to query the available services.")
+            description = "APIs for user query the available services.")
     @GetMapping(value = "/auth/csp/{cspName}/openapi/{type}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -151,7 +151,7 @@ public class CredentialManageApi {
      * @param createCredential The credential to create.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
+            description = "APIs for user manage credentials for authentication.")
     @PostMapping(value = "/auth/csp/{cspName}/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -170,7 +170,7 @@ public class CredentialManageApi {
      * @param updateCredential The credential to update.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
+            description = "APIs for user manage credentials for authentication.")
     @PutMapping(value = "/auth/csp/{cspName}/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -189,7 +189,7 @@ public class CredentialManageApi {
      * @param userName The name of user who provided credential.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
+            description = "APIs for user manage credentials for authentication.")
     @DeleteMapping(value = "/auth/csp/{cspName}/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -202,147 +202,4 @@ public class CredentialManageApi {
         return credentialCenter.deleteCredential(csp, userName);
     }
 
-
-    /**
-     * List the available credential types of the service.
-     *
-     * @param id The UUID of the deployed service.
-     * @return Returns list of the available credential types of the service.
-     */
-    @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
-    @GetMapping(value = "/auth/service/{id}/credential/types",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List credential types provided by the cloud service provider.")
-    public List<CredentialType> getCredentialTypesByServiceId(
-            @Parameter(name = "id", description = "The id of the deployed service.")
-            @PathVariable("id") String id) {
-        return credentialCenter.getAvailableCredentialTypesByServiceId(id);
-    }
-
-    /**
-     * List credential capabilities of the service.
-     *
-     * @param id The id of deployed service.
-     * @return Returns credential capabilities list of the service.
-     */
-    @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
-    @GetMapping(value = "/auth/service/{id}/credential/capabilities",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List credential capabilities of the service.")
-    public List<AbstractCredentialInfo> getCredentialCapabilitiesByServiceId(
-            @Parameter(name = "id", description = "The id of the deployed service.")
-            @PathVariable("id") String id,
-            @Parameter(name = "type", description = "The type of credential.")
-            @RequestParam(name = "type", required = false) CredentialType type) {
-        return credentialCenter.getCredentialCapabilitiesByServiceId(id, type);
-    }
-
-    /**
-     * List credentials of the service.
-     *
-     * @param id   The id of deployed service.
-     * @param type The type of credential.
-     * @return Returns credential capabilities list of the service.
-     */
-    @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
-    @GetMapping(value = "/auth/service/{id}/credentials",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List credentials of the service.")
-    public List<CredentialDefinition> getCredentialDefinitionsByServiceId(
-            @Parameter(name = "id", description = "The id of the deployed service.")
-            @PathVariable("id") String id,
-            @Parameter(name = "type", description = "The type of credential.")
-            @RequestParam(name = "type", required = false) CredentialType type) {
-        return credentialCenter.getCredentialDefinitionsByServiceId(id, type);
-
-    }
-
-    /**
-     * Add credential for the service.
-     *
-     * @param id               The id of deployed service.
-     * @param createCredential The credential to create.
-     */
-    @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
-    @PostMapping(value = "/auth/service/{id}/credential",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Add credential for the service.")
-    public Boolean addCredentialByServiceId(
-            @Parameter(name = "id", description = "The id of the deployed service.")
-            @PathVariable("id") String id,
-            @Valid @RequestBody CreateCredential createCredential) {
-        return credentialCenter.addCredentialByServiceId(id, createCredential);
-    }
-
-    /**
-     * Update credential for the service.
-     *
-     * @param id               The id of deployed service.
-     * @param updateCredential The credential to update.
-     */
-    @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
-    @PutMapping(value = "/auth/service/{id}/credential",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Update credential for the service.")
-    public Boolean updateCredentialByServiceId(
-            @Parameter(name = "id", description = "The id of the deployed service.")
-            @PathVariable("id") String id,
-            @Valid @RequestBody CreateCredential updateCredential) {
-        return credentialCenter.updateCredentialByServiceId(id, updateCredential);
-    }
-
-    /**
-     * Delete credentials of the service.
-     *
-     * @param id   The id of deployed service.
-     * @param type The type of credential.
-     */
-    @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
-    @DeleteMapping(value = "/auth/service/{id}/credential",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Delete credentials of the service.")
-    public Boolean deleteCredentialByServiceId(
-            @Parameter(name = "id", description = "The id of the deployed service.")
-            @PathVariable("id") String id,
-            @RequestParam(name = "type", required = false) CredentialType type) {
-        return credentialCenter.deleteCredentialByServiceId(id, type);
-    }
-
-    /**
-     * Get the API document for adding credential.
-     *
-     * @param id   The id of deployed service.
-     * @param type The type of credential.
-     * @return Link of credential openApi url.
-     */
-    @Tag(name = "Services Available",
-            description = "APIs to query the available services.")
-    @GetMapping(value = "/auth/service/{id}/openapi/{type}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Get the API document for adding credential of the Csp.")
-    public Link getCredentialOpenApiByServiceId(
-            @Parameter(name = "id", description = "The id of the deployed service.")
-            @PathVariable(name = "id") String id,
-            @Parameter(name = "type", description = "The type of credential.")
-            @PathVariable(name = "type") CredentialType type) {
-        String apiUrl = credentialCenter.getCredentialOpenApiUrlByServiceId(id, type);
-        String successMsg = String.format(
-                "Get API document of adding credential with type %s of the deployed service "
-                        + " %s successfully. Url %s", type.toValue(), id, apiUrl);
-        log.info(successMsg);
-        return Link.of(apiUrl, "OpenApi");
-    }
 }
