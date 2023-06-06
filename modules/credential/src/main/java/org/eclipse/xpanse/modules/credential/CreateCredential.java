@@ -28,8 +28,8 @@ public class CreateCredential {
 
     @NotNull
     @NotBlank
-    @Schema(description = "User who create the credential.")
-    private String userName;
+    @Schema(description = "The user who create the credential.")
+    private String xpanseUser;
 
     @Schema(description = "The cloud service provider of the credential.")
     @NotNull

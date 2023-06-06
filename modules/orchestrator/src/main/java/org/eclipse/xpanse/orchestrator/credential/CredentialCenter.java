@@ -94,16 +94,16 @@ public class CredentialCenter {
     }
 
     /**
-     * List the credential info of the @csp and @userName and @type.
+     * List the credential info of the @csp and @xpanseUser and @type.
      *
-     * @param csp      The cloud service provider.
-     * @param userName The name of user who provided the credential info.
-     * @param type     The type of the credential.
+     * @param csp        The cloud service provider.
+     * @param xpanseUser The user who provided the credential info.
+     * @param type       The type of the credential.
      * @return the credentials.
      */
-    public List<CredentialDefinition> getCredentialDefinitionsByCsp(Csp csp, String userName,
+    public List<CredentialDefinition> getCredentialDefinitionsByCsp(Csp csp, String xpanseUser,
                                                                     CredentialType type) {
-        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, userName);
+        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         if (Objects.isNull(type)) {
             return credentialCacheManager.getAllTypeCaches(cacheKey);
         }
@@ -127,7 +127,7 @@ public class CredentialCenter {
         checkInputCredentialIsValid(csp, createCredential);
         createCredential.setCsp(csp);
         CredentialDefinition credential = createCredentialDefinitionObject(createCredential);
-        return createCredential(credential.getCsp(), credential.getUserName(),
+        return createCredential(credential.getCsp(), credential.getXpanseUser(),
                 credential);
     }
 
@@ -141,44 +141,44 @@ public class CredentialCenter {
     public boolean updateCredential(Csp csp, CreateCredential updateCredential) {
         updateCredential.setCsp(csp);
         CredentialDefinition credential = createCredentialDefinitionObject(updateCredential);
-        deleteCredentialByType(csp, credential.getUserName(), credential.getType());
-        return createCredential(csp, credential.getUserName(), credential);
+        deleteCredentialByType(csp, credential.getXpanseUser(), credential.getType());
+        return createCredential(csp, credential.getXpanseUser(), credential);
     }
 
     /**
-     * Delete credential for the @Csp with @userName.
+     * Delete credential for the @Csp with @xpanseUser.
      *
-     * @param csp      The cloud service provider.
-     * @param userName The userName to delete.
+     * @param csp        The cloud service provider.
+     * @param xpanseUser The user who provided the credential info.
      * @return true of false.
      */
-    public boolean deleteCredential(Csp csp, String userName) {
-        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, userName);
+    public boolean deleteCredential(Csp csp, String xpanseUser) {
+        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         credentialCacheManager.removeAllTypeCaches(cacheKey);
         return true;
     }
 
     /**
-     * Delete credential for the @Csp with @userName.
+     * Delete credential for the @Csp with @xpanseUser.
      *
-     * @param csp      The cloud service provider.
-     * @param userName The userName to delete.
+     * @param csp        The cloud service provider.
+     * @param xpanseUser The user who provided the credential info.
      */
-    public boolean deleteCredentialByType(Csp csp, String userName, CredentialType
+    public boolean deleteCredentialByType(Csp csp, String xpanseUser, CredentialType
             credentialType) {
-        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, userName);
+        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         credentialCacheManager.removeCacheByType(cacheKey, credentialType);
         return false;
     }
 
     /**
-     * Get credential for the @Csp with @userName.
+     * Get credential for the @Csp with @xpanseUser.
      *
-     * @param csp      The cloud service provider.
-     * @param userName The userName to get.
+     * @param csp        The cloud service provider.
+     * @param xpanseUser The user who provided the credential info.
      */
-    public CredentialDefinition getCredential(Csp csp, String userName) {
-        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, userName);
+    public CredentialDefinition getCredential(Csp csp, String xpanseUser) {
+        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         List<CredentialDefinition> credentialDefinitionList =
                 credentialCacheManager.getAllTypeCaches(cacheKey);
         if (!CollectionUtils.isEmpty(credentialDefinitionList)) {
@@ -242,15 +242,15 @@ public class CredentialCenter {
     }
 
     /**
-     * Create credential for the @Csp with @userName.
+     * Create credential for the @Csp with @xpanseUser.
      *
      * @param csp        The cloud service provider.
-     * @param userName   The userName to create for.
+     * @param xpanseUser The user who provided the credential info.
      * @param credential The credential to create.
      * @return true of false.
      */
-    public boolean createCredential(Csp csp, String userName, CredentialDefinition credential) {
-        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, userName);
+    public boolean createCredential(Csp csp, String xpanseUser, CredentialDefinition credential) {
+        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         credentialCacheManager.putCache(cacheKey, credential);
         clearExpiredCache();
         return true;
@@ -262,7 +262,6 @@ public class CredentialCenter {
         CredentialDefinition credential = new CredentialDefinition(createCredential.getCsp(),
                 createCredential.getName(), createCredential.getDescription(),
                 createCredential.getType(), createCredential.getVariables());
-        credential.setUserName(createCredential.getUserName());
         if (Objects.isNull(createCredential.getTimeToLive())) {
             createCredential.setTimeToLive(DEFAULT_TIMEOUT_SECONDS);
         }

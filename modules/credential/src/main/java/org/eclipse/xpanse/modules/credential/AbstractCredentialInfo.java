@@ -29,13 +29,13 @@ public abstract class AbstractCredentialInfo {
     Csp csp;
 
     /**
-     * The userId of the credential.
+     * The user who create the credential.
      */
     @Getter
     @Setter
     @NotNull
-    @Schema(description = "The userId of the credential.", defaultValue = "default")
-    String userName = "default";
+    @Schema(description = "The user who create the credential.")
+    String xpanseUser;
 
     /**
      * The name of the credential, this field is provided by the plugins.

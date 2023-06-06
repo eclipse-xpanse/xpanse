@@ -449,7 +449,7 @@ public class CredentialApiUtil implements ApplicationRunner {
                         }
                         """,
                 csp, appVersion, serviceUrl, csp, type, csp, credentialDefinition.getName(),
-                credentialDefinition.getUserName(), csp, credentialDefinition.getDescription(),
+                credentialDefinition.getXpanseUser(), csp, credentialDefinition.getDescription(),
                 type, variablesExampleStr);
     }
 }
