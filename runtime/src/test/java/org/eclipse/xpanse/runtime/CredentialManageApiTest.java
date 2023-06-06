@@ -161,7 +161,7 @@ class CredentialManageApiTest {
         // Setup
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setName("name");
-        createCredential.setUserName("userName");
+        createCredential.setXpanseUser("userName");
         createCredential.setCsp(Csp.AWS);
         createCredential.setDescription("description");
         createCredential.setType(CredentialType.VARIABLES);
@@ -169,7 +169,7 @@ class CredentialManageApiTest {
         // Configure CredentialCenter.addCredential(...).
         final CreateCredential createCredential1 = new CreateCredential();
         createCredential1.setName("name");
-        createCredential1.setUserName("userName");
+        createCredential1.setXpanseUser("userName");
         createCredential1.setCsp(Csp.AWS);
         createCredential1.setDescription("description");
         createCredential1.setType(CredentialType.VARIABLES);
@@ -188,7 +188,7 @@ class CredentialManageApiTest {
         // Setup
         final CreateCredential updateCredential = new CreateCredential();
         updateCredential.setName("name");
-        updateCredential.setUserName("userName");
+        updateCredential.setXpanseUser("userName");
         updateCredential.setCsp(Csp.AWS);
         updateCredential.setDescription("description");
         updateCredential.setType(CredentialType.VARIABLES);
@@ -196,7 +196,7 @@ class CredentialManageApiTest {
         // Configure CredentialCenter.updateCredential(...).
         final CreateCredential updateCredential1 = new CreateCredential();
         updateCredential1.setName("name");
-        updateCredential1.setUserName("userName");
+        updateCredential1.setXpanseUser("userName");
         updateCredential1.setCsp(Csp.AWS);
         updateCredential1.setDescription("description");
         updateCredential1.setType(CredentialType.VARIABLES);
