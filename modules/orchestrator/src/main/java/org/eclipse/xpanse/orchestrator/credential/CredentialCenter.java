@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
@@ -21,8 +20,6 @@ import org.eclipse.xpanse.modules.credential.CredentialCacheManager;
 import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
@@ -41,7 +38,6 @@ public class CredentialCenter {
     private static Long lastedClearTime;
     private final OrchestratorService orchestratorService;
     private final CredentialCacheManager credentialCacheManager;
-    private final DeployServiceStorage deployServiceStorage;
     private final CredentialApiUtil credentialApiUtil;
 
     /**
@@ -51,11 +47,9 @@ public class CredentialCenter {
     public CredentialCenter(
             OrchestratorService orchestratorService,
             CredentialCacheManager credentialCacheManager,
-            DeployServiceStorage deployServiceStorage,
             CredentialApiUtil credentialApiUtil) {
         this.orchestratorService = orchestratorService;
         this.credentialCacheManager = credentialCacheManager;
-        this.deployServiceStorage = deployServiceStorage;
         this.credentialApiUtil = credentialApiUtil;
     }
 
@@ -68,17 +62,6 @@ public class CredentialCenter {
     public List<CredentialType> getAvailableCredentialTypesByCsp(Csp csp) {
         OrchestratorPlugin plugin = orchestratorService.getOrchestratorPlugin(csp);
         return plugin.getAvailableCredentialTypes();
-    }
-
-    /**
-     * List the available credential types by @id.
-     *
-     * @param id The UUID of the deployed service.
-     * @return Returns list of credential types.
-     */
-    public List<CredentialType> getAvailableCredentialTypesByServiceId(String id) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
-        return getAvailableCredentialTypesByCsp(deployServiceEntity.getCsp());
     }
 
     /**
@@ -100,19 +83,6 @@ public class CredentialCenter {
     }
 
     /**
-     * List the credential capabilities by the @id and @type.
-     *
-     * @param id   The UUID of the deployed service.
-     * @param type The type of credential.
-     * @return Returns list of credential capabilities.
-     */
-    public List<AbstractCredentialInfo> getCredentialCapabilitiesByServiceId(String id,
-                                                                             CredentialType type) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
-        return getCredentialCapabilitiesByCsp(deployServiceEntity.getCsp(), type);
-    }
-
-    /**
      * Get credential openApi Url.
      *
      * @param csp  The cloud service provider.
@@ -121,18 +91,6 @@ public class CredentialCenter {
      */
     public String getCredentialOpenApiUrl(Csp csp, CredentialType type) {
         return credentialApiUtil.getCredentialOpenApiUrl(csp, type);
-    }
-
-    /**
-     * Get credential openApi Url.
-     *
-     * @param id   The UUID of the deployed service.
-     * @param type The type of credential.
-     * @return Returns credential openApi Url.
-     */
-    public String getCredentialOpenApiUrlByServiceId(String id, CredentialType type) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
-        return credentialApiUtil.getCredentialOpenApiUrl(deployServiceEntity.getCsp(), type);
     }
 
     /**
@@ -159,21 +117,6 @@ public class CredentialCenter {
     }
 
     /**
-     * List credentials of the service.
-     *
-     * @param id   The id of deployed service.
-     * @param type The type of credential.
-     * @return Returns credential capabilities list of the service.
-     */
-    public List<CredentialDefinition> getCredentialDefinitionsByServiceId(String id,
-                                                                          CredentialType type) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
-        return getCredentialDefinitionsByCsp(deployServiceEntity.getCsp(),
-                deployServiceEntity.getUserName(), type);
-    }
-
-
-    /**
      * Add credential info for the csp.
      *
      * @param csp              The cloud service provider.
@@ -189,23 +132,6 @@ public class CredentialCenter {
     }
 
     /**
-     * Add credential info for the service.
-     *
-     * @param id               The UUID of the deployed service.
-     * @param createCredential The credential for the service.
-     * @return true of false.
-     */
-    public boolean addCredentialByServiceId(String id, CreateCredential createCredential) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
-        CredentialDefinition credential =
-                fillCredentialWithDbEntity(createCredential, deployServiceEntity);
-        checkInputCredentialIsValid(deployServiceEntity.getCsp(), createCredential);
-        return createCredential(credential.getCsp(), credential.getUserName(),
-                credential);
-    }
-
-
-    /**
      * Update credential info for the service.
      *
      * @param csp              The cloud service provider.
@@ -215,29 +141,9 @@ public class CredentialCenter {
     public boolean updateCredential(Csp csp, CreateCredential updateCredential) {
         updateCredential.setCsp(csp);
         CredentialDefinition credential = createCredentialDefinitionObject(updateCredential);
-        deleteCredentialByType(csp, credential.getUserName(),
-                credential.getType());
-        return createCredential(csp, credential.getUserName(),
-                credential);
+        deleteCredentialByType(csp, credential.getUserName(), credential.getType());
+        return createCredential(csp, credential.getUserName(), credential);
     }
-
-    /**
-     * Update credential info for the service.
-     *
-     * @param id               The UUID of the deployed service.
-     * @param updateCredential The credential for the service.
-     * @return true of false.
-     */
-    public boolean updateCredentialByServiceId(String id, CreateCredential updateCredential) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
-        CredentialDefinition credential =
-                fillCredentialWithDbEntity(updateCredential, deployServiceEntity);
-        deleteCredentialByType(credential.getCsp(), credential.getUserName(),
-                credential.getType());
-        return createCredential(credential.getCsp(), credential.getUserName(),
-                credential);
-    }
-
 
     /**
      * Delete credential for the @Csp with @userName.
@@ -250,23 +156,6 @@ public class CredentialCenter {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, userName);
         credentialCacheManager.removeAllTypeCaches(cacheKey);
         return true;
-    }
-
-    /**
-     * Delete credential info of the service.
-     *
-     * @param id   The UUID of the deployed service.
-     * @param type The type of credential.
-     * @return true of false.
-     */
-    public boolean deleteCredentialByServiceId(String id, CredentialType type) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntityById(id);
-        if (Objects.isNull(type)) {
-            return deleteCredential(deployServiceEntity.getCsp(),
-                    deployServiceEntity.getUserName());
-        }
-        return deleteCredentialByType(deployServiceEntity.getCsp(),
-                deployServiceEntity.getUserName(), type);
     }
 
     /**
@@ -367,13 +256,6 @@ public class CredentialCenter {
         return true;
     }
 
-    private CredentialDefinition fillCredentialWithDbEntity(CreateCredential createCredential,
-                                                            DeployServiceEntity deployService) {
-        createCredential.setCsp(deployService.getCsp());
-        createCredential.setUserName(deployService.getUserName());
-        return createCredentialDefinitionObject(createCredential);
-
-    }
 
     private CredentialDefinition createCredentialDefinitionObject(
             CreateCredential createCredential) {
@@ -389,14 +271,6 @@ public class CredentialCenter {
         return credential;
     }
 
-    private DeployServiceEntity getDeployServiceEntityById(String id) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(UUID.fromString(id));
-        if (Objects.isNull(deployServiceEntity)) {
-            throw new RuntimeException(String.format("Deployed service with id %s not found", id));
-        }
-        return deployServiceEntity;
-    }
 
     private void clearExpiredCache() {
         if (Objects.isNull(lastedClearTime)
