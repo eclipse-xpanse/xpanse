@@ -15,7 +15,7 @@ public class HuaweiCloudMonitorMetrics {
 
     public static final String MEM_UTILIZED = "mem_util";
 
-    public static final String CPU_USAGEIZED = "cpu_usage";
+    public static final String CPU_USAGE = "cpu_usage";
 
-    public static final String MEM_usedPercentIZED = "mem_usedPercent";
+    public static final String MEM_USED_IN_PERCENTAGE = "mem_usedPercent";
 }
