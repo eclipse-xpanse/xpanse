@@ -50,6 +50,8 @@
         <logback.version>1.3.5</logback.version>
         <checkstyle-maven-plugin.version>3.2.1</checkstyle-maven-plugin.version>
         <logbook.version>3.0.0-RC.2</logbook.version>
+        <wiremock.version>3.0.0-beta-8</wiremock.version>
+        <instancio.version>2.16.0</instancio.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/swaroopar/osc.git</connection>
