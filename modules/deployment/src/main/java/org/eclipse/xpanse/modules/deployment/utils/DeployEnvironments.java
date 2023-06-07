@@ -12,21 +12,20 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.resource.Flavor;
+import org.springframework.stereotype.Component;
 
 /**
  * Environment variables utils for deployment.
  */
+@Component
 public class DeployEnvironments {
-
-    private DeployEnvironments() {
-    }
 
     /**
      * Get environment variables for deployment.
      *
      * @param task the context of the task.
      */
-    public static Map<String, String> getEnv(DeployTask task) {
+    public Map<String, String> getEnv(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
         Map<String, String> request = task.getCreateRequest().getServiceRequestProperties();
         for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {
@@ -56,7 +55,7 @@ public class DeployEnvironments {
      *
      * @param task the DeployTask.
      */
-    public static Map<String, String> getFlavorVariables(DeployTask task) {
+    public Map<String, String> getFlavorVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
         for (Flavor flavor : task.getOcl().getFlavors()) {
             if (flavor.getName().equals(task.getCreateRequest().getFlavor())) {
@@ -75,7 +74,7 @@ public class DeployEnvironments {
      *
      * @param task the DeployTask.
      */
-    public static Map<String, String> getVariables(DeployTask task) {
+    public Map<String, String> getVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
         Map<String, String> request = task.getCreateRequest().getServiceRequestProperties();
         for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {

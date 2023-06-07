@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
+import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.enums.Category;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
@@ -85,7 +86,8 @@ class RegisterServiceImplTest {
 
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(ocl);
         when(mockStorage.getRegisterServiceById(uuid)).thenReturn(registerServiceEntity);
-        TerraformDeployment deployment = new TerraformDeployment("test", true, "DEBUG");
+        TerraformDeployment deployment =
+                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
         doReturn(deployment).when(mockOrchestratorService).getDeployment(any());
 
         RegisterServiceEntity registeredServiceEntityByUrl =
@@ -119,7 +121,8 @@ class RegisterServiceImplTest {
         registerServiceEntity.setOcl(oclRegister);
 
         when(mockStorage.getRegisterServiceById(uuid)).thenReturn(registerServiceEntity);
-        TerraformDeployment deployment = new TerraformDeployment("test", true, "DEBUG");
+        TerraformDeployment deployment =
+                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
         doReturn(deployment).when(mockOrchestratorService).getDeployment(any());
 
         RegisterServiceEntity updateRegisteredServiceEntity =
@@ -132,7 +135,8 @@ class RegisterServiceImplTest {
 
     @Test
     void testRegisterService() {
-        TerraformDeployment deployment = new TerraformDeployment("test", true, "DEBUG");
+        TerraformDeployment deployment =
+                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
         doReturn(deployment).when(mockOrchestratorService).getDeployment(any());
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerService(oclRegister);
@@ -143,7 +147,8 @@ class RegisterServiceImplTest {
     @Test
     void testRegisterServiceByUrl() throws Exception {
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(oclRegister);
-        TerraformDeployment deployment = new TerraformDeployment("test", true, "DEBUG");
+        TerraformDeployment deployment =
+                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
         doReturn(deployment).when(mockOrchestratorService).getDeployment(any());
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerServiceByUrl(oclLocation);

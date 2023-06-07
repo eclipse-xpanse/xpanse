@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import java.io.IOException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidationResult;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
@@ -19,7 +20,7 @@ public interface Deployment {
 
     DeployResult deploy(DeployTask task);
 
-    DeployResult destroy(DeployTask task, String tfState);
+    DeployResult destroy(DeployTask task, String tfState) throws IOException;
 
     DeployerKind getDeployerKind();
 

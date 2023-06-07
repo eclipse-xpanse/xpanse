@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
@@ -243,18 +244,23 @@ public class OrchestratorService {
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             DeployResult deployResult = deployment.destroy(deployTask,
                     deployServiceEntity.getPrivateProperties().get("stateFile"));
-            deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
-            deployServiceEntity.setProperties(deployResult.getProperties());
-            deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
-            List<DeployResource> resources = deployResult.getResources();
-            if (CollectionUtils.isEmpty(resources)) {
-                deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
+            if (deployResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
+                deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
+                deployServiceEntity.setProperties(deployResult.getProperties());
+                deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
+                List<DeployResource> resources = deployResult.getResources();
+                if (CollectionUtils.isEmpty(resources)) {
+                    deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
+                } else {
+                    deployServiceEntity.setDeployResourceList(
+                            getDeployResourceEntityList(resources, deployServiceEntity));
+                }
+                deployServiceStorage.storeAndFlush(deployServiceEntity);
             } else {
-                deployServiceEntity.setDeployResourceList(
-                        getDeployResourceEntityList(resources, deployServiceEntity));
+                deployServiceEntity.setServiceState(ServiceState.DESTROY_FAILED);
+                deployServiceStorage.storeAndFlush(deployServiceEntity);
             }
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());
             deployServiceEntity.setServiceState(ServiceState.DESTROY_FAILED);
