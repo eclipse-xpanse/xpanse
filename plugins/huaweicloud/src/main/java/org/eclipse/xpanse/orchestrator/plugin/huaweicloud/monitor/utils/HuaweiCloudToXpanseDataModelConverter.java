@@ -161,13 +161,10 @@ public class HuaweiCloudToXpanseDataModelConverter {
                             if (!CollectionUtils.isEmpty(batchMetricData.getDatapoints())) {
                                 List<DatapointForBatchMetric> datapointForBatchMetrics =
                                         batchMetricData.getDatapoints();
-                                datapointForBatchMetrics.sort(
-                                        Comparator.comparing(DatapointForBatchMetric::getTimestamp)
-                                                .reversed());
-                                MetricItem metricItem =
+                                List<MetricItem> metricItems =
                                         convertDatapointForBatchMetricToMetricItem(
                                                 datapointForBatchMetrics);
-                                metric.setMetrics(List.of(metricItem));
+                                metric.setMetrics(metricItems);
                             }
                             metrics.add(metric);
                         }
@@ -178,13 +175,17 @@ public class HuaweiCloudToXpanseDataModelConverter {
         return metrics;
     }
 
-    private MetricItem convertDatapointForBatchMetricToMetricItem(
+    private List<MetricItem> convertDatapointForBatchMetricToMetricItem(
             List<DatapointForBatchMetric> datapointForBatchMetrics) {
-        MetricItem metricItem = new MetricItem();
-        metricItem.setValue(datapointForBatchMetrics.get(0).getAverage());
-        metricItem.setType(MetricItemType.VALUE);
-        metricItem.setTimeStamp(datapointForBatchMetrics.get(0).getTimestamp());
-        return metricItem;
+        List<MetricItem> metricItems = new ArrayList<>();
+        for (DatapointForBatchMetric datapointForBatchMetric : datapointForBatchMetrics) {
+            MetricItem metricItem = new MetricItem();
+            metricItem.setValue(datapointForBatchMetric.getAverage());
+            metricItem.setType(MetricItemType.VALUE);
+            metricItem.setTimeStamp(datapointForBatchMetric.getTimestamp());
+            metricItems.add(metricItem);
+        }
+        return metricItems;
     }
 
     private void buildMetricsDimesion(ServiceMetricRequest serviceMetricRequest,

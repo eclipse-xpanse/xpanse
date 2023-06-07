@@ -203,16 +203,17 @@ public class HuaweiCloudMetricsService {
 
     private MetricInfoList getTargetMetricInfo(List<MetricInfoList> metrics,
                                                MonitorResourceType type) {
-        MetricInfoList defaultMetricInfo = new MetricInfoList();
         if (MonitorResourceType.CPU.equals(type)) {
             for (MetricInfoList metricInfoList : metrics) {
                 if (isAgentCpuMetrics(metricInfoList)) {
                     return metricInfoList;
                 }
             }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
             defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
             defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.CPU_UTILIZED);
             defaultMetricInfo.setUnit("%");
+            return defaultMetricInfo;
         }
         if (MonitorResourceType.MEM.equals(type)) {
             for (MetricInfoList metricInfoList : metrics) {
@@ -221,7 +222,7 @@ public class HuaweiCloudMetricsService {
                 }
             }
         }
-        return defaultMetricInfo;
+        return null;
     }
 
     private boolean isAgentCpuMetrics(MetricInfoList metricInfo) {
