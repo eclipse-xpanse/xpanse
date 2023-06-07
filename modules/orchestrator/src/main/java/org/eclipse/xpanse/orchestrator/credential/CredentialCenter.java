@@ -164,11 +164,10 @@ public class CredentialCenter {
      * @param csp        The cloud service provider.
      * @param xpanseUser The user who provided the credential info.
      */
-    public boolean deleteCredentialByType(Csp csp, String xpanseUser, CredentialType
+    public void deleteCredentialByType(Csp csp, String xpanseUser, CredentialType
             credentialType) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         credentialCacheManager.removeCacheByType(cacheKey, credentialType);
-        return false;
     }
 
     /**
@@ -294,20 +293,25 @@ public class CredentialCenter {
         for (AbstractCredentialInfo credentialAbility : credentialAbilities) {
             CredentialDefinition credentialDefinition = (CredentialDefinition) credentialAbility;
             List<CredentialVariable> variables = credentialDefinition.getVariables();
-            int credentialVariableSetValueCount = 0;
             for (CredentialVariable variable : variables) {
                 String envValue = System.getenv(variable.getName());
                 if (StringUtils.isNotBlank(envValue)) {
                     variable.setValue(envValue);
-                    credentialVariableSetValueCount++;
                 }
             }
             // Check if all variables have been successfully set.
-            if (credentialVariableSetValueCount == variables.size()) {
+            if (!isAnyMandatoryCredentialVariableMissing(credentialDefinition)) {
                 return credentialAbility;
             }
         }
         return null;
+    }
+
+    private boolean isAnyMandatoryCredentialVariableMissing(
+            CredentialDefinition credentialDefinition) {
+        return credentialDefinition.getVariables().stream()
+                .anyMatch(credentialVariable -> credentialVariable.isMandatory()
+                        && Objects.isNull(credentialVariable.getValue()));
     }
 
 }

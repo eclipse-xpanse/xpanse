@@ -72,7 +72,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                         "The Identity authentication URL."));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.TENANT,
-                        "The Name of the Tenant or Project to login with."));
+                        "The Name of the Tenant or Project to use."));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.USERNAME,
                         "The Username to login with."));
@@ -81,7 +81,22 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                         "The Password to login with."));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN,
-                        "The Password to login with."));
+                        "The domain of the openstack installation to be used."));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackEnvironmentConstants.PROXY_HOST,
+                        "Proxy host with protocol and without port through which to "
+                                + "reach the Openstack URL. E.g., http://example.com",
+                        false));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackEnvironmentConstants.PROXY_PORT,
+                        "Proxy port through which to reach the Openstack URL.",
+                        false));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackEnvironmentConstants.SERVICE_TENANT,
+                        "Tenant that must be used for accessing services data. "
+                                + "If not provided, the OS_TENANT_NAME will be used to access "
+                                + "services data.",
+                        false));
         CredentialDefinition httpAuth = new CredentialDefinition(
                 getCsp(), "Variables",
                 "Authenticate at the specified URL using an account and password.",

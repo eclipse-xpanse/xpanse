@@ -17,36 +17,50 @@ import lombok.Data;
 @Data
 public class CredentialVariable {
 
-    /**
-     * The name of the CredentialVariable.
-     */
     @NotNull
     @Schema(description = "The name of the CredentialVariable,"
             + "this field is provided by the the plugin of cloud service provider.")
     private final String name;
 
-    /**
-     * The description of the CredentialVariable.
-     */
     @NotNull
     @Schema(description = "The description of the CredentialVariable,"
             + "this field is provided by the plugin of cloud service provider.")
     private final String description;
 
-    /**
-     * The value of the CredentialVariable.
-     */
+    @Schema(description = "If the variable is mandatory. If is optional then the credential "
+            + "completeness check will ignore this variable. It is upto the plugin to decide what "
+            + "needs to be done if this optional credential variable is present.",
+            defaultValue = "true")
+    private final boolean isMandatory;
+
     @NotNull
     @NotBlank
     @Schema(description = "The value of the CredentialVariable, this field is filled by the user.")
     private String value;
 
     /**
-     * The constructor.
+     * Constructor for default mandatory variables.
+     *
+     * @param name name of the variable.
+     * @param description description of the variable.
      */
     public CredentialVariable(String name, String description) {
         this.name = name;
         this.description = description;
+        this.isMandatory = true;
+    }
+
+    /**
+     * Constructor to set mandatory flag explicitly for the variables.
+     *
+     * @param name name of the variable.
+     * @param description description of the variable.
+     * @param isMandatory if the credential variable is mandatory.
+     */
+    public CredentialVariable(String name, String description, boolean isMandatory) {
+        this.name = name;
+        this.description = description;
+        this.isMandatory = isMandatory;
     }
 
 }
