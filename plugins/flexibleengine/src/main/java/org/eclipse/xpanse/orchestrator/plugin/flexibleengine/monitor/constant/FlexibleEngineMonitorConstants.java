@@ -21,6 +21,7 @@ public class FlexibleEngineMonitorConstants {
     public static final String CES_API_VERSION = "V1.0";
     public static final String DIM0_PREFIX = "instance_id,";
     public static final String METRIC_PATH = "metric-data";
+    public static final String BATCH_METRIC_PATH = "batch-query-metric-data";
     public static final String PROJECTS_PATH = "projects";
     public static final String LIST_METRICS_PATH = "metrics";
 
@@ -33,6 +34,11 @@ public class FlexibleEngineMonitorConstants {
      * Aggregation method of indicator monitoring data: max.
      */
     public static final String FILTER_MAX = "max";
+
+    /**
+     * Dimension name for identifying the instance ID of an ECS.
+     */
+    public static final String VM_DIMENSION_NAME = "instance_id";
 
     /**
      * Aggregation time period of indicator monitoring data: real-time.

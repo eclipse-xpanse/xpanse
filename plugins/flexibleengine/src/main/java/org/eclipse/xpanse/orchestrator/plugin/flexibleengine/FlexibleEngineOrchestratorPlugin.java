@@ -85,7 +85,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
-        return null;
+        return metricsService.getMetricsForResource(resourceMetricRequest);
     }
 
     /**
@@ -96,6 +96,6 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
-        return null;
+        return metricsService.getMetricsForService(serviceMetricRequest);
     }
 }
