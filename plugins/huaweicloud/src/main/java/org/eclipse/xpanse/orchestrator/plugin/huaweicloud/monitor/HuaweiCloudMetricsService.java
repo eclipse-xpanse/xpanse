@@ -92,7 +92,6 @@ public class HuaweiCloudMetricsService {
             Metric metric =
                     huaweiCloudToXpanseDataModelConverter.convertShowMetricDataResponseToMetric(
                             deployResource, showMetricDataResponse, metricInfoList);
-            metrics.add(metric);
             cacheResourceMetricsData(metric, metrics, deployResource, metricInfoList);
         }
         return metrics;
@@ -222,6 +221,30 @@ public class HuaweiCloudMetricsService {
                 }
             }
         }
+        if (MonitorResourceType.VM_NETWORK_INCOMING.equals(type)) {
+            for (MetricInfoList metricInfoList : metrics) {
+                if (isAgentVmNetworkInMetrics(metricInfoList)) {
+                    return metricInfoList;
+                }
+            }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
+            defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
+            defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN);
+            defaultMetricInfo.setUnit("bit/s");
+            return defaultMetricInfo;
+        }
+        if (MonitorResourceType.VM_NETWORK_OUTGOING.equals(type)) {
+            for (MetricInfoList metricInfoList : metrics) {
+                if (isAgentVmNetworkOutMetrics(metricInfoList)) {
+                    return metricInfoList;
+                }
+            }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
+            defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
+            defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT);
+            defaultMetricInfo.setUnit("bit/s");
+            return defaultMetricInfo;
+        }
         return null;
     }
 
@@ -234,6 +257,16 @@ public class HuaweiCloudMetricsService {
         return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
                 && HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE.equals(
                 metricInfo.getMetricName());
+    }
+
+    private boolean isAgentVmNetworkInMetrics(MetricInfoList metricInfo) {
+        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT.equals(metricInfo.getMetricName());
+    }
+
+    private boolean isAgentVmNetworkOutMetrics(MetricInfoList metricInfo) {
+        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV.equals(metricInfo.getMetricName());
     }
 
     /**

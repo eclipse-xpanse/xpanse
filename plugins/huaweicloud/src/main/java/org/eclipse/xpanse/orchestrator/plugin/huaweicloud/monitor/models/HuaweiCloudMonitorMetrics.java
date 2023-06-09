@@ -18,4 +18,13 @@ public class HuaweiCloudMonitorMetrics {
     public static final String CPU_USAGE = "cpu_usage";
 
     public static final String MEM_USED_IN_PERCENTAGE = "mem_usedPercent";
+
+    public static final String VM_NETWORK_BANDWIDTH_IN = "network_vm_bandwidth_in";
+
+    public static final String VM_NETWORK_BANDWIDTH_OUT = "network_vm_bandwidth_out";
+
+    public static final String VM_NET_BIT_SENT = "net_bitSent";
+
+    public static final String VM_NET_BIT_RECV = "net_bitRecv";
+
 }

@@ -114,18 +114,21 @@ public class HuaweiCloudToXpanseDataModelConverter {
         }
         if (Objects.nonNull(response) && !CollectionUtils.isEmpty(response.getDatapoints())) {
             List<Datapoint> datapointList = response.getDatapoints();
-            datapointList.sort(Comparator.comparing(Datapoint::getTimestamp).reversed());
-            metric.setMetrics(List.of(convertDataPointToMetricItem(datapointList.get(0))));
+            metric.setMetrics(convertDataPointToMetricItem(datapointList));
         }
         return metric;
     }
 
-    private MetricItem convertDataPointToMetricItem(Datapoint datapoint) {
-        MetricItem metricItem = new MetricItem();
-        metricItem.setValue(datapoint.getAverage());
-        metricItem.setType(MetricItemType.VALUE);
-        metricItem.setTimeStamp(datapoint.getTimestamp());
-        return metricItem;
+    private List<MetricItem> convertDataPointToMetricItem(List<Datapoint> datapointList) {
+        List<MetricItem> metricItems = new ArrayList<>();
+        for (Datapoint datapoint : datapointList) {
+            MetricItem metricItem = new MetricItem();
+            metricItem.setValue(datapoint.getAverage());
+            metricItem.setType(MetricItemType.VALUE);
+            metricItem.setTimeStamp(datapoint.getTimestamp());
+            metricItems.add(metricItem);
+        }
+        return metricItems;
     }
 
 
