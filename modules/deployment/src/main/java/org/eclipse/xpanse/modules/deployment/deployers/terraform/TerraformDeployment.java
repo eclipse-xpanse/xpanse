@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -44,21 +45,25 @@ public class TerraformDeployment implements Deployment {
     private final String workspaceDirectory;
     private final String debugLogLevel;
     private final boolean isDebugEnabled;
+    private final DeployEnvironments deployEnvironments;
 
     /**
      * Initializes the Terraform deployer.
      *
      * @param workspaceDirectory workspace directory from where Terraform CLI is executed.
-     * @param isDebugEnabled Runs Terraform CLI with debug if enabled.
-     * @param debugLogLevel Level of debug level logs when debug is enabled.
+     * @param isDebugEnabled     Runs Terraform CLI with debug if enabled.
+     * @param debugLogLevel      Level of debug level logs when debug is enabled.
      */
+    @Autowired
     public TerraformDeployment(
             @Value("${terraform.workspace.directory:xpanse_deploy_ws}") String workspaceDirectory,
             @Value("${terraform.debug.enabled:false}") boolean isDebugEnabled,
-            @Value("${terraform.debug.level:DEBUG}") String debugLogLevel) {
+            @Value("${terraform.debug.level:DEBUG}") String debugLogLevel,
+            DeployEnvironments deployEnvironments) {
         this.workspaceDirectory = workspaceDirectory;
         this.isDebugEnabled = isDebugEnabled;
         this.debugLogLevel = debugLogLevel;
+        this.deployEnvironments = deployEnvironments;
     }
 
     /**
@@ -99,7 +104,7 @@ public class TerraformDeployment implements Deployment {
      * @param task the task for the deployment.
      */
     @Override
-    public DeployResult destroy(DeployTask task, String tfState) {
+    public DeployResult destroy(DeployTask task, String tfState) throws IOException {
         DeployResult result = new DeployResult();
         if (StringUtils.isBlank(tfState)) {
             log.error("Deployed service with tfState not found, id:{}", task.getId());
@@ -109,21 +114,14 @@ public class TerraformDeployment implements Deployment {
         }
         String taskId = task.getId().toString();
         String workspace = getWorkspacePath(taskId);
-        try {
-            createDestroyScriptFile(task.getCreateRequest().getCsp(),
-                    task.getCreateRequest().getRegion(), workspace, tfState);
-            TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
-            executor.destroy();
-            deleteWorkSpace(workspace);
-            result.setId(task.getId());
-            result.setState(TerraformExecState.DESTROY_SUCCESS);
-            return result;
-        } catch (Exception e) {
-            log.error("Destroy error, {}", e.getMessage());
-            result.setId(task.getId());
-            result.setState(TerraformExecState.DESTROY_FAILED);
-            return result;
-        }
+        createDestroyScriptFile(task.getCreateRequest().getCsp(),
+                task.getCreateRequest().getRegion(), workspace, tfState);
+        TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
+        executor.destroy();
+        deleteWorkSpace(workspace);
+        result.setId(task.getId());
+        result.setState(TerraformExecState.DESTROY_SUCCESS);
+        return result;
     }
 
     /**
@@ -146,10 +144,10 @@ public class TerraformDeployment implements Deployment {
      * @param workspace the workspace of the deployment.
      */
     private TerraformExecutor getExecutorForDeployTask(DeployTask task, String workspace) {
-        Map<String, String> envVariables = DeployEnvironments.getEnv(task);
-        Map<String, String> inputVariables = DeployEnvironments.getVariables(task);
+        Map<String, String> envVariables = this.deployEnvironments.getEnv(task);
+        Map<String, String> inputVariables = this.deployEnvironments.getVariables(task);
         // load flavor variables also as input variables for terraform executor.
-        inputVariables.putAll(DeployEnvironments.getFlavorVariables(task));
+        inputVariables.putAll(this.deployEnvironments.getFlavorVariables(task));
         return getExecutor(envVariables, inputVariables, workspace);
     }
 

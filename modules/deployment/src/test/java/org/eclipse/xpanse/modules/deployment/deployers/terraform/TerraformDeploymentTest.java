@@ -6,22 +6,44 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
+import static org.instancio.Select.field;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.eclipse.xpanse.modules.models.utils.OclLoader;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test for TerraformDeploy.
  */
+
+@ExtendWith({SpringExtension.class})
+@ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class})
 public class TerraformDeploymentTest {
+
+    @Autowired
+    TerraformDeployment terraformDeployment;
+
+    @MockBean
+    DeployEnvironments deployEnvironments;
 
     @Disabled
     @Test
@@ -46,11 +68,25 @@ public class TerraformDeploymentTest {
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setCreateRequest(deployRequest);
-        TerraformDeployment terraformDeployment = new TerraformDeployment("test", false, "DEBUG");
+        TerraformDeployment terraformDeployment =
+                new TerraformDeployment("test", false, "DEBUG", new DeployEnvironments());
 
         DeployResult deployResult = terraformDeployment.deploy(xpanseDeployTask);
 
         Assertions.assertNotNull(deployResult);
 
+    }
+
+    @Test
+    public void throwExceptionWhenDestroyFails() {
+        CreateRequest createRequest =
+                Instancio.of(CreateRequest.class).set(field(CreateRequest::getCsp),
+                        Csp.OPENSTACK).create();
+        DeployTask deployTask = Instancio.of(DeployTask.class)
+                .set(field(DeployTask::getCreateRequest), createRequest).create();
+        when(this.deployEnvironments.getFlavorVariables(any(DeployTask.class))).thenReturn(
+                new HashMap<>());
+        Assertions.assertThrows(TerraformExecutorException.class,
+                () -> this.terraformDeployment.destroy(deployTask, "test"));
     }
 }
