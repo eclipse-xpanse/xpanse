@@ -70,7 +70,7 @@ public class DeployResourceEntity extends CreateModifiedTime {
     /**
      * The properties of the deployed resource.
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "DEPLOY_RESOURCE_PROPERTY",
             joinColumns = @JoinColumn(name = "deployResource_id", nullable = false))
     @MapKeyColumn(name = "p_key")
