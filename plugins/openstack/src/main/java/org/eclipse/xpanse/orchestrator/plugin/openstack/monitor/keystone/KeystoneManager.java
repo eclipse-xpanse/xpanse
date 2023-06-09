@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.monitor.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.constants.OpenstackEnvironmentConstants;
 import org.openstack4j.core.transport.Config;
+import org.openstack4j.core.transport.ProxyHost;
 import org.openstack4j.model.common.Identifier;
 import org.openstack4j.openstack.OSFactory;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,9 @@ public class KeystoneManager {
         String tenant = null;
         String url = null;
         String domain = null;
+        String serviceTenant = null;
+        String proxyHost = null;
+        String proxyPort = null;
         if (CredentialType.VARIABLES.toValue().equals(credentialDefinition.getType().toValue())) {
             List<CredentialVariable> variables = credentialDefinition.getVariables();
             for (CredentialVariable credentialVariable : variables) {
@@ -62,6 +66,18 @@ public class KeystoneManager {
                         credentialVariable.getName())) {
                     domain = credentialVariable.getValue();
                 }
+                if (OpenstackEnvironmentConstants.PROXY_HOST.equals(
+                        credentialVariable.getName())) {
+                    proxyHost = credentialVariable.getValue();
+                }
+                if (OpenstackEnvironmentConstants.PROXY_PORT.equals(
+                        credentialVariable.getName())) {
+                    proxyPort = credentialVariable.getValue();
+                }
+                if (OpenstackEnvironmentConstants.SERVICE_TENANT.equals(
+                        credentialVariable.getName())) {
+                    serviceTenant = credentialVariable.getValue();
+                }
             }
         }
         if (Objects.isNull(userName) || Objects.isNull(password) || Objects.isNull(tenant)
@@ -75,8 +91,11 @@ public class KeystoneManager {
         // the authentication details in the thread context.
         OSFactory
                 .builderV3()
-                .withConfig(buildClientConfig(url))
-                .credentials(userName, password, Identifier.byName("default"))
+                .withConfig(buildClientConfig(url, proxyHost, proxyPort))
+                .credentials(userName, password, Identifier.byName(domain))
+                .scopeToProject(
+                        Identifier.byName(Objects.isNull(serviceTenant) ? tenant : serviceTenant),
+                        Identifier.byName(domain))
                 .endpoint(url)
                 .authenticate();
     }
@@ -89,9 +108,11 @@ public class KeystoneManager {
         }
     }
 
-    private Config buildClientConfig(String url) {
+    private Config buildClientConfig(String url, String proxyHost, String proxyPort) {
         return Config.newConfig()
                 .withEndpointNATResolution(getIpAddressFromUrl(url))
-                .withEndpointURLResolver(new CustomEndPointResolver());
+                .withEndpointURLResolver(new CustomEndPointResolver())
+                .withProxy(Objects.nonNull(proxyHost)
+                        ? ProxyHost.of(proxyHost, Integer.parseInt(proxyPort)) : null);
     }
 }
