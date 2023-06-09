@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
@@ -34,8 +35,6 @@ import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.CreateRequest;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 
 /**
@@ -103,13 +102,13 @@ public class DeployServiceEntity extends CreateModifiedTime {
 
     @OneToMany(mappedBy = "deployService", orphanRemoval = true)
     @Cascade({CascadeType.ALL})
-    @Fetch(FetchMode.SUBSELECT)
+    @ToString.Exclude
     private List<DeployResourceEntity> deployResourceList;
 
     /**
      * The properties of the deployed service.
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "DEPLOY_SERVICE_PROPERTY",
             joinColumns = @JoinColumn(name = "DEPLOY_SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
@@ -119,7 +118,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
     /**
      * The properties of the deployed service.
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "DEPLOY_RESULT_PROPERTY",
             joinColumns = @JoinColumn(name = "DEPLOY_SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
