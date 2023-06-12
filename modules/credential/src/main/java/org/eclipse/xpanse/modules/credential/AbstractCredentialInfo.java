@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 /**
  * The Abstract class which defines the credential basic information required by a cloud provider.
  */
+@Schema(allOf = {CredentialDefinition.class})
 public abstract class AbstractCredentialInfo {
 
     /**
