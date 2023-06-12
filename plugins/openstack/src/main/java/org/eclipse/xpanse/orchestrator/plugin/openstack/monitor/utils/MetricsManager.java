@@ -19,7 +19,8 @@ import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.Reso
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.aggregates.AggregationRequest;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.filter.MetricsFilter;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.metrics.CeilometerMetricType;
-import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.resources.Resource;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.resources.InstanceNetworkResource;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.resources.InstanceResource;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.keystone.KeystoneManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -71,11 +72,11 @@ public class MetricsManager {
 
         keystoneManager.authenticate(resourceMetricRequest.getCredential());
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
-        Resource resource =
+        InstanceResource instanceResource =
                 this.resourcesService.getInstanceResourceInfoById(
                         resourceMetricRequest.getDeployResource().getResourceId());
         List<Metric> metrics = new ArrayList<>();
-        for (Map.Entry<String, String> entry : resource.getMetrics().entrySet()) {
+        for (Map.Entry<String, String> entry : instanceResource.getMetrics().entrySet()) {
             if (monitorResourceType == MonitorResourceType.CPU
                     || Objects.isNull(monitorResourceType)) {
                 if (entry.getKey().equals(CeilometerMetricType.CPU.toValue())) {
@@ -89,8 +90,33 @@ public class MetricsManager {
                 }
             }
         }
+        if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
+                || monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
+                || Objects.isNull(monitorResourceType)) {
+            InstanceNetworkResource instanceNetworkResource =
+                    this.resourcesService.getInstanceNetworkResourceInfoByInstanceId(
+                            resourceMetricRequest.getDeployResource().getResourceId());
+            for (Map.Entry<String, String> entry : instanceNetworkResource.getMetrics()
+                    .entrySet()) {
+                if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
+                        || Objects.isNull(monitorResourceType)) {
+                    if (entry.getKey().equals(CeilometerMetricType.NETWORK_INCOMING.toValue())) {
+                        metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
+                                MonitorResourceType.VM_NETWORK_INCOMING));
+                    }
+                }
+                if (monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
+                        || Objects.isNull(monitorResourceType)) {
+                    if (entry.getKey().equals(CeilometerMetricType.NETWORK_OUTGOING.toValue())) {
+                        metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
+                                MonitorResourceType.VM_NETWORK_OUTGOING));
+                    }
+                }
+            }
+        }
         return metrics;
     }
+
 
     private Metric getCpuUsage(ResourceMetricRequest resourceMetricRequest, String metricId) {
         AggregationRequest aggregationRequest = this.gnocchiToXpanseModelConverter
@@ -114,6 +140,26 @@ public class MetricsManager {
                 MonitorResourceType.MEM,
                 this.measuresService.getMeasurementsForResourceByMetricId(metricId, metricsFilter),
                 MetricUnit.MB);
+    }
+
+    private Metric getNetworkUsage(ResourceMetricRequest resourceMetricRequest, String metricId,
+                                   MonitorResourceType monitorResourceType) {
+        if (monitorResourceType != MonitorResourceType.VM_NETWORK_INCOMING
+                && monitorResourceType != MonitorResourceType.VM_NETWORK_OUTGOING) {
+            throw new IllegalArgumentException(MonitorResourceType.CPU.toValue()
+                    + "is not a valid resource type for this method");
+        }
+        AggregationRequest aggregationRequest = this.gnocchiToXpanseModelConverter
+                .buildAggregationRequestToGetNetworkRate(
+                        metricId);
+        MetricsFilter metricsFilter =
+                this.gnocchiToXpanseModelConverter.buildMetricsFilter(resourceMetricRequest);
+        return this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
+                resourceMetricRequest.getDeployResource(),
+                monitorResourceType,
+                this.aggregationService.getAggregatedMeasuresByOperation(
+                        aggregationRequest, metricsFilter).getMeasures().getAggregated(),
+                MetricUnit.BYTES_PER_SECOND);
     }
 
 }

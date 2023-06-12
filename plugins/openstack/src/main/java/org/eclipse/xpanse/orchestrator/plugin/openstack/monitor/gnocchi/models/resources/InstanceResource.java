@@ -39,7 +39,7 @@ import java.util.Map;
         "created_by_user_id",
         "created_by_project_id"
 })
-public class Resource {
+public class InstanceResource {
 
     @JsonProperty("creator")
     private String creator;

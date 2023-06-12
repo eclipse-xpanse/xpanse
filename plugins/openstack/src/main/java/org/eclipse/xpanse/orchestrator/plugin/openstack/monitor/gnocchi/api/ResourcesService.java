@@ -5,7 +5,10 @@
 
 package org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api;
 
-import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.resources.Resource;
+import java.util.Arrays;
+import java.util.List;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.resources.InstanceNetworkResource;
+import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.resources.InstanceResource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,7 +17,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResourcesService extends BaseGnocchiServices {
 
-    public Resource getInstanceResourceInfoById(String resourceId) {
-        return get(Resource.class, uri("/v1/resource/instance/%s", resourceId)).execute();
+    public InstanceResource getInstanceResourceInfoById(String resourceId) {
+        return get(InstanceResource.class, uri("/v1/resource/instance/%s", resourceId)).execute();
+    }
+
+    /**
+     * Gets the Network Resource information for Openstack instances.
+     *
+     * @param instanceId ID of an Openstack instance.
+     * @return InstanceNetworkResource
+     */
+    public InstanceNetworkResource getInstanceNetworkResourceInfoByInstanceId(String instanceId) {
+        List<InstanceNetworkResource> instanceNetworkResources = Arrays.stream(get(
+                InstanceNetworkResource[].class,
+                uri("/v1/resource/instance_network_interface")).execute()).toList();
+        return instanceNetworkResources.stream()
+                .filter(instanceNetworkResource ->
+                        instanceNetworkResource.getInstanceId().equals(instanceId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("No network resource for instance id %s  found",
+                                instanceId)));
+
     }
 }

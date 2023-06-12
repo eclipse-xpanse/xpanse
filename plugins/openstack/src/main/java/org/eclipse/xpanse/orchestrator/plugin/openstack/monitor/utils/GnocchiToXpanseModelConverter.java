@@ -88,5 +88,20 @@ public class GnocchiToXpanseModelConverter {
                 .granularity(resourceMetricRequest.getGranularity())
                 .build();
     }
+
+    /**
+     * Build AggregationRequest. From the Stein release, Ceilometer has stopped generating rate
+     * metrics for network. Hence, it is necessary to convert the cumulative network metrics to
+     * "rate of change" value.
+     *
+     * @param metricId ID of the metric.
+     * @return AggregationRequest object.
+     */
+    public AggregationRequest buildAggregationRequestToGetNetworkRate(String metricId) {
+        String operationString = String.format("(aggregate rate:mean (metric %s mean))", metricId);
+        AggregationRequest aggregationRequest = new AggregationRequest();
+        aggregationRequest.setOperations(operationString);
+        return aggregationRequest;
+    }
 }
 

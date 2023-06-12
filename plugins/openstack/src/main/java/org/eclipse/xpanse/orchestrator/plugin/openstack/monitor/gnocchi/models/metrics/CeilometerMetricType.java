@@ -11,7 +11,9 @@ package org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.models.
 public enum CeilometerMetricType {
 
     CPU("cpu"),
-    MEMORY_USAGE("memory.usage");
+    MEMORY_USAGE("memory.usage"),
+    NETWORK_INCOMING("network.incoming.bytes"),
+    NETWORK_OUTGOING("network.outgoing.bytes");
 
     private final String metricType;
 
