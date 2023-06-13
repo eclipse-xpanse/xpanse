@@ -20,7 +20,6 @@ import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest.FilterEnum;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +81,7 @@ public class HuaweiCloudToXpanseDataModelConverter {
             Map<String, List<MetricInfoList>> map) {
         checkNullParamAndFillValue(serviceMetricRequest);
         List<MetricInfo> metricInfos = new ArrayList<>();
-        buildMetricsDimesion(serviceMetricRequest, map, metricInfos);
+        buildMetricsDimension(serviceMetricRequest, map, metricInfos);
         BatchListMetricDataRequestBody body = new BatchListMetricDataRequestBody();
         body.withTo(serviceMetricRequest.getTo());
         body.withFrom(serviceMetricRequest.getFrom());
@@ -99,7 +98,8 @@ public class HuaweiCloudToXpanseDataModelConverter {
      */
     public Metric convertShowMetricDataResponseToMetric(DeployResource deployResource,
                                                         ShowMetricDataResponse response,
-                                                        MetricInfoList metricInfoList) {
+                                                        MetricInfoList metricInfoList,
+                                                        boolean onlyLastKnownMetric) {
         Metric metric = new Metric();
         metric.setName(metricInfoList.getMetricName());
         Map<String, String> labels = new HashMap<>();
@@ -114,19 +114,28 @@ public class HuaweiCloudToXpanseDataModelConverter {
         }
         if (Objects.nonNull(response) && !CollectionUtils.isEmpty(response.getDatapoints())) {
             List<Datapoint> datapointList = response.getDatapoints();
-            metric.setMetrics(convertDataPointToMetricItem(datapointList));
+            metric.setMetrics(convertDataPointToMetricItem(datapointList, onlyLastKnownMetric));
         }
         return metric;
     }
 
-    private List<MetricItem> convertDataPointToMetricItem(List<Datapoint> datapointList) {
+    private List<MetricItem> convertDataPointToMetricItem(List<Datapoint> datapointList,
+                                                          boolean onlyLastKnownMetric) {
         List<MetricItem> metricItems = new ArrayList<>();
-        for (Datapoint datapoint : datapointList) {
+        if (onlyLastKnownMetric) {
             MetricItem metricItem = new MetricItem();
-            metricItem.setValue(datapoint.getAverage());
+            metricItem.setValue(datapointList.get(0).getAverage());
             metricItem.setType(MetricItemType.VALUE);
-            metricItem.setTimeStamp(datapoint.getTimestamp());
+            metricItem.setTimeStamp(datapointList.get(datapointList.size() - 1).getTimestamp());
             metricItems.add(metricItem);
+        } else {
+            for (Datapoint datapoint : datapointList) {
+                MetricItem metricItem = new MetricItem();
+                metricItem.setValue(datapoint.getAverage());
+                metricItem.setType(MetricItemType.VALUE);
+                metricItem.setTimeStamp(datapoint.getTimestamp());
+                metricItems.add(metricItem);
+            }
         }
         return metricItems;
     }
@@ -138,7 +147,8 @@ public class HuaweiCloudToXpanseDataModelConverter {
     public List<Metric> convertBatchListMetricDataResponseToMetric(
             BatchListMetricDataResponse batchListMetricDataResponse,
             Map<String, List<MetricInfoList>> deployResourceMetricInfoMap,
-            List<DeployResource> deployResources) {
+            List<DeployResource> deployResources,
+            boolean onlyLastKnownMetric) {
         List<Metric> metrics = new ArrayList<>();
         for (DeployResource deployResource : deployResources) {
             for (BatchMetricData batchMetricData : batchListMetricDataResponse.getMetrics()) {
@@ -166,7 +176,7 @@ public class HuaweiCloudToXpanseDataModelConverter {
                                         batchMetricData.getDatapoints();
                                 List<MetricItem> metricItems =
                                         convertDatapointForBatchMetricToMetricItem(
-                                                datapointForBatchMetrics);
+                                                datapointForBatchMetrics, onlyLastKnownMetric);
                                 metric.setMetrics(metricItems);
                             }
                             metrics.add(metric);
@@ -179,21 +189,32 @@ public class HuaweiCloudToXpanseDataModelConverter {
     }
 
     private List<MetricItem> convertDatapointForBatchMetricToMetricItem(
-            List<DatapointForBatchMetric> datapointForBatchMetrics) {
+            List<DatapointForBatchMetric> datapointForBatchMetrics, boolean onlyLastKnownMetric) {
         List<MetricItem> metricItems = new ArrayList<>();
-        for (DatapointForBatchMetric datapointForBatchMetric : datapointForBatchMetrics) {
+        if (onlyLastKnownMetric) {
             MetricItem metricItem = new MetricItem();
-            metricItem.setValue(datapointForBatchMetric.getAverage());
+            metricItem.setValue(
+                    datapointForBatchMetrics.get(datapointForBatchMetrics.size() - 1).getAverage());
             metricItem.setType(MetricItemType.VALUE);
-            metricItem.setTimeStamp(datapointForBatchMetric.getTimestamp());
+            metricItem.setTimeStamp(
+                    datapointForBatchMetrics.get(datapointForBatchMetrics.size() - 1)
+                            .getTimestamp());
             metricItems.add(metricItem);
+        } else {
+            for (DatapointForBatchMetric datapointForBatchMetric : datapointForBatchMetrics) {
+                MetricItem metricItem = new MetricItem();
+                metricItem.setValue(datapointForBatchMetric.getAverage());
+                metricItem.setType(MetricItemType.VALUE);
+                metricItem.setTimeStamp(datapointForBatchMetric.getTimestamp());
+                metricItems.add(metricItem);
+            }
         }
         return metricItems;
     }
 
-    private void buildMetricsDimesion(ServiceMetricRequest serviceMetricRequest,
-                                      Map<String, List<MetricInfoList>> map,
-                                      List<MetricInfo> metricInfos) {
+    private void buildMetricsDimension(ServiceMetricRequest serviceMetricRequest,
+                                       Map<String, List<MetricInfoList>> map,
+                                       List<MetricInfo> metricInfos) {
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
             List<MetricsDimension> metricsDimensions = new ArrayList<>();
             metricsDimensions.add(

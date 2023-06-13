@@ -138,7 +138,8 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                     serviceMetricRequest.getMonitorResourceType(),
                     serviceMetricRequest.getFrom(),
                     serviceMetricRequest.getTo(),
-                    serviceMetricRequest.getGranularity()
+                    serviceMetricRequest.getGranularity(),
+                    serviceMetricRequest.isOnlyLastKnownMetric()
             );
             metrics.addAll(this.metricsManager.getMetrics(resourceMetricRequest));
         }

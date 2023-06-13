@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
  */
 @Data
 @AllArgsConstructor
+@SuppressWarnings("UnnecessarilyFullyQualified")
 public class MetricRequest {
 
     @NotNull
@@ -29,4 +30,6 @@ public class MetricRequest {
     private Long to;
 
     private Integer granularity;
+
+    private boolean onlyLastKnownMetric;
 }

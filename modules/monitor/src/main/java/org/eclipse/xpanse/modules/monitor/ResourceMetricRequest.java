@@ -27,8 +27,11 @@ public class ResourceMetricRequest extends MetricRequest {
             DeployResource deployResource,
             @NotNull CredentialDefinition credential,
             MonitorResourceType monitorResourceType,
-            Long from, Long to, Integer period) {
-        super(credential, monitorResourceType, from, to, period);
+            Long from,
+            Long to,
+            Integer period,
+            boolean onlyLastKnownMetric) {
+        super(credential, monitorResourceType, from, to, period, onlyLastKnownMetric);
         this.deployResource = deployResource;
     }
 }

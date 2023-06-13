@@ -17,7 +17,6 @@ import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.MetricsDimension;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +133,8 @@ public class FlexibleEngineMonitorConverter {
      */
     public Metric convertResponseToMetric(DeployResource deployResource,
                                           ShowMetricDataResponse response,
-                                          MetricInfoList metricInfo) {
+                                          MetricInfoList metricInfo,
+                                          boolean onlyLastKnownMetric) {
         Metric metric = new Metric();
         metric.setName(metricInfo.getMetricName());
         Map<String, String> labels = new HashMap<>();
@@ -149,7 +149,7 @@ public class FlexibleEngineMonitorConverter {
         }
         if (Objects.nonNull(response) && !CollectionUtils.isEmpty(response.getDatapoints())) {
             List<Datapoint> datapointList = response.getDatapoints();
-            metric.setMetrics(convertDataPointToMetricItem(datapointList));
+            metric.setMetrics(convertDataPointToMetricItems(datapointList, onlyLastKnownMetric));
         }
         return metric;
     }
@@ -157,10 +157,11 @@ public class FlexibleEngineMonitorConverter {
     /**
      * BatchListMetricDataResponse conversion to Metrics.
      */
-    public static List<Metric> convertBatchListMetricDataResponseToMetric(
+    public List<Metric> convertBatchListMetricDataResponseToMetric(
             BatchListMetricDataResponse batchListMetricDataResponse,
             Map<String, List<MetricInfoList>> map,
-            List<DeployResource> deployResources) {
+            List<DeployResource> deployResources,
+            boolean onlyLastKnownMetric) {
         List<Metric> metricList = new ArrayList<>();
         if (Objects.isNull(batchListMetricDataResponse) || CollectionUtils.isEmpty(
                 batchListMetricDataResponse.getMetrics())) {
@@ -187,17 +188,8 @@ public class FlexibleEngineMonitorConverter {
                                 metric.setUnit(MetricUnit.getByValue(metricInfoList.getUnit()));
                             }
                             if (!CollectionUtils.isEmpty(batchMetricData.getDatapoints())) {
-                                List<DatapointForBatchMetric> datapointForBatchMetrics =
-                                        batchMetricData.getDatapoints();
-                                List<MetricItem> metricItems = new ArrayList<>();
-                                for (DatapointForBatchMetric datapointForBatchMetric :
-                                        datapointForBatchMetrics) {
-                                    MetricItem metricItem =
-                                            convertDatapointForBatchMetricToMetricItem(
-                                                    datapointForBatchMetric);
-                                    metricItems.add(metricItem);
-                                }
-                                metric.setMetrics(metricItems);
+                                metric.setMetrics(convertBatchDataPointToMetricItems(
+                                        batchMetricData.getDatapoints(), onlyLastKnownMetric));
                             }
                             metricList.add(metric);
                         }
@@ -217,14 +209,42 @@ public class FlexibleEngineMonitorConverter {
         return metricItem;
     }
 
-    private List<MetricItem> convertDataPointToMetricItem(List<Datapoint> datapointList) {
+    private List<MetricItem> convertDataPointToMetricItems(List<Datapoint> datapointList,
+                                                           boolean onlyLastKnownMetric) {
         List<MetricItem> metricItems = new ArrayList<>();
-        for (Datapoint datapoint : datapointList) {
+        if (onlyLastKnownMetric) {
             MetricItem metricItem = new MetricItem();
-            metricItem.setValue(datapoint.getAverage());
+            metricItem.setValue(datapointList.get(datapointList.size() - 1).getAverage());
             metricItem.setType(MetricItemType.VALUE);
-            metricItem.setTimeStamp(datapoint.getTimestamp());
+            metricItem.setTimeStamp(datapointList.get(datapointList.size() - 1).getTimestamp());
             metricItems.add(metricItem);
+        } else {
+            for (Datapoint datapoint : datapointList) {
+                MetricItem metricItem = new MetricItem();
+                metricItem.setValue(datapoint.getAverage());
+                metricItem.setType(MetricItemType.VALUE);
+                metricItem.setTimeStamp(datapoint.getTimestamp());
+                metricItems.add(metricItem);
+            }
+        }
+        return metricItems;
+    }
+
+    private List<MetricItem> convertBatchDataPointToMetricItems(
+            List<DatapointForBatchMetric> datapointForBatchMetrics, boolean onlyLastKnownMetric) {
+        List<MetricItem> metricItems = new ArrayList<>();
+        if (onlyLastKnownMetric) {
+            MetricItem metricItem =
+                    convertDatapointForBatchMetricToMetricItem(
+                            datapointForBatchMetrics.get(datapointForBatchMetrics.size() - 1));
+            metricItems.add(metricItem);
+        } else {
+            for (DatapointForBatchMetric datapointForBatchMetric : datapointForBatchMetrics) {
+                MetricItem metricItem =
+                        convertDatapointForBatchMetricToMetricItem(
+                                datapointForBatchMetric);
+                metricItems.add(metricItem);
+            }
         }
         return metricItems;
     }
@@ -315,8 +335,8 @@ public class FlexibleEngineMonitorConverter {
     }
 
     private static void buildMetricsDimesion(ServiceMetricRequest serviceMetricRequest,
-            Map<String, List<MetricInfoList>> map,
-            List<MetricInfo> metricInfos) {
+                                             Map<String, List<MetricInfoList>> map,
+                                             List<MetricInfo> metricInfos) {
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
             List<MetricsDimension> metricsDimensions = new ArrayList<>();
             metricsDimensions.add(
