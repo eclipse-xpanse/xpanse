@@ -118,7 +118,7 @@ public class OpenstackMonitoringIntegrationTest {
         List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(
                 wireMockExtension.getRuntimeInfo(), null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());
-        Assertions.assertEquals(2, metrics.size());
+        Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(1).getType());
         Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.get(0).getName());
