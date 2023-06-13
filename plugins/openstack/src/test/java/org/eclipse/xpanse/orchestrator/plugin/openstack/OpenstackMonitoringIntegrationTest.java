@@ -13,12 +13,9 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemp
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
-import org.eclipse.xpanse.modules.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
@@ -112,34 +109,27 @@ public class OpenstackMonitoringIntegrationTest {
     }
 
     private CredentialDefinition getCredentialDefinition(WireMockRuntimeInfo wmRuntimeInfo) {
-        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        CredentialDefinition credentialDefinition =
+                (CredentialDefinition) this.plugin.getCredentialDefinitions().get(0);
+        for (CredentialVariable credentialVariable : credentialDefinition.getVariables()) {
+            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.AUTH_URL)) {
+                credentialVariable.setValue(wmRuntimeInfo.getHttpBaseUrl() + "/identity/v3");
+            }
+            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.USERNAME)) {
+                credentialVariable.setValue("admin");
+            }
+            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.PASSWORD)) {
+                credentialVariable.setValue("test");
+            }
+            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.DOMAIN)) {
+                credentialVariable.setValue("default");
+            }
+            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.TENANT)) {
+                credentialVariable.setValue("service");
+            }
+        }
 
-        CredentialVariable url = new CredentialVariable(OpenstackEnvironmentConstants.AUTH_URL, "");
-        url.setValue(wmRuntimeInfo.getHttpBaseUrl() + "/identity/v3");
-        credentialVariables.add(url);
-
-        CredentialVariable username =
-                new CredentialVariable(OpenstackEnvironmentConstants.USERNAME, "");
-        username.setValue("admin");
-        credentialVariables.add(username);
-
-        CredentialVariable password =
-                new CredentialVariable(OpenstackEnvironmentConstants.PASSWORD, "");
-        password.setValue("StrongAdminSecret");
-        credentialVariables.add(password);
-
-        CredentialVariable domain =
-                new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN, "");
-        domain.setValue("default");
-        credentialVariables.add(domain);
-
-        CredentialVariable tenant =
-                new CredentialVariable(OpenstackEnvironmentConstants.TENANT, "");
-        tenant.setValue("service");
-        credentialVariables.add(tenant);
-
-        return new CredentialDefinition(Csp.OPENSTACK, "", "", CredentialType.VARIABLES,
-                credentialVariables);
+        return credentialDefinition;
     }
 
 }
