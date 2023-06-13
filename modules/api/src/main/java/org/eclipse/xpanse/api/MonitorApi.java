@@ -46,18 +46,6 @@ public class MonitorApi {
 
     /**
      * Get Monitor Metric.
-     */
-    @Tag(name = "Monitor",
-            description = "APIs to get metrics of deployed services.")
-    @Operation(description = "Get metric types.")
-    @GetMapping(value = "/monitor/metric/types", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public List<MonitorResourceType> getMetricTypes() {
-        return Arrays.asList(MonitorResourceType.values());
-    }
-
-    /**
-     * Get Monitor Metric.
      *
      * @param id Service ID.
      */
