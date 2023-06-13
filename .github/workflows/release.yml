@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - name: Set Up JDK 17
         uses: actions/setup-java@v3
@@ -112,6 +113,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - name: Update next development version in POMs
         run: mvn versions:set -DnewVersion=${{ needs.release.outputs.next-version }}-SNAPSHOT -DgenerateBackupPoms=false
