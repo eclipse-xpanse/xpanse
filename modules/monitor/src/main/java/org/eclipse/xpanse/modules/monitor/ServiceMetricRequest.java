@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 
@@ -26,7 +26,7 @@ public class ServiceMetricRequest extends MetricRequest {
 
     public ServiceMetricRequest(
             List<DeployResource> deployResources,
-            @NotNull CredentialDefinition credential,
+            @NotNull CredentialVariables credential,
             MonitorResourceType monitorResourceType,
             Long from,
             Long to,

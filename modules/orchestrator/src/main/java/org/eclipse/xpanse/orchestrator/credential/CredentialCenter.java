@@ -17,8 +17,8 @@ import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CreateCredential;
 import org.eclipse.xpanse.modules.credential.CredentialCacheKey;
 import org.eclipse.xpanse.modules.credential.CredentialCacheManager;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
@@ -101,17 +101,17 @@ public class CredentialCenter {
      * @param type       The type of the credential.
      * @return the credentials.
      */
-    public List<CredentialDefinition> getCredentialDefinitionsByCsp(Csp csp, String xpanseUser,
-                                                                    CredentialType type) {
+    public List<CredentialVariables> getCredentialDefinitionsByCsp(Csp csp, String xpanseUser,
+                                                                   CredentialType type) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         if (Objects.isNull(type)) {
             return credentialCacheManager.getAllTypeCaches(cacheKey);
         }
-        CredentialDefinition credentialDefinition =
+        CredentialVariables credentialVariables =
                 credentialCacheManager.getCachesByType(cacheKey, type);
-        List<CredentialDefinition> result = new ArrayList<>();
-        if (Objects.nonNull(credentialDefinition)) {
-            result.add(credentialDefinition);
+        List<CredentialVariables> result = new ArrayList<>();
+        if (Objects.nonNull(credentialVariables)) {
+            result.add(credentialVariables);
         }
         return result;
     }
@@ -126,7 +126,7 @@ public class CredentialCenter {
     public boolean addCredential(Csp csp, CreateCredential createCredential) {
         checkInputCredentialIsValid(csp, createCredential);
         createCredential.setCsp(csp);
-        CredentialDefinition credential = createCredentialDefinitionObject(createCredential);
+        CredentialVariables credential = createCredentialDefinitionObject(createCredential);
         return createCredential(credential.getCsp(), credential.getXpanseUser(),
                 credential);
     }
@@ -140,7 +140,7 @@ public class CredentialCenter {
      */
     public boolean updateCredential(Csp csp, CreateCredential updateCredential) {
         updateCredential.setCsp(csp);
-        CredentialDefinition credential = createCredentialDefinitionObject(updateCredential);
+        CredentialVariables credential = createCredentialDefinitionObject(updateCredential);
         deleteCredentialByType(csp, credential.getXpanseUser(), credential.getType());
         return createCredential(csp, credential.getXpanseUser(), credential);
     }
@@ -176,19 +176,19 @@ public class CredentialCenter {
      * @param csp        The cloud service provider.
      * @param xpanseUser The user who provided the credential info.
      */
-    public CredentialDefinition getCredential(Csp csp, String xpanseUser) {
+    public CredentialVariables getCredential(Csp csp, String xpanseUser) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
-        List<CredentialDefinition> credentialDefinitionList =
+        List<CredentialVariables> credentialVariablesList =
                 credentialCacheManager.getAllTypeCaches(cacheKey);
-        if (!CollectionUtils.isEmpty(credentialDefinitionList)) {
-            return credentialDefinitionList.get(0);
+        if (!CollectionUtils.isEmpty(credentialVariablesList)) {
+            return credentialVariablesList.get(0);
         }
         AbstractCredentialInfo credentialInfo = findCredentialInfoFromEnv(csp);
         if (Objects.isNull(credentialInfo)) {
             throw new IllegalStateException(
                     String.format("No credential information found for the given Csp:%s.", csp));
         }
-        return (CredentialDefinition) credentialInfo;
+        return (CredentialVariables) credentialInfo;
     }
 
     /**
@@ -212,7 +212,7 @@ public class CredentialCenter {
                         .collect(Collectors.toSet());
         // check all fields in the input credential are valid based on the defined credentials.
         for (AbstractCredentialInfo credentialDefinition : credentialDefinitions) {
-            CredentialDefinition credential = (CredentialDefinition) credentialDefinition;
+            CredentialVariables credential = (CredentialVariables) credentialDefinition;
             Set<String> needVariableNameSet =
                     credential.getVariables().stream().map(CredentialVariable::getName)
                             .collect(Collectors.toSet());
@@ -248,7 +248,7 @@ public class CredentialCenter {
      * @param credential The credential to create.
      * @return true of false.
      */
-    public boolean createCredential(Csp csp, String xpanseUser, CredentialDefinition credential) {
+    public boolean createCredential(Csp csp, String xpanseUser, CredentialVariables credential) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         credentialCacheManager.putCache(cacheKey, credential);
         clearExpiredCache();
@@ -256,9 +256,9 @@ public class CredentialCenter {
     }
 
 
-    private CredentialDefinition createCredentialDefinitionObject(
+    private CredentialVariables createCredentialDefinitionObject(
             CreateCredential createCredential) {
-        CredentialDefinition credential = new CredentialDefinition(createCredential.getCsp(),
+        CredentialVariables credential = new CredentialVariables(createCredential.getCsp(),
                 createCredential.getName(), createCredential.getDescription(),
                 createCredential.getType(), createCredential.getVariables());
         if (Objects.isNull(createCredential.getTimeToLive())) {
@@ -291,8 +291,8 @@ public class CredentialCenter {
             return null;
         }
         for (AbstractCredentialInfo credentialAbility : credentialAbilities) {
-            CredentialDefinition credentialDefinition = (CredentialDefinition) credentialAbility;
-            List<CredentialVariable> variables = credentialDefinition.getVariables();
+            CredentialVariables credentialVariables = (CredentialVariables) credentialAbility;
+            List<CredentialVariable> variables = credentialVariables.getVariables();
             for (CredentialVariable variable : variables) {
                 String envValue = System.getenv(variable.getName());
                 if (StringUtils.isNotBlank(envValue)) {
@@ -300,7 +300,7 @@ public class CredentialCenter {
                 }
             }
             // Check if all variables have been successfully set.
-            if (!isAnyMandatoryCredentialVariableMissing(credentialDefinition)) {
+            if (!isAnyMandatoryCredentialVariableMissing(credentialVariables)) {
                 return credentialAbility;
             }
         }
@@ -308,8 +308,8 @@ public class CredentialCenter {
     }
 
     private boolean isAnyMandatoryCredentialVariableMissing(
-            CredentialDefinition credentialDefinition) {
-        return credentialDefinition.getVariables().stream()
+            CredentialVariables credentialVariables) {
+        return credentialVariables.getVariables().stream()
                 .anyMatch(credentialVariable -> credentialVariable.isMandatory()
                         && Objects.isNull(credentialVariable.getValue()));
     }

@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
@@ -97,7 +97,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                                 + "If not provided, the OS_TENANT_NAME will be used to access "
                                 + "services data.",
                         false));
-        CredentialDefinition httpAuth = new CredentialDefinition(
+        CredentialVariables httpAuth = new CredentialVariables(
                 getCsp(), "Variables",
                 "Authenticate at the specified URL using an account and password.",
                 CredentialType.VARIABLES, credentialVariables);

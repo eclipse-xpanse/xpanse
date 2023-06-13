@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -69,7 +69,7 @@ public class Monitor {
         if (Objects.isNull(serviceEntity)) {
             throw new EntityNotFoundException("Service not found.");
         }
-        CredentialDefinition credential = credentialCenter.getCredential(
+        CredentialVariables credential = credentialCenter.getCredential(
                 serviceEntity.getCsp(), serviceEntity.getUserName());
 
         OrchestratorPlugin orchestratorPlugin =
@@ -113,7 +113,7 @@ public class Monitor {
             throw new EntityNotFoundException("No resource found in the service.");
         }
 
-        CredentialDefinition credential =
+        CredentialVariables credential =
                 getCredential(serviceEntity.getCsp(), serviceEntity.getUserName());
 
         OrchestratorPlugin orchestratorPlugin =
@@ -153,7 +153,7 @@ public class Monitor {
         BeanUtils.copyProperties(resourceEntity, deployResource);
         DeployServiceEntity serviceEntity = findDeployServiceEntity(
                 resourceEntity.getDeployService().getId());
-        CredentialDefinition credential =
+        CredentialVariables credential =
                 getCredential(serviceEntity.getCsp(), serviceEntity.getUserName());
         OrchestratorPlugin orchestratorPlugin =
                 orchestratorService.getOrchestratorPlugin(serviceEntity.getCsp());
@@ -173,8 +173,8 @@ public class Monitor {
         return serviceEntity;
     }
 
-    private CredentialDefinition getCredential(Csp csp, String userName) {
-        CredentialDefinition credential = credentialCenter.getCredential(
+    private CredentialVariables getCredential(Csp csp, String userName) {
+        CredentialVariables credential = credentialCenter.getCredential(
                 csp, userName);
         if (Objects.isNull(credential)) {
             throw new EntityNotFoundException("Credential not found.");
@@ -184,7 +184,7 @@ public class Monitor {
 
 
     private ResourceMetricRequest getResourceMetricRequest(DeployResource deployResource,
-                                                           CredentialDefinition credential,
+                                                           CredentialVariables credential,
                                                            MonitorResourceType monitorType,
                                                            Long from,
                                                            Long to,
@@ -207,7 +207,7 @@ public class Monitor {
     }
 
     private ServiceMetricRequest getServiceMetricRequest(List<DeployResource> deployResources,
-                                                         CredentialDefinition credential,
+                                                         CredentialVariables credential,
                                                          MonitorResourceType monitorType,
                                                          Long from,
                                                          Long to,

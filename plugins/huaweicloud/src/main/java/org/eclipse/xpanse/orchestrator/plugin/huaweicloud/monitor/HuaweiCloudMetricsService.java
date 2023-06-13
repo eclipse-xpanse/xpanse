@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
@@ -76,7 +76,7 @@ public class HuaweiCloudMetricsService {
     public List<Metric> getMetricsByResource(ResourceMetricRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
-        CredentialDefinition credential = resourceMetricRequest.getCredential();
+        CredentialVariables credential = resourceMetricRequest.getCredential();
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
         clearExpiredMetricCache(deployResource.getResourceId());
         ICredential icredential = getIcredential(credential);
@@ -134,7 +134,7 @@ public class HuaweiCloudMetricsService {
      */
     public List<Metric> getMetricsByService(ServiceMetricRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
-        CredentialDefinition credential = serviceMetricRequest.getCredential();
+        CredentialVariables credential = serviceMetricRequest.getCredential();
         MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
         ICredential icredential = getIcredential(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
@@ -324,11 +324,11 @@ public class HuaweiCloudMetricsService {
         }
     }
 
-    private ICredential getIcredential(CredentialDefinition credentialDefinition) {
+    private ICredential getIcredential(CredentialVariables credentialVariables) {
         String accessKey = null;
         String securityKey = null;
-        if (CredentialType.VARIABLES.toValue().equals(credentialDefinition.getType().toValue())) {
-            List<CredentialVariable> variables = credentialDefinition.getVariables();
+        if (CredentialType.VARIABLES.toValue().equals(credentialVariables.getType().toValue())) {
+            List<CredentialVariable> variables = credentialVariables.getVariables();
             for (CredentialVariable credentialVariable : variables) {
                 if (HuaweiCloudMonitorConstants.HW_ACCESS_KEY.equals(
                         credentialVariable.getName())) {

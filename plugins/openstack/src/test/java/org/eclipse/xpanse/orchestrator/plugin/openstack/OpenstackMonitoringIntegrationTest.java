@@ -12,10 +12,12 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+
 import java.time.Instant;
 import java.util.List;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
+
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
@@ -124,10 +126,10 @@ public class OpenstackMonitoringIntegrationTest {
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
     }
 
-    private CredentialDefinition getCredentialDefinition(WireMockRuntimeInfo wmRuntimeInfo) {
-        CredentialDefinition credentialDefinition =
-                (CredentialDefinition) this.plugin.getCredentialDefinitions().get(0);
-        for (CredentialVariable credentialVariable : credentialDefinition.getVariables()) {
+    private CredentialVariables getCredentialDefinition(WireMockRuntimeInfo wmRuntimeInfo) {
+        CredentialVariables credentialVariables =
+                (CredentialVariables) this.plugin.getCredentialDefinitions().get(0);
+        for (CredentialVariable credentialVariable : credentialVariables.getVariables()) {
             if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.AUTH_URL)) {
                 credentialVariable.setValue(wmRuntimeInfo.getHttpBaseUrl() + "/identity/v3");
             }
@@ -145,7 +147,7 @@ public class OpenstackMonitoringIntegrationTest {
             }
         }
 
-        return credentialDefinition;
+        return credentialVariables;
     }
 
 }

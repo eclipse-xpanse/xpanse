@@ -20,8 +20,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
@@ -89,9 +89,9 @@ public class CredentialApiUtil implements ApplicationRunner {
                                 .collect(Collectors.toMap(AbstractCredentialInfo::getType,
                                         Function.identity(), (existing, replacement) -> existing));
                 typeCredentialInfoMap.keySet().forEach(type -> {
-                    CredentialDefinition credentialDefinition =
-                            (CredentialDefinition) typeCredentialInfoMap.get(type);
-                    createCredentialApi(credentialDefinition);
+                    CredentialVariables credentialVariables =
+                            (CredentialVariables) typeCredentialInfoMap.get(type);
+                    createCredentialApi(credentialVariables);
                 });
             } else {
                 log.info("Not found credential definition of the cloud service provider:{}",
@@ -103,13 +103,13 @@ public class CredentialApiUtil implements ApplicationRunner {
     /**
      * create credentialApi for plugins.
      *
-     * @param credentialDefinition credentialDefinition
+     * @param credentialVariables credentialDefinition
      */
-    public void createCredentialApi(CredentialDefinition credentialDefinition) {
-        String jsonFileName = getCredentialApiFileName(credentialDefinition.getCsp(),
-                credentialDefinition.getType(), ".json");
-        String htmlFileName = getCredentialApiFileName(credentialDefinition.getCsp(),
-                credentialDefinition.getType(), ".html");
+    public void createCredentialApi(CredentialVariables credentialVariables) {
+        String jsonFileName = getCredentialApiFileName(credentialVariables.getCsp(),
+                credentialVariables.getType(), ".json");
+        String htmlFileName = getCredentialApiFileName(credentialVariables.getCsp(),
+                credentialVariables.getType(), ".html");
         String credentialApiDir = getCredentialApiDir();
         File dir = new File(credentialApiDir);
         if (!dir.exists()) {
@@ -119,7 +119,7 @@ public class CredentialApiUtil implements ApplicationRunner {
         File htmlFile = new File(credentialApiDir, htmlFileName);
         htmlFile.deleteOnExit();
         try {
-            String apiDocsJson = getApiDocsJson(credentialDefinition);
+            String apiDocsJson = getApiDocsJson(credentialVariables);
             try (FileWriter apiWriter = new FileWriter(jsonFile.getPath())) {
                 apiWriter.write(apiDocsJson);
             }
@@ -187,7 +187,7 @@ public class CredentialApiUtil implements ApplicationRunner {
                         .findFirst().orElse(null);
                 if (Objects.nonNull(abstractCredentialInfo)) {
                     findCredentialInfo = true;
-                    createCredentialApi((CredentialDefinition) abstractCredentialInfo);
+                    createCredentialApi((CredentialVariables) abstractCredentialInfo);
                 }
             }
             if (!findCredentialInfo) {
@@ -220,11 +220,11 @@ public class CredentialApiUtil implements ApplicationRunner {
         return exampleString;
     }
 
-    private String getApiDocsJson(CredentialDefinition credentialDefinition) {
+    private String getApiDocsJson(CredentialVariables credentialVariables) {
         String serviceUrl = getServiceUrl();
-        String csp = credentialDefinition.getCsp().toValue();
-        String type = credentialDefinition.getType().toValue();
-        String variablesExampleStr = getVariablesExampleStr(credentialDefinition.getVariables());
+        String csp = credentialVariables.getCsp().toValue();
+        String type = credentialVariables.getType().toValue();
+        String variablesExampleStr = getVariablesExampleStr(credentialVariables.getVariables());
         //CHECKSTYLE OFF: LineLength
         return String.format("""
                         {
@@ -448,8 +448,8 @@ public class CredentialApiUtil implements ApplicationRunner {
                             }
                         }
                         """,
-                csp, appVersion, serviceUrl, csp, type, csp, credentialDefinition.getName(),
-                credentialDefinition.getXpanseUser(), csp, credentialDefinition.getDescription(),
+                csp, appVersion, serviceUrl, csp, type, csp, credentialVariables.getName(),
+                credentialVariables.getXpanseUser(), csp, credentialVariables.getDescription(),
                 type, variablesExampleStr);
     }
 }

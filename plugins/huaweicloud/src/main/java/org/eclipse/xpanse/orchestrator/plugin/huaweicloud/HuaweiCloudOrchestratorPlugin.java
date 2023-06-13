@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.models.enums.Csp;
@@ -62,7 +62,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         credentialVariables.add(
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
                         "The security key.", true));
-        CredentialDefinition accessKey = new CredentialDefinition(
+        CredentialVariables accessKey = new CredentialVariables(
                 getCsp(), HuaweiCloudMonitorConstants.IAM,
                 "Using The access key and security key authentication.",
                 CredentialType.VARIABLES, credentialVariables);
