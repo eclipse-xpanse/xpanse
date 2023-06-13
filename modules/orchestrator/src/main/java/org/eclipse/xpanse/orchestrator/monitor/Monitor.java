@@ -82,7 +82,7 @@ public class Monitor {
             if (DeployResourceKind.VM.equals(deployResource.getKind())) {
                 ResourceMetricRequest resourceMetricRequest =
                         getResourceMetricRequest(deployResource, credential, monitorType, from, to,
-                                granularity);
+                                granularity, false);
                 List<Metric> metricList = orchestratorPlugin.getMetrics(resourceMetricRequest);
                 metrics.addAll(metricList);
             }
@@ -94,9 +94,12 @@ public class Monitor {
     /**
      * Get metrics of the service instance.
      */
-    public List<Metric> getMetricsByServiceId(String id, MonitorResourceType monitorType,
+    public List<Metric> getMetricsByServiceId(String id,
+                                              MonitorResourceType monitorType,
                                               Long from,
-                                              Long to, Integer granularity) {
+                                              Long to,
+                                              Integer granularity,
+                                              boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
         DeployServiceEntity serviceEntity = findDeployServiceEntity(UUID.fromString(id));
 
@@ -118,7 +121,7 @@ public class Monitor {
 
         ServiceMetricRequest serviceMetricRequest =
                 getServiceMetricRequest(vmResources, credential, monitorType, from,
-                        to, granularity);
+                        to, granularity, onlyLastKnownMetric);
 
         return orchestratorPlugin.getMetricsForService(serviceMetricRequest);
     }
@@ -127,9 +130,12 @@ public class Monitor {
     /**
      * Get metrics of the resource instance.
      */
-    public List<Metric> getMetricsByResourceId(String id, MonitorResourceType monitorType,
+    public List<Metric> getMetricsByResourceId(String id,
+                                               MonitorResourceType monitorType,
                                                Long from,
-                                               Long to, Integer granularity) {
+                                               Long to,
+                                               Integer granularity,
+                                               boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
         DeployResourceEntity resourceEntity =
                 deployResourceStorage.findDeployResourceByResourceId(id);
@@ -153,7 +159,7 @@ public class Monitor {
                 orchestratorService.getOrchestratorPlugin(serviceEntity.getCsp());
         ResourceMetricRequest resourceMetricRequest =
                 getResourceMetricRequest(deployResource, credential, monitorType, from,
-                        to, granularity);
+                        to, granularity, onlyLastKnownMetric);
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
     }
 
@@ -180,30 +186,46 @@ public class Monitor {
     private ResourceMetricRequest getResourceMetricRequest(DeployResource deployResource,
                                                            CredentialDefinition credential,
                                                            MonitorResourceType monitorType,
-                                                           Long from, Long to,
-                                                           Integer granularity) {
-        if (Objects.isNull(from)) {
-            from = System.currentTimeMillis() - FIVE_MINUTES_MILLISECONDS;
+                                                           Long from,
+                                                           Long to,
+                                                           Integer granularity,
+                                                           boolean onlyLastKnownMetric) {
+        if (onlyLastKnownMetric) {
+            from = null;
+            to = null;
+        } else {
+            if (Objects.isNull(from)) {
+                from = System.currentTimeMillis() - FIVE_MINUTES_MILLISECONDS;
+            }
+            if (Objects.isNull(to)) {
+                to = System.currentTimeMillis();
+            }
         }
-        if (Objects.isNull(to)) {
-            to = System.currentTimeMillis();
-        }
+
         return new ResourceMetricRequest(deployResource, credential, monitorType, from, to,
-                granularity);
+                granularity, onlyLastKnownMetric);
     }
 
     private ServiceMetricRequest getServiceMetricRequest(List<DeployResource> deployResources,
                                                          CredentialDefinition credential,
                                                          MonitorResourceType monitorType,
-                                                         Long from, Long to, Integer granularity) {
-        if (Objects.isNull(from)) {
-            from = System.currentTimeMillis() - FIVE_MINUTES_MILLISECONDS;
-        }
-        if (Objects.isNull(to)) {
-            to = System.currentTimeMillis();
+                                                         Long from,
+                                                         Long to,
+                                                         Integer granularity,
+                                                         boolean onlyLastKnownMetric) {
+        if (onlyLastKnownMetric) {
+            from = null;
+            to = null;
+        } else {
+            if (Objects.isNull(from)) {
+                from = System.currentTimeMillis() - FIVE_MINUTES_MILLISECONDS;
+            }
+            if (Objects.isNull(to)) {
+                to = System.currentTimeMillis();
+            }
         }
         return new ServiceMetricRequest(deployResources, credential, monitorType, from, to,
-                granularity);
+                granularity, onlyLastKnownMetric);
     }
 
     private void validateToAndFromValues(Long from, Long to) {

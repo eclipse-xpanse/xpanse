@@ -129,7 +129,8 @@ public class MetricsManager {
                 MonitorResourceType.CPU,
                 this.aggregationService.getAggregatedMeasuresByOperation(
                         aggregationRequest, metricsFilter).getMeasures().getAggregated(),
-                MetricUnit.PERCENTAGE);
+                MetricUnit.PERCENTAGE,
+                resourceMetricRequest.isOnlyLastKnownMetric());
     }
 
     private Metric getMemoryUsage(ResourceMetricRequest resourceMetricRequest, String metricId) {
@@ -139,7 +140,8 @@ public class MetricsManager {
                 resourceMetricRequest.getDeployResource(),
                 MonitorResourceType.MEM,
                 this.measuresService.getMeasurementsForResourceByMetricId(metricId, metricsFilter),
-                MetricUnit.MB);
+                MetricUnit.MB,
+                resourceMetricRequest.isOnlyLastKnownMetric());
     }
 
     private Metric getNetworkUsage(ResourceMetricRequest resourceMetricRequest, String metricId,
@@ -159,7 +161,8 @@ public class MetricsManager {
                 monitorResourceType,
                 this.aggregationService.getAggregatedMeasuresByOperation(
                         aggregationRequest, metricsFilter).getMeasures().getAggregated(),
-                MetricUnit.BYTES_PER_SECOND);
+                MetricUnit.BYTES_PER_SECOND,
+                resourceMetricRequest.isOnlyLastKnownMetric());
     }
 
 }

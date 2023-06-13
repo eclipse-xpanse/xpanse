@@ -105,7 +105,8 @@ public class HuaweiCloudMetricsService {
                             .invoke();
             Metric metric =
                     huaweiCloudToXpanseDataModelConverter.convertShowMetricDataResponseToMetric(
-                            deployResource, showMetricDataResponse, metricInfoList);
+                            deployResource, showMetricDataResponse, metricInfoList,
+                            resourceMetricRequest.isOnlyLastKnownMetric());
             cacheResourceMetricsData(metric, metrics, deployResource, metricInfoList);
         }
         return metrics;
@@ -163,7 +164,8 @@ public class HuaweiCloudMetricsService {
                         .invoke();
         List<Metric> metrics =
                 huaweiCloudToXpanseDataModelConverter.convertBatchListMetricDataResponseToMetric(
-                        batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources);
+                        batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources,
+                        serviceMetricRequest.isOnlyLastKnownMetric());
         cacheServiceMetricsData(metrics, deployResources, serviceMetricRequest);
         return metrics;
     }

@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -111,9 +110,14 @@ public class MonitorApi {
                             + " depends on how the source systems have generated/collected"
                             + " metrics.")
             @RequestParam(name = "granularity", required = false)
-            Integer granularity) {
+            Integer granularity,
+            @Parameter(name = "onlyLastKnownMetric",
+                    description = "Returns only the last known metric. When this parameter is set "
+                            + "then all other query parameters are ignored.")
+            @RequestParam(name = "onlyLastKnownMetric", required = false, defaultValue = "false")
+            boolean onlyLastKnownMetric) {
         return monitor.getMetricsByServiceId(id, monitorResourceType, from, to,
-                granularity);
+                granularity, onlyLastKnownMetric);
     }
 
 
@@ -149,9 +153,14 @@ public class MonitorApi {
                             + " depends on how the source systems have generated/collected"
                             + " metrics.")
             @RequestParam(name = "granularity", required = false)
-            Integer granularity) {
+            Integer granularity,
+            @Parameter(name = "onlyLastKnownMetric",
+                    description = "Returns only the last known metric. When this parameter is set "
+                            + "then all other query parameters are ignored.")
+            @RequestParam(name = "onlyLastKnownMetric", required = false)
+            boolean onlyLastKnownMetric) {
         return monitor.getMetricsByResourceId(id, monitorResourceType, from, to,
-                granularity);
+                granularity, onlyLastKnownMetric);
     }
 
 }

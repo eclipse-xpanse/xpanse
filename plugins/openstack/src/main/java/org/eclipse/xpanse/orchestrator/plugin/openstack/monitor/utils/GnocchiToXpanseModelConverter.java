@@ -36,7 +36,8 @@ public class GnocchiToXpanseModelConverter {
     public Metric convertGnocchiMeasuresToMetric(DeployResource deployResource,
                                                  MonitorResourceType monitorResourceType,
                                                  List<Measure> measures,
-                                                 MetricUnit metricUnit) {
+                                                 MetricUnit metricUnit,
+                                                 boolean onlyLastKnownMetric) {
         Metric metric = new Metric();
         metric.setName(monitorResourceType.toValue());
         Map<String, String> labels = new HashMap<>();
@@ -46,13 +47,20 @@ public class GnocchiToXpanseModelConverter {
         metric.setLabels(labels);
         metric.setType(MetricType.GAUGE);
         if (!CollectionUtils.isEmpty(measures)) {
-            metric.setMetrics(new ArrayList<>());
-            for (Measure measure : measures) {
+            if (onlyLastKnownMetric) {
                 MetricItem metricItem = new MetricItem();
                 metricItem.setType(MetricItemType.VALUE);
-                metricItem.setValue(measure.getValue());
-                metricItem.setTimeStamp(Instant.parse(measure.getTimestamp()).getEpochSecond());
-                metric.getMetrics().add(metricItem);
+                metricItem.setValue(measures.get(measures.size() - 1).getValue());
+                metric.setMetrics(List.of(metricItem));
+            } else {
+                metric.setMetrics(new ArrayList<>());
+                for (Measure measure : measures) {
+                    MetricItem metricItem = new MetricItem();
+                    metricItem.setType(MetricItemType.VALUE);
+                    metricItem.setValue(measure.getValue());
+                    metricItem.setTimeStamp(Instant.parse(measure.getTimestamp()).getEpochSecond());
+                    metric.getMetrics().add(metricItem);
+                }
             }
         }
         return metric;

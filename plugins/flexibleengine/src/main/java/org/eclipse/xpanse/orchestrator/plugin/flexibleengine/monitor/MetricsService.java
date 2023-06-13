@@ -112,7 +112,7 @@ public class MetricsService {
      * @return Returns HttpRequestBase
      */
     public HttpRequestBase buildPostRequest(CredentialDefinition credential, String url,
-            String postbody) {
+                                            String postbody) {
         String accessKey = null;
         String securityKey = null;
         HttpRequestBase requestBase = null;
@@ -185,8 +185,8 @@ public class MetricsService {
         return result;
     }
 
-    private BatchListMetricDataResponse batchQueryListMetricsInfo(CredentialDefinition credential,
-            BatchListMetricDataRequest request, String url) {
+    private BatchListMetricDataResponse batchQueryListMetricsInfo(
+            CredentialDefinition credential, BatchListMetricDataRequest request, String url) {
         BatchListMetricDataResponse result = null;
         try {
             String requestBody = new ObjectMapper().writeValueAsString(request.getBody());
@@ -248,7 +248,8 @@ public class MetricsService {
                         ShowMetricDataResponse response = queryMetricsInfo(credential, url);
                         Metric metric =
                                 flexibleEngineMonitorConverter.convertResponseToMetric(
-                                        deployResource, response, metricInfoList);
+                                        deployResource, response, metricInfoList,
+                                        resourceMetricRequest.isOnlyLastKnownMetric());
 
                         if (!CollectionUtils.isEmpty(metric.getMetrics())) {
                             metrics.add(metric);
@@ -307,15 +308,16 @@ public class MetricsService {
                         url);
 
         List<Metric> metrics =
-                FlexibleEngineMonitorConverter.convertBatchListMetricDataResponseToMetric(
-                        batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources);
+                flexibleEngineMonitorConverter.convertBatchListMetricDataResponseToMetric(
+                        batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources,
+                        serviceMetricRequest.isOnlyLastKnownMetric());
         cacheServiceMetricsData(metrics, serviceMetricRequest);
 
         return metrics;
     }
 
     private void cacheServiceMetricsData(List<Metric> metrics,
-            ServiceMetricRequest serviceMetricRequest) {
+                                         ServiceMetricRequest serviceMetricRequest) {
         if (!CollectionUtils.isEmpty(metrics)) {
             for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
                 for (Metric metric : metrics) {
