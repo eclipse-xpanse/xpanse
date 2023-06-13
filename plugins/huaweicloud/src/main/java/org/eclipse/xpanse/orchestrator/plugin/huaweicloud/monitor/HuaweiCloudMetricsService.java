@@ -15,6 +15,7 @@ import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.auth.ICredential;
+import com.huaweicloud.sdk.core.exception.ServiceResponseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.models.HuaweiCloudMonitorMetrics;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.models.HuaweiCloudNameSpaceKind;
+import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.models.HuaweiCloudRetryStrategy;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.utils.HuaweiCloudMonitorCache;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.utils.HuaweiCloudMonitorClient;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.utils.HuaweiCloudToXpanseDataModelConverter;
@@ -88,7 +90,19 @@ public class HuaweiCloudMetricsService {
                     huaweiCloudToXpanseDataModelConverter.buildShowMetricDataRequest(
                             resourceMetricRequest, metricInfoList);
             ShowMetricDataResponse showMetricDataResponse =
-                    client.showMetricData(showMetricDataRequest);
+                    client.showMetricDataInvoker(showMetricDataRequest)
+                            .retryTimes(HuaweiCloudRetryStrategy.DEFAULT_RETRY_TIMES)
+                            .retryCondition((resp, ex) -> Objects.nonNull(ex)
+                                    &&
+                                    ServiceResponseException.class.isAssignableFrom(ex.getClass())
+                                    && (((ServiceResponseException) ex).getHttpStatusCode()
+                                    == HuaweiCloudRetryStrategy.ERROR_CODE_TOO_MANY_REQUESTS
+                                    || ((ServiceResponseException) ex).getHttpStatusCode()
+                                    == HuaweiCloudRetryStrategy.ERROR_CODE_INTERNAL_SERVER_ERROR))
+                            .backoffStrategy(
+                                    new HuaweiCloudRetryStrategy(
+                                            HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS))
+                            .invoke();
             Metric metric =
                     huaweiCloudToXpanseDataModelConverter.convertShowMetricDataResponseToMetric(
                             deployResource, showMetricDataResponse, metricInfoList);
@@ -135,7 +149,18 @@ public class HuaweiCloudMetricsService {
                 huaweiCloudToXpanseDataModelConverter.buildBatchListMetricDataRequest(
                         serviceMetricRequest, deployResourceMetricInfoMap);
         BatchListMetricDataResponse batchListMetricDataResponse =
-                client.batchListMetricData(batchListMetricDataRequest);
+                client.batchListMetricDataInvoker(batchListMetricDataRequest)
+                        .retryTimes(HuaweiCloudRetryStrategy.DEFAULT_RETRY_TIMES)
+                        .retryCondition((resp, ex) -> Objects.nonNull(ex)
+                                && ServiceResponseException.class.isAssignableFrom(ex.getClass())
+                                && (((ServiceResponseException) ex).getHttpStatusCode()
+                                == HuaweiCloudRetryStrategy.ERROR_CODE_TOO_MANY_REQUESTS
+                                || ((ServiceResponseException) ex).getHttpStatusCode()
+                                == HuaweiCloudRetryStrategy.ERROR_CODE_INTERNAL_SERVER_ERROR))
+                        .backoffStrategy(
+                                new HuaweiCloudRetryStrategy(
+                                        HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS))
+                        .invoke();
         List<Metric> metrics =
                 huaweiCloudToXpanseDataModelConverter.convertBatchListMetricDataResponseToMetric(
                         batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources);
@@ -170,7 +195,17 @@ public class HuaweiCloudMetricsService {
         List<MetricInfoList> targetMetricInfoLists = new ArrayList<>();
         ListMetricsRequest request =
                 huaweiCloudToXpanseDataModelConverter.buildListMetricsRequest(deployResource);
-        ListMetricsResponse listMetricsResponse = client.listMetrics(request);
+        ListMetricsResponse listMetricsResponse = client.listMetricsInvoker(request)
+                .retryTimes(HuaweiCloudRetryStrategy.DEFAULT_RETRY_TIMES)
+                .retryCondition((resp, ex) -> Objects.nonNull(ex)
+                        && ServiceResponseException.class.isAssignableFrom(ex.getClass())
+                        && (((ServiceResponseException) ex).getHttpStatusCode()
+                        == HuaweiCloudRetryStrategy.ERROR_CODE_TOO_MANY_REQUESTS
+                        || ((ServiceResponseException) ex).getHttpStatusCode()
+                        == HuaweiCloudRetryStrategy.ERROR_CODE_INTERNAL_SERVER_ERROR))
+                .backoffStrategy(
+                        new HuaweiCloudRetryStrategy(HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS))
+                .invoke();
         if (Objects.nonNull(listMetricsResponse)) {
             List<MetricInfoList> metricInfoLists = listMetricsResponse.getMetrics();
             if (Objects.isNull(monitorResourceType)) {
