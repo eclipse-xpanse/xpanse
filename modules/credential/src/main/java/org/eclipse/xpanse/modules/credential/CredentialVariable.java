@@ -15,6 +15,7 @@ import lombok.Data;
  * The class object for the CredentialVariable.
  */
 @Data
+@SuppressWarnings("UnnecessarilyFullyQualified")
 public class CredentialVariable {
 
     @NotNull
