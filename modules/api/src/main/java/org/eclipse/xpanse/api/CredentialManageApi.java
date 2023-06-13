@@ -14,7 +14,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CreateCredential;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
+import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
@@ -107,7 +107,7 @@ public class CredentialManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List credentials of the cloud service provider and the user.")
-    public List<CredentialDefinition> getCredentialDefinitionsByCsp(
+    public List<CredentialVariables> getCredentialDefinitionsByCsp(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable(name = "cspName") Csp csp,
             @Parameter(name = "userName",

@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.models.enums.Csp;
 /**
  * List credential definition that can be provided from end user.
  */
-public class CredentialDefinition extends AbstractCredentialInfo {
+public class CredentialVariables extends AbstractCredentialInfo {
 
     /**
      * The variables list of the credential.
@@ -40,8 +40,8 @@ public class CredentialDefinition extends AbstractCredentialInfo {
     /**
      * The constructor.
      */
-    public CredentialDefinition(Csp csp, String name, String description, CredentialType type,
-                                List<CredentialVariable> variables) {
+    public CredentialVariables(Csp csp, String name, String description, CredentialType type,
+                               List<CredentialVariable> variables) {
         super(csp, name, description, type);
         this.variables = variables;
     }
