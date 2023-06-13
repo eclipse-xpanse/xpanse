@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>modules</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>org.eclipse.xpanse.modules</groupId>
@@ -26,19 +26,19 @@
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>models</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>database</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>credential</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
