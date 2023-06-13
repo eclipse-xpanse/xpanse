@@ -69,19 +69,19 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.AUTH_URL,
-                        "The Identity authentication URL."));
+                        "The Identity authentication URL.", false));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.TENANT,
-                        "The Name of the Tenant or Project to use."));
+                        "The Name of the Tenant or Project to use.", false));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.USERNAME,
-                        "The Username to login with."));
+                        "The Username to login with.", false));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.PASSWORD,
-                        "The Password to login with."));
+                        "The Password to login with.", true));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN,
-                        "The domain of the openstack installation to be used."));
+                        "The domain of the openstack installation to be used.", true));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.PROXY_HOST,
                         "Proxy host with protocol and without port through which to "

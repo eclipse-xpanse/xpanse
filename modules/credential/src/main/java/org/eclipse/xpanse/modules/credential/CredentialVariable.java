@@ -34,6 +34,11 @@ public class CredentialVariable {
     private final boolean isMandatory;
 
     @NotNull
+    @Schema(description = "Defines if the particular variable contains sensitive data. For example "
+            + "the value is false for username and true for password variables respectively.")
+    private final boolean isSensitive;
+
+    @NotNull
     @NotBlank
     @Schema(description = "The value of the CredentialVariable, this field is filled by the user.")
     private String value;
@@ -41,26 +46,29 @@ public class CredentialVariable {
     /**
      * Constructor for default mandatory variables.
      *
-     * @param name name of the variable.
+     * @param name        name of the variable.
      * @param description description of the variable.
      */
-    public CredentialVariable(String name, String description) {
+    public CredentialVariable(String name, String description, boolean isSensitive) {
         this.name = name;
         this.description = description;
         this.isMandatory = true;
+        this.isSensitive = isSensitive;
     }
 
     /**
      * Constructor to set mandatory flag explicitly for the variables.
      *
-     * @param name name of the variable.
+     * @param name        name of the variable.
      * @param description description of the variable.
      * @param isMandatory if the credential variable is mandatory.
      */
-    public CredentialVariable(String name, String description, boolean isMandatory) {
+    public CredentialVariable(String name, String description, boolean isMandatory,
+                              boolean isSensitive) {
         this.name = name;
         this.description = description;
         this.isMandatory = isMandatory;
+        this.isSensitive = isSensitive;
     }
 
 }

@@ -63,10 +63,10 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
                 CredentialType.VARIABLES, credentialVariables);
         credentialVariables.add(
                 new CredentialVariable(FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
-                        "The access key."));
+                        "The access key.", true));
         credentialVariables.add(
                 new CredentialVariable(FlexibleEngineMonitorConstants.OS_SECRET_KEY,
-                        "The security key."));
+                        "The security key.", true));
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(accessKey);
         return credentialInfos;
