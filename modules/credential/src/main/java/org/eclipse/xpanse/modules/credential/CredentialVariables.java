@@ -28,15 +28,6 @@ public class CredentialVariables extends AbstractCredentialInfo {
     @Schema(description = "The variables list of the credential.")
     private final List<CredentialVariable> variables;
 
-
-    /**
-     * The expired unix long time of the credential.
-     */
-    @Getter
-    @Setter
-    @Hidden
-    private Long expiredTime;
-
     /**
      * The constructor.
      */

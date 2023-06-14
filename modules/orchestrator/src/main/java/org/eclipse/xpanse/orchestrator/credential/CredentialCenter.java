@@ -101,15 +101,15 @@ public class CredentialCenter {
      * @param type       The type of the credential.
      * @return the credentials.
      */
-    public List<CredentialVariables> getCredentialDefinitionsByCsp(Csp csp, String xpanseUser,
-                                                                   CredentialType type) {
+    public List<AbstractCredentialInfo> getCredentialDefinitionsByCsp(Csp csp, String xpanseUser,
+                                                                      CredentialType type) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         if (Objects.isNull(type)) {
             return credentialCacheManager.getAllTypeCaches(cacheKey);
         }
-        CredentialVariables credentialVariables =
+        AbstractCredentialInfo credentialVariables =
                 credentialCacheManager.getCachesByType(cacheKey, type);
-        List<CredentialVariables> result = new ArrayList<>();
+        List<AbstractCredentialInfo> result = new ArrayList<>();
         if (Objects.nonNull(credentialVariables)) {
             result.add(credentialVariables);
         }
@@ -126,7 +126,14 @@ public class CredentialCenter {
     public boolean addCredential(Csp csp, CreateCredential createCredential) {
         checkInputCredentialIsValid(csp, createCredential);
         createCredential.setCsp(csp);
-        CredentialVariables credential = createCredentialDefinitionObject(createCredential);
+        AbstractCredentialInfo credential;
+        if (createCredential.getType() == CredentialType.VARIABLES) {
+            credential = createCredentialVariablesObject(createCredential);
+        } else {
+            throw new IllegalStateException(
+                    String.format("Not supported credential type Csp:%s, Type: %d.",
+                            csp, createCredential.getType()));
+        }
         return createCredential(credential.getCsp(), credential.getXpanseUser(),
                 credential);
     }
@@ -140,9 +147,16 @@ public class CredentialCenter {
      */
     public boolean updateCredential(Csp csp, CreateCredential updateCredential) {
         updateCredential.setCsp(csp);
-        CredentialVariables credential = createCredentialDefinitionObject(updateCredential);
-        deleteCredentialByType(csp, credential.getXpanseUser(), credential.getType());
-        return createCredential(csp, credential.getXpanseUser(), credential);
+        AbstractCredentialInfo credential;
+        if (updateCredential.getType() == CredentialType.VARIABLES) {
+            credential = createCredentialVariablesObject(updateCredential);
+        } else {
+            throw new IllegalStateException(
+                    String.format("Not supported credential type Csp:%s, Type: %d.",
+                            csp, updateCredential.getType()));
+        }
+        deleteCredentialByType(csp, updateCredential.getXpanseUser(), updateCredential.getType());
+        return createCredential(csp, updateCredential.getXpanseUser(), credential);
     }
 
     /**
@@ -176,9 +190,9 @@ public class CredentialCenter {
      * @param csp        The cloud service provider.
      * @param xpanseUser The user who provided the credential info.
      */
-    public CredentialVariables getCredential(Csp csp, String xpanseUser) {
+    public AbstractCredentialInfo getCredential(Csp csp, String xpanseUser) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
-        List<CredentialVariables> credentialVariablesList =
+        List<AbstractCredentialInfo> credentialVariablesList =
                 credentialCacheManager.getAllTypeCaches(cacheKey);
         if (!CollectionUtils.isEmpty(credentialVariablesList)) {
             return credentialVariablesList.get(0);
@@ -248,7 +262,7 @@ public class CredentialCenter {
      * @param credential The credential to create.
      * @return true of false.
      */
-    public boolean createCredential(Csp csp, String xpanseUser, CredentialVariables credential) {
+    public boolean createCredential(Csp csp, String xpanseUser, AbstractCredentialInfo credential) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
         credentialCacheManager.putCache(cacheKey, credential);
         clearExpiredCache();
@@ -256,7 +270,7 @@ public class CredentialCenter {
     }
 
 
-    private CredentialVariables createCredentialDefinitionObject(
+    private CredentialVariables createCredentialVariablesObject(
             CreateCredential createCredential) {
         CredentialVariables credential = new CredentialVariables(createCredential.getCsp(),
                 createCredential.getName(), createCredential.getDescription(),

@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.monitor;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 
@@ -21,7 +22,7 @@ import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 public class MetricRequest {
 
     @NotNull
-    private CredentialVariables credential;
+    private AbstractCredentialInfo credential;
 
     private MonitorResourceType monitorResourceType;
 

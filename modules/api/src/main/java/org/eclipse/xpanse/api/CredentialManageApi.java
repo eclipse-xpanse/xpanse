@@ -107,7 +107,7 @@ public class CredentialManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List credentials of the cloud service provider and the user.")
-    public List<CredentialVariables> getCredentialDefinitionsByCsp(
+    public List<AbstractCredentialInfo> getCredentials(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable(name = "cspName") Csp csp,
             @Parameter(name = "userName",

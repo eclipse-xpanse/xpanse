@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.credential;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -66,6 +67,14 @@ public abstract class AbstractCredentialInfo {
     @Schema(description = "The type of the credential,"
             + "this field is provided by  he the plugin of cloud service provider.")
     CredentialType type;
+
+    /**
+     * The expired unix long time of the credential.
+     */
+    @Getter
+    @Setter
+    @Hidden
+    private Long expiredTime;
 
     /**
      * The constructor.
