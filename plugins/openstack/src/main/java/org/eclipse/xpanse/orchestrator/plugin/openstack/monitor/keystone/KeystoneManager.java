@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
+import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
@@ -32,9 +33,9 @@ public class KeystoneManager {
      * Authenticates and sets the authentication details in the thread context which can be
      * used for the further calls to Openstack API.
      *
-     * @param credentialVariables Credential information available for Openstack in the runtime.
+     * @param credential Credential information available for Openstack in the runtime.
      */
-    public void authenticate(CredentialVariables credentialVariables) {
+    public void authenticate(AbstractCredentialInfo credential) {
         String userName = null;
         String password = null;
         String tenant = null;
@@ -43,8 +44,8 @@ public class KeystoneManager {
         String serviceTenant = null;
         String proxyHost = null;
         String proxyPort = null;
-        if (CredentialType.VARIABLES.toValue().equals(credentialVariables.getType().toValue())) {
-            List<CredentialVariable> variables = credentialVariables.getVariables();
+        if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
+            List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
             for (CredentialVariable credentialVariable : variables) {
                 if (OpenstackEnvironmentConstants.USERNAME.equals(
                         credentialVariable.getName())) {

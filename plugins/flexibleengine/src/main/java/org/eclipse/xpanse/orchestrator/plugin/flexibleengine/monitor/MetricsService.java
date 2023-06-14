@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
@@ -78,12 +79,12 @@ public class MetricsService {
      * @param url        The request url of the FlexibleEngine API.
      * @return Returns HttpRequestBase
      */
-    public HttpRequestBase buildGetRequest(CredentialVariables credential, String url) {
+    public HttpRequestBase buildGetRequest(AbstractCredentialInfo credential, String url) {
         String accessKey = null;
         String securityKey = null;
         HttpRequestBase requestBase = null;
         if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
-            List<CredentialVariable> variables = credential.getVariables();
+            List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
             for (CredentialVariable credentialVariable : variables) {
                 if (FlexibleEngineMonitorConstants.OS_ACCESS_KEY.equals(
                         credentialVariable.getName())) {
@@ -111,13 +112,13 @@ public class MetricsService {
      * @param url        The request url of the FlexibleEngine API.
      * @return Returns HttpRequestBase
      */
-    public HttpRequestBase buildPostRequest(CredentialVariables credential, String url,
+    public HttpRequestBase buildPostRequest(AbstractCredentialInfo credential, String url,
                                             String postbody) {
         String accessKey = null;
         String securityKey = null;
         HttpRequestBase requestBase = null;
         if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
-            List<CredentialVariable> variables = credential.getVariables();
+            List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
             for (CredentialVariable credentialVariable : variables) {
                 if (FlexibleEngineMonitorConstants.OS_ACCESS_KEY.equals(
                         credentialVariable.getName())) {
@@ -138,7 +139,7 @@ public class MetricsService {
         return requestBase;
     }
 
-    private Project queryProjectInfo(CredentialVariables credential, String url) {
+    private Project queryProjectInfo(AbstractCredentialInfo credential, String url) {
         HttpRequestBase requestBase = buildGetRequest(credential, url);
         HttpEntity<String> entity = new HttpEntity<>("parameters", getHttpHeaders(requestBase));
         try {
@@ -156,7 +157,7 @@ public class MetricsService {
         return null;
     }
 
-    private ShowMetricDataResponse queryMetricsInfo(CredentialVariables credential, String url) {
+    private ShowMetricDataResponse queryMetricsInfo(AbstractCredentialInfo credential, String url) {
         HttpRequestBase requestBase = buildGetRequest(credential, url);
         HttpEntity<String> entity = new HttpEntity<>("parameters", getHttpHeaders(requestBase));
         ShowMetricDataResponse result = null;
@@ -171,7 +172,8 @@ public class MetricsService {
         return result;
     }
 
-    private ListMetricsResponse queryListMetricsInfo(CredentialVariables credential, String url) {
+    private ListMetricsResponse queryListMetricsInfo(AbstractCredentialInfo credential,
+                                                     String url) {
         HttpRequestBase requestBase = buildGetRequest(credential, url);
         HttpEntity<String> entity = new HttpEntity<>("parameters", getHttpHeaders(requestBase));
         ListMetricsResponse result = null;
@@ -186,7 +188,7 @@ public class MetricsService {
     }
 
     private BatchListMetricDataResponse batchQueryListMetricsInfo(
-            CredentialVariables credential, BatchListMetricDataRequest request, String url) {
+            AbstractCredentialInfo credential, BatchListMetricDataRequest request, String url) {
         BatchListMetricDataResponse result = null;
         try {
             String requestBody = new ObjectMapper().writeValueAsString(request.getBody());
@@ -229,7 +231,7 @@ public class MetricsService {
      */
     public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
-        CredentialVariables credential = resourceMetricRequest.getCredential();
+        AbstractCredentialInfo credential = resourceMetricRequest.getCredential();
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         String region = deployResource.getProperties().get("region");
         MonitorResourceType resourceType = resourceMetricRequest.getMonitorResourceType();
@@ -276,7 +278,7 @@ public class MetricsService {
      */
     public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
-        CredentialVariables credential = serviceMetricRequest.getCredential();
+        AbstractCredentialInfo credential = serviceMetricRequest.getCredential();
         MonitorResourceType resourceType = serviceMetricRequest.getMonitorResourceType();
         String region = deployResources.get(0).getProperties().get("region");
         Project project = null;
@@ -338,7 +340,7 @@ public class MetricsService {
     }
 
     private List<MetricInfoList> getTargetMetricInfoList(DeployResource deployResource,
-                                                         CredentialVariables credential,
+                                                         AbstractCredentialInfo credential,
                                                          MonitorResourceType monitorResourceType,
                                                          Project project) {
 

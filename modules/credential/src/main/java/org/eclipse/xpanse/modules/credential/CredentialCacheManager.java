@@ -28,8 +28,8 @@ import org.springframework.scheduling.annotation.Async;
 @Configuration
 public class CredentialCacheManager {
 
-    private static final Map<CredentialCacheKey, Map<CredentialType, CredentialVariables>> CACHES =
-            new ConcurrentHashMap<>();
+    private static final Map<CredentialCacheKey,
+            Map<CredentialType, AbstractCredentialInfo>> CACHES = new ConcurrentHashMap<>();
 
     /**
      * Is the cache container empty.
@@ -46,11 +46,11 @@ public class CredentialCacheManager {
      * @param key   key
      * @param value value
      */
-    public void putCache(CredentialCacheKey key, CredentialVariables value) {
+    public void putCache(CredentialCacheKey key, AbstractCredentialInfo value) {
         if (CACHES.containsKey(key)) {
             CACHES.get(key).put(value.getType(), value);
         } else {
-            Map<CredentialType, CredentialVariables> typeMap = new ConcurrentHashMap<>();
+            Map<CredentialType, AbstractCredentialInfo> typeMap = new ConcurrentHashMap<>();
             typeMap.put(value.getType(), value);
             CACHES.put(key, typeMap);
         }
@@ -61,13 +61,13 @@ public class CredentialCacheManager {
      *
      * @param key key
      */
-    public List<CredentialVariables> getAllTypeCaches(CredentialCacheKey key) {
+    public List<AbstractCredentialInfo> getAllTypeCaches(CredentialCacheKey key) {
         if (CACHES.containsKey(key)) {
-            Map<CredentialType, CredentialVariables> credentialMap = CACHES.get(key);
+            Map<CredentialType, AbstractCredentialInfo> credentialMap = CACHES.get(key);
             return credentialMap.values().stream().filter(credential ->
                     Objects.nonNull(credential)
                             && credential.getExpiredTime() > System.currentTimeMillis()
-            ).sorted(Comparator.comparing(CredentialVariables::getType)).toList();
+            ).sorted(Comparator.comparing(AbstractCredentialInfo::getType)).toList();
         }
         return Collections.emptyList();
 
@@ -79,9 +79,9 @@ public class CredentialCacheManager {
      * @param key  key
      * @param type credential type
      */
-    public CredentialVariables getCachesByType(CredentialCacheKey key, CredentialType type) {
+    public AbstractCredentialInfo getCachesByType(CredentialCacheKey key, CredentialType type) {
         if (CACHES.containsKey(key)) {
-            CredentialVariables credentialVariables = CACHES.get(key).get(type);
+            AbstractCredentialInfo credentialVariables = CACHES.get(key).get(type);
             if (credentialVariables.getExpiredTime() > System.currentTimeMillis()) {
                 return credentialVariables;
             }
@@ -121,12 +121,12 @@ public class CredentialCacheManager {
         if (CACHES.size() <= 0) {
             return;
         }
-        for (Entry<CredentialCacheKey, Map<CredentialType, CredentialVariables>> next :
+        for (Entry<CredentialCacheKey, Map<CredentialType, AbstractCredentialInfo>> next :
                 CACHES.entrySet()) {
             CredentialCacheKey key = next.getKey();
-            Set<Entry<CredentialType, CredentialVariables>> typeEntrySet =
+            Set<Entry<CredentialType, AbstractCredentialInfo>> typeEntrySet =
                     next.getValue().entrySet();
-            for (Entry<CredentialType, CredentialVariables> typeEntry : typeEntrySet) {
+            for (Entry<CredentialType, AbstractCredentialInfo> typeEntry : typeEntrySet) {
                 if (typeEntry.getValue().getExpiredTime() < System.currentTimeMillis()) {
                     removeCacheByType(key, typeEntry.getKey());
                 }
