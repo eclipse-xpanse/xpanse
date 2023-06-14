@@ -14,7 +14,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CreateCredential;
-import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
@@ -115,7 +114,7 @@ public class CredentialManageApi {
             @RequestParam(name = "userName") String userName,
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type", required = false) CredentialType type) {
-        return credentialCenter.getCredentialDefinitionsByCsp(csp, userName, type);
+        return credentialCenter.getCredentials(csp, userName, type);
     }
 
     /**

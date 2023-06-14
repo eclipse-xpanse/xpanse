@@ -74,7 +74,8 @@ public abstract class AbstractCredentialInfo {
     @Getter
     @Setter
     @Hidden
-    private Long expiredTime;
+    @Schema(description = "The time in seconds to live of the credential")
+    private Integer timeToLive;
 
     /**
      * The constructor.

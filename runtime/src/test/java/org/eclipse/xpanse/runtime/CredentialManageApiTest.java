@@ -101,10 +101,10 @@ class CredentialManageApiTest {
 
         // Configure CredentialCenter.getCredentialDefinitionsByCsp(...).
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.AWS, null, "name", "description",
+                List.of(new CredentialVariables(Csp.AWS, "userName", "name", "description",
                         CredentialType.VARIABLES,
                         List.of(new CredentialVariable("name", "description", false))));
-        when(mockCredentialCenter.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
+        when(mockCredentialCenter.getCredentials(Csp.AWS, "userName",
                 CredentialType.VARIABLES)).thenReturn(credentialVariables);
 
         // Run the test
@@ -119,7 +119,7 @@ class CredentialManageApiTest {
     @Test
     void testGetCredentialDefinitionsByCsp_CredentialCenterReturnsNoItems() {
         // Setup
-        when(mockCredentialCenter.getCredentialDefinitionsByCsp(Csp.AWS, "userName", CredentialType.VARIABLES)).thenReturn(Collections.emptyList());
+        when(mockCredentialCenter.getCredentials(Csp.AWS, "userName", CredentialType.VARIABLES)).thenReturn(Collections.emptyList());
 
         // Run the test
         final List<AbstractCredentialInfo> result =

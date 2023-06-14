@@ -36,8 +36,8 @@ public class CredentialVariableDeserializer extends StdDeserializer<CredentialVa
 
         String name = node.get("name").asText();
         String description = node.get("description").asText();
-        boolean isMandatory = node.get("isMandatory").asBoolean();
-        boolean isSensitive = node.get("isSensitive").asBoolean();
+        boolean isMandatory = node.get("mandatory").asBoolean();
+        boolean isSensitive = node.get("sensitive").asBoolean();
         String value = node.get("value").asText();
 
         return new CredentialVariable(name, description, isMandatory, isSensitive, value);
