@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.eclipse.xpanse.modules.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.MeasuresService;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.ResourcesService;
@@ -41,6 +44,8 @@ public class MetricsManager {
 
     private final MeasuresService measuresService;
 
+    private final CredentialCenter credentialCenter;
+
     /**
      * Constructor for the MetricsManager bean.
      *
@@ -53,12 +58,14 @@ public class MetricsManager {
     @Autowired
     public MetricsManager(KeystoneManager keystoneManager, ResourcesService resourcesService,
                           GnocchiToXpanseModelConverter gnocchiToXpanseModelConverter,
-                          AggregationService aggregationService, MeasuresService measuresService) {
+                          AggregationService aggregationService, MeasuresService measuresService,
+                          CredentialCenter credentialCenter) {
         this.keystoneManager = keystoneManager;
         this.resourcesService = resourcesService;
         this.gnocchiToXpanseModelConverter = gnocchiToXpanseModelConverter;
         this.aggregationService = aggregationService;
         this.measuresService = measuresService;
+        this.credentialCenter = credentialCenter;
     }
 
     /**
@@ -70,7 +77,9 @@ public class MetricsManager {
      */
     public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
 
-        keystoneManager.authenticate(resourceMetricRequest.getCredential());
+        keystoneManager.authenticate(credentialCenter.getCredential(
+                Csp.OPENSTACK, resourceMetricRequest.getXpanseUserName(),
+                CredentialType.VARIABLES));
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
         InstanceResource instanceResource =
                 this.resourcesService.getInstanceResourceInfoById(

@@ -9,11 +9,11 @@ import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.utils.Flexi
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.utils.FlexibleEngineMonitorConverter;
 import org.junit.jupiter.api.Test;
 
-public class FlexibleEngineOrchestratorPluginTest {
+class FlexibleEngineOrchestratorPluginTest {
 
     private final FlexibleEngineOrchestratorPlugin plugin = new FlexibleEngineOrchestratorPlugin(
             new MetricsService(new FlexibleEngineMonitorConverter(),
-                    new FlexibleEngineMonitorCache()));
+                    new FlexibleEngineMonitorCache(), null));
 
     @Test
     void getResourceHandler() {

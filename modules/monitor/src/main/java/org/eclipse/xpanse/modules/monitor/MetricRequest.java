@@ -6,11 +6,8 @@
 
 package org.eclipse.xpanse.modules.monitor;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 
 /**
@@ -21,9 +18,6 @@ import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 @SuppressWarnings("UnnecessarilyFullyQualified")
 public class MetricRequest {
 
-    @NotNull
-    private AbstractCredentialInfo credential;
-
     private MonitorResourceType monitorResourceType;
 
     private Long from;
@@ -33,4 +27,6 @@ public class MetricRequest {
     private Integer granularity;
 
     private boolean onlyLastKnownMetric;
+
+    private String xpanseUserName;
 }

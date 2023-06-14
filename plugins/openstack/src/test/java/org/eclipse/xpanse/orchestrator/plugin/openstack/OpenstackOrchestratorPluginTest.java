@@ -19,12 +19,12 @@ import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.utils.GnocchiToX
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.utils.MetricsManager;
 import org.junit.jupiter.api.Test;
 
-public class OpenstackOrchestratorPluginTest {
+class OpenstackOrchestratorPluginTest {
 
     private final OpenstackOrchestratorPlugin plugin = new OpenstackOrchestratorPlugin(
             new MetricsManager(new KeystoneManager(), new ResourcesService(),
                     new GnocchiToXpanseModelConverter(), new AggregationService(new MetricsQueryBuilder()),
-                    new MeasuresService(new MetricsQueryBuilder())));
+                    new MeasuresService(new MetricsQueryBuilder()), null));
 
     @Test
     void getResourceHandler() {

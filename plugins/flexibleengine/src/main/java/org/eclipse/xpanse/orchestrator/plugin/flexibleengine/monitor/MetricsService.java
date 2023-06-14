@@ -31,11 +31,13 @@ import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
@@ -64,12 +66,23 @@ public class MetricsService {
 
     private final FlexibleEngineMonitorCache flexibleEngineMonitorCache;
 
+    private final CredentialCenter credentialCenter;
+
+    /**
+     * Constructor for the MetricsService class.
+     *
+     * @param flexibleEngineMonitorConverter instance of FlexibleEngineMonitorConverter
+     * @param flexibleEngineMonitorCache instance of FlexibleEngineMonitorCache
+     * @param credentialCenter instance of CredentialCenter
+     */
     @Autowired
     public MetricsService(
             FlexibleEngineMonitorConverter flexibleEngineMonitorConverter,
-            FlexibleEngineMonitorCache flexibleEngineMonitorCache) {
+            FlexibleEngineMonitorCache flexibleEngineMonitorCache,
+            CredentialCenter credentialCenter) {
         this.flexibleEngineMonitorConverter = flexibleEngineMonitorConverter;
         this.flexibleEngineMonitorCache = flexibleEngineMonitorCache;
+        this.credentialCenter = credentialCenter;
     }
 
     /**
@@ -231,7 +244,9 @@ public class MetricsService {
      */
     public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
-        AbstractCredentialInfo credential = resourceMetricRequest.getCredential();
+        AbstractCredentialInfo credential = credentialCenter.getCredential(
+                Csp.FLEXIBLE_ENGINE, resourceMetricRequest.getXpanseUserName(),
+                CredentialType.VARIABLES);
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         String region = deployResource.getProperties().get("region");
         MonitorResourceType resourceType = resourceMetricRequest.getMonitorResourceType();
@@ -239,7 +254,7 @@ public class MetricsService {
             String projectQueryUrl =
                     flexibleEngineMonitorConverter.buildProjectQueryUrl(region).toString();
             Project project =
-                    queryProjectInfo(resourceMetricRequest.getCredential(), projectQueryUrl);
+                    queryProjectInfo(credential, projectQueryUrl);
             if (Objects.nonNull(project) && StringUtils.isNotBlank(project.getId())) {
                 List<MetricInfoList> targetMetrics =
                         getTargetMetricInfoList(deployResource, credential, resourceType, project);
@@ -278,7 +293,9 @@ public class MetricsService {
      */
     public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
-        AbstractCredentialInfo credential = serviceMetricRequest.getCredential();
+        AbstractCredentialInfo credential = credentialCenter.getCredential(
+                Csp.FLEXIBLE_ENGINE, serviceMetricRequest.getXpanseUserName(),
+                CredentialType.VARIABLES);
         MonitorResourceType resourceType = serviceMetricRequest.getMonitorResourceType();
         String region = deployResources.get(0).getProperties().get("region");
         Project project = null;

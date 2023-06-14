@@ -190,19 +190,21 @@ public class CredentialCenter {
      * @param csp        The cloud service provider.
      * @param xpanseUser The user who provided the credential info.
      */
-    public AbstractCredentialInfo getCredential(Csp csp, String xpanseUser) {
+    public AbstractCredentialInfo getCredential(Csp csp,
+                                                String xpanseUser,
+                                                CredentialType credentialType) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
-        List<AbstractCredentialInfo> credentialVariablesList =
-                credentialCacheManager.getAllTypeCaches(cacheKey);
-        if (!CollectionUtils.isEmpty(credentialVariablesList)) {
-            return credentialVariablesList.get(0);
+        AbstractCredentialInfo credentialVariables =
+                credentialCacheManager.getCachesByType(cacheKey, credentialType);
+        if (Objects.nonNull(credentialVariables)) {
+            return credentialVariables;
         }
         AbstractCredentialInfo credentialInfo = findCredentialInfoFromEnv(csp);
         if (Objects.isNull(credentialInfo)) {
             throw new IllegalStateException(
                     String.format("No credential information found for the given Csp:%s.", csp));
         }
-        return (CredentialVariables) credentialInfo;
+        return credentialInfo;
     }
 
     /**

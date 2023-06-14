@@ -134,12 +134,12 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
             ResourceMetricRequest resourceMetricRequest = new ResourceMetricRequest(
                     deployResource,
-                    serviceMetricRequest.getCredential(),
                     serviceMetricRequest.getMonitorResourceType(),
                     serviceMetricRequest.getFrom(),
                     serviceMetricRequest.getTo(),
                     serviceMetricRequest.getGranularity(),
-                    serviceMetricRequest.isOnlyLastKnownMetric()
+                    serviceMetricRequest.isOnlyLastKnownMetric(),
+                    serviceMetricRequest.getXpanseUserName()
             );
             metrics.addAll(this.metricsManager.getMetrics(resourceMetricRequest));
         }
