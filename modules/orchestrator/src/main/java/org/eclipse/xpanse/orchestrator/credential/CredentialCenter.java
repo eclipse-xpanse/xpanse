@@ -202,7 +202,7 @@ public class CredentialCenter {
             throw new IllegalStateException(
                     String.format("No credential information found for the given Csp:%s.", csp));
         }
-        return (CredentialVariables) credentialInfo;
+        return credentialInfo;
     }
 
     /**
@@ -273,6 +273,7 @@ public class CredentialCenter {
     private CredentialVariables createCredentialVariablesObject(
             CreateCredential createCredential) {
         CredentialVariables credential = new CredentialVariables(createCredential.getCsp(),
+                createCredential.getXpanseUser(),
                 createCredential.getName(), createCredential.getDescription(),
                 createCredential.getType(), createCredential.getVariables());
         if (Objects.isNull(createCredential.getTimeToLive())) {

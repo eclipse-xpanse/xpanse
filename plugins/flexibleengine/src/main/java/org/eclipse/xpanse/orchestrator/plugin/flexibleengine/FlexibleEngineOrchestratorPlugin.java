@@ -59,7 +59,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         CredentialVariables accessKey = new CredentialVariables(
-                getCsp(), "AK_SK", "The access key and security key.",
+                getCsp(), null, "AK_SK", "The access key and security key.",
                 CredentialType.VARIABLES, credentialVariables);
         credentialVariables.add(
                 new CredentialVariable(FlexibleEngineMonitorConstants.OS_ACCESS_KEY,

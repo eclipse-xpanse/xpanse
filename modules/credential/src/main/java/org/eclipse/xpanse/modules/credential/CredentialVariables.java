@@ -6,12 +6,10 @@
 
 package org.eclipse.xpanse.modules.credential;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Getter;
-import lombok.Setter;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 
@@ -31,9 +29,10 @@ public class CredentialVariables extends AbstractCredentialInfo {
     /**
      * The constructor.
      */
-    public CredentialVariables(Csp csp, String name, String description, CredentialType type,
+    public CredentialVariables(Csp csp, String xpanseUser, String name, String description,
+                               CredentialType type,
                                List<CredentialVariable> variables) {
-        super(csp, name, description, type);
+        super(csp, xpanseUser, name, description, type);
         this.variables = variables;
     }
 }
