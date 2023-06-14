@@ -90,15 +90,6 @@ public class CredentialCacheManager {
     }
 
     /**
-     * Remove cache.
-     *
-     * @param key key
-     */
-    public void removeAllTypeCaches(CredentialCacheKey key) {
-        CACHES.remove(key);
-    }
-
-    /**
      * Remove cache by key and credential type.
      *
      * @param key  key
