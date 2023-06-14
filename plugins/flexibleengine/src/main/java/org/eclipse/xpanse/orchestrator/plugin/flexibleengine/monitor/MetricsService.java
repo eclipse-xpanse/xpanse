@@ -14,18 +14,14 @@ import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
 import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
 import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
-import com.huaweicloud.sdk.core.internal.model.KeystoneListProjectsResponse;
 import com.huaweicloud.sdk.core.internal.model.Project;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
@@ -43,15 +39,10 @@ import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models.Flex
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.utils.FlexibleEngineMonitorCache;
 import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.utils.FlexibleEngineMonitorConverter;
+import org.eclipse.xpanse.orchestrator.plugin.flexibleengine.monitor.utils.RetryTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Class to encapsulate all Metric related public methods for FlexibleEngine plugin.
@@ -60,11 +51,13 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class MetricsService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final FlexibleEngineMonitorConverter flexibleEngineMonitorConverter;
 
     private final FlexibleEngineMonitorCache flexibleEngineMonitorCache;
+
+    private final RetryTemplateService retryTemplateService;
 
     private final CredentialCenter credentialCenter;
 
@@ -72,16 +65,19 @@ public class MetricsService {
      * Constructor for the MetricsService class.
      *
      * @param flexibleEngineMonitorConverter instance of FlexibleEngineMonitorConverter
-     * @param flexibleEngineMonitorCache instance of FlexibleEngineMonitorCache
-     * @param credentialCenter instance of CredentialCenter
+     * @param flexibleEngineMonitorCache     instance of FlexibleEngineMonitorCache
+     * @param retryTemplateService           instance of retryTemplateService
+     * @param credentialCenter               instance of CredentialCenter
      */
     @Autowired
     public MetricsService(
             FlexibleEngineMonitorConverter flexibleEngineMonitorConverter,
             FlexibleEngineMonitorCache flexibleEngineMonitorCache,
+            RetryTemplateService retryTemplateService,
             CredentialCenter credentialCenter) {
         this.flexibleEngineMonitorConverter = flexibleEngineMonitorConverter;
         this.flexibleEngineMonitorCache = flexibleEngineMonitorCache;
+        this.retryTemplateService = retryTemplateService;
         this.credentialCenter = credentialCenter;
     }
 
@@ -126,7 +122,7 @@ public class MetricsService {
      * @return Returns HttpRequestBase
      */
     public HttpRequestBase buildPostRequest(AbstractCredentialInfo credential, String url,
-                                            String postbody) {
+                                            String postBody) {
         String accessKey = null;
         String securityKey = null;
         HttpRequestBase requestBase = null;
@@ -145,7 +141,7 @@ public class MetricsService {
         }
         try {
             requestBase = Client.post(accessKey, securityKey, url,
-                    flexibleEngineMonitorConverter.getHeaders(), postbody);
+                    flexibleEngineMonitorConverter.getHeaders(), postBody);
         } catch (Exception e) {
             log.error("Build Post Request of the FlexibleEngine API error.", e);
         }
@@ -154,77 +150,32 @@ public class MetricsService {
 
     private Project queryProjectInfo(AbstractCredentialInfo credential, String url) {
         HttpRequestBase requestBase = buildGetRequest(credential, url);
-        HttpEntity<String> entity = new HttpEntity<>("parameters", getHttpHeaders(requestBase));
+        return retryTemplateService.queryProjectInfo(requestBase);
+    }
+
+    private ShowMetricDataResponse queryMetricData(AbstractCredentialInfo credential, String url) {
+        HttpRequestBase requestBase = buildGetRequest(credential, url);
+        return retryTemplateService.queryMetricData(requestBase);
+    }
+
+    private ListMetricsResponse queryMetricItemList(AbstractCredentialInfo credential, String url) {
+        HttpRequestBase requestBase = buildGetRequest(credential, url);
+        return retryTemplateService.queryMetricItemList(requestBase);
+    }
+
+    private BatchListMetricDataResponse batchQueryMetricData(AbstractCredentialInfo credential,
+                                                             BatchListMetricDataRequest request,
+                                                             String url) {
         try {
-            ResponseEntity<KeystoneListProjectsResponse> response =
-                    restTemplate.exchange(requestBase.getURI(), HttpMethod.GET, entity,
-                            KeystoneListProjectsResponse.class);
-            if (Objects.nonNull(response.getBody())) {
-                if (!CollectionUtils.isEmpty(response.getBody().getProjects())) {
-                    return response.getBody().getProjects().get(0);
-                }
-            }
-        } catch (RestClientException e) {
-            log.error("query metrics info by url:{} error.", url, e);
+            String requestBody = objectMapper.writeValueAsString(request.getBody());
+            HttpRequestBase requestBase = buildPostRequest(credential, url, requestBody);
+            return retryTemplateService.batchQueryMetricData(requestBase, requestBody);
+        } catch (JsonProcessingException e) {
+            log.error("BatchQueryMetricData JsonProcessingException.", e);
         }
         return null;
     }
 
-    private ShowMetricDataResponse queryMetricsInfo(AbstractCredentialInfo credential, String url) {
-        HttpRequestBase requestBase = buildGetRequest(credential, url);
-        HttpEntity<String> entity = new HttpEntity<>("parameters", getHttpHeaders(requestBase));
-        ShowMetricDataResponse result = null;
-        try {
-            ResponseEntity<ShowMetricDataResponse> responseEntity =
-                    restTemplate.exchange(url, HttpMethod.GET, entity,
-                            ShowMetricDataResponse.class);
-            result = responseEntity.getBody();
-        } catch (RestClientException e) {
-            log.error("query metrics info by url:{} error.", url, e);
-        }
-        return result;
-    }
-
-    private ListMetricsResponse queryListMetricsInfo(AbstractCredentialInfo credential,
-                                                     String url) {
-        HttpRequestBase requestBase = buildGetRequest(credential, url);
-        HttpEntity<String> entity = new HttpEntity<>("parameters", getHttpHeaders(requestBase));
-        ListMetricsResponse result = null;
-        try {
-            ResponseEntity<ListMetricsResponse> responseEntity =
-                    restTemplate.exchange(url, HttpMethod.GET, entity, ListMetricsResponse.class);
-            result = responseEntity.getBody();
-        } catch (RestClientException e) {
-            log.error("query metrics list info by url:{} error.", url, e);
-        }
-        return result;
-    }
-
-    private BatchListMetricDataResponse batchQueryListMetricsInfo(
-            AbstractCredentialInfo credential, BatchListMetricDataRequest request, String url) {
-        BatchListMetricDataResponse result = null;
-        try {
-            String requestBody = new ObjectMapper().writeValueAsString(request.getBody());
-            HttpRequestBase requestBase = buildPostRequest(credential, url, requestBody);
-            HttpEntity<String> entity = new HttpEntity<>(requestBody,
-                    getHttpHeaders(requestBase));
-            ResponseEntity<BatchListMetricDataResponse> responseEntity =
-                    restTemplate.exchange(url, HttpMethod.POST, entity,
-                            BatchListMetricDataResponse.class);
-            result = responseEntity.getBody();
-        } catch (RestClientException | JsonProcessingException e) {
-            log.error("batch query metrics list info by url:{} error.", url, e);
-        }
-        return result;
-    }
-
-    private HttpHeaders getHttpHeaders(HttpRequestBase httpRequestBase) {
-        HttpHeaders headers = new HttpHeaders();
-        Map<String, String> headerKeyValues = Arrays.stream(httpRequestBase.getAllHeaders())
-                .collect(Collectors.toMap(Header::getName, Header::getValue));
-        headers.setAll(headerKeyValues);
-        return headers;
-    }
 
     /**
      * Get metrics of the @deployResource.
@@ -262,7 +213,7 @@ public class MetricsService {
                     String url = flexibleEngineMonitorConverter.buildMonitorMetricUrl(
                             resourceMetricRequest, project.getId(), metricInfoList);
                     if (StringUtils.isNotBlank(url)) {
-                        ShowMetricDataResponse response = queryMetricsInfo(credential, url);
+                        ShowMetricDataResponse response = queryMetricData(credential, url);
                         Metric metric =
                                 flexibleEngineMonitorConverter.convertResponseToMetric(
                                         deployResource, response, metricInfoList,
@@ -323,8 +274,7 @@ public class MetricsService {
                 project.getId()).toString();
 
         BatchListMetricDataResponse batchListMetricDataResponse =
-                batchQueryListMetricsInfo(credential, batchListMetricDataRequest,
-                        url);
+                batchQueryMetricData(credential, batchListMetricDataRequest, url);
 
         List<Metric> metrics =
                 flexibleEngineMonitorConverter.convertBatchListMetricDataResponseToMetric(
@@ -365,7 +315,7 @@ public class MetricsService {
         String url =
                 flexibleEngineMonitorConverter.buildListMetricsUrl(deployResource,
                         project.getId());
-        ListMetricsResponse listMetricsResponse = queryListMetricsInfo(credential, url);
+        ListMetricsResponse listMetricsResponse = queryMetricItemList(credential, url);
         if (Objects.nonNull(listMetricsResponse)) {
             List<MetricInfoList> metrics = listMetricsResponse.getMetrics();
             if (Objects.isNull(monitorResourceType)) {
@@ -374,7 +324,7 @@ public class MetricsService {
                     if (Objects.nonNull(targetMetricInfo)) {
                         targetMetrics.add(targetMetricInfo);
                     } else {
-                        log.error("Could not get metrics of the resource. metricType:{},"
+                        log.error("Could not get metric item of the resource. metricType:{},"
                                 + "resourceId:{}", type.toValue(), deployResource.getResourceId());
                     }
                 }

@@ -58,7 +58,7 @@ public class FlexibleEngineMonitorCache {
      */
     public List<Metric> get(String resourceId, String metricName) {
         List<Metric> metrics = new ArrayList<>();
-        if (StringUtils.isBlank(resourceId) || isEmpty()) {
+        if (StringUtils.isBlank(resourceId) || isEmpty() || !METRIC_MAP.containsKey(resourceId)) {
             return metrics;
         }
 
