@@ -14,7 +14,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CreateCredential;
-import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
@@ -90,32 +89,6 @@ public class CredentialManageApi {
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type", required = false) CredentialType type) {
         return credentialCenter.getCredentialCapabilitiesByCsp(csp, type);
-    }
-
-
-    /**
-     * List credentials of the cloud service provider and the user.
-     *
-     * @param csp      The cloud service provider.
-     * @param userName The name of user who provided the credential.
-     * @param type     The type of credential.
-     * @return Returns credentials of the cloud service provider and the user.
-     */
-    @Tag(name = "Credentials Management",
-            description = "APIs for user manage credentials for authentication.")
-    @GetMapping(value = "/auth/csp/{cspName}/credentials",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List credentials of the cloud service provider and the user.")
-    public List<CredentialVariables> getCredentialDefinitionsByCsp(
-            @Parameter(name = "cspName", description = "The cloud service provider.")
-            @PathVariable(name = "cspName") Csp csp,
-            @Parameter(name = "userName",
-                    description = "The name of user who provided the credential.")
-            @RequestParam(name = "userName") String userName,
-            @Parameter(name = "type", description = "The type of credential.")
-            @RequestParam(name = "type", required = false) CredentialType type) {
-        return credentialCenter.getCredentialDefinitionsByCsp(csp, userName, type);
     }
 
     /**

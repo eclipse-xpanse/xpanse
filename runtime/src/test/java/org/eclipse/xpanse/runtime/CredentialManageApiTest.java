@@ -15,8 +15,6 @@ import java.util.List;
 import org.eclipse.xpanse.api.CredentialManageApi;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CreateCredential;
-import org.eclipse.xpanse.modules.credential.CredentialVariable;
-import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
@@ -101,41 +99,6 @@ class CredentialManageApiTest {
         // Run the test
         final List<AbstractCredentialInfo> result =
                 credentialManageApiUnderTest.getCredentialCapabilitiesByCsp(Csp.AWS,
-                        CredentialType.VARIABLES);
-
-        // Verify the results
-        assertThat(result).isEqualTo(Collections.emptyList());
-    }
-
-    @Test
-    void testGetCredentialDefinitionsByCsp() {
-
-        // Configure CredentialCenter.getCredentialDefinitionsByCsp(...).
-        final List<CredentialVariables> credentialVariables =
-                List.of(new CredentialVariables(Csp.AWS, "name", "description",
-                        CredentialType.VARIABLES,
-                        List.of(new CredentialVariable("name", "description", false))));
-        when(mockCredentialCenter.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
-                CredentialType.VARIABLES)).thenReturn(credentialVariables);
-
-        // Run the test
-        final List<CredentialVariables> result =
-                credentialManageApiUnderTest.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
-                        CredentialType.VARIABLES);
-
-        // Verify the results
-        assertThat(result).isEqualTo(credentialVariables);
-    }
-
-    @Test
-    void testGetCredentialDefinitionsByCsp_CredentialCenterReturnsNoItems() {
-        // Setup
-        when(mockCredentialCenter.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
-                CredentialType.VARIABLES)).thenReturn(Collections.emptyList());
-
-        // Run the test
-        final List<CredentialVariables> result =
-                credentialManageApiUnderTest.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
                         CredentialType.VARIABLES);
 
         // Verify the results

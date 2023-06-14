@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.orchestrator.credential;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -91,29 +90,6 @@ public class CredentialCenter {
      */
     public String getCredentialOpenApiUrl(Csp csp, CredentialType type) {
         return credentialApiUtil.getCredentialOpenApiUrl(csp, type);
-    }
-
-    /**
-     * List the credential info of the @csp and @xpanseUser and @type.
-     *
-     * @param csp        The cloud service provider.
-     * @param xpanseUser The user who provided the credential info.
-     * @param type       The type of the credential.
-     * @return the credentials.
-     */
-    public List<CredentialVariables> getCredentialDefinitionsByCsp(Csp csp, String xpanseUser,
-                                                                   CredentialType type) {
-        CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
-        if (Objects.isNull(type)) {
-            return credentialCacheManager.getAllTypeCaches(cacheKey);
-        }
-        CredentialVariables credentialVariables =
-                credentialCacheManager.getCachesByType(cacheKey, type);
-        List<CredentialVariables> result = new ArrayList<>();
-        if (Objects.nonNull(credentialVariables)) {
-            result.add(credentialVariables);
-        }
-        return result;
     }
 
     /**
