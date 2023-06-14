@@ -98,7 +98,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                                 + "services data.",
                         false));
         CredentialVariables httpAuth = new CredentialVariables(
-                getCsp(), "Variables",
+                getCsp(), null, "Variables",
                 "Authenticate at the specified URL using an account and password.",
                 CredentialType.VARIABLES, credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();

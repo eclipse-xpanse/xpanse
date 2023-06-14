@@ -79,8 +79,10 @@ public abstract class AbstractCredentialInfo {
     /**
      * The constructor.
      */
-    AbstractCredentialInfo(Csp csp, String name, String description, CredentialType type) {
+    AbstractCredentialInfo(Csp csp, String xpanseUser, String name, String description,
+                           CredentialType type) {
         this.csp = csp;
+        this.xpanseUser = xpanseUser;
         this.name = name;
         this.description = description;
         this.type = type;

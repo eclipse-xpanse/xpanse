@@ -6,16 +6,19 @@
 
 package org.eclipse.xpanse.modules.credential;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.eclipse.xpanse.modules.credential.config.CredentialVariableDeserializer;
 
 /**
  * The class object for the CredentialVariable.
  */
 @Data
 @SuppressWarnings("UnnecessarilyFullyQualified")
+@JsonDeserialize(using = CredentialVariableDeserializer.class)
 public class CredentialVariable {
 
     @NotNull
@@ -72,4 +75,21 @@ public class CredentialVariable {
         this.isSensitive = isSensitive;
     }
 
+    /**
+     * Constructor to initialize all properties of the CredentialVariable.
+     *
+     * @param name        name of the variable.
+     * @param description description of the variable.
+     * @param isMandatory if the credential variable is mandatory.
+     * @param isSensitive defines if the particular variable contains sensitive data.
+     * @param value       the value of the CredentialVariable filled by the user.
+     */
+    public CredentialVariable(String name, String description, boolean isMandatory,
+                              boolean isSensitive, String value) {
+        this.name = name;
+        this.description = description;
+        this.isMandatory = isMandatory;
+        this.isSensitive = isSensitive;
+        this.value = value;
+    }
 }

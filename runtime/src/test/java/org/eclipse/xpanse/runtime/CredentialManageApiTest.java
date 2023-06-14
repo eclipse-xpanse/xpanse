@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-
 import org.eclipse.xpanse.api.CredentialManageApi;
 import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CreateCredential;
@@ -102,7 +101,7 @@ class CredentialManageApiTest {
 
         // Configure CredentialCenter.getCredentialDefinitionsByCsp(...).
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.AWS, "name", "description",
+                List.of(new CredentialVariables(Csp.AWS, null, "name", "description",
                         CredentialType.VARIABLES,
                         List.of(new CredentialVariable("name", "description", false))));
         when(mockCredentialCenter.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
