@@ -13,14 +13,11 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
-import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
@@ -29,7 +26,6 @@ import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
-import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -42,7 +38,6 @@ import org.springframework.util.CollectionUtils;
 public class Monitor {
 
     private static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
-    private final CredentialCenter credentialCenter;
     private final DeployServiceStorage deployServiceStorage;
     private final DeployResourceStorage deployResourceStorage;
     private final OrchestratorService orchestratorService;
@@ -50,11 +45,9 @@ public class Monitor {
     /**
      * The constructor of Monitor.
      */
-    public Monitor(CredentialCenter credentialCenter,
-                   DeployServiceStorage deployServiceStorage,
+    public Monitor(DeployServiceStorage deployServiceStorage,
                    DeployResourceStorage deployResourceStorage,
                    OrchestratorService orchestratorService) {
-        this.credentialCenter = credentialCenter;
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
         this.orchestratorService = orchestratorService;
@@ -70,9 +63,6 @@ public class Monitor {
         if (Objects.isNull(serviceEntity)) {
             throw new EntityNotFoundException("Service not found.");
         }
-        AbstractCredentialInfo credential = credentialCenter.getCredential(
-                serviceEntity.getCsp(), serviceEntity.getUserName());
-
         OrchestratorPlugin orchestratorPlugin =
                 orchestratorService.getOrchestratorPlugin(serviceEntity.getCsp());
 
@@ -82,8 +72,8 @@ public class Monitor {
         for (DeployResource deployResource : deployResources) {
             if (DeployResourceKind.VM.equals(deployResource.getKind())) {
                 ResourceMetricRequest resourceMetricRequest =
-                        getResourceMetricRequest(deployResource, credential, monitorType, from, to,
-                                granularity, false);
+                        getResourceMetricRequest(deployResource, monitorType, from, to,
+                                granularity, false, serviceEntity.getUserName());
                 List<Metric> metricList = orchestratorPlugin.getMetrics(resourceMetricRequest);
                 metrics.addAll(metricList);
             }
@@ -114,15 +104,12 @@ public class Monitor {
             throw new EntityNotFoundException("No resource found in the service.");
         }
 
-        AbstractCredentialInfo credential =
-                getCredential(serviceEntity.getCsp(), serviceEntity.getUserName());
-
         OrchestratorPlugin orchestratorPlugin =
                 orchestratorService.getOrchestratorPlugin(serviceEntity.getCsp());
 
         ServiceMetricRequest serviceMetricRequest =
-                getServiceMetricRequest(vmResources, credential, monitorType, from,
-                        to, granularity, onlyLastKnownMetric);
+                getServiceMetricRequest(vmResources, monitorType, from,
+                        to, granularity, onlyLastKnownMetric, serviceEntity.getUserName());
 
         return orchestratorPlugin.getMetricsForService(serviceMetricRequest);
     }
@@ -154,13 +141,11 @@ public class Monitor {
         BeanUtils.copyProperties(resourceEntity, deployResource);
         DeployServiceEntity serviceEntity = findDeployServiceEntity(
                 resourceEntity.getDeployService().getId());
-        AbstractCredentialInfo credential =
-                getCredential(serviceEntity.getCsp(), serviceEntity.getUserName());
         OrchestratorPlugin orchestratorPlugin =
                 orchestratorService.getOrchestratorPlugin(serviceEntity.getCsp());
         ResourceMetricRequest resourceMetricRequest =
-                getResourceMetricRequest(deployResource, credential, monitorType, from,
-                        to, granularity, onlyLastKnownMetric);
+                getResourceMetricRequest(deployResource, monitorType, from,
+                        to, granularity, onlyLastKnownMetric, serviceEntity.getUserName());
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
     }
 
@@ -174,23 +159,13 @@ public class Monitor {
         return serviceEntity;
     }
 
-    private AbstractCredentialInfo getCredential(Csp csp, String userName) {
-        AbstractCredentialInfo credential = credentialCenter.getCredential(
-                csp, userName);
-        if (Objects.isNull(credential)) {
-            throw new EntityNotFoundException("Credential not found.");
-        }
-        return credential;
-    }
-
-
     private ResourceMetricRequest getResourceMetricRequest(DeployResource deployResource,
-                                                           AbstractCredentialInfo credential,
                                                            MonitorResourceType monitorType,
                                                            Long from,
                                                            Long to,
                                                            Integer granularity,
-                                                           boolean onlyLastKnownMetric) {
+                                                           boolean onlyLastKnownMetric,
+                                                           String xpanseUserName) {
         if (onlyLastKnownMetric) {
             from = null;
             to = null;
@@ -203,17 +178,17 @@ public class Monitor {
             }
         }
 
-        return new ResourceMetricRequest(deployResource, credential, monitorType, from, to,
-                granularity, onlyLastKnownMetric);
+        return new ResourceMetricRequest(deployResource, monitorType, from, to,
+                granularity, onlyLastKnownMetric, xpanseUserName);
     }
 
     private ServiceMetricRequest getServiceMetricRequest(List<DeployResource> deployResources,
-                                                         AbstractCredentialInfo credential,
                                                          MonitorResourceType monitorType,
                                                          Long from,
                                                          Long to,
                                                          Integer granularity,
-                                                         boolean onlyLastKnownMetric) {
+                                                         boolean onlyLastKnownMetric,
+                                                         String xpanseUserName) {
         if (onlyLastKnownMetric) {
             from = null;
             to = null;
@@ -225,8 +200,8 @@ public class Monitor {
                 to = System.currentTimeMillis();
             }
         }
-        return new ServiceMetricRequest(deployResources, credential, monitorType, from, to,
-                granularity, onlyLastKnownMetric);
+        return new ServiceMetricRequest(deployResources, monitorType, from, to,
+                granularity, onlyLastKnownMetric, xpanseUserName);
     }
 
     private void validateToAndFromValues(Long from, Long to) {

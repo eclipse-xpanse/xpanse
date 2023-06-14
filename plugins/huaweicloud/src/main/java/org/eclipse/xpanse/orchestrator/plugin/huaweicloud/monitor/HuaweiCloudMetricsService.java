@@ -26,11 +26,13 @@ import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.models.HuaweiCloudMonitorMetrics;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.monitor.models.HuaweiCloudNameSpaceKind;
@@ -55,6 +57,8 @@ public class HuaweiCloudMetricsService {
 
     private final HuaweiCloudToXpanseDataModelConverter huaweiCloudToXpanseDataModelConverter;
 
+    private final CredentialCenter credentialCenter;
+
     /**
      * Constructs a HuaweiCloudMetricsService with the necessary dependencies.
      */
@@ -62,10 +66,12 @@ public class HuaweiCloudMetricsService {
     public HuaweiCloudMetricsService(
             HuaweiCloudMonitorClient huaweiCloudMonitorClient,
             HuaweiCloudMonitorCache huaweiCloudMonitorCache,
-            HuaweiCloudToXpanseDataModelConverter huaweiCloudToXpanseDataModelConverter) {
+            HuaweiCloudToXpanseDataModelConverter huaweiCloudToXpanseDataModelConverter,
+            CredentialCenter credentialCenter) {
         this.huaweiCloudMonitorClient = huaweiCloudMonitorClient;
         this.huaweiCloudMonitorCache = huaweiCloudMonitorCache;
         this.huaweiCloudToXpanseDataModelConverter = huaweiCloudToXpanseDataModelConverter;
+        this.credentialCenter = credentialCenter;
     }
 
     /**
@@ -77,7 +83,9 @@ public class HuaweiCloudMetricsService {
     public List<Metric> getMetricsByResource(ResourceMetricRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
-        AbstractCredentialInfo credential = resourceMetricRequest.getCredential();
+        AbstractCredentialInfo credential = credentialCenter.getCredential(
+                Csp.FLEXIBLE_ENGINE, resourceMetricRequest.getXpanseUserName(),
+                CredentialType.VARIABLES);
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
         clearExpiredMetricCache(deployResource.getResourceId());
         ICredential icredential = getIcredential(credential);
@@ -135,7 +143,9 @@ public class HuaweiCloudMetricsService {
      */
     public List<Metric> getMetricsByService(ServiceMetricRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
-        AbstractCredentialInfo credential = serviceMetricRequest.getCredential();
+        AbstractCredentialInfo credential = credentialCenter.getCredential(
+                Csp.FLEXIBLE_ENGINE, serviceMetricRequest.getXpanseUserName(),
+                CredentialType.VARIABLES);
         MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
         ICredential icredential = getIcredential(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,

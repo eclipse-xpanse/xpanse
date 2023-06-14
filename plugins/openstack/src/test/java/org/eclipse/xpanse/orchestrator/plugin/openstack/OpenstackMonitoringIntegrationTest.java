@@ -8,6 +8,8 @@ package org.eclipse.xpanse.orchestrator.plugin.openstack;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
@@ -24,6 +26,7 @@ import org.eclipse.xpanse.modules.monitor.Metric;
 import org.eclipse.xpanse.modules.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.orchestrator.plugin.openstack.monitor.gnocchi.api.MeasuresService;
@@ -39,14 +42,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {OpenstackOrchestratorPlugin.class, MetricsManager.class,
         KeystoneManager.class, ResourcesService.class, GnocchiToXpanseModelConverter.class,
-        AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class})
-public class OpenstackMonitoringIntegrationTest {
+        AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class,
+        CredentialCenter.class})
+class OpenstackMonitoringIntegrationTest {
 
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
@@ -58,34 +63,44 @@ public class OpenstackMonitoringIntegrationTest {
     @Autowired
     OpenstackOrchestratorPlugin plugin;
 
-    public ResourceMetricRequest setupResourceRequest(
-            WireMockRuntimeInfo wmRuntimeInfo, Long from, Long to, Integer period, boolean onlyLastKnownMetric) {
+    @MockBean
+    CredentialCenter credentialCenter;
+
+    public ResourceMetricRequest setupResourceRequest(Long from, Long to, Integer period,
+                                                      boolean onlyLastKnownMetric) {
         return new ResourceMetricRequest(
                 Instancio.of(DeployResource.class).set(Select.field(DeployResource::getKind),
-                        DeployResourceKind.VM).set(Select.field(DeployResource::getResourceId), "7b5b6ee6-cab4-4e72-be6e-854a67c6d381").create(), getCredentialDefinition(wmRuntimeInfo),
-                null, from, to, period, onlyLastKnownMetric);
+                        DeployResourceKind.VM).set(Select.field(DeployResource::getResourceId),
+                        "7b5b6ee6-cab4-4e72-be6e-854a67c6d381").create(),
+                null, from, to, period, onlyLastKnownMetric, "user");
     }
 
     @Test
-    public void testGetMetricsHappyCase() {
-        List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(
-                wireMockExtension.getRuntimeInfo(), null, null, null, false));
+    void testGetMetricsHappyCase() {
+        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+                getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
+        List<Metric> metrics =
+                this.plugin.getMetrics(setupResourceRequest(null, null, null, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(1).getType());
         Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.get(0).getName());
         Assertions.assertEquals(MonitorResourceType.MEM.toValue(), metrics.get(1).getName());
-        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING.toValue(), metrics.get(2).getName());
-        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING.toValue(), metrics.get(3).getName());
+        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING.toValue(),
+                metrics.get(2).getName());
+        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING.toValue(),
+                metrics.get(3).getName());
         Assertions.assertEquals(326, metrics.get(0).getMetrics().size());
     }
 
     @Test
-    public void testGetMetricsWithFromAndTo() {
+    void testGetMetricsWithFromAndTo() {
+        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+                getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
         Long currentTime = Instant.now().getEpochSecond();
-        List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(
-                wireMockExtension.getRuntimeInfo(), currentTime, currentTime, null, false));
+        List<Metric> metrics =
+                this.plugin.getMetrics(setupResourceRequest(currentTime, currentTime, null, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
@@ -100,9 +115,10 @@ public class OpenstackMonitoringIntegrationTest {
     }
 
     @Test
-    public void testGetMetricsWithGranularity() {
-        List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(
-                wireMockExtension.getRuntimeInfo(), null, null, 150, false));
+    void testGetMetricsWithGranularity() {
+        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+                getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
+        List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(null, null, 150, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
@@ -113,9 +129,10 @@ public class OpenstackMonitoringIntegrationTest {
     }
 
     @Test
-    public void testGetOnlyLastKnownMetric() {
-        List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(
-                wireMockExtension.getRuntimeInfo(), null, null, 150, true));
+    void testGetOnlyLastKnownMetric() {
+        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+                getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
+        List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
