@@ -166,9 +166,9 @@ public class CredentialCenter {
      * @param xpanseUser The user who provided the credential info.
      * @return true of false.
      */
-    public boolean deleteCredential(Csp csp, String xpanseUser) {
+    public boolean deleteCredential(Csp csp, String xpanseUser, CredentialType credentialType) {
         CredentialCacheKey cacheKey = new CredentialCacheKey(csp, xpanseUser);
-        credentialCacheManager.removeAllTypeCaches(cacheKey);
+        credentialCacheManager.removeCacheByType(cacheKey, credentialType);
         return true;
     }
 

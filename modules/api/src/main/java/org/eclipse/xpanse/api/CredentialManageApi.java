@@ -198,8 +198,10 @@ public class CredentialManageApi {
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable("cspName") Csp csp,
             @Parameter(name = "userName", description = "The name of user who provided credential.")
-            @RequestParam(name = "userName") String userName) {
-        return credentialCenter.deleteCredential(csp, userName);
+            @RequestParam(name = "userName") String userName,
+            @Parameter(name = "type", description = "The type of credential.")
+            @RequestParam(name = "type") CredentialType type) {
+        return credentialCenter.deleteCredential(csp, userName, type);
     }
 
 }
