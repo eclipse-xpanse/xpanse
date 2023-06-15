@@ -91,6 +91,24 @@ public class CredentialManageApi {
         return credentialCenter.getCredentialCapabilitiesByCsp(csp, type);
     }
 
+    /**
+     * List all credentials of the user.
+     *
+     * @param userName The name of user who provided the credential.
+     * @return Returns all credentials of the user.
+     */
+    @Tag(name = "Credentials Management",
+            description = "APIs for user manage credentials for authentication.")
+    @GetMapping(value = "/auth/user/credentials",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(description = "List all credentials of the user.")
+    public List<AbstractCredentialInfo> getCredentialsByUser(
+            @Parameter(name = "userName",
+                    description = "The name of user who provided the credential.")
+            @RequestParam(name = "userName") String userName) {
+        return credentialCenter.getCredentialsByUser(userName);
+    }
 
     /**
      * List credentials of the cloud service provider and the user.
