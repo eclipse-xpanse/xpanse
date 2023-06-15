@@ -126,6 +126,21 @@ public class CredentialCenter {
     }
 
     /**
+     * List the credential info of the @xpanseUser.
+     *
+     * @param xpanseUser The user who provided the credential info.
+     * @return the credentials.
+     */
+    public List<AbstractCredentialInfo> getCredentialsByUser(String xpanseUser) {
+        List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
+        for (Csp csp : orchestratorService.pluginMap().keySet()) {
+            List<AbstractCredentialInfo> credentials = getCredentials(csp, xpanseUser, null);
+            abstractCredentialInfos.addAll(credentials);
+        }
+        return abstractCredentialInfos;
+    }
+
+    /**
      * List the credential info of the @csp and @xpanseUser and @type.
      *
      * @param csp                     The cloud service provider.
