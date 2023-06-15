@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.CredentialsStore;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.credential.enums.CredentialTypeMessage;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
@@ -71,12 +72,46 @@ public class CredentialCenter {
     public List<AbstractCredentialInfo> getCredentialCapabilitiesByCsp(Csp csp,
                                                                        CredentialType type) {
         OrchestratorPlugin plugin = orchestratorService.getOrchestratorPlugin(csp);
+        List<AbstractCredentialInfo> abstractCredentialInfoList;
         if (Objects.isNull(type)) {
-            return plugin.getCredentialDefinitions();
+            abstractCredentialInfoList = plugin.getCredentialDefinitions();
+        } else {
+            abstractCredentialInfoList =
+                    plugin.getCredentialDefinitions().stream().filter(credential ->
+                                    Objects.equals(credential.getType(), type))
+                            .collect(Collectors.toList());
         }
-        return plugin.getCredentialDefinitions().stream().filter(credential ->
-                        Objects.equals(credential.getType(), type))
-                .collect(Collectors.toList());
+        List<AbstractCredentialInfo>
+                abstractCredentialInfos;
+        abstractCredentialInfos = getCredentialCapabilitiesValue(abstractCredentialInfoList);
+
+        return abstractCredentialInfos;
+    }
+
+    /**
+     * List the credential capabilities by @abstractCredentialInfoList.
+     *
+     * @param abstractCredentialInfoList The list of  credential capabilities.
+     * @return Returns list of credential capabilities.
+     */
+    private List<AbstractCredentialInfo> getCredentialCapabilitiesValue(
+            List<AbstractCredentialInfo> abstractCredentialInfoList) {
+
+        List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
+        for (AbstractCredentialInfo abstractCredentialInfo : abstractCredentialInfoList) {
+            if (Objects.equals(abstractCredentialInfo.getType(), CredentialType.VARIABLES)) {
+                CredentialVariables credentialVariables =
+                        (CredentialVariables) abstractCredentialInfo;
+
+                for (CredentialVariable variable : credentialVariables.getVariables()) {
+                    variable.setValue(
+                            CredentialTypeMessage.getMessageByType(CredentialType.VARIABLES));
+                }
+                abstractCredentialInfos.add(credentialVariables);
+            }
+        }
+
+        return abstractCredentialInfos;
     }
 
     /**
