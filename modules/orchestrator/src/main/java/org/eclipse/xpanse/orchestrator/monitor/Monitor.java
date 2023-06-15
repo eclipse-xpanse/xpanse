@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;

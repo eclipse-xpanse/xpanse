@@ -60,6 +60,8 @@
         <logbook.version>3.0.0-RC.2</logbook.version>
         <wiremock.version>3.0.0-beta-8</wiremock.version>
         <instancio.version>2.16.0</instancio.version>
+        <caffeine.cache.version>3.1.6</caffeine.cache.version>
+        <awaitility.version>3.1.6</awaitility.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>

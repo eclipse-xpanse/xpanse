@@ -14,10 +14,8 @@ import static org.mockito.Mockito.when;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
-
 import java.time.Instant;
 import java.util.List;
-
 import org.eclipse.xpanse.modules.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
