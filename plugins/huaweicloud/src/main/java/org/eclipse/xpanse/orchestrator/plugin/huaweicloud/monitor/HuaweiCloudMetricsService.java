@@ -144,7 +144,7 @@ public class HuaweiCloudMetricsService {
     public List<Metric> getMetricsByService(ServiceMetricRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
-                Csp.FLEXIBLE_ENGINE, serviceMetricRequest.getXpanseUserName(),
+                Csp.HUAWEI, serviceMetricRequest.getXpanseUserName(),
                 CredentialType.VARIABLES);
         MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
         ICredential icredential = getIcredential(credential);
