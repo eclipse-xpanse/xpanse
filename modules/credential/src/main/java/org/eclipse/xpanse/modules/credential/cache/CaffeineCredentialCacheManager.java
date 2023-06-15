@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
+@SuppressWarnings("UnnecessarilyFullyQualified")
 public class CaffeineCredentialCacheManager {
 
     private static final Cache<CredentialCacheKey, AbstractCredentialInfo> credentialsCache =
