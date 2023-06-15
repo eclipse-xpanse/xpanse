@@ -104,9 +104,11 @@ public class CredentialCenter {
         if (Objects.nonNull(requestedCredentialType)) {
             AbstractCredentialInfo abstractCredentialInfo =
                     this.credentialsStore.getCredential(csp, requestedCredentialType, xpanseUser);
-
             if (Objects.nonNull(abstractCredentialInfo)) {
+                checkNullParamAndFillValueFromEnv(abstractCredentialInfo);
                 abstractCredentialInfos.add(abstractCredentialInfo);
+            } else {
+                addCredentialInfoFromEnv(csp, abstractCredentialInfos);
             }
             return abstractCredentialInfos;
         } else {
@@ -114,11 +116,16 @@ public class CredentialCenter {
                 AbstractCredentialInfo abstractCredentialInfo =
                         this.credentialsStore.getCredential(csp, credentialType, xpanseUser);
                 if (Objects.nonNull(abstractCredentialInfo)) {
+                    checkNullParamAndFillValueFromEnv(abstractCredentialInfo);
                     abstractCredentialInfos.add(abstractCredentialInfo);
                 }
             }
-            return abstractCredentialInfos;
+            if (CollectionUtils.isEmpty(abstractCredentialInfos)) {
+                addCredentialInfoFromEnv(csp, abstractCredentialInfos);
+            }
         }
+        maskSensitiveValues(abstractCredentialInfos);
+        return abstractCredentialInfos;
     }
 
     /**
@@ -319,4 +326,37 @@ public class CredentialCenter {
                         && Objects.isNull(credentialVariable.getValue()));
     }
 
+    private void checkNullParamAndFillValueFromEnv(AbstractCredentialInfo abstractCredentialInfo) {
+        if (abstractCredentialInfo.getType().equals(CredentialType.VARIABLES)) {
+            CredentialVariables credentialVariables =
+                    (CredentialVariables) abstractCredentialInfo;
+            for (CredentialVariable variable : credentialVariables.getVariables()) {
+                if (Objects.isNull(variable.getValue())
+                        || Objects.equals(variable.getValue(), "null")) {
+                    variable.setValue(System.getenv(variable.getName()));
+                }
+            }
+        }
+    }
+
+    private void addCredentialInfoFromEnv(Csp csp,
+                                          List<AbstractCredentialInfo> abstractCredentialInfos) {
+        AbstractCredentialInfo credentialInfoFromEnv = findCredentialInfoFromEnv(csp);
+        if (Objects.nonNull(credentialInfoFromEnv)) {
+            abstractCredentialInfos.add(credentialInfoFromEnv);
+        }
+    }
+
+    private void maskSensitiveValues(List<AbstractCredentialInfo> abstractCredentialInfos) {
+        for (AbstractCredentialInfo abstractCredentialInfo : abstractCredentialInfos) {
+            CredentialVariables credentialVariables =
+                    (CredentialVariables) abstractCredentialInfo;
+            List<CredentialVariable> variables = credentialVariables.getVariables();
+            for (CredentialVariable variable : variables) {
+                if (variable.isSensitive()) {
+                    variable.setValue("*********");
+                }
+            }
+        }
+    }
 }
