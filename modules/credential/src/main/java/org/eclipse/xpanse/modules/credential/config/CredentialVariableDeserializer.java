@@ -32,14 +32,19 @@ public class CredentialVariableDeserializer extends StdDeserializer<CredentialVa
     public CredentialVariable deserialize(JsonParser jsonParser,
                                           DeserializationContext deserializationContext) throws
             IOException {
+
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
-        String name = node.get("name").asText();
-        String description = node.get("description").asText();
-        boolean isMandatory = node.get("mandatory").asBoolean();
-        boolean isSensitive = node.get("sensitive").asBoolean();
-        String value = node.get("value").asText();
+        String name = node.get("name").isNull() ? null : node.get("name").asText();
+        String description =
+                node.get("description").isNull() ? null : node.get("description").asText();
+        Boolean isMandatory =
+                node.get("mandatory").isNull() ? null : node.get("mandatory").asBoolean();
+        Boolean isSensitive =
+                node.get("sensitive").isNull() ? null : node.get("sensitive").asBoolean();
+        String value = node.get("value").isNull() ? null : node.get("value").asText();
 
-        return new CredentialVariable(name, description, isMandatory, isSensitive, value);
+        return new CredentialVariable(name, description, Boolean.TRUE.equals(isMandatory),
+                Boolean.TRUE.equals(isSensitive), value);
     }
 }

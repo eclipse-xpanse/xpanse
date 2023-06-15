@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.credential.CredentialsStore;
 import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.exceptions.CredentialVariablesNotComplete;
 import org.eclipse.xpanse.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.utils.CredentialApiUtil;
@@ -110,7 +111,6 @@ public class CredentialCenter {
             } else {
                 addCredentialInfoFromEnv(csp, abstractCredentialInfos);
             }
-            return abstractCredentialInfos;
         } else {
             for (CredentialType credentialType : CredentialType.values()) {
                 AbstractCredentialInfo abstractCredentialInfo =
@@ -136,11 +136,11 @@ public class CredentialCenter {
      * @return Deployment bean for the provided deployerKind.
      */
     public boolean addCredential(Csp csp, CreateCredential createCredential) {
-        checkInputCredentialIsValid(csp, createCredential);
         createCredential.setCsp(csp);
+        checkInputCredentialIsValid(createCredential);
         AbstractCredentialInfo credential;
         if (createCredential.getType() == CredentialType.VARIABLES) {
-            credential = createCredentialVariablesObject(createCredential);
+            credential = new CredentialVariables(createCredential);
         } else {
             throw new IllegalStateException(
                     String.format("Not supported credential type Csp:%s, Type: %s.",
@@ -159,9 +159,10 @@ public class CredentialCenter {
      */
     public boolean updateCredential(Csp csp, CreateCredential updateCredential) {
         updateCredential.setCsp(csp);
+        checkInputCredentialIsValid(updateCredential);
         AbstractCredentialInfo credential;
         if (updateCredential.getType() == CredentialType.VARIABLES) {
-            credential = createCredentialVariablesObject(updateCredential);
+            credential = new CredentialVariables(updateCredential);
         } else {
             throw new IllegalStateException(
                     String.format("Not supported credential type Csp:%s, Type: %s.",
@@ -219,51 +220,66 @@ public class CredentialCenter {
     /**
      * Check the input credential whether is valid.
      *
-     * @param csp             The cloud service provider.
      * @param inputCredential The credential to create or update.
      */
-    public void checkInputCredentialIsValid(Csp csp, CreateCredential inputCredential) {
+    public void checkInputCredentialIsValid(CreateCredential inputCredential) {
 
-        // filter defined credentials by csp and type.
-        List<AbstractCredentialInfo> credentialDefinitions =
-                getCredentialCapabilitiesByCsp(csp, inputCredential.getType());
-        if (CollectionUtils.isEmpty(credentialDefinitions)) {
+        // filter defined credential abilities by csp and type.
+        List<AbstractCredentialInfo> credentialAbilities =
+                getCredentialCapabilitiesByCsp(inputCredential.getCsp(), inputCredential.getType());
+
+        if (CollectionUtils.isEmpty(credentialAbilities)) {
             throw new IllegalArgumentException(
                     String.format("Defined credentials with type %s provided by csp %s not found.",
-                            inputCredential.getType(), csp));
+                            inputCredential.getType(), inputCredential.getType()));
         }
-        Set<String> filledVariableNameSet =
-                inputCredential.getVariables().stream().map(CredentialVariable::getName)
-                        .collect(Collectors.toSet());
+        // filter defined credential abilities by name.
+        List<AbstractCredentialInfo> sameNameAbilities = credentialAbilities.stream().filter(
+                credentialAbility -> StringUtils.equals(credentialAbility.getName(),
+                        inputCredential.getName())).toList();
+        if (CollectionUtils.isEmpty(sameNameAbilities)) {
+            throw new IllegalArgumentException(
+                    String.format("Defined credentials with type %s and name %s "
+                                    + "provided by csp %s not found.",
+                            inputCredential.getType(), inputCredential.getName(),
+                            inputCredential.getType()));
+        }
         // check all fields in the input credential are valid based on the defined credentials.
-        for (AbstractCredentialInfo credentialDefinition : credentialDefinitions) {
-            CredentialVariables credential = (CredentialVariables) credentialDefinition;
-            Set<String> needVariableNameSet =
-                    credential.getVariables().stream().map(CredentialVariable::getName)
-                            .collect(Collectors.toSet());
-            if (StringUtils.equals(credential.getName(), inputCredential.getName())
-                    && filledVariableNameSet.containsAll(needVariableNameSet)) {
-                Set<String> blankValueFiledNames = new HashSet<>();
-                for (CredentialVariable credentialVariable : inputCredential.getVariables()) {
-                    if (StringUtils.isBlank(credentialVariable.getValue())) {
-                        blankValueFiledNames.add(credentialVariable.getName());
+        for (AbstractCredentialInfo credentialAbility : credentialAbilities) {
+            if (CredentialType.VARIABLES.equals(credentialAbility.getType())) {
+                Set<String> errorReasons = new HashSet<>();
+                CredentialVariables inputVariables = new CredentialVariables(inputCredential);
+                CredentialVariables definedVariables = (CredentialVariables) credentialAbility;
+                Set<String> definedVariableNameSet =
+                        definedVariables.getVariables().stream()
+                                .map(CredentialVariable::getName).collect(Collectors.toSet());
+                Set<String> inputVariableNameSet = inputVariables.getVariables().stream()
+                        .map(CredentialVariable::getName).collect(Collectors.toSet());
+                if (!inputVariableNameSet.containsAll(definedVariableNameSet)) {
+                    definedVariableNameSet.removeAll(inputVariableNameSet);
+                    errorReasons.add(String.format("Missing variables with names %s.",
+                            definedVariableNameSet));
+                }
+                Set<String> definedMandatoryVariableNameSet =
+                        definedVariables.getVariables().stream()
+                                .filter(CredentialVariable::isMandatory)
+                                .map(CredentialVariable::getName).collect(Collectors.toSet());
+                for (CredentialVariable inputVariable : inputCredential.getVariables()) {
+                    if (definedMandatoryVariableNameSet.contains(inputVariable.getName())
+                            && StringUtils.isBlank(inputVariable.getValue())) {
+                        errorReasons.add(
+                                String.format("The value of mandatory variable with name %s"
+                                        + " could not be empty.", inputVariable.getName()));
                     }
                 }
-                if (!blankValueFiledNames.isEmpty()) {
-                    throw new IllegalArgumentException(
-                            String.format(
-                                    "Defined credentials required fields %s value is blank.",
-                                    blankValueFiledNames));
-
+                if (!errorReasons.isEmpty()) {
+                    throw new CredentialVariablesNotComplete(errorReasons);
                 }
                 return;
             }
         }
-        throw new IllegalArgumentException(
-                String.format("Defined credentials provided by Csp:%s with name:%s not found.",
-                        csp, inputCredential.getName()));
-
     }
+
 
     /**
      * Create credential for the @Csp with @xpanseUser.
@@ -279,17 +295,6 @@ public class CredentialCenter {
         return true;
     }
 
-
-    private CredentialVariables createCredentialVariablesObject(
-            CreateCredential createCredential) {
-        CredentialVariables credential = new CredentialVariables(createCredential.getCsp(),
-                createCredential.getXpanseUser(),
-                createCredential.getName(), createCredential.getDescription(),
-                createCredential.getType(), createCredential.getVariables());
-        credential.setTimeToLive(createCredential.getTimeToLive());
-        return credential;
-    }
-
     /**
      * Get credentialInfo from the environment using @Csp.
      *
@@ -303,17 +308,19 @@ public class CredentialCenter {
             return null;
         }
         for (AbstractCredentialInfo credentialAbility : credentialAbilities) {
-            CredentialVariables credentialVariables = (CredentialVariables) credentialAbility;
-            List<CredentialVariable> variables = credentialVariables.getVariables();
-            for (CredentialVariable variable : variables) {
-                String envValue = System.getenv(variable.getName());
-                if (StringUtils.isNotBlank(envValue)) {
-                    variable.setValue(envValue);
+            if (CredentialType.VARIABLES == credentialAbility.getType()) {
+                CredentialVariables credentialVariables = (CredentialVariables) credentialAbility;
+                List<CredentialVariable> variables = credentialVariables.getVariables();
+                for (CredentialVariable variable : variables) {
+                    String envValue = System.getenv(variable.getName());
+                    if (StringUtils.isNotBlank(envValue)) {
+                        variable.setValue(envValue);
+                    }
                 }
-            }
-            // Check if all variables have been successfully set.
-            if (!isAnyMandatoryCredentialVariableMissing(credentialVariables)) {
-                return credentialAbility;
+                // Check if all variables have been successfully set.
+                if (!isAnyMandatoryCredentialVariableMissing(credentialVariables)) {
+                    return credentialAbility;
+                }
             }
         }
         return null;
