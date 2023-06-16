@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator;
+package org.eclipse.xpanse.modules.register;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

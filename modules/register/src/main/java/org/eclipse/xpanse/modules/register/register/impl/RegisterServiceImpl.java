@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.register.impl;
+package org.eclipse.xpanse.modules.register.register.impl;
 
 import jakarta.annotation.Resource;
 import java.net.URL;
@@ -35,8 +35,8 @@ import org.eclipse.xpanse.modules.plugin.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.plugin.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.plugin.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.plugin.utils.OpenApiUtil;
-import org.eclipse.xpanse.orchestrator.OrchestratorService;
-import org.eclipse.xpanse.orchestrator.register.RegisterService;
+import org.eclipse.xpanse.modules.register.OrchestratorService;
+import org.eclipse.xpanse.modules.register.register.RegisterService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;

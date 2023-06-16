@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator;
+package org.eclipse.xpanse.modules.register;
 
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;

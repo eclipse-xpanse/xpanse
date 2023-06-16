@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.register;
+package org.eclipse.xpanse.modules.register.register;
 
 import java.util.List;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
