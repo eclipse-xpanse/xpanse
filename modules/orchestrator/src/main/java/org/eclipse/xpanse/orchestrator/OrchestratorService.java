@@ -25,9 +25,6 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
-import org.eclipse.xpanse.modules.deployment.Deployment;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
-import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
@@ -37,6 +34,10 @@ import org.eclipse.xpanse.modules.models.service.DeployResult;
 import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
+import org.eclipse.xpanse.modules.plugin.OrchestratorPlugin;
+import org.eclipse.xpanse.modules.plugin.PluginManager;
+import org.eclipse.xpanse.modules.plugin.deployment.DeployTask;
+import org.eclipse.xpanse.modules.plugin.deployment.Deployment;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
@@ -55,8 +56,6 @@ public class OrchestratorService {
 
     private static final String TASK_ID = "TASK_ID";
 
-    private final Map<Csp, OrchestratorPlugin> pluginMap = new ConcurrentHashMap<>();
-
     private final Map<DeployerKind, Deployment> deploymentMap = new ConcurrentHashMap<>();
 
     @Resource
@@ -69,18 +68,8 @@ public class OrchestratorService {
     private DeployResourceStorage deployResourceStorage;
     @Resource
     private DeployVariableValidator deployVariableValidator;
-
-    /**
-     * Get all OrchestratorPlugin group by Csp.
-     *
-     * @return pluginMap
-     */
-    @Bean
-    public Map<Csp, OrchestratorPlugin> pluginMap() {
-        applicationContext.getBeansOfType(OrchestratorPlugin.class)
-                .forEach((key, value) -> pluginMap.put(value.getCsp(), value));
-        return pluginMap;
-    }
+    @Resource
+    private PluginManager pluginManager;
 
     /**
      * Get all Deployment group by DeployerKind.
@@ -314,7 +303,8 @@ public class OrchestratorService {
 
     private void fillHandler(DeployTask deployTask) {
         // Find the deployment plugin and resource handler
-        OrchestratorPlugin plugin = pluginMap.get(deployTask.getCreateRequest().getCsp());
+        OrchestratorPlugin plugin =
+                pluginManager.getPlugins().get(deployTask.getCreateRequest().getCsp());
         if (Objects.isNull(plugin) || Objects.isNull(plugin.getResourceHandler())) {
             throw new RuntimeException("Can't find suitable plugin and resource handler for the "
                     + "Task.");
@@ -334,20 +324,6 @@ public class OrchestratorService {
             throw new RuntimeException("Can't find suitable deployer for the Task.");
         }
         return deployment;
-    }
-
-    /**
-     * Get available plugin bean implements OrchestratorPlugin by the @csp.
-     *
-     * @param csp The cloud service provider.
-     * @return available plugin bean.
-     */
-    public OrchestratorPlugin getOrchestratorPlugin(Csp csp) {
-        OrchestratorPlugin plugin = pluginMap.get(csp);
-        if (Objects.isNull(plugin)) {
-            throw new RuntimeException("Can't find suitable plugin for the Csp " + csp.name());
-        }
-        return plugin;
     }
 
 }

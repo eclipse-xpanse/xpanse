@@ -28,6 +28,7 @@
         <module>monitor</module>
         <module>credential</module>
         <module>logging</module>
+        <module>plugin</module>
     </modules>
 
 </project>

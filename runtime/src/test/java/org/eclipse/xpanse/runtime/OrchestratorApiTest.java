@@ -32,7 +32,7 @@ import org.eclipse.xpanse.modules.models.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.modules.models.view.UserAvailableServiceVo;
-import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
+import org.eclipse.xpanse.modules.plugin.utils.OpenApiUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

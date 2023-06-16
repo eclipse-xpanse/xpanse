@@ -7,8 +7,9 @@ package org.eclipse.xpanse.modules.credential;
 
 import org.eclipse.xpanse.modules.credential.cache.CaffeineCredentialCacheManager;
 import org.eclipse.xpanse.modules.credential.cache.CredentialCacheKey;
-import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.plugin.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.plugin.credential.enums.CredentialType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

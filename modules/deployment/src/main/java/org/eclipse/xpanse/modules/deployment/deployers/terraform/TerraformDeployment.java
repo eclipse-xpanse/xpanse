@@ -18,15 +18,16 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidationResult;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.plugin.deployment.DeployTask;
+import org.eclipse.xpanse.modules.plugin.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.plugin.deployment.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -245,7 +246,7 @@ public class TerraformDeployment implements Deployment {
     /**
      * Validates the Terraform script.
      */
-    public TfValidationResult validate(Ocl ocl) {
+    public DeployValidationResult validate(Ocl ocl) {
         String workspace = getWorkspacePath(UUID.randomUUID().toString());
         // Create the workspace.
         buildWorkspace(workspace);

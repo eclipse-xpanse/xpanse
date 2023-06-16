@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.credential.cache;
 import com.github.benmanes.caffeine.cache.Expiry;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.index.qual.NonNegative;
-import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.plugin.credential.AbstractCredentialInfo;
 
 /**
  * Class to configure cache eviction policy for Credential Cache entries.

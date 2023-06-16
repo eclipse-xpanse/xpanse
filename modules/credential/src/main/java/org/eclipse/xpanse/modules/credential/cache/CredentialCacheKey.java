@@ -5,8 +5,8 @@
 
 package org.eclipse.xpanse.modules.credential.cache;
 
-import org.eclipse.xpanse.modules.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.plugin.credential.enums.CredentialType;
 
 /**
  * Defines credential cache key.
