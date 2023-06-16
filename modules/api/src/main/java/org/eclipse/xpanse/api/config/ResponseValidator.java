@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.api.response;
+package org.eclipse.xpanse.api.config;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -46,7 +46,7 @@ public class ResponseValidator {
             if (object instanceof Collection<?>) {
                 ((Collection<?>) object).forEach(item -> {
                     Set<ConstraintViolation<Object>> validationResults = validator.validate(item);
-                    if (validationResults.size() > 0) {
+                    if (!validationResults.isEmpty()) {
                         for (ConstraintViolation<Object> error : validationResults) {
                             errors.add(error.getPropertyPath() + ":" + error.getMessage());
                         }
@@ -55,13 +55,12 @@ public class ResponseValidator {
                 });
             } else {
                 Set<ConstraintViolation<Object>> validationResults = validator.validate(object);
-                if (validationResults.size() > 0) {
+                if (!validationResults.isEmpty()) {
                     for (ConstraintViolation<Object> error : validationResults) {
                         errors.add(error.getPropertyPath() + ":" + error.getMessage());
                     }
                 }
             }
-
             if (!errors.isEmpty()) {
                 throw new ResponseInvalidException(errors);
             }
