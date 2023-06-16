@@ -84,7 +84,7 @@ public class HuaweiCloudMetricsService {
         List<Metric> metrics = new ArrayList<>();
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
-                Csp.FLEXIBLE_ENGINE, resourceMetricRequest.getXpanseUserName(),
+                Csp.HUAWEI, resourceMetricRequest.getXpanseUserName(),
                 CredentialType.VARIABLES);
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
         clearExpiredMetricCache(deployResource.getResourceId());

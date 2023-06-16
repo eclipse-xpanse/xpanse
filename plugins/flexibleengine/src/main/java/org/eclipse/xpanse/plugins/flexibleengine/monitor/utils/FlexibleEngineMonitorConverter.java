@@ -58,6 +58,107 @@ public class FlexibleEngineMonitorConverter {
 
     private static final Map<String, String> HEADER_MAP = new HashMap<>();
 
+    private static MetricItem convertDatapointForBatchMetricToMetricItem(
+            DatapointForBatchMetric datapointForBatchMetric) {
+        MetricItem metricItem = new MetricItem();
+        metricItem.setValue(datapointForBatchMetric.getAverage());
+        metricItem.setType(MetricItemType.VALUE);
+        metricItem.setTimeStamp(datapointForBatchMetric.getTimestamp());
+        return metricItem;
+    }
+
+    /**
+     * build Batch query Monitor Metric URL.
+     *
+     * @param region    region name.
+     * @param projectId projectId.
+     */
+    public static StringBuilder getBatchQueryMetricBasicUrl(String region, String projectId) {
+        return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
+                .append(FlexibleEngineMonitorConstants.CES_ENDPOINT_PREFIX)
+                .append(region)
+                .append(FlexibleEngineMonitorConstants.ENDPOINT_SUFFIX).append("/")
+                .append(FlexibleEngineMonitorConstants.CES_API_VERSION).append("/")
+                .append(projectId).append("/")
+                .append(FlexibleEngineMonitorConstants.BATCH_METRIC_PATH);
+
+    }
+
+    /**
+     * build Batch query Monitor metric Request.
+     *
+     * @param serviceMetricRequest ServiceMetricRequest.
+     * @param metricInfoMap        metricInfoMap.
+     */
+    public static BatchListMetricDataRequest buildBatchListMetricDataRequest(
+            ServiceMetricRequest serviceMetricRequest,
+            Map<String, List<MetricInfoList>> metricInfoMap) {
+        List<MetricInfo> metricInfos = new ArrayList<>();
+        checkNullParamAndFillValue(serviceMetricRequest);
+        buildMetricsDimesion(serviceMetricRequest, metricInfoMap, metricInfos);
+        BatchListMetricDataRequestBody body = new BatchListMetricDataRequestBody();
+        body.withTo(serviceMetricRequest.getTo());
+        body.withFrom(serviceMetricRequest.getFrom());
+        body.withFilter(FlexibleEngineMonitorConstants.FILTER_AVERAGE);
+        body.withPeriod(serviceMetricRequest.getGranularity().toString());
+        body.withMetrics(metricInfos);
+        BatchListMetricDataRequest request = new BatchListMetricDataRequest();
+        request.withBody(body);
+        return request;
+    }
+
+    private static void buildMetricsDimesion(ServiceMetricRequest serviceMetricRequest,
+                                             Map<String, List<MetricInfoList>> map,
+                                             List<MetricInfo> metricInfos) {
+        for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
+            List<MetricsDimension> metricsDimensions = new ArrayList<>();
+            metricsDimensions.add(
+                    new MetricsDimension()
+                            .withName(FlexibleEngineMonitorConstants.VM_DIMENSION_NAME)
+                            .withValue(deployResource.getResourceId())
+            );
+            for (MetricInfoList metricInfoList : map.get(deployResource.getResourceId())) {
+                metricInfos.add(
+                        new MetricInfo()
+                                .withNamespace(metricInfoList.getNamespace())
+                                .withMetricName(metricInfoList.getMetricName())
+                                .withDimensions(metricsDimensions)
+                );
+            }
+        }
+    }
+
+    private static <T extends MetricRequest> void checkNullParamAndFillValue(T metricRequest) {
+        Long from = metricRequest.getFrom();
+        Long to = metricRequest.getTo();
+        if (Objects.isNull(from)) {
+            from = System.currentTimeMillis()
+                    - FlexibleEngineMonitorConstants.FIVE_MINUTES_MILLISECONDS;
+            metricRequest.setFrom(from);
+        }
+        if (Objects.isNull(to)) {
+            to = System.currentTimeMillis();
+            metricRequest.setTo(to);
+        }
+        if (Objects.isNull(metricRequest.getGranularity())) {
+            if (to - from <= FOUR_HOUR_MILLISECONDS) {
+                metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_REAL_TIME_INT);
+            } else if (to - from > FOUR_HOUR_MILLISECONDS && to - from <= ONE_DAY_MILLISECONDS) {
+                metricRequest.setGranularity(
+                        FlexibleEngineMonitorConstants.PERIOD_FIVE_MINUTES_INT);
+            } else if (to - from > ONE_DAY_MILLISECONDS && to - from <= THREE_DAY_MILLISECONDS) {
+                metricRequest.setGranularity(
+                        FlexibleEngineMonitorConstants.PERIOD_TWENTY_MINUTES_INT);
+            } else if (to - from > THREE_DAY_MILLISECONDS && to - from <= TEN_DAY_MILLISECONDS) {
+                metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_ONE_HOUR_INT);
+            } else if (to - from > TEN_DAY_MILLISECONDS && to - from <= ONE_MONTH_MILLISECONDS) {
+                metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_FOUR_HOURS_INT);
+            } else {
+                metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_ONE_DAY_INT);
+            }
+        }
+    }
+
     /**
      * Get headers of request.
      *
@@ -200,15 +301,6 @@ public class FlexibleEngineMonitorConverter {
         return metricList;
     }
 
-    private static MetricItem convertDatapointForBatchMetricToMetricItem(
-            DatapointForBatchMetric datapointForBatchMetric) {
-        MetricItem metricItem = new MetricItem();
-        metricItem.setValue(datapointForBatchMetric.getAverage());
-        metricItem.setType(MetricItemType.VALUE);
-        metricItem.setTimeStamp(datapointForBatchMetric.getTimestamp());
-        return metricItem;
-    }
-
     private List<MetricItem> convertDataPointToMetricItems(List<Datapoint> datapointList,
                                                            boolean onlyLastKnownMetric) {
         List<MetricItem> metricItems = new ArrayList<>();
@@ -249,7 +341,6 @@ public class FlexibleEngineMonitorConverter {
         return metricItems;
     }
 
-
     private StringBuilder getQueryMetricBasicUrl(String region, String projectId) {
         return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
                 .append(FlexibleEngineMonitorConstants.CES_ENDPOINT_PREFIX)
@@ -260,24 +351,6 @@ public class FlexibleEngineMonitorConverter {
                 .append(FlexibleEngineMonitorConstants.METRIC_PATH).append("?");
 
     }
-
-    /**
-     * build Batch query Monitor Metric URL.
-     *
-     * @param region    region name.
-     * @param projectId projectId.
-     */
-    public static StringBuilder getBatchQueryMetricBasicUrl(String region, String projectId) {
-        return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
-                .append(FlexibleEngineMonitorConstants.CES_ENDPOINT_PREFIX)
-                .append(region)
-                .append(FlexibleEngineMonitorConstants.ENDPOINT_SUFFIX).append("/")
-                .append(FlexibleEngineMonitorConstants.CES_API_VERSION).append("/")
-                .append(projectId).append("/")
-                .append(FlexibleEngineMonitorConstants.BATCH_METRIC_PATH);
-
-    }
-
 
     /**
      * Get url to query project info.
@@ -309,78 +382,5 @@ public class FlexibleEngineMonitorConverter {
         params.put("dim.0", FlexibleEngineMonitorConstants.DIM0_PREFIX
                 + resourceMetricRequest.getDeployResource().getResourceId());
         return params;
-    }
-
-    /**
-     * build Batch query Monitor metric Request.
-     *
-     * @param serviceMetricRequest ServiceMetricRequest.
-     * @param metricInfoMap        metricInfoMap.
-     */
-    public static BatchListMetricDataRequest buildBatchListMetricDataRequest(
-            ServiceMetricRequest serviceMetricRequest,
-            Map<String, List<MetricInfoList>> metricInfoMap) {
-        List<MetricInfo> metricInfos = new ArrayList<>();
-        checkNullParamAndFillValue(serviceMetricRequest);
-        buildMetricsDimesion(serviceMetricRequest, metricInfoMap, metricInfos);
-        BatchListMetricDataRequestBody body = new BatchListMetricDataRequestBody();
-        body.withTo(serviceMetricRequest.getTo());
-        body.withFrom(serviceMetricRequest.getFrom());
-        body.withFilter(FlexibleEngineMonitorConstants.FILTER_AVERAGE);
-        body.withPeriod(serviceMetricRequest.getGranularity().toString());
-        body.withMetrics(metricInfos);
-        BatchListMetricDataRequest request = new BatchListMetricDataRequest();
-        request.withBody(body);
-        return request;
-    }
-
-    private static void buildMetricsDimesion(ServiceMetricRequest serviceMetricRequest,
-                                             Map<String, List<MetricInfoList>> map,
-                                             List<MetricInfo> metricInfos) {
-        for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
-            List<MetricsDimension> metricsDimensions = new ArrayList<>();
-            metricsDimensions.add(
-                    new MetricsDimension()
-                            .withName(FlexibleEngineMonitorConstants.VM_DIMENSION_NAME)
-                            .withValue(deployResource.getResourceId())
-            );
-            for (MetricInfoList metricInfoList : map.get(deployResource.getResourceId())) {
-                metricInfos.add(
-                        new MetricInfo()
-                                .withNamespace(metricInfoList.getNamespace())
-                                .withMetricName(metricInfoList.getMetricName())
-                                .withDimensions(metricsDimensions)
-                );
-            }
-        }
-    }
-
-    private static <T extends MetricRequest> void checkNullParamAndFillValue(T metricRequest) {
-        Long from = metricRequest.getFrom();
-        Long to = metricRequest.getTo();
-        if (Objects.isNull(from)) {
-            metricRequest.setFrom(System.currentTimeMillis()
-                    - FlexibleEngineMonitorConstants.FIVE_MINUTES_MILLISECONDS);
-        }
-        if (Objects.isNull(to)) {
-            metricRequest.setTo(System.currentTimeMillis());
-        }
-        if (Objects.isNull(metricRequest.getGranularity())) {
-            if (to - from <= FOUR_HOUR_MILLISECONDS) {
-                metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_REAL_TIME_INT);
-            } else if (to - from > FOUR_HOUR_MILLISECONDS && to - from <= ONE_DAY_MILLISECONDS) {
-                metricRequest.setGranularity(
-                        FlexibleEngineMonitorConstants.PERIOD_FIVE_MINUTES_INT);
-            } else if (to - from > ONE_DAY_MILLISECONDS && to - from <= THREE_DAY_MILLISECONDS) {
-                metricRequest.setGranularity(
-                        FlexibleEngineMonitorConstants.PERIOD_TWENTY_MINUTES_INT);
-            } else if (to - from > THREE_DAY_MILLISECONDS && to - from <= TEN_DAY_MILLISECONDS) {
-                metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_ONE_HOUR_INT);
-            } else if (to - from > TEN_DAY_MILLISECONDS && to - from <= ONE_MONTH_MILLISECONDS) {
-                metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_FOUR_HOURS_INT);
-            } else {
-                metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_ONE_DAY_INT);
-            }
-        }
     }
 }
