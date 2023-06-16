@@ -7,7 +7,8 @@
 package org.eclipse.xpanse.modules.plugin.credential;
 
 import java.util.List;
-import org.eclipse.xpanse.modules.plugin.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
 /**
  * Interface to be implemented by CSP plugins to define its authentication mechanisms.

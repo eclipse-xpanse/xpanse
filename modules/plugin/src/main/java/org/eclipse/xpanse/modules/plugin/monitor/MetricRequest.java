@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.plugin.monitor;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.eclipse.xpanse.modules.plugin.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 
 /**
  * The model to query metrics.

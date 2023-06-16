@@ -8,9 +8,9 @@ package org.eclipse.xpanse.orchestrator.register;
 
 import java.util.List;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
-import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
+import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.modules.models.service.view.CategoryOclVo;
 
 /**
  * This interface describes register service in charge of interacting with backend fundamental

@@ -9,7 +9,7 @@ package org.eclipse.xpanse.plugins.openstack;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.ResourcesService;

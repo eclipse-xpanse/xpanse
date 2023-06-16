@@ -8,7 +8,7 @@ package org.eclipse.xpanse.plugins.openstack.enums;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 
 
 /**

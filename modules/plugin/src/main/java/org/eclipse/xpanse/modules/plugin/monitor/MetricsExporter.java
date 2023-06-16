@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.plugin.monitor;
 
 import java.util.List;
+import org.eclipse.xpanse.modules.models.monitor.Metric;
 
 /**
  * The interface for the monitor metrics exporter.

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResourceInstance;
-import org.eclipse.xpanse.modules.models.service.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 
 /**
  * Utils Define methods to transform TfResource into DeployResource.

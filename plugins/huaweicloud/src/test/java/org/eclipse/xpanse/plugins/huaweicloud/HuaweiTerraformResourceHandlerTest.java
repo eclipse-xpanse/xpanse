@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfState;
-import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

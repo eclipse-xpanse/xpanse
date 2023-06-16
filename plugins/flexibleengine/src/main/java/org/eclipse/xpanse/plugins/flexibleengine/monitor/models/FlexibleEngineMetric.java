@@ -8,7 +8,7 @@ package org.eclipse.xpanse.plugins.flexibleengine.monitor.models;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.eclipse.xpanse.modules.plugin.monitor.Metric;
+import org.eclipse.xpanse.modules.models.monitor.Metric;
 
 /**
  * FlexibleEngine Metric.

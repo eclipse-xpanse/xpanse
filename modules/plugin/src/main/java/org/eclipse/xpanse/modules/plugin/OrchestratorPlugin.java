@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.modules.plugin;
 
-import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.plugin.credential.AuthenticationCapabilities;
 import org.eclipse.xpanse.modules.plugin.deployment.ServiceResourceHandler;
 import org.eclipse.xpanse.modules.plugin.monitor.MetricsExporter;

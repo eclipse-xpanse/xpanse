@@ -8,11 +8,11 @@ package org.eclipse.xpanse.modules.plugin;
 
 import java.util.List;
 import lombok.extern.java.Log;
-import org.eclipse.xpanse.modules.models.enums.Csp;
-import org.eclipse.xpanse.modules.plugin.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.plugin.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.monitor.Metric;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.plugin.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.plugin.monitor.Metric;
 import org.eclipse.xpanse.modules.plugin.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.plugin.monitor.ServiceMetricRequest;
 import org.springframework.stereotype.Component;

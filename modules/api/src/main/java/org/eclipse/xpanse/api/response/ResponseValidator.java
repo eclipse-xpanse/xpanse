@@ -15,7 +15,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.eclipse.xpanse.modules.models.exceptions.ResponseInvalidException;
+import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

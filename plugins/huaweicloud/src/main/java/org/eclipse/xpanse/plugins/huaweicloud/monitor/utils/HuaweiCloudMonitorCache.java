@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.plugin.monitor.Metric;
+import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudMetric;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;

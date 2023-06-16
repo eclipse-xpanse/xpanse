@@ -9,7 +9,7 @@ package org.eclipse.xpanse.plugins.huaweicloud;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.junit.jupiter.api.Test;
 
 public class HuaweiCloudOrchestratorPluginTest {
