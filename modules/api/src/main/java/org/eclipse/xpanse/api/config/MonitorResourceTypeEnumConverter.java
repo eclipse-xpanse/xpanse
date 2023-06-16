@@ -5,7 +5,7 @@
 
 package org.eclipse.xpanse.api.config;
 
-import org.eclipse.xpanse.modules.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.plugin.monitor.enums.MonitorResourceType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

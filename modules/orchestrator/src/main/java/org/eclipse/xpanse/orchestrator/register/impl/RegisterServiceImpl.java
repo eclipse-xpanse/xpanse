@@ -19,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidateDiagnostics;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidationResult;
 import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
@@ -33,10 +31,12 @@ import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.view.ProviderOclVo;
 import org.eclipse.xpanse.modules.models.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.models.view.VersionOclVo;
+import org.eclipse.xpanse.modules.plugin.deployment.DeployValidateDiagnostics;
+import org.eclipse.xpanse.modules.plugin.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.plugin.utils.IconProcessorUtil;
+import org.eclipse.xpanse.modules.plugin.utils.OpenApiUtil;
 import org.eclipse.xpanse.orchestrator.OrchestratorService;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
-import org.eclipse.xpanse.orchestrator.utils.IconProcessorUtil;
-import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -316,13 +316,13 @@ public class RegisterServiceImpl implements RegisterService {
 
     private void validateTerraformScript(Ocl ocl) {
         if (ocl.getDeployment().getKind() == DeployerKind.TERRAFORM) {
-            TfValidationResult tfValidationResult =
+            DeployValidationResult tfValidationResult =
                     this.orchestratorService.getDeployment(ocl.getDeployment().getKind())
                             .validate(ocl);
             if (!tfValidationResult.isValid()) {
                 throw new TerraformScriptFormatInvalidException(
                         tfValidationResult.getDiagnostics().stream()
-                                .map(TfValidateDiagnostics::getDetail)
+                                .map(DeployValidateDiagnostics::getDetail)
                                 .collect(Collectors.toList()));
             }
         }

@@ -5,7 +5,7 @@
 
 package org.eclipse.xpanse.api.config;
 
-import org.eclipse.xpanse.modules.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.plugin.credential.enums.CredentialType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
