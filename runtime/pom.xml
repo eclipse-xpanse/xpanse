@@ -39,7 +39,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>orchestrator</artifactId>
+            <artifactId>register</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>plugin</artifactId>
+            <artifactId>orchestrator</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

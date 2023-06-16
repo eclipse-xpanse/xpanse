@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.register.impl;
+package org.eclipse.xpanse.modules.register.register.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,7 +31,7 @@ import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServic
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.service.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.plugin.utils.OpenApiUtil;
-import org.eclipse.xpanse.orchestrator.OrchestratorService;
+import org.eclipse.xpanse.modules.register.OrchestratorService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
