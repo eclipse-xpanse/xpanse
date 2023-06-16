@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.database.register;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
 
 /**
  * Interface for persist of RegisterResource.

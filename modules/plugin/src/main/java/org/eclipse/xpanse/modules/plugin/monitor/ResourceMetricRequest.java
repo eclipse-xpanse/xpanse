@@ -9,8 +9,8 @@ package org.eclipse.xpanse.modules.plugin.monitor;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.eclipse.xpanse.modules.models.service.DeployResource;
-import org.eclipse.xpanse.modules.plugin.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 
 /**
  * The model to query metrics for resource instance.

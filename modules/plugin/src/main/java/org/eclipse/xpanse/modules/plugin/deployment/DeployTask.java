@@ -8,8 +8,8 @@ package org.eclipse.xpanse.modules.plugin.deployment;
 
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
-import org.eclipse.xpanse.modules.models.service.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.register.Ocl;
 
 /**
  * The task for the deployment.

@@ -14,7 +14,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
 import javax.imageio.ImageIO;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.Ocl;
 
 /**
  * IconProcessorUtil.
