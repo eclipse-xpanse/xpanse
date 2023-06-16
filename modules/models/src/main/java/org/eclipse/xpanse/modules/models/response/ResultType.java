@@ -1,10 +1,9 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
-package org.eclipse.xpanse.api.response;
+package org.eclipse.xpanse.modules.models.response;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
