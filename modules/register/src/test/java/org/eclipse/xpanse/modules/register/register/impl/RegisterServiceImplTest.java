@@ -21,6 +21,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
+import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
@@ -30,8 +31,7 @@ import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.service.view.CategoryOclVo;
-import org.eclipse.xpanse.modules.plugin.utils.OpenApiUtil;
-import org.eclipse.xpanse.modules.register.OrchestratorService;
+import org.eclipse.xpanse.modules.orchestrator.utils.OpenApiUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -59,7 +59,7 @@ class RegisterServiceImplTest {
     @Mock
     private OpenApiUtil mockOpenApiUtil;
     @Mock
-    private OrchestratorService mockOrchestratorService;
+    private DeployService mockDeployService;
     @InjectMocks
     private RegisterServiceImpl registerServiceImplUnderTest;
 
@@ -88,7 +88,7 @@ class RegisterServiceImplTest {
         when(mockStorage.getRegisterServiceById(uuid)).thenReturn(registerServiceEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
-        doReturn(deployment).when(mockOrchestratorService).getDeployment(any());
+        doReturn(deployment).when(mockDeployService).getDeployment(any());
 
         RegisterServiceEntity registeredServiceEntityByUrl =
                 registerServiceImplUnderTest.updateRegisteredServiceByUrl(uuid.toString(),
@@ -123,7 +123,7 @@ class RegisterServiceImplTest {
         when(mockStorage.getRegisterServiceById(uuid)).thenReturn(registerServiceEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
-        doReturn(deployment).when(mockOrchestratorService).getDeployment(any());
+        doReturn(deployment).when(mockDeployService).getDeployment(any());
 
         RegisterServiceEntity updateRegisteredServiceEntity =
                 registerServiceImplUnderTest.updateRegisteredService(uuid.toString(), ocl);
@@ -137,7 +137,7 @@ class RegisterServiceImplTest {
     void testRegisterService() {
         TerraformDeployment deployment =
                 new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
-        doReturn(deployment).when(mockOrchestratorService).getDeployment(any());
+        doReturn(deployment).when(mockDeployService).getDeployment(any());
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerService(oclRegister);
         Assertions.assertEquals(ServiceState.REGISTERED, registerServiceEntity.getServiceState());
@@ -149,7 +149,7 @@ class RegisterServiceImplTest {
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(oclRegister);
         TerraformDeployment deployment =
                 new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
-        doReturn(deployment).when(mockOrchestratorService).getDeployment(any());
+        doReturn(deployment).when(mockDeployService).getDeployment(any());
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerServiceByUrl(oclLocation);
         Assertions.assertEquals(ServiceState.REGISTERED, registerServiceEntity.getServiceState());

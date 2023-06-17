@@ -25,7 +25,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.Vm;
 import org.eclipse.xpanse.modules.models.service.deploy.Volume;
 import org.eclipse.xpanse.modules.models.service.deploy.Vpc;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.plugin.deployment.DeployResourceHandler;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.plugins.huaweicloud.models.HuaweiResourceProperty;
 import org.springframework.stereotype.Component;
 

@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
-import org.eclipse.xpanse.modules.plugin.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;

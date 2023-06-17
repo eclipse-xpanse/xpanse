@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
+import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
@@ -31,12 +32,11 @@ import org.eclipse.xpanse.modules.models.service.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.service.view.ProviderOclVo;
 import org.eclipse.xpanse.modules.models.service.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.models.service.view.VersionOclVo;
-import org.eclipse.xpanse.modules.plugin.deployment.DeployValidateDiagnostics;
-import org.eclipse.xpanse.modules.plugin.deployment.DeployValidationResult;
-import org.eclipse.xpanse.modules.plugin.utils.IconProcessorUtil;
-import org.eclipse.xpanse.modules.plugin.utils.OpenApiUtil;
-import org.eclipse.xpanse.modules.register.OrchestratorService;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.utils.OpenApiUtil;
 import org.eclipse.xpanse.modules.register.register.RegisterService;
+import org.eclipse.xpanse.modules.register.register.utils.IconProcessorUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -56,7 +56,7 @@ public class RegisterServiceImpl implements RegisterService {
     private OpenApiUtil openApiUtil;
 
     @Resource
-    private OrchestratorService orchestratorService;
+    private DeployService deployService;
 
 
     /**
@@ -317,7 +317,7 @@ public class RegisterServiceImpl implements RegisterService {
     private void validateTerraformScript(Ocl ocl) {
         if (ocl.getDeployment().getKind() == DeployerKind.TERRAFORM) {
             DeployValidationResult tfValidationResult =
-                    this.orchestratorService.getDeployment(ocl.getDeployment().getKind())
+                    this.deployService.getDeployment(ocl.getDeployment().getKind())
                             .validate(ocl);
             if (!tfValidationResult.isValid()) {
                 throw new TerraformScriptFormatInvalidException(

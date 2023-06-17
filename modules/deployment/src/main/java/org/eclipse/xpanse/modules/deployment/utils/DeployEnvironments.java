@@ -11,7 +11,7 @@ import java.util.Map;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
-import org.eclipse.xpanse.modules.plugin.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.stereotype.Component;
 
 /**

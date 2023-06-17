@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.api.OrchestratorApi;
+import org.eclipse.xpanse.api.ServiceDeployerApi;
+import org.eclipse.xpanse.api.ServiceRegisterApi;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.admin.SystemStatus;
 import org.eclipse.xpanse.modules.models.admin.enums.HealthStatus;
@@ -32,7 +33,7 @@ import org.eclipse.xpanse.modules.models.service.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.models.service.view.UserAvailableServiceVo;
-import org.eclipse.xpanse.modules.plugin.utils.OpenApiUtil;
+import org.eclipse.xpanse.modules.orchestrator.utils.OpenApiUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -66,7 +67,9 @@ class OrchestratorApiTest {
     private static Ocl oclRegister;
 
     @Autowired
-    private OrchestratorApi orchestratorApi;
+    private ServiceDeployerApi serviceDeployerApi;
+    @Autowired
+    private ServiceRegisterApi serviceRegisterApi;
 
     @BeforeAll
     static void init() throws Exception {
@@ -108,13 +111,13 @@ class OrchestratorApiTest {
     @Test
     void listCategories() {
         List<Category> categories = Arrays.asList(Category.values());
-        List<Category> categoryList = orchestratorApi.listCategories();
+        List<Category> categoryList = serviceRegisterApi.listCategories();
         Assertions.assertEquals(categories, categoryList);
     }
 
     @Test
     void register() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         log.error(registeredServiceVo.toString());
         Assertions.assertNotNull(registeredServiceVo);
@@ -123,12 +126,12 @@ class OrchestratorApiTest {
     @Test
     void update() throws Exception {
 
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
 
         Ocl oclUpdate = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test.yaml"));
         RegisteredServiceVo updateServiceVo =
-                orchestratorApi.update(registeredServiceVo.getId().toString(), oclUpdate);
+                serviceRegisterApi.update(registeredServiceVo.getId().toString(), oclUpdate);
         Thread.sleep(3000);
         Assertions.assertEquals(registeredServiceVo.getId(), updateServiceVo.getId());
         Assertions.assertNotEquals(registeredServiceVo.getOcl(), updateServiceVo.getOcl());
@@ -137,7 +140,7 @@ class OrchestratorApiTest {
     @Test
     void fetch() throws Exception {
         String oclLocation = "file:./target/test-classes/ocl_test.yaml";
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.fetch(oclLocation);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.fetch(oclLocation);
         Thread.sleep(3000);
         Assertions.assertNotNull(registeredServiceVo);
     }
@@ -145,12 +148,12 @@ class OrchestratorApiTest {
     @Test
     void fetchUpdate() throws Exception {
 
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
 
         String oclLocationUpdate = "file:./target/test-classes/ocl_test.yaml";
         RegisteredServiceVo fetchUpdateServiceVo =
-                orchestratorApi.fetchUpdate(registeredServiceVo.getId().toString(),
+                serviceRegisterApi.fetchUpdate(registeredServiceVo.getId().toString(),
                         oclLocationUpdate);
         Thread.sleep(3000);
         Assertions.assertEquals(registeredServiceVo.getId(), fetchUpdateServiceVo.getId());
@@ -159,22 +162,22 @@ class OrchestratorApiTest {
 
     @Test
     void unregister() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
-        Response response = orchestratorApi.unregister(registeredServiceVo.getId().toString());
+        Response response = serviceRegisterApi.unregister(registeredServiceVo.getId().toString());
         Assertions.assertTrue(response.getSuccess());
     }
 
     @Test
     void listRegisteredServices() throws Exception {
-        orchestratorApi.register(oclRegister);
+        serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
 
         Category categoryName = oclRegister.getCategory();
         String cspName = oclRegister.getCloudServiceProvider().getName().name();
         String serviceName = oclRegister.getName();
         String serviceVersion = oclRegister.getServiceVersion();
-        List<RegisteredServiceVo> registeredServiceVos = orchestratorApi.listRegisteredServices(
+        List<RegisteredServiceVo> registeredServiceVos = serviceRegisterApi.listRegisteredServices(
                 categoryName, cspName, serviceName, serviceVersion);
         log.error(registeredServiceVos.toString());
         Assertions.assertNotNull(registeredServiceVos);
@@ -182,11 +185,11 @@ class OrchestratorApiTest {
 
     @Test
     void detail() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
 
         RegisteredServiceVo registeredServiceVoDetail =
-                orchestratorApi.detail(registeredServiceVo.getId().toString());
+                serviceRegisterApi.detail(registeredServiceVo.getId().toString());
         log.error(registeredServiceVoDetail.toString());
         Assertions.assertNotNull(registeredServiceVoDetail);
     }
@@ -195,14 +198,14 @@ class OrchestratorApiTest {
     void health() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
-        SystemStatus health = orchestratorApi.health();
+        SystemStatus health = serviceRegisterApi.health();
         Assertions.assertEquals(systemStatus, health);
     }
 
     @Disabled
     @Test
     void getDeployedServiceDetailsById() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserName("admin");
@@ -218,9 +221,9 @@ class OrchestratorApiTest {
         serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
-        UUID deployUUid = orchestratorApi.deploy(createRequest);
+        UUID deployUUid = serviceDeployerApi.deploy(createRequest);
         ServiceDetailVo deployedServiceDetailsById =
-                orchestratorApi.getDeployedServiceDetailsById(deployUUid.toString(),
+                serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString(),
                         createRequest.getUserName());
         log.error(deployedServiceDetailsById.toString());
         Assertions.assertNotNull(deployedServiceDetailsById);
@@ -229,7 +232,7 @@ class OrchestratorApiTest {
     @Disabled
     @Test
     void listDeployedServices() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserName("admin");
@@ -245,8 +248,8 @@ class OrchestratorApiTest {
         serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
-        orchestratorApi.deploy(createRequest);
-        List<ServiceVo> serviceVos = orchestratorApi.listDeployedServices();
+        serviceDeployerApi.deploy(createRequest);
+        List<ServiceVo> serviceVos = serviceDeployerApi.listDeployedServices();
         log.error(serviceVos.toString());
         Assertions.assertFalse(serviceVos.isEmpty());
     }
@@ -254,7 +257,7 @@ class OrchestratorApiTest {
     @Disabled
     @Test
     void getDeployedServicesByUser() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserName("admin");
@@ -270,9 +273,9 @@ class OrchestratorApiTest {
         serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
-        orchestratorApi.deploy(createRequest);
+        serviceDeployerApi.deploy(createRequest);
         List<ServiceVo> deployedServicesByUser =
-                orchestratorApi.getDeployedServicesByUser(createRequest.getUserName());
+                serviceDeployerApi.getDeployedServicesByUser(createRequest.getUserName());
         log.error(deployedServicesByUser.toString());
         Assertions.assertFalse(deployedServicesByUser.isEmpty());
     }
@@ -280,7 +283,7 @@ class OrchestratorApiTest {
     @Disabled
     @Test
     void deploy() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserName("admin");
@@ -297,7 +300,7 @@ class OrchestratorApiTest {
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
         Assertions.assertDoesNotThrow(() -> {
-            UUID deployUUid = orchestratorApi.deploy(createRequest);
+            UUID deployUUid = serviceDeployerApi.deploy(createRequest);
             Assertions.assertNotNull(deployUUid);
         });
     }
@@ -305,7 +308,7 @@ class OrchestratorApiTest {
     @Disabled
     @Test
     void destroy() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserName("admin");
@@ -321,22 +324,22 @@ class OrchestratorApiTest {
         serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
-        UUID deployUUid = orchestratorApi.deploy(createRequest);
+        UUID deployUUid = serviceDeployerApi.deploy(createRequest);
 
-        Response response = orchestratorApi.destroy(deployUUid.toString());
+        Response response = serviceDeployerApi.destroy(deployUUid.toString());
         Assertions.assertTrue(response.getSuccess());
     }
 
     @Test
     void listAvailableServices() throws Exception {
-        orchestratorApi.register(oclRegister);
+        serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         Category categoryName = oclRegister.getCategory();
         String cspName = oclRegister.getCloudServiceProvider().getName().name();
         String serviceName = oclRegister.getName();
         String serviceVersion = oclRegister.getServiceVersion();
         List<UserAvailableServiceVo> userAvailableServiceVos =
-                orchestratorApi.listAvailableServices(categoryName, cspName, serviceName,
+                serviceDeployerApi.listAvailableServices(categoryName, cspName, serviceName,
                         serviceVersion);
         log.error(userAvailableServiceVos.toString());
         Assertions.assertNotNull(userAvailableServiceVos);
@@ -344,29 +347,29 @@ class OrchestratorApiTest {
 
     @Test
     void getAvailableServicesTree() throws Exception {
-        orchestratorApi.register(oclRegister);
+        serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         List<CategoryOclVo> categoryOclVos =
-                orchestratorApi.getAvailableServicesTree(oclRegister.getCategory());
+                serviceDeployerApi.getAvailableServicesTree(oclRegister.getCategory());
         log.error(categoryOclVos.toString());
         Assertions.assertNotNull(categoryOclVos);
     }
 
     @Test
     void availableServiceDetails() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         UserAvailableServiceVo userAvailableServiceVo =
-                orchestratorApi.availableServiceDetails(registeredServiceVo.getId().toString());
+                serviceDeployerApi.availableServiceDetails(registeredServiceVo.getId().toString());
         log.error(userAvailableServiceVo.toString());
         Assertions.assertNotNull(userAvailableServiceVo);
     }
 
     @Test
     void openApi() throws Exception {
-        RegisteredServiceVo registeredServiceVo = orchestratorApi.register(oclRegister);
+        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
-        Link link = orchestratorApi.openApi(registeredServiceVo.getId().toString());
+        Link link = serviceDeployerApi.openApi(registeredServiceVo.getId().toString());
         log.error(link.toString());
         Assertions.assertNotNull(link);
         Assertions.assertEquals("OpenApi", link.getRel().toString());
