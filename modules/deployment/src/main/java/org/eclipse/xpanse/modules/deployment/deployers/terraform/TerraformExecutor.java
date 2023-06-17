@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmdResult;
-import org.eclipse.xpanse.modules.plugin.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 
 /**
  * An executor for terraform.

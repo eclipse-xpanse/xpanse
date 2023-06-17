@@ -24,7 +24,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.plugin.monitor.ResourceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;

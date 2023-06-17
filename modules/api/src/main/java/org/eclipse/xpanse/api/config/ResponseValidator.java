@@ -34,7 +34,9 @@ public class ResponseValidator {
     }
 
     @AfterReturning(
-            pointcut = "execution(public * org.eclipse.xpanse.api.OrchestratorApi.*(..))",
+            pointcut = "execution(public * org.eclipse.xpanse.api.ServiceDeployerApi.*(..)) || "
+                    + "execution(public * org.eclipse.xpanse.api.MonitorApi.*(..)) || "
+                    + "execution(public * org.eclipse.xpanse.api.ServiceRegisterApi.*(..))",
             returning = "result")
     public void validateResponseData(Object result) {
         validateResponse(result);
