@@ -85,40 +85,44 @@ public class MetricsManager {
                 this.resourcesService.getInstanceResourceInfoById(
                         resourceMetricRequest.getDeployResource().getResourceId());
         List<Metric> metrics = new ArrayList<>();
-        for (Map.Entry<String, String> entry : instanceResource.getMetrics().entrySet()) {
-            if (monitorResourceType == MonitorResourceType.CPU
-                    || Objects.isNull(monitorResourceType)) {
-                if (entry.getKey().equals(CeilometerMetricType.CPU.toValue())) {
-                    metrics.add(getCpuUsage(resourceMetricRequest, entry.getValue()));
-                }
-            }
-            if (monitorResourceType == MonitorResourceType.MEM
-                    || Objects.isNull(monitorResourceType)) {
-                if (entry.getKey().equals(CeilometerMetricType.MEMORY_USAGE.toValue())) {
-                    metrics.add(getMemoryUsage(resourceMetricRequest, entry.getValue()));
-                }
-            }
-        }
-        if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
-                || monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
-                || Objects.isNull(monitorResourceType)) {
-            InstanceNetworkResource instanceNetworkResource =
-                    this.resourcesService.getInstanceNetworkResourceInfoByInstanceId(
-                            resourceMetricRequest.getDeployResource().getResourceId());
-            for (Map.Entry<String, String> entry : instanceNetworkResource.getMetrics()
-                    .entrySet()) {
-                if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
+        if (Objects.nonNull(instanceResource)) {
+            for (Map.Entry<String, String> entry : instanceResource.getMetrics().entrySet()) {
+                if (monitorResourceType == MonitorResourceType.CPU
                         || Objects.isNull(monitorResourceType)) {
-                    if (entry.getKey().equals(CeilometerMetricType.NETWORK_INCOMING.toValue())) {
-                        metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
-                                MonitorResourceType.VM_NETWORK_INCOMING));
+                    if (entry.getKey().equals(CeilometerMetricType.CPU.toValue())) {
+                        metrics.add(getCpuUsage(resourceMetricRequest, entry.getValue()));
                     }
                 }
-                if (monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
+                if (monitorResourceType == MonitorResourceType.MEM
                         || Objects.isNull(monitorResourceType)) {
-                    if (entry.getKey().equals(CeilometerMetricType.NETWORK_OUTGOING.toValue())) {
-                        metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
-                                MonitorResourceType.VM_NETWORK_OUTGOING));
+                    if (entry.getKey().equals(CeilometerMetricType.MEMORY_USAGE.toValue())) {
+                        metrics.add(getMemoryUsage(resourceMetricRequest, entry.getValue()));
+                    }
+                }
+            }
+            if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
+                    || monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
+                    || Objects.isNull(monitorResourceType)) {
+                InstanceNetworkResource instanceNetworkResource =
+                        this.resourcesService.getInstanceNetworkResourceInfoByInstanceId(
+                                resourceMetricRequest.getDeployResource().getResourceId());
+                for (Map.Entry<String, String> entry : instanceNetworkResource.getMetrics()
+                        .entrySet()) {
+                    if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
+                            || Objects.isNull(monitorResourceType)) {
+                        if (entry.getKey()
+                                .equals(CeilometerMetricType.NETWORK_INCOMING.toValue())) {
+                            metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
+                                    MonitorResourceType.VM_NETWORK_INCOMING));
+                        }
+                    }
+                    if (monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
+                            || Objects.isNull(monitorResourceType)) {
+                        if (entry.getKey()
+                                .equals(CeilometerMetricType.NETWORK_OUTGOING.toValue())) {
+                            metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
+                                    MonitorResourceType.VM_NETWORK_OUTGOING));
+                        }
                     }
                 }
             }
