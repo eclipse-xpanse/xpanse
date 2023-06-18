@@ -18,7 +18,6 @@ import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.credential.enums.CredentialTypeMessage;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariablesNotComplete;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
@@ -80,37 +79,8 @@ public class CredentialCenter {
                                     Objects.equals(credential.getType(), type))
                             .collect(Collectors.toList());
         }
-        List<AbstractCredentialInfo>
-                abstractCredentialInfos;
-        abstractCredentialInfos = getCredentialCapabilitiesValue(abstractCredentialInfoList);
 
-        return abstractCredentialInfos;
-    }
-
-    /**
-     * List the credential capabilities by @abstractCredentialInfoList.
-     *
-     * @param abstractCredentialInfoList The list of  credential capabilities.
-     * @return Returns list of credential capabilities.
-     */
-    private List<AbstractCredentialInfo> getCredentialCapabilitiesValue(
-            List<AbstractCredentialInfo> abstractCredentialInfoList) {
-
-        List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
-        for (AbstractCredentialInfo abstractCredentialInfo : abstractCredentialInfoList) {
-            if (Objects.equals(abstractCredentialInfo.getType(), CredentialType.VARIABLES)) {
-                CredentialVariables credentialVariables =
-                        (CredentialVariables) abstractCredentialInfo;
-
-                for (CredentialVariable variable : credentialVariables.getVariables()) {
-                    variable.setValue(
-                            CredentialTypeMessage.getMessageByType(CredentialType.VARIABLES));
-                }
-                abstractCredentialInfos.add(credentialVariables);
-            }
-        }
-
-        return abstractCredentialInfos;
+        return abstractCredentialInfoList;
     }
 
     /**
