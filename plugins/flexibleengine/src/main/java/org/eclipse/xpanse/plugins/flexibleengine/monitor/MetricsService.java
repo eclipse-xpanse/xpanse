@@ -7,7 +7,6 @@ package org.eclipse.xpanse.plugins.flexibleengine.monitor;
 
 
 import com.cloud.apigateway.sdk.utils.Client;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
@@ -30,6 +29,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCalledException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
@@ -88,10 +88,10 @@ public class MetricsService {
      * @param url        The request url of the FlexibleEngine API.
      * @return Returns HttpRequestBase
      */
-    public HttpRequestBase buildGetRequest(AbstractCredentialInfo credential, String url) {
+    public HttpRequestBase buildGetRequest(AbstractCredentialInfo credential, String url)
+            throws Exception {
         String accessKey = null;
         String securityKey = null;
-        HttpRequestBase requestBase = null;
         if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
             List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
             for (CredentialVariable credentialVariable : variables) {
@@ -105,13 +105,8 @@ public class MetricsService {
                 }
             }
         }
-        try {
-            requestBase = Client.get(accessKey, securityKey, url,
-                    flexibleEngineMonitorConverter.getHeaders());
-        } catch (Exception e) {
-            log.error("Build Get Request of the FlexibleEngine API error.", e);
-        }
-        return requestBase;
+        return Client.get(accessKey, securityKey, url,
+                flexibleEngineMonitorConverter.getHeaders());
     }
 
     /**
@@ -122,10 +117,9 @@ public class MetricsService {
      * @return Returns HttpRequestBase
      */
     public HttpRequestBase buildPostRequest(AbstractCredentialInfo credential, String url,
-                                            String postBody) {
+                                            String postBody) throws Exception {
         String accessKey = null;
         String securityKey = null;
-        HttpRequestBase requestBase = null;
         if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
             List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
             for (CredentialVariable credentialVariable : variables) {
@@ -139,28 +133,45 @@ public class MetricsService {
                 }
             }
         }
-        try {
-            requestBase = Client.post(accessKey, securityKey, url,
-                    flexibleEngineMonitorConverter.getHeaders(), postBody);
-        } catch (Exception e) {
-            log.error("Build Post Request of the FlexibleEngine API error.", e);
-        }
-        return requestBase;
+        return Client.post(accessKey, securityKey, url,
+                flexibleEngineMonitorConverter.getHeaders(), postBody);
     }
 
     private Project queryProjectInfo(AbstractCredentialInfo credential, String url) {
-        HttpRequestBase requestBase = buildGetRequest(credential, url);
-        return retryTemplateService.queryProjectInfo(requestBase);
+        try {
+            HttpRequestBase requestBase = buildGetRequest(credential, url);
+            return retryTemplateService.queryProjectInfo(requestBase);
+        } catch (Exception e) {
+            String errorMsg = String.format("Query project info by FlexibleEngine Client error. %s",
+                    e.getMessage());
+            log.error(errorMsg);
+            throw new ClientApiCalledException(errorMsg);
+        }
     }
 
     private ShowMetricDataResponse queryMetricData(AbstractCredentialInfo credential, String url) {
-        HttpRequestBase requestBase = buildGetRequest(credential, url);
-        return retryTemplateService.queryMetricData(requestBase);
+        try {
+            HttpRequestBase requestBase = buildGetRequest(credential, url);
+            return retryTemplateService.queryMetricData(requestBase);
+        } catch (Exception e) {
+            String errorMsg = String.format("Query metric data by FlexibleEngine Client error. %s",
+                    e.getMessage());
+            log.error(errorMsg);
+            throw new ClientApiCalledException(errorMsg);
+        }
     }
 
     private ListMetricsResponse queryMetricItemList(AbstractCredentialInfo credential, String url) {
-        HttpRequestBase requestBase = buildGetRequest(credential, url);
-        return retryTemplateService.queryMetricItemList(requestBase);
+        try {
+            HttpRequestBase requestBase = buildGetRequest(credential, url);
+            return retryTemplateService.queryMetricItemList(requestBase);
+        } catch (Exception e) {
+            String errorMsg =
+                    String.format("Query metric item list by FlexibleEngine Client error. %s",
+                            e.getMessage());
+            log.error(errorMsg);
+            throw new ClientApiCalledException(errorMsg);
+        }
     }
 
     private BatchListMetricDataResponse batchQueryMetricData(AbstractCredentialInfo credential,
@@ -170,10 +181,13 @@ public class MetricsService {
             String requestBody = objectMapper.writeValueAsString(request.getBody());
             HttpRequestBase requestBase = buildPostRequest(credential, url, requestBody);
             return retryTemplateService.batchQueryMetricData(requestBase, requestBody);
-        } catch (JsonProcessingException e) {
-            log.error("BatchQueryMetricData JsonProcessingException.", e);
+        } catch (Exception e) {
+            String errorMsg =
+                    String.format("Batch query metric data by FlexibleEngine Client error. %s",
+                            e.getMessage());
+            log.error(errorMsg);
+            throw new ClientApiCalledException(errorMsg);
         }
-        return null;
     }
 
 
@@ -202,10 +216,9 @@ public class MetricsService {
         String region = deployResource.getProperties().get("region");
         MonitorResourceType resourceType = resourceMetricRequest.getMonitorResourceType();
         if (StringUtils.isNotBlank(region)) {
-            String projectQueryUrl =
-                    flexibleEngineMonitorConverter.buildProjectQueryUrl(region).toString();
             Project project =
-                    queryProjectInfo(credential, projectQueryUrl);
+                    queryProjectInfo(credential,
+                            flexibleEngineMonitorConverter.buildProjectQueryUrl(region).toString());
             if (Objects.nonNull(project) && StringUtils.isNotBlank(project.getId())) {
                 List<MetricInfoList> targetMetrics =
                         getTargetMetricInfoList(deployResource, credential, resourceType, project);
@@ -219,7 +232,8 @@ public class MetricsService {
                                         deployResource, response, metricInfoList,
                                         resourceMetricRequest.isOnlyLastKnownMetric());
 
-                        if (!CollectionUtils.isEmpty(metric.getMetrics())) {
+                        if (Objects.nonNull(metric)
+                                && !CollectionUtils.isEmpty(metric.getMetrics())) {
                             metrics.add(metric);
                             flexibleEngineMonitorCache.set(deployResource.getResourceId(), metric);
                         } else {
@@ -228,7 +242,6 @@ public class MetricsService {
                                             metricInfoList.getMetricName());
                             metrics.addAll(metricCache);
                         }
-
                     }
                 }
             }
@@ -257,7 +270,8 @@ public class MetricsService {
                     queryProjectInfo(credential, projectQueryUrl);
         }
         if (Objects.isNull(project) || StringUtils.isBlank(project.getId())) {
-            return new ArrayList<>();
+            throw new ClientApiCalledException(
+                    "Query project info by FlexibleEngine Client failed. Project info is null.");
         }
         Map<String, List<MetricInfoList>> deployResourceMetricInfoMap = new HashMap<>();
         for (DeployResource deployResource : deployResources) {
