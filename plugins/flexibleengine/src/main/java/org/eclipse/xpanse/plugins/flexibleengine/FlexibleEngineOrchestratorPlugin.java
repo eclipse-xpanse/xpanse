@@ -72,11 +72,6 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
         return credentialInfos;
     }
 
-    @Override
-    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
-        return metricsService.getMetrics(resourceMetricRequest);
-    }
-
     /**
      * Get metrics for resource instance by the @resourceMetricRequest.
      *

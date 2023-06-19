@@ -42,43 +42,7 @@ public class MonitorApi {
     public MonitorApi(Monitor monitor) {
         this.monitor = monitor;
     }
-
-    /**
-     * Get Monitor Metric.
-     *
-     * @param id Service ID.
-     */
-    @Tag(name = "Monitor",
-            description = "APIs to get metrics of deployed services.")
-    @Operation(description = "Get metrics of the deployed service.")
-    @GetMapping(value = "/monitor/metric/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public List<Metric> getMetrics(
-            @Parameter(name = "id", description = "Id of the deployed service")
-            @PathVariable(name = "id") String id,
-            @Parameter(name = "monitorResourceType", description = "Types of the monitor resource")
-            @RequestParam(name = "monitorResourceType", required = false)
-            MonitorResourceType monitorResourceType,
-            @Parameter(name = "from", description = "Start UNIX timestamp in milliseconds. "
-                    + "If no value filled,the default value is the UNIX timestamp in milliseconds"
-                    + " of the five minutes ago.")
-            @RequestParam(name = "from", required = false)
-            @Min(value = 0, message = "The value cannot be less than 0") Long from,
-            @Parameter(name = "to", description = "End UNIX timestamp in milliseconds. "
-                    + "If no value filled,the default value is the UNIX timestamp in milliseconds "
-                    + "of the current time.")
-            @RequestParam(name = "to", required = false)
-            @Min(value = 0, message = "The value cannot be less than 0") Long to,
-            @Parameter(name = "granularity",
-                    description = "Return metrics collected in provided time interval. This"
-                            + " depends on how the source systems have generated/collected"
-                            + " metrics.")
-            @RequestParam(name = "granularity", required = false)
-            Integer granularity) {
-
-        return monitor.getMetrics(UUID.fromString(id), monitorResourceType, from, to, granularity);
-    }
-
+    
     /**
      * Get Monitor Metric.
      *

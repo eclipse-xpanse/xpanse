@@ -71,11 +71,6 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         return credentialInfos;
     }
 
-    @Override
-    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
-        return huaweiCloudMetricsService.getMetricsByResource(resourceMetricRequest);
-    }
-
     /**
      * Get metrics for resource instance by the @resourceMetricRequest.
      *

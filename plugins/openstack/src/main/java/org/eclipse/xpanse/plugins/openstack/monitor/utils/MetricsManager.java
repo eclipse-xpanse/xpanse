@@ -71,7 +71,7 @@ public class MetricsManager {
 
     /**
      * Method which does the actual implementation for MetricsExporter. {@link
-     * MetricsExporter#getMetrics(ResourceMetricRequest metricQueryRequest)}().
+     * MetricsExporter#getMetricsForResource} (ResourceMetricRequest metricQueryRequest)}().
      *
      * @return returns list of Metrics.
      */
