@@ -15,7 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
+import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.credential.enums.CredentialTypeMessage;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
@@ -88,7 +91,10 @@ public class CredentialManageApi {
             @PathVariable(name = "cspName") Csp csp,
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type", required = false) CredentialType type) {
-        return credentialCenter.getCredentialCapabilitiesByCsp(csp, type);
+        List<AbstractCredentialInfo> abstractCredentialInfos =
+                credentialCenter.getCredentialCapabilitiesByCsp(csp, type);
+        getCredentialCapabilitiesValue(abstractCredentialInfos);
+        return abstractCredentialInfos;
     }
 
     /**
@@ -219,6 +225,21 @@ public class CredentialManageApi {
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type") CredentialType type) {
         return credentialCenter.deleteCredential(csp, userName, type);
+    }
+
+    private void getCredentialCapabilitiesValue(
+            List<AbstractCredentialInfo> abstractCredentialInfoList) {
+
+        for (AbstractCredentialInfo abstractCredentialInfo : abstractCredentialInfoList) {
+            if (abstractCredentialInfo.getType() == CredentialType.VARIABLES) {
+                CredentialVariables credentialVariables =
+                        (CredentialVariables) abstractCredentialInfo;
+                for (CredentialVariable variable : credentialVariables.getVariables()) {
+                    variable.setValue(
+                            CredentialTypeMessage.getMessageByType(CredentialType.VARIABLES));
+                }
+            }
+        }
     }
 
 }
