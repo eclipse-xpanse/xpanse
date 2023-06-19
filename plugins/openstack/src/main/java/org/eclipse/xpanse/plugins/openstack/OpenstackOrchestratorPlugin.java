@@ -106,11 +106,6 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         return credentialInfos;
     }
 
-    @Override
-    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
-        return this.metricsManager.getMetrics(resourceMetricRequest);
-    }
-
     /**
      * Get metrics for resource instance by the @resourceMetricRequest.
      *

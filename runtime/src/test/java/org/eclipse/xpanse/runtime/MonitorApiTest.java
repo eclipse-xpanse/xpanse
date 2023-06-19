@@ -12,13 +12,12 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.eclipse.xpanse.api.MonitorApi;
-import org.eclipse.xpanse.modules.monitor.Monitor;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.MetricItem;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.monitor.Monitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +39,8 @@ class MonitorApiTest {
 
     private final Long to = System.currentTimeMillis();
 
+    private final String ID = "e034af0c-be03-453e-92cd-fd69acbfe526";
+
     @Mock
     private Monitor mockMonitor;
 
@@ -52,7 +53,7 @@ class MonitorApiTest {
     }
 
     @Test
-    void testGetMetrics() {
+    void testGetMetricsByResourceId() {
 
         // Setup
         final Metric metric = new Metric();
@@ -73,13 +74,13 @@ class MonitorApiTest {
         final MetricItem metricItem1 = new MetricItem();
         metric1.setMetrics(List.of(metricItem1));
         final List<Metric> metrics = List.of(metric1);
-        when(mockMonitor.getMetrics(UUID.fromString("e034af0c-be03-453e-92cd-fd69acbfe526"),
-                MonitorResourceType.CPU, from, to, 1)).thenReturn(metrics);
+        when(mockMonitor.getMetricsByResourceId(ID,
+                MonitorResourceType.CPU, from, to, 1, false)).thenReturn(metrics);
 
         // Run the test
         final List<Metric> result =
-                monitorApiUnderTest.getMetrics("e034af0c-be03-453e-92cd-fd69acbfe526",
-                        MonitorResourceType.CPU, from, to, 1);
+                monitorApiUnderTest.getMetricsByResourceId(ID,
+                        MonitorResourceType.CPU, from, to, 1, false);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -88,13 +89,62 @@ class MonitorApiTest {
     @Test
     void testGetMetrics_MonitorReturnsNoItems() {
         // Setup
-        when(mockMonitor.getMetrics(UUID.fromString("e034af0c-be03-453e-92cd-fd69acbfe526"),
-                MonitorResourceType.CPU, from, to, 1)).thenReturn(Collections.emptyList());
+        when(mockMonitor.getMetricsByResourceId(ID,
+                MonitorResourceType.CPU, from, to, 1, false)).thenReturn(Collections.emptyList());
 
         // Run the test
         final List<Metric> result =
-                monitorApiUnderTest.getMetrics("e034af0c-be03-453e-92cd-fd69acbfe526",
-                        MonitorResourceType.CPU, from, to, 1);
+                monitorApiUnderTest.getMetricsByResourceId(ID,
+                        MonitorResourceType.CPU, from, to, 1, false);
+
+        // Verify the results
+        assertThat(result).isEqualTo(Collections.emptyList());
+    }
+
+    @Test
+    void testGetMetricsByServiceId() {
+
+        // Setup
+        final Metric metric = new Metric();
+        metric.setName("name");
+        metric.setDescription("description");
+        metric.setType(MetricType.COUNTER);
+        metric.setLabels(Map.ofEntries(Map.entry("value", "value")));
+        final MetricItem metricItem = new MetricItem();
+        metric.setMetrics(List.of(metricItem));
+        final List<Metric> expectedResult = List.of(metric);
+
+        // Configure Monitor.getMetrics(...).
+        final Metric metric1 = new Metric();
+        metric1.setName("name");
+        metric1.setDescription("description");
+        metric1.setType(MetricType.COUNTER);
+        metric1.setLabels(Map.ofEntries(Map.entry("value", "value")));
+        final MetricItem metricItem1 = new MetricItem();
+        metric1.setMetrics(List.of(metricItem1));
+        final List<Metric> metrics = List.of(metric1);
+        when(mockMonitor.getMetricsByServiceId(ID,
+                MonitorResourceType.CPU, from, to, 1, false)).thenReturn(metrics);
+
+        // Run the test
+        final List<Metric> result =
+                monitorApiUnderTest.getMetricsByServiceId(ID,
+                        MonitorResourceType.CPU, from, to, 1, false);
+
+        // Verify the results
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testGetMetricsByServiceId_MonitorReturnsNoItems() {
+        // Setup
+        when(mockMonitor.getMetricsByServiceId(ID,
+                MonitorResourceType.CPU, from, to, 1, false)).thenReturn(Collections.emptyList());
+
+        // Run the test
+        final List<Metric> result =
+                monitorApiUnderTest.getMetricsByServiceId(ID,
+                        MonitorResourceType.CPU, from, to, 1, false);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());

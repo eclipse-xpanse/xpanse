@@ -78,7 +78,7 @@ class OpenstackMonitoringIntegrationTest {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
         List<Metric> metrics =
-                this.plugin.getMetrics(setupResourceRequest(null, null, null, false));
+                this.plugin.getMetricsForResource(setupResourceRequest(null, null, null, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
@@ -98,7 +98,7 @@ class OpenstackMonitoringIntegrationTest {
                 getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
         Long currentTime = Instant.now().getEpochSecond();
         List<Metric> metrics =
-                this.plugin.getMetrics(setupResourceRequest(currentTime, currentTime, null, false));
+                this.plugin.getMetricsForResource(setupResourceRequest(currentTime, currentTime, null, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
@@ -116,7 +116,7 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsWithGranularity() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
-        List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(null, null, 150, false));
+        List<Metric> metrics = this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
@@ -130,7 +130,7 @@ class OpenstackMonitoringIntegrationTest {
     void testGetOnlyLastKnownMetric() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
-        List<Metric> metrics = this.plugin.getMetrics(setupResourceRequest(null, null, 150, true));
+        List<Metric> metrics = this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());

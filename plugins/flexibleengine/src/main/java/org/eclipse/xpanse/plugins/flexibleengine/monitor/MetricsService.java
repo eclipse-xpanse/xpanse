@@ -176,17 +176,6 @@ public class MetricsService {
         return null;
     }
 
-
-    /**
-     * Get metrics of the @deployResource.
-     *
-     * @param resourceMetricRequest The request model to query metrics.
-     * @return Returns list of metric result.
-     */
-    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
-        return getMetricsForResource(resourceMetricRequest);
-    }
-
     /**
      * Get metrics of the @deployResource.
      *

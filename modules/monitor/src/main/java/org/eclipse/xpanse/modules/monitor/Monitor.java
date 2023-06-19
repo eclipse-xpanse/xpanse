@@ -53,35 +53,6 @@ public class Monitor {
         this.pluginManager = pluginManager;
     }
 
-
-    /**
-     * Get metrics of the service instance.
-     */
-    public List<Metric> getMetrics(UUID id, MonitorResourceType monitorType, Long from, Long to,
-                                   Integer granularity) {
-        DeployServiceEntity serviceEntity = deployServiceStorage.findDeployServiceById(id);
-        if (Objects.isNull(serviceEntity)) {
-            throw new EntityNotFoundException("Service not found.");
-        }
-        OrchestratorPlugin orchestratorPlugin =
-                pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
-
-        List<DeployResource> deployResources =
-                EntityTransUtils.transResourceEntity(serviceEntity.getDeployResourceList());
-        List<Metric> metrics = new ArrayList<>();
-        for (DeployResource deployResource : deployResources) {
-            if (DeployResourceKind.VM.equals(deployResource.getKind())) {
-                ResourceMetricRequest resourceMetricRequest =
-                        getResourceMetricRequest(deployResource, monitorType, from, to,
-                                granularity, false, serviceEntity.getUserName());
-                List<Metric> metricList = orchestratorPlugin.getMetrics(resourceMetricRequest);
-                metrics.addAll(metricList);
-            }
-        }
-        return metrics;
-    }
-
-
     /**
      * Get metrics of the service instance.
      */
