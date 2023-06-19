@@ -55,13 +55,13 @@ public class DatabaseDeployResourceStorage implements DeployResourceStorage {
     @Override
     public DeployResourceEntity findDeployResourceByResourceId(String resourceId) {
         Specification<DeployResourceEntity> specification =
-                ((root, query, criteriaBuilder) -> {
+                (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     predicateList.add(criteriaBuilder.equal(root.get("resourceId"),
                             resourceId));
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
-                });
+                };
 
         List<DeployResourceEntity> deployResources =
                 deployResourceRepository.findAll(specification);

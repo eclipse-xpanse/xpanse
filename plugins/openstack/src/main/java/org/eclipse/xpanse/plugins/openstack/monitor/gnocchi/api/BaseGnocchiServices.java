@@ -18,7 +18,7 @@ import org.openstack4j.openstack.internal.BaseOpenStackService;
 public class BaseGnocchiServices extends BaseOpenStackService {
 
     protected BaseGnocchiServices() {
-        super(ServiceType.TELEMETRY, EndpointFunction.instance);
+        super(ServiceType.TELEMETRY, EndpointFunction.INSTANCE);
     }
 
     /**
@@ -27,7 +27,7 @@ public class BaseGnocchiServices extends BaseOpenStackService {
     private static class EndpointFunction implements Function<String, String> {
 
         static final EndpointFunction
-                instance = new EndpointFunction();
+                INSTANCE = new EndpointFunction();
 
         @Override
         public String apply(String input) {

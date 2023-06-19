@@ -145,10 +145,10 @@ public class CustomEndPointResolver implements EndpointURLResolver {
 
         for (Service service : token.getCatalog()) {
             // Special handling for metric to get the correct end point.
-            if ((urlResolverParams.type == ServiceType.TELEMETRY
-                    && service.getType().equals("metric"))
-                    || (urlResolverParams.type == ServiceType.forName(service.getType())
-                    || urlResolverParams.type == ServiceType.forName(service.getName()))) {
+            if (urlResolverParams.type == ServiceType.TELEMETRY
+                    && service.getType().equals("metric")
+                    || urlResolverParams.type == ServiceType.forName(service.getType())
+                    || urlResolverParams.type == ServiceType.forName(service.getName())) {
                 if (urlResolverParams.perspective == null) {
                     urlResolverParams.perspective = Facing.PUBLIC;
                 }
@@ -245,6 +245,14 @@ public class CustomEndPointResolver implements EndpointURLResolver {
             } else {
                 return uid.equals(other.uid);
             }
+        }
+
+        public int hashCode() {
+            int result = 1;
+            result = 31 * result + (this.perspective == null ? 0 : this.perspective.hashCode());
+            result = 31 * result + (this.type == null ? 0 : this.type.hashCode());
+            result = 31 * result + (this.uid == null ? 0 : this.uid.hashCode());
+            return result;
         }
     }
 }

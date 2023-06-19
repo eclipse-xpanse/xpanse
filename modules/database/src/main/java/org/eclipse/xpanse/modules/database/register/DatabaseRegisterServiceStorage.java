@@ -54,7 +54,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
     public RegisterServiceEntity findRegisteredService(
             RegisterServiceEntity registerServiceEntity) {
         Specification<RegisterServiceEntity> specification =
-                ((root, query, criteriaBuilder) -> {
+                (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     predicateList.add(criteriaBuilder.equal(root.get("csp"),
                             registerServiceEntity.getCsp()));
@@ -66,7 +66,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
                             registerServiceEntity.getCategory()));
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
-                });
+                };
         Optional<RegisterServiceEntity> optional = repository.findOne(specification);
         return optional.orElse(null);
 
@@ -83,7 +83,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
             RegisteredServiceQuery serviceQuery) {
 
         Specification<RegisterServiceEntity> specification =
-                ((root, query, criteriaBuilder) -> {
+                (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(serviceQuery.getCategory())) {
                         predicateList.add(criteriaBuilder.equal(root.get("category"),
@@ -106,7 +106,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
 
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
-                });
+                };
 
         return repository.findAll(specification);
     }

@@ -23,7 +23,7 @@ public record HuaweiCloudRetryStrategy(long delayMillis) implements BackoffStrat
     public static final int ERROR_CODE_INTERNAL_SERVER_ERROR = 500;
 
     @Override
-    public <ResT> long computeDelayBeforeNextRetry(RetryContext<ResT> retryContext) {
+    public <T> long computeDelayBeforeNextRetry(RetryContext<T> retryContext) {
         return delayMillis;
     }
 }

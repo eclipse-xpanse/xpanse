@@ -50,7 +50,8 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class MetricsService {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final FlexibleEngineMonitorConverter flexibleEngineMonitorConverter;
 
@@ -177,7 +178,7 @@ public class MetricsService {
                                                              BatchListMetricDataRequest request,
                                                              String url) {
         try {
-            String requestBody = objectMapper.writeValueAsString(request.getBody());
+            String requestBody = OBJECT_MAPPER.writeValueAsString(request.getBody());
             HttpRequestBase requestBase = buildPostRequest(credential, url, requestBody);
             return retryTemplateService.batchQueryMetricData(requestBase, requestBody);
         } catch (Exception e) {

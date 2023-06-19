@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CredentialOpenApiGenerator implements ApplicationRunner {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final String appVersion;
     private final OpenApiUtil openApiUtil;
     private final PluginManager pluginManager;
@@ -214,7 +214,7 @@ public class CredentialOpenApiGenerator implements ApplicationRunner {
                 credentialVariable.getDescription()));
         String exampleString = "";
         try {
-            exampleString = mapper.writeValueAsString(variables);
+            exampleString = OBJECT_MAPPER.writeValueAsString(variables);
         } catch (JsonProcessingException e) {
             log.error("Failed to write value as string.", e);
         }

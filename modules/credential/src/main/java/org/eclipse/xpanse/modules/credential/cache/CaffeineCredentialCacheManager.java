@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings("UnnecessarilyFullyQualified")
 public class CaffeineCredentialCacheManager {
 
-    private static final Cache<CredentialCacheKey, AbstractCredentialInfo> credentialsCache =
+    private static final Cache<CredentialCacheKey, AbstractCredentialInfo> CREDENTIALS_CACHE =
             credentialsCache();
 
     private static Cache<CredentialCacheKey, AbstractCredentialInfo> credentialsCache() {
@@ -39,15 +39,15 @@ public class CaffeineCredentialCacheManager {
     }
 
     public void put(CredentialCacheKey key, AbstractCredentialInfo value) {
-        credentialsCache.put(key, value);
+        CREDENTIALS_CACHE.put(key, value);
     }
 
     public AbstractCredentialInfo get(CredentialCacheKey key) {
-        return credentialsCache.getIfPresent(key);
+        return CREDENTIALS_CACHE.getIfPresent(key);
     }
 
     public void remove(CredentialCacheKey key) {
-        credentialsCache.invalidate(key);
+        CREDENTIALS_CACHE.invalidate(key);
     }
 
 }
