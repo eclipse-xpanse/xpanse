@@ -34,12 +34,12 @@ public class CredentialVariable {
             + "completeness check will ignore this variable. It is upto the plugin to decide what "
             + "needs to be done if this optional credential variable is present.",
             defaultValue = "true")
-    private final boolean isMandatory;
+    private final Boolean isMandatory;
 
     @NotNull
     @Schema(description = "Defines if the particular variable contains sensitive data. For example "
             + "the value is false for username and true for password variables respectively.")
-    private final boolean isSensitive;
+    private final Boolean isSensitive;
 
     @NotNull
     @NotBlank
@@ -52,7 +52,7 @@ public class CredentialVariable {
      * @param name        name of the variable.
      * @param description description of the variable.
      */
-    public CredentialVariable(String name, String description, boolean isSensitive) {
+    public CredentialVariable(String name, String description, Boolean isSensitive) {
         this.name = name;
         this.description = description;
         this.isMandatory = true;
@@ -66,8 +66,8 @@ public class CredentialVariable {
      * @param description description of the variable.
      * @param isMandatory if the credential variable is mandatory.
      */
-    public CredentialVariable(String name, String description, boolean isMandatory,
-                              boolean isSensitive) {
+    public CredentialVariable(String name, String description, Boolean isMandatory,
+                              Boolean isSensitive) {
         this.name = name;
         this.description = description;
         this.isMandatory = isMandatory;
@@ -83,8 +83,8 @@ public class CredentialVariable {
      * @param isSensitive defines if the particular variable contains sensitive data.
      * @param value       the value of the CredentialVariable filled by the user.
      */
-    public CredentialVariable(String name, String description, boolean isMandatory,
-                              boolean isSensitive, String value) {
+    public CredentialVariable(String name, String description, Boolean isMandatory,
+                              Boolean isSensitive, String value) {
         this.name = name;
         this.description = description;
         this.isMandatory = isMandatory;
