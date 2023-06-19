@@ -105,7 +105,8 @@ public class CredentialManageApi {
     @Operation(description = "List all credentials of the user.")
     public List<AbstractCredentialInfo> getCredentialsByUser(
             @Parameter(name = "userName",
-                    description = "The name of user who provided the credential.")
+                    description = "The name of user who provided the credential.",
+                    required = true)
             @RequestParam(name = "userName") String userName) {
         return credentialCenter.getCredentialsByUser(userName);
     }
