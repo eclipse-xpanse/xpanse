@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCalledException;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
@@ -145,7 +145,7 @@ public class MetricsService {
             String errorMsg = String.format("Query project info by FlexibleEngine Client error. %s",
                     e.getMessage());
             log.error(errorMsg);
-            throw new ClientApiCalledException(errorMsg);
+            throw new ClientApiCallFailedException(errorMsg);
         }
     }
 
@@ -157,7 +157,7 @@ public class MetricsService {
             String errorMsg = String.format("Query metric data by FlexibleEngine Client error. %s",
                     e.getMessage());
             log.error(errorMsg);
-            throw new ClientApiCalledException(errorMsg);
+            throw new ClientApiCallFailedException(errorMsg);
         }
     }
 
@@ -170,7 +170,7 @@ public class MetricsService {
                     String.format("Query metric item list by FlexibleEngine Client error. %s",
                             e.getMessage());
             log.error(errorMsg);
-            throw new ClientApiCalledException(errorMsg);
+            throw new ClientApiCallFailedException(errorMsg);
         }
     }
 
@@ -186,7 +186,7 @@ public class MetricsService {
                     String.format("Batch query metric data by FlexibleEngine Client error. %s",
                             e.getMessage());
             log.error(errorMsg);
-            throw new ClientApiCalledException(errorMsg);
+            throw new ClientApiCallFailedException(errorMsg);
         }
     }
 
@@ -259,7 +259,7 @@ public class MetricsService {
                     queryProjectInfo(credential, projectQueryUrl);
         }
         if (Objects.isNull(project) || StringUtils.isBlank(project.getId())) {
-            throw new ClientApiCalledException(
+            throw new ClientApiCallFailedException(
                     "Query project info by FlexibleEngine Client failed. Project info is null.");
         }
         Map<String, List<MetricInfoList>> deployResourceMetricInfoMap = new HashMap<>();

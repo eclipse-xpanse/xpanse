@@ -8,9 +8,9 @@ package org.eclipse.xpanse.modules.models.monitor.exceptions;
 /**
  * Exception thrown when calling API by the client.
  */
-public class ClientApiCalledException extends RuntimeException {
+public class ClientApiCallFailedException extends RuntimeException {
 
-    public ClientApiCalledException(String message) {
+    public ClientApiCallFailedException(String message) {
         super("Client Called API Exception:" + message);
     }
 }
