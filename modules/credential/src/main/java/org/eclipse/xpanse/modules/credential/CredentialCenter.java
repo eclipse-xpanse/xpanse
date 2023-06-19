@@ -310,7 +310,7 @@ public class CredentialCenter {
                 }
                 Set<String> definedMandatoryVariableNameSet =
                         definedVariables.getVariables().stream()
-                                .filter(CredentialVariable::isMandatory)
+                                .filter(CredentialVariable::getIsMandatory)
                                 .map(CredentialVariable::getName).collect(Collectors.toSet());
                 for (CredentialVariable inputVariable : inputCredential.getVariables()) {
                     if (definedMandatoryVariableNameSet.contains(inputVariable.getName())
@@ -377,7 +377,7 @@ public class CredentialCenter {
     private boolean isAnyMandatoryCredentialVariableMissing(
             CredentialVariables credentialVariables) {
         return credentialVariables.getVariables().stream()
-                .anyMatch(credentialVariable -> credentialVariable.isMandatory()
+                .anyMatch(credentialVariable -> credentialVariable.getIsMandatory()
                         && Objects.isNull(credentialVariable.getValue()));
     }
 
@@ -408,7 +408,7 @@ public class CredentialCenter {
                     (CredentialVariables) abstractCredentialInfo;
             List<CredentialVariable> variables = credentialVariables.getVariables();
             for (CredentialVariable variable : variables) {
-                if (variable.isSensitive()) {
+                if (variable.getIsSensitive()) {
                     variable.setValue("*********");
                 }
             }
