@@ -40,7 +40,7 @@ public class CredentialVariables extends AbstractCredentialInfo {
      */
     public CredentialVariables(CreateCredential createCredential) {
         super(createCredential.getCsp(), createCredential.getXpanseUser(),
-                createCredential.getXpanseUser(), createCredential.getDescription(),
+                createCredential.getName(), createCredential.getDescription(),
                 createCredential.getType());
         super.timeToLive = createCredential.getTimeToLive();
         this.variables = createCredential.getVariables();

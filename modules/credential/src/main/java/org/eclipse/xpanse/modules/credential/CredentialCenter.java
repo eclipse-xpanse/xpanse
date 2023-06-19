@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.credential;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -101,6 +102,9 @@ public class CredentialCenter {
      * @return the credentials.
      */
     public List<AbstractCredentialInfo> getCredentialsByUser(String xpanseUser) {
+        if (StringUtils.isBlank(xpanseUser)) {
+            return Collections.emptyList();
+        }
         List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
         for (Csp csp : pluginManager.getPlugins().keySet()) {
             List<AbstractCredentialInfo> credentials = getCredentials(csp, xpanseUser, null);
@@ -119,6 +123,9 @@ public class CredentialCenter {
      */
     public List<AbstractCredentialInfo> getCredentials(
             Csp csp, String xpanseUser, CredentialType requestedCredentialType) {
+        if (StringUtils.isBlank(xpanseUser)) {
+            return Collections.emptyList();
+        }
         List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
         if (Objects.nonNull(requestedCredentialType)) {
             AbstractCredentialInfo abstractCredentialInfo =
