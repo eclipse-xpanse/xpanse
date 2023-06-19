@@ -1,15 +1,15 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
-package org.eclipse.xpanse.modules.orchestrator;
+package org.eclipse.xpanse.modules.register;
 
 import java.io.File;
 import java.net.URL;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
-import org.eclipse.xpanse.modules.orchestrator.utils.OpenApiUtil;
+import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -33,7 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(OrderAnnotation.class)
-public class OpenApiUtilTest {
+class OpenApiUtilTest {
 
     private static final String ID = "488adf44-b48f-43fb-9b7f-61e79f40016a";
     private static final String CLIENT_DOWNLOAD_URL = "https://repo1.maven.org/maven2/org/"
@@ -49,7 +49,7 @@ public class OpenApiUtilTest {
 
     @Test
     @Order(1)
-    public void createServiceApi_test() throws Exception {
+    void createServiceApi_test() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_testOpenApi.yaml"));
         RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
@@ -61,9 +61,10 @@ public class OpenApiUtilTest {
         registerServiceEntity.setOcl(ocl);
         registerServiceEntity.setServiceState(ServiceState.REGISTERED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
-        OpenApiUtil openApiUtil = new OpenApiUtil(deployVariableValidator, CLIENT_DOWNLOAD_URL,
-                OPENAPI_PATH, SERVICER_PORT);
-        openApiUtil.createServiceApi(registerServiceEntity);
+        OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL, OPENAPI_PATH, SERVICER_PORT);
+        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator = new RegisteredServicesOpenApiGenerator(
+                deployVariableValidator, openApiUtil);
+        registeredServicesOpenApiGenerator.createServiceApi(registerServiceEntity);
         String openApiWorkdir = openApiUtil.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");
         Assertions.assertTrue(htmlFile.exists());
@@ -71,7 +72,7 @@ public class OpenApiUtilTest {
 
     @Test
     @Order(2)
-    public void updateServiceApi_test() throws Exception {
+    void updateServiceApi_test() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_testOpenApi.yaml"));
         RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
@@ -83,18 +84,22 @@ public class OpenApiUtilTest {
         registerServiceEntity.setOcl(ocl);
         registerServiceEntity.setServiceState(ServiceState.REGISTERED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
-        OpenApiUtil openApiUtil = new OpenApiUtil(deployVariableValidator, CLIENT_DOWNLOAD_URL,
+        OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
                 OPENAPI_PATH, SERVICER_PORT);
-        Assertions.assertDoesNotThrow(() -> openApiUtil.updateServiceApi(registerServiceEntity));
+        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator = new RegisteredServicesOpenApiGenerator(
+                deployVariableValidator, openApiUtil);
+        Assertions.assertDoesNotThrow(() -> registeredServicesOpenApiGenerator.updateServiceApi(registerServiceEntity));
     }
 
     @Test
     @Order(3)
-    public void deleteServiceApi_test() {
+    void deleteServiceApi_test() {
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
-        OpenApiUtil openApiUtil = new OpenApiUtil(deployVariableValidator, CLIENT_DOWNLOAD_URL,
+        OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
                 OPENAPI_PATH, SERVICER_PORT);
-        openApiUtil.deleteServiceApi(ID);
+        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator = new RegisteredServicesOpenApiGenerator(
+                deployVariableValidator, openApiUtil);
+        registeredServicesOpenApiGenerator.deleteServiceApi(ID);
         String openApiWorkdir = openApiUtil.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");
         Assertions.assertFalse(htmlFile.exists());

@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
@@ -31,7 +32,7 @@ import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.service.view.CategoryOclVo;
-import org.eclipse.xpanse.modules.orchestrator.utils.OpenApiUtil;
+import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,9 +58,11 @@ class RegisterServiceImplTest {
     @Mock
     private OclLoader mockOclLoader;
     @Mock
-    private OpenApiUtil mockOpenApiUtil;
+    private RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator;
     @Mock
     private DeployService mockDeployService;
+    @Mock
+    private OpenApiUtil openApiUtil;
     @InjectMocks
     private RegisterServiceImpl registerServiceImplUnderTest;
 
@@ -96,7 +99,7 @@ class RegisterServiceImplTest {
         log.error(registeredServiceEntityByUrl.toString());
         Assertions.assertEquals(ServiceState.UPDATED,
                 registeredServiceEntityByUrl.getServiceState());
-        verify(mockOpenApiUtil).updateServiceApi(registerServiceEntity);
+        verify(registeredServicesOpenApiGenerator).updateServiceApi(registerServiceEntity);
     }
 
     @Test
@@ -130,7 +133,7 @@ class RegisterServiceImplTest {
         log.error(updateRegisteredServiceEntity.toString());
         Assertions.assertEquals(ServiceState.UPDATED,
                 updateRegisteredServiceEntity.getServiceState());
-        verify(mockOpenApiUtil).updateServiceApi(registerServiceEntity);
+        verify(registeredServicesOpenApiGenerator).updateServiceApi(registerServiceEntity);
     }
 
     @Test
@@ -141,7 +144,7 @@ class RegisterServiceImplTest {
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerService(oclRegister);
         Assertions.assertEquals(ServiceState.REGISTERED, registerServiceEntity.getServiceState());
-        verify(mockOpenApiUtil).generateServiceApi(registerServiceEntity);
+        verify(registeredServicesOpenApiGenerator).generateServiceApi(registerServiceEntity);
     }
 
     @Test
@@ -153,7 +156,7 @@ class RegisterServiceImplTest {
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerServiceByUrl(oclLocation);
         Assertions.assertEquals(ServiceState.REGISTERED, registerServiceEntity.getServiceState());
-        verify(mockOpenApiUtil).generateServiceApi(registerServiceEntity);
+        verify(registeredServicesOpenApiGenerator).generateServiceApi(registerServiceEntity);
     }
 
     @Test
@@ -265,7 +268,7 @@ class RegisterServiceImplTest {
     void testUnregisterService() {
         registerServiceImplUnderTest.unregisterService(uuid.toString());
         verify(mockStorage).removeById(uuid);
-        verify(mockOpenApiUtil).deleteServiceApi(uuid.toString());
+        verify(registeredServicesOpenApiGenerator).deleteServiceApi(uuid.toString());
     }
 
     @Test
@@ -281,7 +284,7 @@ class RegisterServiceImplTest {
 
         when(mockStorage.getRegisterServiceById(uuid))
                 .thenReturn(registerServiceEntity);
-        when(mockOpenApiUtil.getOpenApi(registerServiceEntity)).thenReturn("result");
+        when(registeredServicesOpenApiGenerator.getOpenApi(registerServiceEntity)).thenReturn("result");
         String result =
                 registerServiceImplUnderTest.getOpenApiUrl(uuid.toString());
         Assertions.assertEquals(result, "result");
