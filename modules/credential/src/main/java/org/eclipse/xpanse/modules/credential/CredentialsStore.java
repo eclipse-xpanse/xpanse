@@ -34,21 +34,19 @@ public class CredentialsStore {
     /**
      * Methods to add credentials to credentials store.
      *
-     * @param csp CSP to which the credential belongs to.
-     * @param xpanseUserName xpanseUserName to which the credential belongs to.
      * @param abstractCredentialInfo Complete credential configuration object.
      */
-    public void storeCredential(Csp csp, String xpanseUserName,
-                                AbstractCredentialInfo abstractCredentialInfo) {
+    public void storeCredential(AbstractCredentialInfo abstractCredentialInfo) {
         CredentialCacheKey credentialCacheKey =
-                new CredentialCacheKey(csp, xpanseUserName, abstractCredentialInfo.getType());
+                new CredentialCacheKey(abstractCredentialInfo.getCsp(),
+                        abstractCredentialInfo.getXpanseUser(), abstractCredentialInfo.getType());
         this.caffeineCredentialCacheManager.put(credentialCacheKey, abstractCredentialInfo);
     }
 
     /**
      * Method to get credential data from credentials store.
      *
-     * @param csp CSP to which the credential belongs to.
+     * @param csp            CSP to which the credential belongs to.
      * @param xpanseUserName xpanseUserName to which the credential belongs to.
      * @param credentialType Type of the credential to be searched for.
      * @return returns AbstractCredentialInfo which contains the complete credential information.
@@ -63,7 +61,7 @@ public class CredentialsStore {
     /**
      * Method to delete credential data from credentials store.
      *
-     * @param csp CSP to which the credential belongs to.
+     * @param csp            CSP to which the credential belongs to.
      * @param xpanseUserName xpanseUserName to which the credential belongs to.
      * @param credentialType Type of the credential to be searched for.
      */

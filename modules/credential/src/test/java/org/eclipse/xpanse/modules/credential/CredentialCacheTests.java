@@ -33,14 +33,14 @@ class CredentialCacheTests {
 
     @Test
     void testWriteToCache() {
-        credentialsStore.storeCredential(Csp.OPENSTACK, "user", getCredentialToBeStored());
+        credentialsStore.storeCredential(getCredentialToBeStored());
         Assertions.assertTrue(Objects.nonNull(
                 credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
     }
 
     @Test
     void testCacheEviction() {
-        credentialsStore.storeCredential(Csp.OPENSTACK, "user", getCredentialToBeStored());
+        credentialsStore.storeCredential(getCredentialToBeStored());
         Assertions.assertTrue(Objects.nonNull(
                 credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
         Awaitility.await().pollDelay(6, TimeUnit.SECONDS).until(() -> true);
@@ -50,8 +50,8 @@ class CredentialCacheTests {
 
     @Test
     void testCacheKey() {
-        credentialsStore.storeCredential(Csp.HUAWEI, "user", getCredentialToBeStored());
-        Assertions.assertTrue(Objects.isNull(
+        credentialsStore.storeCredential(getCredentialToBeStored());
+        Assertions.assertTrue(Objects.nonNull(
                 credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
         Assertions.assertTrue(Objects.isNull(
                 credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.API_KEY, "user123")));
@@ -59,7 +59,7 @@ class CredentialCacheTests {
 
     @Test
     void testCacheDeletion() {
-        credentialsStore.storeCredential(Csp.OPENSTACK, "user", getCredentialToBeStored());
+        credentialsStore.storeCredential(getCredentialToBeStored());
         Assertions.assertTrue(Objects.nonNull(
                 credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
         credentialsStore.deleteCredential(Csp.OPENSTACK, CredentialType.VARIABLES,
