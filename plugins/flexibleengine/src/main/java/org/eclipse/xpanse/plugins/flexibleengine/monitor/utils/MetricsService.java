@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.flexibleengine.monitor;
+package org.eclipse.xpanse.plugins.flexibleengine.monitor.utils;
 
 
 import com.cloud.apigateway.sdk.utils.Client;
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -32,14 +33,12 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMonitorCache;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMonitorConverter;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -55,7 +54,7 @@ public class MetricsService {
 
     private final FlexibleEngineMonitorConverter flexibleEngineMonitorConverter;
 
-    private final FlexibleEngineMonitorCache flexibleEngineMonitorCache;
+    private final MonitorMetricStore monitorMetricStore;
 
     private final RetryTemplateService retryTemplateService;
 
@@ -65,18 +64,18 @@ public class MetricsService {
      * Constructor for the MetricsService class.
      *
      * @param flexibleEngineMonitorConverter instance of FlexibleEngineMonitorConverter
-     * @param flexibleEngineMonitorCache     instance of FlexibleEngineMonitorCache
+     * @param monitorMetricStore             instance of MetricItemsStore
      * @param retryTemplateService           instance of retryTemplateService
      * @param credentialCenter               instance of CredentialCenter
      */
     @Autowired
     public MetricsService(
             FlexibleEngineMonitorConverter flexibleEngineMonitorConverter,
-            FlexibleEngineMonitorCache flexibleEngineMonitorCache,
+            MonitorMetricStore monitorMetricStore,
             RetryTemplateService retryTemplateService,
             CredentialCenter credentialCenter) {
         this.flexibleEngineMonitorConverter = flexibleEngineMonitorConverter;
-        this.flexibleEngineMonitorCache = flexibleEngineMonitorCache;
+        this.monitorMetricStore = monitorMetricStore;
         this.retryTemplateService = retryTemplateService;
         this.credentialCenter = credentialCenter;
     }
@@ -209,28 +208,21 @@ public class MetricsService {
                     queryProjectInfo(credential,
                             flexibleEngineMonitorConverter.buildProjectQueryUrl(region).toString());
             if (Objects.nonNull(project) && StringUtils.isNotBlank(project.getId())) {
-                List<MetricInfoList> targetMetrics =
-                        getTargetMetricInfoList(deployResource, credential, resourceType, project);
-                for (MetricInfoList metricInfoList : targetMetrics) {
+                Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
+                        getTargetMetricsMap(deployResource, credential, resourceType, project);
+                for (Map.Entry<MonitorResourceType, MetricInfoList> entry
+                        : targetMetricsMap.entrySet()) {
                     String url = flexibleEngineMonitorConverter.buildMonitorMetricUrl(
-                            resourceMetricRequest, project.getId(), metricInfoList);
+                            resourceMetricRequest, project.getId(), entry.getValue());
                     if (StringUtils.isNotBlank(url)) {
                         ShowMetricDataResponse response = queryMetricData(credential, url);
                         Metric metric =
                                 flexibleEngineMonitorConverter.convertResponseToMetric(
-                                        deployResource, response, metricInfoList,
+                                        deployResource, response, entry.getValue(),
                                         resourceMetricRequest.isOnlyLastKnownMetric());
-
-                        if (Objects.nonNull(metric)
-                                && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                            metrics.add(metric);
-                            flexibleEngineMonitorCache.set(deployResource.getResourceId(), metric);
-                        } else {
-                            List<Metric> metricCache =
-                                    flexibleEngineMonitorCache.get(deployResource.getResourceId(),
-                                            metricInfoList.getMetricName());
-                            metrics.addAll(metricCache);
-                        }
+                        doCacheActionForResourceMetrics(resourceMetricRequest, entry.getKey(),
+                                metric);
+                        metrics.add(metric);
                     }
                 }
             }
@@ -264,8 +256,9 @@ public class MetricsService {
         }
         Map<String, List<MetricInfoList>> deployResourceMetricInfoMap = new HashMap<>();
         for (DeployResource deployResource : deployResources) {
-            List<MetricInfoList> targetMetricInfoList =
-                    getTargetMetricInfoList(deployResource, credential, resourceType, project);
+            Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
+                    getTargetMetricsMap(deployResource, credential, resourceType, project);
+            List<MetricInfoList> targetMetricInfoList = targetMetricsMap.values().stream().toList();
             deployResourceMetricInfoMap.put(deployResource.getResourceId(),
                     targetMetricInfoList);
         }
@@ -283,38 +276,76 @@ public class MetricsService {
                 flexibleEngineMonitorConverter.convertBatchListMetricDataResponseToMetric(
                         batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources,
                         serviceMetricRequest.isOnlyLastKnownMetric());
-        cacheServiceMetricsData(metrics, serviceMetricRequest);
-
+        doCacheActionForServiceMetrics(serviceMetricRequest, deployResourceMetricInfoMap, metrics);
         return metrics;
     }
 
-    private void cacheServiceMetricsData(List<Metric> metrics,
-                                         ServiceMetricRequest serviceMetricRequest) {
-        if (!CollectionUtils.isEmpty(metrics)) {
-            for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
-                for (Metric metric : metrics) {
-                    String id = metric.getLabels().get("id");
-                    if (id.equals(deployResource.getResourceId())) {
-                        flexibleEngineMonitorCache.set(deployResource.getResourceId(), metric);
-                    }
+
+    private void doCacheActionForResourceMetrics(ResourceMetricRequest resourceMetricRequest,
+                                                 MonitorResourceType monitorResourceType,
+                                                 Metric metric) {
+        if (resourceMetricRequest.isOnlyLastKnownMetric()) {
+            String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
+            if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
+                monitorMetricStore.storeMonitorMetric(Csp.OPENSTACK,
+                        resourceId, monitorResourceType, metric);
+
+            } else {
+                Metric cacheMetric = monitorMetricStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
+                        monitorResourceType);
+                if (Objects.nonNull(cacheMetric)
+                        && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
+                    metric = cacheMetric;
                 }
-            }
-        } else {
-            for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
-                List<Metric> metricList =
-                        flexibleEngineMonitorCache.get(deployResource.getResourceId(),
-                                serviceMetricRequest.getMonitorResourceType().toValue());
-                metrics.addAll(metricList);
             }
         }
     }
 
-    private List<MetricInfoList> getTargetMetricInfoList(DeployResource deployResource,
-                                                         AbstractCredentialInfo credential,
-                                                         MonitorResourceType monitorResourceType,
-                                                         Project project) {
+    private void doCacheActionForServiceMetrics(ServiceMetricRequest serviceMetricRequest,
+                                                Map<String, List<MetricInfoList>> resourceMetricMap,
+                                                List<Metric> metrics) {
+        if (serviceMetricRequest.isOnlyLastKnownMetric()) {
+            for (Map.Entry<String, List<MetricInfoList>> entry : resourceMetricMap.entrySet()) {
+                String resourceId = entry.getKey();
+                for (MetricInfoList metricInfo : entry.getValue()) {
+                    MonitorResourceType type =
+                            getMonitorResourceTypeByMetricName(metricInfo.getMetricName());
+                    if (CollectionUtils.isEmpty(metrics)) {
+                        Metric metricCache =
+                                monitorMetricStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
+                                        resourceId, type);
+                        metrics.add(metricCache);
+                    } else {
+                        Optional<Metric> metricOptional = metrics.stream().filter(
+                                metric -> StringUtils.equals(metric.getName(),
+                                        metricInfo.getMetricName())
+                                        && !CollectionUtils.isEmpty(metric.getMetrics())
+                                        && StringUtils.equals(resourceId,
+                                        metric.getLabels().get("id"))
+                        ).findAny();
+                        if (metricOptional.isPresent()) {
+                            monitorMetricStore.storeMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId,
+                                    type,
+                                    metricOptional.get());
+                        } else {
+                            Metric metricCache =
+                                    monitorMetricStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
+                                            resourceId, type);
+                            metrics.add(metricCache);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-        List<MetricInfoList> targetMetrics = new ArrayList<>();
+    private Map<MonitorResourceType, MetricInfoList> getTargetMetricsMap(
+            DeployResource deployResource,
+            AbstractCredentialInfo credential,
+            MonitorResourceType monitorResourceType,
+            Project project) {
+
+        Map<MonitorResourceType, MetricInfoList> targetMetricsMap = new HashMap<>();
         String url =
                 flexibleEngineMonitorConverter.buildListMetricsUrl(deployResource,
                         project.getId());
@@ -325,7 +356,7 @@ public class MetricsService {
                 for (MonitorResourceType type : MonitorResourceType.values()) {
                     MetricInfoList targetMetricInfo = getTargetMetricInfo(metrics, type);
                     if (Objects.nonNull(targetMetricInfo)) {
-                        targetMetrics.add(targetMetricInfo);
+                        targetMetricsMap.put(type, targetMetricInfo);
                     } else {
                         log.error("Could not get metric item of the resource. metricType:{},"
                                 + "resourceId:{}", type.toValue(), deployResource.getResourceId());
@@ -334,7 +365,7 @@ public class MetricsService {
             } else {
                 MetricInfoList targetMetricInfo = getTargetMetricInfo(metrics, monitorResourceType);
                 if (Objects.nonNull(targetMetricInfo)) {
-                    targetMetrics.add(targetMetricInfo);
+                    targetMetricsMap.put(monitorResourceType, targetMetricInfo);
                 } else {
                     log.error(
                             "Could not get metrics of the resource. metricType:{}, resourceId:{}",
@@ -342,7 +373,7 @@ public class MetricsService {
                 }
             }
         }
-        return targetMetrics;
+        return targetMetricsMap;
 
     }
 
@@ -394,6 +425,26 @@ public class MetricsService {
         }
         return null;
     }
+
+
+    private MonitorResourceType getMonitorResourceTypeByMetricName(String metricName) {
+        MonitorResourceType type = null;
+        switch (metricName) {
+            case FlexibleEngineMonitorMetrics.CPU_USAGE,
+                    FlexibleEngineMonitorMetrics.CPU_UTILIZED -> type = MonitorResourceType.CPU;
+            case FlexibleEngineMonitorMetrics.MEM_UTILIZED,
+                    FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE -> type =
+                    MonitorResourceType.MEM;
+            case FlexibleEngineMonitorMetrics.VM_NET_BIT_RECV -> type =
+                    MonitorResourceType.VM_NETWORK_INCOMING;
+            case FlexibleEngineMonitorMetrics.VM_NET_BIT_SENT -> type =
+                    MonitorResourceType.VM_NETWORK_OUTGOING;
+            default -> {
+            }
+        }
+        return type;
+    }
+
 
     private boolean isAgentCpuMetrics(MetricInfoList metricInfo) {
         return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())

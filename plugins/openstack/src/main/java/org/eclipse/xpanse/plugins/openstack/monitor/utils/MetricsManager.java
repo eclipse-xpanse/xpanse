@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.MetricsExporter;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
@@ -28,6 +29,7 @@ import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.resources.Ins
 import org.eclipse.xpanse.plugins.openstack.monitor.keystone.KeystoneManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Class to encapsulate all Metric related public methods for Openstack plugin.
@@ -47,6 +49,8 @@ public class MetricsManager {
 
     private final CredentialCenter credentialCenter;
 
+    private final MonitorMetricStore monitorMetricStore;
+
     /**
      * Constructor for the MetricsManager bean.
      *
@@ -55,18 +59,21 @@ public class MetricsManager {
      * @param gnocchiToXpanseModelConverter GnocchiToXpanseModelConverter bean.
      * @param aggregationService            AggregationService bean.
      * @param measuresService               MeasuresService bean.
+     * @param monitorMetricStore            MonitorMetricStore bean.
      */
     @Autowired
     public MetricsManager(KeystoneManager keystoneManager, ResourcesService resourcesService,
                           GnocchiToXpanseModelConverter gnocchiToXpanseModelConverter,
                           AggregationService aggregationService, MeasuresService measuresService,
-                          CredentialCenter credentialCenter) {
+                          CredentialCenter credentialCenter,
+                          MonitorMetricStore monitorMetricStore) {
         this.keystoneManager = keystoneManager;
         this.resourcesService = resourcesService;
         this.gnocchiToXpanseModelConverter = gnocchiToXpanseModelConverter;
         this.aggregationService = aggregationService;
         this.measuresService = measuresService;
         this.credentialCenter = credentialCenter;
+        this.monitorMetricStore = monitorMetricStore;
     }
 
     /**
@@ -137,24 +144,28 @@ public class MetricsManager {
                         metricId);
         MetricsFilter metricsFilter =
                 this.gnocchiToXpanseModelConverter.buildMetricsFilter(resourceMetricRequest);
-        return this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
+        Metric metric = this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
                 resourceMetricRequest.getDeployResource(),
                 MonitorResourceType.CPU,
                 this.aggregationService.getAggregatedMeasuresByOperation(
                         aggregationRequest, metricsFilter).getMeasures().getAggregated(),
                 MetricUnit.PERCENTAGE,
                 resourceMetricRequest.isOnlyLastKnownMetric());
+        doCacheActionForResourceMetrics(resourceMetricRequest, MonitorResourceType.CPU, metric);
+        return metric;
     }
 
     private Metric getMemoryUsage(ResourceMetricRequest resourceMetricRequest, String metricId) {
         MetricsFilter metricsFilter =
                 this.gnocchiToXpanseModelConverter.buildMetricsFilter(resourceMetricRequest);
-        return this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
+        Metric metric = this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
                 resourceMetricRequest.getDeployResource(),
                 MonitorResourceType.MEM,
                 this.measuresService.getMeasurementsForResourceByMetricId(metricId, metricsFilter),
                 MetricUnit.MB,
                 resourceMetricRequest.isOnlyLastKnownMetric());
+        doCacheActionForResourceMetrics(resourceMetricRequest, MonitorResourceType.MEM, metric);
+        return metric;
     }
 
     private Metric getNetworkUsage(ResourceMetricRequest resourceMetricRequest, String metricId,
@@ -169,13 +180,37 @@ public class MetricsManager {
                         metricId);
         MetricsFilter metricsFilter =
                 this.gnocchiToXpanseModelConverter.buildMetricsFilter(resourceMetricRequest);
-        return this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
+        Metric metric = this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
                 resourceMetricRequest.getDeployResource(),
                 monitorResourceType,
                 this.aggregationService.getAggregatedMeasuresByOperation(
                         aggregationRequest, metricsFilter).getMeasures().getAggregated(),
                 MetricUnit.BYTES_PER_SECOND,
                 resourceMetricRequest.isOnlyLastKnownMetric());
+        doCacheActionForResourceMetrics(resourceMetricRequest, monitorResourceType, metric);
+        return metric;
     }
+
+
+    private void doCacheActionForResourceMetrics(ResourceMetricRequest resourceMetricRequest,
+                                                 MonitorResourceType monitorResourceType,
+                                                 Metric metric) {
+        if (resourceMetricRequest.isOnlyLastKnownMetric()) {
+            String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
+            if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
+                monitorMetricStore.storeMonitorMetric(Csp.OPENSTACK,
+                        resourceId, monitorResourceType, metric);
+
+            } else {
+                Metric cacheMetric = monitorMetricStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
+                        monitorResourceType);
+                if (Objects.nonNull(cacheMetric)
+                        && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
+                    metric = cacheMetric;
+                }
+            }
+        }
+    }
+
 
 }

@@ -6,6 +6,12 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine.monitor.utils;
 
+import static org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants.FOUR_HOUR_MILLISECONDS;
+import static org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS;
+import static org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants.ONE_MONTH_MILLISECONDS;
+import static org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants.TEN_DAY_MILLISECONDS;
+import static org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants.THREE_DAY_MILLISECONDS;
+
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataRequestBody;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
@@ -44,17 +50,6 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class FlexibleEngineMonitorConverter {
 
-    public static final long FOUR_HOUR_MILLISECONDS = 4 * 3600 * 1000;
-
-    public static final long ONE_DAY_MILLISECONDS = 24 * 3600 * 1000;
-
-    public static final long THREE_DAY_MILLISECONDS = 3 * 24 * 3600 * 1000;
-
-    public static final long TEN_DAY_MILLISECONDS = 10 * 24 * 3600 * 1000;
-
-    public static final long ONE_MONTH_MILLISECONDS = 30 * 24 * 3600 * 1000;
-
-    public static final long SIX_MONTH_MILLISECONDS = 180 * 24 * 3600 * 1000;
 
     private static final Map<String, String> HEADER_MAP = new HashMap<>();
 
@@ -135,6 +130,7 @@ public class FlexibleEngineMonitorConverter {
             from = System.currentTimeMillis()
                     - FlexibleEngineMonitorConstants.FIVE_MINUTES_MILLISECONDS;
             metricRequest.setFrom(from);
+
         }
         if (Objects.isNull(to)) {
             to = System.currentTimeMillis();
