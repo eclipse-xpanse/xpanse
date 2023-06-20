@@ -19,7 +19,8 @@ public enum ResultType {
     BAD_PARAMETERS("Parameters Invalid"),
     TERRAFORM_SCRIPT_INVALID("Terraform Script Invalid"),
     UNPROCESSABLE_ENTITY("Unprocessable Entity"),
-    INVALID_RESPONSE("Response Not Valid");
+    INVALID_RESPONSE("Response Not Valid"),
+    BACKEND_FAILURE("Failure while connecting to backend");
 
     private final String value;
 
