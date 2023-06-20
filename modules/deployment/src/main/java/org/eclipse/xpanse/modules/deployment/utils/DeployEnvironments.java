@@ -135,8 +135,8 @@ public class DeployEnvironments {
 
         if (abstractCredentialInfo != null
                 && abstractCredentialInfo.getType().equals(CredentialType.VARIABLES)) {
-            for (CredentialVariable variable :
-                    ((CredentialVariables) abstractCredentialInfo).getVariables()) {
+            for (CredentialVariable variable
+                    : ((CredentialVariables) abstractCredentialInfo).getVariables()) {
                 variables.put(variable.getName(), variable.getValue());
             }
         }
