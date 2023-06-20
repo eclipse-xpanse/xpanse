@@ -156,12 +156,9 @@ public class CredentialCenter {
     /**
      * Add credential info for the csp.
      *
-     * @param csp              The cloud service provider.
      * @param createCredential The credential for the service.
-     * @return Deployment bean for the provided deployerKind.
      */
-    public boolean addCredential(Csp csp, CreateCredential createCredential) {
-        createCredential.setCsp(csp);
+    public void addCredential(CreateCredential createCredential) {
         checkInputCredentialIsValid(createCredential);
         AbstractCredentialInfo credential;
         if (createCredential.getType() == CredentialType.VARIABLES) {
@@ -169,21 +166,17 @@ public class CredentialCenter {
         } else {
             throw new IllegalStateException(
                     String.format("Not supported credential type Csp:%s, Type: %s.",
-                            csp, createCredential.getType()));
+                            createCredential.getCsp(), createCredential.getType()));
         }
-        return createCredential(credential.getCsp(), credential.getXpanseUser(),
-                credential);
+        createCredential(credential);
     }
 
     /**
      * Update credential info for the service.
      *
-     * @param csp              The cloud service provider.
      * @param updateCredential The credential for the service.
-     * @return true of false.
      */
-    public boolean updateCredential(Csp csp, CreateCredential updateCredential) {
-        updateCredential.setCsp(csp);
+    public void updateCredential(CreateCredential updateCredential) {
         checkInputCredentialIsValid(updateCredential);
         AbstractCredentialInfo credential;
         if (updateCredential.getType() == CredentialType.VARIABLES) {
@@ -191,10 +184,11 @@ public class CredentialCenter {
         } else {
             throw new IllegalStateException(
                     String.format("Not supported credential type Csp:%s, Type: %s.",
-                            csp, updateCredential.getType()));
+                            updateCredential.getCsp(), updateCredential.getType()));
         }
-        deleteCredentialByType(csp, updateCredential.getXpanseUser(), updateCredential.getType());
-        return createCredential(csp, updateCredential.getXpanseUser(), credential);
+        deleteCredentialByType(updateCredential.getCsp(), updateCredential.getXpanseUser(),
+                updateCredential.getType());
+        createCredential(credential);
     }
 
     /**
@@ -202,11 +196,9 @@ public class CredentialCenter {
      *
      * @param csp        The cloud service provider.
      * @param xpanseUser The user who provided the credential info.
-     * @return true of false.
      */
-    public boolean deleteCredential(Csp csp, String xpanseUser, CredentialType credentialType) {
+    public void deleteCredential(Csp csp, String xpanseUser, CredentialType credentialType) {
         credentialsStore.deleteCredential(csp, credentialType, xpanseUser);
-        return true;
     }
 
     /**
@@ -309,15 +301,11 @@ public class CredentialCenter {
     /**
      * Create credential for the @Csp with @xpanseUser.
      *
-     * @param csp        The cloud service provider.
-     * @param xpanseUser The user who provided the credential info.
-     * @return true of false.
+     * @param abstractCredentialInfo  Instance of any class that implements AbstractCredentialInfo
      */
 
-    public boolean createCredential(Csp csp, String xpanseUser,
-                                    AbstractCredentialInfo abstractCredentialInfo) {
-        credentialsStore.storeCredential(csp, xpanseUser, abstractCredentialInfo);
-        return true;
+    public void createCredential(AbstractCredentialInfo abstractCredentialInfo) {
+        credentialsStore.storeCredential(abstractCredentialInfo);
     }
 
     /**

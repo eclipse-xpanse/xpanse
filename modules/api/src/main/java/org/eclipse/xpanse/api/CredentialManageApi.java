@@ -171,39 +171,33 @@ public class CredentialManageApi {
     /**
      * Add credential of the cloud service provider.
      *
-     * @param csp              The cloud service provider.
      * @param createCredential The credential to create.
      */
     @Tag(name = "Credentials Management",
             description = "APIs for user manage credentials for authentication.")
-    @PostMapping(value = "/auth/csp/{cspName}/credential",
+    @PostMapping(value = "/auth/csp/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Add credential of the cloud service provider.")
-    public Boolean addCredential(
-            @Parameter(name = "cspName", description = "The cloud service provider.")
-            @PathVariable("cspName") Csp csp,
+    public void addCredential(
             @Valid @RequestBody CreateCredential createCredential) {
-        return credentialCenter.addCredential(csp, createCredential);
+        credentialCenter.addCredential(createCredential);
     }
 
     /**
      * Update credential of the cloud service provider.
      *
-     * @param csp              The cloud service provider.
      * @param updateCredential The credential to update.
      */
     @Tag(name = "Credentials Management",
             description = "APIs for user manage credentials for authentication.")
-    @PutMapping(value = "/auth/csp/{cspName}/credential",
+    @PutMapping(value = "/auth/csp/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Update credential of the cloud service provider.")
-    public Boolean updateCredential(
-            @Parameter(name = "cspName", description = "The cloud service provider")
-            @PathVariable("cspName") Csp csp,
+    public void updateCredential(
             @Valid @RequestBody CreateCredential updateCredential) {
-        return credentialCenter.updateCredential(csp, updateCredential);
+        credentialCenter.updateCredential(updateCredential);
     }
 
     /**
@@ -216,16 +210,16 @@ public class CredentialManageApi {
             description = "APIs for user manage credentials for authentication.")
     @DeleteMapping(value = "/auth/csp/{cspName}/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete credential of the cloud service provider and the user.")
-    public Boolean deleteCredential(
+    public void deleteCredential(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable("cspName") Csp csp,
             @Parameter(name = "userName", description = "The name of user who provided credential.")
             @RequestParam(name = "userName") String userName,
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type") CredentialType type) {
-        return credentialCenter.deleteCredential(csp, userName, type);
+        credentialCenter.deleteCredential(csp, userName, type);
     }
 
     private void getCredentialCapabilitiesValue(
