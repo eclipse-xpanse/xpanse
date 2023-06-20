@@ -1,5 +1,9 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Huawei Inc.
+#
 ---
-name: Xpanse Release Workflow
+name: xpanse-cd
 
 on:
   workflow_dispatch:
