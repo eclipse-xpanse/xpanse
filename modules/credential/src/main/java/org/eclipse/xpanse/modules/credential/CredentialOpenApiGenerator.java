@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -26,7 +27,6 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.orchestrator.utils.OpenApiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class CredentialApiUtil implements ApplicationRunner {
+public class CredentialOpenApiGenerator implements ApplicationRunner {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final String appVersion;
@@ -49,9 +49,9 @@ public class CredentialApiUtil implements ApplicationRunner {
      * Constructor of CredentialApiUtil.
      */
     @Autowired
-    public CredentialApiUtil(PluginManager pluginManager,
-            OpenApiUtil openApiUtil,
-            @Value("${app.version:1.0.0}")
+    public CredentialOpenApiGenerator(PluginManager pluginManager,
+                                      OpenApiUtil openApiUtil,
+                                      @Value("${app.version:1.0.0}")
                     String appVersion) {
         this.pluginManager = pluginManager;
         this.openApiUtil = openApiUtil;

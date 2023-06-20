@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.admin.SystemStatus;
 import org.eclipse.xpanse.modules.models.admin.enums.HealthStatus;
@@ -26,7 +27,7 @@ import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.service.view.RegisteredServiceVo;
-import org.eclipse.xpanse.modules.orchestrator.utils.OpenApiUtil;
+import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -88,9 +89,12 @@ public class ServiceRegisterApiTest {
         registerServiceEntity.setOcl(oclRegister);
         registerServiceEntity.setServiceState(ServiceState.REGISTERED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
-        OpenApiUtil openApiUtil = new OpenApiUtil(deployVariableValidator, CLIENT_DOWNLOAD_URL,
+        OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
                 OPENAPI_PATH, SERVICER_PORT);
-        openApiUtil.createServiceApi(registerServiceEntity);
+        RegisteredServicesOpenApiGenerator
+                registeredServicesOpenApiGenerator = new RegisteredServicesOpenApiGenerator(
+                deployVariableValidator, openApiUtil);
+        registeredServicesOpenApiGenerator.createServiceApi(registerServiceEntity);
         String openApiWorkdir = openApiUtil.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir,
                 registerServiceEntity.getId().toString() + ".html");

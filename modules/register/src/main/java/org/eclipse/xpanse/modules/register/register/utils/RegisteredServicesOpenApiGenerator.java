@@ -1,10 +1,9 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
-package org.eclipse.xpanse.modules.orchestrator.utils;
+package org.eclipse.xpanse.modules.register.register.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,27 +11,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotNull;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -40,62 +31,25 @@ import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
- * OpenApiUtil.
+ * Bean to generate OpenApi files for registered services.
  */
-@Slf4j
 @Component
-public class OpenApiUtil {
+@Slf4j
+public class RegisteredServicesOpenApiGenerator {
 
     private final DeployVariableValidator deployVariableValidator;
-    private final String clientDownLoadUrl;
-    @Getter
-    private final String openapiPath;
-    private final Integer port;
+    private final OpenApiUtil openApiUtil;
 
-    /**
-     * OpenApiUtil.
-     */
     @Autowired
-    public OpenApiUtil(DeployVariableValidator deployVariableValidator,
-                       @Value("${openapi.download-generator-client-url:https://repo1.maven.org/"
-                               + "maven2/org/openapitools/openapi-generator-cli/6.5.0/"
-                               + "openapi-generator-cli.6.5.0.jar}")
-                               String clientDownLoadUrl,
-                       @Value("${openapi.path:openapi/}") String openapiPath,
-                       @Value("${server.port:8080}") Integer port) {
+    public RegisteredServicesOpenApiGenerator(DeployVariableValidator deployVariableValidator,
+                                              OpenApiUtil openApiUtil) {
         this.deployVariableValidator = deployVariableValidator;
-        this.clientDownLoadUrl = clientDownLoadUrl;
-        this.openapiPath = openapiPath;
-        this.port = port;
+        this.openApiUtil = openApiUtil;
     }
-
-    private List<String> getRequiredFields(Object object) {
-        List<String> fieldNames = new ArrayList<>();
-        Field[] fields = object.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            Annotation notNullAnnotation = field.getAnnotation(NotNull.class);
-            if (Objects.nonNull(notNullAnnotation)) {
-                fieldNames.add(field.getName());
-
-            }
-        }
-        return fieldNames;
-    }
-
-    private List<String> getCspValues() {
-        return Arrays.stream(Csp.values()).map(Csp::toValue).collect(Collectors.toList());
-    }
-
-    private List<String> getCategoryValues() {
-        return Arrays.stream(Category.values()).map(Category::toValue).collect(Collectors.toList());
-    }
-
 
     /**
      * Get openApi url by registered service.
@@ -108,59 +62,12 @@ public class OpenApiUtil {
             throw new IllegalArgumentException("Registered service is null.");
         }
         String id = registerServiceEntity.getId().toString();
-        File apiFile = new File(getOpenApiWorkdir(), id + ".html");
+        File apiFile = new File(this.openApiUtil.getOpenApiWorkdir(), id + ".html");
         if (apiFile.exists()) {
-            return getOpenApiUrl(id);
+            return this.openApiUtil.getOpenApiUrl(id);
         } else {
             return createServiceApi(registerServiceEntity);
         }
-    }
-
-    /**
-     * Get serviceUrl.
-     *
-     * @return serviceUrl
-     */
-    public String getServiceUrl() {
-        try {
-            return ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-        } catch (Exception e) {
-            String host = "localhost";
-            try {
-                InetAddress address = InetAddress.getLocalHost();
-                host = address.getHostAddress();
-            } catch (UnknownHostException ex) {
-                log.error("Get localHost error.", ex);
-            }
-            return "http://" + host + ":" + port;
-        }
-
-    }
-
-    /**
-     * Get openApi Url.
-     *
-     * @return openApiUrl
-     */
-    public String getOpenApiUrl(String id) {
-        if (openapiPath.endsWith("/")) {
-            return getServiceUrl() + "/" + openapiPath + id + ".html";
-        }
-        return getServiceUrl() + "/" + openapiPath + "/" + id + ".html";
-    }
-
-    /**
-     * Update OpenApi document for registered service.
-     *
-     * @param registerService Registered services.
-     */
-    @Async("taskExecutor")
-    public void updateServiceApi(RegisterServiceEntity registerService) {
-        File file = new File(getOpenApiWorkdir(), registerService.getId() + ".html");
-        if (file.exists()) {
-            log.info("Delete old openApi file:{}, success:{}", file.getName(), file.delete());
-        }
-        createServiceApi(registerService);
     }
 
     /**
@@ -174,13 +81,28 @@ public class OpenApiUtil {
     }
 
     /**
+     * Update OpenApi document for registered service.
+     *
+     * @param registerService Registered services.
+     */
+    @Async("taskExecutor")
+    public void updateServiceApi(RegisterServiceEntity registerService) {
+        File file =
+                new File(this.openApiUtil.getOpenApiWorkdir(), registerService.getId() + ".html");
+        if (file.exists()) {
+            log.info("Delete old openApi file:{}, success:{}", file.getName(), file.delete());
+        }
+        createServiceApi(registerService);
+    }
+
+    /**
      * Delete OpenApi document for registered service using the ID.
      *
      * @param id ID of registered service.
      */
     @Async("taskExecutor")
     public void deleteServiceApi(String id) {
-        File file = new File(getOpenApiWorkdir(), id + ".html");
+        File file = new File(this.openApiUtil.getOpenApiWorkdir(), id + ".html");
         if (file.exists()) {
             log.info("Delete openApi html file:{}, success:{}", file.getName(), file.delete());
         }
@@ -195,7 +117,7 @@ public class OpenApiUtil {
         // ID of registered service.
         String serviceId = registerService.getId().toString();
         String yamlFileName = serviceId + ".yaml";
-        String openApiDir = getOpenApiWorkdir();
+        String openApiDir = this.openApiUtil.getOpenApiWorkdir();
         File yamlFile = new File(openApiDir, yamlFileName);
         File htmlFile = new File(openApiDir, serviceId + ".html");
         try {
@@ -203,7 +125,7 @@ public class OpenApiUtil {
                 log.info("Service openApi is generating.serviceId:{}", serviceId);
                 Thread.sleep(2000);
                 if (htmlFile.exists()) {
-                    return getOpenApiUrl(serviceId);
+                    return this.openApiUtil.getOpenApiUrl(serviceId);
                 }
             } else {
                 String apiDocsJson = getApiDocsJson(registerService);
@@ -212,7 +134,7 @@ public class OpenApiUtil {
                 }
                 log.info("Service openApi yamlFile:{} create success.", yamlFile.getPath());
             }
-            if (yamlFile.exists() && downloadClientJar(openApiDir)) {
+            if (yamlFile.exists() && this.openApiUtil.downloadClientJar(openApiDir)) {
                 File jarPath = new File(openApiDir, "openapi-generator-cli.jar");
                 String comm = String.format("java -jar %s generate -g html2 "
                         + "-i %s -o %s", jarPath.getPath(), yamlFile.getPath(), openApiDir);
@@ -231,14 +153,13 @@ public class OpenApiUtil {
                 }
                 // Modify the file name to serviceId.html
                 File tempHtmlFile = new File(openApiDir, "index.html");
-                if (tempHtmlFile.exists()) {
-                    if (tempHtmlFile.renameTo(htmlFile)) {
-                        log.info("Create service openApi html file:{} success.",
-                                htmlFile.getName());
-                        if (htmlFile.exists()) {
-                            return getOpenApiUrl(serviceId);
-                        }
+                if (tempHtmlFile.exists() && (tempHtmlFile.renameTo(htmlFile))) {
+                    log.info("Create service openApi html file:{} success.",
+                            htmlFile.getName());
+                    if (htmlFile.exists()) {
+                        return this.openApiUtil.getOpenApiUrl(serviceId);
                     }
+
                 }
             }
             return StringUtils.EMPTY;
@@ -253,87 +174,12 @@ public class OpenApiUtil {
         }
     }
 
-
-    /**
-     * Get the work directory of the openApi.
-     *
-     * @return workdir  The work directory of the openApi.
-     */
-    public String getOpenApiWorkdir() {
-        String rootPath = System.getProperty("user.dir");
-        try {
-            int modulesIndex = rootPath.indexOf("modules");
-            if (modulesIndex > 1) {
-                rootPath = rootPath.substring(0, modulesIndex);
-            }
-            int runtimeIndex = rootPath.indexOf("runtime");
-            if (runtimeIndex > 1) {
-                rootPath = rootPath.substring(0, runtimeIndex);
-            }
-            File openApiDir = new File(rootPath, openapiPath);
-            if (!openApiDir.exists() && !openApiDir.mkdirs()) {
-                throw new FileNotFoundException("Create open API workspace failed!");
-            }
-            return openApiDir.getPath();
-
-        } catch (IOException e) {
-            log.error("Create open API workdir failed!", e);
-        }
-        return rootPath;
-
-    }
-
-    /**
-     * Download openapi-generator-cli.jar from the maven repository or the URL specified by the
-     * `@openapi.download-generator-client-url` into the work directory.
-     *
-     * @param workdir The work directory of the openApi.
-     */
-    public boolean downloadClientJar(String workdir) throws IOException {
-        File workDir = new File(workdir);
-        if (!workDir.exists() && !workDir.mkdirs()) {
-            throw new RuntimeException("Download client jar failed.");
-        }
-        String execJarName = "openapi-generator-cli.jar";
-        File execJarFile = new File(workdir, execJarName);
-        if (!execJarFile.exists() && !execJarFile.canExecute()) {
-            log.info("Download openapi client:{} from URL:{} start.",
-                    execJarFile.getPath(), clientDownLoadUrl);
-            String jarTempFile = execJarName + ".temp";
-            File downloadTemp = new File(workDir, jarTempFile);
-            FileOutputStream fos = null;
-            boolean downloadEnd = false;
-            try {
-                URL url = new URL(clientDownLoadUrl);
-                URLConnection con = url.openConnection();
-                ReadableByteChannel rbc = Channels.newChannel(con.getInputStream());
-                fos = new FileOutputStream(downloadTemp);
-                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-                downloadEnd = true;
-                log.info("Download openapi client:{} from URL:{} end.",
-                        execJarFile.getPath(), clientDownLoadUrl);
-            } finally {
-                if (Objects.nonNull(fos)) {
-                    fos.close();
-                }
-            }
-            if (downloadEnd && downloadTemp.renameTo(execJarFile)) {
-                log.info("Download openapi client:{} from URL:{} success.",
-                        execJarFile.getPath(), clientDownLoadUrl);
-                return true;
-            }
-
-        }
-        return true;
-    }
-
-
     private String getApiDocsJson(RegisterServiceEntity registerService) {
         if (Objects.isNull(registerService)) {
             return StringUtils.EMPTY;
         }
         // service url.
-        String serviceUrl = getServiceUrl();
+        String serviceUrl = this.openApiUtil.getServiceUrl();
         // string of required fields list.
         String createRequiredStr = null;
         // category value of registered service.
@@ -536,5 +382,24 @@ public class OpenApiUtil {
                 serviceVersion, csp, cspValuesStr, propertiesRequiredStr, propertiesStr);
     }
 
+    private List<String> getRequiredFields(Object object) {
+        List<String> fieldNames = new ArrayList<>();
+        Field[] fields = object.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            Annotation notNullAnnotation = field.getAnnotation(NotNull.class);
+            if (Objects.nonNull(notNullAnnotation)) {
+                fieldNames.add(field.getName());
 
+            }
+        }
+        return fieldNames;
+    }
+
+    private List<String> getCspValues() {
+        return Arrays.stream(Csp.values()).map(Csp::toValue).collect(Collectors.toList());
+    }
+
+    private List<String> getCategoryValues() {
+        return Arrays.stream(Category.values()).map(Category::toValue).collect(Collectors.toList());
+    }
 }

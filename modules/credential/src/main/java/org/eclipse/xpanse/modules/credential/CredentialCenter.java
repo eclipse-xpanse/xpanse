@@ -35,7 +35,7 @@ public class CredentialCenter {
 
     private final PluginManager pluginManager;
     private final CredentialsStore credentialsStore;
-    private final CredentialApiUtil credentialApiUtil;
+    private final CredentialOpenApiGenerator credentialOpenApiGenerator;
 
     /**
      * Constructor of CredentialCenter.
@@ -44,10 +44,10 @@ public class CredentialCenter {
     public CredentialCenter(
             PluginManager pluginManager,
             CredentialsStore credentialsStore,
-            CredentialApiUtil credentialApiUtil) {
+            CredentialOpenApiGenerator credentialOpenApiGenerator) {
         this.pluginManager = pluginManager;
         this.credentialsStore = credentialsStore;
-        this.credentialApiUtil = credentialApiUtil;
+        this.credentialOpenApiGenerator = credentialOpenApiGenerator;
     }
 
     /**
@@ -92,7 +92,7 @@ public class CredentialCenter {
      * @return Returns credential openApi Url.
      */
     public String getCredentialOpenApiUrl(Csp csp, CredentialType type) {
-        return credentialApiUtil.getCredentialOpenApiUrl(csp, type);
+        return credentialOpenApiGenerator.getCredentialOpenApiUrl(csp, type);
     }
 
     /**

@@ -34,9 +34,9 @@ import org.eclipse.xpanse.modules.models.service.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.models.service.view.VersionOclVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
-import org.eclipse.xpanse.modules.orchestrator.utils.OpenApiUtil;
 import org.eclipse.xpanse.modules.register.register.RegisterService;
 import org.eclipse.xpanse.modules.register.register.utils.IconProcessorUtil;
+import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -53,7 +53,7 @@ public class RegisterServiceImpl implements RegisterService {
     @Resource
     private OclLoader oclLoader;
     @Resource
-    private OpenApiUtil openApiUtil;
+    private RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator;
 
     @Resource
     private DeployService deployService;
@@ -94,7 +94,7 @@ public class RegisterServiceImpl implements RegisterService {
         existedService.setOcl(ocl);
         existedService.setServiceState(ServiceState.UPDATED);
         storage.store(existedService);
-        openApiUtil.updateServiceApi(existedService);
+        registeredServicesOpenApiGenerator.updateServiceApi(existedService);
         return existedService;
     }
 
@@ -166,7 +166,7 @@ public class RegisterServiceImpl implements RegisterService {
         }
         validateTerraformScript(ocl);
         storage.store(newEntity);
-        openApiUtil.generateServiceApi(newEntity);
+        registeredServicesOpenApiGenerator.generateServiceApi(newEntity);
         return newEntity;
     }
 
@@ -271,7 +271,7 @@ public class RegisterServiceImpl implements RegisterService {
     public void unregisterService(String registeredServiceId) {
         UUID uuid = UUID.fromString(registeredServiceId);
         storage.removeById(uuid);
-        openApiUtil.deleteServiceApi(registeredServiceId);
+        registeredServicesOpenApiGenerator.deleteServiceApi(registeredServiceId);
     }
 
 
@@ -289,7 +289,7 @@ public class RegisterServiceImpl implements RegisterService {
             throw new IllegalArgumentException(String.format("Registered service with id %s not "
                     + "existed.", id));
         }
-        String openApiUrl = openApiUtil.getOpenApi(registerService);
+        String openApiUrl = registeredServicesOpenApiGenerator.getOpenApi(registerService);
         if (StringUtils.isBlank(openApiUrl)) {
             throw new RuntimeException("Get openApi Url is Empty.");
         }
