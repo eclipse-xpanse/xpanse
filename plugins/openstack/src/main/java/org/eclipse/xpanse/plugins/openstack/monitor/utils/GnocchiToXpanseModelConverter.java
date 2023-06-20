@@ -40,6 +40,7 @@ public class GnocchiToXpanseModelConverter {
                                                  boolean onlyLastKnownMetric) {
         Metric metric = new Metric();
         metric.setName(monitorResourceType.toValue());
+        metric.setMonitorResourceType(monitorResourceType);
         Map<String, String> labels = new HashMap<>();
         labels.put("id", deployResource.getResourceId());
         labels.put("name", deployResource.getName());

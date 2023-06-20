@@ -12,6 +12,7 @@ import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
+import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 
 /**
  * One kind of metric.
@@ -29,6 +30,10 @@ public class Metric {
     @NotNull
     @Schema(description = "The type of the metric.")
     MetricType type;
+
+    @NotNull
+    @Schema(description = "The resource type of the metric.")
+    MonitorResourceType monitorResourceType;
 
     @NotNull
     @Schema(description = "The unit of the metric.")

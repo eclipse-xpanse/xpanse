@@ -30,11 +30,13 @@ import org.eclipse.xpanse.modules.models.monitor.MetricItem;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricItemType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
+import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.monitor.MetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudMonitorMetrics;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -44,6 +46,28 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 @Component
 public class HuaweiCloudToXpanseDataModelConverter {
+
+    private final Map<String, MonitorResourceType> metricNameToResourceTypeMap = new HashMap<>();
+
+    /**
+     * The constructor.
+     * Initializes the metricNameToResourceTypeMap with the mapping of metric names to monitor
+     * resource types.
+     */
+    public HuaweiCloudToXpanseDataModelConverter() {
+        metricNameToResourceTypeMap.putAll(Map.of(
+                HuaweiCloudMonitorMetrics.CPU_USAGE, MonitorResourceType.CPU,
+                HuaweiCloudMonitorMetrics.CPU_UTILIZED, MonitorResourceType.CPU,
+                HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE, MonitorResourceType.MEM,
+                HuaweiCloudMonitorMetrics.MEM_UTILIZED, MonitorResourceType.MEM,
+                HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN,
+                MonitorResourceType.VM_NETWORK_INCOMING,
+                HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT, MonitorResourceType.VM_NETWORK_INCOMING,
+                HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT,
+                MonitorResourceType.VM_NETWORK_OUTGOING,
+                HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV, MonitorResourceType.VM_NETWORK_OUTGOING
+        ));
+    }
 
     /**
      * Build ListMetricsRequest for HuaweiCloud Monitor client.
@@ -100,18 +124,9 @@ public class HuaweiCloudToXpanseDataModelConverter {
                                                         ShowMetricDataResponse response,
                                                         MetricInfoList metricInfoList,
                                                         boolean onlyLastKnownMetric) {
-        Metric metric = new Metric();
-        metric.setName(metricInfoList.getMetricName());
-        Map<String, String> labels = new HashMap<>();
-        labels.put("id", deployResource.getResourceId());
-        labels.put("name", deployResource.getName());
-        metric.setLabels(labels);
-        metric.setType(MetricType.GAUGE);
-        if (metricInfoList.getUnit().equals("%")) {
-            metric.setUnit(MetricUnit.PERCENTAGE);
-        } else {
-            metric.setUnit(MetricUnit.getByValue(metricInfoList.getUnit()));
-        }
+        Metric metric =
+                createMetric(metricInfoList.getMetricName(), deployResource,
+                        metricInfoList);
         if (Objects.nonNull(response) && !CollectionUtils.isEmpty(response.getDatapoints())) {
             List<Datapoint> datapointList = response.getDatapoints();
             metric.setMetrics(convertDataPointToMetricItem(datapointList, onlyLastKnownMetric));
@@ -159,18 +174,9 @@ public class HuaweiCloudToXpanseDataModelConverter {
                     for (MetricInfoList metricInfoList : metricInfoLists) {
                         if (metricInfoList.getMetricName()
                                 .equals(batchMetricData.getMetricName())) {
-                            Metric metric = new Metric();
-                            metric.setName(metricInfoList.getMetricName());
-                            Map<String, String> labels = new HashMap<>();
-                            labels.put("id", deployResource.getResourceId());
-                            labels.put("name", deployResource.getName());
-                            metric.setLabels(labels);
-                            metric.setType(MetricType.GAUGE);
-                            if (metricInfoList.getUnit().equals("%")) {
-                                metric.setUnit(MetricUnit.PERCENTAGE);
-                            } else {
-                                metric.setUnit(MetricUnit.getByValue(metricInfoList.getUnit()));
-                            }
+                            Metric metric =
+                                    createMetric(metricInfoList.getMetricName(), deployResource,
+                                            metricInfoList);
                             if (!CollectionUtils.isEmpty(batchMetricData.getDatapoints())) {
                                 List<DatapointForBatchMetric> datapointForBatchMetrics =
                                         batchMetricData.getDatapoints();
@@ -210,6 +216,26 @@ public class HuaweiCloudToXpanseDataModelConverter {
             }
         }
         return metricItems;
+    }
+
+    private Metric createMetric(String metricName, DeployResource deployResource,
+                                MetricInfoList metricInfo) {
+        Metric metric = new Metric();
+        metric.setName(metricName);
+        if (metricNameToResourceTypeMap.containsKey(metricName)) {
+            metric.setMonitorResourceType(metricNameToResourceTypeMap.get(metricName));
+        }
+        Map<String, String> labels = new HashMap<>();
+        labels.put("id", deployResource.getResourceId());
+        labels.put("name", deployResource.getName());
+        metric.setLabels(labels);
+        metric.setType(MetricType.GAUGE);
+        if (metricInfo.getUnit().equals("%")) {
+            metric.setUnit(MetricUnit.PERCENTAGE);
+        } else {
+            metric.setUnit(MetricUnit.getByValue(metricInfo.getUnit()));
+        }
+        return metric;
     }
 
     private void buildMetricsDimension(ServiceMetricRequest serviceMetricRequest,

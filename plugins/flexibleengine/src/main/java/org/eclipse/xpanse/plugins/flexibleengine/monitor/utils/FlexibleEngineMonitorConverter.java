@@ -28,11 +28,13 @@ import org.eclipse.xpanse.modules.models.monitor.MetricItem;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricItemType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
+import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.monitor.MetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -57,6 +59,30 @@ public class FlexibleEngineMonitorConverter {
     public static final long SIX_MONTH_MILLISECONDS = 180 * 24 * 3600 * 1000;
 
     private static final Map<String, String> HEADER_MAP = new HashMap<>();
+
+    private final Map<String, MonitorResourceType> metricNameToResourceTypeMap = new HashMap<>();
+
+    /**
+     * The constructor.
+     * Initializes the metricNameToResourceTypeMap with the mapping of metric names to monitor
+     * resource types.
+     */
+    public FlexibleEngineMonitorConverter() {
+        metricNameToResourceTypeMap.putAll(Map.of(
+                FlexibleEngineMonitorMetrics.CPU_USAGE, MonitorResourceType.CPU,
+                FlexibleEngineMonitorMetrics.CPU_UTILIZED, MonitorResourceType.CPU,
+                FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE, MonitorResourceType.MEM,
+                FlexibleEngineMonitorMetrics.MEM_UTILIZED, MonitorResourceType.MEM,
+                FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_IN,
+                MonitorResourceType.VM_NETWORK_INCOMING,
+                FlexibleEngineMonitorMetrics.VM_NET_BIT_SENT,
+                MonitorResourceType.VM_NETWORK_INCOMING,
+                FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT,
+                MonitorResourceType.VM_NETWORK_OUTGOING,
+                FlexibleEngineMonitorMetrics.VM_NET_BIT_RECV,
+                MonitorResourceType.VM_NETWORK_OUTGOING
+        ));
+    }
 
     private static MetricItem convertDatapointForBatchMetricToMetricItem(
             DatapointForBatchMetric datapointForBatchMetric) {
@@ -234,20 +260,11 @@ public class FlexibleEngineMonitorConverter {
      */
     public Metric convertResponseToMetric(DeployResource deployResource,
                                           ShowMetricDataResponse response,
-                                          MetricInfoList metricInfo,
+                                          MetricInfoList metricInfoList,
                                           boolean onlyLastKnownMetric) {
-        Metric metric = new Metric();
-        metric.setName(metricInfo.getMetricName());
-        Map<String, String> labels = new HashMap<>();
-        labels.put("id", deployResource.getResourceId());
-        labels.put("name", deployResource.getName());
-        metric.setLabels(labels);
-        metric.setType(MetricType.GAUGE);
-        if (metricInfo.getUnit().equals("%")) {
-            metric.setUnit(MetricUnit.PERCENTAGE);
-        } else {
-            metric.setUnit(MetricUnit.getByValue(metricInfo.getUnit()));
-        }
+        Metric metric =
+                createMetric(metricInfoList.getMetricName(), deployResource,
+                        metricInfoList);
         if (Objects.nonNull(response) && !CollectionUtils.isEmpty(response.getDatapoints())) {
             List<Datapoint> datapointList = response.getDatapoints();
             metric.setMetrics(convertDataPointToMetricItems(datapointList, onlyLastKnownMetric));
@@ -276,18 +293,9 @@ public class FlexibleEngineMonitorConverter {
                     for (MetricInfoList metricInfoList : metricInfoLists) {
                         if (metricInfoList.getMetricName()
                                 .equals(batchMetricData.getMetricName())) {
-                            Metric metric = new Metric();
-                            metric.setName(metricInfoList.getMetricName());
-                            Map<String, String> labels = new HashMap<>();
-                            labels.put("id", deployResource.getResourceId());
-                            labels.put("name", deployResource.getName());
-                            metric.setLabels(labels);
-                            metric.setType(MetricType.GAUGE);
-                            if (metricInfoList.getUnit().equals("%")) {
-                                metric.setUnit(MetricUnit.PERCENTAGE);
-                            } else {
-                                metric.setUnit(MetricUnit.getByValue(metricInfoList.getUnit()));
-                            }
+                            Metric metric =
+                                    createMetric(metricInfoList.getMetricName(), deployResource,
+                                            metricInfoList);
                             if (!CollectionUtils.isEmpty(batchMetricData.getDatapoints())) {
                                 metric.setMetrics(convertBatchDataPointToMetricItems(
                                         batchMetricData.getDatapoints(), onlyLastKnownMetric));
@@ -299,6 +307,26 @@ public class FlexibleEngineMonitorConverter {
             }
         }
         return metricList;
+    }
+
+    private Metric createMetric(String metricName, DeployResource deployResource,
+                                MetricInfoList metricInfo) {
+        Metric metric = new Metric();
+        metric.setName(metricName);
+        if (metricNameToResourceTypeMap.containsKey(metricName)) {
+            metric.setMonitorResourceType(metricNameToResourceTypeMap.get(metricName));
+        }
+        Map<String, String> labels = new HashMap<>();
+        labels.put("id", deployResource.getResourceId());
+        labels.put("name", deployResource.getName());
+        metric.setLabels(labels);
+        metric.setType(MetricType.GAUGE);
+        if (metricInfo.getUnit().equals("%")) {
+            metric.setUnit(MetricUnit.PERCENTAGE);
+        } else {
+            metric.setUnit(MetricUnit.getByValue(metricInfo.getUnit()));
+        }
+        return metric;
     }
 
     private List<MetricItem> convertDataPointToMetricItems(List<Datapoint> datapointList,
