@@ -14,7 +14,6 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployAdmin;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
@@ -128,19 +127,14 @@ public class DeployEnvironments {
         }
 
         CredentialType credentialType = task.getOcl().getDeployment().getCredentialType();
-        DeployAdmin deployAdmin = task.getOcl().getDeployment().getDeployAdmin();
         Csp csp = task.getOcl().getCloudServiceProvider().getName();
 
-        String xpanseUser = task.getCreateRequest().getUserName();
-        if (deployAdmin.equals(DeployAdmin.CSP)) {
-            // todo: Try to get the xpanseUser of the register service from the task context.
-            xpanseUser = DeployAdmin.CSP.toValue();
-        }
-
         AbstractCredentialInfo abstractCredentialInfo =
-                this.credentialCenter.getCredential(csp, xpanseUser, credentialType);
+                this.credentialCenter.getCredential(csp, task.getCreateRequest().getUserName(),
+                        credentialType);
 
-        if (abstractCredentialInfo.getType().equals(CredentialType.VARIABLES)) {
+        if (abstractCredentialInfo != null
+                && abstractCredentialInfo.getType().equals(CredentialType.VARIABLES)) {
             for (CredentialVariable variable :
                     ((CredentialVariables) abstractCredentialInfo).getVariables()) {
                 variables.put(variable.getName(), variable.getValue());
