@@ -194,7 +194,7 @@ public class RetryTemplateService {
             public <T, E extends Throwable> void close(RetryContext context,
                                                        RetryCallback<T, E> callback,
                                                        Throwable throwable) {
-                log.error("Retry close context:{}.", context);
+                log.error("Retry close context:{}", context);
             }
 
             @Override

@@ -19,8 +19,8 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.MetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
