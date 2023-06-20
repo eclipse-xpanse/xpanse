@@ -90,7 +90,7 @@ class RegisterServiceImplTest {
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(ocl);
         when(mockStorage.getRegisterServiceById(uuid)).thenReturn(registerServiceEntity);
         TerraformDeployment deployment =
-                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
+                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments(null));
         doReturn(deployment).when(mockDeployService).getDeployment(any());
 
         RegisterServiceEntity registeredServiceEntityByUrl =
@@ -125,7 +125,7 @@ class RegisterServiceImplTest {
 
         when(mockStorage.getRegisterServiceById(uuid)).thenReturn(registerServiceEntity);
         TerraformDeployment deployment =
-                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
+                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments(null));
         doReturn(deployment).when(mockDeployService).getDeployment(any());
 
         RegisterServiceEntity updateRegisteredServiceEntity =
@@ -139,7 +139,7 @@ class RegisterServiceImplTest {
     @Test
     void testRegisterService() {
         TerraformDeployment deployment =
-                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
+                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments(null));
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerService(oclRegister);
@@ -151,7 +151,7 @@ class RegisterServiceImplTest {
     void testRegisterServiceByUrl() throws Exception {
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(oclRegister);
         TerraformDeployment deployment =
-                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments());
+                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments(null));
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerServiceByUrl(oclLocation);
