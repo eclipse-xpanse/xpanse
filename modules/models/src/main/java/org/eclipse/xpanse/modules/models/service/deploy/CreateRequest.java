@@ -27,7 +27,7 @@ public class CreateRequest {
     private UUID id;
 
     /**
-     * The category of the Service.
+     * The user who ordered the Service.
      */
     @NotNull
     @Schema(description = "User who ordered the service")

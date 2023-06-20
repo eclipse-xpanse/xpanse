@@ -12,6 +12,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
+import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployAdmin;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
 
 /**
@@ -28,6 +30,12 @@ public class Deployment {
     @NotNull
     @Schema(description = "The variables for the deployment, which will be passed to the deployer")
     private List<DeployVariable> variables;
+
+    @Schema(description = "The credential type to do the deployment")
+    private CredentialType credentialType = CredentialType.VARIABLES;
+    
+    @Schema(description = "The role of the user for deployment")
+    private DeployAdmin deployAdmin = DeployAdmin.USER;
 
     @NotNull
     @NotBlank
