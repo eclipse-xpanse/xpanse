@@ -60,7 +60,7 @@ public class DeployEnvironments {
         for (Flavor flavor : task.getOcl().getFlavors()) {
             if (flavor.getName().equals(task.getCreateRequest().getFlavor())) {
                 for (Map.Entry<String, String> entry : flavor.getProperties().entrySet()) {
-                    variables.put((entry.getKey()), entry.getValue());
+                    variables.put(entry.getKey(), entry.getValue());
                 }
                 return variables;
             }
