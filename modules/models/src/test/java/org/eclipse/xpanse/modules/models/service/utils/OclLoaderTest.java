@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models;
+package org.eclipse.xpanse.modules.models.service.utils;
 
 import java.io.File;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
@@ -18,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+/**
+ * Test of OclLoader.
+ */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {OclLoader.class,})
 public class OclLoaderTest {
