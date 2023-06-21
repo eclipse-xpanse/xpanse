@@ -6,6 +6,11 @@
     <img src="https://github.com/eclipse-xpanse/xpanse/actions/workflows/xpanse.yml/badge.svg" alt="build">
 </a>
 </p>
+<p align='center'>
+  <a href="https://github.com/openservicescloud/xpanse-1000/actions/workflows/coverage.yml" target="_blank">
+    <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/eclipse-xpanse-bot/3d9c022b98734fbf615c21136abe4add/raw/gistfile1.txt" alt="coverage">
+  </a>
+</p>
 
 Xpanse is an Open Source project allowing to easily implement native managed
 service on any cloud service provider. This project is part of the Open Services Cloud (OSC) charter.
