@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models;
+package org.eclipse.xpanse.modules.models.service.utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+/**
+ * Test of DeployVariableValidator.
+ */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DeployVariableValidator.class,})
 public class DeployVariableValidatorTest {
