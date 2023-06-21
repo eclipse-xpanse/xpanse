@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @SuppressWarnings("UnnecessarilyFullyQualified")
 public class CredentialVariablesNotComplete extends RuntimeException {
 
-    private Set<String> errorReasons;
+    private final Set<String> errorReasons;
 
     public CredentialVariablesNotComplete(Set<String> errorReasons) {
         super(String.format("Credential Variables Not Complete. Error reasons: %s", errorReasons));

@@ -20,7 +20,10 @@ public enum ResultType {
     TERRAFORM_SCRIPT_INVALID("Terraform Script Invalid"),
     UNPROCESSABLE_ENTITY("Unprocessable Entity"),
     INVALID_RESPONSE("Response Not Valid"),
-    BACKEND_FAILURE("Failure while connecting to backend");
+    BACKEND_FAILURE("Failure while connecting to backend"),
+    CREDENTIAL_CAPABILITY_NOT_FOUND("Credential Capability Not Found"),
+    CREDENTIALS_NOT_FOUND("Credentials Not Found"),
+    CREDENTIALS_VARIABLES_NOT_COMPLETE("Credential Variables Not Complete");
 
     private final String value;
 
