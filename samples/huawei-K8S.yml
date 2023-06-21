@@ -69,16 +69,6 @@ deployment:
   # - env_variable: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a regular variable to the deployer. End user cannot see or change this variable.
   # The parameters will be used to generate the API of the managed service.
   variables:
-    - name: HW_ACCESS_KEY
-      description: Huawei cloud access key.
-      kind: env
-      dataType: string
-      mandatory: false
-    - name: HW_SECRET_KEY
-      description: Huawei cloud secret key.
-      kind: env
-      dataType: string
-      mandatory: false
     - name: admin_passwd
       description: The admin password of all nodes in the K8S cluster. If the value is empty, will create a random password.
       kind: variable

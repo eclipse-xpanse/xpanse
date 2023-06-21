@@ -10,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.eclipse.xpanse.modules.models.resource.Deployment;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.Deployment;
+import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.junit.jupiter.api.Test;
 
 public class OclTest {

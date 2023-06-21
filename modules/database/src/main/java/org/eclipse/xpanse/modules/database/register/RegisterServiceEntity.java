@@ -22,10 +22,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
-import org.eclipse.xpanse.modules.models.enums.Category;
-import org.eclipse.xpanse.modules.models.enums.Csp;
-import org.eclipse.xpanse.modules.models.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
+import org.eclipse.xpanse.modules.models.service.common.enums.Category;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.hibernate.annotations.Type;
 
 /**

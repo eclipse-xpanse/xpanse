@@ -24,10 +24,11 @@
         <module>models</module>
         <module>database</module>
         <module>deployment</module>
-        <module>orchestrator</module>
+        <module>register</module>
         <module>monitor</module>
         <module>credential</module>
         <module>logging</module>
+        <module>orchestrator</module>
     </modules>
 
 </project>

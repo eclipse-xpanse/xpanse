@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
-import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 
 /**
  * Interface of terraform provider.

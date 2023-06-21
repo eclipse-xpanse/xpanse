@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
+import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -54,7 +54,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
     public RegisterServiceEntity findRegisteredService(
             RegisterServiceEntity registerServiceEntity) {
         Specification<RegisterServiceEntity> specification =
-                ((root, query, criteriaBuilder) -> {
+                (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     predicateList.add(criteriaBuilder.equal(root.get("csp"),
                             registerServiceEntity.getCsp()));
@@ -66,7 +66,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
                             registerServiceEntity.getCategory()));
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
-                });
+                };
         Optional<RegisterServiceEntity> optional = repository.findOne(specification);
         return optional.orElse(null);
 
@@ -83,7 +83,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
             RegisteredServiceQuery serviceQuery) {
 
         Specification<RegisterServiceEntity> specification =
-                ((root, query, criteriaBuilder) -> {
+                (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(serviceQuery.getCategory())) {
                         predicateList.add(criteriaBuilder.equal(root.get("category"),
@@ -106,7 +106,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
 
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
-                });
+                };
 
         return repository.findAll(specification);
     }

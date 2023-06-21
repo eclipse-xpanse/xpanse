@@ -2,8 +2,8 @@
     <img src="static/full-logo.png" alt='xpanse-logo' style='align-content: center'>
 </p>
 <p align='center'>
-<a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/xpanse.yml" target="_blank">
-    <img src="https://github.com/eclipse-xpanse/xpanse/actions/workflows/xpanse.yml/badge.svg" alt="build">
+<a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml" target="_blank">
+    <img src="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml/badge.svg" alt="build">
 </a>
 </p>
 <p align='center'>

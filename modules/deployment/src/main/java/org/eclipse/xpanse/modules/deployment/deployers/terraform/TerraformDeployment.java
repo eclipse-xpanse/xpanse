@@ -18,15 +18,16 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfValidationResult;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.models.enums.Csp;
-import org.eclipse.xpanse.modules.models.enums.DeployerKind;
-import org.eclipse.xpanse.modules.models.enums.TerraformExecState;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
-import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -148,6 +149,8 @@ public class TerraformDeployment implements Deployment {
         Map<String, String> inputVariables = this.deployEnvironments.getVariables(task);
         // load flavor variables also as input variables for terraform executor.
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(task));
+        // load credential variables also as env variables for terraform executor.
+        envVariables.putAll(this.deployEnvironments.getCredentialVariables(task));
         return getExecutor(envVariables, inputVariables, workspace);
     }
 
@@ -245,7 +248,7 @@ public class TerraformDeployment implements Deployment {
     /**
      * Validates the Terraform script.
      */
-    public TfValidationResult validate(Ocl ocl) {
+    public DeployValidationResult validate(Ocl ocl) {
         String workspace = getWorkspacePath(UUID.randomUUID().toString());
         // Create the workspace.
         buildWorkspace(workspace);

@@ -19,7 +19,7 @@
     <artifactId>openstack</artifactId>
     <dependencies>
         <dependency>
-            <artifactId>orchestrator</artifactId>
+            <artifactId>register</artifactId>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <version>${project.version}</version>
         </dependency>

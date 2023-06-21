@@ -16,11 +16,12 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.models.enums.Csp;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
-import org.eclipse.xpanse.modules.models.service.CreateRequest;
-import org.eclipse.xpanse.modules.models.service.DeployResult;
-import org.eclipse.xpanse.modules.models.utils.OclLoader;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -69,7 +70,7 @@ public class TerraformDeploymentTest {
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setCreateRequest(deployRequest);
         TerraformDeployment terraformDeployment =
-                new TerraformDeployment("test", false, "DEBUG", new DeployEnvironments());
+                new TerraformDeployment("test", false, "DEBUG", new DeployEnvironments(null));
 
         DeployResult deployResult = terraformDeployment.deploy(xpanseDeployTask);
 

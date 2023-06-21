@@ -12,10 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.api.response.Response;
-import org.eclipse.xpanse.api.response.ResultType;
-import org.eclipse.xpanse.modules.models.exceptions.ResponseInvalidException;
-import org.eclipse.xpanse.modules.models.exceptions.TerraformScriptFormatInvalidException;
+import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.TerraformScriptFormatInvalidException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindingResult;
@@ -143,5 +144,16 @@ public class CommonExceptionHandler {
     public Response handleResponseInvalidException(
             ResponseInvalidException ex) {
         return Response.errorResponse(ResultType.INVALID_RESPONSE, ex.getErrorReasons());
+    }
+
+    /**
+     * Exception handler for ResponseInvalidException.
+     */
+    @ExceptionHandler({ClientApiCallFailedException.class})
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ResponseBody
+    public Response handleClientApiCalledException(
+            ResponseInvalidException ex) {
+        return Response.errorResponse(ResultType.BACKEND_FAILURE, ex.getErrorReasons());
     }
 }

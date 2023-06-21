@@ -7,10 +7,10 @@
 package org.eclipse.xpanse.modules.models;
 
 import java.io.File;
-import org.eclipse.xpanse.modules.models.resource.Ocl;
-import org.eclipse.xpanse.modules.models.enums.BillingCurrency;
-import org.eclipse.xpanse.modules.models.enums.BillingPeriod;
-import org.eclipse.xpanse.modules.models.utils.OclLoader;
+import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.enums.BillingCurrency;
+import org.eclipse.xpanse.modules.models.service.register.enums.BillingPeriod;
+import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

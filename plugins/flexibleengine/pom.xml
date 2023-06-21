@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>orchestrator</artifactId>
+            <artifactId>register</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -50,8 +50,29 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.huawei.apigateway</groupId>
+            <artifactId>java-sdk-core</artifactId>
+            <version>3.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.huaweicloud.sdk</groupId>
+            <artifactId>huaweicloud-sdk-ces</artifactId>
+            <version>3.1.41</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>6.0.3</version>
         </dependency>
 
         <!-- test -->
@@ -76,19 +97,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-            <version>1.6</version>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>orchestrator</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.huawei.apigateway</groupId>
-            <artifactId>java-sdk-core</artifactId>
-            <version>3.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.huaweicloud.sdk</groupId>
-            <artifactId>huaweicloud-sdk-ces</artifactId>
-            <version>3.1.41</version>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>monitor</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

@@ -7,18 +7,21 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.xpanse.api.CredentialManageApi;
-import org.eclipse.xpanse.modules.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.credential.CreateCredential;
-import org.eclipse.xpanse.modules.credential.CredentialDefinition;
-import org.eclipse.xpanse.modules.credential.CredentialVariable;
-import org.eclipse.xpanse.modules.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.enums.Csp;
-import org.eclipse.xpanse.orchestrator.credential.CredentialCenter;
+import org.eclipse.xpanse.modules.credential.CredentialCenter;
+import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.models.credential.CreateCredential;
+import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
+import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -110,31 +113,31 @@ class CredentialManageApiTest {
     void testGetCredentialDefinitionsByCsp() {
 
         // Configure CredentialCenter.getCredentialDefinitionsByCsp(...).
-        final List<CredentialDefinition> credentialDefinitions =
-                List.of(new CredentialDefinition(Csp.AWS, "name", "description",
+        final List<AbstractCredentialInfo> credentialVariables =
+                List.of(new CredentialVariables(Csp.AWS, "userName", "name", "description",
                         CredentialType.VARIABLES,
-                        List.of(new CredentialVariable("name", "description"))));
-        when(mockCredentialCenter.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
-                CredentialType.VARIABLES)).thenReturn(credentialDefinitions);
+                        List.of(new CredentialVariable("name", "description", false))));
+        when(mockCredentialCenter.getCredentials(Csp.AWS, "userName",
+                CredentialType.VARIABLES)).thenReturn(credentialVariables);
 
         // Run the test
-        final List<CredentialDefinition> result =
-                credentialManageApiUnderTest.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
+        final List<AbstractCredentialInfo> result =
+                credentialManageApiUnderTest.getCredentials(Csp.AWS, "userName",
                         CredentialType.VARIABLES);
 
         // Verify the results
-        assertThat(result).isEqualTo(credentialDefinitions);
+        assertThat(result).isEqualTo(credentialVariables);
     }
 
     @Test
     void testGetCredentialDefinitionsByCsp_CredentialCenterReturnsNoItems() {
         // Setup
-        when(mockCredentialCenter.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
+        when(mockCredentialCenter.getCredentials(Csp.AWS, "userName",
                 CredentialType.VARIABLES)).thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<CredentialDefinition> result =
-                credentialManageApiUnderTest.getCredentialDefinitionsByCsp(Csp.AWS, "userName",
+        final List<AbstractCredentialInfo> result =
+                credentialManageApiUnderTest.getCredentials(Csp.AWS, "userName",
                         CredentialType.VARIABLES);
 
         // Verify the results
@@ -173,14 +176,12 @@ class CredentialManageApiTest {
         createCredential1.setCsp(Csp.AWS);
         createCredential1.setDescription("description");
         createCredential1.setType(CredentialType.VARIABLES);
-        when(mockCredentialCenter.addCredential(Csp.AWS, createCredential1)).thenReturn(false);
-
-        // Run the test
-        final Boolean result =
-                credentialManageApiUnderTest.addCredential(Csp.AWS, createCredential);
+        doThrow(new RuntimeException("test")).when(mockCredentialCenter)
+                .addCredential(any(CreateCredential.class));
 
         // Verify the results
-        assertThat(result).isFalse();
+        Assertions.assertThrows(RuntimeException.class,
+                () -> credentialManageApiUnderTest.addCredential(createCredential));
     }
 
     @Test
@@ -200,25 +201,23 @@ class CredentialManageApiTest {
         updateCredential1.setCsp(Csp.AWS);
         updateCredential1.setDescription("description");
         updateCredential1.setType(CredentialType.VARIABLES);
-        when(mockCredentialCenter.updateCredential(Csp.AWS, updateCredential1)).thenReturn(false);
+        doThrow(new RuntimeException("test")).when(mockCredentialCenter)
+                .updateCredential(any(CreateCredential.class));
 
         // Run the test
-        final Boolean result =
-                credentialManageApiUnderTest.updateCredential(Csp.AWS, updateCredential);
-
-        // Verify the results
-        assertThat(result).isFalse();
+        Assertions.assertThrows(RuntimeException.class,
+                () -> credentialManageApiUnderTest.updateCredential(updateCredential));
     }
 
     @Test
     void testDeleteCredential() {
         // Setup
-        when(mockCredentialCenter.deleteCredential(Csp.AWS, "userName")).thenReturn(false);
+        doThrow(new RuntimeException("test")).when(mockCredentialCenter)
+                .deleteCredential(any(Csp.class), any(String.class), any(CredentialType.class));
 
         // Run the test
-        final Boolean result = credentialManageApiUnderTest.deleteCredential(Csp.AWS, "userName");
-
-        // Verify the results
-        assertThat(result).isFalse();
+        Assertions.assertThrows(RuntimeException.class,
+                () -> credentialManageApiUnderTest.deleteCredential(Csp.AWS, "userName",
+                        CredentialType.VARIABLES));
     }
 }

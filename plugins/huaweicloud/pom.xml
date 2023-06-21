@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>orchestrator</artifactId>
+            <artifactId>register</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>deployment</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -78,6 +78,12 @@
             <artifactId>huaweicloud-sdk-aom</artifactId>
             <groupId>com.huaweicloud.sdk</groupId>
             <version>3.1.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>monitor</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

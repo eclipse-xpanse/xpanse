@@ -31,7 +31,7 @@ public class SystemCmd {
 
     @Setter
     @Getter
-    private Map<String, String> env = null;
+    private Map<String, String> env;
 
     @Setter
     @Getter
@@ -114,8 +114,8 @@ public class SystemCmd {
             return;
         }
         final Map<String, String> contextMap = new HashMap<>(
-                Objects.nonNull(MDC.getCopyOfContextMap()) ? MDC.getCopyOfContextMap() :
-                        new HashMap<>());
+                Objects.nonNull(MDC.getCopyOfContextMap()) ? MDC.getCopyOfContextMap()
+                        : new HashMap<>());
 
 
         // Starting threads in parallel to read stdout and stderr. This is needed because in

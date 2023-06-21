@@ -1,0 +1,152 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "url": "/metric/v1/resource/instance_network_interface"
+      },
+      "response": {
+        "transformers": [
+          "response-template"
+        ],
+        "headers": {
+          "Content-Type": "application/json",
+          "X-Subject-Token": "gAAAAABkfxXzXwAFGWO9tHe92Q_jOWkpOvIsutmlDbxmHWa__E6LWKOTfhJcLMObqesFQ-tFU1AtZ1LZXnuQr6rLUI9Hdf2Qdd3jrgrjQla0va45SbnyEzVCx-yalaIK0A0VYsGy-28GGJ3gPhO_bTw6GjMAmi7pPiJl-JF_zYGY656rmOZlsLs"
+        },
+        "status": 200,
+        "jsonBody": [
+          {
+            "creator": "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
+            "started_at": "2023-06-05T11:10:18.130486+00:00",
+            "revision_start": "2023-06-05T11:10:18.130492+00:00",
+            "ended_at": null,
+            "user_id": "08ad2f8d537349ee9862c55398fc3b29",
+            "project_id": "1c190e0a4fc14e72a871810b1fc08788",
+            "original_resource_id": "instance-00000005-7b5b6ee6-cab4-4e72-be6e-854a67c6d381-tapffdde028-eb",
+            "id": "f4b607a9-ff04-5566-a5a4-399ad0cadd26",
+            "type": "instance_network_interface",
+            "name": "tapffdde028-eb",
+            "instance_id": "7b5b6ee6-cab4-4e72-be6e-854a67c6d381",
+            "revision_end": null,
+            "metrics": {
+              "network.incoming.bytes": "13e29c07-324e-456f-bac5-d02366570b79",
+              "network.incoming.packets": "74f6e4fb-9c1a-403a-80df-06ec1fcb9335",
+              "network.incoming.packets.drop": "dbc4fe1d-f8d5-4980-9057-61b6d3512e4a",
+              "network.incoming.packets.error": "5b27ac01-dc16-448f-bb09-1e1e8813e4ab",
+              "network.outgoing.bytes": "c07586ab-3b38-44fd-acea-ccb23900cbc4",
+              "network.outgoing.packets": "f812d3f0-8cbd-458b-b105-8256f825e310",
+              "network.outgoing.packets.drop": "6667c6ca-5959-4f24-b6cc-03eb4a495ac1",
+              "network.outgoing.packets.error": "45baf68a-0749-4ffe-acdc-17779b2c51b9"
+            },
+            "created_by_user_id": "91ac6b28dc5f4a519422f3154bc4d14d",
+            "created_by_project_id": "2c2c51522b0342fc94254c1b3afb95b5"
+          },
+          {
+            "creator": "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
+            "started_at": "2023-06-05T11:10:18.229306+00:00",
+            "revision_start": "2023-06-05T11:10:18.229312+00:00",
+            "ended_at": null,
+            "user_id": "08ad2f8d537349ee9862c55398fc3b29",
+            "project_id": "1c190e0a4fc14e72a871810b1fc08788",
+            "original_resource_id": "instance-00000006-e2e75bfc-ff9e-4957-a64b-11abc3c5ea26-tap1323a318-ad",
+            "id": "7c50a391-c444-55f6-8324-d002452a6fe1",
+            "type": "instance_network_interface",
+            "name": "tap1323a318-ad",
+            "instance_id": "e2e75bfc-ff9e-4957-a64b-11abc3c5ea26",
+            "revision_end": null,
+            "metrics": {
+              "network.incoming.bytes": "26f12859-c793-46a4-9816-6a896885640a",
+              "network.incoming.packets": "e7d91af6-1501-4ccc-a6c1-f1b5f01bb838",
+              "network.incoming.packets.drop": "b4975acf-2302-4b15-a9fb-f5ee08f39985",
+              "network.incoming.packets.error": "9d7c35da-46e8-466a-b676-49d62c494f5d",
+              "network.outgoing.bytes": "bbc9285a-3d80-449f-b154-413d08b1893b",
+              "network.outgoing.packets": "56f8b817-92ab-4210-baae-ea97d3b10a9a",
+              "network.outgoing.packets.drop": "4bcad701-431e-4417-a9b1-30ab2100c8c6",
+              "network.outgoing.packets.error": "690d5917-94a9-47da-bdcb-8a8c6e96d70f"
+            },
+            "created_by_user_id": "91ac6b28dc5f4a519422f3154bc4d14d",
+            "created_by_project_id": "2c2c51522b0342fc94254c1b3afb95b5"
+          },
+          {
+            "creator": "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
+            "started_at": "2023-06-05T11:10:18.321900+00:00",
+            "revision_start": "2023-06-05T11:10:18.321905+00:00",
+            "ended_at": null,
+            "user_id": "08ad2f8d537349ee9862c55398fc3b29",
+            "project_id": "1c190e0a4fc14e72a871810b1fc08788",
+            "original_resource_id": "instance-00000007-5d745917-42d2-4909-95a6-ba2bf186bd5e-tapbe0afc60-97",
+            "id": "e4467db6-94cb-58b0-8b27-7e7dee01cc17",
+            "type": "instance_network_interface",
+            "name": "tapbe0afc60-97",
+            "instance_id": "5d745917-42d2-4909-95a6-ba2bf186bd5e",
+            "revision_end": null,
+            "metrics": {
+              "network.incoming.bytes": "453a4085-0eb9-40c3-b0ec-bdde996095f5",
+              "network.incoming.packets": "4516d674-2cc8-4e0d-b46e-a1195976d4d7",
+              "network.incoming.packets.drop": "2cfbce27-ab8d-4131-a30e-75305e906391",
+              "network.incoming.packets.error": "d2da4bbd-2035-475f-8921-9d9b78a76a02",
+              "network.outgoing.bytes": "167cb70b-b8c8-4c32-8171-8f2bf665d5d6",
+              "network.outgoing.packets": "506fa37b-2140-4d66-bf19-d3aa6327dc0b",
+              "network.outgoing.packets.drop": "deecfa3b-5e43-4544-b68f-1f6b2c3abe74",
+              "network.outgoing.packets.error": "ecd43bfa-5066-4be9-b69d-700b80d586db"
+            },
+            "created_by_user_id": "91ac6b28dc5f4a519422f3154bc4d14d",
+            "created_by_project_id": "2c2c51522b0342fc94254c1b3afb95b5"
+          },
+          {
+            "creator": "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
+            "started_at": "2023-06-05T11:10:18.409768+00:00",
+            "revision_start": "2023-06-05T11:10:18.409773+00:00",
+            "ended_at": null,
+            "user_id": "08ad2f8d537349ee9862c55398fc3b29",
+            "project_id": "1c190e0a4fc14e72a871810b1fc08788",
+            "original_resource_id": "instance-00000008-ef32f288-6981-4d7f-b7e3-d3e8977f6c29-tap8d94b0b5-58",
+            "id": "ddc31668-a0dd-545a-a0ba-2c2ba636ad3d",
+            "type": "instance_network_interface",
+            "name": "tap8d94b0b5-58",
+            "instance_id": "ef32f288-6981-4d7f-b7e3-d3e8977f6c29",
+            "revision_end": null,
+            "metrics": {
+              "network.incoming.bytes": "8c640af3-9102-4cd9-aff4-04298669d8ce",
+              "network.incoming.packets": "8de83f99-337f-44e8-bcf5-5410bdb028dd",
+              "network.incoming.packets.drop": "84087d3c-974e-4120-bf79-8644972b2ac4",
+              "network.incoming.packets.error": "2bdcfb2f-9193-4f84-8dd3-c0af2af5317c",
+              "network.outgoing.bytes": "d11591f1-2a83-4568-b25a-04a0e67a7279",
+              "network.outgoing.packets": "41bcbe99-0b26-4391-9276-cff1615b60e4",
+              "network.outgoing.packets.drop": "f73ff300-8419-42c3-8a73-9dccce879725",
+              "network.outgoing.packets.error": "efc54290-c3c0-46aa-ae87-6d2736e7c3ee"
+            },
+            "created_by_user_id": "91ac6b28dc5f4a519422f3154bc4d14d",
+            "created_by_project_id": "2c2c51522b0342fc94254c1b3afb95b5"
+          },
+          {
+            "creator": "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
+            "started_at": "2023-06-09T06:45:18.104863+00:00",
+            "revision_start": "2023-06-09T06:45:18.104870+00:00",
+            "ended_at": null,
+            "user_id": "08ad2f8d537349ee9862c55398fc3b29",
+            "project_id": "1c190e0a4fc14e72a871810b1fc08788",
+            "original_resource_id": "instance-00000009-ce72cacd-9d52-4a9f-9c1d-533033fa2f5b-tapa5712565-05",
+            "id": "375c4fc3-88ca-58e6-bf73-1535541e03df",
+            "type": "instance_network_interface",
+            "name": "tapa5712565-05",
+            "instance_id": "ce72cacd-9d52-4a9f-9c1d-533033fa2f5b",
+            "revision_end": null,
+            "metrics": {
+              "network.incoming.bytes": "e5d9116f-b4a4-4c18-9f28-8ad84e5dad2e",
+              "network.incoming.packets": "7201e605-f79a-4aba-9895-5e8bfda867e8",
+              "network.incoming.packets.drop": "e3cfe324-03d6-4e0c-aa53-51232bcd8d08",
+              "network.incoming.packets.error": "a4a9b05a-ca55-4486-b645-1cdd27f1c787",
+              "network.outgoing.bytes": "9252511e-12ac-4cc5-b35c-f306017d190e",
+              "network.outgoing.packets": "4eed4371-5b1b-4267-867e-fffbb417f658",
+              "network.outgoing.packets.drop": "02f8545f-fee6-4887-b89d-047f7878dda4",
+              "network.outgoing.packets.error": "ac558ab7-009d-4a85-a2d3-3f3b7599f093"
+            },
+            "created_by_user_id": "91ac6b28dc5f4a519422f3154bc4d14d",
+            "created_by_project_id": "2c2c51522b0342fc94254c1b3afb95b5"
+          }
+        ]
+      }
+    }
+  ]
+}

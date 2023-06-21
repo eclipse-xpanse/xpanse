@@ -11,7 +11,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Aws;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.FlexibleEngine;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Huawei;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Openstack;
-import org.eclipse.xpanse.modules.models.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 
 /**
  * Terraform providers.
