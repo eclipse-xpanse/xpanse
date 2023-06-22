@@ -11,7 +11,7 @@ on:
     branches: [ main ]
 
 env:
-  GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+  GIST_TOKEN_ALIAS: ${{ secrets.GIST_TOKEN }}
 
 jobs:
   build:
@@ -24,8 +24,8 @@ jobs:
 
       - name: Create Coverage Badge
         run: |
-          curl -X PATCH -H "Authorization: token $GIST_TOKEN" -d '{"files": {"xpanse_coverage.json": {"content": "{\"schemaVersion\":1,\"label\":\"Coverage\",\"message\":\"60%\",\"color\":\"hsl(${{ env.COVERAGE_PERCENTAGE }},100%,40%)\"}"}}}' https://api.github.com/gists/3d9c022b98734fbf615c21136abe4add
-
+          curl -X PATCH -H "Authorization: token $GIST_TOKEN_ALIAS" -d '{"files": {"xpanse_coverage.json": {"content": "{\"schemaVersion\":1,\"label\":\"Coverage\",\"message\":\"60%\",\"color\":\"hsl(${{ env.COVERAGE_PERCENTAGE }},100%,40%)\"}"}}}' https://api.github.com/gists/3d9c022b98734fbf615c21136abe4add
+          curl -X PATCH -H "Authorization: token ${{ secrets.GIST_TOKEN }}" -d '{"files": {"xpanse_coverage.json": {"content": "{\"schemaVersion\":1,\"label\":\"Coverage\",\"message\":\"60%\",\"color\":\"hsl(${{ env.COVERAGE_PERCENTAGE }},100%,40%)\"}"}}}' https://api.github.com/gists/3d9c022b98734fbf615c21136abe4add
       - name: Create Coverage Badge2
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
