@@ -29,7 +29,8 @@ import org.mockito.Mock;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ContextConfiguration(classes = {CaffeineCredentialCacheManager.class, CredentialsStore.class, PluginManager.class})
+@ContextConfiguration(classes = {CaffeineCredentialCacheManager.class, CredentialsStore.class,
+        PluginManager.class})
 @ExtendWith(SpringExtension.class)
 class CredentialSearchTests {
 
@@ -86,7 +87,8 @@ class CredentialSearchTests {
     void testJoinSuccessfulCredentialsGet() throws Exception {
         withEnvironmentVariable("name", "testUser").execute(() -> {
             final List<AbstractCredentialInfo> credentialVariables =
-                    List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name", "description",
+                    List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
+                            "description",
                             CredentialType.VARIABLES,
                             List.of(new CredentialVariable("name", "description", true, false),
                                     new CredentialVariable("id", "description", true, false,
@@ -110,7 +112,8 @@ class CredentialSearchTests {
     void testGetFullCredentialConfigFromEnv() throws Exception {
         withEnvironmentVariables("name", "testUser", "id", "testId").execute(() -> {
             final List<AbstractCredentialInfo> credentialVariables =
-                    List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name", "description",
+                    List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
+                            "description",
                             CredentialType.VARIABLES,
                             List.of(new CredentialVariable("name", "description", true, false),
                                     new CredentialVariable("id", "description", true, false))));

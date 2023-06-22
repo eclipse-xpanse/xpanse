@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum ResultType {
     SUCCESS("Success"),
-    RUNTIME_ERROR("Runtime Failure"),
+    RUNTIME_ERROR("Runtime Error"),
     BAD_PARAMETERS("Parameters Invalid"),
     TERRAFORM_SCRIPT_INVALID("Terraform Script Invalid"),
     UNPROCESSABLE_ENTITY("Unprocessable Entity"),
@@ -23,7 +23,21 @@ public enum ResultType {
     BACKEND_FAILURE("Failure while connecting to backend"),
     CREDENTIAL_CAPABILITY_NOT_FOUND("Credential Capability Not Found"),
     CREDENTIALS_NOT_FOUND("Credentials Not Found"),
-    CREDENTIALS_VARIABLES_NOT_COMPLETE("Credential Variables Not Complete");
+    CREDENTIALS_VARIABLES_NOT_COMPLETE("Credential Variables Not Complete"),
+    FLAVOR_NOT_FOUND("Flavor Invalid"),
+    TERRAFORM_EXECUTION_FAILED("Terraform Execution Failed"),
+    PLUGIN_NOT_FOUND("Plugin Not Found"),
+    DEPLOYER_NOT_FOUND("Deployer Not Found"),
+    TERRAFORM_PROVIDER_NOT_FOUND("Terraform Provider Not Found"),
+    CREDENTIAL_DEFINITIONS_NOT_AVAILABLE("No Credential Definition Available"),
+    SERVICE_STATE_INVALID("Invalid Service State"),
+    RESOURCE_TYPE_INVALID_FOR_MONITORING("Resource Invalid For Monitoring"),
+    UNHANDLED_EXCEPTION("Unhandled Exception"),
+    SERVICE_ALREADY_REGISTERED("Service Already Registered"),
+    ICON_PROCESSING_FAILED("Icon Processing Failed"),
+    SERVICE_NOT_REGISTERED("Service Not Registered"),
+    SERVICE_DEPLOYMENT_NOT_FOUND("Service Deployment Not Found"),
+    RESOURCE_NOT_FOUND("Resource Not Found");
 
     private final String value;
 

@@ -32,7 +32,8 @@ public class TfResourceTransUtils {
      * @param keyProperty    keyProperty
      */
     public static void fillDeployResource(TfStateResourceInstance instance,
-            DeployResource deployResource, Map<String, String> keyProperty) {
+                                          DeployResource deployResource,
+                                          Map<String, String> keyProperty) {
         Map<String, Object> instanceAttributes = instance.getAttributes();
         if (Objects.isNull(instanceAttributes) || instanceAttributes.isEmpty()) {
             return;

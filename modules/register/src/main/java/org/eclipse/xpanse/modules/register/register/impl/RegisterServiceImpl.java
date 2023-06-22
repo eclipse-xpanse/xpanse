@@ -20,11 +20,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.register.Region;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceAlreadyRegisteredException;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
@@ -85,8 +88,9 @@ public class RegisterServiceImpl implements RegisterService {
         RegisterServiceEntity existedService = storage.getRegisterServiceById(UUID.fromString(id));
         if (Objects.isNull(existedService)) {
             log.error("Registered service with id {} not existing.", id);
-            throw new IllegalArgumentException(String.format("Registered service with id %s not "
-                    + "existed.", id));
+            throw new ServiceNotRegisteredException(
+                    String.format("Registered service with id %s not "
+                            + "existed.", id));
         }
         iconUpdate(existedService, ocl);
         checkParams(existedService, ocl);
@@ -162,7 +166,7 @@ public class RegisterServiceImpl implements RegisterService {
                     String.format("Service already registered. registered service id: %s.",
                             existedEntity.getId());
             log.error(errorMsg);
-            throw new IllegalArgumentException(errorMsg);
+            throw new ServiceAlreadyRegisteredException(errorMsg);
         }
         validateTerraformScript(ocl);
         storage.store(newEntity);
@@ -286,12 +290,13 @@ public class RegisterServiceImpl implements RegisterService {
         UUID uuid = UUID.fromString(id);
         RegisterServiceEntity registerService = storage.getRegisterServiceById(uuid);
         if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
-            throw new IllegalArgumentException(String.format("Registered service with id %s not "
-                    + "existed.", id));
+            throw new ServiceNotRegisteredException(
+                    String.format("Registered service with id %s not "
+                            + "found.", id));
         }
         String openApiUrl = registeredServicesOpenApiGenerator.getOpenApi(registerService);
         if (StringUtils.isBlank(openApiUrl)) {
-            throw new RuntimeException("Get openApi Url is Empty.");
+            throw new OpenApiFileGenerationException("Get openApi Url is Empty.");
         }
         return openApiUrl;
     }

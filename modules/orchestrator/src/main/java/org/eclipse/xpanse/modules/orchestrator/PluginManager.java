@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -50,7 +51,8 @@ public class PluginManager {
     public OrchestratorPlugin getOrchestratorPlugin(Csp csp) {
         OrchestratorPlugin plugin = pluginMap.get(csp);
         if (Objects.isNull(plugin)) {
-            throw new RuntimeException("Can't find suitable plugin for the Csp " + csp.name());
+            throw new PluginNotFoundException(
+                    "Can't find suitable plugin for the Csp " + csp.name());
         }
         return plugin;
     }

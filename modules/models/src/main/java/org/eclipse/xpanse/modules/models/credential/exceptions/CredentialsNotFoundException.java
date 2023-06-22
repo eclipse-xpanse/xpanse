@@ -10,7 +10,7 @@ package org.eclipse.xpanse.modules.models.credential.exceptions;
  */
 public class CredentialsNotFoundException extends RuntimeException {
     public CredentialsNotFoundException(String message) {
-        super("Credentials not found Exception:" + message);
+        super(message);
     }
 
 

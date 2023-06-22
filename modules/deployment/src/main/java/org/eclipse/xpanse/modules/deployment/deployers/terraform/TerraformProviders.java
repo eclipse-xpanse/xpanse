@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Flexi
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Huawei;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Openstack;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
 
 /**
  * Terraform providers.
@@ -49,6 +50,6 @@ public enum TerraformProviders {
             }
         }
 
-        throw new RuntimeException("Cannot find provider " + csp + ".");
+        throw new TerraformProviderNotFoundException("Cannot find provider " + csp + ".");
     }
 }

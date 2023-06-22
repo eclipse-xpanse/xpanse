@@ -20,10 +20,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiUtil;
+import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.credential.exceptions.NoCredentialDefinitionAvailable;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -52,7 +54,7 @@ public class CredentialOpenApiGenerator implements ApplicationRunner {
     public CredentialOpenApiGenerator(PluginManager pluginManager,
                                       OpenApiUtil openApiUtil,
                                       @Value("${app.version:1.0.0}")
-                    String appVersion) {
+                                      String appVersion) {
         this.pluginManager = pluginManager;
         this.openApiUtil = openApiUtil;
         this.appVersion = appVersion;
@@ -155,7 +157,8 @@ public class CredentialOpenApiGenerator implements ApplicationRunner {
             }
         } catch (IOException | InterruptedException ex) {
             log.error("credentialApi html file:{} creation failed.", htmlFile.getName(), ex);
-            throw new RuntimeException("credentialApi html file creation failed.", ex);
+            throw new OpenApiFileGenerationException(
+                    "credentialApi html file creation failed: " + ex.getMessage());
         } finally {
             // Delete the json file named ${Csp}_credentialApi.yaml
             if (jsonFile.exists()) {
@@ -196,7 +199,7 @@ public class CredentialOpenApiGenerator implements ApplicationRunner {
                         "Not found credential definition with type %s of the cloud service "
                                 + "provider %s", type.toValue(), csp.toValue());
                 log.error(errorMsg);
-                throw new RuntimeException(errorMsg);
+                throw new NoCredentialDefinitionAvailable(errorMsg);
             }
         }
         if (openApiUtil.getOpenapiPath().endsWith("/")) {

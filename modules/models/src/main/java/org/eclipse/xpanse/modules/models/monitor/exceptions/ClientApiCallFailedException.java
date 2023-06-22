@@ -11,7 +11,7 @@ package org.eclipse.xpanse.modules.models.monitor.exceptions;
 public class ClientApiCallFailedException extends RuntimeException {
 
     public ClientApiCallFailedException(String message) {
-        super("Client Called API Exception:" + message);
+        super(message);
     }
 }
 

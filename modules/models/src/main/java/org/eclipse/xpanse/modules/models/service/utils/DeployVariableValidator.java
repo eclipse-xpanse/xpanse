@@ -144,7 +144,7 @@ public class DeployVariableValidator {
      * @return Map of validators.
      */
     public Map<VariableValidator, String> getValidatorMap(String variableName, String validatorStr,
-            DeployVariableDataType type) {
+                                                          DeployVariableDataType type) {
         Map<VariableValidator, String> validatorMap = new HashMap<>();
         if (StringUtils.isNotBlank(validatorStr)) {
             String[] validStrArray = StringUtils.split(validatorStr, "|");
@@ -202,7 +202,7 @@ public class DeployVariableValidator {
      * @return isValid
      */
     public boolean isVariableValid(List<DeployVariable> deployVariables,
-            Map<String, String> deployProperty) {
+                                   Map<String, String> deployProperty) {
 
         if (!CollectionUtils.isEmpty(deployVariables) && Objects.nonNull(deployProperty)) {
             // check required keys
@@ -245,7 +245,7 @@ public class DeployVariableValidator {
     }
 
     private void validVariable(String userPutValue, String userKey, VariableValidator validator,
-            String validatorValue) {
+                               String validatorValue) {
         boolean isValid = true;
         String errorMsg = String.format("Key %s with value %s in is valid. Validator [%s: %s]",
                 userKey, userPutValue, validator.toValue(), validatorValue);

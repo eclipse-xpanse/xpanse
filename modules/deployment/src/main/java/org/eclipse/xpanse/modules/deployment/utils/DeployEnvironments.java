@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
@@ -70,17 +71,12 @@ public class DeployEnvironments {
      * @param task the DeployTask.
      */
     public Map<String, String> getFlavorVariables(DeployTask task) {
-        Map<String, String> variables = new HashMap<>();
         for (Flavor flavor : task.getOcl().getFlavors()) {
             if (flavor.getName().equals(task.getCreateRequest().getFlavor())) {
-                for (Map.Entry<String, String> entry : flavor.getProperties().entrySet()) {
-                    variables.put(entry.getKey(), entry.getValue());
-                }
-                return variables;
+                return flavor.getProperties();
             }
         }
-
-        throw new RuntimeException("Can not get an available flavor.");
+        throw new FlavorInvalidException("Can not get an available flavor.");
     }
 
     /**

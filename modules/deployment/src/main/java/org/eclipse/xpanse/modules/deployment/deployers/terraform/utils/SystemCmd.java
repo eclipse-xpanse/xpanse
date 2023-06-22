@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.slf4j.MDC;
 
 /**
@@ -87,7 +88,7 @@ public class SystemCmd {
             Thread.currentThread().interrupt();
             systemCmdResult.setCommandSuccessful(false);
         } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new TerraformExecutorException(e.getMessage());
         }
         return systemCmdResult;
     }

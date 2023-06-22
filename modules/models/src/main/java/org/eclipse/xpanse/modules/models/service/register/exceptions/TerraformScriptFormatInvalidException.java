@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TerraformScriptFormatInvalidException extends RuntimeException {
-    private List<String> errorReasons;
+    private final List<String> errorReasons;
 
     public TerraformScriptFormatInvalidException(List<String> errorReasons) {
         this.errorReasons = errorReasons;

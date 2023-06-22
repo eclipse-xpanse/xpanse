@@ -24,7 +24,7 @@ public class Aws implements Provider {
                 }
               }
             }
-            
+                        
             provider "aws" {
               region = "%s"
             }

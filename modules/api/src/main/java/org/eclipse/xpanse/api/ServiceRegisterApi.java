@@ -273,8 +273,8 @@ public class ServiceRegisterApi {
     }
 
     private RegisteredServiceQuery getServicesQueryModel(Category category, String cspName,
-            String serviceName,
-            String serviceVersion) {
+                                                         String serviceName,
+                                                         String serviceVersion) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         if (StringUtils.isNotBlank(cspName)) {
             query.setCsp(Csp.getByValue(cspName));

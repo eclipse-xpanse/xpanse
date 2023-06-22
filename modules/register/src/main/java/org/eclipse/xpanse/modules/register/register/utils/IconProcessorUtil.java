@@ -15,6 +15,7 @@ import java.net.URLConnection;
 import java.util.Base64;
 import javax.imageio.ImageIO;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.IconProcessingFailedException;
 
 /**
  * IconProcessorUtil.
@@ -46,7 +47,7 @@ public class IconProcessorUtil {
                 InputStream inputStream = connection.getInputStream();
                 BufferedImage image = ImageIO.read(inputStream);
                 if (image == null) {
-                    throw new IllegalArgumentException("URL is not an image link.");
+                    throw new IconProcessingFailedException("URL is not an image link.");
                 }
                 int width = image.getWidth();
                 int height = image.getHeight();
@@ -57,12 +58,12 @@ public class IconProcessorUtil {
                     return "data:image/png;base64," + Base64.getEncoder().withoutPadding()
                             .encodeToString(out.toByteArray());
                 } else {
-                    throw new IllegalArgumentException(String.format(
+                    throw new IconProcessingFailedException(String.format(
                             "The icon does not exceed %sx%spx, and the size does not exceed %skb",
                             MAX_WIDTH, MAX_HEIGHT, MAX_SIZE));
                 }
             } catch (IOException e) {
-                throw new IllegalArgumentException(
+                throw new IconProcessingFailedException(
                         "Icon parameter URL format is not supported or invalid.");
             }
         }

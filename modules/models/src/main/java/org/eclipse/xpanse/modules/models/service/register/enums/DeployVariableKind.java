@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Deploy variable kinds.
- * */
+ */
 @Schema(enumAsRef = true, description = """
         - `fix_env`: Values for variable of this type are defined by the managed service provider\s
         in the OCL template. Runtime will inject it to deployer as environment variables.\s
