@@ -79,7 +79,7 @@ public class CredentialOpenApiGenerator implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        Map<Csp, OrchestratorPlugin> cspOrchestratorPluginMap = pluginManager.getPlugins();
+        Map<Csp, OrchestratorPlugin> cspOrchestratorPluginMap = pluginManager.getPluginsMap();
         for (Csp csp : cspOrchestratorPluginMap.keySet()) {
             OrchestratorPlugin orchestratorPlugin = cspOrchestratorPluginMap.get(csp);
             List<AbstractCredentialInfo> credentialDefinitions =

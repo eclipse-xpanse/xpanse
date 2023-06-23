@@ -21,6 +21,8 @@ import org.openstack4j.core.transport.Config;
 import org.openstack4j.core.transport.ProxyHost;
 import org.openstack4j.model.common.Identifier;
 import org.openstack4j.openstack.OSFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +30,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class KeystoneManager {
+
+    private final Environment environment;
+
+    @Autowired
+    public KeystoneManager(Environment environment) {
+        this.environment = environment;
+    }
 
     /**
      * Authenticates and sets the authentication details in the thread context which can be
@@ -39,11 +48,7 @@ public class KeystoneManager {
         String userName = null;
         String password = null;
         String tenant = null;
-        String url = null;
         String domain = null;
-        String serviceTenant = null;
-        String proxyHost = null;
-        String proxyPort = null;
         if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
             List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
             for (CredentialVariable credentialVariable : variables) {
@@ -55,34 +60,18 @@ public class KeystoneManager {
                         credentialVariable.getName())) {
                     password = credentialVariable.getValue();
                 }
-                if (OpenstackEnvironmentConstants.TENANT.equals(
+                if (OpenstackEnvironmentConstants.PROJECT.equals(
                         credentialVariable.getName())) {
                     tenant = credentialVariable.getValue();
-                }
-                if (OpenstackEnvironmentConstants.AUTH_URL.equals(
-                        credentialVariable.getName())) {
-                    url = credentialVariable.getValue();
                 }
                 if (OpenstackEnvironmentConstants.DOMAIN.equals(
                         credentialVariable.getName())) {
                     domain = credentialVariable.getValue();
                 }
-                if (OpenstackEnvironmentConstants.PROXY_HOST.equals(
-                        credentialVariable.getName())) {
-                    proxyHost = credentialVariable.getValue();
-                }
-                if (OpenstackEnvironmentConstants.PROXY_PORT.equals(
-                        credentialVariable.getName())) {
-                    proxyPort = credentialVariable.getValue();
-                }
-                if (OpenstackEnvironmentConstants.SERVICE_TENANT.equals(
-                        credentialVariable.getName())) {
-                    serviceTenant = credentialVariable.getValue();
-                }
             }
         }
         if (Objects.isNull(userName) || Objects.isNull(password) || Objects.isNull(tenant)
-                || Objects.isNull(url) || Objects.isNull(domain)) {
+                || Objects.isNull(domain)) {
             throw new CredentialsNotFoundException(
                     "Values for all openstack credential"
                             + " variables to connect to Openstack API is not found");
@@ -90,6 +79,11 @@ public class KeystoneManager {
         OSFactory.enableHttpLoggingFilter(true);
         // there is no need to return the authenticated client because the below method already sets
         // the authentication details in the thread context.
+        String url = this.environment.getRequiredProperty(OpenstackEnvironmentConstants.AUTH_URL);
+        String serviceTenant =
+                this.environment.getProperty(OpenstackEnvironmentConstants.SERVICE_PROJECT);
+        String proxyHost = this.environment.getProperty(OpenstackEnvironmentConstants.PROXY_HOST);
+        String proxyPort = this.environment.getProperty(OpenstackEnvironmentConstants.PROXY_PORT);
         OSFactory
                 .builderV3()
                 .withConfig(buildClientConfig(url, proxyHost, proxyPort))

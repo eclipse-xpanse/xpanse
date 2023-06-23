@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.plugins.flexibleengine;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -46,6 +47,11 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public Csp getCsp() {
         return Csp.FLEXIBLE_ENGINE;
+    }
+
+    @Override
+    public List<String> requiredProperties() {
+        return Collections.emptyList();
     }
 
     @Override

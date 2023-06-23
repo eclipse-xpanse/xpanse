@@ -304,7 +304,7 @@ public class DeployService {
     private void fillHandler(DeployTask deployTask) {
         // Find the deployment plugin and resource handler
         OrchestratorPlugin plugin =
-                pluginManager.getPlugins().get(deployTask.getCreateRequest().getCsp());
+                pluginManager.getPluginsMap().get(deployTask.getCreateRequest().getCsp());
         if (Objects.isNull(plugin) || Objects.isNull(plugin.getResourceHandler())) {
             throw new RuntimeException("Can't find suitable plugin and resource handler for the "
                     + "Task.");

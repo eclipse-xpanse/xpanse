@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.orchestrator;
 
+import java.util.List;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.credential.AuthenticationCapabilities;
 import org.eclipse.xpanse.modules.orchestrator.deployment.ServiceResourceHandler;
@@ -22,4 +23,6 @@ public interface OrchestratorPlugin
      * get the Csp of the plugin.
      */
     Csp getCsp();
+
+    List<String> requiredProperties();
 }

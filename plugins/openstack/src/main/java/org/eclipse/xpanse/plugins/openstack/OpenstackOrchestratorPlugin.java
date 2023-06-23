@@ -58,6 +58,11 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    public List<String> requiredProperties() {
+        return List.of(OpenstackEnvironmentConstants.AUTH_URL);
+    }
+
+    @Override
     public List<CredentialType> getAvailableCredentialTypes() {
         List<CredentialType> credentialTypes = new ArrayList<>();
         credentialTypes.add(CredentialType.VARIABLES);
@@ -68,38 +73,17 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.AUTH_URL,
-                        "The Identity authentication URL.", false));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.TENANT,
-                        "The Name of the Tenant or Project to use.", false));
+                new CredentialVariable(OpenstackEnvironmentConstants.PROJECT,
+                        "The Name of the Tenant or Project to use.", true, false));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.USERNAME,
-                        "The Username to login with.", false));
+                        "The Username to login with.", true, false));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.PASSWORD,
-                        "The Password to login with.", true));
+                        "The Password to login with.", true, true));
         credentialVariables.add(
                 new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN,
-                        "The domain of the openstack installation to be used.", true));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.PROXY_HOST,
-                        "Proxy host with protocol and without port through which to "
-                                + "reach the Openstack URL. E.g., http://example.com",
-                        false,
-                        false));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.PROXY_PORT,
-                        "Proxy port through which to reach the Openstack URL.",
-                        false,
-                        false));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.SERVICE_TENANT,
-                        "Tenant that must be used for accessing services data. "
-                                + "If not provided, the OS_TENANT_NAME will be used to access "
-                                + "services data.",
-                        false,
-                        false));
+                        "The domain of the openstack installation to be used.", true, false));
         CredentialVariables httpAuth = new CredentialVariables(
                 getCsp(), null, "Variables",
                 "Authenticate at the specified URL using an account and password.",
