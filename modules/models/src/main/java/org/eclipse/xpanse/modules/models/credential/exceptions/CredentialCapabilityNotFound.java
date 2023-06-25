@@ -13,6 +13,6 @@ package org.eclipse.xpanse.modules.models.credential.exceptions;
 public class CredentialCapabilityNotFound extends RuntimeException {
 
     public CredentialCapabilityNotFound(String message) {
-        super("Credentials not found Exception:" + message);
+        super(message);
     }
 }

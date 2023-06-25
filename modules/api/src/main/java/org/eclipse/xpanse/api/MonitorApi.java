@@ -41,7 +41,7 @@ public class MonitorApi {
     public MonitorApi(Monitor monitor) {
         this.monitor = monitor;
     }
-    
+
     /**
      * Get Monitor Metric.
      *

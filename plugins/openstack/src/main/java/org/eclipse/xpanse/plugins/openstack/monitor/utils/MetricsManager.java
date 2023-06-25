@@ -170,11 +170,6 @@ public class MetricsManager {
 
     private Metric getNetworkUsage(ResourceMetricRequest resourceMetricRequest, String metricId,
                                    MonitorResourceType monitorResourceType) {
-        if (monitorResourceType != MonitorResourceType.VM_NETWORK_INCOMING
-                && monitorResourceType != MonitorResourceType.VM_NETWORK_OUTGOING) {
-            throw new IllegalArgumentException(MonitorResourceType.CPU.toValue()
-                    + "is not a valid resource type for this method");
-        }
         AggregationRequest aggregationRequest = this.gnocchiToXpanseModelConverter
                 .buildAggregationRequestToGetNetworkRate(
                         metricId);

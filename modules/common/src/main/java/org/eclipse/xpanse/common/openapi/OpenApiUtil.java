@@ -18,6 +18,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,8 +42,8 @@ public class OpenApiUtil {
      */
     @Autowired
     public OpenApiUtil(@Value("${openapi.download-generator-client-url:https://repo1.maven.org/"
-                               + "maven2/org/openapitools/openapi-generator-cli/6.5.0/"
-                               + "openapi-generator-cli.6.5.0.jar}")
+            + "maven2/org/openapitools/openapi-generator-cli/6.5.0/"
+            + "openapi-generator-cli.6.5.0.jar}")
                        String clientDownLoadUrl,
                        @Value("${openapi.path:openapi/}") String openapiPath,
                        @Value("${server.port:8080}") Integer port) {
@@ -94,7 +95,7 @@ public class OpenApiUtil {
     public boolean downloadClientJar(String workdir) throws IOException {
         File workDir = new File(workdir);
         if (!workDir.exists() && !workDir.mkdirs()) {
-            throw new RuntimeException("Download client jar failed.");
+            throw new OpenApiFileGenerationException("Download client jar failed.");
         }
         String execJarName = "openapi-generator-cli.jar";
         File execJarFile = new File(workdir, execJarName);

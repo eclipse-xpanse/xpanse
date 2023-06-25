@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -105,7 +106,7 @@ public class KeystoneManager {
         try {
             return InetAddress.getByName(new URL(url).getHost()).getHostAddress();
         } catch (UnknownHostException | MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new XpanseUnhandledException(e.getMessage());
         }
     }
 

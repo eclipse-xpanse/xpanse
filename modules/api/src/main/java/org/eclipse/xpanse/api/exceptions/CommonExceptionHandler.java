@@ -6,17 +6,14 @@
 
 package org.eclipse.xpanse.api.exceptions;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.service.register.exceptions.TerraformScriptFormatInvalidException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindingResult;
@@ -52,19 +49,6 @@ public class CommonExceptionHandler {
     }
 
     /**
-     * Exception handler for ConstraintViolationException.
-     */
-    @ExceptionHandler({ConstraintViolationException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public Response handleConstraintViolationException(ConstraintViolationException ex) {
-        log.error("handleConstraintViolationException: ", ex);
-        String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS,
-                Collections.singletonList(failMessage));
-    }
-
-    /**
      * Exception handler for RuntimeException.
      */
     @ExceptionHandler({RuntimeException.class})
@@ -83,18 +67,6 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Response handleHttpMessageConversionException(HttpMessageConversionException ex) {
         log.error("handleHttpMessageConversionException: ", ex);
-        String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS,
-                Collections.singletonList(failMessage));
-    }
-
-    /**
-     * Exception handler for EntityNotFoundException.
-     */
-    @ExceptionHandler({EntityNotFoundException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Response handleNotFoundException(EntityNotFoundException ex) {
-        log.error("handleNotFoundException: ", ex);
         String failMessage = ex.getMessage();
         return Response.errorResponse(ResultType.BAD_PARAMETERS,
                 Collections.singletonList(failMessage));
@@ -125,17 +97,6 @@ public class CommonExceptionHandler {
     }
 
     /**
-     * Exception handler for IllegalArgumentException.
-     */
-    @ExceptionHandler({TerraformScriptFormatInvalidException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public Response handleTerraformScriptFormatInvalidException(
-            TerraformScriptFormatInvalidException ex) {
-        return Response.errorResponse(ResultType.TERRAFORM_SCRIPT_INVALID, ex.getErrorReasons());
-    }
-
-    /**
      * Exception handler for ResponseInvalidException.
      */
     @ExceptionHandler({ResponseInvalidException.class})
@@ -149,11 +110,13 @@ public class CommonExceptionHandler {
     /**
      * Exception handler for ResponseInvalidException.
      */
-    @ExceptionHandler({ClientApiCallFailedException.class})
-    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ExceptionHandler({XpanseUnhandledException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public Response handleClientApiCalledException(
-            ResponseInvalidException ex) {
-        return Response.errorResponse(ResultType.BACKEND_FAILURE, ex.getErrorReasons());
+    public Response handleXpanseUnhandledException(
+            XpanseUnhandledException ex) {
+        return Response.errorResponse(ResultType.UNHANDLED_EXCEPTION,
+                Collections.singletonList(ex.getMessage()));
     }
+
 }

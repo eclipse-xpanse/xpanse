@@ -16,6 +16,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 
 /**
@@ -23,6 +25,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
  */
 @Valid
 @Data
+@Slf4j
 public class Ocl {
 
     private static ObjectMapper theMapper = new ObjectMapper();
@@ -100,8 +103,9 @@ public class Ocl {
             theMapper.writeValue(out, this);
             return theMapper.readValue(new StringReader(out.toString()), Ocl.class);
         } catch (IOException ex) {
+            log.error("Deep copy failed", ex);
             // Should not happen , since we don't actually touch any real I/O device
-            throw new IllegalStateException("Deep copy failed", ex);
+            throw new XpanseUnhandledException("Deep copy failed: " + ex.getMessage());
 
         }
     }

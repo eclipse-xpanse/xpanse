@@ -25,10 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
+import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -59,7 +61,7 @@ public class RegisteredServicesOpenApiGenerator {
      */
     public String getOpenApi(RegisterServiceEntity registerServiceEntity) {
         if (Objects.isNull(registerServiceEntity)) {
-            throw new IllegalArgumentException("Registered service is null.");
+            throw new ServiceNotRegisteredException("Registered service is null.");
         }
         String id = registerServiceEntity.getId().toString();
         File apiFile = new File(this.openApiUtil.getOpenApiWorkdir(), id + ".html");
@@ -165,7 +167,8 @@ public class RegisteredServicesOpenApiGenerator {
             return StringUtils.EMPTY;
         } catch (IOException | InterruptedException | RuntimeException ex) {
             log.error("Create service openApi html file error:", ex);
-            throw new RuntimeException("Create service openApi html file error.", ex);
+            throw new OpenApiFileGenerationException(
+                    "Create service openApi html file error: " + ex.getMessage());
         } finally {
             // Delete the temp file named serviceId.yaml
             if (yamlFile.exists()) {

@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.monitor;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -19,8 +18,11 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
@@ -71,7 +73,7 @@ public class Monitor {
                 .filter(deployResource -> DeployResourceKind.VM.equals(deployResource.getKind()))
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(vmResources)) {
-            throw new EntityNotFoundException("No resource found in the service.");
+            throw new ResourceNotFoundException("No resource found in the service.");
         }
 
         OrchestratorPlugin orchestratorPlugin =
@@ -98,14 +100,14 @@ public class Monitor {
         DeployResourceEntity resourceEntity =
                 deployResourceStorage.findDeployResourceByResourceId(id);
         if (Objects.isNull(resourceEntity)) {
-            throw new EntityNotFoundException("Resource not found.");
+            throw new ResourceNotFoundException("Resource not found.");
         }
 
         if (!DeployResourceKind.VM.equals(resourceEntity.getKind())) {
             String errorMsg =
                     String.format("Resource kind %s not support.", resourceEntity.getKind());
             log.error(errorMsg);
-            throw new RuntimeException(errorMsg);
+            throw new ResourceNotSupportedForMonitoringException(errorMsg);
         }
         DeployResource deployResource = new DeployResource();
         BeanUtils.copyProperties(resourceEntity, deployResource);
@@ -124,7 +126,7 @@ public class Monitor {
         DeployServiceEntity serviceEntity =
                 deployServiceStorage.findDeployServiceById(id);
         if (Objects.isNull(serviceEntity)) {
-            throw new EntityNotFoundException("Service not found.");
+            throw new ServiceNotDeployedException("Service not found.");
         }
         return serviceEntity;
     }

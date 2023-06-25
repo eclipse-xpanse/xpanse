@@ -148,10 +148,13 @@ public class CredentialCenter {
     public void addCredential(CreateCredential createCredential) {
         checkInputCredentialIsValid(createCredential);
         AbstractCredentialInfo credential;
-        if (createCredential.getType() == CredentialType.VARIABLES) {
+        OrchestratorPlugin orchestratorPlugin =
+                pluginManager.getOrchestratorPlugin(createCredential.getCsp());
+        if (orchestratorPlugin.getAvailableCredentialTypes().contains(createCredential.getType())) {
             credential = new CredentialVariables(createCredential);
+            createCredential(credential);
         } else {
-            throw new IllegalStateException(
+            throw new CredentialCapabilityNotFound(
                     String.format("Not supported credential type Csp:%s, Type: %s.",
                             createCredential.getCsp(), createCredential.getType()));
         }
@@ -169,7 +172,7 @@ public class CredentialCenter {
         if (updateCredential.getType() == CredentialType.VARIABLES) {
             credential = new CredentialVariables(updateCredential);
         } else {
-            throw new IllegalStateException(
+            throw new CredentialCapabilityNotFound(
                     String.format("Not supported credential type Csp:%s, Type: %s.",
                             updateCredential.getCsp(), updateCredential.getType()));
         }
@@ -243,7 +246,7 @@ public class CredentialCenter {
         if (CollectionUtils.isEmpty(credentialAbilities)) {
             throw new CredentialCapabilityNotFound(
                     String.format("Defined credentials with type %s provided by csp %s not found.",
-                            inputCredential.getType(), inputCredential.getType()));
+                            inputCredential.getType(), inputCredential.getCsp()));
         }
         // filter defined credential abilities by name.
         List<AbstractCredentialInfo> sameNameAbilities = credentialAbilities.stream().filter(

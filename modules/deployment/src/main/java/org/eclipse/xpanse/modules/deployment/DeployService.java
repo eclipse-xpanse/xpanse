@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,8 +28,13 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
@@ -120,7 +124,7 @@ public class DeployService {
         serviceEntity.setCategory(deployTask.getCreateRequest().getCategory());
         serviceEntity = registerServiceStorage.findRegisteredService(serviceEntity);
         if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
-            throw new RuntimeException("Registered service not found");
+            throw new ServiceNotRegisteredException("Registered service not found");
         }
         // Check context validation
         if (Objects.nonNull(serviceEntity.getOcl().getDeployment()) && Objects.nonNull(
@@ -194,13 +198,14 @@ public class DeployService {
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
         if (Objects.isNull(deployServiceEntity) || Objects.isNull(
                 deployServiceEntity.getCreateRequest())) {
-            throw new RuntimeException(String.format("Deployed service with id %s not found",
-                    deployTask.getId()));
+            throw new ServiceNotDeployedException(
+                    String.format("Deployed service with id %s not found",
+                            deployTask.getId()));
         }
         // Get state of service.
         ServiceState state = deployServiceEntity.getServiceState();
         if (state.equals(ServiceState.DEPLOYING) || state.equals(ServiceState.DESTROYING)) {
-            throw new RuntimeException(String.format("Service with id %s is %s.",
+            throw new InvalidServiceStateException(String.format("Service with id %s is %s.",
                     deployTask.getId(), state));
         }
         // Set Ocl and CreateRequest
@@ -225,8 +230,9 @@ public class DeployService {
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
         if (Objects.isNull(deployServiceEntity)) {
-            throw new RuntimeException(String.format("Deployed service with id %s not found",
-                    deployTask.getId()));
+            throw new ServiceNotDeployedException(
+                    String.format("Deployed service with id %s not found",
+                            deployTask.getId()));
         }
         try {
             deployServiceEntity.setServiceState(ServiceState.DESTROYING);
@@ -284,7 +290,7 @@ public class DeployService {
         DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
         if (Objects.isNull(deployServiceEntity)
                 || !deployServiceEntity.getUserName().equals(user)) {
-            throw new EntityNotFoundException("Service not found.");
+            throw new ServiceNotDeployedException("Service not found.");
         }
         ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
         BeanUtils.copyProperties(deployServiceEntity, serviceDetailVo);
@@ -306,8 +312,9 @@ public class DeployService {
         OrchestratorPlugin plugin =
                 pluginManager.getPlugins().get(deployTask.getCreateRequest().getCsp());
         if (Objects.isNull(plugin) || Objects.isNull(plugin.getResourceHandler())) {
-            throw new RuntimeException("Can't find suitable plugin and resource handler for the "
-                    + "Task.");
+            throw new PluginNotFoundException(
+                    "Can't find suitable plugin and resource handler for the "
+                            + "Task.");
         }
         deployTask.setDeployResourceHandler(plugin.getResourceHandler());
     }
@@ -321,7 +328,7 @@ public class DeployService {
     public Deployment getDeployment(DeployerKind deployerKind) {
         Deployment deployment = deploymentMap.get(deployerKind);
         if (Objects.isNull(deployment)) {
-            throw new RuntimeException("Can't find suitable deployer for the Task.");
+            throw new DeployerNotFoundException("Can't find suitable deployer for the Task.");
         }
         return deployment;
     }

@@ -25,7 +25,7 @@ public final class ThreadMdcUtil {
      * @return T
      */
     public static <T> Callable<T> wrap(final Callable<T> callable,
-            final Map<String, String> context) {
+                                       final Map<String, String> context) {
         return new Callable<>() {
             @Override
             public T call() throws Exception {

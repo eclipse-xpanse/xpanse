@@ -40,7 +40,7 @@ public class Response {
         Response response = new Response();
         response.success = false;
         response.resultType = resultCode;
-        response.details =  errMsg;
+        response.details = errMsg;
         return response;
     }
 
@@ -54,7 +54,7 @@ public class Response {
         Response response = new Response();
         response.success = true;
         response.resultType = ResultType.SUCCESS;
-        response.details =  successMsg;
+        response.details = successMsg;
         return response;
     }
 

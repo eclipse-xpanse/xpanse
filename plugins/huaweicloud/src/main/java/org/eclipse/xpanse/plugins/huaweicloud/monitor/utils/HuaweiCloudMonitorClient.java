@@ -12,6 +12,7 @@ import com.huaweicloud.sdk.core.auth.BasicCredentials;
 import com.huaweicloud.sdk.core.auth.ICredential;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +31,7 @@ public class HuaweiCloudMonitorClient {
     public ICredential getIcredentialWithAkSk(String accessKey, String securityKey) {
         if (StringUtils.isBlank(accessKey) || StringUtils.isBlank(securityKey)) {
             log.error("Get ICredential error,accessKey:{},securityKey:{}", accessKey, securityKey);
-            throw new IllegalArgumentException("Get ICredential error,AK or SK is empty");
+            throw new CredentialsNotFoundException("Get ICredential error,AK or SK is empty");
         }
         return new BasicCredentials()
                 .withAk(accessKey).withSk(securityKey);
