@@ -130,8 +130,12 @@ public class CredentialCenter {
         if (StringUtils.isBlank(xpanseUser)) {
             return Collections.emptyList();
         }
-        List<AbstractCredentialInfo> abstractCredentialInfos = joinCredentialsFromAllSources(
+        List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
+        AbstractCredentialInfo abstractCredentialInfo = credentialsStore.getCredential(
                 csp, requestedCredentialType, xpanseUser);
+        if (Objects.nonNull(abstractCredentialInfo)) {
+            abstractCredentialInfos.add(abstractCredentialInfo);
+        }
         maskSensitiveValues(abstractCredentialInfos);
         return abstractCredentialInfos;
     }
@@ -196,10 +200,12 @@ public class CredentialCenter {
     }
 
     /**
-     * Get credential for the @Csp with @xpanseUser.
+     * Get credential for the @Csp with @xpanseUser. This method is used only within Xpanse
+     * application. This method joins credential variables from all sources.
      *
      * @param csp        The cloud service provider.
      * @param xpanseUser The user who provided the credential info.
+     * @param credentialType Type of the credential
      */
     public AbstractCredentialInfo getCredential(Csp csp,
                                                 String xpanseUser,
