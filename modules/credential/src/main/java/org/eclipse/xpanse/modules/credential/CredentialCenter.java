@@ -110,8 +110,13 @@ public class CredentialCenter {
         }
         List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
         for (Csp csp : pluginManager.getPluginsMap().keySet()) {
-            List<AbstractCredentialInfo> credentials = getCredentials(csp, xpanseUser, null);
-            abstractCredentialInfos.addAll(credentials);
+            pluginManager.getOrchestratorPlugin(csp).getCredentialDefinitions().forEach(
+                    credentialInfo -> {
+                        List<AbstractCredentialInfo> credentials =
+                                getCredentials(csp, xpanseUser, credentialInfo.getType());
+                        abstractCredentialInfos.addAll(credentials);
+                    }
+            );
         }
         return abstractCredentialInfos;
     }
@@ -131,10 +136,22 @@ public class CredentialCenter {
             return Collections.emptyList();
         }
         List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
-        AbstractCredentialInfo abstractCredentialInfo = credentialsStore.getCredential(
-                csp, requestedCredentialType, xpanseUser);
-        if (Objects.nonNull(abstractCredentialInfo)) {
-            abstractCredentialInfos.add(abstractCredentialInfo);
+        if (Objects.nonNull(requestedCredentialType)) {
+            AbstractCredentialInfo abstractCredentialInfo = credentialsStore.getCredential(
+                    csp, requestedCredentialType, xpanseUser);
+            if (Objects.nonNull(abstractCredentialInfo)) {
+                abstractCredentialInfos.add(abstractCredentialInfo);
+            }
+        } else {
+            pluginManager.getOrchestratorPlugin(csp).getCredentialDefinitions().forEach(
+                    credentialInfo -> {
+                        AbstractCredentialInfo abstractCredentialInfo =
+                                credentialsStore.getCredential(
+                                        csp, credentialInfo.getType(), xpanseUser);
+                        if (Objects.nonNull(abstractCredentialInfo)) {
+                            abstractCredentialInfos.add(abstractCredentialInfo);
+                        }
+                    });
         }
         maskSensitiveValues(abstractCredentialInfos);
         return abstractCredentialInfos;
@@ -206,8 +223,8 @@ public class CredentialCenter {
      * Get credential for the @Csp with @xpanseUser. This method is used only within Xpanse
      * application. This method joins credential variables from all sources.
      *
-     * @param csp        The cloud service provider.
-     * @param xpanseUser The user who provided the credential info.
+     * @param csp            The cloud service provider.
+     * @param xpanseUser     The user who provided the credential info.
      * @param credentialType Type of the credential
      */
     public AbstractCredentialInfo getCredential(Csp csp,
