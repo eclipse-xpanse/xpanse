@@ -83,16 +83,19 @@ public class SystemCmd {
             log.debug("stderr of the command: " + systemCmdResult.getCommandStdError());
         } catch (final IOException ex) {
             systemCmdResult.setCommandSuccessful(false);
+            systemCmdResult.setCommandStdError(ex.getMessage());
         } catch (final InterruptedException ex) {
             log.error("SystemCmd process be interrupted.");
             Thread.currentThread().interrupt();
             systemCmdResult.setCommandSuccessful(false);
+            systemCmdResult.setCommandStdError(ex.getMessage());
         } catch (ExecutionException e) {
+            systemCmdResult.setCommandSuccessful(false);
+            systemCmdResult.setCommandStdError(e.getMessage());
             throw new TerraformExecutorException(e.getMessage());
         }
         return systemCmdResult;
     }
-
 
     private String readStream(BufferedReader bufferedReader, Map<String, String> contextMap) {
         //copying MDC context of the main deployment thread to the stream reader thread.
@@ -135,8 +138,11 @@ public class SystemCmd {
         Future<String> stdErrFuture =
                 threadToReadStdErr.submit(() -> readStream(stdErrorReader, contextMap));
 
+        int count = 0;
         while (!stdOutFuture.isDone() || !stdErrFuture.isDone()) {
-            log.debug("Command output and error streams are still being read.");
+            if (count++ < 10 || count % 100000 == 0) {
+                log.debug("Command output and error streams are still being read.");
+            }
         }
 
         systemCmdResult.setCommandStdError(stdErrFuture.get());
@@ -144,6 +150,5 @@ public class SystemCmd {
         threadToReadStdout.shutdown();
         threadToReadStdErr.shutdown();
     }
-
 
 }
