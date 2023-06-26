@@ -1,0 +1,30 @@
+{
+  "datapoints": [
+    {
+      "average": 0.14,
+      "timestamp": 1687336740000,
+      "unit": "%"
+    },
+    {
+      "average": 0.52,
+      "timestamp": 1687336800000,
+      "unit": "%"
+    },
+    {
+      "average": 0.15,
+      "timestamp": 1687336860000,
+      "unit": "%"
+    },
+    {
+      "average": 0.08,
+      "timestamp": 1687336920000,
+      "unit": "%"
+    },
+    {
+      "average": 0.08,
+      "timestamp": 1687336980000,
+      "unit": "%"
+    }
+  ],
+  "metric_name": "cpu_usage"
+}

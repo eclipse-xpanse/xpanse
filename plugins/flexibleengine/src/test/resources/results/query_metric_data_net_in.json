@@ -1,0 +1,30 @@
+{
+  "datapoints": [
+    {
+      "average": 3800.0,
+      "timestamp": 1687336740000,
+      "unit": "bit/s"
+    },
+    {
+      "average": 2510.0,
+      "timestamp": 1687336800000,
+      "unit": "bit/s"
+    },
+    {
+      "average": 2446.53,
+      "timestamp": 1687336860000,
+      "unit": "bit/s"
+    },
+    {
+      "average": 2416.67,
+      "timestamp": 1687336920000,
+      "unit": "bit/s"
+    },
+    {
+      "average": 2441.33,
+      "timestamp": 1687336980000,
+      "unit": "bit/s"
+    }
+  ],
+  "metric_name": "net_bitRecv"
+}

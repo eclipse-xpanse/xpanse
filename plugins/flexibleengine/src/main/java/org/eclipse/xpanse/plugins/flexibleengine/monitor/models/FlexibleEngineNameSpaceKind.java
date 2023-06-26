@@ -38,7 +38,7 @@ public enum FlexibleEngineNameSpaceKind {
     @JsonCreator
     public FlexibleEngineNameSpaceKind getByValue(String nameSpace) {
         for (FlexibleEngineNameSpaceKind flexibleEngineNameSpaceKind : values()) {
-            if (flexibleEngineNameSpaceKind.nameSpace.equals(StringUtils.lowerCase(nameSpace))) {
+            if (StringUtils.equalsIgnoreCase(flexibleEngineNameSpaceKind.nameSpace, nameSpace)) {
                 return flexibleEngineNameSpaceKind;
             }
         }

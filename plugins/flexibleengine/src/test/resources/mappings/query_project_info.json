@@ -1,0 +1,35 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/v3/projects(.*)"
+      },
+      "response": {
+        "transformers": [
+          "response-template"
+        ],
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "SDK-HMAC-SHA256 Access=QU6EIIXEBIUFLW3QZTSY, SignedHeaders=content-type;host;x-sdk-date, Signature=3821f47510dffa190cab2775d258c72ce0163c00411a209a7258e6cc1c305c34",
+          "Host": "127.0.0.1:9090",
+          "X-Sdk-Date": "20230621T082359Z"
+        },
+        "status": 200,
+        "jsonBody": {
+          "projects": [
+            {
+              "description": "",
+              "domain_id": "624425dc6e84486ea7869be887496784",
+              "enabled": true,
+              "id": "cddffdf04cf441c8b94aac85dfdc2a69",
+              "is_domain": false,
+              "name": "eu-west-0",
+              "parent_id": "624425dc6e84486ea7869be887496784"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
