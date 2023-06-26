@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.plugins.flexibleengine.monitor.constant;
 
 /**
- * Huawei Monitor Constant.
+ * FlexibleEngine Constants.
  */
 public class FlexibleEngineMonitorConstants {
 

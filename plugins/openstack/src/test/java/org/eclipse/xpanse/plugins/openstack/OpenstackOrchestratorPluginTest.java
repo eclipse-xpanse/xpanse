@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class OpenstackOrchestratorPluginTest {
 
     private final OpenstackOrchestratorPlugin plugin = new OpenstackOrchestratorPlugin(
-            new MetricsManager(new KeystoneManager(), new ResourcesService(),
+            new MetricsManager(new KeystoneManager(null), new ResourcesService(),
                     new GnocchiToXpanseModelConverter(),
                     new AggregationService(new MetricsQueryBuilder()),
                     new MeasuresService(new MetricsQueryBuilder()), null,
@@ -72,12 +72,12 @@ class OpenstackOrchestratorPluginTest {
         assertEquals(CredentialType.VARIABLES, credentialVariables.getType());
 
         List<CredentialVariable> variables = credentialVariables.getVariables();
-        assertEquals(8, variables.size());
+        assertEquals(4, variables.size());
 
         //Verify the attribute value of the first CredentialVariable
         CredentialVariable authUrlVariable = variables.get(0);
-        assertEquals(OpenstackEnvironmentConstants.AUTH_URL, authUrlVariable.getName());
-        assertEquals("The Identity authentication URL.", authUrlVariable.getDescription());
+        assertEquals(OpenstackEnvironmentConstants.PROJECT, authUrlVariable.getName());
+        assertEquals("The Name of the Tenant or Project to use.", authUrlVariable.getDescription());
         assertTrue(authUrlVariable.getIsMandatory());
         assertFalse(authUrlVariable.getIsSensitive());
     }

@@ -59,7 +59,7 @@ class CredentialSearchTests {
     @Test
     void testCredentialsNotFoundExceptionIsThrownWhenNoVariableIsFound() {
         when(credentialsStore.getCredential(any(), any(), any())).thenReturn(null);
-        when(pluginManager.getOrchestratorPlugin(Csp.OPENSTACK)).thenReturn(new PluginTest());
+        when(pluginManager.getOrchestratorPlugin(Csp.OPENSTACK)).thenReturn(new DummyPluginImpl());
         Assertions.assertThrows(CredentialsNotFoundException.class,
                 () -> this.credentialCenter.getCredential(Csp.OPENSTACK, "user",
                         CredentialType.VARIABLES));

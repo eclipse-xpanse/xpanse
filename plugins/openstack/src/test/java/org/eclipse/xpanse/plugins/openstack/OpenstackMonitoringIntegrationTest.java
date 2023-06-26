@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import java.time.Instant;
 import java.util.List;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
@@ -37,7 +36,9 @@ import org.eclipse.xpanse.plugins.openstack.monitor.utils.MetricsManager;
 import org.instancio.Instancio;
 import org.instancio.Select;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         KeystoneManager.class, ResourcesService.class, GnocchiToXpanseModelConverter.class,
         AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class,
         CredentialCenter.class, MonitorMetricStore.class})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpenstackMonitoringIntegrationTest {
 
     @RegisterExtension
@@ -58,6 +60,12 @@ class OpenstackMonitoringIntegrationTest {
                     .dynamicPort()
                     .extensions(new ResponseTemplateTransformer(true)))
             .build();
+
+    @BeforeAll
+    void setEnvVar() {
+        System.setProperty(OpenstackEnvironmentConstants.AUTH_URL,
+                wireMockExtension.getRuntimeInfo().getHttpBaseUrl() + "/identity/v3");
+    }
 
     @Autowired
     OpenstackOrchestratorPlugin plugin;
@@ -80,7 +88,7 @@ class OpenstackMonitoringIntegrationTest {
     @Test
     void testGetMetricsHappyCase() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
-                getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
+                getCredentialDefinition());
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, null, false));
         Assertions.assertFalse(metrics.isEmpty());
@@ -99,7 +107,7 @@ class OpenstackMonitoringIntegrationTest {
     @Test
     void testGetMetricsWithFromAndTo() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
-                getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
+                getCredentialDefinition());
         Long currentTime = Instant.now().getEpochSecond();
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(
@@ -120,7 +128,7 @@ class OpenstackMonitoringIntegrationTest {
     @Test
     void testGetMetricsWithGranularity() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
-                getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
+                getCredentialDefinition());
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, false));
         Assertions.assertFalse(metrics.isEmpty());
@@ -135,7 +143,7 @@ class OpenstackMonitoringIntegrationTest {
     @Test
     void testGetOnlyLastKnownMetric() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
-                getCredentialDefinition(wireMockExtension.getRuntimeInfo()));
+                getCredentialDefinition());
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());
@@ -148,13 +156,10 @@ class OpenstackMonitoringIntegrationTest {
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
     }
 
-    private CredentialVariables getCredentialDefinition(WireMockRuntimeInfo wmRuntimeInfo) {
+    private CredentialVariables getCredentialDefinition() {
         CredentialVariables credentialVariables =
                 (CredentialVariables) this.plugin.getCredentialDefinitions().get(0);
         for (CredentialVariable credentialVariable : credentialVariables.getVariables()) {
-            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.AUTH_URL)) {
-                credentialVariable.setValue(wmRuntimeInfo.getHttpBaseUrl() + "/identity/v3");
-            }
             if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.USERNAME)) {
                 credentialVariable.setValue("admin");
             }
@@ -164,7 +169,7 @@ class OpenstackMonitoringIntegrationTest {
             if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.DOMAIN)) {
                 credentialVariable.setValue("default");
             }
-            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.TENANT)) {
+            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.PROJECT)) {
                 credentialVariable.setValue("service");
             }
         }

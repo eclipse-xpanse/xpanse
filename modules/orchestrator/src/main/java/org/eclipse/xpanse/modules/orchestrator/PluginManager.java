@@ -7,10 +7,14 @@
 package org.eclipse.xpanse.modules.orchestrator;
 
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.springframework.context.ApplicationContext;
@@ -24,21 +28,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class PluginManager {
 
-    private final Map<Csp, OrchestratorPlugin> pluginMap = new ConcurrentHashMap<>();
+    @Getter
+    private final Map<Csp, OrchestratorPlugin> pluginsMap = new ConcurrentHashMap<>();
 
     @Resource
     private ApplicationContext applicationContext;
 
     /**
-     * Get all OrchestratorPlugin group by Csp.
-     *
-     * @return pluginMap
+     * Instantiates plugins map.
      */
     @Bean
-    public Map<Csp, OrchestratorPlugin> getPlugins() {
+    public void loadPlugins() {
         applicationContext.getBeansOfType(OrchestratorPlugin.class)
-                .forEach((key, value) -> pluginMap.put(value.getCsp(), value));
-        return pluginMap;
+                .forEach((key, value) -> {
+                    if (isPluginUsable(value.requiredProperties(), value.getCsp())) {
+                        pluginsMap.put(value.getCsp(), value);
+                    } else {
+                        log.error(String.format(
+                                "Plugin for csp %s is not in usable state. Will not be activated.",
+                                value.getCsp()));
+                    }
+                });
     }
 
 
@@ -49,12 +59,27 @@ public class PluginManager {
      * @return available plugin bean.
      */
     public OrchestratorPlugin getOrchestratorPlugin(Csp csp) {
-        OrchestratorPlugin plugin = pluginMap.get(csp);
+        OrchestratorPlugin plugin = pluginsMap.get(csp);
         if (Objects.isNull(plugin)) {
             throw new PluginNotFoundException(
                     "Can't find suitable plugin for the Csp " + csp.name());
         }
         return plugin;
+    }
+
+    private boolean isPluginUsable(List<String> requiredProperties, Csp csp) {
+        List<String> missingMandatoryProperties = new ArrayList<>();
+        for (String property : requiredProperties) {
+            if (Strings.isBlank(this.applicationContext.getEnvironment().getProperty(property))) {
+                missingMandatoryProperties.add(property);
+            }
+        }
+        if (!missingMandatoryProperties.isEmpty()) {
+            log.error("Missing mandatory configuration properties for Csp " + csp + ": "
+                    + String.join(", ", missingMandatoryProperties));
+            return false;
+        }
+        return true;
     }
 
 }

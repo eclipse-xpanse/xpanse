@@ -109,7 +109,7 @@ public class CredentialCenter {
             return Collections.emptyList();
         }
         List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
-        for (Csp csp : pluginManager.getPlugins().keySet()) {
+        for (Csp csp : pluginManager.getPluginsMap().keySet()) {
             List<AbstractCredentialInfo> credentials = getCredentials(csp, xpanseUser, null);
             abstractCredentialInfos.addAll(credentials);
         }

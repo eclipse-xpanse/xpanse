@@ -62,7 +62,7 @@ Xpanse provides different options to generate and provision OCL:
 * REST API on the xpanse runtime
 * Xpanse UI
 
-## Orchestrator & binding
+## Orchestrator & Binding
 
 OCL descriptor is an abstract description of the final managed service state.
 It's generic enough to work with any cloud service provider.
@@ -76,6 +76,33 @@ actions required to actually deal with the services' lifecycle:
 1. to bind OCL to the concrete cloud provider internal APIs
 2. to generate the graph of actions required to reach the final expected state,
    specifically for a target cloud provider
+
+### Plugin Activation
+
+A plugin for a cloud provider is activated by default. But a plugin might need one or more mandatory configuration
+available for it to work.
+These mandatory configuration properties must be declared when the plugins are implemented.
+If any of the required configuration properties is not available, then such plugin is simply not considered for 
+processing any requests.
+
+#### Openstack
+
+Mandatory configuration properties are the following - 
+
+- `OS_AUTH_URL` - Keystone URL of the Openstack installation.
+
+Other optional config properties
+
+- `OS_SERVICE_PROJECT` - Openstack project to be used to get monitoring information. All metrics data is stored in a
+  different central project. If this is not provided, then the project where the resource is hosted is used to get the 
+  metrics data.
+- `OS_PROXY_HOST` and `OS_PROXY_PORT` - Proxy server information to reach the Openstack installation.
+
+#### HuaweiCloud
+No mandatory configuration properties required.
+
+#### FlexibleEngine
+No mandatory configuration properties required.
 
 ## Runtime
 

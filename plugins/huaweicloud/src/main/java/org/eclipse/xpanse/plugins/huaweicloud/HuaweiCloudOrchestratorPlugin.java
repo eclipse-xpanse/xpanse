@@ -8,6 +8,7 @@ package org.eclipse.xpanse.plugins.huaweicloud;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -45,6 +46,12 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public Csp getCsp() {
         return Csp.HUAWEI;
     }
+
+    @Override
+    public List<String> requiredProperties() {
+        return Collections.emptyList();
+    }
+
 
     @Override
     public List<CredentialType> getAvailableCredentialTypes() {
