@@ -50,6 +50,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>orchestrator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>monitor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.6</version>
@@ -74,7 +84,6 @@
             <artifactId>spring-aspects</artifactId>
             <version>6.0.3</version>
         </dependency>
-
         <!-- test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -97,16 +106,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>orchestrator</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>monitor</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-junit</artifactId>
+            <version>${instancio.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

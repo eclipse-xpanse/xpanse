@@ -1,0 +1,52 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/V1.0/.*/metric-data(.*cpu_.*)"
+      },
+      "response": {
+        "transformers": [
+          "response-template"
+        ],
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "SDK-HMAC-SHA256 Access=QU6EIIXEBIUFLW3QZTSY, SignedHeaders=content-type;host;x-sdk-date, Signature=3821f47510dffa190cab2775d258c72ce0163c00411a209a7258e6cc1c305c34",
+          "Host": "127.0.0.1:9090",
+          "X-Sdk-Date": "20230621T082359Z"
+        },
+        "status": 200,
+        "jsonBody": {
+          "datapoints": [
+            {
+              "average": 0.14,
+              "timestamp": 1687336740000,
+              "unit": "%"
+            },
+            {
+              "average": 0.52,
+              "timestamp": 1687336800000,
+              "unit": "%"
+            },
+            {
+              "average": 0.15,
+              "timestamp": 1687336860000,
+              "unit": "%"
+            },
+            {
+              "average": 0.08,
+              "timestamp": 1687336920000,
+              "unit": "%"
+            },
+            {
+              "average": 0.08,
+              "timestamp": 1687336980000,
+              "unit": "%"
+            }
+          ],
+          "metric_name": "cpu_usage"
+        }
+      }
+    }
+  ]
+}

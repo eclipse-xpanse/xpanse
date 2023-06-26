@@ -10,7 +10,6 @@ import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
 import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.internal.model.KeystoneListProjectsResponse;
-import com.huaweicloud.sdk.core.internal.model.Project;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +31,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -58,16 +56,14 @@ public class RetryTemplateService {
     @Retryable(retryFor = RestClientException.class, maxAttempts = RETRY_TIMES,
             listeners = "restTemplateRetryListener",
             backoff = @Backoff(delay = DELAY_MILLISECONDS, multiplier = DELAY_MULTIPLIER))
-    public Project queryProjectInfo(HttpRequestBase httpRequestBase) {
+    public KeystoneListProjectsResponse queryProjectInfo(HttpRequestBase httpRequestBase) {
         HttpEntity<String> httpEntity =
                 new HttpEntity<>("parameters", getHttpHeaders(httpRequestBase));
         ResponseEntity<KeystoneListProjectsResponse> response =
                 restTemplate.exchange(httpRequestBase.getURI(), HttpMethod.GET, httpEntity,
                         KeystoneListProjectsResponse.class);
         if (Objects.nonNull(response.getBody())) {
-            if (!CollectionUtils.isEmpty(response.getBody().getProjects())) {
-                return response.getBody().getProjects().get(0);
-            }
+            return response.getBody();
         }
         throw new RestClientException("query project info result is null.");
     }
