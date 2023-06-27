@@ -26,8 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
-import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
@@ -36,9 +34,6 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
-import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
-import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudMonitorMetrics;
-import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudNameSpaceKind;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudRetryStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,7 +50,7 @@ public class HuaweiCloudMetricsService {
 
     private final MonitorMetricStore monitorMetricStore;
 
-    private final HuaweiCloudToXpanseDataModelConverter huaweiCloudToXpanseDataModelConverter;
+    private final HuaweiCloudDataModelConverter huaweiCloudDataModelConverter;
 
     private final CredentialCenter credentialCenter;
 
@@ -66,11 +61,11 @@ public class HuaweiCloudMetricsService {
     public HuaweiCloudMetricsService(
             HuaweiCloudMonitorClient huaweiCloudMonitorClient,
             MonitorMetricStore monitorMetricStore,
-            HuaweiCloudToXpanseDataModelConverter huaweiCloudToXpanseDataModelConverter,
+            HuaweiCloudDataModelConverter huaweiCloudDataModelConverter,
             CredentialCenter credentialCenter) {
         this.huaweiCloudMonitorClient = huaweiCloudMonitorClient;
         this.monitorMetricStore = monitorMetricStore;
-        this.huaweiCloudToXpanseDataModelConverter = huaweiCloudToXpanseDataModelConverter;
+        this.huaweiCloudDataModelConverter = huaweiCloudDataModelConverter;
         this.credentialCenter = credentialCenter;
     }
 
@@ -87,7 +82,7 @@ public class HuaweiCloudMetricsService {
                 Csp.HUAWEI, resourceMetricRequest.getXpanseUserName(),
                 CredentialType.VARIABLES);
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
-        ICredential icredential = getIcredential(credential);
+        ICredential icredential = huaweiCloudMonitorClient.getCredentialForClient(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
                 deployResource.getProperties().get("region"));
         Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
@@ -95,7 +90,7 @@ public class HuaweiCloudMetricsService {
         for (Map.Entry<MonitorResourceType, MetricInfoList> entry
                 : targetMetricsMap.entrySet()) {
             ShowMetricDataRequest showMetricDataRequest =
-                    huaweiCloudToXpanseDataModelConverter.buildShowMetricDataRequest(
+                    huaweiCloudDataModelConverter.buildShowMetricDataRequest(
                             resourceMetricRequest, entry.getValue());
             ShowMetricDataResponse showMetricDataResponse =
                     client.showMetricDataInvoker(showMetricDataRequest)
@@ -112,7 +107,7 @@ public class HuaweiCloudMetricsService {
                                             HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS))
                             .invoke();
             Metric metric =
-                    huaweiCloudToXpanseDataModelConverter.convertShowMetricDataResponseToMetric(
+                    huaweiCloudDataModelConverter.convertShowMetricDataResponseToMetric(
                             deployResource, showMetricDataResponse, entry.getValue(),
                             resourceMetricRequest.isOnlyLastKnownMetric());
             doCacheActionForResourceMetrics(resourceMetricRequest, entry.getKey(), metric);
@@ -134,7 +129,7 @@ public class HuaweiCloudMetricsService {
                 Csp.HUAWEI, serviceMetricRequest.getXpanseUserName(),
                 CredentialType.VARIABLES);
         MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
-        ICredential icredential = getIcredential(credential);
+        ICredential icredential = huaweiCloudMonitorClient.getCredentialForClient(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
                 deployResources.get(0).getProperties().get("region"));
         Map<String, List<MetricInfoList>> deployResourceMetricInfoMap = new HashMap<>();
@@ -145,7 +140,7 @@ public class HuaweiCloudMetricsService {
             deployResourceMetricInfoMap.put(deployResource.getResourceId(), targetMetricInfoList);
         }
         BatchListMetricDataRequest batchListMetricDataRequest =
-                huaweiCloudToXpanseDataModelConverter.buildBatchListMetricDataRequest(
+                huaweiCloudDataModelConverter.buildBatchListMetricDataRequest(
                         serviceMetricRequest, deployResourceMetricInfoMap);
         BatchListMetricDataResponse batchListMetricDataResponse =
                 client.batchListMetricDataInvoker(batchListMetricDataRequest)
@@ -161,7 +156,7 @@ public class HuaweiCloudMetricsService {
                                         HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS))
                         .invoke();
         List<Metric> metrics =
-                huaweiCloudToXpanseDataModelConverter.convertBatchListMetricDataResponseToMetric(
+                huaweiCloudDataModelConverter.convertBatchListMetricDataResponseToMetric(
                         batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources,
                         serviceMetricRequest.isOnlyLastKnownMetric());
         doCacheActionForServiceMetrics(serviceMetricRequest, deployResourceMetricInfoMap, metrics);
@@ -197,7 +192,8 @@ public class HuaweiCloudMetricsService {
                 String resourceId = entry.getKey();
                 for (MetricInfoList metricInfo : entry.getValue()) {
                     MonitorResourceType type =
-                            getMonitorResourceTypeByMetricName(metricInfo.getMetricName());
+                            huaweiCloudDataModelConverter.getMonitorResourceTypeByMetricName(
+                                    metricInfo.getMetricName());
                     if (CollectionUtils.isEmpty(metrics)) {
                         Metric metricCache =
                                 monitorMetricStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
@@ -233,7 +229,7 @@ public class HuaweiCloudMetricsService {
             CesClient client) {
         Map<MonitorResourceType, MetricInfoList> targetMetricsMap = new HashMap<>();
         ListMetricsRequest request =
-                huaweiCloudToXpanseDataModelConverter.buildListMetricsRequest(deployResource);
+                huaweiCloudDataModelConverter.buildListMetricsRequest(deployResource);
         ListMetricsResponse listMetricsResponse = client.listMetricsInvoker(request)
                 .retryTimes(HuaweiCloudRetryStrategy.DEFAULT_RETRY_TIMES)
                 .retryCondition((resp, ex) -> Objects.nonNull(ex)
@@ -249,7 +245,9 @@ public class HuaweiCloudMetricsService {
             List<MetricInfoList> metricInfoLists = listMetricsResponse.getMetrics();
             if (Objects.isNull(monitorResourceType)) {
                 for (MonitorResourceType type : MonitorResourceType.values()) {
-                    MetricInfoList targetMetricInfo = getTargetMetricInfo(metricInfoLists, type);
+                    MetricInfoList targetMetricInfo =
+                            huaweiCloudDataModelConverter.getTargetMetricInfo(
+                                    metricInfoLists, type);
                     if (Objects.nonNull(targetMetricInfo)) {
                         targetMetricsMap.put(type, targetMetricInfo);
                     } else {
@@ -261,7 +259,8 @@ public class HuaweiCloudMetricsService {
                 }
             } else {
                 MetricInfoList targetMetricInfo =
-                        getTargetMetricInfo(metricInfoLists, monitorResourceType);
+                        huaweiCloudDataModelConverter.getTargetMetricInfo(metricInfoLists,
+                                monitorResourceType);
                 if (Objects.nonNull(targetMetricInfo)) {
                     targetMetricsMap.put(monitorResourceType, targetMetricInfo);
                 } else {
@@ -272,113 +271,6 @@ public class HuaweiCloudMetricsService {
             }
         }
         return targetMetricsMap;
-    }
-
-    private MetricInfoList getTargetMetricInfo(List<MetricInfoList> metrics,
-                                               MonitorResourceType type) {
-        if (MonitorResourceType.CPU.equals(type)) {
-            for (MetricInfoList metricInfoList : metrics) {
-                if (isAgentCpuMetrics(metricInfoList)) {
-                    return metricInfoList;
-                }
-            }
-            MetricInfoList defaultMetricInfo = new MetricInfoList();
-            defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
-            defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.CPU_UTILIZED);
-            defaultMetricInfo.setUnit("%");
-            return defaultMetricInfo;
-        }
-        if (MonitorResourceType.MEM.equals(type)) {
-            for (MetricInfoList metricInfoList : metrics) {
-                if (isAgentMemMetrics(metricInfoList)) {
-                    return metricInfoList;
-                }
-            }
-        }
-        if (MonitorResourceType.VM_NETWORK_INCOMING.equals(type)) {
-            for (MetricInfoList metricInfoList : metrics) {
-                if (isAgentVmNetworkInMetrics(metricInfoList)) {
-                    return metricInfoList;
-                }
-            }
-            MetricInfoList defaultMetricInfo = new MetricInfoList();
-            defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
-            defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN);
-            defaultMetricInfo.setUnit("bit/s");
-            return defaultMetricInfo;
-        }
-        if (MonitorResourceType.VM_NETWORK_OUTGOING.equals(type)) {
-            for (MetricInfoList metricInfoList : metrics) {
-                if (isAgentVmNetworkOutMetrics(metricInfoList)) {
-                    return metricInfoList;
-                }
-            }
-            MetricInfoList defaultMetricInfo = new MetricInfoList();
-            defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
-            defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT);
-            defaultMetricInfo.setUnit("bit/s");
-            return defaultMetricInfo;
-        }
-        return null;
-    }
-
-    private MonitorResourceType getMonitorResourceTypeByMetricName(String metricName) {
-        MonitorResourceType type = null;
-        switch (metricName) {
-            case HuaweiCloudMonitorMetrics.CPU_USAGE,
-                    HuaweiCloudMonitorMetrics.CPU_UTILIZED -> type = MonitorResourceType.CPU;
-            case HuaweiCloudMonitorMetrics.MEM_UTILIZED,
-                    HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE -> type =
-                    MonitorResourceType.MEM;
-            case HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV -> type =
-                    MonitorResourceType.VM_NETWORK_INCOMING;
-            case HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT -> type =
-                    MonitorResourceType.VM_NETWORK_OUTGOING;
-            default -> {
-            }
-        }
-        return type;
-    }
-
-    private boolean isAgentCpuMetrics(MetricInfoList metricInfo) {
-        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
-                && HuaweiCloudMonitorMetrics.CPU_USAGE.equals(metricInfo.getMetricName());
-    }
-
-    private boolean isAgentMemMetrics(MetricInfoList metricInfo) {
-        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
-                && HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE.equals(
-                metricInfo.getMetricName());
-    }
-
-    private boolean isAgentVmNetworkInMetrics(MetricInfoList metricInfo) {
-        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
-                && HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT.equals(metricInfo.getMetricName());
-    }
-
-    private boolean isAgentVmNetworkOutMetrics(MetricInfoList metricInfo) {
-        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
-                && HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV.equals(metricInfo.getMetricName());
-    }
-
-    private ICredential getIcredential(AbstractCredentialInfo credentialVariables) {
-        String accessKey = null;
-        String securityKey = null;
-        if (CredentialType.VARIABLES.toValue().equals(credentialVariables.getType().toValue())) {
-            List<CredentialVariable> variables =
-                    ((CredentialVariables) credentialVariables).getVariables();
-            for (CredentialVariable credentialVariable : variables) {
-                if (HuaweiCloudMonitorConstants.HW_ACCESS_KEY.equals(
-                        credentialVariable.getName())) {
-                    accessKey = credentialVariable.getValue();
-                }
-                if (HuaweiCloudMonitorConstants.HW_SECRET_KEY.equals(
-                        credentialVariable.getName())) {
-                    securityKey = credentialVariable.getValue();
-                }
-            }
-        }
-        return huaweiCloudMonitorClient.getIcredentialWithAkSk(accessKey, securityKey);
     }
 
 }

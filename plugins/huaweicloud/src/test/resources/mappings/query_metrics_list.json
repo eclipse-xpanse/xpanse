@@ -1,0 +1,493 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/V1.0/.*/metrics(.*)"
+      },
+      "response": {
+        "transformers": [
+          "response-template"
+        ],
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "SDK-HMAC-SHA256 Access=QU6EIIXEBIUFLW3QZTSY, SignedHeaders=content-type;host;x-sdk-date, Signature=3821f47510dffa190cab2775d258c72ce0163c00411a209a7258e6cc1c305c34",
+          "Host": "127.0.0.1:9090",
+          "X-Sdk-Date": "20230621T082359Z"
+        },
+        "status": 200,
+        "jsonBody": {
+          "meta_data": {
+            "count": 42,
+            "marker": "AGT.ECS.SlAsH_disk_free.instance_id:ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd",
+            "total": 42
+          },
+          "metrics": [
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "network_vm_pps_out",
+              "namespace": "SYS.ECS",
+              "unit": "count"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "network_vm_pps_in",
+              "namespace": "SYS.ECS",
+              "unit": "count"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "network_vm_newconnections",
+              "namespace": "SYS.ECS",
+              "unit": "count"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "network_vm_connections",
+              "namespace": "SYS.ECS",
+              "unit": "count"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "network_vm_bandwidth_out",
+              "namespace": "SYS.ECS",
+              "unit": "count"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "network_vm_bandwidth_in",
+              "namespace": "SYS.ECS",
+              "unit": "count"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "network_outgoing_bytes_aggregate_rate",
+              "namespace": "SYS.ECS",
+              "unit": "B/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "network_incoming_bytes_aggregate_rate",
+              "namespace": "SYS.ECS",
+              "unit": "B/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "disk_write_requests_rate",
+              "namespace": "SYS.ECS",
+              "unit": "request/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "disk_write_bytes_rate",
+              "namespace": "SYS.ECS",
+              "unit": "B/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "disk_read_requests_rate",
+              "namespace": "SYS.ECS",
+              "unit": "request/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "disk_read_bytes_rate",
+              "namespace": "SYS.ECS",
+              "unit": "B/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "cpu_util",
+              "namespace": "SYS.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "cpu_surplus_credit_charged",
+              "namespace": "SYS.ECS",
+              "unit": "credits"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "cpu_surplus_credit_balance",
+              "namespace": "SYS.ECS",
+              "unit": "credits"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "cpu_credit_usage",
+              "namespace": "SYS.ECS",
+              "unit": "credits"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "cpu_credit_balance",
+              "namespace": "SYS.ECS",
+              "unit": "credits"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "volumeSlAsHvda_disk_ioUtils",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "proc_zombie_count",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "proc_total_count",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "proc_sleeping_count",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "proc_running_count",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "proc_idle_count",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "proc_blocked_count",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "net_tcp_total",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "net_tcp_established",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "net_packetSent",
+              "namespace": "AGT.ECS",
+              "unit": "Count/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "net_packetRecv",
+              "namespace": "AGT.ECS",
+              "unit": "Count/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "net_bitSent",
+              "namespace": "AGT.ECS",
+              "unit": "bit/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "net_bitRecv",
+              "namespace": "AGT.ECS",
+              "unit": "bit/s"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "mem_usedPercent",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "load_average5",
+              "namespace": "AGT.ECS",
+              "unit": ""
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "id_99434da1075811a47b2e2381114d7a9d",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "id_8d296a61d70f66ae68391f6228b17319",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "id_87504fa222b138b32d3e42101fae688f",
+              "namespace": "AGT.ECS",
+              "unit": "GB"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "id_1fc6d69b3f4c20282c395128a97925b7",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "id_17fdd63302b0fd597516d3de06c6dfd2",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "cpu_usage",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "SlAsH_disk_usedPercent",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "SlAsH_disk_ioUtils",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "SlAsH_disk_inodesUsedPercent",
+              "namespace": "AGT.ECS",
+              "unit": "%"
+            },
+            {
+              "dimensions": [
+                {
+                  "name": "instance_id",
+                  "value": "ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd"
+                }
+              ],
+              "metric_name": "SlAsH_disk_free",
+              "namespace": "AGT.ECS",
+              "unit": "GB"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
