@@ -1,14 +1,18 @@
 package org.eclipse.xpanse.plugins.flexibleengine;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
 import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
+import com.huaweicloud.sdk.core.http.HttpMethod;
 import com.huaweicloud.sdk.core.internal.model.KeystoneListProjectsResponse;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -27,12 +31,14 @@ import org.eclipse.xpanse.modules.monitor.cache.MonitorMetricCacheManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMonitorConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.MetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,24 +46,34 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {FlexibleEngineOrchestratorPlugin.class, MetricsService.class,
-        FlexibleEngineMonitorConverter.class, RetryTemplateService.class, CredentialCenter.class,
+        FlexibleEngineMonitorClient.class, RetryTemplateService.class,
+        FlexibleEngineMonitorConverter.class, CredentialCenter.class,
         MonitorMetricStore.class, MonitorMetricCacheManager.class})
-class FlexibleEngineMonitorTest {
+class FlexibleEngineMonitorIntegrationTest {
+
+    @RegisterExtension
+    static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
+            .options(wireMockConfig()
+                    .dynamicPort()
+                    .extensions(new ResponseTemplateTransformer(true)))
+            .build();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     FlexibleEngineOrchestratorPlugin plugin;
+    @Autowired
+    FlexibleEngineMonitorConverter converter;
 
     @MockBean
     CredentialCenter credentialCenter;
 
     @MockBean
-    RetryTemplateService retryTemplateService;
+    FlexibleEngineMonitorClient client;
 
     ResourceMetricRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
                                                      Long from, Long to,
-                                                     boolean onlyLastKnownMetric) {
+                                                     boolean onlyLastKnownMetric) throws Exception {
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd");
         deployResource.setName("name");
@@ -65,16 +81,41 @@ class FlexibleEngineMonitorTest {
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
         return new ResourceMetricRequest(deployResource, monitorResourceType, from, to, null,
                 onlyLastKnownMetric, "xpanseUserName");
+
     }
 
-    void mockAllRequestForResource(MonitorResourceType monitorResourceType) throws IOException {
+    void mockClientHttpRequest() throws Exception {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
-        when(this.retryTemplateService.queryProjectInfo(any())).thenReturn(getProjectResponse());
-        when(this.retryTemplateService.queryMetricItemList(any())).thenReturn(
-                getListMetricsResponse());
-        when(this.retryTemplateService.queryMetricData(any())).thenReturn(
-                getShowMetricDataResponse(monitorResourceType));
+        when(this.client.buildGetRequest(any(), matches("/v3/projects(.*)"))).thenReturn(
+                getHttpRequestBase(HttpMethod.GET.name(), "/v3/projects"));
+
+        when(this.client.buildGetRequest(any(), matches("/V1.0/.*/metrics(.*)"))).thenReturn(
+                getHttpRequestBase(HttpMethod.GET.name(), "/V1.0/project_id/metrics"));
+
+        when(this.client.buildGetRequest(any(),
+                matches("/V1.0/.*/metric-data(.*cpu_.*)"))).thenReturn(
+                getHttpRequestBase(HttpMethod.GET.name(),
+                        "/V1.0/project_id/metric-data?namespace=cpu_"));
+        when(this.client.buildGetRequest(any(),
+                matches("/V1.0/.*/metric-data(.*mem_.*)"))).thenReturn(
+                getHttpRequestBase(HttpMethod.GET.name(),
+                        "/V1.0/project_id/metric-data?namespace=mem_"));
+
+        when(this.client.buildGetRequest(any(),
+                matches("/V1.0/.*/metric-data(.*net_bitSent.*)"))).thenReturn(
+                getHttpRequestBase(HttpMethod.GET.name(),
+                        "/V1.0/project_id/metric-data?namespace=net_bitSent"));
+
+        when(this.client.buildGetRequest(any(),
+                matches("/V1.0/.*/metric-data(.*net_bitRecv.*)"))).thenReturn(
+                getHttpRequestBase(HttpMethod.GET.name(),
+                        "/V1.0/project_id/metric-data?namespace=net_bitRecv"));
+
+        when(this.client.buildPostRequest(any(), matches("/V1.0/.*/batch-query-metric-data"),
+                any())).thenReturn(
+                getHttpRequestBase(HttpMethod.POST.name(),
+                        "/V1.0/project_id/batch-query-metric-data"));
     }
 
 
@@ -91,24 +132,14 @@ class FlexibleEngineMonitorTest {
                 onlyLastKnownMetric, "xpanseUserName");
     }
 
-    void mockAllRequestForService() throws IOException {
-        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
-                getCredentialDefinition());
-        when(this.retryTemplateService.queryProjectInfo(any())).thenReturn(
-                getProjectResponse());
-        when(this.retryTemplateService.queryMetricItemList(any())).thenReturn(
-                getListMetricsResponse());
-        when(this.retryTemplateService.batchQueryMetricData(any(), any())).thenReturn(
-                getBatchListMetricDataResponse());
-    }
 
     @Test
-    void testGetMetricsForResourceWithParamsOnlyLastKnownMetricTrue() throws IOException {
+    void testGetMetricsForResourceWithParamsOnlyLastKnownMetricTrue() throws Exception {
 
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(null, null, null, true);
-        mockAllRequestForResource(null);
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForResource(resourceMetricRequest);
@@ -123,14 +154,13 @@ class FlexibleEngineMonitorTest {
     }
 
     @Test
-    void testGetMetricsForResourceWithParamsFromAndTo() throws IOException {
-        mockAllRequestForResource(null);
+    void testGetMetricsForResourceWithParamsFromAndTo() throws Exception {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(null, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForResource(null);
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForResource(resourceMetricRequest);
@@ -145,13 +175,13 @@ class FlexibleEngineMonitorTest {
     }
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeCpu() throws IOException {
+    void testGetMetricsForResourceWithParamsTypeCpu() throws Exception {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.THREE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForResource(null);
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForResource(resourceMetricRequest);
@@ -165,13 +195,13 @@ class FlexibleEngineMonitorTest {
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeMem() throws IOException {
+    void testGetMetricsForResourceWithParamsTypeMem() throws Exception {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.TEN_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForResource(MonitorResourceType.MEM);
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForResource(resourceMetricRequest);
@@ -185,14 +215,14 @@ class FlexibleEngineMonitorTest {
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeVmNetworkIncoming() throws IOException {
+    void testGetMetricsForResourceWithParamsTypeVmNetworkIncoming() throws Exception {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
                         System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_MONTH_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForResource(MonitorResourceType.VM_NETWORK_INCOMING);
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForResource(resourceMetricRequest);
@@ -207,14 +237,14 @@ class FlexibleEngineMonitorTest {
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeVmNetworkOutgoing() throws IOException {
+    void testGetMetricsForResourceWithParamsTypeVmNetworkOutgoing() throws Exception {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
                         System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_MONTH_MILLISECONDS - 1,
                         System.currentTimeMillis(), false);
-        mockAllRequestForResource(MonitorResourceType.VM_NETWORK_OUTGOING);
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForResource(resourceMetricRequest);
@@ -229,11 +259,11 @@ class FlexibleEngineMonitorTest {
 
 
     @Test
-    void testGetMetricsForServiceWithParamsOnlyLastKnownMetricTrue() throws IOException {
+    void testGetMetricsForServiceWithParamsOnlyLastKnownMetricTrue() throws Exception {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(null, null, null, true);
-        mockAllRequestForService();
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForService(serviceMetricRequest);
@@ -248,13 +278,13 @@ class FlexibleEngineMonitorTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsFromAndTo() throws IOException {
+    void testGetMetricsForServiceWithParamsFromAndTo() throws Exception {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(null, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForService();
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForService(serviceMetricRequest);
@@ -268,13 +298,13 @@ class FlexibleEngineMonitorTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeCpu() throws IOException {
+    void testGetMetricsForServiceWithParamsTypeCpu() throws Exception {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForService();
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForService(serviceMetricRequest);
@@ -286,13 +316,13 @@ class FlexibleEngineMonitorTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeMem() throws IOException {
+    void testGetMetricsForServiceWithParamsTypeMem() throws Exception {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForService();
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForService(serviceMetricRequest);
@@ -304,14 +334,14 @@ class FlexibleEngineMonitorTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeVmNetworkIncoming() throws IOException {
+    void testGetMetricsForServiceWithParamsTypeVmNetworkIncoming() throws Exception {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
                         System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForService();
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForService(serviceMetricRequest);
@@ -324,14 +354,14 @@ class FlexibleEngineMonitorTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeVmNetworkOutgoing() throws IOException {
+    void testGetMetricsForServiceWithParamsTypeVmNetworkOutgoing() throws Exception {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
                         System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
-        mockAllRequestForService();
+        mockClientHttpRequest();
 
         // Run the test
         List<Metric> metrics = plugin.getMetricsForService(serviceMetricRequest);
@@ -358,57 +388,16 @@ class FlexibleEngineMonitorTest {
         return credentialVariables;
     }
 
-    private ListMetricsResponse getListMetricsResponse() throws IOException {
-        return objectMapper.readValue(
-                new URL("file:./target/test-classes/results/query_metrics_list.json"),
-                ListMetricsResponse.class);
-    }
 
-    private KeystoneListProjectsResponse getProjectResponse() throws IOException {
-        return objectMapper.readValue(
-                new URL("file:./target/test-classes/results/query_project_info.json"),
-                KeystoneListProjectsResponse.class);
-    }
-
-    private BatchListMetricDataResponse getBatchListMetricDataResponse() throws IOException {
-        return objectMapper.readValue(
-                new URL("file:./target/test-classes/results/batch_query_metric_data.json"),
-                BatchListMetricDataResponse.class);
-    }
-
-    private ShowMetricDataResponse getShowMetricDataResponse(MonitorResourceType type)
-            throws IOException {
-
-        if (MonitorResourceType.MEM == type) {
-            return objectMapper.readValue(
-                    new URL("file:./target/test-classes/results/query_metric_data_mem.json"),
-                    ShowMetricDataResponse.class);
-        }
-        if (MonitorResourceType.VM_NETWORK_INCOMING == type) {
-            return objectMapper.readValue(
-                    new URL("file:./target/test-classes/results/query_metric_data_net_in.json"),
-                    ShowMetricDataResponse.class);
-        }
-        if (MonitorResourceType.VM_NETWORK_OUTGOING == type) {
-            return objectMapper.readValue(
-                    new URL("file:./target/test-classes/results/query_metric_data_net_out.json"),
-                    ShowMetricDataResponse.class);
-        }
-        return objectMapper.readValue(
-                new URL("file:./target/test-classes/results/query_metric_data_cpu.json"),
-                ShowMetricDataResponse.class);
-
-    }
-
-    private HttpRequestBase getHttpRequestBase(String url,
-                                               String httpMethod) throws URISyntaxException {
+    private HttpRequestBase getHttpRequestBase(String httpMethod, String url)
+            throws URISyntaxException {
         HttpRequestBase httpRequestBase = new HttpRequestBase() {
             @Override
             public String getMethod() {
                 return httpMethod;
             }
         };
-        httpRequestBase.setURI(new URI(url));
+        httpRequestBase.setURI(new URI(wireMockExtension.getRuntimeInfo().getHttpBaseUrl() + url));
         httpRequestBase.setHeader("Content-Type", "application/json");
         return httpRequestBase;
     }

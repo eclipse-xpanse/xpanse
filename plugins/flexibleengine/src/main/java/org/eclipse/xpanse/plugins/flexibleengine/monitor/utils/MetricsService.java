@@ -6,7 +6,6 @@
 package org.eclipse.xpanse.plugins.flexibleengine.monitor.utils;
 
 
-import com.cloud.apigateway.sdk.utils.Client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
@@ -26,8 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
-import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
@@ -37,9 +34,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -56,6 +51,8 @@ public class MetricsService {
 
     private final FlexibleEngineMonitorConverter flexibleEngineMonitorConverter;
 
+    private final FlexibleEngineMonitorClient flexibleEngineMonitorClient;
+
     private final MonitorMetricStore monitorMetricStore;
 
     private final RetryTemplateService retryTemplateService;
@@ -65,6 +62,7 @@ public class MetricsService {
     /**
      * Constructor for the MetricsService class.
      *
+     * @param flexibleEngineMonitorClient    instance of FlexibleEngineMonitorClient
      * @param flexibleEngineMonitorConverter instance of FlexibleEngineMonitorConverter
      * @param monitorMetricStore             instance of MetricItemsStore
      * @param retryTemplateService           instance of retryTemplateService
@@ -72,75 +70,23 @@ public class MetricsService {
      */
     @Autowired
     public MetricsService(
+            FlexibleEngineMonitorClient flexibleEngineMonitorClient,
             FlexibleEngineMonitorConverter flexibleEngineMonitorConverter,
             MonitorMetricStore monitorMetricStore,
             RetryTemplateService retryTemplateService,
             CredentialCenter credentialCenter) {
         this.flexibleEngineMonitorConverter = flexibleEngineMonitorConverter;
+        this.flexibleEngineMonitorClient = flexibleEngineMonitorClient;
         this.monitorMetricStore = monitorMetricStore;
         this.retryTemplateService = retryTemplateService;
         this.credentialCenter = credentialCenter;
     }
 
-    /**
-     * Get HttpRequestBase of the Get request of the FlexibleEngine API.
-     *
-     * @param credential The credential of the service.
-     * @param url        The request url of the FlexibleEngine API.
-     * @return Returns HttpRequestBase
-     */
-    public HttpRequestBase buildGetRequest(AbstractCredentialInfo credential, String url)
-            throws Exception {
-        String accessKey = null;
-        String securityKey = null;
-        if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
-            List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
-            for (CredentialVariable credentialVariable : variables) {
-                if (FlexibleEngineMonitorConstants.OS_ACCESS_KEY.equals(
-                        credentialVariable.getName())) {
-                    accessKey = credentialVariable.getValue();
-                }
-                if (FlexibleEngineMonitorConstants.OS_SECRET_KEY.equals(
-                        credentialVariable.getName())) {
-                    securityKey = credentialVariable.getValue();
-                }
-            }
-        }
-        return Client.get(accessKey, securityKey, url,
-                flexibleEngineMonitorConverter.getHeaders());
-    }
-
-    /**
-     * Get HttpRequestBase of the Get request of the FlexibleEngine API.
-     *
-     * @param credential The credential of the service.
-     * @param url        The request url of the FlexibleEngine API.
-     * @return Returns HttpRequestBase
-     */
-    public HttpRequestBase buildPostRequest(AbstractCredentialInfo credential, String url,
-                                            String postBody) throws Exception {
-        String accessKey = null;
-        String securityKey = null;
-        if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
-            List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
-            for (CredentialVariable credentialVariable : variables) {
-                if (FlexibleEngineMonitorConstants.OS_ACCESS_KEY.equals(
-                        credentialVariable.getName())) {
-                    accessKey = credentialVariable.getValue();
-                }
-                if (FlexibleEngineMonitorConstants.OS_SECRET_KEY.equals(
-                        credentialVariable.getName())) {
-                    securityKey = credentialVariable.getValue();
-                }
-            }
-        }
-        return Client.post(accessKey, securityKey, url,
-                flexibleEngineMonitorConverter.getHeaders(), postBody);
-    }
 
     private Project queryProjectInfo(AbstractCredentialInfo credential, String url) {
         try {
-            HttpRequestBase requestBase = buildGetRequest(credential, url);
+            HttpRequestBase requestBase =
+                    flexibleEngineMonitorClient.buildGetRequest(credential, url);
             KeystoneListProjectsResponse projectsResponse =
                     retryTemplateService.queryProjectInfo(requestBase);
             if (Objects.nonNull(projectsResponse)
@@ -159,7 +105,8 @@ public class MetricsService {
 
     private ShowMetricDataResponse queryMetricData(AbstractCredentialInfo credential, String url) {
         try {
-            HttpRequestBase requestBase = buildGetRequest(credential, url);
+            HttpRequestBase requestBase =
+                    flexibleEngineMonitorClient.buildGetRequest(credential, url);
             return retryTemplateService.queryMetricData(requestBase);
         } catch (Exception e) {
             String errorMsg = String.format("Query metric data by FlexibleEngine Client error. %s",
@@ -171,7 +118,8 @@ public class MetricsService {
 
     private ListMetricsResponse queryMetricItemList(AbstractCredentialInfo credential, String url) {
         try {
-            HttpRequestBase requestBase = buildGetRequest(credential, url);
+            HttpRequestBase requestBase =
+                    flexibleEngineMonitorClient.buildGetRequest(credential, url);
             return retryTemplateService.queryMetricItemList(requestBase);
         } catch (Exception e) {
             String errorMsg =
@@ -187,7 +135,8 @@ public class MetricsService {
                                                              String url) {
         try {
             String requestBody = OBJECT_MAPPER.writeValueAsString(request.getBody());
-            HttpRequestBase requestBase = buildPostRequest(credential, url, requestBody);
+            HttpRequestBase requestBase =
+                    flexibleEngineMonitorClient.buildPostRequest(credential, url, requestBody);
             return retryTemplateService.batchQueryMetricData(requestBase, requestBody);
         } catch (Exception e) {
             String errorMsg =
@@ -321,7 +270,8 @@ public class MetricsService {
                 String resourceId = entry.getKey();
                 for (MetricInfoList metricInfo : entry.getValue()) {
                     MonitorResourceType type =
-                            getMonitorResourceTypeByMetricName(metricInfo.getMetricName());
+                            flexibleEngineMonitorConverter.getMonitorResourceTypeByMetricName(
+                                    metricInfo.getMetricName());
                     if (CollectionUtils.isEmpty(metrics)) {
                         Metric metricCache =
                                 monitorMetricStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
@@ -367,7 +317,8 @@ public class MetricsService {
             List<MetricInfoList> metrics = listMetricsResponse.getMetrics();
             if (Objects.isNull(monitorResourceType)) {
                 for (MonitorResourceType type : MonitorResourceType.values()) {
-                    MetricInfoList targetMetricInfo = getTargetMetricInfo(metrics, type);
+                    MetricInfoList targetMetricInfo =
+                            flexibleEngineMonitorConverter.getTargetMetricInfo(metrics, type);
                     if (Objects.nonNull(targetMetricInfo)) {
                         targetMetricsMap.put(type, targetMetricInfo);
                     } else {
@@ -376,7 +327,9 @@ public class MetricsService {
                     }
                 }
             } else {
-                MetricInfoList targetMetricInfo = getTargetMetricInfo(metrics, monitorResourceType);
+                MetricInfoList targetMetricInfo =
+                        flexibleEngineMonitorConverter.getTargetMetricInfo(metrics,
+                                monitorResourceType);
                 if (Objects.nonNull(targetMetricInfo)) {
                     targetMetricsMap.put(monitorResourceType, targetMetricInfo);
                 } else {
@@ -390,101 +343,5 @@ public class MetricsService {
 
     }
 
-
-    /**
-     * Get target MetricInfoList object by type.
-     *
-     * @param metrics list of MetricInfoList
-     * @param type    MonitorResourceType
-     * @return MetricInfoList object
-     */
-    public MetricInfoList getTargetMetricInfo(List<MetricInfoList> metrics,
-                                              MonitorResourceType type) {
-        if (MonitorResourceType.CPU.equals(type)) {
-            for (MetricInfoList metric : metrics) {
-                if (isAgentCpuMetrics(metric)) {
-                    return metric;
-                }
-            }
-            MetricInfoList defaultMetricInfo = new MetricInfoList();
-            defaultMetricInfo.setNamespace(FlexibleEngineNameSpaceKind.ECS_SYS.toValue());
-            defaultMetricInfo.setMetricName(FlexibleEngineMonitorMetrics.CPU_UTILIZED);
-            defaultMetricInfo.setUnit("%");
-            return defaultMetricInfo;
-        }
-        if (MonitorResourceType.MEM.equals(type)) {
-            for (MetricInfoList metric : metrics) {
-                if (isAgentMemMetrics(metric)) {
-                    return metric;
-                }
-            }
-        }
-        if (MonitorResourceType.VM_NETWORK_INCOMING.equals(type)) {
-            for (MetricInfoList metricInfoList : metrics) {
-                if (isAgentVmNetworkInMetrics(metricInfoList)) {
-                    return metricInfoList;
-                }
-            }
-            MetricInfoList defaultMetricInfo = new MetricInfoList();
-            defaultMetricInfo.setNamespace(FlexibleEngineNameSpaceKind.ECS_SYS.toValue());
-            defaultMetricInfo.setMetricName(FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_IN);
-            defaultMetricInfo.setUnit("bit/s");
-            return defaultMetricInfo;
-        }
-        if (MonitorResourceType.VM_NETWORK_OUTGOING.equals(type)) {
-            for (MetricInfoList metricInfoList : metrics) {
-                if (isAgentVmNetworkOutMetrics(metricInfoList)) {
-                    return metricInfoList;
-                }
-            }
-            MetricInfoList defaultMetricInfo = new MetricInfoList();
-            defaultMetricInfo.setNamespace(FlexibleEngineNameSpaceKind.ECS_SYS.toValue());
-            defaultMetricInfo.setMetricName(FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT);
-            defaultMetricInfo.setUnit("bit/s");
-            return defaultMetricInfo;
-        }
-        return null;
-    }
-
-
-    private MonitorResourceType getMonitorResourceTypeByMetricName(String metricName) {
-        MonitorResourceType type = null;
-        switch (metricName) {
-            case FlexibleEngineMonitorMetrics.CPU_USAGE,
-                    FlexibleEngineMonitorMetrics.CPU_UTILIZED -> type = MonitorResourceType.CPU;
-            case FlexibleEngineMonitorMetrics.MEM_UTILIZED,
-                    FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE -> type =
-                    MonitorResourceType.MEM;
-            case FlexibleEngineMonitorMetrics.VM_NET_BIT_RECV -> type =
-                    MonitorResourceType.VM_NETWORK_INCOMING;
-            case FlexibleEngineMonitorMetrics.VM_NET_BIT_SENT -> type =
-                    MonitorResourceType.VM_NETWORK_OUTGOING;
-            default -> {
-            }
-        }
-        return type;
-    }
-
-
-    private boolean isAgentCpuMetrics(MetricInfoList metricInfo) {
-        return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
-                && FlexibleEngineMonitorMetrics.CPU_USAGE.equals(metricInfo.getMetricName());
-    }
-
-    private boolean isAgentMemMetrics(MetricInfoList metricInfo) {
-        return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
-                && FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE.equals(
-                metricInfo.getMetricName());
-    }
-
-    private boolean isAgentVmNetworkInMetrics(MetricInfoList metricInfo) {
-        return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
-                && FlexibleEngineMonitorMetrics.VM_NET_BIT_SENT.equals(metricInfo.getMetricName());
-    }
-
-    private boolean isAgentVmNetworkOutMetrics(MetricInfoList metricInfo) {
-        return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
-                && FlexibleEngineMonitorMetrics.VM_NET_BIT_RECV.equals(metricInfo.getMetricName());
-    }
 
 }

@@ -41,7 +41,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
-import org.springframework.http.MediaType;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -51,9 +51,6 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 @Component
 public class FlexibleEngineMonitorConverter {
-
-
-    private static final Map<String, String> HEADER_MAP = new HashMap<>();
 
     private final Map<String, MonitorResourceType> metricNameToResourceTypeMap = new HashMap<>();
 
@@ -179,16 +176,6 @@ public class FlexibleEngineMonitorConverter {
                 metricRequest.setGranularity(FlexibleEngineMonitorConstants.PERIOD_ONE_DAY_INT);
             }
         }
-    }
-
-    /**
-     * Get headers of request.
-     *
-     * @return Map of headers.
-     */
-    public Map<String, String> getHeaders() {
-        HEADER_MAP.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        return HEADER_MAP;
     }
 
     /**
@@ -406,5 +393,106 @@ public class FlexibleEngineMonitorConverter {
         params.put("dim.0", FlexibleEngineMonitorConstants.DIM0_PREFIX
                 + resourceMetricRequest.getDeployResource().getResourceId());
         return params;
+    }
+
+    /**
+     * Get target MetricInfoList object by type.
+     *
+     * @param metrics list of MetricInfoList
+     * @param type    MonitorResourceType
+     * @return MetricInfoList object
+     */
+    public MetricInfoList getTargetMetricInfo(List<MetricInfoList> metrics,
+                                              MonitorResourceType type) {
+        if (MonitorResourceType.CPU.equals(type)) {
+            for (MetricInfoList metric : metrics) {
+                if (isAgentCpuMetrics(metric)) {
+                    return metric;
+                }
+            }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
+            defaultMetricInfo.setNamespace(FlexibleEngineNameSpaceKind.ECS_SYS.toValue());
+            defaultMetricInfo.setMetricName(FlexibleEngineMonitorMetrics.CPU_UTILIZED);
+            defaultMetricInfo.setUnit("%");
+            return defaultMetricInfo;
+        }
+        if (MonitorResourceType.MEM.equals(type)) {
+            for (MetricInfoList metric : metrics) {
+                if (isAgentMemMetrics(metric)) {
+                    return metric;
+                }
+            }
+        }
+        if (MonitorResourceType.VM_NETWORK_INCOMING.equals(type)) {
+            for (MetricInfoList metricInfoList : metrics) {
+                if (isAgentVmNetworkInMetrics(metricInfoList)) {
+                    return metricInfoList;
+                }
+            }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
+            defaultMetricInfo.setNamespace(FlexibleEngineNameSpaceKind.ECS_SYS.toValue());
+            defaultMetricInfo.setMetricName(FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_IN);
+            defaultMetricInfo.setUnit("bit/s");
+            return defaultMetricInfo;
+        }
+        if (MonitorResourceType.VM_NETWORK_OUTGOING.equals(type)) {
+            for (MetricInfoList metricInfoList : metrics) {
+                if (isAgentVmNetworkOutMetrics(metricInfoList)) {
+                    return metricInfoList;
+                }
+            }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
+            defaultMetricInfo.setNamespace(FlexibleEngineNameSpaceKind.ECS_SYS.toValue());
+            defaultMetricInfo.setMetricName(FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT);
+            defaultMetricInfo.setUnit("bit/s");
+            return defaultMetricInfo;
+        }
+        return null;
+    }
+
+    /**
+     * Get MonitorResourceType by metricName.
+     *
+     * @param metricName metricName
+     * @return MonitorResourceType
+     */
+    public MonitorResourceType getMonitorResourceTypeByMetricName(String metricName) {
+        MonitorResourceType type = null;
+        switch (metricName) {
+            case FlexibleEngineMonitorMetrics.CPU_USAGE,
+                    FlexibleEngineMonitorMetrics.CPU_UTILIZED -> type = MonitorResourceType.CPU;
+            case FlexibleEngineMonitorMetrics.MEM_UTILIZED,
+                    FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE -> type =
+                    MonitorResourceType.MEM;
+            case FlexibleEngineMonitorMetrics.VM_NET_BIT_RECV -> type =
+                    MonitorResourceType.VM_NETWORK_INCOMING;
+            case FlexibleEngineMonitorMetrics.VM_NET_BIT_SENT -> type =
+                    MonitorResourceType.VM_NETWORK_OUTGOING;
+            default -> {
+            }
+        }
+        return type;
+    }
+
+
+    private boolean isAgentCpuMetrics(MetricInfoList metricInfo) {
+        return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && FlexibleEngineMonitorMetrics.CPU_USAGE.equals(metricInfo.getMetricName());
+    }
+
+    private boolean isAgentMemMetrics(MetricInfoList metricInfo) {
+        return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE.equals(
+                metricInfo.getMetricName());
+    }
+
+    private boolean isAgentVmNetworkInMetrics(MetricInfoList metricInfo) {
+        return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && FlexibleEngineMonitorMetrics.VM_NET_BIT_SENT.equals(metricInfo.getMetricName());
+    }
+
+    private boolean isAgentVmNetworkOutMetrics(MetricInfoList metricInfo) {
+        return FlexibleEngineNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && FlexibleEngineMonitorMetrics.VM_NET_BIT_RECV.equals(metricInfo.getMetricName());
     }
 }

@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
 import org.eclipse.xpanse.modules.monitor.cache.MonitorMetricCacheManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMonitorConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.MetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
@@ -28,7 +29,8 @@ import org.junit.jupiter.api.Test;
 public class FlexibleEngineOrchestratorPluginTest {
 
     private final FlexibleEngineOrchestratorPlugin plugin = new FlexibleEngineOrchestratorPlugin(
-            new MetricsService(new FlexibleEngineMonitorConverter(),
+            new MetricsService(new FlexibleEngineMonitorClient(),
+                    new FlexibleEngineMonitorConverter(),
                     new MonitorMetricStore(new MonitorMetricCacheManager()),
                     new RetryTemplateService(), null));
 
