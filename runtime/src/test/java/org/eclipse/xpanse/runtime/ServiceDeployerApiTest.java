@@ -54,7 +54,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {XpanseApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ServiceDeployerApiTest {
+class ServiceDeployerApiTest {
 
     private static final String CLIENT_DOWNLOAD_URL = "https://repo1.maven.org/maven2/org/"
             + "openapitools/openapi-generator-cli/6.5.0/openapi-generator-cli-6.5.0.jar";

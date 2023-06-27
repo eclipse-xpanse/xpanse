@@ -111,7 +111,7 @@ public class RegisteredServicesOpenApiGenerator {
     }
 
     /**
-     * create OpenApi for registered service .
+     * create OpenApi for registered service.
      *
      * @param registerService Registered services.
      */
@@ -124,17 +124,14 @@ public class RegisteredServicesOpenApiGenerator {
         File htmlFile = new File(openApiDir, serviceId + ".html");
         try {
             if (yamlFile.exists()) {
-                log.info("Service openApi is generating.serviceId:{}", serviceId);
-                Thread.sleep(2000);
-                if (htmlFile.exists()) {
-                    return this.openApiUtil.getOpenApiUrl(serviceId);
-                }
+                log.info("Service openApi is being generated. serviceId:{}", serviceId);
+                return this.openApiUtil.getOpenApiUrl(serviceId);
             } else {
                 String apiDocsJson = getApiDocsJson(registerService);
                 try (FileWriter apiWriter = new FileWriter(yamlFile.getPath())) {
                     apiWriter.write(apiDocsJson);
                 }
-                log.info("Service openApi yamlFile:{} create success.", yamlFile.getPath());
+                log.info("Service openApi yamlFile:{} create successful.", yamlFile.getPath());
             }
             if (yamlFile.exists() && this.openApiUtil.downloadClientJar(openApiDir)) {
                 File jarPath = new File(openApiDir, "openapi-generator-cli.jar");

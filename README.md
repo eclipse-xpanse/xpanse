@@ -116,21 +116,13 @@ The runtime embeds and run together:
 
 ## Database
 
-The default database attached to the runtime is the H2 in-memory database.
-The same can be replaced with other production ready database systems by
-replacing the configurations mentioned below and by adding relevant maven
-dependencies.
+### Development
+H2 file-based database is used for development purposes. This works without any extra configuration requirements. All 
+DB configurations are automatically created during the server startup.
 
-```
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-
-spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
-spring.jpa.hibernate.ddl-auto= update
-```
+### Production
+Currently, MariaDB is supported for production use cases. This can be activated by using `mariadb`spring profile.
+Please refer to the detailed database [here](https://eclipse-xpanse.github.io/xpanse-website/docs/database).
 
 ### Build and Package
 
@@ -152,20 +144,14 @@ $ cd runtime/target
 $ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
-By default, the runtime is built in "exploded mode". Additionally, you can also
-build a Docker image adding `-Ddocker.skip=false` as build argument:
+By default, the runtime is built in "exploded mode."
+Additionally, you can also build a Docker image adding `-Ddocker.skip=false` as build argument:
 
 ```shell
 $ cd runtime
 $ mvn clean install -Ddocker.skip=false
 ```
 
-We can start xpanse runtime with a specific plugin by passing the plugin name
-in the profile name. For example to start openstack
-
-```shell
-$ docker run -e "SPRING_PROFILES_ACTIVE=openstack" --name my-xpanse-runtime xpanse
-```
 
 ### Static Code Analysis using CheckStyle
 
