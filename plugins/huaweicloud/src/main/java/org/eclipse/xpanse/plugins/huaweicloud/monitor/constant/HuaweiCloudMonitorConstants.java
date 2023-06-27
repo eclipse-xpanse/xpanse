@@ -68,4 +68,14 @@ public class HuaweiCloudMonitorConstants {
 
     public static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
 
+    public static final long FOUR_HOUR_MILLISECONDS = 4 * 3600 * 1000L;
+
+    public static final long ONE_DAY_MILLISECONDS = 24 * 3600 * 1000L;
+
+    public static final long THREE_DAY_MILLISECONDS = 3 * 24 * 3600 * 1000L;
+
+    public static final long TEN_DAY_MILLISECONDS = 10 * 24 * 3600 * 1000L;
+
+    public static final long ONE_MONTH_MILLISECONDS = 30 * 24 * 3600 * 1000L;
+
 }

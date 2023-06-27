@@ -34,27 +34,12 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>models</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>register</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.plugins</groupId>
-            <artifactId>openstack</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.plugins</groupId>
-            <artifactId>huaweicloud</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.plugins</groupId>
-            <artifactId>flexibleengine</artifactId>
+            <artifactId>credential</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -64,7 +49,22 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>deployment</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>logging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>models</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>monitor</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -74,7 +74,22 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>register</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.plugins</groupId>
+            <artifactId>flexibleengine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.plugins</groupId>
+            <artifactId>huaweicloud</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.plugins</groupId>
+            <artifactId>openstack</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

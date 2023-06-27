@@ -38,7 +38,7 @@ public enum HuaweiCloudNameSpaceKind {
     @JsonCreator
     public HuaweiCloudNameSpaceKind getByValue(String nameSpace) {
         for (HuaweiCloudNameSpaceKind huaweiCloudNameSpaceKind : values()) {
-            if (huaweiCloudNameSpaceKind.nameSpace.equals(StringUtils.lowerCase(nameSpace))) {
+            if (StringUtils.equalsIgnoreCase(huaweiCloudNameSpaceKind.nameSpace, nameSpace)) {
                 return huaweiCloudNameSpaceKind;
             }
         }

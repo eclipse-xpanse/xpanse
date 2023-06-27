@@ -6,6 +6,12 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.monitor.utils;
 
+import static org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants.FOUR_HOUR_MILLISECONDS;
+import static org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS;
+import static org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants.ONE_MONTH_MILLISECONDS;
+import static org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants.TEN_DAY_MILLISECONDS;
+import static org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants.THREE_DAY_MILLISECONDS;
+
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataRequestBody;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
@@ -37,6 +43,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudMonitorMetrics;
+import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudNameSpaceKind;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -45,7 +52,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Component
-public class HuaweiCloudToXpanseDataModelConverter {
+public class HuaweiCloudDataModelConverter {
 
     private final Map<String, MonitorResourceType> metricNameToResourceTypeMap = new HashMap<>();
 
@@ -54,7 +61,7 @@ public class HuaweiCloudToXpanseDataModelConverter {
      * Initializes the metricNameToResourceTypeMap with the mapping of metric names to monitor
      * resource types.
      */
-    public HuaweiCloudToXpanseDataModelConverter() {
+    public HuaweiCloudDataModelConverter() {
         metricNameToResourceTypeMap.putAll(Map.of(
                 HuaweiCloudMonitorMetrics.CPU_USAGE, MonitorResourceType.CPU,
                 HuaweiCloudMonitorMetrics.CPU_UTILIZED, MonitorResourceType.CPU,
@@ -260,6 +267,7 @@ public class HuaweiCloudToXpanseDataModelConverter {
     }
 
     private <T extends MetricRequest> void checkNullParamAndFillValue(T metricRequest) {
+
         if (Objects.isNull(metricRequest.getFrom())) {
             metricRequest.setFrom(System.currentTimeMillis()
                     - HuaweiCloudMonitorConstants.FIVE_MINUTES_MILLISECONDS);
@@ -267,9 +275,126 @@ public class HuaweiCloudToXpanseDataModelConverter {
         if (Objects.isNull(metricRequest.getTo())) {
             metricRequest.setTo(System.currentTimeMillis());
         }
+
         if (Objects.isNull(metricRequest.getGranularity())) {
-            metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_REAL_TIME_INT);
+            Long from = metricRequest.getFrom();
+            Long to = metricRequest.getTo();
+            if (to - from <= FOUR_HOUR_MILLISECONDS) {
+                metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_REAL_TIME_INT);
+            } else if (to - from > FOUR_HOUR_MILLISECONDS && to - from <= ONE_DAY_MILLISECONDS) {
+                metricRequest.setGranularity(
+                        HuaweiCloudMonitorConstants.PERIOD_FIVE_MINUTES_INT);
+            } else if (to - from > ONE_DAY_MILLISECONDS && to - from <= THREE_DAY_MILLISECONDS) {
+                metricRequest.setGranularity(
+                        HuaweiCloudMonitorConstants.PERIOD_TWENTY_MINUTES_INT);
+            } else if (to - from > THREE_DAY_MILLISECONDS && to - from <= TEN_DAY_MILLISECONDS) {
+                metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_ONE_HOUR_INT);
+            } else if (to - from > TEN_DAY_MILLISECONDS && to - from <= ONE_MONTH_MILLISECONDS) {
+                metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_FOUR_HOURS_INT);
+            } else {
+                metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_ONE_DAY_INT);
+            }
         }
+    }
+
+    /**
+     * Get target MetricInfoList object by type.
+     *
+     * @param metrics list of MetricInfoList
+     * @param type    MonitorResourceType
+     * @return MetricInfoList object
+     */
+    public MetricInfoList getTargetMetricInfo(List<MetricInfoList> metrics,
+                                              MonitorResourceType type) {
+        if (MonitorResourceType.CPU.equals(type)) {
+            for (MetricInfoList metricInfoList : metrics) {
+                if (isAgentCpuMetrics(metricInfoList)) {
+                    return metricInfoList;
+                }
+            }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
+            defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
+            defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.CPU_UTILIZED);
+            defaultMetricInfo.setUnit("%");
+            return defaultMetricInfo;
+        }
+        if (MonitorResourceType.MEM.equals(type)) {
+            for (MetricInfoList metricInfoList : metrics) {
+                if (isAgentMemMetrics(metricInfoList)) {
+                    return metricInfoList;
+                }
+            }
+        }
+        if (MonitorResourceType.VM_NETWORK_INCOMING.equals(type)) {
+            for (MetricInfoList metricInfoList : metrics) {
+                if (isAgentVmNetworkInMetrics(metricInfoList)) {
+                    return metricInfoList;
+                }
+            }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
+            defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
+            defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN);
+            defaultMetricInfo.setUnit("bit/s");
+            return defaultMetricInfo;
+        }
+        if (MonitorResourceType.VM_NETWORK_OUTGOING.equals(type)) {
+            for (MetricInfoList metricInfoList : metrics) {
+                if (isAgentVmNetworkOutMetrics(metricInfoList)) {
+                    return metricInfoList;
+                }
+            }
+            MetricInfoList defaultMetricInfo = new MetricInfoList();
+            defaultMetricInfo.setNamespace(HuaweiCloudNameSpaceKind.ECS_SYS.toValue());
+            defaultMetricInfo.setMetricName(HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT);
+            defaultMetricInfo.setUnit("bit/s");
+            return defaultMetricInfo;
+        }
+        return null;
+    }
+
+    /**
+     * Get MonitorResourceType by metricName.
+     *
+     * @param metricName metricName
+     * @return MonitorResourceType
+     */
+    public MonitorResourceType getMonitorResourceTypeByMetricName(String metricName) {
+        MonitorResourceType type = null;
+        switch (metricName) {
+            case HuaweiCloudMonitorMetrics.CPU_USAGE,
+                    HuaweiCloudMonitorMetrics.CPU_UTILIZED -> type = MonitorResourceType.CPU;
+            case HuaweiCloudMonitorMetrics.MEM_UTILIZED,
+                    HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE -> type =
+                    MonitorResourceType.MEM;
+            case HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV -> type =
+                    MonitorResourceType.VM_NETWORK_INCOMING;
+            case HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT -> type =
+                    MonitorResourceType.VM_NETWORK_OUTGOING;
+            default -> {
+            }
+        }
+        return type;
+    }
+
+    private boolean isAgentCpuMetrics(MetricInfoList metricInfo) {
+        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && HuaweiCloudMonitorMetrics.CPU_USAGE.equals(metricInfo.getMetricName());
+    }
+
+    private boolean isAgentMemMetrics(MetricInfoList metricInfo) {
+        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE.equals(
+                metricInfo.getMetricName());
+    }
+
+    private boolean isAgentVmNetworkInMetrics(MetricInfoList metricInfo) {
+        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT.equals(metricInfo.getMetricName());
+    }
+
+    private boolean isAgentVmNetworkOutMetrics(MetricInfoList metricInfo) {
+        return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
+                && HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV.equals(metricInfo.getMetricName());
     }
 
 }
