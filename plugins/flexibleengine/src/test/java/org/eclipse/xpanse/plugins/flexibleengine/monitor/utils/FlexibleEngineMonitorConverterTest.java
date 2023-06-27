@@ -4,38 +4,20 @@ import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class MetricsServiceTest {
+class FlexibleEngineMonitorConverterTest {
 
-    @Mock
-    private FlexibleEngineMonitorConverter mockFlexibleEngineMonitorConverter;
-    @Mock
-    private MonitorMetricStore mockMonitorMetricStore;
-    @Mock
-    private RetryTemplateService mockRetryTemplateService;
-    @Mock
-    private CredentialCenter mockCredentialCenter;
 
-    private MetricsService metricsServiceUnderTest;
+    private final FlexibleEngineMonitorConverter converter = new FlexibleEngineMonitorConverter();
 
-    @BeforeEach
-    void setUp() {
-        metricsServiceUnderTest =
-                new MetricsService(mockFlexibleEngineMonitorConverter, mockMonitorMetricStore,
-                        mockRetryTemplateService, mockCredentialCenter);
-    }
 
     @Test
     void testGetTargetMetricInfo() {
@@ -61,14 +43,14 @@ class MetricsServiceTest {
 
         // Run the test
         final MetricInfoList result1 =
-                metricsServiceUnderTest.getTargetMetricInfo(metricList, MonitorResourceType.CPU);
+                converter.getTargetMetricInfo(metricList, MonitorResourceType.CPU);
         final MetricInfoList result2 =
-                metricsServiceUnderTest.getTargetMetricInfo(metricList, MonitorResourceType.MEM);
+                converter.getTargetMetricInfo(metricList, MonitorResourceType.MEM);
         final MetricInfoList result3 =
-                metricsServiceUnderTest.getTargetMetricInfo(metricList,
+                converter.getTargetMetricInfo(metricList,
                         MonitorResourceType.VM_NETWORK_OUTGOING);
         final MetricInfoList result4 =
-                metricsServiceUnderTest.getTargetMetricInfo(metricList,
+                converter.getTargetMetricInfo(metricList,
                         MonitorResourceType.VM_NETWORK_INCOMING);
 
         // Verify the results
