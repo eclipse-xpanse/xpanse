@@ -1,0 +1,232 @@
+package org.eclipse.xpanse.modules.monitor;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.monitor.Metric;
+import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
+import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
+import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {Monitor.class, PluginManager.class,
+        DeployResourceStorage.class, DeployServiceStorage.class})
+class MonitorTest {
+
+    private final String resourceId = "8d1495ae-8420-4172-93c1-746c09b4a005";
+    private final String serviceId = "23cc529b-64d9-4875-a2f0-08b415705964";
+    @MockBean
+    DeployServiceStorage mockDeployServiceStorage;
+    @MockBean
+    DeployResourceStorage mockDeployResourceStorage;
+    @MockBean
+    private PluginManager mockPluginManager;
+    @MockBean
+    private OrchestratorPlugin orchestratorPlugin;
+    @Autowired
+    private Monitor monitorUnderTest;
+
+    @Test
+    void testGetMetricsByServiceId() {
+        // Setup
+        final Metric metric = new Metric();
+        metric.setName("name");
+        metric.setDescription("description");
+        metric.setType(MetricType.COUNTER);
+        metric.setMonitorResourceType(MonitorResourceType.CPU);
+        metric.setUnit(MetricUnit.MB);
+        final List<Metric> expectedResult = List.of(metric);
+
+        // Configure DeployServiceStorage.findDeployServiceById(...).
+        final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        deployServiceEntity.setId(UUID.fromString(serviceId));
+        deployServiceEntity.setUserName("xpanseUserName");
+        deployServiceEntity.setCsp(Csp.HUAWEI);
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setResourceId(resourceId);
+        deployResourceEntity.setKind(DeployResourceKind.VM);
+        deployResourceEntity.setProperties(Map.ofEntries(Map.entry("value", "value")));
+        deployServiceEntity.setDeployResourceList(List.of(deployResourceEntity));
+        when(mockDeployServiceStorage.findDeployServiceById(eq(UUID.fromString(serviceId))))
+                .thenReturn(deployServiceEntity);
+        when(mockPluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(
+                getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
+        when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
+        // Run the test
+        final List<Metric> result =
+                monitorUnderTest.getMetricsByServiceId(serviceId,
+                        null, null, null, null, true);
+
+        final List<Metric> result1 =
+                monitorUnderTest.getMetricsByServiceId(serviceId,
+                        null, null, null, null, false);
+
+        // Verify the results
+        assertThat(result).isEqualTo(expectedResult);
+        assertThat(result1).isEqualTo(expectedResult);
+    }
+
+
+    @Test
+    void testGetMetricsByResourceIdException() {
+
+        // Configure DeployResourceStorage.findDeployResourceByResourceId(...).
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setKind(DeployResourceKind.PUBLIC_IP);
+        deployResourceEntity.setResourceId(resourceId);
+        when(mockDeployResourceStorage.findDeployResourceByResourceId(eq(resourceId)))
+                .thenReturn(deployResourceEntity);
+
+        Assertions.assertThrows(ResourceNotSupportedForMonitoringException.class,
+                () -> monitorUnderTest.getMetricsByResourceId(resourceId, null, null, null, null,
+                        false));
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> monitorUnderTest.getMetricsByResourceId(UUID.randomUUID().toString(), null,
+                        Long.MAX_VALUE, Long.MAX_VALUE, null,
+                        false));
+
+        // Verify the results
+        Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> monitorUnderTest.getMetricsByResourceId("id", null, null, null, null,
+                        false));
+    }
+
+    @Test
+    void testGetMetricsByResourceId() {
+
+        // Setup
+        final Metric metric = new Metric();
+        metric.setName("name");
+        metric.setDescription("description");
+        metric.setType(MetricType.COUNTER);
+        metric.setMonitorResourceType(MonitorResourceType.CPU);
+        metric.setUnit(MetricUnit.MB);
+        final List<Metric> expectedResult = List.of(metric);
+
+        // Configure DeployResourceStorage.findDeployResourceByResourceId(...).
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setKind(DeployResourceKind.VM);
+        deployResourceEntity.setResourceId(resourceId);
+        final DeployServiceEntity deployService = new DeployServiceEntity();
+        deployService.setId(UUID.fromString(serviceId));
+        deployService.setUserName("xpanseUserName");
+        deployService.setCsp(Csp.HUAWEI);
+        deployService.setDeployResourceList(List.of(new DeployResourceEntity()));
+        deployResourceEntity.setDeployService(deployService);
+        deployResourceEntity.setProperties(Map.ofEntries(Map.entry("value", "value")));
+        when(mockDeployResourceStorage.findDeployResourceByResourceId(eq(resourceId)))
+                .thenReturn(deployResourceEntity);
+        when(mockPluginManager.getOrchestratorPlugin(Csp.HUAWEI)).thenReturn(
+                getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
+        when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
+        when(mockDeployServiceStorage.findDeployServiceById(eq(UUID.fromString(serviceId))))
+                .thenReturn(deployService);
+        when(mockPluginManager.getOrchestratorPlugin(Csp.HUAWEI)).thenReturn(
+                getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
+        when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
+
+        // Run the test
+        final List<Metric> result =
+                monitorUnderTest.getMetricsByResourceId(resourceId, null, null, null, null,
+                        true);
+
+        final List<Metric> result1 =
+                monitorUnderTest.getMetricsByResourceId(resourceId, null, null, null, null,
+                        false);
+        // Verify the results
+        assertThat(result).isEqualTo(expectedResult);
+
+        assertThat(result1).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testGetMetricsBySourceIdException() {
+        long currentTimeMillis = System.currentTimeMillis();
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> monitorUnderTest.getMetricsByServiceId(UUID.randomUUID().toString(), null,
+                        currentTimeMillis, 1L, null,
+                        false));
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> monitorUnderTest.getMetricsByServiceId(UUID.randomUUID().toString(), null,
+                        currentTimeMillis + 3000, currentTimeMillis + 5000, null,
+                        false));
+
+        Assertions.assertThrows(ServiceNotDeployedException.class,
+                () -> monitorUnderTest.getMetricsByServiceId(UUID.randomUUID().toString(), null,
+                        null, null, null,
+                        false));
+    }
+
+    private OrchestratorPlugin getOrchestratorPlugin(Csp csp, List<Metric> metrics) {
+        return new OrchestratorPlugin() {
+            @Override
+            public Csp getCsp() {
+                return csp;
+            }
+
+            @Override
+            public List<String> requiredProperties() {
+                return null;
+            }
+
+            @Override
+            public List<CredentialType> getAvailableCredentialTypes() {
+                return null;
+            }
+
+            @Override
+            public List<AbstractCredentialInfo> getCredentialDefinitions() {
+                return null;
+            }
+
+            @Override
+            public DeployResourceHandler getResourceHandler() {
+                return null;
+            }
+
+            @Override
+            public List<Metric> getMetricsForResource(
+                    ResourceMetricRequest resourceMetricRequest) {
+                return metrics;
+            }
+
+            @Override
+            public List<Metric> getMetricsForService(
+                    ServiceMetricRequest serviceMetricRequest) {
+                return metrics;
+            }
+        };
+
+    }
+
+}
