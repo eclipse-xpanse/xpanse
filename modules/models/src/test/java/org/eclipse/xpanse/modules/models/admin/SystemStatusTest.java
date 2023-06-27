@@ -7,9 +7,7 @@
 package org.eclipse.xpanse.modules.models.admin;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -35,10 +33,12 @@ class SystemStatusTest {
     }
 
     @Test
-    public void tsetToString() {
+    void testToString() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
-        Assertions.assertEquals("OK", systemStatus.healthStatus.toString());
+
+        String expectedToString = "SystemStatus(healthStatus=OK)";
+        assertEquals(expectedToString, systemStatus.toString());
     }
 
     @Test
@@ -59,9 +59,10 @@ class SystemStatusTest {
         SystemStatus systemStatus3 = new SystemStatus();
         systemStatus3.setHealthStatus(HealthStatus.NOK);
 
-        assertTrue(systemStatus1.equals(systemStatus2));
+        assertEquals(systemStatus1, systemStatus2);
         assertEquals(systemStatus1.hashCode(), systemStatus2.hashCode());
-        assertFalse(systemStatus1.equals(systemStatus3));
+        assertNotEquals(systemStatus1, systemStatus3);
         assertNotEquals(systemStatus1.hashCode(), systemStatus3.hashCode());
     }
+
 }

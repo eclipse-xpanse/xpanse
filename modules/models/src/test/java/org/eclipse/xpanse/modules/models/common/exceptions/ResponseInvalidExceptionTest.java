@@ -4,37 +4,29 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.service.register.exceptions;
+package org.eclipse.xpanse.modules.models.common.exceptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test of TerraformScriptFormatInvalidException.
+ * Test of ResponseInvalidException.
  */
-class TerraformScriptFormatInvalidExceptionTest {
+class ResponseInvalidExceptionTest {
 
-    private List<String> errorReasons1;
-    private List<String> errorReasons2;
-    private List<String> errorReasons3;
+    private static final List<String> errorReasons1 = Arrays.asList("Reason 1", "Reason 2");
+    private static final List<String> errorReasons2 = Arrays.asList("Reason 1", "Reason 2");
+    private static final List<String> errorReasons3 = Arrays.asList("Reason 1", "Reason 3");
 
-    @BeforeEach
-    void setUp() {
-        errorReasons1 = new ArrayList<>(Arrays.asList("Reason 1", "Reason 2"));
-        errorReasons2 = new ArrayList<>(Arrays.asList("Reason 1", "Reason 2"));
-        errorReasons3 = new ArrayList<>(Arrays.asList("Reason 1", "Reason 3"));
-    }
 
     @Test
     void testConstructorAndGetErrorReasons() {
         ResponseInvalidException exception = new ResponseInvalidException(errorReasons1);
+
         assertEquals(errorReasons1, exception.getErrorReasons());
     }
 
@@ -54,11 +46,18 @@ class TerraformScriptFormatInvalidExceptionTest {
     }
 
     @Test
+    void testEqualsWithDifferentObjectTypes() {
+        ResponseInvalidException exception = new ResponseInvalidException(errorReasons1);
+
+        assertNotEquals(exception, null);
+        assertNotEquals(exception, "InvalidException");
+    }
+
+    @Test
     void testToString() {
         ResponseInvalidException exception = new ResponseInvalidException(errorReasons1);
 
-        String expectedToString =
-                "ResponseInvalidException(errorReasons=" + errorReasons1 + ")";
+        String expectedToString = "ResponseInvalidException(errorReasons=" + errorReasons1 + ")";
         assertEquals(expectedToString, exception.toString());
     }
 
