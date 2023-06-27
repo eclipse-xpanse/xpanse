@@ -1,0 +1,52 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/V1.0/.*/metric-data(.*net_bitSent.*)"
+      },
+      "response": {
+        "transformers": [
+          "response-template"
+        ],
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "SDK-HMAC-SHA256 Access=QU6EIIXEBIUFLW3QZTSY, SignedHeaders=content-type;host;x-sdk-date, Signature=3821f47510dffa190cab2775d258c72ce0163c00411a209a7258e6cc1c305c34",
+          "Host": "127.0.0.1:9090",
+          "X-Sdk-Date": "20230621T082359Z"
+        },
+        "status": 200,
+        "jsonBody": {
+          "datapoints": [
+            {
+              "average": 3472.93,
+              "timestamp": 1687336740000,
+              "unit": "bit/s"
+            },
+            {
+              "average": 1966.93,
+              "timestamp": 1687336800000,
+              "unit": "bit/s"
+            },
+            {
+              "average": 1921.2,
+              "timestamp": 1687336860000,
+              "unit": "bit/s"
+            },
+            {
+              "average": 1921.73,
+              "timestamp": 1687336920000,
+              "unit": "bit/s"
+            },
+            {
+              "average": 1924.27,
+              "timestamp": 1687336980000,
+              "unit": "bit/s"
+            }
+          ],
+          "metric_name": "net_bitSent"
+        }
+      }
+    }
+  ]
+}
