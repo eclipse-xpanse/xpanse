@@ -24,7 +24,7 @@ public abstract class AbstractMariaDbIntegrationTest {
     private static final MariaDBContainer<?> mariaDBContainer;
 
     static {
-        mariaDBContainer = new MariaDBContainer<>(DockerImageName.parse("mariadb:10.6.14"));
+        mariaDBContainer = new MariaDBContainer<>(DockerImageName.parse("mariadb:10.11.4"));
         mariaDBContainer.start();
     }
 
