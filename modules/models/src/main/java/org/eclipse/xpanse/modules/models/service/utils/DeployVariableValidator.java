@@ -15,6 +15,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.VariableValidator;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
@@ -217,8 +218,9 @@ public class DeployVariableValidator {
                 }
             }
             if (!ignoredKeys.isEmpty()) {
-                throw new IllegalArgumentException(String.format("Required keys %s  of deploy "
-                        + " variables not found in deploy property", ignoredKeys));
+                throw new InvalidDeploymentVariableException(
+                        String.format("Required keys %s  of deploy "
+                                + " variables not found in deploy property", ignoredKeys));
             }
             // check input value of variables is valid by validator of Ocl context.
             Map<String, Map<VariableValidator, String>> variableInfoMap = getVariableValidatorMap(
@@ -318,10 +320,11 @@ public class DeployVariableValidator {
                 }
             }
         } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException(errorMsg, ex);
+            log.error(ex.getMessage(), ex);
+            throw new InvalidDeploymentVariableException(errorMsg);
         }
         if (!isValid) {
-            throw new IllegalArgumentException(errorMsg);
+            throw new InvalidDeploymentVariableException(errorMsg);
         }
     }
 

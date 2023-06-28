@@ -16,6 +16,7 @@ import org.eclipse.xpanse.api.exceptions.DeploymentExceptionHandler;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
@@ -127,6 +128,18 @@ class DeploymentExceptionHandlerTests {
                         get("/xpanse/auth/user/credentials?userName=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Deployment Not Found"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testInvalidDeploymentVariableException() throws Exception {
+        when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
+                new InvalidDeploymentVariableException(
+                        "test error"));
+        this.mockMvc.perform(
+                        get("/xpanse/auth/user/credentials?userName=test"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Deployment Variable Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }
