@@ -114,7 +114,7 @@ class RegisteredServiceVoTest {
                 ", ocl=" + ocl +
                 ", createTime=" + createTime +
                 ", lastModifiedTime=" + lastModifiedTime +
-                ", serviceState=" + serviceState +
+                ", serviceRegistrationState=" + serviceState +
                 ")";
         assertEquals(expectedToString, registeredServiceVo.toString());
     }
