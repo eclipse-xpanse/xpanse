@@ -274,7 +274,7 @@ public class CredentialCenter {
                     String.format("Defined credentials with type %s and name %s "
                                     + "provided by csp %s not found.",
                             inputCredential.getType(), inputCredential.getName(),
-                            inputCredential.getType()));
+                            inputCredential.getCsp()));
         }
         // check all fields in the input credential are valid based on the defined credentials.
         for (AbstractCredentialInfo credentialAbility : credentialAbilities) {
