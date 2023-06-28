@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.service.register.Region;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceAlreadyRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
@@ -125,7 +126,7 @@ public class RegisterServiceImpl implements RegisterService {
         if (!newParams.toLowerCase(Locale.ROOT).equals(oldParams.toLowerCase(Locale.ROOT))) {
             log.error("Update service failed, Field {} cannot changed with update request",
                     oldParams);
-            throw new IllegalArgumentException(String.format(
+            throw new ServiceUpdateNotAllowed(String.format(
                     "Update service failed, Field %s cannot changed with update request",
                     oldParams));
         }

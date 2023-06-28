@@ -92,7 +92,7 @@
             <artifactId>openstack</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--junit4 dependency needed in classpath for testcotainers due to a known issue-->
+        <!--junit4 dependency needed in classpath for testcontainers due to a known issue-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -127,7 +127,7 @@
     <build>
         <plugins>
             <plugin>
-                <!--used to update an application version in the application banner-->
+                <!--used to update the application version in the application banner-->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>

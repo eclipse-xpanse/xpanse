@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -143,8 +144,8 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
         if (repository.existsById(uuid)) {
             repository.deleteById(uuid);
         } else {
-            throw new IllegalStateException(
-                    String.format("Registered service %s not existed.", uuid));
+            throw new ServiceNotRegisteredException(
+                    String.format("Registered service %s not found.", uuid));
         }
 
     }
