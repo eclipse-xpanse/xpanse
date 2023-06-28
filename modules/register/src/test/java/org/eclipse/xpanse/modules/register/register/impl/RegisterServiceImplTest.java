@@ -27,8 +27,8 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeploy
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.service.view.CategoryOclVo;
@@ -82,7 +82,7 @@ class RegisterServiceImplTest {
         registerServiceEntity.setName(oclRegister.getName());
         registerServiceEntity.setId(UUID.randomUUID());
         registerServiceEntity.setCategory(oclRegister.getCategory());
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
+        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         registerServiceEntity.setVersion(oclRegister.getServiceVersion());
         registerServiceEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         registerServiceEntity.setOcl(oclRegister);
@@ -97,8 +97,8 @@ class RegisterServiceImplTest {
                 registerServiceImplUnderTest.updateRegisteredServiceByUrl(uuid.toString(),
                         oclLocation);
         log.error(registeredServiceEntityByUrl.toString());
-        Assertions.assertEquals(ServiceState.UPDATED,
-                registeredServiceEntityByUrl.getServiceState());
+        Assertions.assertEquals(ServiceRegistrationState.UPDATED,
+                registeredServiceEntityByUrl.getServiceRegistrationState());
         verify(registeredServicesOpenApiGenerator).updateServiceApi(registerServiceEntity);
     }
 
@@ -118,7 +118,7 @@ class RegisterServiceImplTest {
         registerServiceEntity.setName(oclRegister.getName());
         registerServiceEntity.setId(UUID.randomUUID());
         registerServiceEntity.setCategory(oclRegister.getCategory());
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
+        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         registerServiceEntity.setVersion(oclRegister.getServiceVersion());
         registerServiceEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         registerServiceEntity.setOcl(oclRegister);
@@ -131,8 +131,8 @@ class RegisterServiceImplTest {
         RegisterServiceEntity updateRegisteredServiceEntity =
                 registerServiceImplUnderTest.updateRegisteredService(uuid.toString(), ocl);
         log.error(updateRegisteredServiceEntity.toString());
-        Assertions.assertEquals(ServiceState.UPDATED,
-                updateRegisteredServiceEntity.getServiceState());
+        Assertions.assertEquals(ServiceRegistrationState.UPDATED,
+                updateRegisteredServiceEntity.getServiceRegistrationState());
         verify(registeredServicesOpenApiGenerator).updateServiceApi(registerServiceEntity);
     }
 
@@ -143,7 +143,7 @@ class RegisterServiceImplTest {
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerService(oclRegister);
-        Assertions.assertEquals(ServiceState.REGISTERED, registerServiceEntity.getServiceState());
+        Assertions.assertEquals(ServiceRegistrationState.REGISTERED, registerServiceEntity.getServiceRegistrationState());
         verify(registeredServicesOpenApiGenerator).generateServiceApi(registerServiceEntity);
     }
 
@@ -155,7 +155,7 @@ class RegisterServiceImplTest {
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         RegisterServiceEntity registerServiceEntity =
                 registerServiceImplUnderTest.registerServiceByUrl(oclLocation);
-        Assertions.assertEquals(ServiceState.REGISTERED, registerServiceEntity.getServiceState());
+        Assertions.assertEquals(ServiceRegistrationState.REGISTERED, registerServiceEntity.getServiceRegistrationState());
         verify(registeredServicesOpenApiGenerator).generateServiceApi(registerServiceEntity);
     }
 
@@ -172,7 +172,7 @@ class RegisterServiceImplTest {
         registerServiceEntity.setName(oclRegister.getName());
         registerServiceEntity.setId(UUID.randomUUID());
         registerServiceEntity.setCategory(oclRegister.getCategory());
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
+        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         registerServiceEntity.setVersion(oclRegister.getServiceVersion());
         registerServiceEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         registerServiceEntity.setOcl(oclRegister);
@@ -189,7 +189,7 @@ class RegisterServiceImplTest {
         registerServiceEntity.setName(oclRegister.getName());
         registerServiceEntity.setId(UUID.randomUUID());
         registerServiceEntity.setCategory(oclRegister.getCategory());
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
+        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         registerServiceEntity.setVersion(oclRegister.getServiceVersion());
         registerServiceEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         registerServiceEntity.setOcl(oclRegister);
@@ -229,7 +229,7 @@ class RegisterServiceImplTest {
         registerServiceEntity.setName(oclRegister.getName());
         registerServiceEntity.setId(UUID.randomUUID());
         registerServiceEntity.setCategory(oclRegister.getCategory());
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
+        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         registerServiceEntity.setVersion(oclRegister.getServiceVersion());
         registerServiceEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         registerServiceEntity.setOcl(oclRegister);
@@ -277,7 +277,7 @@ class RegisterServiceImplTest {
         registerServiceEntity.setName(oclRegister.getName());
         registerServiceEntity.setId(UUID.randomUUID());
         registerServiceEntity.setCategory(oclRegister.getCategory());
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
+        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         registerServiceEntity.setVersion(oclRegister.getServiceVersion());
         registerServiceEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         registerServiceEntity.setOcl(oclRegister);

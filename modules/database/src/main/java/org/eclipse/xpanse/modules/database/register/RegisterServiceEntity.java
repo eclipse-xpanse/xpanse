@@ -24,8 +24,8 @@ import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.hibernate.annotations.Type;
 
 /**
@@ -63,7 +63,7 @@ public class RegisterServiceEntity extends CreateModifiedTime {
     @Convert(converter = ObjectJsonConverter.class)
     private Ocl ocl;
 
-    @Column(name = "SERVICE_STATE")
+    @Column(name = "SERVICE_REGISTRATION_STATE")
     @Enumerated(EnumType.STRING)
-    private ServiceState serviceState;
+    private ServiceRegistrationState serviceRegistrationState;
 }

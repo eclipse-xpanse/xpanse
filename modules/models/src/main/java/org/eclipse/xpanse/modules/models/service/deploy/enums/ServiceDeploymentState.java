@@ -12,10 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Defines possible states of a managed service.
  */
-public enum ServiceState {
+public enum ServiceDeploymentState {
 
-    REGISTERED("registered"),
-    UPDATED("updated"),
     DEPLOYING("deploying"),
     DEPLOY_SUCCESS("deploy_success"),
     DEPLOY_FAILED("deploy_failed"),
@@ -24,19 +22,19 @@ public enum ServiceState {
     DESTROY_FAILED("destroy_failed");
 
 
-    private final String serviceState;
+    private final String state;
 
-    ServiceState(String serviceState) {
-        this.serviceState = serviceState;
+    ServiceDeploymentState(String state) {
+        this.state = state;
     }
 
     /**
-     * For BillingPeriod serialize.
+     * For ServiceDeploymentState deserialize.
      */
     @JsonCreator
-    public ServiceState getByValue(String state) {
-        for (ServiceState serviceState : values()) {
-            if (serviceState.serviceState.equals(StringUtils.lowerCase(state))) {
+    public ServiceDeploymentState getByValue(String state) {
+        for (ServiceDeploymentState serviceState : values()) {
+            if (serviceState.state.equals(StringUtils.lowerCase(state))) {
                 return serviceState;
             }
         }
@@ -44,7 +42,7 @@ public enum ServiceState {
     }
 
     /**
-     * For BillingPeriod deserialize.
+     * For ServiceDeploymentState serialize.
      */
     @JsonValue
     public String toValue() {
