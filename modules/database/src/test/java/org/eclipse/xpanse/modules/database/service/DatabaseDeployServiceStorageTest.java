@@ -29,14 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
  * Test for DatabaseDeployServiceStorage.
  */
 @Transactional
-public class DatabaseDeployServiceStorageTest {
+class DatabaseDeployServiceStorageTest {
 
     @PersistenceContext
     EntityManager entityManager;
 
     @Disabled
     @Test
-    public void basicTest() throws Exception {
+    void basicTest() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test.yaml"));
