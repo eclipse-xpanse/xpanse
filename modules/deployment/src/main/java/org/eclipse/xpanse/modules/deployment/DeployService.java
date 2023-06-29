@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
@@ -154,10 +154,10 @@ public class DeployService {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
         try {
-            deployServiceEntity.setServiceState(ServiceState.DEPLOYING);
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
-            deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
             deployServiceEntity.setProperties(deployResult.getProperties());
             deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
             deployServiceEntity.setDeployResourceList(
@@ -165,7 +165,7 @@ public class DeployService {
             deployServiceStorage.storeAndFlush(deployServiceEntity);
         } catch (RuntimeException e) {
             log.error("asyncDeployService failed.", e);
-            deployServiceEntity.setServiceState(ServiceState.DEPLOY_FAILED);
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
             deployServiceEntity.setResultMessage(e.getMessage());
             deployServiceStorage.storeAndFlush(deployServiceEntity);
         }
@@ -203,8 +203,9 @@ public class DeployService {
                             deployTask.getId()));
         }
         // Get state of service.
-        ServiceState state = deployServiceEntity.getServiceState();
-        if (state.equals(ServiceState.DEPLOYING) || state.equals(ServiceState.DESTROYING)) {
+        ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
+        if (state.equals(ServiceDeploymentState.DEPLOYING)
+                || state.equals(ServiceDeploymentState.DESTROYING)) {
             throw new InvalidServiceStateException(String.format("Service with id %s is %s.",
                     deployTask.getId(), state));
         }
@@ -235,12 +236,13 @@ public class DeployService {
                             deployTask.getId()));
         }
         try {
-            deployServiceEntity.setServiceState(ServiceState.DESTROYING);
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             DeployResult deployResult = deployment.destroy(deployTask,
                     deployServiceEntity.getPrivateProperties().get("stateFile"));
             if (deployResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
-                deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
+                deployServiceEntity.setServiceDeploymentState(
+                        ServiceDeploymentState.DESTROY_SUCCESS);
                 deployServiceEntity.setProperties(deployResult.getProperties());
                 deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
                 List<DeployResource> resources = deployResult.getResources();
@@ -252,13 +254,14 @@ public class DeployService {
                 }
                 deployServiceStorage.storeAndFlush(deployServiceEntity);
             } else {
-                deployServiceEntity.setServiceState(ServiceState.DESTROY_FAILED);
+                deployServiceEntity.setServiceDeploymentState(
+                        ServiceDeploymentState.DESTROY_FAILED);
                 deployServiceStorage.storeAndFlush(deployServiceEntity);
             }
         } catch (Exception e) {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());
-            deployServiceEntity.setServiceState(ServiceState.DESTROY_FAILED);
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
         }
 

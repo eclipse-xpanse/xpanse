@@ -22,10 +22,10 @@ import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.register.Region;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceAlreadyRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceUpdateNotAllowed;
@@ -97,7 +97,7 @@ public class RegisterServiceImpl implements RegisterService {
         checkParams(existedService, ocl);
         validateTerraformScript(ocl);
         existedService.setOcl(ocl);
-        existedService.setServiceState(ServiceState.UPDATED);
+        existedService.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
         storage.store(existedService);
         registeredServicesOpenApiGenerator.updateServiceApi(existedService);
         return existedService;
@@ -139,7 +139,7 @@ public class RegisterServiceImpl implements RegisterService {
         entity.setCsp(ocl.getCloudServiceProvider().getName());
         entity.setCategory(ocl.getCategory());
         entity.setOcl(ocl);
-        entity.setServiceState(ServiceState.REGISTERED);
+        entity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         return entity;
     }
 

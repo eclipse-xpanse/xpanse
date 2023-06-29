@@ -19,11 +19,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Billing;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.Region;
+import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
@@ -98,6 +98,6 @@ public class UserAvailableServiceVo extends RepresentationModel<UserAvailableSer
 
     @NotNull
     @Schema(description = "The state of the available service.")
-    private ServiceState serviceState;
+    private ServiceRegistrationState serviceRegistrationState;
 
 }

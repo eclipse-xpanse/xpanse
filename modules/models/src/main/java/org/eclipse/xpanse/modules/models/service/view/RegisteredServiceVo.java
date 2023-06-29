@@ -16,8 +16,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
@@ -65,6 +65,6 @@ public class RegisteredServiceVo extends RepresentationModel<RegisteredServiceVo
 
     @NotNull
     @Schema(description = "State of service.")
-    private ServiceState serviceState;
+    private ServiceRegistrationState serviceRegistrationState;
 
 }

@@ -13,8 +13,8 @@ import java.util.Date;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,20 +27,20 @@ class RegisteredServiceVoTest {
     private static final String version = "1.0";
     private static final Csp csp = Csp.HUAWEI;
     private static final Ocl ocl = new Ocl();
-    private static final ServiceState serviceState = ServiceState.REGISTERED;
+    private static final ServiceRegistrationState serviceState = ServiceRegistrationState.REGISTERED;
     private static final Category category = Category.COMPUTE;
     private static final Date createTime = new Date();
     private static final Date lastModifiedTime = new Date();
 
     @Test
-    public void testGetterAndSetter() {
+    void testGetterAndSetter() {
         RegisteredServiceVo registeredServiceVo = new RegisteredServiceVo();
         registeredServiceVo.setId(id);
         registeredServiceVo.setName(name);
         registeredServiceVo.setVersion(version);
         registeredServiceVo.setCsp(csp);
         registeredServiceVo.setOcl(ocl);
-        registeredServiceVo.setServiceState(serviceState);
+        registeredServiceVo.setServiceRegistrationState(serviceState);
         registeredServiceVo.setCategory(category);
         registeredServiceVo.setCreateTime(createTime);
         registeredServiceVo.setLastModifiedTime(lastModifiedTime);
@@ -50,21 +50,21 @@ class RegisteredServiceVoTest {
         assertEquals(version, registeredServiceVo.getVersion());
         assertEquals(csp, registeredServiceVo.getCsp());
         assertEquals(ocl, registeredServiceVo.getOcl());
-        assertEquals(serviceState, registeredServiceVo.getServiceState());
+        assertEquals(serviceState, registeredServiceVo.getServiceRegistrationState());
         assertEquals(category, registeredServiceVo.getCategory());
         assertEquals(createTime, registeredServiceVo.getCreateTime());
         assertEquals(lastModifiedTime, registeredServiceVo.getLastModifiedTime());
     }
 
     @Test
-    public void testEqualsAndHashCode() {
+    void testEqualsAndHashCode() {
         RegisteredServiceVo registeredServiceVo1 = new RegisteredServiceVo();
         registeredServiceVo1.setId(id);
         registeredServiceVo1.setName(name);
         registeredServiceVo1.setVersion(version);
         registeredServiceVo1.setCsp(csp);
         registeredServiceVo1.setOcl(ocl);
-        registeredServiceVo1.setServiceState(serviceState);
+        registeredServiceVo1.setServiceRegistrationState(serviceState);
 
 
         RegisteredServiceVo registeredServiceVo2 = new RegisteredServiceVo();
@@ -73,7 +73,7 @@ class RegisteredServiceVoTest {
         registeredServiceVo2.setVersion(version);
         registeredServiceVo2.setCsp(csp);
         registeredServiceVo2.setOcl(ocl);
-        registeredServiceVo2.setServiceState(serviceState);
+        registeredServiceVo2.setServiceRegistrationState(serviceState);
 
         RegisteredServiceVo registeredServiceVo3 = new RegisteredServiceVo();
         registeredServiceVo3.setId(UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5"));
@@ -81,7 +81,7 @@ class RegisteredServiceVoTest {
         registeredServiceVo3.setVersion("v2.0");
         registeredServiceVo3.setCsp(Csp.FLEXIBLE_ENGINE);
         registeredServiceVo3.setOcl(ocl);
-        registeredServiceVo3.setServiceState(ServiceState.UPDATED);
+        registeredServiceVo3.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
 
         assertEquals(registeredServiceVo1, registeredServiceVo1);
         assertEquals(registeredServiceVo1, registeredServiceVo2);
@@ -104,7 +104,7 @@ class RegisteredServiceVoTest {
         registeredServiceVo.setOcl(ocl);
         registeredServiceVo.setCreateTime(createTime);
         registeredServiceVo.setLastModifiedTime(lastModifiedTime);
-        registeredServiceVo.setServiceState(serviceState);
+        registeredServiceVo.setServiceRegistrationState(serviceState);
 
         String expectedToString = "RegisteredServiceVo(id=" + id +
                 ", name=" + name +
@@ -114,7 +114,7 @@ class RegisteredServiceVoTest {
                 ", ocl=" + ocl +
                 ", createTime=" + createTime +
                 ", lastModifiedTime=" + lastModifiedTime +
-                ", serviceState=" + serviceState +
+                ", serviceRegistrationState=" + serviceState +
                 ")";
         assertEquals(expectedToString, registeredServiceVo.toString());
     }

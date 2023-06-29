@@ -15,7 +15,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.api.ServiceDeployerApi;
 import org.eclipse.xpanse.api.ServiceRegisterApi;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
@@ -62,7 +62,7 @@ class DeploymentWithMariaDbTest extends AbstractMariaDbIntegrationTest {
                 serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString(),
                         createRequest.getUserName());
         Assertions.assertNotNull(serviceDetailVo);
-        Assertions.assertEquals(ServiceState.DEPLOY_FAILED, serviceDetailVo.getServiceState());
+        Assertions.assertEquals(ServiceDeploymentState.DEPLOY_FAILED, serviceDetailVo.getServiceDeploymentState());
     }
 
     private RegisteredServiceVo registerService() throws Exception {

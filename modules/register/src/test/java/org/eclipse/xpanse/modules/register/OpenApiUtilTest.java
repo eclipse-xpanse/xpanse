@@ -13,8 +13,8 @@ import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
@@ -59,7 +59,7 @@ class OpenApiUtilTest {
         registerServiceEntity.setCsp(Csp.HUAWEI);
         registerServiceEntity.setCategory(Category.MIDDLEWARE);
         registerServiceEntity.setOcl(ocl);
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
+        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
         OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL, OPENAPI_PATH, SERVICER_PORT);
         RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator = new RegisteredServicesOpenApiGenerator(
@@ -82,7 +82,7 @@ class OpenApiUtilTest {
         registerServiceEntity.setCsp(Csp.HUAWEI);
         registerServiceEntity.setCategory(Category.AI);
         registerServiceEntity.setOcl(ocl);
-        registerServiceEntity.setServiceState(ServiceState.REGISTERED);
+        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
         OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
                 OPENAPI_PATH, SERVICER_PORT);
