@@ -11,6 +11,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
@@ -113,6 +114,19 @@ public class DeploymentExceptionHandler {
     public Response handleServiceNotDeployedException(
             ServiceNotDeployedException ex) {
         return Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                Collections.singletonList(ex.getMessage()));
+
+    }
+
+    /**
+     * Exception handler for ServiceNotDeployedException.
+     */
+    @ExceptionHandler({InvalidDeploymentVariableException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleInvalidDeploymentVariableException(
+            InvalidDeploymentVariableException ex) {
+        return Response.errorResponse(ResultType.DEPLOYMENT_VARIABLE_INVALID,
                 Collections.singletonList(ex.getMessage()));
 
     }
