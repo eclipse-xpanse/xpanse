@@ -5,19 +5,12 @@
 
 package org.eclipse.xpanse.plugins.openstack;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import java.time.Instant;
-import java.util.List;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
+import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
@@ -25,6 +18,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;
@@ -41,10 +35,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.openstack4j.openstack.OSFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.time.Instant;
+import java.util.List;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {OpenstackOrchestratorPlugin.class, MetricsManager.class,
@@ -60,6 +64,12 @@ class OpenstackMonitoringIntegrationTest {
                     .dynamicPort()
                     .extensions(new ResponseTemplateTransformer(true)))
             .build();
+    @Autowired
+    OpenstackOrchestratorPlugin plugin;
+    @MockBean
+    CredentialCenter credentialCenter;
+    @MockBean
+    MonitorMetricStore monitorMetricStore;
 
     @BeforeAll
     void setEnvVar() {
@@ -67,21 +77,21 @@ class OpenstackMonitoringIntegrationTest {
                 wireMockExtension.getRuntimeInfo().getHttpBaseUrl() + "/identity/v3");
     }
 
-    @Autowired
-    OpenstackOrchestratorPlugin plugin;
-
-    @MockBean
-    CredentialCenter credentialCenter;
-
-    @MockBean
-    MonitorMetricStore monitorMetricStore;
-
     public ResourceMetricRequest setupResourceRequest(Long from, Long to, Integer period,
                                                       boolean onlyLastKnownMetric) {
         return new ResourceMetricRequest(
                 Instancio.of(DeployResource.class).set(Select.field(DeployResource::getKind),
                         DeployResourceKind.VM).set(Select.field(DeployResource::getResourceId),
                         "7b5b6ee6-cab4-4e72-be6e-854a67c6d381").create(),
+                null, from, to, period, onlyLastKnownMetric, "user");
+    }
+
+    public ServiceMetricRequest setupServiceRequest(Long from, Long to, Integer period,
+                                                    boolean onlyLastKnownMetric) {
+        return new ServiceMetricRequest(
+                List.of(Instancio.of(DeployResource.class).set(Select.field(DeployResource::getKind),
+                        DeployResourceKind.VM).set(Select.field(DeployResource::getResourceId),
+                        "7b5b6ee6-cab4-4e72-be6e-854a67c6d381").create()),
                 null, from, to, period, onlyLastKnownMetric, "user");
     }
 
@@ -155,6 +165,32 @@ class OpenstackMonitoringIntegrationTest {
         Assertions.assertEquals(1, metrics.get(0).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
     }
+
+
+    @Test
+    void testGetMetricsForServiceOnlyLastKnownMetric() {
+        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+                getCredentialDefinition());
+        List<Metric> metrics =
+                this.plugin.getMetricsForService(setupServiceRequest(null, null, 150, true));
+        Assertions.assertFalse(metrics.isEmpty());
+        Assertions.assertEquals(4, metrics.size());
+        Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
+        Assertions.assertEquals(MetricType.GAUGE, metrics.get(1).getType());
+        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.get(0).getName());
+        Assertions.assertEquals(MonitorResourceType.MEM.toValue(), metrics.get(1).getName());
+        Assertions.assertEquals(1, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
+    }
+
+    @Test
+    void testGetMetricsException() {
+        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+                this.plugin.getCredentialDefinitions().get(0));
+        Assertions.assertThrows(CredentialsNotFoundException.class,
+                () -> this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, true)));
+    }
+
 
     private CredentialVariables getCredentialDefinition() {
         CredentialVariables credentialVariables =

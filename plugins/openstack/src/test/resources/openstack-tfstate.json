@@ -685,6 +685,93 @@
           "sensitive_attributes": []
         }
       ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_blockstorage_volume_v3",
+      "name": "volume",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "attachment": [],
+            "availability_zone": "RegionOne",
+            "cascade": false,
+            "consistency_group_id": null,
+            "description": "my volume",
+            "id": "dfa9c658-c398-4366-a7ae-29113a829e8c",
+            "image_id": null,
+            "metadata": {},
+            "multiattach": false,
+            "name": "volume",
+            "region": "RegionOne",
+            "size": 20,
+            "snapshot_id": "",
+            "source_replica": null,
+            "source_vol_id": "",
+            "tags": null,
+            "timeouts": null,
+            "volume_type": "SAS"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.openstack_compute_availability_zones_v2.osc-az"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_networking_floatingip_v2",
+      "name": "osc-eip-kafka-zookeeper",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": "127.0.0.1",
+            "auto_pay": null,
+            "auto_renew": null,
+            "bandwidth": [
+              {
+                "charge_mode": "traffic",
+                "id": "a8299462-3a3a-4385-89f1-d9b8f1173831",
+                "name": "osc-eip-kafka-zookeeper-27e7c494",
+                "share_type": "PER",
+                "size": 5
+              }
+            ],
+            "charging_mode": null,
+            "tenant_id": "55a93d3bbb784dcba80a297ab9bc1c4d",
+            "id": "db9a443b-a59c-48e2-9d48-911d13b4c744",
+            "ipv6_address": "",
+            "name": "",
+            "period": null,
+            "period_unit": null,
+            "port_id": "",
+            "private_ip": "",
+            "publicip": [
+              {
+                "ip_address": "127.0.0.1",
+                "ip_version": 4,
+                "port_id": "",
+                "type": "5_sbgp"
+              }
+            ],
+            "region": "RegionOne",
+            "status": "UNBOUND",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "random_id.new"
+          ]
+        }
+      ]
     }
   ],
   "check_results": null
