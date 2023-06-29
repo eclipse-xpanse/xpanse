@@ -37,7 +37,8 @@ public enum ResultType {
     ICON_PROCESSING_FAILED("Icon Processing Failed"),
     SERVICE_NOT_REGISTERED("Service Not Registered"),
     SERVICE_DEPLOYMENT_NOT_FOUND("Service Deployment Not Found"),
-    RESOURCE_NOT_FOUND("Resource Not Found");
+    RESOURCE_NOT_FOUND("Resource Not Found"),
+    SERVICE_UPDATE_NOT_ALLOWED("Service Update Not Allowed");
 
     private final String value;
 

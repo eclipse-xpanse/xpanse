@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceAlreadyRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.TerraformScriptFormatInvalidException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,6 +90,18 @@ class RegistrationExceptionHandlerTests {
                         get("/xpanse/auth/user/credentials?userName=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Not Registered"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testServiceUpdateNotAllowed() throws Exception {
+        when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
+                new ServiceUpdateNotAllowed(
+                        "test error"));
+        this.mockMvc.perform(
+                        get("/xpanse/auth/user/credentials?userName=test"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Service Update Not Allowed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }

@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceAlreadyRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
+import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.TerraformScriptFormatInvalidException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -77,5 +78,17 @@ public class RegistrationExceptionHandler {
     public Response handleTerraformScriptFormatInvalidException(
             TerraformScriptFormatInvalidException ex) {
         return Response.errorResponse(ResultType.TERRAFORM_SCRIPT_INVALID, ex.getErrorReasons());
+    }
+
+    /**
+     * Exception handler for handleServiceUpdateNotAllowed.
+     */
+    @ExceptionHandler({ServiceUpdateNotAllowed.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceUpdateNotAllowed(
+            ServiceUpdateNotAllowed ex) {
+        return Response.errorResponse(ResultType.SERVICE_UPDATE_NOT_ALLOWED,
+                Collections.singletonList(ex.getMessage()));
     }
 }
