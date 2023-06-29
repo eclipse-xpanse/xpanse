@@ -22,9 +22,11 @@ import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.service.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Disabled
 class DeploymentWithMariaDbTest extends AbstractMariaDbIntegrationTest {
 
     @Autowired

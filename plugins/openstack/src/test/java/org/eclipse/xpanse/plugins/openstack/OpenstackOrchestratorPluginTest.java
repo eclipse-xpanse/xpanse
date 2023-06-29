@@ -6,13 +6,6 @@
 
 package org.eclipse.xpanse.plugins.openstack;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -29,6 +22,11 @@ import org.eclipse.xpanse.plugins.openstack.monitor.keystone.KeystoneManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.utils.GnocchiToXpanseModelConverter;
 import org.eclipse.xpanse.plugins.openstack.monitor.utils.MetricsManager;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 class OpenstackOrchestratorPluginTest {
 
@@ -80,5 +78,10 @@ class OpenstackOrchestratorPluginTest {
         assertEquals("The Name of the Tenant or Project to use.", authUrlVariable.getDescription());
         assertTrue(authUrlVariable.getIsMandatory());
         assertFalse(authUrlVariable.getIsSensitive());
+    }
+
+    @Test
+    void testRequiredProperties() {
+        assertThat(plugin.requiredProperties()).isEqualTo(List.of(OpenstackEnvironmentConstants.AUTH_URL));
     }
 }

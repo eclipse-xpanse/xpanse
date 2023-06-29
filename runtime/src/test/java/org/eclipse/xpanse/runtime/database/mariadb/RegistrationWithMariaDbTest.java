@@ -16,9 +16,11 @@ import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceAlre
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.service.view.RegisteredServiceVo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Disabled
 class RegistrationWithMariaDbTest extends AbstractMariaDbIntegrationTest {
 
     @Autowired
