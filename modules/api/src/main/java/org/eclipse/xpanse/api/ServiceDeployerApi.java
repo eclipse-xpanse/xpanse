@@ -315,6 +315,7 @@ public class ServiceDeployerApi {
             userAvailableServiceVo.setNamespace(serviceEntity.getOcl().getNamespace());
             userAvailableServiceVo.setBilling(serviceEntity.getOcl().getBilling());
             userAvailableServiceVo.setFlavors(serviceEntity.getOcl().getFlavors());
+            userAvailableServiceVo.setDeployment(serviceEntity.getOcl().getDeployment());
             userAvailableServiceVo.setVariables(
                     serviceEntity.getOcl().getDeployment().getVariables());
             userAvailableServiceVo.setRegions(

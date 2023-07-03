@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.register.Billing;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
+import org.eclipse.xpanse.modules.models.service.register.Deployment;
 import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.Region;
 import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
@@ -37,6 +38,7 @@ class UserAvailableServiceVoTest {
     private static final String description = "description";
     private static final String namespace = "namespace";
     private static final String icon = "icon";
+    private static final Deployment DEPLOYMENT = new Deployment();
     private static final Date createTime = new Date();
     private static final Date lastModifiedTime = new Date();
     private static final ServiceRegistrationState serviceRegistrationState =
@@ -75,6 +77,7 @@ class UserAvailableServiceVoTest {
         userAvailableServiceVo.setDescription(description);
         userAvailableServiceVo.setNamespace(namespace);
         userAvailableServiceVo.setIcon(icon);
+        userAvailableServiceVo.setDeployment(DEPLOYMENT);
         userAvailableServiceVo.setVariables(variables);
         userAvailableServiceVo.setFlavors(flavors);
         userAvailableServiceVo.setBilling(billing);
@@ -175,6 +178,12 @@ class UserAvailableServiceVoTest {
         assertNotEquals(userAvailableServiceVo.hashCode(), userAvailableServiceVo1.hashCode());
         assertNotEquals(userAvailableServiceVo1.hashCode(), userAvailableServiceVo2.hashCode());
 
+        userAvailableServiceVo1.setDeployment(DEPLOYMENT);
+        assertNotEquals(userAvailableServiceVo, userAvailableServiceVo1);
+        assertNotEquals(userAvailableServiceVo1, userAvailableServiceVo2);
+        assertNotEquals(userAvailableServiceVo.hashCode(), userAvailableServiceVo1.hashCode());
+        assertNotEquals(userAvailableServiceVo1.hashCode(), userAvailableServiceVo2.hashCode());
+
         userAvailableServiceVo1.setVariables(variables);
         assertNotEquals(userAvailableServiceVo, userAvailableServiceVo1);
         assertNotEquals(userAvailableServiceVo1, userAvailableServiceVo2);
@@ -224,6 +233,7 @@ class UserAvailableServiceVoTest {
                 "description=" + description + ", " +
                 "namespace=" + namespace + ", " +
                 "icon=" + icon + ", " +
+                "deployment=" + DEPLOYMENT + ", " +
                 "variables=" + variables + ", " +
                 "flavors=" + flavors + ", " +
                 "billing=" + billing + ", " +
