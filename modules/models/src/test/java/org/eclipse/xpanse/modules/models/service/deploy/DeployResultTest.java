@@ -27,36 +27,39 @@ class DeployResultTest {
     private static final String name = "name";
     private static final TerraformExecState state = TerraformExecState.DEPLOY_SUCCESS;
     private static final Map<String, String> map = Map.of("key", "value");
-    private static final DeployResource deployResource1 = new DeployResource();
-    private static final DeployResource deployResource2 = new DeployResource();
-    private static final List<DeployResource> resources = List.of(deployResource1);
     private static final Map<String, String> properties = Collections.singletonMap("key", "value");
     private static final Map<String, String> privateProperties =
             Collections.singletonMap("privateKey", "privateValue");
+    private static List<DeployResource> resources;
+    private static DeployResult deployResult;
 
     @BeforeEach
     void setUp() {
+        DeployResource deployResource1 = new DeployResource();
         deployResource1.setResourceId(id.toString());
         deployResource1.setName(name);
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(map);
 
+        DeployResource deployResource2 = new DeployResource();
         deployResource2.setResourceId(
                 UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5").toString());
         deployResource2.setName(name);
         deployResource2.setKind(DeployResourceKind.VPC);
         deployResource2.setProperties(map);
-    }
 
-    @Test
-    void testConstructorAndGetters() {
-        DeployResult deployResult = new DeployResult();
+        resources = List.of(deployResource1, deployResource2);
+
+        deployResult = new DeployResult();
         deployResult.setId(id);
         deployResult.setState(state);
         deployResult.setResources(resources);
         deployResult.setProperties(properties);
         deployResult.setPrivateProperties(privateProperties);
+    }
 
+    @Test
+    void testConstructorAndGetters() {
         assertEquals(id, deployResult.getId());
         assertEquals(state, deployResult.getState());
         assertEquals(resources, deployResult.getResources());
@@ -66,46 +69,56 @@ class DeployResultTest {
 
     @Test
     void testEqualsAndHashCode() {
+        assertEquals(deployResult, deployResult);
+        assertEquals(deployResult.hashCode(), deployResult.hashCode());
+
+        Object obj = new Object();
+        assertNotEquals(deployResult, obj);
+        assertNotEquals(deployResult, null);
+        assertNotEquals(deployResult.hashCode(), obj.hashCode());
+
         DeployResult deployResult1 = new DeployResult();
-        deployResult1.setId(id);
-        deployResult1.setState(state);
-        deployResult1.setResources(resources);
-        deployResult1.setProperties(properties);
-        deployResult1.setPrivateProperties(privateProperties);
-
         DeployResult deployResult2 = new DeployResult();
-        deployResult2.setId(id);
-        deployResult2.setState(state);
-        deployResult2.setResources(resources);
-        deployResult2.setProperties(properties);
-        deployResult2.setPrivateProperties(privateProperties);
-
-        DeployResult deployResult3 = new DeployResult();
-        deployResult3.setId(UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5"));
-        deployResult3.setState(TerraformExecState.DEPLOY_FAILED);
-        deployResult3.setResources(List.of(deployResource2));
-        deployResult3.setProperties(Collections.singletonMap("key2", "value2"));
-        deployResult3.setPrivateProperties(
-                Collections.singletonMap("privateKey2", "privateValue2"));
-
-        assertEquals(deployResult1, deployResult1);
+        assertNotEquals(deployResult, deployResult1);
+        assertNotEquals(deployResult, deployResult2);
         assertEquals(deployResult1, deployResult2);
-        assertNotEquals(deployResult1, deployResult3);
-
-        assertEquals(deployResult1.hashCode(), deployResult1.hashCode());
+        assertNotEquals(deployResult.hashCode(), deployResult1.hashCode());
+        assertNotEquals(deployResult.hashCode(), deployResult2.hashCode());
         assertEquals(deployResult1.hashCode(), deployResult2.hashCode());
-        assertNotEquals(deployResult1.hashCode(), deployResult3.hashCode());
+
+        deployResult1.setId(id);
+        assertNotEquals(deployResult, deployResult1);
+        assertNotEquals(deployResult1, deployResult2);
+        assertNotEquals(deployResult.hashCode(), deployResult1.hashCode());
+        assertNotEquals(deployResult1.hashCode(), deployResult2.hashCode());
+
+        deployResult1.setState(state);
+        assertNotEquals(deployResult, deployResult1);
+        assertNotEquals(deployResult1, deployResult2);
+        assertNotEquals(deployResult.hashCode(), deployResult1.hashCode());
+        assertNotEquals(deployResult1.hashCode(), deployResult2.hashCode());
+
+        deployResult1.setResources(resources);
+        assertNotEquals(deployResult, deployResult1);
+        assertNotEquals(deployResult1, deployResult2);
+        assertNotEquals(deployResult.hashCode(), deployResult1.hashCode());
+        assertNotEquals(deployResult1.hashCode(), deployResult2.hashCode());
+
+        deployResult1.setProperties(properties);
+        assertNotEquals(deployResult, deployResult1);
+        assertNotEquals(deployResult1, deployResult2);
+        assertNotEquals(deployResult.hashCode(), deployResult1.hashCode());
+        assertNotEquals(deployResult1.hashCode(), deployResult2.hashCode());
+
+        deployResult1.setPrivateProperties(privateProperties);
+        assertEquals(deployResult, deployResult1);
+        assertNotEquals(deployResult1, deployResult2);
+        assertEquals(deployResult.hashCode(), deployResult1.hashCode());
+        assertNotEquals(deployResult1.hashCode(), deployResult2.hashCode());
     }
 
     @Test
     void testToString() {
-        DeployResult deployResult = new DeployResult();
-        deployResult.setId(id);
-        deployResult.setState(state);
-        deployResult.setResources(resources);
-        deployResult.setProperties(properties);
-        deployResult.setPrivateProperties(privateProperties);
-
         String expectedToString =
                 "DeployResult(id=" + id + ", state=" + state + ", resources=" + resources +
                         ", properties=" + properties + ", privateProperties=" + privateProperties +

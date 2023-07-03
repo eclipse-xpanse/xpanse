@@ -21,6 +21,9 @@ class HealthStatusTest {
 
         HealthStatus nokStatus = HealthStatus.NOK.getByValue("NOK");
         Assertions.assertEquals(HealthStatus.NOK, nokStatus);
+
+        HealthStatus nullStatus = HealthStatus.NOK.getByValue("null");
+        Assertions.assertNull(nullStatus);
     }
 
     @Test
@@ -34,7 +37,8 @@ class HealthStatusTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        Assertions.assertTrue(HealthStatus.OK.toString().equals("OK"));
+        Assertions.assertEquals(HealthStatus.OK.toString(),"OK");
         Assertions.assertEquals(HealthStatus.OK.hashCode(), HealthStatus.OK.hashCode());
     }
+
 }

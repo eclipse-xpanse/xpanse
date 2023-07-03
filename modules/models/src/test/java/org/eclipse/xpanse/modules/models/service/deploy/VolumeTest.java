@@ -28,10 +28,11 @@ class VolumeTest {
     private static final String name = "volume";
     private static final DeployResourceKind kind = DeployResourceKind.VOLUME;
     private static final Map<String, String> properties = Collections.singletonMap("key", "value");
-    private static final Volume volume = new Volume();
+    private static Volume volume;
 
     @BeforeEach
     void setUp() {
+        volume = new Volume();
         volume.setSize(size);
         volume.setType(type);
         volume.setResourceId(resourceId);
@@ -52,29 +53,58 @@ class VolumeTest {
 
     @Test
     void testEqualsAndHashCode() {
-        Volume volume2 = new Volume();
-        volume2.setSize(size);
-        volume2.setType(type);
-        volume2.setResourceId(resourceId);
-        volume2.setName(name);
-        volume2.setKind(kind);
-        volume2.setProperties(properties);
-
-        Volume volume3 = new Volume();
-        volume3.setSize("300G");
-        volume3.setType("HDD");
-        volume3.setResourceId("20424910-5f64-4984-84f0-6013c63c64f5");
-        volume3.setName(name);
-        volume3.setKind(DeployResourceKind.VOLUME);
-        volume3.setProperties(properties);
-
         assertEquals(volume, volume);
-        assertEquals(volume, volume2);
-        assertNotEquals(volume, volume3);
-
         assertEquals(volume.hashCode(), volume.hashCode());
-        assertEquals(volume.hashCode(), volume2.hashCode());
-        assertNotEquals(volume.hashCode(), volume3.hashCode());
+
+        Object obj = new Object();
+        assertNotEquals(volume, obj);
+        assertNotEquals(volume, null);
+        assertNotEquals(volume.hashCode(), obj.hashCode());
+
+        Volume volume1 = new Volume();
+        Volume volume2 = new Volume();
+        assertNotEquals(volume, volume1);
+        assertNotEquals(volume, volume2);
+        assertEquals(volume1, volume2);
+        assertNotEquals(volume.hashCode(), volume1.hashCode());
+        assertNotEquals(volume.hashCode(), volume2.hashCode());
+        assertEquals(volume1.hashCode(), volume2.hashCode());
+
+        volume1.setSize(size);
+        assertNotEquals(volume, volume1);
+        assertNotEquals(volume1, volume2);
+        assertNotEquals(volume.hashCode(), volume1.hashCode());
+        assertNotEquals(volume1.hashCode(), volume2.hashCode());
+
+        volume1.setType(type);
+        assertNotEquals(volume, volume1);
+        assertNotEquals(volume1, volume2);
+        assertNotEquals(volume.hashCode(), volume1.hashCode());
+        assertNotEquals(volume1.hashCode(), volume2.hashCode());
+
+        volume1.setName(name);
+        assertNotEquals(volume, volume1);
+        assertNotEquals(volume1, volume2);
+        assertNotEquals(volume.hashCode(), volume1.hashCode());
+        assertNotEquals(volume1.hashCode(), volume2.hashCode());
+
+        volume1.setResourceId(resourceId);
+        assertNotEquals(volume, volume1);
+        assertNotEquals(volume1, volume2);
+        assertNotEquals(volume.hashCode(), volume1.hashCode());
+        assertNotEquals(volume1.hashCode(), volume2.hashCode());
+
+        volume1.setKind(kind);
+        assertNotEquals(volume, volume1);
+        assertNotEquals(volume1, volume2);
+        assertNotEquals(volume.hashCode(), volume1.hashCode());
+        assertNotEquals(volume1.hashCode(), volume2.hashCode());
+
+        volume1.setProperties(properties);
+        assertEquals(volume, volume1);
+        assertNotEquals(volume1, volume2);
+        assertEquals(volume.hashCode(), volume1.hashCode());
+        assertNotEquals(volume1.hashCode(), volume2.hashCode());
     }
 
     @Test

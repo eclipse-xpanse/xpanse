@@ -27,10 +27,11 @@ class PublicIpTest {
     private static final String name = "public_ip";
     private static final DeployResourceKind kind = DeployResourceKind.PUBLIC_IP;
     private static final Map<String, String> properties = Collections.singletonMap("key", "value");
-    private static final PublicIp publicIp = new PublicIp();
+    private static PublicIp publicIp;
 
     @BeforeEach
     void setUp() {
+        publicIp = new PublicIp();
         publicIp.setIp(ip);
         publicIp.setResourceId(resourceId);
         publicIp.setName(name);
@@ -49,27 +50,53 @@ class PublicIpTest {
 
     @Test
     void testEqualsAndHashCode() {
-        PublicIp publicIp2 = new PublicIp();
-        publicIp2.setIp(ip);
-        publicIp2.setResourceId(resourceId);
-        publicIp2.setName(name);
-        publicIp2.setKind(kind);
-        publicIp2.setProperties(properties);
-
-        PublicIp publicIp3 = new PublicIp();
-        publicIp3.setIp("192.168.0.0");
-        publicIp3.setResourceId("20424910-5f64-4984-84f0-6013c63c64f5");
-        publicIp3.setName("name");
-        publicIp3.setKind(DeployResourceKind.PUBLIC_IP);
-        publicIp3.setProperties(properties);
-
         assertEquals(publicIp, publicIp);
-        assertEquals(publicIp, publicIp2);
-        assertNotEquals(publicIp, publicIp3);
-
         assertEquals(publicIp.hashCode(), publicIp.hashCode());
-        assertEquals(publicIp.hashCode(), publicIp2.hashCode());
-        assertNotEquals(publicIp.hashCode(), publicIp3.hashCode());
+
+        Object obj = new Object();
+        assertNotEquals(publicIp, obj);
+        assertNotEquals(publicIp, null);
+        assertNotEquals(publicIp.hashCode(), obj.hashCode());
+
+        PublicIp publicIp1 = new PublicIp();
+        PublicIp publicIp2 = new PublicIp();
+        assertNotEquals(publicIp, publicIp1);
+        assertNotEquals(publicIp, publicIp2);
+        assertEquals(publicIp1, publicIp2);
+        assertNotEquals(publicIp.hashCode(), publicIp1.hashCode());
+        assertNotEquals(publicIp.hashCode(), publicIp2.hashCode());
+        assertEquals(publicIp1.hashCode(), publicIp2.hashCode());
+
+
+        publicIp1.setIp(ip);
+        assertNotEquals(publicIp, publicIp1);
+        assertNotEquals(publicIp1, publicIp2);
+        assertNotEquals(publicIp.hashCode(), publicIp1.hashCode());
+        assertNotEquals(publicIp1.hashCode(), publicIp2.hashCode());
+
+        publicIp1.setResourceId(resourceId);
+        assertNotEquals(publicIp, publicIp1);
+        assertNotEquals(publicIp1, publicIp2);
+        assertNotEquals(publicIp.hashCode(), publicIp1.hashCode());
+        assertNotEquals(publicIp1.hashCode(), publicIp2.hashCode());
+
+        publicIp1.setName(name);
+        assertNotEquals(publicIp, publicIp1);
+        assertNotEquals(publicIp1, publicIp2);
+        assertNotEquals(publicIp.hashCode(), publicIp1.hashCode());
+        assertNotEquals(publicIp1.hashCode(), publicIp2.hashCode());
+
+        publicIp1.setKind(kind);
+        assertNotEquals(publicIp, publicIp1);
+        assertNotEquals(publicIp1, publicIp2);
+        assertNotEquals(publicIp.hashCode(), publicIp1.hashCode());
+        assertNotEquals(publicIp1.hashCode(), publicIp2.hashCode());
+
+        publicIp1.setProperties(properties);
+        assertEquals(publicIp, publicIp1);
+        assertNotEquals(publicIp1, publicIp2);
+        assertEquals(publicIp.hashCode(), publicIp1.hashCode());
+        assertNotEquals(publicIp1.hashCode(), publicIp2.hashCode());
     }
 
     @Test

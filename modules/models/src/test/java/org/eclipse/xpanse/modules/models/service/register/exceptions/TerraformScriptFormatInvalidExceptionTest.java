@@ -8,11 +8,10 @@ package org.eclipse.xpanse.modules.models.service.register.exceptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,44 +20,73 @@ import org.junit.jupiter.api.Test;
  */
 class TerraformScriptFormatInvalidExceptionTest {
 
-    private List<String> errorReasons1;
-    private List<String> errorReasons2;
-    private List<String> errorReasons3;
+    private static List<String> errorReasons;
+    private static List<String> errorReasons1;
+    private static List<String> errorReasons2;
+    private static TerraformScriptFormatInvalidException exception;
 
     @BeforeEach
-    void setUp() {
-        errorReasons1 = new ArrayList<>(Arrays.asList("Reason 1", "Reason 2"));
-        errorReasons2 = new ArrayList<>(Arrays.asList("Reason 1", "Reason 2"));
-        errorReasons3 = new ArrayList<>(Arrays.asList("Reason 1", "Reason 3"));
+    public void setUp() {
+        errorReasons = new ArrayList<>();
+        errorReasons.add("Reason 1");
+        errorReasons.add("Reason 2");
+
+        errorReasons1 = new ArrayList<>();
+
+        errorReasons2 = new ArrayList<>();
+        errorReasons2.add("Reason 1");
+        errorReasons2.add("Reason 3");
+
+        exception = new TerraformScriptFormatInvalidException(errorReasons);
     }
 
     @Test
-    void testConstructorAndGetErrorReasons() {
-        ResponseInvalidException exception = new ResponseInvalidException(errorReasons1);
-        assertEquals(errorReasons1, exception.getErrorReasons());
+    public void testConstructorAndGetErrorReasons() {
+        assertEquals(errorReasons, exception.getErrorReasons());
+    }
+
+    @Test
+    public void testConstructorAndGetMessage() {
+        assertNull(exception.getMessage());
     }
 
     @Test
     void testEqualsAndHashCode() {
-        ResponseInvalidException exception1 = new ResponseInvalidException(errorReasons1);
-        ResponseInvalidException exception2 = new ResponseInvalidException(errorReasons2);
-        ResponseInvalidException exception3 = new ResponseInvalidException(errorReasons3);
+        assertEquals(exception, exception);
+        assertEquals(exception.hashCode(), exception.hashCode());
 
-        assertEquals(exception1, exception1);
-        assertNotEquals(exception1, exception2);
-        assertNotEquals(exception1, exception3);
+        Object obj = new Object();
+        assertNotEquals(exception, obj);
+        assertNotEquals(exception, null);
+        assertNotEquals(exception.hashCode(), obj.hashCode());
 
-        assertEquals(exception1.hashCode(), exception1.hashCode());
-        assertNotEquals(exception1.hashCode(), exception2.hashCode());
-        assertNotEquals(exception1.hashCode(), exception3.hashCode());
+        TerraformScriptFormatInvalidException exception1 =
+                new TerraformScriptFormatInvalidException(errorReasons1);
+        assertNotEquals(exception, exception1);
+        assertNotEquals(exception.hashCode(), exception1.hashCode());
+
+        TerraformScriptFormatInvalidException exception2 =
+                new TerraformScriptFormatInvalidException(errorReasons);
+        assertNotEquals(exception, exception2);
+        assertNotEquals(exception2, exception1);
+        assertNotEquals(exception.hashCode(), exception2.hashCode());
+        assertNotEquals(exception2.hashCode(), exception1.hashCode());
+
+        TerraformScriptFormatInvalidException exception3 =
+                new TerraformScriptFormatInvalidException(errorReasons2);
+        assertNotEquals(exception, exception3);
+        assertNotEquals(exception3, exception2);
+        assertNotEquals(exception3, exception1);
+        assertNotEquals(exception.hashCode(), exception3.hashCode());
+        assertNotEquals(exception3.hashCode(), exception2.hashCode());
+        assertNotEquals(exception3.hashCode(), exception1.hashCode());
     }
 
     @Test
     void testToString() {
-        ResponseInvalidException exception = new ResponseInvalidException(errorReasons1);
-
         String expectedToString =
-                "ResponseInvalidException(errorReasons=" + errorReasons1 + ")";
+                "TerraformScriptFormatInvalidException(errorReasons=" + errorReasons + ")";
+
         assertEquals(expectedToString, exception.toString());
     }
 

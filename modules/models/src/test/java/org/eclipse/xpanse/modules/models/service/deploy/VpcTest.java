@@ -28,10 +28,11 @@ class VpcTest {
     private static final String name = "vpc";
     private static final DeployResourceKind kind = DeployResourceKind.VPC;
     private static final Map<String, String> properties = Collections.singletonMap("key", "value");
-    private static final Vpc vpc = new Vpc();
+    private static Vpc vpc;
 
     @BeforeEach
     void setUp() {
+        vpc = new Vpc();
         vpc.setVpc(vpcStr);
         vpc.setSubnet(subnetStr);
         vpc.setResourceId(resourceId);
@@ -52,29 +53,58 @@ class VpcTest {
 
     @Test
     void testEqualsAndHashCode() {
-        Vpc vpc2 = new Vpc();
-        vpc2.setVpc(vpcStr);
-        vpc2.setSubnet(subnetStr);
-        vpc2.setResourceId(resourceId);
-        vpc2.setName(name);
-        vpc2.setKind(kind);
-        vpc2.setProperties(properties);
-
-        Vpc vpc3 = new Vpc();
-        vpc3.setVpc("192.168.1.1/16");
-        vpc3.setSubnet("192.168.10.10/24");
-        vpc3.setResourceId("20424910-5f64-4984-84f0-6013c63c64f5");
-        vpc3.setName(name);
-        vpc3.setKind(DeployResourceKind.VPC);
-        vpc3.setProperties(properties);
-
         assertEquals(vpc, vpc);
-        assertEquals(vpc, vpc2);
-        assertNotEquals(vpc, vpc3);
-
         assertEquals(vpc.hashCode(), vpc.hashCode());
-        assertEquals(vpc.hashCode(), vpc2.hashCode());
-        assertNotEquals(vpc.hashCode(), vpc3.hashCode());
+
+        Object obj = new Object();
+        assertNotEquals(vpc, obj);
+        assertNotEquals(vpc, null);
+        assertNotEquals(vpc.hashCode(), obj.hashCode());
+
+        Vpc vpc1 = new Vpc();
+        Vpc vpc2 = new Vpc();
+        assertNotEquals(vpc, vpc1);
+        assertNotEquals(vpc, vpc2);
+        assertEquals(vpc1, vpc2);
+        assertNotEquals(vpc.hashCode(), vpc1.hashCode());
+        assertNotEquals(vpc.hashCode(), vpc2.hashCode());
+        assertEquals(vpc1.hashCode(), vpc2.hashCode());
+
+        vpc1.setVpc(vpcStr);
+        assertNotEquals(vpc, vpc1);
+        assertNotEquals(vpc1, vpc2);
+        assertNotEquals(vpc.hashCode(), vpc1.hashCode());
+        assertNotEquals(vpc1.hashCode(), vpc2.hashCode());
+
+        vpc1.setSubnet(subnetStr);
+        assertNotEquals(vpc, vpc1);
+        assertNotEquals(vpc1, vpc2);
+        assertNotEquals(vpc.hashCode(), vpc1.hashCode());
+        assertNotEquals(vpc1.hashCode(), vpc2.hashCode());
+
+        vpc1.setResourceId(resourceId);
+        assertNotEquals(vpc, vpc1);
+        assertNotEquals(vpc1, vpc2);
+        assertNotEquals(vpc.hashCode(), vpc1.hashCode());
+        assertNotEquals(vpc1.hashCode(), vpc2.hashCode());
+
+        vpc1.setName(name);
+        assertNotEquals(vpc, vpc1);
+        assertNotEquals(vpc1, vpc2);
+        assertNotEquals(vpc.hashCode(), vpc1.hashCode());
+        assertNotEquals(vpc1.hashCode(), vpc2.hashCode());
+
+        vpc1.setKind(kind);
+        assertNotEquals(vpc, vpc1);
+        assertNotEquals(vpc1, vpc2);
+        assertNotEquals(vpc.hashCode(), vpc1.hashCode());
+        assertNotEquals(vpc1.hashCode(), vpc2.hashCode());
+
+        vpc1.setProperties(properties);
+        assertEquals(vpc, vpc1);
+        assertNotEquals(vpc1, vpc2);
+        assertEquals(vpc.hashCode(), vpc1.hashCode());
+        assertNotEquals(vpc1.hashCode(), vpc2.hashCode());
     }
 
     @Test
