@@ -16,11 +16,9 @@ import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceAlre
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.service.view.RegisteredServiceVo;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Disabled
 class RegistrationWithMariaDbTest extends AbstractMariaDbIntegrationTest {
 
     @Autowired
@@ -53,7 +51,6 @@ class RegistrationWithMariaDbTest extends AbstractMariaDbIntegrationTest {
     @Test
     void testServiceRegistrationUpdate() throws Exception {
         RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(getOclFromFile());
-        ;
         registeredServiceVo.getOcl().setVersion("v3.3.3");
         serviceRegisterApi.update(registeredServiceVo.getId().toString(),
                 registeredServiceVo.getOcl());
