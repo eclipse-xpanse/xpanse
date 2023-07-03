@@ -315,6 +315,7 @@ public class RegisterServiceImpl implements RegisterService {
         userAvailableServiceVo.setBilling(serviceEntity.getOcl().getBilling());
         userAvailableServiceVo.setFlavors(serviceEntity.getOcl().getFlavors());
         userAvailableServiceVo.setVariables(serviceEntity.getOcl().getDeployment().getVariables());
+        userAvailableServiceVo.setDeployment(serviceEntity.getOcl().getDeployment());
         userAvailableServiceVo.setRegions(
                 serviceEntity.getOcl().getCloudServiceProvider().getRegions());
         return userAvailableServiceVo;

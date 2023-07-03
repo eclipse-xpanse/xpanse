@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.register.Billing;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
+import org.eclipse.xpanse.modules.models.service.register.Deployment;
 import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.Region;
 import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
@@ -73,6 +74,11 @@ public class UserAvailableServiceVo extends RepresentationModel<UserAvailableSer
     @NotBlank
     @Schema(description = "The icon of the available service.")
     private String icon;
+
+    @Valid
+    @NotNull
+    @Schema(description = "The deployment of the managed service")
+    private Deployment deployment;
 
     @NotNull
     @Schema(description = "The variables for the deployment, which will be passed to the deployer.")
