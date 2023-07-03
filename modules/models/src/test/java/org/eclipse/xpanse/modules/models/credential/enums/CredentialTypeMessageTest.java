@@ -40,4 +40,11 @@ class CredentialTypeMessageTest {
         String message = CredentialTypeMessage.getMessageByType(CredentialType.OAUTH2);
         assertNull(null, message);
     }
+
+    @Test
+    public void testGetMessageByType_WithEmpty() {
+        String message = CredentialTypeMessage.getMessageByType(CredentialType.getByValue("null"));
+        assertNull(null, message);
+    }
+
 }

@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,12 +28,12 @@ class CreateCredentialTest {
     private static final List<CredentialVariable> variables =
             List.of(new CredentialVariable("variable1", "description1", false, false),
                     new CredentialVariable("variable2", "description2", true, true));
-    private static final Integer timeToLive = 3600;
+    private static final Integer timeToLive = 36000;
+    private static CreateCredential createCredential;
 
-    @Test
-    public void testConstructorAndGetters() {
-
-        CreateCredential createCredential = new CreateCredential();
+    @BeforeEach
+    void setUp() {
+        createCredential = new CreateCredential();
         createCredential.setName(name);
         createCredential.setXpanseUser(xpanseUser);
         createCredential.setCsp(csp);
@@ -40,7 +41,10 @@ class CreateCredentialTest {
         createCredential.setType(type);
         createCredential.setVariables(variables);
         createCredential.setTimeToLive(timeToLive);
+    }
 
+    @Test
+    public void testConstructorAndGetters() {
         assertEquals(name, createCredential.getName());
         assertEquals(xpanseUser, createCredential.getXpanseUser());
         assertEquals(csp, createCredential.getCsp());
@@ -52,40 +56,71 @@ class CreateCredentialTest {
 
     @Test
     public void testEqualsAndHashCode() {
+        assertEquals(createCredential, createCredential);
+        assertEquals(createCredential.hashCode(), createCredential.hashCode());
+
+        Object obj = new Object();
+        assertNotEquals(createCredential, obj);
+        assertNotEquals(createCredential, null);
+        assertNotEquals(createCredential.hashCode(), obj.hashCode());
+
         CreateCredential createCredential1 = new CreateCredential();
-        createCredential1.setName(name);
-        createCredential1.setXpanseUser(xpanseUser);
-        createCredential1.setCsp(csp);
-        createCredential1.setDescription(description);
-        createCredential1.setType(type);
-        createCredential1.setVariables(variables);
-        createCredential1.setTimeToLive(timeToLive);
-
         CreateCredential createCredential2 = new CreateCredential();
-        createCredential2.setName(name);
-        createCredential2.setXpanseUser(xpanseUser);
-        createCredential2.setCsp(csp);
-        createCredential2.setDescription(description);
-        createCredential2.setType(type);
-        createCredential2.setVariables(variables);
-        createCredential2.setTimeToLive(timeToLive);
-
-        CreateCredential createCredential3 = new CreateCredential();
-        createCredential3.setName("credential3");
-        createCredential3.setXpanseUser(xpanseUser);
-        createCredential3.setCsp(csp);
-        createCredential3.setDescription(description);
-        createCredential3.setType(type);
-        createCredential3.setVariables(variables);
-        createCredential3.setTimeToLive(timeToLive);
-
-        assertEquals(createCredential1, createCredential1);
+        assertNotEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential, createCredential2);
         assertEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential1, createCredential3);
-
-        assertEquals(createCredential1.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential.hashCode(), createCredential2.hashCode());
         assertEquals(createCredential1.hashCode(), createCredential2.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential3.hashCode());
+
+        createCredential1.setName(name);
+        assertNotEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential1, createCredential2);
+        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
+
+        createCredential1.setXpanseUser(xpanseUser);
+        assertNotEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential1, createCredential2);
+        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
+
+        createCredential1.setDescription(description);
+        assertNotEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential1, createCredential2);
+        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
+
+        createCredential1.setCsp(csp);
+        assertNotEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential, createCredential2);
+        assertNotEquals(createCredential1, createCredential2);
+        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
+
+        createCredential1.setType(type);
+        assertNotEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential1, createCredential2);
+        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
+
+        createCredential1.setVariables(variables);
+        assertNotEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential1, createCredential2);
+        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
+
+        createCredential1.setTimeToLive(timeToLive);
+        assertEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential1, createCredential2);
+        assertEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
+
+        createCredential1.setTimeToLive(48000);
+        assertNotEquals(createCredential, createCredential1);
+        assertNotEquals(createCredential1, createCredential2);
+        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
+        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
     }
 
     @Test
@@ -109,7 +144,7 @@ class CreateCredentialTest {
                 "isMandatory=false, isSensitive=false, value=null), " +
                 "CredentialVariable(name=variable2, description=description2, " +
                 "isMandatory=true, isSensitive=true, value=null)], " +
-                "timeToLive=3600)";
+                "timeToLive=36000)";
         assertEquals(expectedToString, createCredential.toString());
     }
 

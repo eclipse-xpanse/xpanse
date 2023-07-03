@@ -27,10 +27,11 @@ class VmTest {
     private static final String name = "vm";
     private static final DeployResourceKind kind = DeployResourceKind.VM;
     private static final Map<String, String> properties = Collections.singletonMap("key", "value");
-    private static final Vm vm = new Vm();
+    private static Vm vm;
 
     @BeforeEach
     void setUp() {
+        vm = new Vm();
         vm.setIp(ip);
         vm.setResourceId(resourceId);
         vm.setName(name);
@@ -49,27 +50,52 @@ class VmTest {
 
     @Test
     void testEqualsAndHashCode() {
-        Vm vm2 = new Vm();
-        vm2.setIp(ip);
-        vm2.setResourceId(resourceId);
-        vm2.setName(name);
-        vm2.setKind(kind);
-        vm2.setProperties(properties);
-
-        Vm vm3 = new Vm();
-        vm3.setIp("192.168.0.0");
-        vm3.setResourceId("20424910-5f64-4984-84f0-6013c63c64f5");
-        vm3.setName("name");
-        vm3.setKind(DeployResourceKind.PUBLIC_IP);
-        vm3.setProperties(properties);
-
         assertEquals(vm, vm);
-        assertEquals(vm, vm2);
-        assertNotEquals(vm, vm3);
-
         assertEquals(vm.hashCode(), vm.hashCode());
-        assertEquals(vm.hashCode(), vm2.hashCode());
-        assertNotEquals(vm.hashCode(), vm3.hashCode());
+
+        Object obj = new Object();
+        assertNotEquals(vm, obj);
+        assertNotEquals(vm, null);
+        assertNotEquals(vm.hashCode(), obj.hashCode());
+
+        Vm vm1 = new Vm();
+        Vm vm2 = new Vm();
+        assertNotEquals(vm, vm1);
+        assertNotEquals(vm, vm2);
+        assertEquals(vm1, vm2);
+        assertNotEquals(vm.hashCode(), vm1.hashCode());
+        assertNotEquals(vm.hashCode(), vm2.hashCode());
+        assertEquals(vm1.hashCode(), vm2.hashCode());
+
+        vm1.setIp(ip);
+        assertNotEquals(vm, vm1);
+        assertNotEquals(vm1, vm2);
+        assertNotEquals(vm.hashCode(), vm1.hashCode());
+        assertNotEquals(vm1.hashCode(), vm2.hashCode());
+
+        vm1.setResourceId(resourceId);
+        assertNotEquals(vm, vm1);
+        assertNotEquals(vm1, vm2);
+        assertNotEquals(vm.hashCode(), vm1.hashCode());
+        assertNotEquals(vm1.hashCode(), vm2.hashCode());
+
+        vm1.setName(name);
+        assertNotEquals(vm, vm1);
+        assertNotEquals(vm1, vm2);
+        assertNotEquals(vm.hashCode(), vm1.hashCode());
+        assertNotEquals(vm1.hashCode(), vm2.hashCode());
+
+        vm1.setKind(kind);
+        assertNotEquals(vm, vm1);
+        assertNotEquals(vm1, vm2);
+        assertNotEquals(vm.hashCode(), vm1.hashCode());
+        assertNotEquals(vm1.hashCode(), vm2.hashCode());
+
+        vm1.setProperties(properties);
+        assertEquals(vm, vm1);
+        assertNotEquals(vm1, vm2);
+        assertEquals(vm.hashCode(), vm1.hashCode());
+        assertNotEquals(vm1.hashCode(), vm2.hashCode());
     }
 
     @Test

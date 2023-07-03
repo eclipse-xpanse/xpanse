@@ -60,14 +60,70 @@ class CredentialVariableTest {
                 new CredentialVariable(name, description, isMandatory, isSensitive, value);
         CredentialVariable credentialVariable3 =
                 new CredentialVariable("variable2", description, isMandatory, isSensitive, value);
+        CredentialVariable credentialVariable4 =
+                new CredentialVariable(name, "description2", isMandatory, isSensitive, value);
+        CredentialVariable credentialVariable5 =
+                new CredentialVariable(name, description, !isMandatory, isSensitive, value);
+        CredentialVariable credentialVariable6 =
+                new CredentialVariable(name, description, isMandatory, !isSensitive, value);
+        CredentialVariable credentialVariable7 =
+                new CredentialVariable(name, description, isMandatory, isSensitive, "value2");
 
         assertEquals(credentialVariable1, credentialVariable1);
         assertEquals(credentialVariable1, credentialVariable2);
         assertNotEquals(credentialVariable1, credentialVariable3);
+        assertNotEquals(credentialVariable1, credentialVariable4);
+        assertNotEquals(credentialVariable1, credentialVariable5);
+        assertNotEquals(credentialVariable1, credentialVariable6);
+        assertNotEquals(credentialVariable1, credentialVariable7);
+        assertNotEquals(credentialVariable1, null);
+        assertNotEquals(credentialVariable1, new Object());
 
         assertEquals(credentialVariable1.hashCode(), credentialVariable1.hashCode());
         assertEquals(credentialVariable1.hashCode(), credentialVariable2.hashCode());
         assertNotEquals(credentialVariable1.hashCode(), credentialVariable3.hashCode());
+        assertNotEquals(credentialVariable1.hashCode(), credentialVariable4.hashCode());
+        assertNotEquals(credentialVariable1.hashCode(), credentialVariable5.hashCode());
+        assertNotEquals(credentialVariable1.hashCode(), credentialVariable6.hashCode());
+        assertNotEquals(credentialVariable1.hashCode(), credentialVariable7.hashCode());
+    }
+
+    @Test
+    public void testEqualsWithNullValues() {
+        Object obj = new Object();
+        CredentialVariable credentialVariable1 =
+                new CredentialVariable(null, description, isMandatory, isSensitive, value);
+        CredentialVariable credentialVariable2 =
+                new CredentialVariable(name, null, isMandatory, isSensitive, value);
+        CredentialVariable credentialVariable3 =
+                new CredentialVariable(name, description, null, isSensitive, value);
+        CredentialVariable credentialVariable4 =
+                new CredentialVariable(name, description, isMandatory, null, value);
+        CredentialVariable credentialVariable5 =
+                new CredentialVariable(name, description, isMandatory, isSensitive, null);
+
+        assertEquals(credentialVariable1, credentialVariable1);
+        assertNotEquals(credentialVariable1, credentialVariable2);
+        assertNotEquals(credentialVariable1, credentialVariable3);
+        assertNotEquals(credentialVariable1, credentialVariable4);
+        assertNotEquals(credentialVariable1, credentialVariable5);
+        assertNotEquals(credentialVariable1, obj);
+        assertNotEquals(credentialVariable1, null);
+
+        assertNotEquals(credentialVariable2, credentialVariable3);
+        assertNotEquals(credentialVariable2, credentialVariable4);
+        assertNotEquals(credentialVariable2, credentialVariable5);
+
+        assertNotEquals(credentialVariable3, credentialVariable4);
+        assertNotEquals(credentialVariable3, credentialVariable5);
+
+        assertNotEquals(credentialVariable4, credentialVariable5);
+
+        assertEquals(credentialVariable1.hashCode(), credentialVariable1.hashCode());
+        assertNotEquals(credentialVariable1.hashCode(), credentialVariable2.hashCode());
+        assertNotEquals(credentialVariable1.hashCode(), credentialVariable3.hashCode());
+        assertNotEquals(credentialVariable1.hashCode(), credentialVariable4.hashCode());
+        assertNotEquals(credentialVariable1.hashCode(), credentialVariable5.hashCode());
     }
 
     @Test

@@ -14,6 +14,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.eclipse.xpanse.modules.models.admin.enums.HealthStatus;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -21,48 +22,57 @@ import org.junit.jupiter.api.Test;
  */
 class SystemStatusTest {
 
+    private static SystemStatus systemStatus;
     private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = validatorFactory.getValidator();
 
+    @BeforeEach
+    void setUp() {
+        systemStatus = new SystemStatus();
+        systemStatus.setHealthStatus(HealthStatus.OK);
+    }
+
     @Test
     public void testHealthStatusNotNull() {
-        SystemStatus systemStatus = new SystemStatus();
-        systemStatus.setHealthStatus(HealthStatus.OK);
         Assertions.assertNotNull(systemStatus.getHealthStatus());
         Assertions.assertEquals(0, validator.validate(systemStatus).size());
     }
 
     @Test
     void testToString() {
-        SystemStatus systemStatus = new SystemStatus();
-        systemStatus.setHealthStatus(HealthStatus.OK);
-
         String expectedToString = "SystemStatus(healthStatus=OK)";
         assertEquals(expectedToString, systemStatus.toString());
     }
 
     @Test
     public void testGetterAndSetter() {
-        SystemStatus systemStatus = new SystemStatus();
-        systemStatus.setHealthStatus(HealthStatus.OK);
         assertEquals(HealthStatus.OK, systemStatus.getHealthStatus());
     }
 
     @Test
     public void testEqualsAndHashCode() {
+        assertEquals(systemStatus, systemStatus);
+        assertEquals(systemStatus.hashCode(), systemStatus.hashCode());
+
+        Object obj = new Object();
+        assertNotEquals(systemStatus, obj);
+        assertNotEquals(systemStatus, null);
+        assertNotEquals(systemStatus.hashCode(), obj.hashCode());
+
         SystemStatus systemStatus1 = new SystemStatus();
-        systemStatus1.setHealthStatus(HealthStatus.OK);
-
         SystemStatus systemStatus2 = new SystemStatus();
-        systemStatus2.setHealthStatus(HealthStatus.OK);
-
-        SystemStatus systemStatus3 = new SystemStatus();
-        systemStatus3.setHealthStatus(HealthStatus.NOK);
-
+        assertNotEquals(systemStatus, systemStatus1);
+        assertNotEquals(systemStatus, systemStatus2);
         assertEquals(systemStatus1, systemStatus2);
+        assertNotEquals(systemStatus.hashCode(), systemStatus1.hashCode());
+        assertNotEquals(systemStatus.hashCode(), systemStatus2.hashCode());
         assertEquals(systemStatus1.hashCode(), systemStatus2.hashCode());
-        assertNotEquals(systemStatus1, systemStatus3);
-        assertNotEquals(systemStatus1.hashCode(), systemStatus3.hashCode());
+
+        systemStatus1.setHealthStatus(HealthStatus.OK);
+        assertEquals(systemStatus, systemStatus1);
+        assertNotEquals(systemStatus1, systemStatus2);
+        assertEquals(systemStatus.hashCode(), systemStatus1.hashCode());
+        assertNotEquals(systemStatus1.hashCode(), systemStatus2.hashCode());
     }
 
 }

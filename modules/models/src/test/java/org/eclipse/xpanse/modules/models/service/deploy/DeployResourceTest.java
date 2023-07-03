@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.util.Collections;
 import java.util.Map;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -23,15 +24,19 @@ class DeployResourceTest {
     private static final String name = "resource";
     private static final DeployResourceKind kind = DeployResourceKind.VM;
     private static final Map<String, String> properties = Collections.singletonMap("key", "value");
+    private static DeployResource resource;
 
-    @Test
-    void testConstructorAndGetters() {
-        DeployResource resource = new DeployResource();
+    @BeforeEach
+    void setUp() {
+        resource = new DeployResource();
         resource.setResourceId(resourceId);
         resource.setName(name);
         resource.setKind(kind);
         resource.setProperties(properties);
+    }
 
+    @Test
+    void testConstructorAndGetters() {
         assertEquals(resourceId, resource.getResourceId());
         assertEquals(name, resource.getName());
         assertEquals(kind, resource.getKind());
@@ -40,31 +45,46 @@ class DeployResourceTest {
 
     @Test
     void testEqualsAndHashCode() {
+        assertEquals(resource, resource);
+        assertEquals(resource.hashCode(), resource.hashCode());
+
+        Object obj = new Object();
+        assertNotEquals(resource, obj);
+        assertNotEquals(resource, null);
+        assertNotEquals(resource.hashCode(), obj.hashCode());
+
         DeployResource resource1 = new DeployResource();
-        resource1.setResourceId(resourceId);
-        resource1.setName(name);
-        resource1.setKind(kind);
-        resource1.setProperties(properties);
-
         DeployResource resource2 = new DeployResource();
-        resource2.setResourceId(resourceId);
-        resource2.setName(name);
-        resource2.setKind(kind);
-        resource2.setProperties(properties);
-
-        DeployResource resource3 = new DeployResource();
-        resource3.setResourceId("20424910-5f64-4984-84f0-6013c63c64f5");
-        resource3.setName("kafka");
-        resource3.setKind(DeployResourceKind.VPC);
-        resource3.setProperties(Collections.singletonMap("key2", "value2"));
-
-        assertEquals(resource1, resource1);
+        assertNotEquals(resource, resource1);
+        assertNotEquals(resource, resource2);
         assertEquals(resource1, resource2);
-        assertNotEquals(resource1, resource3);
-
-        assertEquals(resource1.hashCode(), resource1.hashCode());
+        assertNotEquals(resource.hashCode(), resource1.hashCode());
+        assertNotEquals(resource.hashCode(), resource2.hashCode());
         assertEquals(resource1.hashCode(), resource2.hashCode());
-        assertNotEquals(resource1.hashCode(), resource3.hashCode());
+
+        resource1.setResourceId(resourceId);
+        assertNotEquals(resource, resource1);
+        assertNotEquals(resource1, resource2);
+        assertNotEquals(resource.hashCode(), resource1.hashCode());
+        assertNotEquals(resource1.hashCode(), resource2.hashCode());
+
+        resource1.setName(name);
+        assertNotEquals(resource, resource1);
+        assertNotEquals(resource1, resource2);
+        assertNotEquals(resource.hashCode(), resource1.hashCode());
+        assertNotEquals(resource1.hashCode(), resource2.hashCode());
+
+        resource1.setKind(kind);
+        assertNotEquals(resource, resource1);
+        assertNotEquals(resource1, resource2);
+        assertNotEquals(resource.hashCode(), resource1.hashCode());
+        assertNotEquals(resource1.hashCode(), resource2.hashCode());
+
+        resource1.setProperties(properties);
+        assertEquals(resource, resource1);
+        assertNotEquals(resource1, resource2);
+        assertEquals(resource.hashCode(), resource1.hashCode());
+        assertNotEquals(resource1.hashCode(), resource2.hashCode());
     }
 
     @Test
