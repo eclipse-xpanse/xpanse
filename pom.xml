@@ -64,6 +64,7 @@
         <caffeine.cache.version>3.1.6</caffeine.cache.version>
         <awaitility.version>3.1.6</awaitility.version>
         <jacoco.version>0.8.10</jacoco.version>
+        <springdoc.version>2.1.0</springdoc.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
