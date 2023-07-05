@@ -3,14 +3,15 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.deployment.deployers.terraform;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.utils;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmdResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Test of SystemCmd.
+ */
 public class SystemCmdTest {
 
     @Test
@@ -26,5 +27,7 @@ public class SystemCmdTest {
         Assertions.assertTrue(systemCmdResult.isCommandSuccessful());
         Assertions.assertEquals("hello", systemCmdResult.getCommandStdOutput());
         Assertions.assertEquals("", systemCmdResult.getCommandStdError());
+        Assertions.assertNull(systemCmd.getEnv());
+        Assertions.assertNotNull(systemCmd.getWorkDir());
     }
 }
