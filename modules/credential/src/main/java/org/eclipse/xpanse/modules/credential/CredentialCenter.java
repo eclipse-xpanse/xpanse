@@ -153,8 +153,7 @@ public class CredentialCenter {
                         }
                     });
         }
-        maskSensitiveValues(abstractCredentialInfos);
-        return abstractCredentialInfos;
+        return maskSensitiveValues(abstractCredentialInfos);
     }
 
     /**
@@ -382,17 +381,31 @@ public class CredentialCenter {
         }
     }
 
-    private void maskSensitiveValues(List<AbstractCredentialInfo> abstractCredentialInfos) {
+    private List<AbstractCredentialInfo> maskSensitiveValues(
+            List<AbstractCredentialInfo> abstractCredentialInfos) {
+        List<AbstractCredentialInfo> maskedCredentialInfos = new ArrayList<>();
         for (AbstractCredentialInfo abstractCredentialInfo : abstractCredentialInfos) {
             CredentialVariables credentialVariables =
                     (CredentialVariables) abstractCredentialInfo;
-            List<CredentialVariable> variables = credentialVariables.getVariables();
-            for (CredentialVariable variable : variables) {
-                if (variable.getIsSensitive()) {
-                    variable.setValue("*********");
+            List<CredentialVariable> maskedCredentialVariableList = new ArrayList<>();
+            for (CredentialVariable variable : credentialVariables.getVariables()) {
+                CredentialVariable maskedCredentialVariable =
+                        new CredentialVariable(variable.getName(), variable.getDescription(),
+                                variable.getIsMandatory(), variable.getIsSensitive(),
+                                variable.getValue());
+                if (maskedCredentialVariable.getIsSensitive()) {
+                    maskedCredentialVariable.setValue("*********");
                 }
+                maskedCredentialVariableList.add(maskedCredentialVariable);
             }
+            CredentialVariables maskedCredentialVariables =
+                    new CredentialVariables(credentialVariables.getCsp(),
+                            credentialVariables.getXpanseUser(), credentialVariables.getName(),
+                            credentialVariables.getDescription(), credentialVariables.getType(),
+                            maskedCredentialVariableList);
+            maskedCredentialInfos.add(maskedCredentialVariables);
         }
+        return maskedCredentialInfos;
     }
 
     private List<AbstractCredentialInfo> joinCredentialsFromAllSources(
