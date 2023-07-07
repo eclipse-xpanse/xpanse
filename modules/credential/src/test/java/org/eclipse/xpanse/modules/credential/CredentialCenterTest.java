@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.modules.credential;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -258,7 +259,15 @@ class CredentialCenterTest {
 
         credentialsStore.getCredential(csp, requestedCredentialType, xpanseUser);
 
-        assertEquals(Collections.singletonList(credential), result);
+        assertNotEquals(Collections.singletonList(credential), result);
+
+        AbstractCredentialInfo abstractCredentialInfoResult = result.get(0);
+
+        assertEquals(credential.getCsp(), abstractCredentialInfoResult.getCsp());
+        assertEquals(credential.getXpanseUser(), abstractCredentialInfoResult.getXpanseUser());
+        assertEquals(credential.getName(), abstractCredentialInfoResult.getName());
+        assertEquals(credential.getDescription(), abstractCredentialInfoResult.getDescription());
+        assertEquals(credential.getType(), abstractCredentialInfoResult.getType());
     }
 
     @Test
@@ -297,7 +306,14 @@ class CredentialCenterTest {
 
         credentialsStore.getCredential(csp, CredentialType.VARIABLES, xpanseUser);
 
-        Assertions.assertEquals(List.of(credential1), result);
+        Assertions.assertNotEquals(List.of(credential1), result);
+        AbstractCredentialInfo abstractCredentialInfoResult = result.get(0);
+
+        assertEquals(credential1.getCsp(), abstractCredentialInfoResult.getCsp());
+        assertEquals(credential1.getXpanseUser(), abstractCredentialInfoResult.getXpanseUser());
+        assertEquals(credential1.getName(), abstractCredentialInfoResult.getName());
+        assertEquals(credential1.getDescription(), abstractCredentialInfoResult.getDescription());
+        assertEquals(credential1.getType(), abstractCredentialInfoResult.getType());
     }
 
     @Test
