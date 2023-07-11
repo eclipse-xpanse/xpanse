@@ -29,6 +29,7 @@
         <module>credential</module>
         <module>logging</module>
         <module>orchestrator</module>
+        <module>security</module>
     </modules>
 
 </project>
