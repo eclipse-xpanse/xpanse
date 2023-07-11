@@ -18,12 +18,12 @@ import org.springframework.scheduling.annotation.EnableAsync;
 /**
  * Main entry class to xpanse runtime. This class can be directly executed to start the server.
  */
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableAsync(proxyTargetClass = true)
 @EnableJpaRepositories(basePackages = "org.eclipse.xpanse")
 @EntityScan(basePackages = "org.eclipse.xpanse")
 @ComponentScan(basePackages = "org.eclipse.xpanse")
 @EnableJpaAuditing
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class XpanseApplication {
 
     public static void main(String[] args) {
