@@ -15,3 +15,4 @@ node_modules
 *.db
 xpanse_deploy_ws
 /openapi
+.mvn/wrapper/*.jar
