@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoun
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.service.register.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
@@ -47,6 +48,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -74,6 +76,8 @@ public class DeployService {
     private DeployVariableValidator deployVariableValidator;
     @Resource
     private PluginManager pluginManager;
+    @Resource
+    private Pbkdf2PasswordEncoder passwordEncoder;
 
     /**
      * Get all Deployment group by DeployerKind.
@@ -153,6 +157,7 @@ public class DeployService {
     public void asyncDeployService(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
+        encodeDeployVariable(deployServiceEntity);
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
@@ -170,6 +175,32 @@ public class DeployService {
             deployServiceStorage.storeAndFlush(deployServiceEntity);
         }
 
+    }
+
+    private void encodeDeployVariable(DeployServiceEntity deployServiceEntity) {
+        if (Objects.isNull(deployServiceEntity) || CollectionUtils.isEmpty(
+                deployServiceEntity.getCreateRequest().getServiceRequestProperties())) {
+            return;
+        }
+        deployServiceEntity.getCreateRequest().getOcl().getDeployment().getVariables().stream()
+                .forEach(variable -> {
+                    String variableValue = getVariableValue(variable.getName(),
+                            deployServiceEntity.getCreateRequest().getServiceRequestProperties());
+                    if (StringUtils.isNotBlank(variableValue)
+                            && variable.getSensitiveScope() != SensitiveScope.NONE) {
+                        variable.setValue(passwordEncoder.encode(variableValue));
+                    }
+                });
+    }
+
+    private String getVariableValue(String key, Map<String, String> serviceRequestProperties) {
+        if (CollectionUtils.isEmpty(serviceRequestProperties)) {
+            return null;
+        }
+        if (serviceRequestProperties.containsKey(key)) {
+            return serviceRequestProperties.get(key);
+        }
+        return null;
     }
 
     private List<DeployResourceEntity> getDeployResourceEntityList(
