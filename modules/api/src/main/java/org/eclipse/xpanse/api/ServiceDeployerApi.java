@@ -7,6 +7,10 @@
 package org.eclipse.xpanse.api;
 
 
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,6 +44,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,6 +64,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/xpanse")
 @CrossOrigin
+@Secured({ROLE_ADMIN, ROLE_USER})
 public class ServiceDeployerApi {
 
     @Resource
@@ -227,6 +233,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services/available/category/{categoryName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_USER})
     public List<CategoryOclVo> getAvailableServicesTree(
             @Parameter(name = "categoryName", description = "category of the service")
             @PathVariable(name = "categoryName", required = false) Category category) {
@@ -276,6 +283,7 @@ public class ServiceDeployerApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the available service.")
+    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_USER})
     public Link openApi(@PathVariable("id") String id) {
         String apiUrl = this.registerService.getOpenApiUrl(id);
         String successMsg = String.format(

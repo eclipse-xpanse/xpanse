@@ -7,6 +7,10 @@
 package org.eclipse.xpanse.api;
 
 
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +37,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,6 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/xpanse")
 @CrossOrigin
+@Secured({ROLE_ADMIN, ROLE_CSP})
 public class ServiceRegisterApi {
 
     @Resource
@@ -266,6 +272,7 @@ public class ServiceRegisterApi {
     @Tag(name = "Admin", description = "APIs for administrating Xpanse")
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_USER})
     public SystemStatus health() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);

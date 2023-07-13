@@ -39,7 +39,9 @@ public enum ResultType {
     SERVICE_DEPLOYMENT_NOT_FOUND("Service Deployment Not Found"),
     RESOURCE_NOT_FOUND("Resource Not Found"),
     DEPLOYMENT_VARIABLE_INVALID("Deployment Variable Invalid"),
-    SERVICE_UPDATE_NOT_ALLOWED("Service Update Not Allowed");
+    SERVICE_UPDATE_NOT_ALLOWED("Service Update Not Allowed"),
+    UNAUTHORIZED("Unauthorized"),
+    ACCESS_DENIED("Access Denied");
 
     private final String value;
 

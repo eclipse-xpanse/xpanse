@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -116,6 +117,18 @@ public class CommonExceptionHandler {
     public Response handleXpanseUnhandledException(
             XpanseUnhandledException ex) {
         return Response.errorResponse(ResultType.UNHANDLED_EXCEPTION,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for AccessDeniedException.
+     */
+    @ExceptionHandler({AccessDeniedException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public Response handleAccessDeniedException(
+            AccessDeniedException ex) {
+        return Response.errorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList(ex.getMessage()));
     }
 
