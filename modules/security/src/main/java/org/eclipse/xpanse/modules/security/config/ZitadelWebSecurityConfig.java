@@ -6,13 +6,22 @@
 
 package org.eclipse.xpanse.modules.security.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -24,6 +33,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Profile("zitadel")
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class ZitadelWebSecurityConfig {
 
     @Value("${spring.security.oauth2.resourceserver.opaquetoken.introspection-uri}")
@@ -45,7 +55,7 @@ public class ZitadelWebSecurityConfig {
 
         http.authorizeHttpRequests(arc -> {
             // add permit for swagger-ui docs and resource
-            arc.requestMatchers("/swagger-ui/**", "/v3/**", "/favicon.ico").permitAll();
+            arc.requestMatchers("/swagger-ui/**", "/v3/**", "/favicon.ico", "/error").permitAll();
             // add permit for h2-console html and resource
             arc.requestMatchers("/h2-console/**", "h2/**").permitAll();
             // declarative route configuration
@@ -54,14 +64,52 @@ public class ZitadelWebSecurityConfig {
             arc.anyRequest().authenticated();
         });
 
-        http.oauth2ResourceServer(oauth2 -> oauth2
-                .opaqueToken(opaque -> opaque
-                        .introspectionUri(this.introspectionUri)
-                        .introspectionClientCredentials(this.clientId, this.clientSecret)
+        // use custom implementation of OpaqueTokenIntrospector
+        http.oauth2ResourceServer(oauth2 ->
+                oauth2.opaqueToken(opaque ->
+                        opaque.introspector(zitadelIntrospector())
                 )
         );
 
+        // set custom exception handler
+        http.exceptionHandling(exceptionHandlingConfigurer ->
+                exceptionHandlingConfigurer.authenticationEntryPoint(
+                        (httpRequest, httpResponse, authException) -> {
+                            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            httpResponse.setCharacterEncoding("UTF-8");
+                            httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            Response responseModel = Response.errorResponse(ResultType.UNAUTHORIZED,
+                                    Collections.singletonList(ResultType.UNAUTHORIZED.toValue()));
+                            String resBody = objectMapper.writeValueAsString(responseModel);
+                            PrintWriter printWriter = httpResponse.getWriter();
+                            printWriter.print(resBody);
+                            printWriter.flush();
+                            printWriter.close();
+                        }
+                ));
+
         return http.build();
+    }
+
+    /**
+     * Customize the ZitadelAuthoritiesOpaqueTokenIntrospector as the implementation class of
+     * OpaqueTokenIntrospector to instead of the SpringOpaqueTokenIntrospector
+     * as default implementation class.
+     * The SpringOpaqueTokenIntrospector get roles of user from the filed 'authorities' default.
+     * The IAM 'zitadel' put roles of user into other filed not 'authorities'. In this case,
+     * we could not get roles of user the default SpringOpaqueTokenIntrospector.
+     * So we need to customize the ZitadelAuthoritiesOpaqueTokenIntrospector, in which
+     * we get the roles of user from the real filed.
+     *
+     * @return custom NimbusOpaqueTokenIntrospector
+     */
+    @Bean
+    public OpaqueTokenIntrospector zitadelIntrospector() {
+        return new ZitadelAuthoritiesOpaqueTokenIntrospector(
+                this.introspectionUri,
+                this.clientId,
+                this.clientSecret);
     }
 
 }
