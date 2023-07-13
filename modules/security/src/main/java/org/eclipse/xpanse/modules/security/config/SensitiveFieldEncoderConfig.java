@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.common.security.config;
+package org.eclipse.xpanse.modules.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

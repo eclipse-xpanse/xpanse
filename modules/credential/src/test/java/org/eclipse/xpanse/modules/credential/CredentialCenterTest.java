@@ -37,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -58,6 +59,9 @@ class CredentialCenterTest {
     @Mock
     private CredentialOpenApiGenerator credentialOpenApiGenerator;
 
+    @Mock
+    private Pbkdf2PasswordEncoder passwordEncoder;
+
     private CredentialCenter credentialCenter;
 
 
@@ -65,7 +69,7 @@ class CredentialCenterTest {
     public void setup() {
         MockitoAnnotations.openMocks(this);
         credentialCenter = new CredentialCenter(mockPluginManager, credentialsStore,
-                credentialOpenApiGenerator);
+                passwordEncoder, credentialOpenApiGenerator);
     }
 
     @Test

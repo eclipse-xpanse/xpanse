@@ -6,10 +6,10 @@
 
 package org.eclipse.xpanse.runtime.modules.common;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.eclipse.xpanse.common.security.config.SensitiveFieldEncoderConfig;
+import org.eclipse.xpanse.modules.security.config.SensitiveFieldEncoderConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

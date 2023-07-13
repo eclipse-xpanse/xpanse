@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -38,6 +39,7 @@ public class CredentialCenter {
 
     private final PluginManager pluginManager;
     private final CredentialsStore credentialsStore;
+    private final Pbkdf2PasswordEncoder passwordEncoder;
     private final CredentialOpenApiGenerator credentialOpenApiGenerator;
 
     /**
@@ -47,9 +49,11 @@ public class CredentialCenter {
     public CredentialCenter(
             PluginManager pluginManager,
             CredentialsStore credentialsStore,
+            Pbkdf2PasswordEncoder passwordEncoder,
             CredentialOpenApiGenerator credentialOpenApiGenerator) {
         this.pluginManager = pluginManager;
         this.credentialsStore = credentialsStore;
+        this.passwordEncoder = passwordEncoder;
         this.credentialOpenApiGenerator = credentialOpenApiGenerator;
     }
 
@@ -163,6 +167,7 @@ public class CredentialCenter {
      */
     public void addCredential(CreateCredential createCredential) {
         checkInputCredentialIsValid(createCredential);
+        encodeSensitiveVariables(createCredential);
         AbstractCredentialInfo credential;
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(createCredential.getCsp());
@@ -174,7 +179,15 @@ public class CredentialCenter {
                     String.format("Not supported credential type Csp:%s, Type: %s.",
                             createCredential.getCsp(), createCredential.getType()));
         }
-        createCredential(credential);
+    }
+
+    private void encodeSensitiveVariables(CreateCredential createCredential) {
+        List<CredentialVariable> variables = createCredential.getVariables();
+        variables.stream().forEach(variable -> {
+            if (!Objects.isNull(variable) && variable.getIsSensitive()) {
+                variable.setValue(passwordEncoder.encode(variable.getValue()));
+            }
+        });
     }
 
     /**
@@ -184,6 +197,7 @@ public class CredentialCenter {
      */
     public void updateCredential(CreateCredential updateCredential) {
         checkInputCredentialIsValid(updateCredential);
+        encodeSensitiveVariables(updateCredential);
         AbstractCredentialInfo credential;
         if (updateCredential.getType() == CredentialType.VARIABLES) {
             credential = new CredentialVariables(updateCredential);
