@@ -24,7 +24,7 @@ class HuaweiTest {
     }
 
     @Test
-    public void testGetProvider() {
+    void testGetProvider() {
         String region = "us-west-2";
 
         String providerInfo = huaweiProvider.getProvider(region);
@@ -33,7 +33,7 @@ class HuaweiTest {
                   required_providers {
                     huaweicloud = {
                       source = "huaweicloud/huaweicloud"
-                      version = ">= 1.40.0"
+                      version = "~> 1.51.0"
                     }
                   }
                 }
@@ -47,7 +47,7 @@ class HuaweiTest {
     }
 
     @Test
-    public void testGetCsp() {
+    void testGetCsp() {
         Csp csp = huaweiProvider.getCsp();
 
         assertEquals(Csp.HUAWEI, csp);
