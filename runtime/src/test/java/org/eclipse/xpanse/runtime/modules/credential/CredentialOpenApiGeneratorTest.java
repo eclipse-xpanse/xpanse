@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  * Test of CredentialOpenApiGenerator.
  */
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("default")
 @SpringBootTest(classes = {XpanseApplication.class, CaffeineCredentialCacheManager.class,
         CredentialsStore.class,
         ServletUriComponentsBuilder.class, OpenApiUtil.class, PluginManager.class})
@@ -33,10 +35,6 @@ class CredentialOpenApiGeneratorTest {
 
     @Autowired
     private CredentialOpenApiGenerator credentialOpenApiGenerator;
-
-    @Autowired
-    private OpenApiUtil openApiUtil;
-
 
     @Test
     void testGetServiceUrl() {
@@ -48,7 +46,7 @@ class CredentialOpenApiGeneratorTest {
 
     @Test
     void testRun() {
-        credentialOpenApiGenerator.run(null);
+        credentialOpenApiGenerator.onApplicationEvent(null);
     }
 
     @Test
