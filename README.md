@@ -1,11 +1,15 @@
 ![Xpanse logo](static/full-logo.png)
-<p style="text-align: center;">
+<p align='center'>
 <a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml" target="_blank">
     <img src="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml/badge.svg" alt="build">
 </a>
 
  <a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/coverage.yml" target="_blank">
     <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/eclipse-xpanse-bot/3d9c022b98734fbf615c21136abe4add/raw/xpanse-coverage.json" alt="coverage">
+  </a>
+
+<a href="https://opensource.org/licenses/Apache-2.0" target="_blank">
+    <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="coverage">
   </a>
 </p>
 
