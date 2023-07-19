@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.config;
+package org.eclipse.xpanse.modules.security.zitadel.introspector;
 
 import java.util.Collection;
 import java.util.Objects;

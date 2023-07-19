@@ -1,7 +1,5 @@
-<p align='center'>
-    <img src="static/full-logo.png" alt='xpanse-logo' style='align-content: center'>
-</p>
-<p align='center'>
+![Xpanse logo](static/full-logo.png)
+<p style="text-align: center;">
 <a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml" target="_blank">
     <img src="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml/badge.svg" alt="build">
 </a>
@@ -47,7 +45,7 @@ property names. Runtime wil ensure tht these variables are automatically availab
 
 As part of the OCL, the managed service provider can define variables that can be either entered by the user or
 available as defaults. All possible types of variables are defined
-here [Deployment Variables](modules/models/src/main/java/org/eclipse/xpanse/modules/models/resource/DeployVariable.java)
+here [Deployment Variables](modules/models/src/main/java/org/eclipse/xpanse/modules/models/service/register/DeployVariable.java)
 The variables can then be used in the deployment scripts.
 
 ## OCL loading
@@ -91,9 +89,11 @@ Other optional config properties
 - `OS_PROXY_HOST` and `OS_PROXY_PORT` - Proxy server information to reach the Openstack installation.
 
 #### HuaweiCloud
+
 No mandatory configuration properties required.
 
 #### FlexibleEngine
+
 No mandatory configuration properties required.
 
 ## Runtime
@@ -109,12 +109,14 @@ The runtime embeds and run together:
 ## Database
 
 ### Development
-H2 file-based database is used for development purposes. This works without any extra configuration requirements. All 
-DB configurations are automatically created during the server startup.
+
+H2 file-based database is used for development purposes. This works without any extra configuration requirements. All DB
+configurations are automatically created during the server startup.
 
 ### Production
-Currently, MariaDB is supported for production use cases. This can be activated by using `mariadb`spring profile.
-Please refer to the detailed database [here](https://eclipse-xpanse.github.io/xpanse-website/docs/database).
+
+Currently, MariaDB is supported for production use cases. This can be activated by using `mariadb`spring profile. Please
+refer to the detailed database [here](https://eclipse-xpanse.github.io/xpanse-website/docs/database).
 
 ### Build and Package
 
@@ -127,9 +129,8 @@ $ mvn clean install
 
 ### Run
 
-By default, the application will not activate any plugins. They must be
-activated via spring profiles. Also ensure that only one plugin is active at a
-time. For example, openstack plugin can be activated as below
+By default, the application will not activate any plugins. They must be activated via spring profiles. Also ensure that
+only one plugin is active at a time. For example, openstack plugin can be activated as below
 
 ```shell
 $ cd runtime/target
@@ -157,6 +158,34 @@ $ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar --spring.profiles.active=zitadel \
 --authorization-api-client-secret=2S7yZR4jWauyE3wLHM1h5asc0WNWdBUXAw2lll3Pmu0qM4D3LWBCwikXbsG81ycl \
 --authorization-swagger-ui-client-id=221664356859969539@eclipse-xpanse
 ```
+
+##### Execute authenticated APIs
+
+When the application has activated authorization with 'zitadel' profile, all protected APIs must have an
+`Authorization` header in the `Bearer ${access token}` format in the http request. Here are two ways to get access_token
+for executing authenticated APIs:
+
+The first way, is to open the Swagger-UI page of the Xpanse server. In case of local development server, the Swagger-UI
+is reachable on `http://localhost:8080/swagger-ui/index.html`.
+![Browser open openAPI page](static/browser_open_openAPI_page.png)
+
+Click on the 'Authorize' button on the SwaggerUI page to open the authentication window. Click on the 'select all'
+option to select all 'Scopes' and click on 'Authorize'
+![Authorize in the authentication window](static/authorize_in_authorization_window.png)
+
+The browser will redirect to the login page of the IAM service. Fill username and password to complete user login. Once
+the login is successful, the control is automatically redirected to the Swagger-UI page. Close the authentication window
+and select the API which you want to execute and click to expand it, then click on 'Try it out' and 'Execute' to execute
+the API method. In the Curl command, you can see the request header named `Authorization` with the value of
+${access_token} after prefix `Bearer `.
+![Execute APIs using openAPI page](static/execute_api_in_openAPI_page.png)
+
+The other way is to use the `Authorize` REST API. Call the method using browser. In case of local development server,
+the URL is `http://localhost:8080/auth/authorize`. The browser will redirect to the login page of the IAM service. Fill
+username and password to complete user login. After successful login in the IAM the browser will back to the token API
+url with response model 'TokenResponse' with field 'access_token'. Then you can use the value of 'access_token' to fill
+header 'Authorization' in the http request when executing authenticated APIs with CLI or the other http client tools.
+![Authorized access token response](static/authorized_access_token_response.png)
 
 By default, the runtime is built in "exploded mode."
 Additionally, you can also build a Docker image adding `-Ddocker.skip=false` as build argument:
