@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.config;
+package org.eclipse.xpanse.modules.security.zitadel.config;
 
 import static org.springframework.web.cors.CorsConfiguration.ALL;
 
@@ -15,6 +15,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.security.zitadel.introspector.ZitadelAuthoritiesOpaqueTokenIntrospector;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -65,6 +67,8 @@ public class ZitadelWebSecurityConfig {
             arc.requestMatchers("/swagger-ui/**", "/v3/**", "/favicon.ico", "/error").permitAll();
             // add permit for h2-console html and resource
             arc.requestMatchers("/h2-console/**", "h2/**").permitAll();
+            // add permit for auth apis
+            arc.requestMatchers("/auth/**").permitAll();
             // declarative route configuration
             arc.requestMatchers("/xpanse/**").authenticated();
             // add additional routes
@@ -117,6 +121,11 @@ public class ZitadelWebSecurityConfig {
                 this.introspectionUri,
                 this.clientId,
                 this.clientSecret);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
     CorsConfigurationSource corsConfigurationSource() {

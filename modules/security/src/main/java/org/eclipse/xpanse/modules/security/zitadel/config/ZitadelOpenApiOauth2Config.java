@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.config;
+package org.eclipse.xpanse.modules.security.zitadel.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
