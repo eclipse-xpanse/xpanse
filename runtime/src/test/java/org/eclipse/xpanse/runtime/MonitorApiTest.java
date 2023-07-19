@@ -25,12 +25,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test for MonitorApiTest.
  */
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("default")
 @SpringBootTest(classes = {XpanseApplication.class, MonitorApi.class})
 @AutoConfigureMockMvc
 class MonitorApiTest {

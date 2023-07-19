@@ -33,6 +33,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -146,6 +147,18 @@ class CommonExceptionHandlerTests {
                 .andExpect(status().is(500))
                 .andExpect(jsonPath("$.resultType").value("Unhandled Exception"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+
+    @Test
+    void testHandleAccessDeniedException() throws Exception {
+        when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
+                new AccessDeniedException("Access Denied"));
+        this.mockMvc.perform(
+                        get("/xpanse/auth/user/credentials?userName=test"))
+                .andExpect(status().is(403))
+                .andExpect(jsonPath("$.resultType").value("Access Denied"))
+                .andExpect(jsonPath("$.details[0]").value("Access Denied"));
     }
 
 

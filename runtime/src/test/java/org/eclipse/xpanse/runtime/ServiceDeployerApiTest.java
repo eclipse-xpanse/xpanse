@@ -44,6 +44,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.Link;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -52,6 +53,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("default")
 @SpringBootTest(classes = {XpanseApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ServiceDeployerApiTest {
