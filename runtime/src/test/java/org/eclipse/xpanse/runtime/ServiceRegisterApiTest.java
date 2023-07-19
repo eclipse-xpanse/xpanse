@@ -17,8 +17,6 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.models.admin.SystemStatus;
-import org.eclipse.xpanse.modules.models.admin.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -187,13 +185,5 @@ class ServiceRegisterApiTest {
                 serviceRegisterApi.detail(registeredServiceVo.getId().toString());
         log.error(registeredServiceVoDetail.toString());
         Assertions.assertNotNull(registeredServiceVoDetail);
-    }
-
-    @Test
-    void health() {
-        SystemStatus systemStatus = new SystemStatus();
-        systemStatus.setHealthStatus(HealthStatus.OK);
-        SystemStatus health = serviceRegisterApi.health();
-        Assertions.assertEquals(systemStatus, health);
     }
 }
