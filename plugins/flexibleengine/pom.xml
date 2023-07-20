@@ -74,6 +74,12 @@
             <groupId>com.huawei.apigateway</groupId>
             <artifactId>java-sdk-core</artifactId>
             <version>3.1.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.huaweicloud.sdk</groupId>
