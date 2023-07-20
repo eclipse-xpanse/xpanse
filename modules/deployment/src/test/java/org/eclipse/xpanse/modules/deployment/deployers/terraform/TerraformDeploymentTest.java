@@ -39,11 +39,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 
 @ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class})
+@ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class,
+        TerraformVersionProvider.class})
 public class TerraformDeploymentTest {
 
     @Autowired
     TerraformDeployment terraformDeployment;
+
+    @Autowired
+    TerraformVersionProvider terraformVersionProvider;
 
     @MockBean
     DeployEnvironments deployEnvironments;
@@ -72,7 +76,8 @@ public class TerraformDeploymentTest {
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setCreateRequest(deployRequest);
         TerraformDeployment terraformDeployment =
-                new TerraformDeployment("test", false, "DEBUG", new DeployEnvironments(null, null));
+                new TerraformDeployment("test", false, "DEBUG", new DeployEnvironments(null,
+                        null), terraformVersionProvider);
 
         DeployResult deployResult = terraformDeployment.deploy(xpanseDeployTask);
 

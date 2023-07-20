@@ -27,7 +27,7 @@ class HuaweiTest {
     void testGetProvider() {
         String region = "us-west-2";
 
-        String providerInfo = huaweiProvider.getProvider(region);
+        String providerInfo = huaweiProvider.getProvider(">= 1.52.1", region);
         String expectedProviderInfo = """
                 terraform {
                   required_providers {

@@ -27,7 +27,7 @@ class FlexibleEngineTest {
     public void testGetProvider() {
         String region = "us-west-2";
 
-        String providerInfo = flexibleEngineProvider.getProvider(region);
+        String providerInfo = flexibleEngineProvider.getProvider(">= 1.30.0", region);
         String expectedProviderInfo = """         
                 terraform {
                   required_providers {

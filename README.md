@@ -238,6 +238,37 @@ If no AES private key file aes_sec is found in the intended location or if the f
 no encryption of the sensitive variables will take place. All data will stored in plain text within
 the JVM.
 
+### Version Configuration For Terraform Providers
+
+Xpanse currently uses Terraform to orchestrate resources on cloud providers, but versions of
+Terraform for cloud providers are in constant iteration. In order to configure the Terraform version
+of the cloud providers more conveniently and quickly, you can configure the Terraform version of the
+cloud providers in the [xpanse configuration file](./runtime/src/main/resources/application.properties)
+
+#### The Version Key Of The Terraform Providers
+
+|  Terraform Providers   | key  |
+|  ----  | ----  |
+| AWS  | `terraform.provider.aws.version` |
+| HuaweiCloud  | `terraform.provider.huaweicloud.version` |
+| OpenStack  | `terraform.provider.openstack.version` |
+| FlexibleEngine  | `terraform.provider.flexibleengine.version` |
+
+#### How To Configure The Version of Terraform Providers
+
+For how to configure the version value of Terraform Providers, please refer to the chapter of
+`Version Constraints` in https://developer.hashicorp.com/terraform/language/providers/requirements#version-constraints
+
+
+The following are some examples, please refer to
+```properties
+terraform.provider.aws.version=~> 4.0
+terraform.provider.openstack.version=>= 1.48.0
+terraform.provider.flexibleengine.version=>= 1.30.0
+terraform.provider.huaweicloud.version=~> 1.51.0
+
+
+
 
 
 

@@ -19,7 +19,7 @@ public class Huawei implements Provider {
               required_providers {
                 huaweicloud = {
                   source = "huaweicloud/huaweicloud"
-                  version = ">= 1.52.1"
+                  version = "%s"
                 }
               }
             }
@@ -30,8 +30,8 @@ public class Huawei implements Provider {
             """;
 
     @Override
-    public String getProvider(String region) {
-        return String.format(PROVIDER, region);
+    public String getProvider(String version, String region) {
+        return String.format(PROVIDER, version, region);
     }
 
     @Override

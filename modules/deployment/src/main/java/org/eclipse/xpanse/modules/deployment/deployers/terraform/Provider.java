@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
  */
 public interface Provider {
 
-    String getProvider(String region);
+    String getProvider(String version, String region);
 
     Csp getCsp();
 
