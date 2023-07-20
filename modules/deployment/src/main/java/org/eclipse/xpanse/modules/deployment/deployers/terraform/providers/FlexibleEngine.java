@@ -19,7 +19,7 @@ public class FlexibleEngine implements Provider {
               required_providers {
                 flexibleengine = {
                   source  = "FlexibleEngineCloud/flexibleengine"
-                  version = ">= 1.30.0"
+                  version = "%s"
                 }
               }
             }
@@ -30,8 +30,8 @@ public class FlexibleEngine implements Provider {
             """;
 
     @Override
-    public String getProvider(String region) {
-        return String.format(PROVIDER, region);
+    public String getProvider(String version, String region) {
+        return String.format(PROVIDER, version, region);
     }
 
     @Override

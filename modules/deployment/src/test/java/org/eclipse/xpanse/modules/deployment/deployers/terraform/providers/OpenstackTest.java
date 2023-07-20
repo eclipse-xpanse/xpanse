@@ -27,7 +27,7 @@ class OpenstackTest {
     public void testGetProvider() {
         String region = "us-west-2";
 
-        String providerInfo = openStackProvider.getProvider(region);
+        String providerInfo = openStackProvider.getProvider(">= 1.48.0", region);
         String expectedProviderInfo = """
                 terraform {
                   required_providers {

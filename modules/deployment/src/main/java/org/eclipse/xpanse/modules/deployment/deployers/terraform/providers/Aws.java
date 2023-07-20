@@ -20,7 +20,7 @@ public class Aws implements Provider {
               required_providers {
                 aws = {
                   source  = "hashicorp/aws"
-                  version = "~> 4.0"
+                  version = "%s"
                 }
               }
             }
@@ -31,8 +31,8 @@ public class Aws implements Provider {
             """;
 
     @Override
-    public String getProvider(String region) {
-        return String.format(PROVIDER, region);
+    public String getProvider(String version, String region) {
+        return String.format(PROVIDER, version, region);
     }
 
     @Override

@@ -47,6 +47,7 @@ public class TerraformDeployment implements Deployment {
     private final String debugLogLevel;
     private final boolean isDebugEnabled;
     private final DeployEnvironments deployEnvironments;
+    private final TerraformVersionProvider terraformVersionProvider;
 
     /**
      * Initializes the Terraform deployer.
@@ -60,11 +61,13 @@ public class TerraformDeployment implements Deployment {
             @Value("${terraform.workspace.directory:xpanse_deploy_ws}") String workspaceDirectory,
             @Value("${terraform.debug.enabled:false}") boolean isDebugEnabled,
             @Value("${terraform.debug.level:DEBUG}") String debugLogLevel,
-            DeployEnvironments deployEnvironments) {
+            DeployEnvironments deployEnvironments,
+            TerraformVersionProvider terraformVersionProvider) {
         this.workspaceDirectory = workspaceDirectory;
         this.isDebugEnabled = isDebugEnabled;
         this.debugLogLevel = debugLogLevel;
         this.deployEnvironments = deployEnvironments;
+        this.terraformVersionProvider = terraformVersionProvider;
     }
 
     /**
@@ -172,12 +175,17 @@ public class TerraformDeployment implements Deployment {
      */
     private void createScriptFile(Csp csp, String region, String workspace, String script) {
         log.info("start create terraform script");
+        String version = terraformVersionProvider.getTerraformVersionByCsp(csp);
+        if (StringUtils.isBlank(version)) {
+            log.error("Csp does't exist,csp: {}", csp);
+            return;
+        }
         String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
         try {
             try (FileWriter verWriter = new FileWriter(verScriptPath);
                     FileWriter scriptWriter = new FileWriter(scriptPath)) {
-                verWriter.write(TerraformProviders.getProvider(csp).getProvider(region));
+                verWriter.write(TerraformProviders.getProvider(csp).getProvider(version, region));
                 scriptWriter.write(script);
             }
             log.info("terraform script create success");
@@ -201,11 +209,16 @@ public class TerraformDeployment implements Deployment {
         if (!parentPath.exists() || !parentPath.isDirectory()) {
             parentPath.mkdirs();
         }
+        String version = terraformVersionProvider.getTerraformVersionByCsp(csp);
+        if (StringUtils.isBlank(version)) {
+            log.error("Csp does't exist,csp: {}", csp);
+            return;
+        }
         String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + STATE_FILE_NAME;
         try (FileWriter verWriter = new FileWriter(verScriptPath);
                 FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(TerraformProviders.getProvider(csp).getProvider(region));
+            verWriter.write(TerraformProviders.getProvider(csp).getProvider(version, region));
             scriptWriter.write(tfState);
         }
         log.info("terraform workspace and script create success");

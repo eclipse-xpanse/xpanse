@@ -27,7 +27,7 @@ class AwsTest {
     public void testGetProvider() {
         String region = "us-west-2";
 
-        String providerInfo = awsProvider.getProvider(region);
+        String providerInfo = awsProvider.getProvider("~> 4.0", region);
         String expectedProviderInfo = """
                 terraform {
                   required_providers {
