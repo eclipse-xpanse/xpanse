@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariabl
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.security.config.AesUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,9 +31,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ContextConfiguration(classes = {CaffeineCredentialCacheManager.class, CredentialsStore.class,
-        PluginManager.class})
+        PluginManager.class, AesUtil.class})
 @ExtendWith(SpringExtension.class)
 class CredentialSearchTests {
+
+    @Mock
+    AesUtil aesUtil;
 
     @Mock
     CredentialsStore credentialsStore;

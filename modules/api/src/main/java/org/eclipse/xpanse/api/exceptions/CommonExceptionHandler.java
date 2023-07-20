@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
+import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
@@ -129,6 +130,18 @@ public class CommonExceptionHandler {
     public Response handleAccessDeniedException(
             AccessDeniedException ex) {
         return Response.errorResponse(ResultType.ACCESS_DENIED,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for SensitiveFieldEncryptionOrDecryptionFailedException.
+     */
+    @ExceptionHandler({SensitiveFieldEncryptionOrDecryptionFailedException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleSensitiveFieldEncryptionOrDecryptionFailedException(
+            SensitiveFieldEncryptionOrDecryptionFailedException ex) {
+        return Response.errorResponse(ResultType.SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 

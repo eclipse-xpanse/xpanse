@@ -41,7 +41,9 @@ public enum ResultType {
     DEPLOYMENT_VARIABLE_INVALID("Deployment Variable Invalid"),
     SERVICE_UPDATE_NOT_ALLOWED("Service Update Not Allowed"),
     UNAUTHORIZED("Unauthorized"),
-    ACCESS_DENIED("Access Denied");
+    ACCESS_DENIED("Access Denied"),
+    SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION("Sensitive "
+            + "Field Encryption Or Decryption Failed Exception");
 
     private final String value;
 

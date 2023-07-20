@@ -51,6 +51,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.security.config.AesUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,6 +80,9 @@ class DeployServiceTest {
     private static List<DeployResourceEntity> deployResourceEntities;
     private static CreateRequest createRequest;
     private static org.eclipse.xpanse.modules.models.service.register.Deployment deployment;
+
+    @Mock
+    private AesUtil aesUtil;
 
     @Mock
     private ApplicationContext applicationContext;

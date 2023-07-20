@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.security.config.AesUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +54,8 @@ class DeployEnvironmentsTest {
     private static DeployVariable deployVariable2;
     private static DeployVariable deployVariable3;
     private static DeployVariable deployVariable4;
+    @Mock
+    private AesUtil aesUtil;
     @Mock
     private CredentialCenter mockCredentialCenter;
     private DeployEnvironments deployEnvironmentsUnderTest;
@@ -111,7 +114,7 @@ class DeployEnvironmentsTest {
         task.setCreateRequest(createRequest);
         task.setOcl(ocl);
 
-        deployEnvironmentsUnderTest = new DeployEnvironments(mockCredentialCenter);
+        deployEnvironmentsUnderTest = new DeployEnvironments(mockCredentialCenter, aesUtil);
     }
 
     @Test
