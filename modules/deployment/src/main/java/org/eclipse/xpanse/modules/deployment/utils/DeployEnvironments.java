@@ -18,7 +18,9 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalid
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.service.register.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.security.config.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,11 +30,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeployEnvironments {
 
+    private final AesUtil aesUtil;
+
     private final CredentialCenter credentialCenter;
 
     @Autowired
-    public DeployEnvironments(CredentialCenter credentialCenter) {
+    public DeployEnvironments(CredentialCenter credentialCenter, AesUtil aesUtil) {
         this.credentialCenter = credentialCenter;
+        this.aesUtil = aesUtil;
     }
 
     /**
@@ -47,7 +52,11 @@ public class DeployEnvironments {
             if (variable.getKind() == DeployVariableKind.ENV) {
                 if (request.containsKey(variable.getName())
                         && request.get(variable.getName()) != null) {
-                    variables.put(variable.getName(), request.get(variable.getName()));
+                    variables.put(variable.getName(),
+                            !SensitiveScope.NONE.toValue()
+                                    .equals(variable.getSensitiveScope().toValue())
+                                    ? aesUtil.decode(request.get(variable.getName()))
+                                    : request.get(variable.getName()));
                 } else {
                     variables.put(variable.getName(), System.getenv(variable.getName()));
                 }
@@ -58,7 +67,10 @@ public class DeployEnvironments {
             }
 
             if (variable.getKind() == DeployVariableKind.FIX_ENV) {
-                variables.put(variable.getName(), variable.getValue());
+                variables.put(variable.getName(),
+                        !SensitiveScope.NONE.toValue()
+                                .equals(variable.getSensitiveScope().toValue())
+                                ? aesUtil.decode(variable.getValue()) : variable.getValue());
             }
         }
 
@@ -91,7 +103,11 @@ public class DeployEnvironments {
             if (variable.getKind() == DeployVariableKind.VARIABLE) {
                 if (request.containsKey(variable.getName())
                         && request.get(variable.getName()) != null) {
-                    variables.put(variable.getName(), request.get(variable.getName()));
+                    variables.put(variable.getName(),
+                            !SensitiveScope.NONE.toValue()
+                                    .equals(variable.getSensitiveScope().toValue())
+                                    ? aesUtil.decode(request.get(variable.getName()))
+                                    : request.get(variable.getName()));
                 } else {
                     variables.put(variable.getName(), System.getenv(variable.getName()));
                 }
@@ -103,7 +119,10 @@ public class DeployEnvironments {
 
             if (variable.getKind() == DeployVariableKind.FIX_VARIABLE
                     && request.containsKey(variable.getName())) {
-                variables.put(variable.getName(), variable.getValue());
+                variables.put(variable.getName(),
+                        !SensitiveScope.NONE.toValue()
+                                .equals(variable.getSensitiveScope().toValue())
+                                ? aesUtil.decode(variable.getValue()) : variable.getValue());
             }
         }
 

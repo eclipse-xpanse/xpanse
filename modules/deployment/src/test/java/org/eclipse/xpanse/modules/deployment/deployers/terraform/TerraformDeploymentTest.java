@@ -72,7 +72,7 @@ public class TerraformDeploymentTest {
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setCreateRequest(deployRequest);
         TerraformDeployment terraformDeployment =
-                new TerraformDeployment("test", false, "DEBUG", new DeployEnvironments(null));
+                new TerraformDeployment("test", false, "DEBUG", new DeployEnvironments(null, null));
 
         DeployResult deployResult = terraformDeployment.deploy(xpanseDeployTask);
 

@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFou
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.security.config.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -36,6 +37,7 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class CredentialCenter {
 
+    private final AesUtil aesUtil;
     private final PluginManager pluginManager;
     private final CredentialsStore credentialsStore;
     private final CredentialOpenApiGenerator credentialOpenApiGenerator;
@@ -45,9 +47,10 @@ public class CredentialCenter {
      */
     @Autowired
     public CredentialCenter(
-            PluginManager pluginManager,
+            AesUtil aesUtil, PluginManager pluginManager,
             CredentialsStore credentialsStore,
             CredentialOpenApiGenerator credentialOpenApiGenerator) {
+        this.aesUtil = aesUtil;
         this.pluginManager = pluginManager;
         this.credentialsStore = credentialsStore;
         this.credentialOpenApiGenerator = credentialOpenApiGenerator;
@@ -163,6 +166,7 @@ public class CredentialCenter {
      */
     public void addCredential(CreateCredential createCredential) {
         checkInputCredentialIsValid(createCredential);
+        encodeSensitiveVariables(createCredential);
         AbstractCredentialInfo credential;
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(createCredential.getCsp());
@@ -184,6 +188,7 @@ public class CredentialCenter {
      */
     public void updateCredential(CreateCredential updateCredential) {
         checkInputCredentialIsValid(updateCredential);
+        encodeSensitiveVariables(updateCredential);
         AbstractCredentialInfo credential;
         if (updateCredential.getType() == CredentialType.VARIABLES) {
             credential = new CredentialVariables(updateCredential);
@@ -241,11 +246,34 @@ public class CredentialCenter {
         if (credentialWithAllVariables.isEmpty()) {
             throw new CredentialVariablesNotComplete(Set.of(String.format(
                     "All mandatory variables for credential of type %s for Csp:%s and user %s is "
-                            + "not available",
-                    csp,
-                    credentialType, xpanseUser)));
+                            + "not available", csp, credentialType, xpanseUser)));
         }
-        return credentialWithAllVariables.get();
+        return decodeSensitiveVariables(credentialWithAllVariables.get());
+    }
+
+    private void encodeSensitiveVariables(CreateCredential createCredential) {
+        List<CredentialVariable> variables = createCredential.getVariables();
+        variables.stream().forEach(variable -> {
+            if (!Objects.isNull(variable) && variable.getIsSensitive()) {
+                if (StringUtils.isNotBlank(variable.getValue())) {
+                    variable.setValue(aesUtil.encode(variable.getValue()));
+                }
+            }
+        });
+    }
+
+    private CredentialVariables decodeSensitiveVariables(
+            AbstractCredentialInfo abstractCredentialInfo) {
+        CredentialVariables credentialVariables = (CredentialVariables) abstractCredentialInfo;
+        List<CredentialVariable> variables = credentialVariables.getVariables();
+        variables.stream().forEach(variable -> {
+            if (!Objects.isNull(variable) && variable.getIsSensitive()) {
+                if (StringUtils.isNotBlank(variable.getValue())) {
+                    variable.setValue(aesUtil.decode(variable.getValue()));
+                }
+            }
+        });
+        return credentialVariables;
     }
 
     /**

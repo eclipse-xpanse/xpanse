@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoun
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.service.register.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
@@ -42,6 +43,7 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.security.config.AesUtil;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
@@ -74,6 +76,8 @@ public class DeployService {
     private DeployVariableValidator deployVariableValidator;
     @Resource
     private PluginManager pluginManager;
+    @Resource
+    private AesUtil aesUtil;
 
     /**
      * Get all Deployment group by DeployerKind.
@@ -134,6 +138,8 @@ public class DeployService {
             deployVariableValidator.isVariableValid(deployVariables,
                     deployTask.getCreateRequest().getServiceRequestProperties());
         }
+        encodeDeployVariable(serviceEntity,
+                deployTask.getCreateRequest().getServiceRequestProperties());
         // Set Ocl and CreateRequest
         deployTask.setOcl(serviceEntity.getOcl());
         deployTask.getCreateRequest().setOcl(serviceEntity.getOcl());
@@ -141,6 +147,22 @@ public class DeployService {
         fillHandler(deployTask);
         // get the deployment.
         return getDeployment(deployTask.getOcl().getDeployment().getKind());
+    }
+
+    private void encodeDeployVariable(RegisterServiceEntity serviceEntity,
+            Map<String, String> serviceRequestProperties) {
+        if (Objects.isNull(serviceEntity.getOcl().getDeployment())
+                || CollectionUtils.isEmpty(serviceEntity.getOcl().getDeployment().getVariables())) {
+            return;
+        }
+        serviceEntity.getOcl().getDeployment().getVariables().stream().forEach(variable -> {
+            if (Objects.nonNull(variable) && !SensitiveScope.NONE.toValue()
+                    .equals(variable.getSensitiveScope().toValue())
+                    && serviceRequestProperties.containsKey(variable.getName())) {
+                serviceRequestProperties.put(variable.getName(),
+                        aesUtil.encode(serviceRequestProperties.get(variable.getName())));
+            }
+        });
     }
 
     /**

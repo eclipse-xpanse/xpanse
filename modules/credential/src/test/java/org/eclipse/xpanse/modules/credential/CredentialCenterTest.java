@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariabl
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.security.config.AesUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,9 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = {CaffeineCredentialCacheManager.class, CredentialsStore.class})
 @ExtendWith(MockitoExtension.class)
 class CredentialCenterTest {
+
+    @Mock
+    private AesUtil aesUtil;
 
     @Mock
     private PluginManager mockPluginManager;
@@ -64,7 +68,7 @@ class CredentialCenterTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        credentialCenter = new CredentialCenter(mockPluginManager, credentialsStore,
+        credentialCenter = new CredentialCenter(aesUtil, mockPluginManager, credentialsStore,
                 credentialOpenApiGenerator);
     }
 
