@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.admin.enums;
+package org.eclipse.xpanse.modules.models.system.enums;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

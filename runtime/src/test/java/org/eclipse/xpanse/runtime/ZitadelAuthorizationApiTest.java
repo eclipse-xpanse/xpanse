@@ -10,18 +10,18 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockBearerTokenAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import jakarta.annotation.Resource;
+import java.util.Arrays;
 import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.models.admin.SystemStatus;
-import org.eclipse.xpanse.modules.models.admin.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
+import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -33,14 +33,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 
-@ActiveProfiles({"zitadel", "zitadel-testbed"})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {XpanseApplication.class})
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ZitadelAuthorizationApiTest {
 
@@ -96,9 +94,8 @@ class ZitadelAuthorizationApiTest {
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
     }
 
-
     @Test
-    void testHealthUnauthorized() throws Exception {
+    void testCallApiUnauthorized() throws Exception {
         // SetUp
         Response responseModel = Response.errorResponse(ResultType.UNAUTHORIZED,
                 Collections.singletonList(ResultType.UNAUTHORIZED.toValue()));
@@ -116,29 +113,9 @@ class ZitadelAuthorizationApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = {"admin"},
-            claims = @OpenIdClaims(preferredUsername = "xpanse-admin"))
-    void testHealthAuthorized() throws Exception {
-        // SetUp
-        SystemStatus systemStatus = new SystemStatus();
-        systemStatus.setHealthStatus(HealthStatus.OK);
-        String resBody = objectMapper.writeValueAsString(systemStatus);
-
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/health")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
-        assertEquals(resBody, response.getContentAsString());
-    }
-
-    @Test
-    @WithMockJwtAuth(authorities = {"user"},
-            claims = @OpenIdClaims(preferredUsername = "xpanse-user"))
-    void testApiAccessDenied() throws Exception {
+    @WithMockBearerTokenAuthentication(authorities = {"user"},
+            attributes = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
+    void testCallApiAccessDenied() throws Exception {
         // SetUp
         Response responseModel = Response.errorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList(ResultType.ACCESS_DENIED.toValue()));
@@ -150,6 +127,24 @@ class ZitadelAuthorizationApiTest {
 
         // Verify the results
         assertEquals(response.getStatus(), HttpStatus.FORBIDDEN.value());
+        assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
+        assertEquals(resBody, response.getContentAsString());
+    }
+
+
+    @Test
+    @WithMockBearerTokenAuthentication(authorities = {"csp"},
+            attributes = @OpenIdClaims(sub = "csp-id", preferredUsername = "xpanse-csp"))
+    void testCallApiWell() throws Exception {
+        // SetUp
+        String resBody = objectMapper.writeValueAsString(Arrays.asList(Category.values()));
+        // Run the test
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/categories")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(response.getStatus(), HttpStatus.OK.value());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
     }

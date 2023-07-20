@@ -14,8 +14,13 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
+import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
+import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
+import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
+import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
@@ -25,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -110,8 +116,41 @@ public class ZitadelAuthorizationService {
         HttpEntity<MultiValueMap<String, Object>> param = new HttpEntity<>(map, headers);
 
         String tokenUrl = iamServerEndpoint + "/oauth/v2/token";
-        ResponseEntity<TokenResponse> response =
-                restTemplate.postForEntity(tokenUrl, param, TokenResponse.class);
-        return response.getBody();
+        try {
+            ResponseEntity<TokenResponse> response =
+                    restTemplate.postForEntity(tokenUrl, param, TokenResponse.class);
+            return response.getBody();
+        } catch (RestClientException e) {
+            log.error("Get access token by code:{} form the IAM error.", code, e);
+        }
+        return null;
     }
+
+
+    /**
+     * Get health status of the IdentityProvider.
+     *
+     * @return Health status of the IdentityProvider.
+     */
+    public BackendSystemStatus getIdentityProviderStatus() {
+        BackendSystemStatus status = new BackendSystemStatus();
+        status.setBackendSystemType(BackendSystemType.IDENTITY_PROVIDER);
+        status.setName(IdentityProviderType.ZITADEL.toValue());
+        status.setEndpoint(iamServerEndpoint);
+        status.setHealthStatus(HealthStatus.NOK);
+        String healthCheckUrl = iamServerEndpoint + "/debug/healthz";
+        try {
+            ResponseEntity<String> response =
+                    restTemplate.getForEntity(healthCheckUrl, String.class);
+            if (StringUtils.endsWithIgnoreCase(HealthStatus.OK.toValue(), response.getBody())) {
+                status.setHealthStatus(HealthStatus.OK);
+            }
+        } catch (RestClientException e) {
+            status.setDetails(e.getMessage());
+            log.error("Get health status of the IAM error.", e);
+        }
+        return status;
+    }
+
+
 }

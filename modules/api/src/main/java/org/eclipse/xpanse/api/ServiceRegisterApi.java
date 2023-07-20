@@ -9,7 +9,6 @@ package org.eclipse.xpanse.api;
 
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_CSP;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,8 +23,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.models.admin.SystemStatus;
-import org.eclipse.xpanse.modules.models.admin.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -262,21 +259,6 @@ public class ServiceRegisterApi {
                 "Get detail of registered service with name %s success.", id);
         log.info(successMsg);
         return registeredServiceVo;
-    }
-
-    /**
-     * Method to find out the current state of the system.
-     *
-     * @return Returns the current state of the system.
-     */
-    @Tag(name = "Admin", description = "APIs for administrating Xpanse")
-    @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_USER})
-    public SystemStatus health() {
-        SystemStatus systemStatus = new SystemStatus();
-        systemStatus.setHealthStatus(HealthStatus.OK);
-        return systemStatus;
     }
 
     private RegisteredServiceQuery getServicesQueryModel(Category category, String cspName,
