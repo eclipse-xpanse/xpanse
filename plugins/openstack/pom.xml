@@ -67,6 +67,12 @@
             <groupId>com.github.openstack4j.core</groupId>
             <artifactId>openstack4j</artifactId>
             <version>3.11</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <artifactId>monitor</artifactId>

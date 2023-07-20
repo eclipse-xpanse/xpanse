@@ -31,8 +31,8 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,12 +40,13 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class CredentialOpenApiGenerator implements ApplicationRunner {
+public class CredentialOpenApiGenerator implements ApplicationListener<ApplicationStartedEvent> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final String appVersion;
     private final OpenApiUtil openApiUtil;
     private final PluginManager pluginManager;
+
 
     /**
      * Constructor of CredentialApiUtil.
@@ -54,7 +55,7 @@ public class CredentialOpenApiGenerator implements ApplicationRunner {
     public CredentialOpenApiGenerator(PluginManager pluginManager,
                                       OpenApiUtil openApiUtil,
                                       @Value("${app.version:1.0.0}")
-                                      String appVersion) {
+                                              String appVersion) {
         this.pluginManager = pluginManager;
         this.openApiUtil = openApiUtil;
         this.appVersion = appVersion;
@@ -78,14 +79,12 @@ public class CredentialOpenApiGenerator implements ApplicationRunner {
         return openApiUtil.getOpenApiWorkdir();
     }
 
-
     @Override
-    public void run(ApplicationArguments args) {
+    public void onApplicationEvent(ApplicationStartedEvent event) {
         Map<Csp, OrchestratorPlugin> cspOrchestratorPluginMap = pluginManager.getPluginsMap();
-        for (Csp csp : cspOrchestratorPluginMap.keySet()) {
-            OrchestratorPlugin orchestratorPlugin = cspOrchestratorPluginMap.get(csp);
+        for (Map.Entry<Csp, OrchestratorPlugin> entry : cspOrchestratorPluginMap.entrySet()) {
             List<AbstractCredentialInfo> credentialDefinitions =
-                    orchestratorPlugin.getCredentialDefinitions();
+                    entry.getValue().getCredentialDefinitions();
             if (Objects.nonNull(credentialDefinitions)) {
                 Map<CredentialType, AbstractCredentialInfo> typeCredentialInfoMap =
                         credentialDefinitions.stream().filter(Objects::nonNull)
@@ -98,10 +97,11 @@ public class CredentialOpenApiGenerator implements ApplicationRunner {
                 });
             } else {
                 log.info("Not found credential definition of the cloud service provider:{}",
-                        csp.toValue());
+                        entry.getKey().toValue());
             }
         }
     }
+
 
     /**
      * create credentialApi for plugins.

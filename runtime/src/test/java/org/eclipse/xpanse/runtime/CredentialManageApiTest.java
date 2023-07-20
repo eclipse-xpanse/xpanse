@@ -30,12 +30,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.Link;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test for CredentialManageApiTest.
  */
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("default")
 @SpringBootTest(classes = {XpanseApplication.class, CredentialManageApi.class})
 @AutoConfigureMockMvc
 class CredentialManageApiTest {
