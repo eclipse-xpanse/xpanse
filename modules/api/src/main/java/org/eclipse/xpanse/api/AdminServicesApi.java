@@ -10,6 +10,7 @@ import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_CSP;
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class AdminServicesApi {
      * @return Returns the current state of the system.
      */
     @Tag(name = "Admin", description = "APIs for administrating Xpanse")
+    @Operation(description = "Check health of API service and backend system.")
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_USER})
