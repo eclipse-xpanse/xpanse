@@ -67,8 +67,8 @@ public class ZitadelWebSecurityConfig {
             arc.requestMatchers("/swagger-ui/**", "/v3/**", "/favicon.ico", "/error").permitAll();
             // add permit for h2-console html and resource
             arc.requestMatchers("/h2-console/**", "h2/**").permitAll();
-            // add permit for auth apis
-            arc.requestMatchers("/auth/**").permitAll();
+            // add permit for auth apis and openAPI html
+            arc.requestMatchers("/auth/**", "openapi/**").permitAll();
             // declarative route configuration
             arc.requestMatchers("/xpanse/**").authenticated();
             // add additional routes
@@ -138,5 +138,6 @@ public class ZitadelWebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 
 }
