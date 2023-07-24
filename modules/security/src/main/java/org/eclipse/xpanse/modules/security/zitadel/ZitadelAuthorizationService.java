@@ -13,8 +13,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -142,8 +143,10 @@ public class ZitadelAuthorizationService {
         try {
             ResponseEntity<String> response =
                     restTemplate.getForEntity(healthCheckUrl, String.class);
-            if (StringUtils.endsWithIgnoreCase(HealthStatus.OK.toValue(), response.getBody())) {
+            if (Objects.equals(HttpStatus.OK, response.getStatusCode())) {
                 status.setHealthStatus(HealthStatus.OK);
+            } else {
+                status.setDetails(response.getBody());
             }
         } catch (RestClientException e) {
             status.setDetails(e.getMessage());
