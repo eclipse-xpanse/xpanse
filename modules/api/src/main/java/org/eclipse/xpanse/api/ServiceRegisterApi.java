@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -61,21 +60,6 @@ public class ServiceRegisterApi {
 
     @Resource
     private RegisterService registerService;
-
-    /**
-     * Register new service using ocl model.
-     *
-     * @return response
-     */
-    @Tag(name = "Service Vendor",
-            description = "APIs to manage register services.")
-    @Operation(description = "Get category list.")
-    @GetMapping(value = "/services/categories",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public List<Category> listCategories() {
-        return Arrays.asList(Category.values());
-    }
 
     /**
      * Register new service using ocl model.
