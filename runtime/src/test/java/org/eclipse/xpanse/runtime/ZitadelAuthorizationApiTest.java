@@ -15,13 +15,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import jakarta.annotation.Resource;
-import java.util.Arrays;
 import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -113,15 +111,15 @@ class ZitadelAuthorizationApiTest {
     }
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = {"user"},
-            attributes = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
+    @WithMockBearerTokenAuthentication(authorities = {"csp"},
+            attributes = @OpenIdClaims(sub = "csp-id", preferredUsername = "xpanse-csp"))
     void testCallApiAccessDenied() throws Exception {
         // SetUp
         Response responseModel = Response.errorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList(ResultType.ACCESS_DENIED.toValue()));
         String resBody = objectMapper.writeValueAsString(responseModel);
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/categories")
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/deployed")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
@@ -131,22 +129,19 @@ class ZitadelAuthorizationApiTest {
         assertEquals(resBody, response.getContentAsString());
     }
 
-
     @Test
-    @WithMockBearerTokenAuthentication(authorities = {"csp"},
-            attributes = @OpenIdClaims(sub = "csp-id", preferredUsername = "xpanse-csp"))
+    @WithMockBearerTokenAuthentication(authorities = {"user"},
+            attributes = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
     void testCallApiWell() throws Exception {
-        // SetUp
-        String resBody = objectMapper.writeValueAsString(Arrays.asList(Category.values()));
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/categories")
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/deployed")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
         // Verify the results
         assertEquals(response.getStatus(), HttpStatus.OK.value());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
-        assertEquals(resBody, response.getContentAsString());
+        assertEquals("[]", response.getContentAsString());
     }
 
 

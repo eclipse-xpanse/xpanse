@@ -9,7 +9,6 @@ package org.eclipse.xpanse.runtime;
 import jakarta.transaction.Transactional;
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,13 +98,6 @@ class ServiceRegisterApiTest {
         File htmlFile = new File(openApiWorkdir,
                 registerServiceEntity.getId().toString() + ".html");
         Assertions.assertTrue(htmlFile.exists());
-    }
-
-    @Test
-    void listCategories() {
-        List<Category> categories = Arrays.asList(Category.values());
-        List<Category> categoryList = serviceRegisterApi.listCategories();
-        Assertions.assertEquals(categories, categoryList);
     }
 
     @Test
