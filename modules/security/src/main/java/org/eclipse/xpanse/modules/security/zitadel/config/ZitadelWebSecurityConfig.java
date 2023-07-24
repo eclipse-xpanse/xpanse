@@ -26,6 +26,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -63,17 +65,24 @@ public class ZitadelWebSecurityConfig {
         http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(
                 corsConfigurationSource()));
         http.authorizeHttpRequests(arc -> {
+            // add permit for h2-console html and resource
+            arc.requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll();
             // add permit for swagger-ui docs and resource
             arc.requestMatchers("/swagger-ui/**", "/v3/**", "/favicon.ico", "/error").permitAll();
-            // add permit for h2-console html and resource
-            arc.requestMatchers("/h2-console/**", "h2/**").permitAll();
             // add permit for auth apis and openAPI html
-            arc.requestMatchers("/auth/**", "openapi/**").permitAll();
+            arc.requestMatchers("/auth/**", "/openapi/**").permitAll();
             // declarative route configuration
             arc.requestMatchers("/xpanse/**").authenticated();
             // add additional routes
             arc.anyRequest().authenticated();
         });
+
+        http.csrf(csrfConfigurer -> csrfConfigurer.ignoringRequestMatchers(
+                new AntPathRequestMatcher("/h2-console/**")));
+
+        http.headers(headersConfigurer -> headersConfigurer.addHeaderWriter(
+                new XFrameOptionsHeaderWriter(
+                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)));
 
         // use custom implementation of OpaqueTokenIntrospector
         http.oauth2ResourceServer(oauth2 ->
