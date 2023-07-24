@@ -247,12 +247,12 @@ cloud providers in the [xpanse configuration file](./runtime/src/main/resources/
 
 #### The Version Key Of The Terraform Providers
 
-|  Terraform Providers   | key  |
-|  ----  | ----  |
-| AWS  | `terraform.provider.aws.version` |
-| HuaweiCloud  | `terraform.provider.huaweicloud.version` |
-| OpenStack  | `terraform.provider.openstack.version` |
-| FlexibleEngine  | `terraform.provider.flexibleengine.version` |
+| Terraform Providers | key                                         |
+|---------------------|---------------------------------------------|
+| AWS                 | `terraform.provider.aws.version`            |
+| HuaweiCloud         | `terraform.provider.huaweicloud.version`    |
+| OpenStack           | `terraform.provider.openstack.version`      |
+| FlexibleEngine      | `terraform.provider.flexibleengine.version` |
 
 #### How To Configure The Version of Terraform Providers
 
@@ -266,9 +266,4 @@ terraform.provider.aws.version=~> 4.0
 terraform.provider.openstack.version=>= 1.48.0
 terraform.provider.flexibleengine.version=>= 1.30.0
 terraform.provider.huaweicloud.version=~> 1.51.0
-
-
-
-
-
-
+```
