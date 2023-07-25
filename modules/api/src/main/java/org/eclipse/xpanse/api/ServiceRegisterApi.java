@@ -49,7 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * REST interface methods for processing OCL.
+ * REST interface methods for registering services using OCL and managing registered services.
  */
 @Slf4j
 @RestController
@@ -62,7 +62,7 @@ public class ServiceRegisterApi {
     private RegisterService registerService;
 
     /**
-     * Register new service using ocl model.
+     * Register new service using an ocl model.
      *
      * @param ocl model of Ocl.
      * @return response
@@ -83,7 +83,7 @@ public class ServiceRegisterApi {
     }
 
     /**
-     * Update registered service using id and ocl model.
+     * Update registered service using an id and ocl model.
      *
      * @param ocl model of Ocl.
      * @return response

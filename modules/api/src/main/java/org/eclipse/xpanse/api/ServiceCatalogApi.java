@@ -55,7 +55,7 @@ public class ServiceCatalogApi {
     private RegisterService registerService;
 
     /**
-     * List the available services.
+     * Returns the list of all registered services that are available for user to order/deploy.
      *
      * @param category       name of category.
      * @param cspName        name of cloud service provider.
@@ -63,9 +63,10 @@ public class ServiceCatalogApi {
      * @param serviceVersion version of registered service.
      * @return response
      */
-    @Tag(name = "Services Available",
-            description = "APIs to query the available services.")
-    @Operation(description = "List the available services.")
+    @Tag(name = "Service Catalog",
+            description = "APIs to query the services which are available for the user to order.")
+    @Operation(description =
+            "Returns the list of all registered services that are available for user to order.")
     @GetMapping(value = "/services/available",
             produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     @ResponseStatus(HttpStatus.OK)
@@ -96,13 +97,17 @@ public class ServiceCatalogApi {
     }
 
     /**
-     * Get the available services by tree.
+     * Returns the list of all registered services in a tree structure
+     * with service name
+     * representing the root of the tree and service versions
+     * representing the branches of the tree.
+     * This method is used for providing different views of the available services.
      *
      * @param category name of category.
      * @return response
      */
-    @Tag(name = "Services Available",
-            description = "APIs to query the available services.")
+    @Tag(name = "Service Catalog",
+            description = "APIs to query the services which are available for the user to order.")
     @Operation(description = "Get the available services by tree.")
     @GetMapping(value = "/services/available/category/{categoryName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -123,14 +128,14 @@ public class ServiceCatalogApi {
     }
 
     /**
-     * Get available service by id.
+     * Get deployable service by id.
      *
-     * @param id The id of available service.
+     * @param id The id of deployable service.
      * @return userAvailableServiceVo
      */
-    @Tag(name = "Services Available",
-            description = "APIs to query the available services.")
-    @Operation(description = "Get available service by id.")
+    @Tag(name = "Service Catalog",
+            description = "APIs to query the services which are available for the user to order.")
+    @Operation(description = "Get deployable service by id.")
     @GetMapping(value = "/services/available/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -146,12 +151,12 @@ public class ServiceCatalogApi {
     }
 
     /**
-     * Get the API document of the available service.
+     * Get the API document of the deployable service.
      *
-     * @param id The id of available service.
+     * @param id The id of deployable service.
      */
-    @Tag(name = "Services Available",
-            description = "APIs to query the available services.")
+    @Tag(name = "Service Catalog",
+            description = "APIs to query the services which are available for the user to order.")
     @GetMapping(value = "/services/available/{id}/openapi",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)

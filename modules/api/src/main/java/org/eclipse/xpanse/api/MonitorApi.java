@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Monitor Api.
+ * REST API methods for monitoring deployed services.
  */
 @Slf4j
 @CrossOrigin
@@ -48,13 +48,13 @@ public class MonitorApi {
     }
 
     /**
-     * Get Monitor Metric.
+     * Get metrics of all resources in a deployed service.
      *
      * @param id Service ID.
      */
     @Tag(name = "Monitor",
             description = "APIs to get metrics of deployed services.")
-    @Operation(description = "Get metrics of the deployed service.")
+    @Operation(description = "Get metrics of all resources in a deployed service.")
     @GetMapping(value = "/monitor/metric/service/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<Metric> getMetricsByServiceId(
@@ -90,13 +90,13 @@ public class MonitorApi {
 
 
     /**
-     * Get Monitor Metric.
+     * Get metrics of a specific deployed resource.
      *
      * @param id Service ID.
      */
     @Tag(name = "Monitor",
             description = "APIs to get metrics of deployed services.")
-    @Operation(description = "Get metrics of the deployed resource.")
+    @Operation(description = "Get metrics of a specific deployed resource.")
     @GetMapping(value = "/monitor/metric/resource/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
