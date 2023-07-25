@@ -269,7 +269,7 @@ public class ServiceRegisterApi {
             RegisteredServiceVo registeredServiceVo = new RegisteredServiceVo();
             BeanUtils.copyProperties(serviceEntity, registeredServiceVo);
             registeredServiceVo.add(
-                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceDeployerApi.class)
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
                             .openApi(serviceEntity.getId().toString())).withRel("openApi"));
             return registeredServiceVo;
         }

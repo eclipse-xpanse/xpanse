@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.ServiceCatalogApi;
+import org.eclipse.xpanse.api.ServiceDeployerApi;
 import org.eclipse.xpanse.api.ServiceRegisterApi;
 import org.eclipse.xpanse.common.openapi.OpenApiUtil;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
@@ -65,7 +67,9 @@ class ServiceDeployerApiTest {
     private static Ocl oclRegister;
 
     @Autowired
-    private org.eclipse.xpanse.api.ServiceDeployerApi serviceDeployerApi;
+    private ServiceDeployerApi serviceDeployerApi;
+    @Autowired
+    private ServiceCatalogApi serviceCatalogApi;
     @Autowired
     private ServiceRegisterApi serviceRegisterApi;
 
@@ -247,7 +251,7 @@ class ServiceDeployerApiTest {
         String serviceName = oclRegister.getName();
         String serviceVersion = oclRegister.getServiceVersion();
         List<UserAvailableServiceVo> userAvailableServiceVos =
-                serviceDeployerApi.listAvailableServices(categoryName, cspName, serviceName,
+                serviceCatalogApi.listAvailableServices(categoryName, cspName, serviceName,
                         serviceVersion);
         log.error(userAvailableServiceVos.toString());
         Assertions.assertNotNull(userAvailableServiceVos);
@@ -258,7 +262,7 @@ class ServiceDeployerApiTest {
         serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         List<CategoryOclVo> categoryOclVos =
-                serviceDeployerApi.getAvailableServicesTree(oclRegister.getCategory());
+                serviceCatalogApi.getAvailableServicesTree(oclRegister.getCategory());
         log.error(categoryOclVos.toString());
         Assertions.assertNotNull(categoryOclVos);
     }
@@ -268,7 +272,7 @@ class ServiceDeployerApiTest {
         RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         UserAvailableServiceVo userAvailableServiceVo =
-                serviceDeployerApi.availableServiceDetails(registeredServiceVo.getId().toString());
+                serviceCatalogApi.availableServiceDetails(registeredServiceVo.getId().toString());
         log.error(userAvailableServiceVo.toString());
         Assertions.assertNotNull(userAvailableServiceVo);
     }
@@ -277,7 +281,7 @@ class ServiceDeployerApiTest {
     void openApi() throws Exception {
         RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
-        Link link = serviceDeployerApi.openApi(registeredServiceVo.getId().toString());
+        Link link = serviceCatalogApi.openApi(registeredServiceVo.getId().toString());
         log.error(link.toString());
         Assertions.assertNotNull(link);
         Assertions.assertEquals("OpenApi", link.getRel().toString());
