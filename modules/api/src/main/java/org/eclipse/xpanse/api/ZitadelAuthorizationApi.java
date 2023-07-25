@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * REST interface methods for credential management.
+ * REST interface methods for Zitadel oauth2 authentication.
  */
 @Slf4j
 @RestController
@@ -39,8 +39,8 @@ public class ZitadelAuthorizationApi {
 
 
     @Tag(name = "Auth Management",
-            description = "APIs for user authentication.")
-    @Operation(description = "Get and redirect authorization url for user to authorize.")
+            description = "APIs for user authentication and authorization.")
+    @Operation(description = "Get and redirect authorization url for user to authenticate.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/auth/authorize")
     void authorize(HttpServletResponse response) throws IOException {
@@ -49,7 +49,7 @@ public class ZitadelAuthorizationApi {
     }
 
     @Tag(name = "Auth Management",
-            description = "APIs for user authentication.")
+            description = "APIs for user authentication and authorization.")
     @Operation(description = "Get token info by authorization code.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/auth/token")

@@ -62,7 +62,7 @@ public class AdminServicesApi {
      * @return Returns the current state of the system.
      */
     @Tag(name = "Admin", description = "APIs for administrating Xpanse")
-    @Operation(description = "Check health of API service and backend system.")
+    @Operation(description = "Check health of API service and backend systems.")
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_USER})

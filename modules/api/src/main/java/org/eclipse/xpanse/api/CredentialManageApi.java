@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * REST interface methods for credential management.
+ * REST interface methods for managing cloud provider credentials of the user.
  */
 @Slf4j
 @RestController
@@ -63,14 +63,14 @@ public class CredentialManageApi {
      * List the available credential types of the cloud service provider.
      *
      * @param csp The cloud service provider.
-     * @return Returns list of the available credential types of the cloud service provider.
+     * @return Returns list the available credential types of the cloud service provider.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs for user manage credentials for authentication.")
+            description = "APIs for managing user's cloud provider credentials")
     @GetMapping(value = "/auth/csp/{cspName}/credential/types",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List credential types provided by the cloud service provider.")
+    @Operation(description = "Get the credential types supported by the cloud service provider.")
     public List<CredentialType> getCredentialTypesByCsp(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable(name = "cspName") Csp csp) {
@@ -79,22 +79,23 @@ public class CredentialManageApi {
 
 
     /**
-     * List credential capabilities of the cloud service provider.
+     * Get the credential capabilities defined by the cloud service provider.
      *
      * @param csp  The cloud service provider.
      * @param type The type of credential.
-     * @return Returns list of credential capabilities of the cloud service provider.
+     * @return Returns list of credential capabilities defined by the cloud service provider.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs for user manage credentials for authentication.")
+            description = "APIs for managing user's cloud provider credentials")
     @GetMapping(value = "/auth/csp/{cspName}/credential/capabilities",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List credential capabilities provided by the cloud service provider.")
+    @Operation(description =
+            "Get the credential capabilities defined by the cloud service provider.")
     public List<AbstractCredentialInfo> getCredentialCapabilitiesByCsp(
-            @Parameter(name = "cspName", description = "The cloud service provider.")
+            @Parameter(name = "cspName", description = "name of the cloud service provider.")
             @PathVariable(name = "cspName") Csp csp,
-            @Parameter(name = "type", description = "The type of credential.")
+            @Parameter(name = "type", description = "type of tje credential.")
             @RequestParam(name = "type", required = false) CredentialType type) {
         List<AbstractCredentialInfo> abstractCredentialInfos =
                 credentialCenter.getCredentialCapabilitiesByCsp(csp, type);
@@ -103,17 +104,17 @@ public class CredentialManageApi {
     }
 
     /**
-     * List all credentials of the user.
+     * Get all cloud provider credentials added by the user.
      *
-     * @param userName The name of user who provided the credential.
+     * @param userName The name of the user who provided the credential.
      * @return Returns all credentials of the user.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs for user manage credentials for authentication.")
+            description = "APIs for managing user's cloud provider credentials")
     @GetMapping(value = "/auth/user/credentials",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List all credentials of the user.")
+    @Operation(description = "Get all cloud provider credentials added by the user.")
     public List<AbstractCredentialInfo> getCredentialsByUser(
             @Parameter(name = "userName",
                     description = "The name of user who provided the credential.",
@@ -123,19 +124,20 @@ public class CredentialManageApi {
     }
 
     /**
-     * List credentials of the cloud service provider and the user.
+     * Get all cloud provider credentials added by the user for a cloud service provider.
      *
      * @param csp      The cloud service provider.
-     * @param userName The name of user who provided the credential.
+     * @param userName The name of the user who provided the credential.
      * @param type     The type of credential.
      * @return Returns credentials of the cloud service provider and the user.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs for user manage credentials for authentication.")
+            description = "APIs for managing user's cloud provider credentials")
     @GetMapping(value = "/auth/csp/{cspName}/credentials",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List credentials of the cloud service provider and the user.")
+    @Operation(description =
+            "Get all cloud provider credentials added by the user for a cloud service provider.")
     public List<AbstractCredentialInfo> getCredentials(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable(name = "cspName") Csp csp,
@@ -148,18 +150,18 @@ public class CredentialManageApi {
     }
 
     /**
-     * Get the API document for adding credential.
+     * Get the OpenAPI document for adding a credential.
      *
      * @param csp  The cloud service provider.
      * @param type The type of credential.
      * @return Link of credential openApi url.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs to manage credentials for authentication.")
+            description = "APIs for managing user's cloud provider credentials")
     @GetMapping(value = "/auth/csp/{cspName}/openapi/{type}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Get the API document for adding credential of the Csp.")
+    @Operation(description = "Returns the OpenAPI document for adding a credential.")
     public Link getCredentialOpenApi(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable(name = "cspName") Csp csp,
@@ -174,49 +176,51 @@ public class CredentialManageApi {
     }
 
     /**
-     * Add credential of the cloud service provider.
+     * Add user's credential for connecting to the cloud service provider.
      *
-     * @param createCredential The credential to create.
+     * @param createCredential The credential to be created.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs for user manage credentials for authentication.")
+            description = "APIs for managing user's cloud provider credentials")
     @PostMapping(value = "/auth/csp/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(description = "Add credential of the cloud service provider.")
+    @Operation(description = "Add user's credential for connecting to the cloud service provider.")
     public void addCredential(
             @Valid @RequestBody CreateCredential createCredential) {
         credentialCenter.addCredential(createCredential);
     }
 
     /**
-     * Update credential of the cloud service provider.
+     * Update user's credential for connecting to the cloud service provider.
      *
-     * @param updateCredential The credential to update.
+     * @param updateCredential The credential to be updated.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs for user manage credentials for authentication.")
+            description = "APIs for managing user's cloud provider credentials")
     @PutMapping(value = "/auth/csp/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(description = "Update credential of the cloud service provider.")
+    @Operation(description =
+            "Update user's credential for connecting to the cloud service provider.")
     public void updateCredential(
             @Valid @RequestBody CreateCredential updateCredential) {
         credentialCenter.updateCredential(updateCredential);
     }
 
     /**
-     * Delete credential of the cloud service provider and the user.
+     * Delete user's credential for connecting to the cloud service provider.
      *
      * @param csp      The cloud service provider.
-     * @param userName The name of user who provided credential.
+     * @param userName The name of the user who provided credential.
      */
     @Tag(name = "Credentials Management",
-            description = "APIs for user manage credentials for authentication.")
+            description = "APIs for managing user's cloud provider credentials")
     @DeleteMapping(value = "/auth/csp/{cspName}/credential",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(description = "Delete credential of the cloud service provider and the user.")
+    @Operation(description =
+            "Delete user's credential for connecting to the cloud service provider.")
     public void deleteCredential(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable("cspName") Csp csp,
