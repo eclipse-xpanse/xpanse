@@ -236,7 +236,7 @@ public class ServiceDeployerApi {
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_USER})
     public List<CategoryOclVo> getAvailableServicesTree(
             @Parameter(name = "categoryName", description = "category of the service")
-            @PathVariable(name = "categoryName", required = false) Category category) {
+            @PathVariable(name = "categoryName") Category category) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
         query.setCategory(category);
         List<CategoryOclVo> categoryOclList =
