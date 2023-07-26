@@ -5,10 +5,13 @@
 
 package org.eclipse.xpanse.modules.credential;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.java.Log;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -47,7 +50,19 @@ public class DummyPluginImpl implements OrchestratorPlugin {
 
     @Override
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
-        return null;
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        CredentialVariables accessKey = new CredentialVariables(
+                getCsp(), null, "AK_SK", "The access key and security key.",
+                CredentialType.VARIABLES, credentialVariables);
+        credentialVariables.add(
+                new CredentialVariable("OS_ACCESS_KEY",
+                        "The access key.", true));
+        credentialVariables.add(
+                new CredentialVariable("OS_SECRET_KEY",
+                        "The security key.", true));
+        List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
+        credentialInfos.add(accessKey);
+        return credentialInfos;
     }
 
     /**

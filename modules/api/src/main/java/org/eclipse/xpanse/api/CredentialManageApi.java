@@ -95,10 +95,12 @@ public class CredentialManageApi {
     public List<AbstractCredentialInfo> getCredentialCapabilitiesByCsp(
             @Parameter(name = "cspName", description = "name of the cloud service provider.")
             @PathVariable(name = "cspName") Csp csp,
-            @Parameter(name = "type", description = "type of tje credential.")
-            @RequestParam(name = "type", required = false) CredentialType type) {
+            @Parameter(name = "type", description = "The type of credential.")
+            @RequestParam(name = "type", required = false) CredentialType type,
+            @Parameter(name = "name", description = "The name of credential.")
+            @RequestParam(name = "name", required = false) String name) {
         List<AbstractCredentialInfo> abstractCredentialInfos =
-                credentialCenter.getCredentialCapabilitiesByCsp(csp, type);
+                credentialCenter.getCredentialCapabilitiesByCsp(csp, type, name);
         getCredentialCapabilitiesValue(abstractCredentialInfos);
         return abstractCredentialInfos;
     }
@@ -141,12 +143,12 @@ public class CredentialManageApi {
     public List<AbstractCredentialInfo> getCredentials(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable(name = "cspName") Csp csp,
+            @Parameter(name = "type", description = "The type of credential.")
+            @RequestParam(name = "type", required = false) CredentialType type,
             @Parameter(name = "userName",
                     description = "The name of user who provided the credential.")
-            @RequestParam(name = "userName") String userName,
-            @Parameter(name = "type", description = "The type of credential.")
-            @RequestParam(name = "type", required = false) CredentialType type) {
-        return credentialCenter.getCredentials(csp, userName, type);
+            @RequestParam(name = "userName") String userName) {
+        return credentialCenter.getCredentials(csp, type, userName);
     }
 
     /**
@@ -224,11 +226,13 @@ public class CredentialManageApi {
     public void deleteCredential(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable("cspName") Csp csp,
-            @Parameter(name = "userName", description = "The name of user who provided credential.")
-            @RequestParam(name = "userName") String userName,
             @Parameter(name = "type", description = "The type of credential.")
-            @RequestParam(name = "type") CredentialType type) {
-        credentialCenter.deleteCredential(csp, userName, type);
+            @RequestParam(name = "type") CredentialType type,
+            @Parameter(name = "name", description = "The name of of credential.")
+            @RequestParam(name = "name") String name,
+            @Parameter(name = "userName", description = "The name of user who provided credential.")
+            @RequestParam(name = "userName") String userName) {
+        credentialCenter.deleteCredential(csp, type, name, userName);
     }
 
     private void getCredentialCapabilitiesValue(

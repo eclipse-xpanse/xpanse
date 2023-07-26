@@ -187,14 +187,14 @@ class DeployEnvironmentsTest {
                         "The security key.", true));
 
         CredentialType credentialType = CredentialType.VARIABLES;
-        CredentialVariables credentialVariables =
-                new CredentialVariables(csp, userName, "name", "description", credentialType,
+
+        AbstractCredentialInfo abstractCredentialInfo =
+                new CredentialVariables(csp, userName, "AK_SK", "description", credentialType,
                         variables);
 
-        AbstractCredentialInfo abstractCredentialInfo = credentialVariables;
-
-        when(mockCredentialCenter.getCredential(csp, createRequest.getUserName(), credentialType))
-                .thenReturn(abstractCredentialInfo);
+        when(mockCredentialCenter.getCredentials(csp, credentialType,
+                createRequest.getUserName()))
+                .thenReturn(List.of(abstractCredentialInfo));
 
         Map<String, String> variablesActual =
                 deployEnvironmentsUnderTest.getCredentialVariables(task);
@@ -205,7 +205,7 @@ class DeployEnvironmentsTest {
             assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
         }
         verify(mockCredentialCenter, times(1))
-                .getCredential(csp, userName, credentialType);
+                .getCredentials(csp, credentialType, userName);
     }
 
 }
