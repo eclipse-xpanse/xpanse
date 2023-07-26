@@ -12,14 +12,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.models.credential.exceptions.DuplicateCredentialDefinition;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * The instance to manage the all the plugins.
@@ -49,6 +54,7 @@ public class PluginManager {
                                 value.getCsp()));
                     }
                 });
+        checkCredentialDefinitions();
     }
 
 
@@ -80,6 +86,36 @@ public class PluginManager {
             return false;
         }
         return true;
+    }
+
+    private void checkCredentialDefinitions() {
+        List<String> errorMsgList = new ArrayList<>();
+        for (Map.Entry<Csp, OrchestratorPlugin> entry : pluginsMap.entrySet()) {
+            List<AbstractCredentialInfo> cspCredentialDefinitions =
+                    entry.getValue().getCredentialDefinitions();
+            if (CollectionUtils.isEmpty(cspCredentialDefinitions)) {
+                log.error("No defined credential definition found in the plugin of csp:{}",
+                        entry.getKey());
+                continue;
+            }
+            Map<String, List<AbstractCredentialInfo>> uniqueKeyCredentialDefinitionsMap =
+                    cspCredentialDefinitions.stream()
+                            .collect(Collectors.groupingBy(AbstractCredentialInfo::getUniqueKey));
+            for (Map.Entry<String, List<AbstractCredentialInfo>> credentialEntry
+                    : uniqueKeyCredentialDefinitionsMap.entrySet()) {
+                if (!CollectionUtils.isEmpty(credentialEntry.getValue())
+                        && credentialEntry.getValue().size() > 1) {
+                    String errorMsg = String.format("In the plugin of csp %s defined duplicate "
+                                    + "credential definitions with key %s", entry.getKey(),
+                            credentialEntry.getKey());
+                    errorMsgList.add(errorMsg);
+                }
+            }
+        }
+        if (!errorMsgList.isEmpty()) {
+            throw new DuplicateCredentialDefinition(StringUtils.join(errorMsgList, "\n"));
+        }
+
     }
 
 }

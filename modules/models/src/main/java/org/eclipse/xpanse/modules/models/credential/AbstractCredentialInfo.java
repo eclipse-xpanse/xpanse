@@ -44,8 +44,9 @@ public abstract class AbstractCredentialInfo {
     @Getter
     @NotNull
     @NotBlank
-    @Schema(description = "The name of the credential,"
-            + "this field is provided by  he the plugin of cloud service provider.")
+    @Schema(description = "The name of the credential, this field is provided by "
+            + "the plugin of cloud service provider. The value of this field must be unique "
+            + "between credentials with the same csp and type.")
     String name;
 
     /**
@@ -86,5 +87,14 @@ public abstract class AbstractCredentialInfo {
         this.name = name;
         this.description = description;
         this.type = type;
+    }
+
+    /**
+     * Get the unique key of AbstractCredentialInfo.
+     *
+     * @return the unique key joined by csp, type and name
+     */
+    public String getUniqueKey() {
+        return this.csp.name() + "-" + this.type.name() + "-" + this.name;
     }
 }

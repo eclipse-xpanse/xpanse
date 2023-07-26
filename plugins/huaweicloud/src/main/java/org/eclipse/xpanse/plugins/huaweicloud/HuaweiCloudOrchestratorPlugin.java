@@ -73,8 +73,16 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
                 getCsp(), null, HuaweiCloudMonitorConstants.IAM,
                 "Using The access key and security key authentication.",
                 CredentialType.VARIABLES, credentialVariables);
+
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(accessKey);
+        /* In the credential definition object CredentialVariables. The value of fields joined like
+           csp-type-name must be unique. It means when you want to add a new CredentialVariables
+           with type VARIABLES for this csp, the value of filed name in the new CredentialVariables
+           must be different from the value of filed name in others CredentialVariables
+           with the same type VARIABLES. Otherwise, it will throw an exception at the application
+           startup.
+           */
         return credentialInfos;
     }
 

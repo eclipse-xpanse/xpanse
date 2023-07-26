@@ -156,8 +156,8 @@ public class MetricsService {
     public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
-                Csp.FLEXIBLE_ENGINE, resourceMetricRequest.getXpanseUserName(),
-                CredentialType.VARIABLES);
+                Csp.FLEXIBLE_ENGINE,
+                CredentialType.VARIABLES, resourceMetricRequest.getXpanseUserName());
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         String region = deployResource.getProperties().get("region");
         Project project = getProjectInfoByRegion(credential, region);
@@ -192,8 +192,8 @@ public class MetricsService {
     public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
-                Csp.FLEXIBLE_ENGINE, serviceMetricRequest.getXpanseUserName(),
-                CredentialType.VARIABLES);
+                Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
+                serviceMetricRequest.getXpanseUserName());
         MonitorResourceType resourceType = serviceMetricRequest.getMonitorResourceType();
         String region = deployResources.get(0).getProperties().get("region");
         Project project = getProjectInfoByRegion(credential, region);

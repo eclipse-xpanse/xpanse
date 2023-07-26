@@ -42,41 +42,53 @@ class CredentialCacheTests {
     void testWriteToCache() {
         credentialsStore.storeCredential(getCredentialToBeStored());
         assertTrue(Objects.nonNull(
-                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
+                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "AK_SK",
+                        "user")));
     }
 
     @Test
     void testCacheEviction() {
         credentialsStore.storeCredential(getCredentialToBeStored());
         assertTrue(Objects.nonNull(
-                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
+                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "AK_SK",
+                        "user")));
         Awaitility.await().pollDelay(6, TimeUnit.SECONDS).until(() -> true);
         assertTrue(Objects.isNull(
-                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
+                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "AK_SK",
+                        "user")));
     }
 
     @Test
     void testCacheKey() {
         credentialsStore.storeCredential(getCredentialToBeStored());
         assertTrue(Objects.nonNull(
-                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
+                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "AK_SK",
+                        "user")));
         assertTrue(Objects.isNull(
-                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.API_KEY, "user123")));
+                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.API_KEY, "AK_SK",
+                        "user123")));
         CredentialCacheKey key1 =
-                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, "user1", CredentialType.API_KEY);
+                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, CredentialType.API_KEY, "AK_SK",
+                        "userId");
         CredentialCacheKey key2 =
-                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, "user1", CredentialType.API_KEY);
+                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, CredentialType.API_KEY, "AK_SK",
+                        "userId");
         CredentialCacheKey key3 =
-                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, "user2", CredentialType.API_KEY);
+                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, CredentialType.API_KEY, "AK_SK",
+                        "user1");
         CredentialCacheKey key4 =
-                new CredentialCacheKey(Csp.OPENSTACK, "user1", CredentialType.API_KEY);
+                new CredentialCacheKey(Csp.OPENSTACK, CredentialType.API_KEY, "AK_SK", "user1");
         CredentialCacheKey key5 =
-                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, "user1", CredentialType.VARIABLES);
+                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK",
+                        "user1");
 
-        CredentialCacheKey key6 = new CredentialCacheKey(null, "user1", CredentialType.API_KEY);
+        CredentialCacheKey key6 =
+                new CredentialCacheKey(null, CredentialType.API_KEY, "AK_SK", "user1");
         CredentialCacheKey key7 =
-                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, null, CredentialType.API_KEY);
-        CredentialCacheKey key8 = new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, "user1", null);
+                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, CredentialType.API_KEY, "",
+                        "user1");
+        CredentialCacheKey key8 =
+                new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, CredentialType.API_KEY, "", null);
 
         assertEquals(key1, key1);
         assertEquals(key1, key2);
@@ -102,16 +114,19 @@ class CredentialCacheTests {
     void testCacheDeletion() {
         credentialsStore.storeCredential(getCredentialToBeStored());
         assertTrue(Objects.nonNull(
-                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
-        credentialsStore.deleteCredential(Csp.OPENSTACK, CredentialType.VARIABLES,
+                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "AK_SK",
+                        "user")));
+        credentialsStore.deleteCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "AK_SK",
                 getCredentialToBeStored().getXpanseUser());
         assertTrue(Objects.isNull(
-                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "user")));
+                credentialsStore.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "AK_SK",
+                        "user")));
     }
 
     private AbstractCredentialInfo getCredentialToBeStored() {
         CredentialVariables credentialVariables = new CredentialVariables(
-                Csp.OPENSTACK, "user", "test", "test", CredentialType.VARIABLES, new ArrayList<>());
+                Csp.OPENSTACK, "user", "AK_SK", "test", CredentialType.VARIABLES,
+                new ArrayList<>());
         credentialVariables.setTimeToLive(5);
         return credentialVariables;
     }

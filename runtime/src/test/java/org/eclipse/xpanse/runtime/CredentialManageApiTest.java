@@ -85,12 +85,12 @@ class CredentialManageApiTest {
     void testGetCredentialCapabilitiesByCsp() {
         // Setup
         when(mockCredentialCenter.getCredentialCapabilitiesByCsp(Csp.AWS,
-                CredentialType.VARIABLES)).thenReturn(List.of());
+                CredentialType.VARIABLES, "AK_SK")).thenReturn(List.of());
 
         // Run the test
         final List<AbstractCredentialInfo> result =
                 credentialManageApiUnderTest.getCredentialCapabilitiesByCsp(Csp.AWS,
-                        CredentialType.VARIABLES);
+                        CredentialType.VARIABLES, "AK_SK");
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -100,12 +100,12 @@ class CredentialManageApiTest {
     void testGetCredentialCapabilitiesByCsp_CredentialCenterReturnsNoItems() {
         // Setup
         when(mockCredentialCenter.getCredentialCapabilitiesByCsp(Csp.AWS,
-                CredentialType.VARIABLES)).thenReturn(Collections.emptyList());
+                CredentialType.VARIABLES, "AK_SK")).thenReturn(Collections.emptyList());
 
         // Run the test
         final List<AbstractCredentialInfo> result =
                 credentialManageApiUnderTest.getCredentialCapabilitiesByCsp(Csp.AWS,
-                        CredentialType.VARIABLES);
+                        CredentialType.VARIABLES, "AK_SK");
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -119,13 +119,13 @@ class CredentialManageApiTest {
                 List.of(new CredentialVariables(Csp.AWS, "userName", "name", "description",
                         CredentialType.VARIABLES,
                         List.of(new CredentialVariable("name", "description", false))));
-        when(mockCredentialCenter.getCredentials(Csp.AWS, "userName",
-                CredentialType.VARIABLES)).thenReturn(credentialVariables);
+        when(mockCredentialCenter.getCredentials(Csp.AWS,
+                CredentialType.VARIABLES, "userName")).thenReturn(credentialVariables);
 
         // Run the test
         final List<AbstractCredentialInfo> result =
-                credentialManageApiUnderTest.getCredentials(Csp.AWS, "userName",
-                        CredentialType.VARIABLES);
+                credentialManageApiUnderTest.getCredentials(Csp.AWS,
+                        CredentialType.VARIABLES, "userName");
 
         // Verify the results
         assertThat(result).isEqualTo(credentialVariables);
@@ -134,13 +134,13 @@ class CredentialManageApiTest {
     @Test
     void testGetCredentialDefinitionsByCsp_CredentialCenterReturnsNoItems() {
         // Setup
-        when(mockCredentialCenter.getCredentials(Csp.AWS, "userName",
-                CredentialType.VARIABLES)).thenReturn(Collections.emptyList());
+        when(mockCredentialCenter.getCredentials(Csp.AWS,
+                CredentialType.VARIABLES, "userName")).thenReturn(Collections.emptyList());
 
         // Run the test
         final List<AbstractCredentialInfo> result =
-                credentialManageApiUnderTest.getCredentials(Csp.AWS, "userName",
-                        CredentialType.VARIABLES);
+                credentialManageApiUnderTest.getCredentials(Csp.AWS,
+                        CredentialType.VARIABLES, "userName");
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -215,11 +215,12 @@ class CredentialManageApiTest {
     void testDeleteCredential() {
         // Setup
         doThrow(new RuntimeException("test")).when(mockCredentialCenter)
-                .deleteCredential(any(Csp.class), any(String.class), any(CredentialType.class));
+                .deleteCredential(any(Csp.class), any(CredentialType.class), any(String.class),
+                        any(String.class));
 
         // Run the test
         Assertions.assertThrows(RuntimeException.class,
-                () -> credentialManageApiUnderTest.deleteCredential(Csp.AWS, "userName",
-                        CredentialType.VARIABLES));
+                () -> credentialManageApiUnderTest.deleteCredential(Csp.AWS,
+                        CredentialType.VARIABLES, "AK_SK", "user"));
     }
 }

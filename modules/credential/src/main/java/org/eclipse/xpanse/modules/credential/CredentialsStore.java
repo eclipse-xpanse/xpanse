@@ -39,7 +39,8 @@ public class CredentialsStore {
     public void storeCredential(AbstractCredentialInfo abstractCredentialInfo) {
         CredentialCacheKey credentialCacheKey =
                 new CredentialCacheKey(abstractCredentialInfo.getCsp(),
-                        abstractCredentialInfo.getXpanseUser(), abstractCredentialInfo.getType());
+                        abstractCredentialInfo.getType(), abstractCredentialInfo.getName(),
+                        abstractCredentialInfo.getXpanseUser());
         this.caffeineCredentialCacheManager.put(credentialCacheKey, abstractCredentialInfo);
     }
 
@@ -47,14 +48,16 @@ public class CredentialsStore {
      * Method to get credential data from credentials store.
      *
      * @param csp            CSP to which the credential belongs to.
-     * @param xpanseUserName xpanseUserName to which the credential belongs to.
      * @param credentialType Type of the credential to be searched for.
+     * @param credentialName Name of the credential to be searched for.
+     * @param xpanseUserName Name of user who create the credential.
      * @return returns AbstractCredentialInfo which contains the complete credential information.
      */
     public AbstractCredentialInfo getCredential(Csp csp, CredentialType credentialType,
+                                                String credentialName,
                                                 String xpanseUserName) {
         CredentialCacheKey credentialCacheKey =
-                new CredentialCacheKey(csp, xpanseUserName, credentialType);
+                new CredentialCacheKey(csp, credentialType, credentialName, xpanseUserName);
         return this.caffeineCredentialCacheManager.get(credentialCacheKey);
     }
 
@@ -62,12 +65,14 @@ public class CredentialsStore {
      * Method to delete credential data from credentials store.
      *
      * @param csp            CSP to which the credential belongs to.
-     * @param xpanseUserName xpanseUserName to which the credential belongs to.
      * @param credentialType Type of the credential to be searched for.
+     * @param credentialName Name of the credential to be searched for.
+     * @param xpanseUserName Name of user who create the credential.
      */
-    public void deleteCredential(Csp csp, CredentialType credentialType, String xpanseUserName) {
+    public void deleteCredential(Csp csp, CredentialType credentialType, String credentialName,
+                                 String xpanseUserName) {
         CredentialCacheKey credentialCacheKey =
-                new CredentialCacheKey(csp, xpanseUserName, credentialType);
+                new CredentialCacheKey(csp, credentialType, credentialName, xpanseUserName);
         this.caffeineCredentialCacheManager.remove(credentialCacheKey);
     }
 }
