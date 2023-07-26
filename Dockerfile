@@ -12,4 +12,5 @@ RUN mkdir ${OPENAPI_WORKDIR}
 RUN wget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/${OPENAPI_CLIENT_VERSION}/openapi-generator-cli-${OPENAPI_CLIENT_VERSION}.jar
 RUN mv openapi-generator-cli-${OPENAPI_CLIENT_VERSION}.jar ${OPENAPI_WORKDIR}/openapi-generator-cli.jar
 COPY runtime/target/xpanse-runtime-*.jar xpanse-runtime.jar
+RUN tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32 > aes_sec
 ENTRYPOINT ["java","-jar","xpanse-runtime.jar"]
