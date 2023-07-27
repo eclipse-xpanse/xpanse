@@ -42,6 +42,7 @@ import org.eclipse.xpanse.modules.register.register.RegisterService;
 import org.eclipse.xpanse.modules.register.register.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
 import org.springframework.beans.BeanUtils;
+import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -318,6 +319,8 @@ public class RegisterServiceImpl implements RegisterService {
         userAvailableServiceVo.setDeployment(serviceEntity.getOcl().getDeployment());
         userAvailableServiceVo.setRegions(
                 serviceEntity.getOcl().getCloudServiceProvider().getRegions());
+        String openApiUrl = getOpenApiUrl(serviceEntity.getId().toString());
+        userAvailableServiceVo.add(Link.of(openApiUrl, "openApi"));
         return userAvailableServiceVo;
     }
 
