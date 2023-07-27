@@ -244,6 +244,10 @@ class RegisterServiceImplTest {
         registerServiceEntities.add(registerServiceEntity);
         when(mockStorage.queryRegisteredServices(new RegisteredServiceQuery())).thenReturn(
                 registerServiceEntities);
+        when(mockStorage.getRegisterServiceById(registerServiceEntity.getId())).thenReturn(
+                registerServiceEntity);
+        when(registeredServicesOpenApiGenerator.getOpenApi(registerServiceEntity)).thenReturn(
+                "openApiUri");
 
         List<CategoryOclVo> managedServicesTree =
                 registerServiceImplUnderTest.getManagedServicesTree(new RegisteredServiceQuery());
