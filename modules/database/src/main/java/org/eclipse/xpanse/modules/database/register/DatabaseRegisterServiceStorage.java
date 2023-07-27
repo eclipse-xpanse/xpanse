@@ -121,7 +121,9 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
     @Override
     public RegisterServiceEntity getRegisterServiceById(UUID uuid) {
         Optional<RegisterServiceEntity> optional = repository.findById(uuid);
-        return optional.orElse(null);
+        return optional.orElseThrow(() -> new ServiceNotRegisteredException(
+                String.format("Registered service %s not found.", uuid)
+        ));
     }
 
     /**

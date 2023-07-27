@@ -261,12 +261,9 @@ class DatabaseRegisterServiceStorageTest {
                 .thenReturn(Optional.empty());
 
         // Run the test
-        final RegisterServiceEntity result =
-                databaseRegisterServiceStorageUnderTest.getRegisterServiceById(
-                        UUID.fromString("ade91a2c-79d4-4d64-9263-a870c659bee9"));
-
-        // Verify the results
-        assertThat(result).isNull();
+        assertThatThrownBy(() -> databaseRegisterServiceStorageUnderTest.getRegisterServiceById(
+                UUID.fromString("ade91a2c-79d4-4d64-9263-a870c659bee9"))).isInstanceOf(
+                ServiceNotRegisteredException.class);
     }
 
     @Test
