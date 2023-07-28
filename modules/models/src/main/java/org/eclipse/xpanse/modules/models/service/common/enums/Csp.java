@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.service.common.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * Cloud service providers.
@@ -37,7 +38,8 @@ public enum Csp {
                 return csp;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("Csp value %s is not supported.", name));
     }
 
     /**

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.models.service.common.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class CspTest {
         Assertions.assertEquals(Csp.AWS, Csp.getByValue("aws"));
         Assertions.assertEquals(Csp.AZURE, Csp.getByValue("azure"));
         Assertions.assertEquals(Csp.GOOGLE, Csp.getByValue("google"));
-        Assertions.assertNull(Csp.getByValue("null"));
+        Assertions.assertThrows(UnsupportedEnumValueException.class, () -> Csp.getByValue("null"));
     }
 
     @Test
