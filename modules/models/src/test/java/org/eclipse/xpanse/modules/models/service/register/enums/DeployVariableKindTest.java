@@ -7,8 +7,9 @@
 package org.eclipse.xpanse.modules.models.service.register.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,7 +28,8 @@ class DeployVariableKindTest {
         assertEquals(DeployVariableKind.ENV_ENV, DeployVariableKind.ENV_ENV.getByValue("env_env"));
         assertEquals(DeployVariableKind.ENV_VARIABLE,
                 DeployVariableKind.ENV_VARIABLE.getByValue("env_variable"));
-        assertNull(DeployVariableKind.ENV_VARIABLE.getByValue("null"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> DeployVariableKind.ENV_VARIABLE.getByValue("null"));
     }
 
     @Test

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.models.monitor.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,8 @@ class MetricTypeTest {
         Assertions.assertEquals(MetricType.GAUGE, MetricType.GAUGE.getByValue("gauge"));
         Assertions.assertEquals(MetricType.HISTOGRAM, MetricType.HISTOGRAM.getByValue("histogram"));
         Assertions.assertEquals(MetricType.SUMMARY, MetricType.SUMMARY.getByValue("summary"));
-        Assertions.assertNull(MetricType.SUMMARY.getByValue("null"));
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> MetricType.SUMMARY.getByValue("null"));
     }
 
     @Test

@@ -7,8 +7,9 @@
 package org.eclipse.xpanse.modules.models.service.register.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -24,7 +25,8 @@ class DeployVariableDataTypeTest {
                 DeployVariableDataType.NUMBER.getByValue("number"));
         assertEquals(DeployVariableDataType.BOOLEAN,
                 DeployVariableDataType.BOOLEAN.getByValue("boolean"));
-        assertNull(DeployVariableDataType.BOOLEAN.getByValue("null"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> DeployVariableDataType.BOOLEAN.getByValue("null"));
     }
 
     @Test

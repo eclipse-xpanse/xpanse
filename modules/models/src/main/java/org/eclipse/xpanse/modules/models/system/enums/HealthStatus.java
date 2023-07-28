@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.system.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * Defines possible states of the system.
@@ -32,7 +33,8 @@ public enum HealthStatus {
                 return healthStatus;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("HealthStatus value %s is not supported.", state));
     }
 
     /**

@@ -20,6 +20,8 @@ import java.util.List;
 import org.eclipse.xpanse.api.exceptions.CommonExceptionHandler;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
+import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.instancio.Instancio;
@@ -161,5 +163,27 @@ class CommonExceptionHandlerTests {
                 .andExpect(jsonPath("$.details[0]").value("Access Denied"));
     }
 
+    @Test
+    void testSensitiveFieldEncryptionOrDecryptionFailedException() throws Exception {
+        when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
+                new SensitiveFieldEncryptionOrDecryptionFailedException("test error"));
+        this.mockMvc.perform(
+                        get("/xpanse/auth/user/credentials?userName=test"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Sensitive "
+                        + "Field Encryption Or Decryption Failed Exception"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testUnsupportedEnumValueException() throws Exception {
+        when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
+                new UnsupportedEnumValueException("test error"));
+        this.mockMvc.perform(
+                        get("/xpanse/auth/user/credentials?userName=test"))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.resultType").value("Unsupported Enum Value"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
 
 }

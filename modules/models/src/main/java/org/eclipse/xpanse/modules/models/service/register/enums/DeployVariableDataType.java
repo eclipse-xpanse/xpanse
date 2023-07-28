@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.service.register.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * Deploy variable data types.
@@ -33,7 +34,8 @@ public enum DeployVariableDataType {
                 return deployVariableType;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("DeployVariableDataType value %s is not supported.", type));
     }
 
     /**

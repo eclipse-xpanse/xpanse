@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.service.register.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 
 /**
@@ -38,7 +39,8 @@ public enum BillingCurrency {
                 return billingCurrency;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("BillingCurrency value %s is not supported.", currency));
     }
 
     /**

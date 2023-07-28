@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.monitor.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * The Resources Type of The Monitor.
@@ -42,6 +43,7 @@ public enum MonitorResourceType {
                 return monitorEnum;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("MonitorResourceType value %s is not supported.", name));
     }
 }

@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.monitor.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * The unit of the metric.
@@ -36,7 +37,8 @@ public enum MetricUnit {
                 return metricUnit;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("MetricUnit value %s is not supported.", type));
     }
 
     /**

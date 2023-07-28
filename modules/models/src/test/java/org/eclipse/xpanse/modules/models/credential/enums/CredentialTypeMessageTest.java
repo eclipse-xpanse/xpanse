@@ -8,7 +8,9 @@ package org.eclipse.xpanse.modules.models.credential.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,8 +45,8 @@ class CredentialTypeMessageTest {
 
     @Test
     public void testGetMessageByType_WithEmpty() {
-        String message = CredentialTypeMessage.getMessageByType(CredentialType.getByValue("null"));
-        assertNull(null, message);
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> CredentialTypeMessage.getMessageByType(CredentialType.getByValue("null")));
     }
 
 }
