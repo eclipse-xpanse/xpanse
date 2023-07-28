@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.models.service.common.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,8 @@ class CategoryTest {
         Assertions.assertEquals(Category.SECURITY, Category.getByValue("security"));
         Assertions.assertEquals(Category.MIDDLEWARE, Category.getByValue("middleware"));
         Assertions.assertEquals(Category.OTHERS, Category.getByValue("others"));
-        Assertions.assertNull(Category.getByValue("null"));
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> Category.getByValue("null"));
     }
 
     @Test

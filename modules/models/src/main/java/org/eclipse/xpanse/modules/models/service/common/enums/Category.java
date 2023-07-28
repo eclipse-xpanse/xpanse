@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.service.common.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * Service Category enums.
@@ -40,7 +41,8 @@ public enum Category {
                 return category;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("Category value %s is not supported.", catalog));
     }
 
     /**
