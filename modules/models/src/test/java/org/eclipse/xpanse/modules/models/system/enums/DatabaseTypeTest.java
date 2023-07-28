@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.models.system.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +23,8 @@ class DatabaseTypeTest {
         DatabaseType type1 = DatabaseType.getByValue("mariadb");
         Assertions.assertEquals(type1, DatabaseType.MARIADB);
 
-        DatabaseType type2 = DatabaseType.getByValue(null);
-        Assertions.assertNull(type2);
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> DatabaseType.getByValue(null));
     }
 
     @Test

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.models.system.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +23,8 @@ class IdentityProviderTypeTest {
         IdentityProviderType type1 = IdentityProviderType.getByValue("ZITAdel");
         Assertions.assertEquals(type1, IdentityProviderType.ZITADEL);
 
-        IdentityProviderType type2 = IdentityProviderType.getByValue(null);
-        Assertions.assertNull(type2);
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> IdentityProviderType.getByValue(null));
     }
 
     @Test

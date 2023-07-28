@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.models.system.enums;
 
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +24,8 @@ class BackendSystemTypeTest {
         BackendSystemType type1 = BackendSystemType.getByValue("database");
         Assertions.assertEquals(type1, BackendSystemType.DATABASE);
 
-        BackendSystemType type2 = BackendSystemType.getByValue(null);
-        Assertions.assertNull(type2);
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> BackendSystemType.getByValue(null));
     }
 
     @Test

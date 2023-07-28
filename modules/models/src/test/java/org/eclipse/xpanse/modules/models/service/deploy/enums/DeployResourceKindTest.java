@@ -7,11 +7,11 @@
 package org.eclipse.xpanse.modules.models.service.deploy.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.PublicIp;
 import org.eclipse.xpanse.modules.models.service.deploy.Vm;
@@ -52,11 +52,13 @@ class DeployResourceKindTest {
     void testGetByValue() {
         assertEquals(vmKind, DeployResourceKind.VM.getByValue("vm"));
         assertEquals(containerKind, DeployResourceKind.CONTAINER.getByValue("container"));
-        assertNotEquals(publicIpKind, DeployResourceKind.PUBLIC_IP.getByValue("publicIP"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> DeployResourceKind.UNKNOWN.getByValue("publicIP"));
         assertEquals(vpcKind, DeployResourceKind.VPC.getByValue("vpc"));
         assertEquals(volumeKind, DeployResourceKind.VOLUME.getByValue("volume"));
         assertEquals(unknownKind, DeployResourceKind.UNKNOWN.getByValue("unknown"));
-        assertNull(DeployResourceKind.UNKNOWN.getByValue("unavailable"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> DeployResourceKind.UNKNOWN.getByValue("unavailable"));
     }
 
     @Test

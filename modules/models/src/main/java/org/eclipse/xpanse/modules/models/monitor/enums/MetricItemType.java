@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.monitor.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * The type of the metrics item.
@@ -33,7 +34,8 @@ public enum MetricItemType {
                 return metricsItemType;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("MetricItemType value %s is not supported.", type));
     }
 
     /**

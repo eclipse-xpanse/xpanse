@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.models.monitor.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,8 +21,10 @@ class MetricUnitTest {
         Assertions.assertEquals(MetricUnit.KB, MetricUnit.getByValue("kb"));
         Assertions.assertEquals(MetricUnit.PERCENTAGE, MetricUnit.getByValue("percentage"));
         Assertions.assertEquals(MetricUnit.BITS_PER_SECOND, MetricUnit.getByValue("bit/s"));
-        Assertions.assertNotEquals(MetricUnit.BYTES_PER_SECOND, MetricUnit.getByValue("Byte/s"));
-        Assertions.assertNull(MetricUnit.getByValue("null"));
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> MetricUnit.getByValue("Byte/s"));
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> MetricUnit.getByValue("null"));
     }
 
     @Test

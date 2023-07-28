@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.service.deploy.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.PublicIp;
 import org.eclipse.xpanse.modules.models.service.deploy.Vm;
@@ -58,7 +59,8 @@ public enum DeployResourceKind {
                 return resourceKind;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("DeployResourceKind value %s is not supported.", kind));
     }
 
     /**

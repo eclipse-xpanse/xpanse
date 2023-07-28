@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.service.deploy.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * Deploy variable validator type.
@@ -43,7 +44,8 @@ public enum VariableValidator {
                 return deployVariableType;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("VariableValidator value %s is not supported.", type));
     }
 
     /**

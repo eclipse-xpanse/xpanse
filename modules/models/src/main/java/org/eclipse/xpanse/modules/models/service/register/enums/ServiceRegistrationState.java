@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.service.register.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * Defines possible states of a managed service registration.
@@ -33,7 +34,8 @@ public enum ServiceRegistrationState {
                 return serviceState;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("ServiceRegistrationState value %s is not supported.", state));
     }
 
     /**

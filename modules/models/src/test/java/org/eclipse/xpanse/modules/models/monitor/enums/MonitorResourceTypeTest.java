@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.models.monitor.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,8 @@ class MonitorResourceTypeTest {
                 MonitorResourceType.getByValue("vm_network_incoming"));
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING,
                 MonitorResourceType.getByValue("vm_network_outgoing"));
-        Assertions.assertNull(MonitorResourceType.getByValue("null"));
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> MonitorResourceType.getByValue("null"));
     }
 
 }

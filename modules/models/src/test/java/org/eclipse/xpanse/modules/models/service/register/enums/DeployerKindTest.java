@@ -7,8 +7,9 @@
 package org.eclipse.xpanse.modules.models.service.register.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -19,7 +20,8 @@ class DeployerKindTest {
     @Test
     void testGetByValue() {
         assertEquals(DeployerKind.TERRAFORM, DeployerKind.TERRAFORM.getByValue("terraform"));
-        assertNull(DeployerKind.TERRAFORM.getByValue("null"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> DeployerKind.TERRAFORM.getByValue("null"));
     }
 
     @Test

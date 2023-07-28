@@ -7,8 +7,9 @@
 package org.eclipse.xpanse.modules.models.service.deploy.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,7 +28,8 @@ class TerraformExecStateTest {
                 TerraformExecState.DESTROY_SUCCESS.getByValue("destroy_success"));
         assertEquals(TerraformExecState.DESTROY_FAILED,
                 TerraformExecState.DESTROY_FAILED.getByValue("destroy_failed"));
-        assertNull(TerraformExecState.DESTROY_FAILED.getByValue("unavailable"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> TerraformExecState.DESTROY_FAILED.getByValue("unavailable"));
     }
 
     @Test

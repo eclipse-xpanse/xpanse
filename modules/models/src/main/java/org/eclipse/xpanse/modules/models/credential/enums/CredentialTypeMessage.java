@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.modules.models.credential.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
+
 /**
  * The credential type message.
  */
@@ -33,7 +35,8 @@ public enum CredentialTypeMessage {
                 return typeMessage.message;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("CredentialTypeMessage value %s is not supported.", type));
     }
 
 }

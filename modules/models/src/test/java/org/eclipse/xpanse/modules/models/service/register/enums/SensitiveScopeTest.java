@@ -7,8 +7,9 @@
 package org.eclipse.xpanse.modules.models.service.register.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -21,7 +22,8 @@ class SensitiveScopeTest {
         assertEquals(SensitiveScope.NONE, SensitiveScope.NONE.getByValue("none"));
         assertEquals(SensitiveScope.ONCE, SensitiveScope.ONCE.getByValue("once"));
         assertEquals(SensitiveScope.ALWAYS, SensitiveScope.ALWAYS.getByValue("always"));
-        assertNull(SensitiveScope.ALWAYS.getByValue("null"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> SensitiveScope.ALWAYS.getByValue("null"));
     }
 
     @Test

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.models.monitor.enums;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +20,8 @@ class MetricItemTypeTest {
         Assertions.assertEquals(MetricItemType.VALUE, MetricItemType.VALUE.getByValue("value"));
         Assertions.assertEquals(MetricItemType.COUNT, MetricItemType.COUNT.getByValue("count"));
         Assertions.assertEquals(MetricItemType.SUM, MetricItemType.SUM.getByValue("sum"));
-        Assertions.assertNull(MetricItemType.SUM.getByValue("null"));
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> MetricItemType.SUM.getByValue("null"));
     }
 
     @Test

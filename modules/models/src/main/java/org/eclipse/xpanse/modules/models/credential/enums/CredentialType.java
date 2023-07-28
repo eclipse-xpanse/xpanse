@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.credential.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * The credential types.
@@ -34,7 +35,8 @@ public enum CredentialType {
                 return credentialType;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("CredentialType value %s is not supported.", type));
     }
 
     /**

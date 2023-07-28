@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * Deploy variable kinds.
@@ -64,7 +65,8 @@ public enum DeployVariableKind {
                 return deployVariableKind;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("DeployVariableKind value %s is not supported.", type));
     }
 
     /**

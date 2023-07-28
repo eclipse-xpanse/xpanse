@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.system.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
  * Defines type of identity provider.
@@ -32,7 +33,8 @@ public enum IdentityProviderType {
                 return providerType;
             }
         }
-        return null;
+        throw new UnsupportedEnumValueException(
+                String.format("IdentityProviderType value %s is not supported.", code));
     }
 
     /**

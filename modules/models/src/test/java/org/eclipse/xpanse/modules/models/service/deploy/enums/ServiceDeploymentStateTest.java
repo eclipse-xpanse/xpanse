@@ -7,8 +7,9 @@
 package org.eclipse.xpanse.modules.models.service.deploy.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -18,17 +19,20 @@ class ServiceDeploymentStateTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(ServiceDeploymentState.DEPLOYING, ServiceDeploymentState.DEPLOYING.getByValue("deploying"));
+        assertEquals(ServiceDeploymentState.DEPLOYING,
+                ServiceDeploymentState.DEPLOYING.getByValue("deploying"));
         assertEquals(ServiceDeploymentState.DEPLOY_SUCCESS,
                 ServiceDeploymentState.DEPLOY_SUCCESS.getByValue("deploy_success"));
         assertEquals(ServiceDeploymentState.DEPLOY_FAILED,
                 ServiceDeploymentState.DEPLOY_FAILED.getByValue("deploy_failed"));
-        assertEquals(ServiceDeploymentState.DESTROYING, ServiceDeploymentState.DESTROYING.getByValue("destroying"));
+        assertEquals(ServiceDeploymentState.DESTROYING,
+                ServiceDeploymentState.DESTROYING.getByValue("destroying"));
         assertEquals(ServiceDeploymentState.DESTROY_SUCCESS,
                 ServiceDeploymentState.DESTROY_SUCCESS.getByValue("destroy_success"));
         assertEquals(ServiceDeploymentState.DESTROY_FAILED,
                 ServiceDeploymentState.DESTROY_FAILED.getByValue("destroy_failed"));
-        assertNull(ServiceDeploymentState.DESTROY_FAILED.getByValue("unavailable"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> ServiceDeploymentState.DESTROY_FAILED.getByValue("unavailable"));
     }
 
     @Test

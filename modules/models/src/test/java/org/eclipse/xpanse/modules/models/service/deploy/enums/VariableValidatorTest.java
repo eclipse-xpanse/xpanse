@@ -7,8 +7,9 @@
 package org.eclipse.xpanse.modules.models.service.deploy.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,7 +27,8 @@ class VariableValidatorTest {
         assertEquals(VariableValidator.MAXIMUM, VariableValidator.MAXIMUM.getByValue("maximum"));
         assertEquals(VariableValidator.PATTERN, VariableValidator.PATTERN.getByValue("pattern"));
         assertEquals(VariableValidator.ENUM, VariableValidator.ENUM.getByValue("enum"));
-        assertNull(VariableValidator.ENUM.getByValue("unavailable"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> VariableValidator.ENUM.getByValue("unavailable"));
     }
 
     @Test
