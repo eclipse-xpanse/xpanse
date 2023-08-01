@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.deployment.utils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -24,7 +23,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.config.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Environment variables utils for deployment.
@@ -146,12 +145,11 @@ public class DeployEnvironments {
         CredentialType credentialType = task.getOcl().getDeployment().getCredentialType();
         Csp csp = task.getOcl().getCloudServiceProvider().getName();
 
-        List<AbstractCredentialInfo> abstractCredentialInfos =
-                this.credentialCenter.getCredentials(csp, credentialType,
+        AbstractCredentialInfo abstractCredentialInfo =
+                this.credentialCenter.getCredential(csp, credentialType,
                         task.getCreateRequest().getUserName());
 
-        if (!CollectionUtils.isEmpty(abstractCredentialInfos)) {
-            AbstractCredentialInfo abstractCredentialInfo = abstractCredentialInfos.get(0);
+        if (!ObjectUtils.isEmpty(abstractCredentialInfo)) {
             for (CredentialVariable variable
                     : ((CredentialVariables) abstractCredentialInfo).getVariables()) {
                 variables.put(variable.getName(), variable.getValue());
