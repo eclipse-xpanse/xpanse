@@ -32,8 +32,11 @@ public class ZitadelUserAuthenticationConverter {
             CurrentUserInfo currentUserInfo = new CurrentUserInfo();
             currentUserInfo.setUserId(
                     tokenAuthentication.getTokenAttributes().get("sub").toString());
-            currentUserInfo.setUserName(
-                    tokenAuthentication.getTokenAttributes().get("preferred_username").toString());
+            if (tokenAuthentication.getTokenAttributes().containsKey("preferred_username")) {
+                currentUserInfo.setUserName(
+                        tokenAuthentication.getTokenAttributes().get("preferred_username")
+                                .toString());
+            }
             List<String> roles = tokenAuthentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority).toList();
             currentUserInfo.setRoles(roles);
