@@ -131,7 +131,7 @@ First, you can build the whole xpanse project, including all modules
 $ mvn clean install
 ```
 
-### Run
+## Run
 
 By default, the application will not activate any plugins. They must be activated via spring profiles. Also ensure that
 only one plugin is active at a time. For example, openstack plugin can be activated as below
@@ -141,7 +141,7 @@ $ cd runtime/target
 $ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
-#### Run with authorization
+### Run with authorization
 
 By default, the application will not activate any authorization. They must be activated via spring profiles. Also ensure
 that only one authentication is active at a time. For example, zitadel oauth can be activated quickly as below by using
@@ -163,7 +163,7 @@ $ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar --spring.profiles.active=zitadel \
 --authorization-swagger-ui-client-id=221664356859969539@eclipse-xpanse
 ```
 
-##### Execute authenticated APIs
+#### Execute authenticated APIs
 
 When the application has activated authorization with 'zitadel' profile, all protected APIs must have an
 `Authorization` header in the `Bearer ${access token}` format in the http request. Here are two ways to get access_token
@@ -199,7 +199,7 @@ $ cd runtime
 $ mvn clean install -Ddocker.skip=false
 ```
 
-### Static Code Analysis using CheckStyle
+## Static Code Analysis using CheckStyle
 
 This project using `CheckStyle` framework to perform static code analysis. The configuration can be found
 in [CheckStyle](checkstyle.xml). The framework also checks the code format in accordance to `Google Java Format`.
@@ -210,13 +210,13 @@ perform code formatting directly in IDE.
 The framework is added as a maven plugin and is executed by default as part of the `verify` phase. Any violations will
 result in build failure.
 
-### License/Copyright Configuration
+## License/Copyright Configuration
 
 All files in the repository must contain a license header in the format mentioned in [License Header](license.header).
 
 The static code analysis framework will also validate if the license exists in the specified format.
 
-### Sensitive Parameters Handling
+## Sensitive Parameters Handling
 
 The xpanse project involves the use of some sensitive information, such as AK/SK sensitive fields in
 credential management, sensitive variable information during service deployment, etc.
@@ -237,33 +237,3 @@ Encryption key 256 field to the aes_sec file.
 If no AES private key file aes_sec is found in the intended location or if the file is empty, then
 no encryption of the sensitive variables will take place. All data will stored in plain text within
 the JVM.
-
-### Version Configuration For Terraform Providers
-
-Xpanse currently uses Terraform to orchestrate resources on cloud providers, but versions of
-Terraform for cloud providers are in constant iteration. In order to configure the Terraform version
-of the cloud providers more conveniently and quickly, you can configure the Terraform version of the
-cloud providers in the [xpanse configuration file](./runtime/src/main/resources/application.properties)
-
-#### The Version Key Of The Terraform Providers
-
-| Terraform Providers | key                                         |
-|---------------------|---------------------------------------------|
-| AWS                 | `terraform.provider.aws.version`            |
-| HuaweiCloud         | `terraform.provider.huaweicloud.version`    |
-| OpenStack           | `terraform.provider.openstack.version`      |
-| FlexibleEngine      | `terraform.provider.flexibleengine.version` |
-
-#### How To Configure The Version of Terraform Providers
-
-For how to configure the version value of Terraform Providers, please refer to the chapter of
-`Version Constraints` in https://developer.hashicorp.com/terraform/language/providers/requirements#version-constraints
-
-
-The following are some examples, please refer to
-```properties
-terraform.provider.aws.version=~> 4.0
-terraform.provider.openstack.version=>= 1.48.0
-terraform.provider.flexibleengine.version=>= 1.30.0
-terraform.provider.huaweicloud.version=~> 1.51.0
-```
