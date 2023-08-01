@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
@@ -77,8 +78,7 @@ public class ZitadelWebSecurityConfig {
             arc.anyRequest().authenticated();
         });
 
-        http.csrf(csrfConfigurer -> csrfConfigurer.ignoringRequestMatchers(
-                new AntPathRequestMatcher("/h2-console/**")));
+        http.csrf(AbstractHttpConfigurer::disable);
 
         http.headers(headersConfigurer -> headersConfigurer.addHeaderWriter(
                 new XFrameOptionsHeaderWriter(
