@@ -24,12 +24,13 @@ import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncrypt
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.instancio.Instancio;
 import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,18 +42,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CredentialManageApi.class, CommonExceptionHandler.class,
-        CredentialCenter.class})
+        CredentialCenter.class, IdentityProviderManager.class})
 @WebMvcTest
 class CommonExceptionHandlerTests {
 
     @MockBean
     CredentialCenter credentialCenter;
-
-    @InjectMocks
-    CredentialManageApi credentialManageApi;
 
     @Autowired
     private WebApplicationContext context;
@@ -89,7 +88,7 @@ class CommonExceptionHandlerTests {
         when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
                 new RuntimeException("test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(500))
                 .andExpect(jsonPath("$.resultType").value("Runtime Error"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -100,7 +99,7 @@ class CommonExceptionHandlerTests {
         when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
                 new HttpMessageConversionException("test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Parameters Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -111,7 +110,7 @@ class CommonExceptionHandlerTests {
         when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
                 new IllegalArgumentException("test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Parameters Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -123,7 +122,7 @@ class CommonExceptionHandlerTests {
             throw new Exception("test error");
         });
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(500))
                 .andExpect(jsonPath("$.resultType").value("Runtime Error"))
                 .andExpect(jsonPath("$.details[0]").value("java.lang.Exception:test error"));
@@ -134,7 +133,7 @@ class CommonExceptionHandlerTests {
         when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
                 new ResponseInvalidException(List.of("test error")));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.resultType").value("Response Not Valid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -145,7 +144,7 @@ class CommonExceptionHandlerTests {
         when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
                 new XpanseUnhandledException("test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(500))
                 .andExpect(jsonPath("$.resultType").value("Unhandled Exception"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -157,7 +156,7 @@ class CommonExceptionHandlerTests {
         when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
                 new AccessDeniedException("Access Denied"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(403))
                 .andExpect(jsonPath("$.resultType").value("Access Denied"))
                 .andExpect(jsonPath("$.details[0]").value("Access Denied"));
@@ -168,7 +167,7 @@ class CommonExceptionHandlerTests {
         when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
                 new SensitiveFieldEncryptionOrDecryptionFailedException("test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Sensitive "
                         + "Field Encryption Or Decryption Failed Exception"))
@@ -180,10 +179,23 @@ class CommonExceptionHandlerTests {
         when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
                 new UnsupportedEnumValueException("test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.resultType").value("Unsupported Enum Value"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testMethodArgumentTypeMismatchException() throws Exception {
+        when(credentialCenter.getCredentialsByUser(anyString())).thenThrow(
+                new MethodArgumentTypeMismatchException("errorValue", Csp.class, null, null, null));
+        this.mockMvc.perform(
+                        get("/xpanse/auth/user/credentials"))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.resultType").value("Unprocessable Entity"))
+                .andExpect(jsonPath("$.details[0]").value("Failed to convert value of type "
+                        + "'java.lang.String' to required type "
+                        + "'org.eclipse.xpanse.modules.models.service.common.enums.Csp'"));
     }
 
 }

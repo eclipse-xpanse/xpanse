@@ -113,7 +113,7 @@ public class TerraformDeploymentTest {
 
         CreateRequest createRequest = new CreateRequest();
         createRequest.setId(uuid);
-        createRequest.setUserName("userName");
+        createRequest.setUserId("UserId");
         createRequest.setCategory(Category.COMPUTE);
         createRequest.setCsp(Csp.HUAWEI);
         createRequest.setServiceName("service");

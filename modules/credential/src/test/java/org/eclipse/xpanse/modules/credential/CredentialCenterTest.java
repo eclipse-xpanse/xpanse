@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialCapabil
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariablesNotComplete;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.config.AesUtil;
+import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,23 +43,18 @@ import org.springframework.test.context.ContextConfiguration;
 @ExtendWith(MockitoExtension.class)
 class CredentialCenterTest {
 
+    String credentialName = "AK_SK";
     @Mock
     private AesUtil aesUtil;
-
     @Mock
     private PluginManager mockPluginManager;
-
     @Mock
     private CredentialsStore credentialsStore;
-
     @Mock
     private DummyPluginImpl orchestratorPlugin;
-
     @Mock
     private CredentialOpenApiGenerator credentialOpenApiGenerator;
-
     private CredentialCenter credentialCenter;
-
 
     @BeforeEach
     public void setup() {
@@ -88,11 +83,10 @@ class CredentialCenterTest {
     public void testGetCredentialCapabilitiesByCsp_WithValidType() {
         Csp csp = Csp.OPENSTACK;
         CredentialType credentialType = CredentialType.VARIABLES;
-        String credentialName = "AK_SK";
+
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", credentialName,
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
         when(mockPluginManager.getOrchestratorPlugin(csp)).thenReturn(orchestratorPlugin);
@@ -110,9 +104,8 @@ class CredentialCenterTest {
     public void testGetCredentialCapabilitiesByCsp_WithNullType() {
         Csp csp = Csp.OPENSTACK;
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
         when(mockPluginManager.getOrchestratorPlugin(csp)).thenReturn(orchestratorPlugin);
@@ -129,9 +122,8 @@ class CredentialCenterTest {
         Csp csp = Csp.OPENSTACK;
         CredentialType credentialType = CredentialType.API_KEY;
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
         when(mockPluginManager.getOrchestratorPlugin(csp)).thenReturn(orchestratorPlugin);
@@ -206,9 +198,8 @@ class CredentialCenterTest {
     @Test
     void testCreateCredential() {
         final AbstractCredentialInfo credentialInfo =
-                new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description1", true, false),
                                 new CredentialVariable("id", "description", true, false)));
 
@@ -223,15 +214,14 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.VARIABLES);
-        inputCredential.setName("name");
+        inputCredential.setName(credentialName);
         inputCredential.setVariables(
                 List.of(new CredentialVariable("name", "description", true, false, "value"),
                         new CredentialVariable("id", "description", true, false, "value")));
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false, "value"),
                                 new CredentialVariable("id", "description", true, false,
                                         "value"))));
@@ -247,15 +237,14 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.VARIABLES);
-        inputCredential.setName("name");
+        inputCredential.setName(credentialName);
         inputCredential.setVariables(
                 List.of(new CredentialVariable("name", "description", true, false, "value"),
                         new CredentialVariable("id", "description", true, false, "value")));
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.API_KEY,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.API_KEY,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false, "value"),
                                 new CredentialVariable("id", "description", true, false,
                                         "value"))));
@@ -277,9 +266,8 @@ class CredentialCenterTest {
         inputCredential.setName("name1");
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
         when(mockPluginManager.getOrchestratorPlugin(inputCredential.getCsp())).thenReturn(
@@ -296,15 +284,14 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.VARIABLES);
-        inputCredential.setName("name");
+        inputCredential.setName(credentialName);
         inputCredential.setVariables(
                 List.of(new CredentialVariable("name", "description", true, false),
                         new CredentialVariable("id1", "description", true, false)));
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
         when(mockPluginManager.getOrchestratorPlugin(inputCredential.getCsp())).thenReturn(
@@ -321,15 +308,14 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.VARIABLES);
-        inputCredential.setName("name");
+        inputCredential.setName(credentialName);
         inputCredential.setVariables(
                 List.of(new CredentialVariable("name", "description", true, false),
                         new CredentialVariable("id1", "description", true, false)));
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", false, false),
                                 new CredentialVariable("id", "description", true, false))));
         when(mockPluginManager.getOrchestratorPlugin(inputCredential.getCsp())).thenReturn(
@@ -346,12 +332,11 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.API_KEY);
-        inputCredential.setName("name");
+        inputCredential.setName(credentialName);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
         when(mockPluginManager.getOrchestratorPlugin(inputCredential.getCsp())).thenReturn(
@@ -368,8 +353,8 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.VARIABLES);
-        inputCredential.setName("name");
-        inputCredential.setXpanseUser("user");
+        inputCredential.setName(credentialName);
+        inputCredential.setUserId("userId");
         inputCredential.setTimeToLive(5);
         inputCredential.setDescription("user");
         inputCredential.setVariables(
@@ -377,15 +362,14 @@ class CredentialCenterTest {
                         new CredentialVariable("id", "description", true, false, "value")));
 
         CredentialVariables credentialVariable = new CredentialVariables(
-                inputCredential.getCsp(), inputCredential.getXpanseUser(),
+                inputCredential.getCsp(), CredentialType.VARIABLES,
                 inputCredential.getName(), inputCredential.getDescription(),
-                CredentialType.VARIABLES, inputCredential.getVariables());
+                inputCredential.getUserId(), inputCredential.getVariables());
         credentialVariable.setTimeToLive(5);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         new ArrayList<>()));
 
         List<CredentialType> credentialTypes = new ArrayList<>();
@@ -412,8 +396,8 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.API_KEY);
-        inputCredential.setName("name");
-        inputCredential.setXpanseUser("user");
+        inputCredential.setName(credentialName);
+        inputCredential.setUserId("userId");
         inputCredential.setTimeToLive(5);
         inputCredential.setDescription("user");
         inputCredential.setVariables(
@@ -421,15 +405,14 @@ class CredentialCenterTest {
                         new CredentialVariable("id", "description", true, false, "value")));
 
         CredentialVariables credentialVariable = new CredentialVariables(
-                inputCredential.getCsp(), inputCredential.getXpanseUser(),
+                inputCredential.getCsp(), CredentialType.API_KEY,
                 inputCredential.getName(), inputCredential.getDescription(),
-                CredentialType.API_KEY, inputCredential.getVariables());
+                inputCredential.getUserId(), inputCredential.getVariables());
         credentialVariable.setTimeToLive(5);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.API_KEY,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.API_KEY,
+                        credentialName, "description", "userId",
                         new ArrayList<>()));
 
         List<CredentialType> credentialTypes = new ArrayList<>();
@@ -453,8 +436,8 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.VARIABLES);
-        inputCredential.setName("name");
-        inputCredential.setXpanseUser("user");
+        inputCredential.setName(credentialName);
+        inputCredential.setUserId("userId");
         inputCredential.setTimeToLive(5);
         inputCredential.setDescription("user");
         inputCredential.setVariables(
@@ -462,15 +445,14 @@ class CredentialCenterTest {
                         new CredentialVariable("id", "description", true, false, "value")));
 
         CredentialVariables credentialVariable = new CredentialVariables(
-                inputCredential.getCsp(), inputCredential.getXpanseUser(),
+                inputCredential.getCsp(), CredentialType.VARIABLES,
                 inputCredential.getName(), inputCredential.getDescription(),
-                CredentialType.VARIABLES, inputCredential.getVariables());
+                inputCredential.getUserId(), inputCredential.getVariables());
         credentialVariable.setTimeToLive(5);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         new ArrayList<>()));
 
         List<CredentialType> credentialTypes = new ArrayList<>();
@@ -481,7 +463,7 @@ class CredentialCenterTest {
         credentialCenter.checkInputCredentialIsValid(inputCredential);
 
         credentialsStore.deleteCredential(credentialVariable.getCsp(), credentialVariable.getType(),
-                credentialVariable.getName(), credentialVariable.getXpanseUser());
+                credentialVariable.getName(), credentialVariable.getUserId());
 
         credentialsStore.storeCredential(credentialVariable);
         credentialCenter.createCredential(credentialVariable);
@@ -498,8 +480,8 @@ class CredentialCenterTest {
         CreateCredential inputCredential = new CreateCredential();
         inputCredential.setCsp(Csp.OPENSTACK);
         inputCredential.setType(CredentialType.API_KEY);
-        inputCredential.setName("name");
-        inputCredential.setXpanseUser("user");
+        inputCredential.setName(credentialName);
+        inputCredential.setUserId("userId");
         inputCredential.setTimeToLive(5);
         inputCredential.setDescription("user");
         inputCredential.setVariables(
@@ -507,15 +489,14 @@ class CredentialCenterTest {
                         new CredentialVariable("id", "description", true, false, "value")));
 
         CredentialVariables credentialVariable = new CredentialVariables(
-                inputCredential.getCsp(), inputCredential.getXpanseUser(),
+                inputCredential.getCsp(), CredentialType.VARIABLES,
                 inputCredential.getName(), inputCredential.getDescription(),
-                CredentialType.API_KEY, inputCredential.getVariables());
+                inputCredential.getUserId(), inputCredential.getVariables());
         credentialVariable.setTimeToLive(5);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
-                        "description",
-                        CredentialType.API_KEY,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        credentialName, "description", "userId",
                         new ArrayList<>()));
 
         List<CredentialType> credentialTypes = new ArrayList<>();
@@ -524,10 +505,6 @@ class CredentialCenterTest {
         when(mockPluginManager.getOrchestratorPlugin(inputCredential.getCsp())).thenReturn(
                 orchestratorPlugin);
         when(orchestratorPlugin.getCredentialDefinitions()).thenReturn(credentialVariables);
-        credentialCenter.checkInputCredentialIsValid(inputCredential);
-
-        credentialsStore.storeCredential(credentialVariable);
-        credentialCenter.createCredential(credentialVariable);
 
         assertThrows(CredentialCapabilityNotFound.class,
                 () -> credentialCenter.updateCredential(inputCredential));

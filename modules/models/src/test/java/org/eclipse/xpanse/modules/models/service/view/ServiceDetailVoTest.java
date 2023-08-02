@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * Test of ServiceDetailVo.
  */
 class ServiceDetailVoTest {
-    private static final String userName = "userName";
+    private static final String userId = "userId";
     private static final Category category = Category.COMPUTE;
     private static final String serviceName = "serviceName";
     private static final String version = "v1.0.0";
@@ -49,7 +49,7 @@ class ServiceDetailVoTest {
     @BeforeEach
     void setUp() {
         createRequest = new CreateRequest();
-        createRequest.setUserName(userName);
+        createRequest.setUserId(userId);
         createRequest.setCategory(category);
         createRequest.setServiceName(serviceName);
         createRequest.setVersion(version);
@@ -82,7 +82,7 @@ class ServiceDetailVoTest {
 
     @Test
     public void testGetterAndSetter() {
-        assertEquals(userName, createRequest.getUserName());
+        assertEquals(userId, createRequest.getUserId());
         assertEquals(category, createRequest.getCategory());
         assertEquals(serviceName, createRequest.getServiceName());
         assertEquals(version, createRequest.getVersion());

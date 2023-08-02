@@ -26,7 +26,7 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class ZitadelAuthoritiesOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
-    private static final String ATTRIBUTE_USERNAME = "username";
+    private static final String ATTRIBUTE_USERNAME = "preferred_username";
     private static final String ATTRIBUTE_USERID = "sub";
     private static final String ATTRIBUTE_ROLES = "urn:zitadel:iam:org:project:roles";
     private static final String DEFAULT_ROLE = "user";

@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.config;
+package org.eclipse.xpanse.modules.security.common;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,7 +49,7 @@ public class AesUtil {
      */
     public String encode(String content) {
         try {
-            if (!isEnabledAes()) {
+            if (aesIsDisabled()) {
                 return content;
             }
             Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
@@ -73,7 +73,7 @@ public class AesUtil {
      */
     public String decode(String content) {
         try {
-            if (!isEnabledAes()) {
+            if (aesIsDisabled()) {
                 return content;
             }
             Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
@@ -93,7 +93,7 @@ public class AesUtil {
     }
 
     private Cipher getCipher(int mode) {
-        Cipher cipher = null;
+        Cipher cipher;
         try (InputStream is = new FileInputStream(
                 System.getProperty("user.dir") + File.separator + aesKeyFileName)) {
             byte[] bytes = new byte[is.available()];
@@ -113,13 +113,10 @@ public class AesUtil {
     /**
      * Whether to enable AES encryption and decryption.
      */
-    private boolean isEnabledAes() {
+    private boolean aesIsDisabled() {
         File file = new File(System.getProperty("user.dir")
                 + File.separator + aesKeyFileName);
-        if (file.exists() && file.length() != 0) {
-            return true;
-        }
-        return false;
+        return !file.exists() || file.length() == 0;
     }
 
 }

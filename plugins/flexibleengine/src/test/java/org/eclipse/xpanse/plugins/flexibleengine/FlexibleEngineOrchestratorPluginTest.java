@@ -60,7 +60,7 @@ public class FlexibleEngineOrchestratorPluginTest {
         //Verify that the attribute values of the CredentialVariables object match expectations
         CredentialVariables credentialVariables = (CredentialVariables) result.get(0);
         assertEquals(plugin.getCsp(), credentialVariables.getCsp());
-        assertNull(credentialVariables.getXpanseUser());
+        assertNull(credentialVariables.getUserId());
         assertEquals("AK_SK", credentialVariables.getName());
         assertEquals("The access key and security key.",
                 credentialVariables.getDescription());

@@ -5,17 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
-import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
-import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.http.HttpMethod;
-import com.huaweicloud.sdk.core.internal.model.KeystoneListProjectsResponse;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -58,8 +52,6 @@ class FlexibleEngineMonitorIntegrationTest {
                     .extensions(new ResponseTemplateTransformer(true)))
             .build();
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Autowired
     FlexibleEngineOrchestratorPlugin plugin;
     @Autowired
@@ -73,14 +65,14 @@ class FlexibleEngineMonitorIntegrationTest {
 
     ResourceMetricRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
                                                      Long from, Long to,
-                                                     boolean onlyLastKnownMetric) throws Exception {
+                                                     boolean onlyLastKnownMetric) {
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
         return new ResourceMetricRequest(deployResource, monitorResourceType, from, to, null,
-                onlyLastKnownMetric, "xpanseUserName");
+                onlyLastKnownMetric, "userId");
 
     }
 
@@ -129,7 +121,7 @@ class FlexibleEngineMonitorIntegrationTest {
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
         return new ServiceMetricRequest(List.of(deployResource), monitorResourceType, from, to,
                 null,
-                onlyLastKnownMetric, "xpanseUserName");
+                onlyLastKnownMetric, "userId");
     }
 
 

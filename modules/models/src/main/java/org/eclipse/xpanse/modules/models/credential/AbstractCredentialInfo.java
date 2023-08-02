@@ -30,13 +30,13 @@ public abstract class AbstractCredentialInfo {
     Csp csp;
 
     /**
-     * The user who create the credential.
+     * The type of the credential.
      */
     @Getter
-    @Setter
     @NotNull
-    @Schema(description = "The user who create the credential.")
-    String xpanseUser;
+    @Schema(description = "The type of the credential,"
+            + "this field is provided by  he the plugin of cloud service provider.")
+    CredentialType type;
 
     /**
      * The name of the credential, this field is provided by the plugins.
@@ -60,13 +60,13 @@ public abstract class AbstractCredentialInfo {
     String description;
 
     /**
-     * The type of the credential.
+     * The id of user who create the credential.
      */
     @Getter
+    @Setter
     @NotNull
-    @Schema(description = "The type of the credential,"
-            + "this field is provided by  he the plugin of cloud service provider.")
-    CredentialType type;
+    @Schema(description = "The id of user who create the credential.")
+    String userId;
 
     /**
      * The expired unix long time of the credential.
@@ -80,13 +80,13 @@ public abstract class AbstractCredentialInfo {
     /**
      * The constructor.
      */
-    AbstractCredentialInfo(Csp csp, String xpanseUser, String name, String description,
-                           CredentialType type) {
+    AbstractCredentialInfo(Csp csp, CredentialType type, String name, String description,
+                           String userId) {
         this.csp = csp;
-        this.xpanseUser = xpanseUser;
+        this.type = type;
         this.name = name;
         this.description = description;
-        this.type = type;
+        this.userId = userId;
     }
 
     /**
@@ -94,6 +94,7 @@ public abstract class AbstractCredentialInfo {
      *
      * @return the unique key joined by csp, type and name
      */
+    @Hidden
     public String getUniqueKey() {
         return this.csp.name() + "-" + this.type.name() + "-" + this.name;
     }

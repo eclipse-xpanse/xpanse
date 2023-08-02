@@ -29,12 +29,14 @@ public class CaffeineCredentialCacheManager {
                 .removalListener(
                         (CredentialCacheKey key,
                          AbstractCredentialInfo graph,
-                         RemovalCause cause) ->
-                                log.info(String.format(
-                                        "Cache entry for csp %s type %s and xpanse user %s "
-                                                + "was removed. Reason - %s",
-                                        key.csp().toValue(), key.credentialType().toValue(),
-                                        key.userName(), cause.toString())))
+                         RemovalCause cause) -> {
+                            assert key != null;
+                            log.info(String.format(
+                                    "Cache entry for csp %s type %s and xpanse user %s "
+                                            + "was removed. Reason - %s",
+                                    key.csp().toValue(), key.credentialType().toValue(),
+                                    key.userId(), cause.toString()));
+                        })
                 .build();
     }
 

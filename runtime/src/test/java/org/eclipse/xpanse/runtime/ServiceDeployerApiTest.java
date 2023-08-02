@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.api.ServiceCatalogApi;
 import org.eclipse.xpanse.api.ServiceDeployerApi;
 import org.eclipse.xpanse.api.ServiceRegisterApi;
 import org.eclipse.xpanse.common.openapi.OpenApiUtil;
@@ -27,11 +26,9 @@ import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.service.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.service.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
-import org.eclipse.xpanse.modules.models.service.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -45,7 +42,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.hateoas.Link;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -64,12 +60,11 @@ class ServiceDeployerApiTest {
             + "openapitools/openapi-generator-cli/6.5.0/openapi-generator-cli-6.5.0.jar";
     private static final String OPENAPI_PATH = "openapi/";
     private static final Integer SERVICER_PORT = 8080;
+    private static final String uuid = "e2d4de73-1518-40f7-8de1-60f184ea6e1d";
+    private static final String userId = "defaultUserId";
     private static Ocl oclRegister;
-
     @Autowired
     private ServiceDeployerApi serviceDeployerApi;
-    @Autowired
-    private ServiceCatalogApi serviceCatalogApi;
     @Autowired
     private ServiceRegisterApi serviceRegisterApi;
 
@@ -80,7 +75,7 @@ class ServiceDeployerApiTest {
         oclRegister.setVersion("2.1");
 
         Map<String, String> contextMap = new HashMap<>();
-        contextMap.put("TASK_ID", UUID.randomUUID().toString());
+        contextMap.put("TASK_ID", uuid);
         MDC.setContextMap(contextMap);
     }
 
@@ -101,7 +96,7 @@ class ServiceDeployerApiTest {
         registerServiceEntity.setOcl(oclRegister);
         registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
-        OpenApiUtil openApiUtil = new OpenApiUtil( CLIENT_DOWNLOAD_URL,
+        OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
                 OPENAPI_PATH, SERVICER_PORT);
         RegisteredServicesOpenApiGenerator
                 registeredServicesOpenApiUtil = new RegisteredServicesOpenApiGenerator(
@@ -120,7 +115,7 @@ class ServiceDeployerApiTest {
         RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
-        createRequest.setUserName("admin");
+        createRequest.setUserId(userId);
         createRequest.setServiceName(registeredServiceVo.getName());
         createRequest.setVersion(registeredServiceVo.getVersion());
         createRequest.setCsp(registeredServiceVo.getCsp());
@@ -135,44 +130,18 @@ class ServiceDeployerApiTest {
 
         UUID deployUUid = serviceDeployerApi.deploy(createRequest);
         ServiceDetailVo deployedServiceDetailsById =
-                serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString(),
-                        createRequest.getUserName());
+                serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString());
         log.error(deployedServiceDetailsById.toString());
         Assertions.assertNotNull(deployedServiceDetailsById);
     }
 
     @Disabled
     @Test
-    void listDeployedServices() throws Exception {
+    void listMyDeployedServices() throws Exception {
         RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
-        createRequest.setUserName("admin");
-        createRequest.setServiceName(registeredServiceVo.getName());
-        createRequest.setVersion(registeredServiceVo.getVersion());
-        createRequest.setCsp(registeredServiceVo.getCsp());
-        createRequest.setCategory(registeredServiceVo.getCategory());
-        createRequest.setFlavor(registeredServiceVo.getOcl().getFlavors().get(0).toString());
-        createRequest.setRegion(
-                registeredServiceVo.getOcl().getCloudServiceProvider().getRegions().get(0)
-                        .toString());
-        Map<String, String> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
-        createRequest.setServiceRequestProperties(serviceRequestProperties);
-
-        serviceDeployerApi.deploy(createRequest);
-        List<ServiceVo> serviceVos = serviceDeployerApi.listDeployedServices();
-        log.error(serviceVos.toString());
-        Assertions.assertFalse(serviceVos.isEmpty());
-    }
-
-    @Disabled
-    @Test
-    void getDeployedServicesByUser() throws Exception {
-        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
-        Thread.sleep(3000);
-        CreateRequest createRequest = new CreateRequest();
-        createRequest.setUserName("admin");
+        createRequest.setUserId(userId);
         createRequest.setServiceName(registeredServiceVo.getName());
         createRequest.setVersion(registeredServiceVo.getVersion());
         createRequest.setCsp(registeredServiceVo.getCsp());
@@ -187,7 +156,7 @@ class ServiceDeployerApiTest {
 
         serviceDeployerApi.deploy(createRequest);
         List<ServiceVo> deployedServicesByUser =
-                serviceDeployerApi.getDeployedServicesByUser(createRequest.getUserName());
+                serviceDeployerApi.listMyDeployedServices();
         log.error(deployedServicesByUser.toString());
         Assertions.assertFalse(deployedServicesByUser.isEmpty());
     }
@@ -198,7 +167,7 @@ class ServiceDeployerApiTest {
         RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
-        createRequest.setUserName("admin");
+        createRequest.setUserId(userId);
         createRequest.setServiceName(registeredServiceVo.getName());
         createRequest.setVersion(registeredServiceVo.getVersion());
         createRequest.setCsp(registeredServiceVo.getCsp());
@@ -223,7 +192,7 @@ class ServiceDeployerApiTest {
         RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
-        createRequest.setUserName("admin");
+        createRequest.setUserId(userId);
         createRequest.setServiceName(registeredServiceVo.getName());
         createRequest.setVersion(registeredServiceVo.getVersion());
         createRequest.setCsp(registeredServiceVo.getCsp());
@@ -240,51 +209,5 @@ class ServiceDeployerApiTest {
 
         Response response = serviceDeployerApi.destroy(deployUUid.toString());
         Assertions.assertTrue(response.getSuccess());
-    }
-
-    @Test
-    void listAvailableServices() throws Exception {
-        serviceRegisterApi.register(oclRegister);
-        Thread.sleep(3000);
-        Category categoryName = oclRegister.getCategory();
-        String cspName = oclRegister.getCloudServiceProvider().getName().name();
-        String serviceName = oclRegister.getName();
-        String serviceVersion = oclRegister.getServiceVersion();
-        List<UserAvailableServiceVo> userAvailableServiceVos =
-                serviceCatalogApi.listAvailableServices(categoryName, cspName, serviceName,
-                        serviceVersion);
-        log.error(userAvailableServiceVos.toString());
-        Assertions.assertNotNull(userAvailableServiceVos);
-    }
-
-    @Test
-    void getAvailableServicesTree() throws Exception {
-        serviceRegisterApi.register(oclRegister);
-        Thread.sleep(3000);
-        List<CategoryOclVo> categoryOclVos =
-                serviceCatalogApi.getAvailableServicesTree(oclRegister.getCategory());
-        log.error(categoryOclVos.toString());
-        Assertions.assertNotNull(categoryOclVos);
-    }
-
-    @Test
-    void availableServiceDetails() throws Exception {
-        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
-        Thread.sleep(3000);
-        UserAvailableServiceVo userAvailableServiceVo =
-                serviceCatalogApi.availableServiceDetails(registeredServiceVo.getId().toString());
-        log.error(userAvailableServiceVo.toString());
-        Assertions.assertNotNull(userAvailableServiceVo);
-    }
-
-    @Test
-    void openApi() throws Exception {
-        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
-        Thread.sleep(3000);
-        Link link = serviceCatalogApi.openApi(registeredServiceVo.getId().toString());
-        log.error(link.toString());
-        Assertions.assertNotNull(link);
-        Assertions.assertEquals("OpenApi", link.getRel().toString());
-        Assertions.assertTrue(link.getHref().contains(registeredServiceVo.getId().toString()));
     }
 }

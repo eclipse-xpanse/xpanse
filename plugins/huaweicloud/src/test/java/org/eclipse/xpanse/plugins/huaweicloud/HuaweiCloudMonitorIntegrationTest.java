@@ -25,9 +25,9 @@ import org.eclipse.xpanse.modules.monitor.cache.MonitorMetricCacheManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudDataModelConverter;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudMonitorClient;
-import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudDataModelConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +67,7 @@ class HuaweiCloudMonitorIntegrationTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "cn-southwest-2")));
         return new ResourceMetricRequest(deployResource, monitorResourceType, from, to, null,
-                onlyLastKnownMetric, "xpanseUserName");
+                onlyLastKnownMetric, "userId");
     }
 
     void mockCesClient() {
@@ -89,17 +89,17 @@ class HuaweiCloudMonitorIntegrationTest {
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "cn-southwest-2")));
         return new ServiceMetricRequest(List.of(deployResource), monitorResourceType, from, to,
                 null,
-                onlyLastKnownMetric, "xpanseUserName");
+                onlyLastKnownMetric, "userId");
     }
 
-    void mockAllRequestForService() throws Exception {
+    void mockAllRequestForService() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
         when(huaweiCloudMonitorClient.getCesClient(any(), any())).thenReturn(getCesClient());
     }
 
     @Test
-    void testGetMetricsForResourceWithParamsOnlyLastKnownMetricTrue() throws Exception {
+    void testGetMetricsForResourceWithParamsOnlyLastKnownMetricTrue() {
 
         // Setup
         ResourceMetricRequest resourceMetricRequest =
@@ -119,7 +119,7 @@ class HuaweiCloudMonitorIntegrationTest {
     }
 
     @Test
-    void testGetMetricsForResourceWithParamsFromAndTo() throws Exception {
+    void testGetMetricsForResourceWithParamsFromAndTo() {
         mockCesClient();
         // Setup
         ResourceMetricRequest resourceMetricRequest =
@@ -141,7 +141,7 @@ class HuaweiCloudMonitorIntegrationTest {
     }
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeCpu() throws Exception {
+    void testGetMetricsForResourceWithParamsTypeCpu() {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
@@ -161,7 +161,7 @@ class HuaweiCloudMonitorIntegrationTest {
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeMem() throws Exception {
+    void testGetMetricsForResourceWithParamsTypeMem() {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
@@ -181,7 +181,7 @@ class HuaweiCloudMonitorIntegrationTest {
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeVmNetworkIncoming() throws Exception {
+    void testGetMetricsForResourceWithParamsTypeVmNetworkIncoming() {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
@@ -203,7 +203,7 @@ class HuaweiCloudMonitorIntegrationTest {
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeVmNetworkOutgoing() throws Exception {
+    void testGetMetricsForResourceWithParamsTypeVmNetworkOutgoing() {
         // Setup
         ResourceMetricRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
@@ -225,7 +225,7 @@ class HuaweiCloudMonitorIntegrationTest {
 
 
     @Test
-    void testGetMetricsForServiceWithParamsOnlyLastKnownMetricTrue() throws Exception {
+    void testGetMetricsForServiceWithParamsOnlyLastKnownMetricTrue() {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(null, null, null, true);
@@ -244,7 +244,7 @@ class HuaweiCloudMonitorIntegrationTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsFromAndTo() throws Exception {
+    void testGetMetricsForServiceWithParamsFromAndTo() {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(null, System.currentTimeMillis() -
@@ -264,7 +264,7 @@ class HuaweiCloudMonitorIntegrationTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeCpu() throws Exception {
+    void testGetMetricsForServiceWithParamsTypeCpu() {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
@@ -282,7 +282,7 @@ class HuaweiCloudMonitorIntegrationTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeMem() throws Exception {
+    void testGetMetricsForServiceWithParamsTypeMem() {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
@@ -300,7 +300,7 @@ class HuaweiCloudMonitorIntegrationTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeVmNetworkIncoming() throws Exception {
+    void testGetMetricsForServiceWithParamsTypeVmNetworkIncoming() {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
@@ -320,7 +320,7 @@ class HuaweiCloudMonitorIntegrationTest {
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeVmNetworkOutgoing() throws Exception {
+    void testGetMetricsForServiceWithParamsTypeVmNetworkOutgoing() {
         // Setup
         ServiceMetricRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,

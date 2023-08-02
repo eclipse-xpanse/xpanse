@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.deployment.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -20,10 +21,9 @@ import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.service.register.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.security.config.AesUtil;
+import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Environment variables utils for deployment.
@@ -147,9 +147,9 @@ public class DeployEnvironments {
 
         AbstractCredentialInfo abstractCredentialInfo =
                 this.credentialCenter.getCredential(csp, credentialType,
-                        task.getCreateRequest().getUserName());
+                        task.getCreateRequest().getUserId());
 
-        if (!ObjectUtils.isEmpty(abstractCredentialInfo)) {
+        if (Objects.nonNull(abstractCredentialInfo)) {
             for (CredentialVariable variable
                     : ((CredentialVariables) abstractCredentialInfo).getVariables()) {
                 variables.put(variable.getName(), variable.getValue());

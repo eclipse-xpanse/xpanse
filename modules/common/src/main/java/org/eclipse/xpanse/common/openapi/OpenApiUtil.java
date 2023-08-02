@@ -42,8 +42,8 @@ public class OpenApiUtil {
      */
     @Autowired
     public OpenApiUtil(@Value("${openapi.download-generator-client-url:https://repo1.maven.org/"
-            + "maven2/org/openapitools/openapi-generator-cli/6.5.0/"
-            + "openapi-generator-cli.6.5.0.jar}")
+            + "maven2/org/openapitools/openapi-generator-cli/6.6.0/"
+            + "openapi-generator-cli.6.6.0.jar}")
                        String clientDownLoadUrl,
                        @Value("${openapi.path:openapi/}") String openapiPath,
                        @Value("${server.port:8080}") Integer port) {
@@ -125,7 +125,6 @@ public class OpenApiUtil {
                         execJarFile.getPath(), clientDownLoadUrl);
                 return true;
             }
-
         }
         return true;
     }

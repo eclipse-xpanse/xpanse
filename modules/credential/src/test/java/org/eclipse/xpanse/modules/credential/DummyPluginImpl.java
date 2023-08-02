@@ -52,8 +52,8 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         CredentialVariables accessKey = new CredentialVariables(
-                getCsp(), null, "AK_SK", "The access key and security key.",
-                CredentialType.VARIABLES, credentialVariables);
+                getCsp(), CredentialType.VARIABLES, "AK_SK", "The access key and security key.",
+                null, credentialVariables);
         credentialVariables.add(
                 new CredentialVariable("OS_ACCESS_KEY",
                         "The access key.", true));

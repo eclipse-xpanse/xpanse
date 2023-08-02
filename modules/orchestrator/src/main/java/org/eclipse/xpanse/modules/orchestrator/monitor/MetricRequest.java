@@ -28,5 +28,5 @@ public class MetricRequest {
 
     private boolean onlyLastKnownMetric;
 
-    private String xpanseUserName;
+    private String userId;
 }

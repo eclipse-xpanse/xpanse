@@ -20,7 +20,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariablesNotComplete;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.config.AesUtil;
+import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,8 +50,9 @@ class CredentialSearchTests {
     void testCredentialVariablesNotCompleteIsThrownWhenMandatoryVariablesAreMissing() {
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(new DummyPluginImpl());
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name", "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES, "name",
+                        "description",
+                        "userId",
                         List.of(new CredentialVariable("name", "description", false))));
         when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
                 credentialVariables.get(0));
@@ -64,8 +65,9 @@ class CredentialSearchTests {
     void testSuccessfulCredentialsGet() {
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(new DummyPluginImpl());
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name", "description",
-                        CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES, "name",
+                        "description",
+                        "userId",
                         List.of(new CredentialVariable("name", "description", false, false),
                                 new CredentialVariable("id", "description", true, false,
                                         "testName"))));
@@ -84,9 +86,9 @@ class CredentialSearchTests {
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(new DummyPluginImpl());
         withEnvironmentVariable("name", "testUser").execute(() -> {
             final List<AbstractCredentialInfo> credentialVariables =
-                    List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
+                    List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES, "name",
                             "description",
-                            CredentialType.VARIABLES,
+                            "userId",
                             List.of(new CredentialVariable("name", "description", true, false),
                                     new CredentialVariable("id", "description", true, false,
                                             "testName"))));
@@ -110,9 +112,9 @@ class CredentialSearchTests {
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(new DummyPluginImpl());
         withEnvironmentVariables("name", "testUser", "id", "testId").execute(() -> {
             final List<AbstractCredentialInfo> credentialVariables =
-                    List.of(new CredentialVariables(Csp.OPENSTACK, "userName", "name",
+                    List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES, "name",
                             "description",
-                            CredentialType.VARIABLES,
+                            "userId",
                             List.of(new CredentialVariable("name", "description", true, false),
                                     new CredentialVariable("id", "description", true, false))));
             when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(

@@ -70,9 +70,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
                         "The security key.", true));
         CredentialVariables accessKey = new CredentialVariables(
-                getCsp(), null, HuaweiCloudMonitorConstants.IAM,
-                "Using The access key and security key authentication.",
-                CredentialType.VARIABLES, credentialVariables);
+                getCsp(), CredentialType.VARIABLES, HuaweiCloudMonitorConstants.IAM,
+                "Using The access key and security key authentication.", null, credentialVariables);
 
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(accessKey);

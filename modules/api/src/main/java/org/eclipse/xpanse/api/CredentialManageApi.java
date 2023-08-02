@@ -14,7 +14,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
@@ -22,7 +24,9 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialTypeMessage;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -52,10 +56,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class CredentialManageApi {
 
     private final CredentialCenter credentialCenter;
+    private final IdentityProviderManager identityProviderManager;
 
     @Autowired
-    public CredentialManageApi(CredentialCenter credentialCenter) {
+    public CredentialManageApi(CredentialCenter credentialCenter,
+                               IdentityProviderManager identityProviderManager) {
         this.credentialCenter = credentialCenter;
+        this.identityProviderManager = identityProviderManager;
     }
 
 
@@ -108,7 +115,6 @@ public class CredentialManageApi {
     /**
      * Get all cloud provider credentials added by the user.
      *
-     * @param userName The name of the user who provided the credential.
      * @return Returns all credentials of the user.
      */
     @Tag(name = "Credentials Management",
@@ -117,20 +123,15 @@ public class CredentialManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get all cloud provider credentials added by the user.")
-    public List<AbstractCredentialInfo> getCredentialsByUser(
-            @Parameter(name = "userName",
-                    description = "The name of user who provided the credential.",
-                    required = true)
-            @RequestParam(name = "userName") String userName) {
-        return credentialCenter.getCredentialsByUser(userName);
+    public List<AbstractCredentialInfo> getCredentialsByUser() {
+        return credentialCenter.getCredentialsByUser(getCurrentLoginUserId());
     }
 
     /**
      * Get all cloud provider credentials added by the user for a cloud service provider.
      *
-     * @param csp      The cloud service provider.
-     * @param userName The name of the user who provided the credential.
-     * @param type     The type of credential.
+     * @param csp  The cloud service provider.
+     * @param type The type of credential.
      * @return Returns credentials of the cloud service provider and the user.
      */
     @Tag(name = "Credentials Management",
@@ -144,11 +145,8 @@ public class CredentialManageApi {
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @PathVariable(name = "cspName") Csp csp,
             @Parameter(name = "type", description = "The type of credential.")
-            @RequestParam(name = "type", required = false) CredentialType type,
-            @Parameter(name = "userName",
-                    description = "The name of user who provided the credential.")
-            @RequestParam(name = "userName") String userName) {
-        return credentialCenter.getCredentials(csp, type, userName);
+            @RequestParam(name = "type", required = false) CredentialType type) {
+        return credentialCenter.getCredentials(csp, type, getCurrentLoginUserId());
     }
 
     /**
@@ -190,6 +188,7 @@ public class CredentialManageApi {
     @Operation(description = "Add user's credential for connecting to the cloud service provider.")
     public void addCredential(
             @Valid @RequestBody CreateCredential createCredential) {
+        createCredential.setUserId(getCurrentLoginUserId());
         credentialCenter.addCredential(createCredential);
     }
 
@@ -207,14 +206,16 @@ public class CredentialManageApi {
             "Update user's credential for connecting to the cloud service provider.")
     public void updateCredential(
             @Valid @RequestBody CreateCredential updateCredential) {
+        updateCredential.setUserId(getCurrentLoginUserId());
         credentialCenter.updateCredential(updateCredential);
     }
 
     /**
      * Delete user's credential for connecting to the cloud service provider.
      *
-     * @param csp      The cloud service provider.
-     * @param userName The name of the user who provided credential.
+     * @param csp  The cloud service provider.
+     * @param type The type of credential.
+     * @param name The name of credential.
      */
     @Tag(name = "Credentials Management",
             description = "APIs for managing user's cloud provider credentials")
@@ -229,11 +230,20 @@ public class CredentialManageApi {
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type") CredentialType type,
             @Parameter(name = "name", description = "The name of of credential.")
-            @RequestParam(name = "name") String name,
-            @Parameter(name = "userName", description = "The name of user who provided credential.")
-            @RequestParam(name = "userName") String userName) {
-        credentialCenter.deleteCredential(csp, type, name, userName);
+            @RequestParam(name = "name") String name) {
+        credentialCenter.deleteCredential(csp, type, name, getCurrentLoginUserId());
     }
+
+    private String getCurrentLoginUserId() {
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)
+                && StringUtils.isNotBlank(currentUserInfo.getUserId())) {
+            return currentUserInfo.getUserId();
+        } else {
+            return "defaultUserId";
+        }
+    }
+
 
     private void getCredentialCapabilitiesValue(
             List<AbstractCredentialInfo> abstractCredentialInfoList) {

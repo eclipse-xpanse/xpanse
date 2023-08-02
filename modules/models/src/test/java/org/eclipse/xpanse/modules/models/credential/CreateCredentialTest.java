@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 class CreateCredentialTest {
 
     private static final String name = "credential";
-    private static final String xpanseUser = "user";
+    private static final String userId = "user";
     private static final Csp csp = Csp.AWS;
     private static final String description = "Test credential";
     private static final CredentialType type = CredentialType.VARIABLES;
@@ -35,7 +35,7 @@ class CreateCredentialTest {
     void setUp() {
         createCredential = new CreateCredential();
         createCredential.setName(name);
-        createCredential.setXpanseUser(xpanseUser);
+        createCredential.setUserId(userId);
         createCredential.setCsp(csp);
         createCredential.setDescription(description);
         createCredential.setType(type);
@@ -46,7 +46,7 @@ class CreateCredentialTest {
     @Test
     public void testConstructorAndGetters() {
         assertEquals(name, createCredential.getName());
-        assertEquals(xpanseUser, createCredential.getXpanseUser());
+        assertEquals(userId, createCredential.getUserId());
         assertEquals(csp, createCredential.getCsp());
         assertEquals(description, createCredential.getDescription());
         assertEquals(type, createCredential.getType());
@@ -79,7 +79,7 @@ class CreateCredentialTest {
         assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
         assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
 
-        createCredential1.setXpanseUser(xpanseUser);
+        createCredential1.setUserId(userId);
         assertNotEquals(createCredential, createCredential1);
         assertNotEquals(createCredential1, createCredential2);
         assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
@@ -127,7 +127,7 @@ class CreateCredentialTest {
     void testToString() {
         CreateCredential createCredential = new CreateCredential();
         createCredential.setName(name);
-        createCredential.setXpanseUser(xpanseUser);
+        createCredential.setUserId(userId);
         createCredential.setCsp(csp);
         createCredential.setDescription(description);
         createCredential.setType(type);
@@ -136,7 +136,7 @@ class CreateCredentialTest {
 
         String expectedToString = "CreateCredential(" +
                 "name=credential, " +
-                "xpanseUser=user, " +
+                "userId=user, " +
                 "csp=AWS, " +
                 "description=Test credential, " +
                 "type=VARIABLES, " +

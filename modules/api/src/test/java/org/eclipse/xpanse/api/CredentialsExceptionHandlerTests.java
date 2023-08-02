@@ -19,10 +19,10 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialCapabil
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariablesNotComplete;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.modules.models.credential.exceptions.NoCredentialDefinitionAvailable;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,15 +34,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CredentialManageApi.class, CommonExceptionHandler.class,
-        CredentialCenter.class, CredentialsExceptionHandler.class})
+        CredentialCenter.class, CredentialsExceptionHandler.class, IdentityProviderManager.class})
 @WebMvcTest
 class CredentialsExceptionHandlerTests {
 
     @MockBean
     CredentialCenter credentialCenter;
-
-    @InjectMocks
-    CredentialManageApi credentialManageApi;
 
     @Autowired
     private WebApplicationContext context;
@@ -62,7 +59,7 @@ class CredentialsExceptionHandlerTests {
                 new CredentialCapabilityNotFound(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Credential Capability Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -74,7 +71,7 @@ class CredentialsExceptionHandlerTests {
                 new CredentialsNotFoundException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Credentials Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -86,7 +83,7 @@ class CredentialsExceptionHandlerTests {
                 new CredentialVariablesNotComplete(
                         Set.of("test error")));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Credential Variables Not Complete"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -98,7 +95,7 @@ class CredentialsExceptionHandlerTests {
                 new NoCredentialDefinitionAvailable(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("No Credential Definition Available"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));

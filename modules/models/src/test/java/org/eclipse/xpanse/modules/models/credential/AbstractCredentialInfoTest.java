@@ -20,21 +20,21 @@ class AbstractCredentialInfoTest {
     @Test
     public void testConstructorAndGetters() {
         Csp csp = Csp.HUAWEI;
-        String xpanseUser = "user";
+        String UserId = "user";
         String name = "credential";
         String description = "Test credential";
         CredentialType type = CredentialType.VARIABLES;
         Integer timeToLive = 100000;
 
         AbstractCredentialInfo credentialInfo =
-                new AbstractCredentialInfoImpl(csp, xpanseUser, name, description, type);
+                new AbstractCredentialInfoImpl(csp, UserId, name, description, type);
 
         credentialInfo.setTimeToLive(timeToLive);
         credentialInfo.setCsp(Csp.FLEXIBLE_ENGINE);
-        credentialInfo.setXpanseUser("admin");
+        credentialInfo.setUserId("admin");
 
         assertEquals(Csp.FLEXIBLE_ENGINE, credentialInfo.getCsp());
-        assertEquals("admin", credentialInfo.getXpanseUser());
+        assertEquals("admin", credentialInfo.getUserId());
         assertEquals(name, credentialInfo.getName());
         assertEquals(description, credentialInfo.getDescription());
         assertEquals(type, credentialInfo.getType());
@@ -42,9 +42,9 @@ class AbstractCredentialInfoTest {
     }
 
     private static class AbstractCredentialInfoImpl extends AbstractCredentialInfo {
-        AbstractCredentialInfoImpl(Csp csp, String xpanseUser, String name, String description,
+        AbstractCredentialInfoImpl(Csp csp, String userId, String name, String description,
                                    CredentialType type) {
-            super(csp, xpanseUser, name, description, type);
+            super(csp, type, name, description, userId);
         }
     }
 

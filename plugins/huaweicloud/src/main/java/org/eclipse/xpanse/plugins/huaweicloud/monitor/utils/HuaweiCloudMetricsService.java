@@ -80,7 +80,7 @@ public class HuaweiCloudMetricsService {
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
                 Csp.HUAWEI,
-                CredentialType.VARIABLES, resourceMetricRequest.getXpanseUserName());
+                CredentialType.VARIABLES, resourceMetricRequest.getUserId());
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
         ICredential icredential = huaweiCloudMonitorClient.getCredentialForClient(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
@@ -127,7 +127,7 @@ public class HuaweiCloudMetricsService {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
                 Csp.HUAWEI,
-                CredentialType.VARIABLES, serviceMetricRequest.getXpanseUserName());
+                CredentialType.VARIABLES, serviceMetricRequest.getUserId());
         MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
         ICredential icredential = huaweiCloudMonitorClient.getCredentialForClient(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 
 /**
@@ -155,6 +156,18 @@ public class CommonExceptionHandler {
     public Response handleUnsupportedEnumValueException(
             UnsupportedEnumValueException ex) {
         return Response.errorResponse(ResultType.UNSUPPORTED_ENUM_VALUE,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for MethodArgumentTypeMismatchException.
+     */
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseBody
+    public Response handleMethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException ex) {
+        return Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY,
                 Collections.singletonList(ex.getMessage()));
     }
 }

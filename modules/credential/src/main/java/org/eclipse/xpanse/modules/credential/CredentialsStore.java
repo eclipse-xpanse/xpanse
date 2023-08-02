@@ -40,7 +40,7 @@ public class CredentialsStore {
         CredentialCacheKey credentialCacheKey =
                 new CredentialCacheKey(abstractCredentialInfo.getCsp(),
                         abstractCredentialInfo.getType(), abstractCredentialInfo.getName(),
-                        abstractCredentialInfo.getXpanseUser());
+                        abstractCredentialInfo.getUserId());
         this.caffeineCredentialCacheManager.put(credentialCacheKey, abstractCredentialInfo);
     }
 

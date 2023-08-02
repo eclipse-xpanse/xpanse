@@ -3,6 +3,7 @@ package org.eclipse.xpanse.common.openapi;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(properties = {"openapi.download-generator-client-url=https://repo1.maven.org"
-        + "/maven2/org/openapitools/openapi-generator-cli/6.5.0/openapi-generator-cli-6.5.0.jar",
-        "openapi.path=test_openapi",
+        + "/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar",
+        "openapi.path=openapi",
         "server.port=8080"})
 @ContextConfiguration(classes = {OpenApiUtil.class, String.class})
 class OpenApiUtilTest {
@@ -51,11 +52,11 @@ class OpenApiUtilTest {
     @Test
     void testGetOpenApiUrl() {
         // SetUp
-        String id = "123";
+        String id = UUID.randomUUID().toString();
         String openApiUrl =
                 openApiUtilTest.getServiceUrl() + "/" + openApiPath + "/" + id + ".html";
         // Run the test
-        String result = openApiUtilTest.getOpenApiUrl("123");
+        String result = openApiUtilTest.getOpenApiUrl(id);
         // Verify the results
         Assertions.assertEquals(openApiUrl, result);
     }
@@ -63,8 +64,10 @@ class OpenApiUtilTest {
     @Test
     void testDownloadClientJar() throws IOException {
         // SetUp
-        File jarFile = new File(openApiPath + "/openapi-generator-cli-6.5.0.jar");
-        Assertions.assertFalse(jarFile.exists());
+        File jarFile = new File(openApiPath + "/openapi-generator-cli-6.6.0.jar").getAbsoluteFile();
+        if (jarFile.exists()) {
+            jarFile.delete();
+        }
         // Run the test
         boolean result = openApiUtilTest.downloadClientJar(openApiPath);
         // Verify the results

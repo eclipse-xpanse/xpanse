@@ -20,10 +20,10 @@ import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceAlre
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.TerraformScriptFormatInvalidException;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,15 +35,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CredentialManageApi.class, CommonExceptionHandler.class,
-        CredentialCenter.class, RegistrationExceptionHandler.class})
+        CredentialCenter.class, RegistrationExceptionHandler.class, IdentityProviderManager.class})
 @WebMvcTest
 class RegistrationExceptionHandlerTests {
 
     @MockBean
     CredentialCenter credentialCenter;
-
-    @InjectMocks
-    CredentialManageApi credentialManageApi;
 
     @Autowired
     private WebApplicationContext context;
@@ -63,7 +60,7 @@ class RegistrationExceptionHandlerTests {
                 new TerraformScriptFormatInvalidException(
                         List.of("test error")));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Terraform Script Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -75,7 +72,7 @@ class RegistrationExceptionHandlerTests {
                 new ServiceAlreadyRegisteredException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Already Registered"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -87,7 +84,7 @@ class RegistrationExceptionHandlerTests {
                 new IconProcessingFailedException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Icon Processing Failed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -99,7 +96,7 @@ class RegistrationExceptionHandlerTests {
                 new ServiceNotRegisteredException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Not Registered"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -111,7 +108,7 @@ class RegistrationExceptionHandlerTests {
                 new ServiceUpdateNotAllowed(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Update Not Allowed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));

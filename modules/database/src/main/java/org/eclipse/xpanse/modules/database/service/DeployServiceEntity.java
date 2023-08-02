@@ -49,9 +49,9 @@ public class DeployServiceEntity extends CreateModifiedTime {
     private UUID id;
 
     /**
-     * The name of the user who deployed the service.
+     * The id of user who deployed the service.
      */
-    private String userName;
+    private String userId;
 
     /**
      * The category of the Service.

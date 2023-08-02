@@ -6,6 +6,14 @@
 
 package org.eclipse.xpanse.plugins.openstack;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -22,11 +30,6 @@ import org.eclipse.xpanse.plugins.openstack.monitor.keystone.KeystoneManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.utils.GnocchiToXpanseModelConverter;
 import org.eclipse.xpanse.plugins.openstack.monitor.utils.MetricsManager;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class OpenstackOrchestratorPluginTest {
 
@@ -63,7 +66,7 @@ class OpenstackOrchestratorPluginTest {
         //Verify that the attribute values of the CredentialVariables object match expectations
         CredentialVariables credentialVariables = (CredentialVariables) result.get(0);
         assertEquals(plugin.getCsp(), credentialVariables.getCsp());
-        assertNull(credentialVariables.getXpanseUser());
+        assertNull(credentialVariables.getUserId());
         assertEquals("Variables", credentialVariables.getName());
         assertEquals("Authenticate at the specified URL using an account and password.",
                 credentialVariables.getDescription());

@@ -32,7 +32,7 @@ import org.eclipse.xpanse.modules.models.service.register.Flavor;
 import org.eclipse.xpanse.modules.models.service.register.Ocl;
 import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.security.config.AesUtil;
+import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +45,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DeployEnvironmentsTest {
 
-    private static final String userName = "userName";
+    private static final String userId = "userId";
     private static DeployTask task;
     private static CreateRequest createRequest;
     private static Ocl ocl;
@@ -68,7 +68,7 @@ class DeployEnvironmentsTest {
         serviceRequestProperties.put("example", null);
 
         createRequest = new CreateRequest();
-        createRequest.setUserName(userName);
+        createRequest.setUserId(userId);
         createRequest.setFlavor("flavor");
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
@@ -189,11 +189,10 @@ class DeployEnvironmentsTest {
         CredentialType credentialType = CredentialType.VARIABLES;
 
         AbstractCredentialInfo abstractCredentialInfo =
-                new CredentialVariables(csp, userName, "AK_SK", "description", credentialType,
+                new CredentialVariables(csp, credentialType, "AK_SK", "description", userId,
                         variables);
-
         when(mockCredentialCenter.getCredential(csp, credentialType,
-                createRequest.getUserName()))
+                createRequest.getUserId()))
                 .thenReturn(abstractCredentialInfo);
 
         Map<String, String> variablesActual =
@@ -205,7 +204,8 @@ class DeployEnvironmentsTest {
             assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
         }
         verify(mockCredentialCenter, times(1))
-                .getCredential(csp, credentialType, userName);
+                .getCredential(csp, credentialType, userId);
+
     }
 
 }

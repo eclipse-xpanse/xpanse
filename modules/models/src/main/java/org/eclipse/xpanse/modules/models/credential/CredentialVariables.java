@@ -28,10 +28,9 @@ public class CredentialVariables extends AbstractCredentialInfo {
     /**
      * The constructor.
      */
-    public CredentialVariables(Csp csp, String xpanseUser, String name, String description,
-                               CredentialType type,
-                               List<CredentialVariable> variables) {
-        super(csp, xpanseUser, name, description, type);
+    public CredentialVariables(Csp csp, CredentialType type, String name, String description,
+                               String userId, List<CredentialVariable> variables) {
+        super(csp, type, name, description, userId);
         this.variables = variables;
     }
 
@@ -39,9 +38,9 @@ public class CredentialVariables extends AbstractCredentialInfo {
      * The constructor.
      */
     public CredentialVariables(CreateCredential createCredential) {
-        super(createCredential.getCsp(), createCredential.getXpanseUser(),
+        super(createCredential.getCsp(), createCredential.getType(),
                 createCredential.getName(), createCredential.getDescription(),
-                createCredential.getType());
+                createCredential.getUserId());
         super.timeToLive = createCredential.getTimeToLive();
         this.variables = createCredential.getVariables();
     }

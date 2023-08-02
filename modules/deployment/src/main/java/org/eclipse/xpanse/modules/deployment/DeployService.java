@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
@@ -43,12 +44,14 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
-import org.eclipse.xpanse.modules.security.config.AesUtil;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -76,6 +79,8 @@ public class DeployService {
     private DeployVariableValidator deployVariableValidator;
     @Resource
     private PluginManager pluginManager;
+    @Resource
+    private IdentityProviderManager identityProviderManager;
     @Resource
     private AesUtil aesUtil;
 
@@ -106,7 +111,7 @@ public class DeployService {
         entity.setCategory(deployTask.getCreateRequest().getCategory());
         entity.setCustomerServiceName(deployTask.getCreateRequest().getCustomerServiceName());
         entity.setFlavor(deployTask.getCreateRequest().getFlavor());
-        entity.setUserName(deployTask.getCreateRequest().getUserName());
+        entity.setUserId(deployTask.getCreateRequest().getUserId());
         entity.setCreateRequest(deployTask.getCreateRequest());
         entity.setDeployResourceList(new ArrayList<>());
         return entity;
@@ -118,6 +123,8 @@ public class DeployService {
      * @param deployTask the task of deploy managed service name.
      */
     public Deployment getDeployHandler(DeployTask deployTask) {
+
+        deployTask.getCreateRequest().setUserId(getCurrentLoginUserId());
 
         // Find the registered service and fill Ocl.
         RegisterServiceEntity serviceEntity = new RegisterServiceEntity();
@@ -150,12 +157,12 @@ public class DeployService {
     }
 
     private void encodeDeployVariable(RegisterServiceEntity serviceEntity,
-            Map<String, String> serviceRequestProperties) {
+                                      Map<String, String> serviceRequestProperties) {
         if (Objects.isNull(serviceEntity.getOcl().getDeployment())
                 || CollectionUtils.isEmpty(serviceEntity.getOcl().getDeployment().getVariables())) {
             return;
         }
-        serviceEntity.getOcl().getDeployment().getVariables().stream().forEach(variable -> {
+        serviceEntity.getOcl().getDeployment().getVariables().forEach(variable -> {
             if (Objects.nonNull(variable) && !SensitiveScope.NONE.toValue()
                     .equals(variable.getSensitiveScope().toValue())
                     && serviceRequestProperties.containsKey(variable.getName())) {
@@ -224,6 +231,10 @@ public class DeployService {
                     String.format("Deployed service with id %s not found",
                             deployTask.getId()));
         }
+        if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No right to destroy resource or data belong to other users.");
+        }
         // Get state of service.
         ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
         if (state.equals(ServiceDeploymentState.DEPLOYING)
@@ -290,18 +301,21 @@ public class DeployService {
     }
 
     /**
-     * List deploy services.
+     * List deploy services for user.
      *
      * @return serviceVos
      */
-    public List<ServiceVo> getDeployedServices() {
+    public List<ServiceVo> listMyDeployedServices() {
         List<DeployServiceEntity> deployServices =
                 deployServiceStorage.services();
-        return deployServices.stream().map(service -> {
-            ServiceVo serviceVo = new ServiceVo();
-            BeanUtils.copyProperties(service, serviceVo);
-            return serviceVo;
-        }).collect(Collectors.toList());
+        String currentUserId = getCurrentLoginUserId();
+        return deployServices.stream()
+                .filter(service -> StringUtils.equals(currentUserId, service.getUserId()))
+                .map(service -> {
+                    ServiceVo serviceVo = new ServiceVo();
+                    BeanUtils.copyProperties(service, serviceVo);
+                    return serviceVo;
+                }).collect(Collectors.toList());
 
     }
 
@@ -311,12 +325,17 @@ public class DeployService {
      * @param id ID of deploy service.
      * @return serviceDetailVo
      */
-    public ServiceDetailVo getDeployServiceDetails(UUID id, String user) {
+    public ServiceDetailVo getDeployServiceDetails(UUID id) {
         DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
-        if (Objects.isNull(deployServiceEntity)
-                || !deployServiceEntity.getUserName().equals(user)) {
+        if (Objects.isNull(deployServiceEntity)) {
             throw new ServiceNotDeployedException("Service not found.");
         }
+
+        if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No right to view details of service belong to other users.");
+        }
+
         ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
         BeanUtils.copyProperties(deployServiceEntity, serviceDetailVo);
         if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
@@ -356,6 +375,16 @@ public class DeployService {
             throw new DeployerNotFoundException("Can't find suitable deployer for the Task.");
         }
         return deployment;
+    }
+
+    private String getCurrentLoginUserId() {
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)
+                && StringUtils.isNotBlank(currentUserInfo.getUserId())) {
+            return currentUserInfo.getUserId();
+        } else {
+            return "defaultUserId";
+        }
     }
 
 }

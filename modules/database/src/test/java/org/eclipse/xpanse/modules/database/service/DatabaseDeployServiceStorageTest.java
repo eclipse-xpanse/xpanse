@@ -20,9 +20,10 @@ import org.springframework.dao.OptimisticLockingFailureException;
 @ExtendWith(MockitoExtension.class)
 class DatabaseDeployServiceStorageTest {
 
+    private final UUID id = UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2");
+    private final String userId = "defaultUserId";
     @Mock
     private DeployServiceRepository mockDeployServiceRepository;
-
     private DatabaseDeployServiceStorage databaseDeployServiceStorageUnderTest;
 
     @BeforeEach
@@ -34,15 +35,15 @@ class DatabaseDeployServiceStorageTest {
     @Test
     void testStore() {
         final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        deployServiceEntity.setUserName("userName");
+        deployServiceEntity.setId(id);
+        deployServiceEntity.setUserId(userId);
         deployServiceEntity.setCategory(Category.AI);
         deployServiceEntity.setName("name");
         deployServiceEntity.setCustomerServiceName("customerServiceName");
         databaseDeployServiceStorageUnderTest.store(deployServiceEntity);
         final DeployServiceEntity entity = new DeployServiceEntity();
-        entity.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        entity.setUserName("userName");
+        entity.setId(id);
+        entity.setUserId(userId);
         entity.setCategory(Category.AI);
         entity.setName("name");
         entity.setCustomerServiceName("customerServiceName");
@@ -52,14 +53,14 @@ class DatabaseDeployServiceStorageTest {
     @Test
     void testStore_DeployServiceRepositoryThrowsOptimisticLockingFailureException() {
         final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        deployServiceEntity.setUserName("userName");
+        deployServiceEntity.setId(id);
+        deployServiceEntity.setUserId(userId);
         deployServiceEntity.setCategory(Category.AI);
         deployServiceEntity.setName("name");
         deployServiceEntity.setCustomerServiceName("customerServiceName");
         final DeployServiceEntity entity = new DeployServiceEntity();
-        entity.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        entity.setUserName("userName");
+        entity.setId(id);
+        entity.setUserId(userId);
         entity.setCategory(Category.AI);
         entity.setName("name");
         entity.setCustomerServiceName("customerServiceName");
@@ -72,15 +73,15 @@ class DatabaseDeployServiceStorageTest {
     @Test
     void testStoreAndFlush() {
         final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        deployServiceEntity.setUserName("userName");
+        deployServiceEntity.setId(id);
+        deployServiceEntity.setUserId(userId);
         deployServiceEntity.setCategory(Category.AI);
         deployServiceEntity.setName("name");
         deployServiceEntity.setCustomerServiceName("customerServiceName");
         databaseDeployServiceStorageUnderTest.storeAndFlush(deployServiceEntity);
         final DeployServiceEntity entity = new DeployServiceEntity();
-        entity.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        entity.setUserName("userName");
+        entity.setId(id);
+        entity.setUserId(userId);
         entity.setCategory(Category.AI);
         entity.setName("name");
         entity.setCustomerServiceName("customerServiceName");
@@ -90,15 +91,15 @@ class DatabaseDeployServiceStorageTest {
     @Test
     void testServices() {
         final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        deployServiceEntity.setUserName("userName");
+        deployServiceEntity.setId(id);
+        deployServiceEntity.setUserId(userId);
         deployServiceEntity.setCategory(Category.AI);
         deployServiceEntity.setName("name");
         deployServiceEntity.setCustomerServiceName("customerServiceName");
         final List<DeployServiceEntity> expectedResult = List.of(deployServiceEntity);
         final DeployServiceEntity deployServiceEntity1 = new DeployServiceEntity();
-        deployServiceEntity1.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        deployServiceEntity1.setUserName("userName");
+        deployServiceEntity1.setId(id);
+        deployServiceEntity1.setUserId(userId);
         deployServiceEntity1.setCategory(Category.AI);
         deployServiceEntity1.setName("name");
         deployServiceEntity1.setCustomerServiceName("customerServiceName");
@@ -118,35 +119,35 @@ class DatabaseDeployServiceStorageTest {
     @Test
     void testFindDeployServiceById() {
         final DeployServiceEntity expectedResult = new DeployServiceEntity();
-        expectedResult.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        expectedResult.setUserName("userName");
+        expectedResult.setId(id);
+        expectedResult.setUserId(userId);
         expectedResult.setCategory(Category.AI);
         expectedResult.setName("name");
         expectedResult.setCustomerServiceName("customerServiceName");
         final DeployServiceEntity deployServiceEntity1 = new DeployServiceEntity();
-        deployServiceEntity1.setId(UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2"));
-        deployServiceEntity1.setUserName("userName");
+        deployServiceEntity1.setId(id);
+        deployServiceEntity1.setUserId(userId);
         deployServiceEntity1.setCategory(Category.AI);
         deployServiceEntity1.setName("name");
         deployServiceEntity1.setCustomerServiceName("customerServiceName");
         final Optional<DeployServiceEntity> deployServiceEntity = Optional.of(deployServiceEntity1);
         when(mockDeployServiceRepository.findById(
-                UUID.fromString("96e3485f-7b9e-4e7e-a239-851e4c53ec75")))
+                id))
                 .thenReturn(deployServiceEntity);
         final DeployServiceEntity result =
                 databaseDeployServiceStorageUnderTest.findDeployServiceById(
-                        UUID.fromString("96e3485f-7b9e-4e7e-a239-851e4c53ec75"));
+                        id);
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
     void testFindDeployServiceById_DeployServiceRepositoryReturnsAbsent() {
         when(mockDeployServiceRepository.findById(
-                UUID.fromString("96e3485f-7b9e-4e7e-a239-851e4c53ec75")))
+                id))
                 .thenReturn(Optional.empty());
         final DeployServiceEntity result =
                 databaseDeployServiceStorageUnderTest.findDeployServiceById(
-                        UUID.fromString("96e3485f-7b9e-4e7e-a239-851e4c53ec75"));
+                        id);
         assertThat(result).isNull();
     }
 }
