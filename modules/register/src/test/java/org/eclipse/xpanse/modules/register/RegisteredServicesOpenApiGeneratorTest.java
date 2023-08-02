@@ -19,33 +19,24 @@ import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
 import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Test for OpenApiUtilTest.
  */
 @Slf4j
-@ExtendWith(MockitoExtension.class)
 @TestMethodOrder(OrderAnnotation.class)
-class OpenApiUtilTest {
+class RegisteredServicesOpenApiGeneratorTest {
 
-    private static final String ID = "488adf44-b48f-43fb-9b7f-61e79f40016a";
-    private static final String CLIENT_DOWNLOAD_URL = "https://repo1.maven.org/maven2/org/"
-            + "openapitools/openapi-generator-cli/6.5.0/openapi-generator-cli-6.5.0.jar";
-    private static final String OPENAPI_PATH = "openapi/";
-    private static final Integer SERVICER_PORT = 8080;
-    private static UUID RANDOM_UUID;
-
-    @BeforeAll
-    static void init() {
-        RANDOM_UUID = UUID.fromString(ID);
-    }
+    private final String ID = "488adf44-b48f-43fb-9b7f-61e79f40016a";
+    private final String CLIENT_DOWNLOAD_URL = "https://repo1.maven.org/maven2/org/"
+            + "openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar";
+    private final String OPENAPI_PATH = "openapi/";
+    private final Integer SERVICER_PORT = 8080;
+    private final UUID RANDOM_UUID = UUID.fromString(ID);
 
     @Test
     @Order(1)
@@ -62,8 +53,9 @@ class OpenApiUtilTest {
         registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
         OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL, OPENAPI_PATH, SERVICER_PORT);
-        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator = new RegisteredServicesOpenApiGenerator(
-                deployVariableValidator, openApiUtil);
+        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator =
+                new RegisteredServicesOpenApiGenerator(
+                        deployVariableValidator, openApiUtil);
         registeredServicesOpenApiGenerator.createServiceApi(registerServiceEntity);
         String openApiWorkdir = openApiUtil.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");
@@ -86,9 +78,11 @@ class OpenApiUtilTest {
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
         OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
                 OPENAPI_PATH, SERVICER_PORT);
-        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator = new RegisteredServicesOpenApiGenerator(
-                deployVariableValidator, openApiUtil);
-        Assertions.assertDoesNotThrow(() -> registeredServicesOpenApiGenerator.updateServiceApi(registerServiceEntity));
+        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator =
+                new RegisteredServicesOpenApiGenerator(
+                        deployVariableValidator, openApiUtil);
+        Assertions.assertDoesNotThrow(
+                () -> registeredServicesOpenApiGenerator.updateServiceApi(registerServiceEntity));
     }
 
     @Test
@@ -97,8 +91,9 @@ class OpenApiUtilTest {
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
         OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
                 OPENAPI_PATH, SERVICER_PORT);
-        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator = new RegisteredServicesOpenApiGenerator(
-                deployVariableValidator, openApiUtil);
+        RegisteredServicesOpenApiGenerator registeredServicesOpenApiGenerator =
+                new RegisteredServicesOpenApiGenerator(
+                        deployVariableValidator, openApiUtil);
         registeredServicesOpenApiGenerator.deleteServiceApi(ID);
         String openApiWorkdir = openApiUtil.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");

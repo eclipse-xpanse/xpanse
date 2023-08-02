@@ -17,9 +17,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +55,7 @@ public class ServiceDeployerApi {
     @Resource
     private DeployService deployService;
 
+
     /**
      * Get status of the managed service with name.
      *
@@ -64,28 +63,14 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Get deployed service details by id.")
-    @GetMapping(value = "/services/deployed/{id}/details/{userName}",
+    @GetMapping(value = "/services/deployed/{id}/details",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ServiceDetailVo getDeployedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
-            @PathVariable("id") String id,
-            @Parameter(name = "userName", description = "User who deployed the service")
-            @PathVariable("userName") String userName) {
-        return this.deployService.getDeployServiceDetails(UUID.fromString(id), userName);
-    }
+            @PathVariable("id") String id) {
 
-    /**
-     * List all deployed services.
-     *
-     * @return list of all services deployed.
-     */
-    @Tag(name = "Service", description = "APIs to manage the service instances")
-    @Operation(description = "Lists all deployed services.")
-    @GetMapping(value = "/services/deployed", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public List<ServiceVo> listDeployedServices() {
-        return this.deployService.getDeployedServices();
+        return this.deployService.getDeployServiceDetails(UUID.fromString(id));
     }
 
     /**
@@ -95,19 +80,11 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "List all deployed services by a user.")
-    @GetMapping(value = "/services/deployed/{userName}",
+    @GetMapping(value = "/services/deployed",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ServiceVo> getDeployedServicesByUser(
-            @Parameter(name = "userName", description = "User who deployed the service")
-            @PathVariable("userName") String userName) {
-        return this.deployService
-                .getDeployedServices()
-                .stream()
-                .filter(serviceVo -> Objects.nonNull(serviceVo.getUserName())
-                        && serviceVo.getUserName().equals(userName))
-                .collect(Collectors.toList());
-
+    public List<ServiceVo> listMyDeployedServices() {
+        return this.deployService.listMyDeployedServices();
     }
 
     /**

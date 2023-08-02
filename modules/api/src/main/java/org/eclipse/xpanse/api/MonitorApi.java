@@ -17,7 +17,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.monitor.Monitor;
+import org.eclipse.xpanse.modules.monitor.MonitorMetricsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -41,10 +41,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Secured({ROLE_ADMIN, ROLE_USER})
 public class MonitorApi {
 
-    private final Monitor monitor;
+    private final MonitorMetricsService monitorMetricsService;
 
-    public MonitorApi(Monitor monitor) {
-        this.monitor = monitor;
+    public MonitorApi(MonitorMetricsService monitorMetricsService) {
+        this.monitorMetricsService = monitorMetricsService;
     }
 
     /**
@@ -84,7 +84,7 @@ public class MonitorApi {
                             + "then all other query parameters are ignored.")
             @RequestParam(name = "onlyLastKnownMetric", required = false, defaultValue = "false")
             boolean onlyLastKnownMetric) {
-        return monitor.getMetricsByServiceId(id, monitorResourceType, from, to,
+        return monitorMetricsService.getMetricsByServiceId(id, monitorResourceType, from, to,
                 granularity, onlyLastKnownMetric);
     }
 
@@ -127,7 +127,7 @@ public class MonitorApi {
                             + "then all other query parameters are ignored.")
             @RequestParam(name = "onlyLastKnownMetric", required = false)
             boolean onlyLastKnownMetric) {
-        return monitor.getMetricsByResourceId(id, monitorResourceType, from, to,
+        return monitorMetricsService.getMetricsByResourceId(id, monitorResourceType, from, to,
                 granularity, onlyLastKnownMetric);
     }
 

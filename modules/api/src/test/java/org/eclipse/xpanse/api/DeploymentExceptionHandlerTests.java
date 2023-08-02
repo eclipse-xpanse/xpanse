@@ -22,10 +22,10 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoun
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,15 +37,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CredentialManageApi.class, CommonExceptionHandler.class,
-        CredentialCenter.class, DeploymentExceptionHandler.class})
+        CredentialCenter.class, DeploymentExceptionHandler.class, IdentityProviderManager.class})
 @WebMvcTest
 class DeploymentExceptionHandlerTests {
 
     @MockBean
     CredentialCenter credentialCenter;
-
-    @InjectMocks
-    CredentialManageApi credentialManageApi;
 
     @Autowired
     private WebApplicationContext context;
@@ -65,7 +62,7 @@ class DeploymentExceptionHandlerTests {
                 new FlavorInvalidException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Flavor Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -77,7 +74,7 @@ class DeploymentExceptionHandlerTests {
                 new TerraformExecutorException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(502))
                 .andExpect(jsonPath("$.resultType").value("Terraform Execution Failed"))
                 .andExpect(jsonPath("$.details[0]").value("TFExecutor Exception: test error"));
@@ -89,7 +86,7 @@ class DeploymentExceptionHandlerTests {
                 new PluginNotFoundException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Plugin Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -101,7 +98,7 @@ class DeploymentExceptionHandlerTests {
                 new DeployerNotFoundException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Deployer Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -113,7 +110,7 @@ class DeploymentExceptionHandlerTests {
                 new TerraformProviderNotFoundException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Terraform Provider Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -125,7 +122,7 @@ class DeploymentExceptionHandlerTests {
                 new InvalidServiceStateException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Invalid Service State"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -137,7 +134,7 @@ class DeploymentExceptionHandlerTests {
                 new ServiceNotDeployedException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Deployment Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -149,7 +146,7 @@ class DeploymentExceptionHandlerTests {
                 new InvalidDeploymentVariableException(
                         "test error"));
         this.mockMvc.perform(
-                        get("/xpanse/auth/user/credentials?userName=test"))
+                        get("/xpanse/auth/user/credentials?userId=test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Deployment Variable Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));

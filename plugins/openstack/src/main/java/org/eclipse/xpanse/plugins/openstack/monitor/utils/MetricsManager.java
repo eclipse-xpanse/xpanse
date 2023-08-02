@@ -86,7 +86,7 @@ public class MetricsManager {
 
         keystoneManager.authenticate(credentialCenter.getCredential(
                 Csp.OPENSTACK, CredentialType.VARIABLES,
-                resourceMetricRequest.getXpanseUserName()));
+                resourceMetricRequest.getUserId()));
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
         InstanceResource instanceResource =
                 this.resourcesService.getInstanceResourceInfoById(

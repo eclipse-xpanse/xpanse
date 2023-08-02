@@ -38,7 +38,7 @@ import org.springframework.web.client.RestTemplate;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class ZitadelAuthorizationApiTest {
+class AuthorizationApiTest {
 
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
@@ -146,7 +146,6 @@ class ZitadelAuthorizationApiTest {
 
 
     private ResponseEntity<TokenResponse> getAccessToken(String url) {
-
         TestRestTemplate testRestTemplate = new TestRestTemplate();
         return new ResponseEntity<>(testRestTemplate.postForObject(url, "{}", TokenResponse.class),
                 HttpStatus.OK);

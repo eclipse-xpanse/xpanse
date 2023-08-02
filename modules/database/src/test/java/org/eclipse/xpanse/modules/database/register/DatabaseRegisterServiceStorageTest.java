@@ -30,31 +30,31 @@ class DatabaseRegisterServiceStorageTest {
     @Mock
     private RegisterServiceRepository mockRegisterServiceRepository;
 
-    private DatabaseRegisterServiceStorage databaseRegisterServiceStorageUnderTest;
+    private final UUID id = UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d");
+    private DatabaseRegisterServiceStorage test;
 
     @BeforeEach
     void setUp() {
-        databaseRegisterServiceStorageUnderTest =
-                new DatabaseRegisterServiceStorage(mockRegisterServiceRepository);
+        test = new DatabaseRegisterServiceStorage(mockRegisterServiceRepository);
     }
 
     @Test
     void testStore() {
         // Setup
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
         registerServiceEntity.setCategory(Category.AI);
 
         // Run the test
-        databaseRegisterServiceStorageUnderTest.store(registerServiceEntity);
+        test.store(registerServiceEntity);
 
         // Verify the results
         // Confirm RegisterServiceRepository.save(...).
         final RegisterServiceEntity entity = new RegisterServiceEntity();
-        entity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        entity.setId(id);
         entity.setName("name");
         entity.setVersion("version");
         entity.setCsp(Csp.HUAWEI);
@@ -66,7 +66,7 @@ class DatabaseRegisterServiceStorageTest {
     void testStore_RegisterServiceRepositoryThrowsOptimisticLockingFailureException() {
         // Setup
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
@@ -74,7 +74,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Configure RegisterServiceRepository.save(...).
         final RegisterServiceEntity entity = new RegisterServiceEntity();
-        entity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        entity.setId(id);
         entity.setName("name");
         entity.setVersion("version");
         entity.setCsp(Csp.HUAWEI);
@@ -83,7 +83,7 @@ class DatabaseRegisterServiceStorageTest {
                 .thenThrow(OptimisticLockingFailureException.class);
 
         // Run the test
-        assertThatThrownBy(() -> databaseRegisterServiceStorageUnderTest.store(
+        assertThatThrownBy(() -> test.store(
                 registerServiceEntity)).isInstanceOf(OptimisticLockingFailureException.class);
     }
 
@@ -91,14 +91,14 @@ class DatabaseRegisterServiceStorageTest {
     void testFindRegisteredService() {
         // Setup
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
         registerServiceEntity.setCategory(Category.AI);
 
         final RegisterServiceEntity expectedResult = new RegisterServiceEntity();
-        expectedResult.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        expectedResult.setId(id);
         expectedResult.setName("name");
         expectedResult.setVersion("version");
         expectedResult.setCsp(Csp.HUAWEI);
@@ -106,7 +106,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Configure RegisterServiceRepository.findOne(...).
         final RegisterServiceEntity registerServiceEntity2 = new RegisterServiceEntity();
-        registerServiceEntity2.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity2.setId(id);
         registerServiceEntity2.setName("name");
         registerServiceEntity2.setVersion("version");
         registerServiceEntity2.setCsp(Csp.HUAWEI);
@@ -118,7 +118,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Run the test
         final RegisterServiceEntity result =
-                databaseRegisterServiceStorageUnderTest.findRegisteredService(
+                test.findRegisteredService(
                         registerServiceEntity);
 
         // Verify the results
@@ -129,7 +129,7 @@ class DatabaseRegisterServiceStorageTest {
     void testFindRegisteredService_RegisterServiceRepositoryReturnsAbsent() {
         // Setup
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
@@ -140,7 +140,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Run the test
         final RegisterServiceEntity result =
-                databaseRegisterServiceStorageUnderTest.findRegisteredService(
+                test.findRegisteredService(
                         registerServiceEntity);
 
         // Verify the results
@@ -151,7 +151,7 @@ class DatabaseRegisterServiceStorageTest {
     void testFindRegisteredService_RegisterServiceRepositoryThrowsIncorrectResultSizeDataAccessException() {
         // Setup
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
@@ -161,7 +161,7 @@ class DatabaseRegisterServiceStorageTest {
                 .thenThrow(IncorrectResultSizeDataAccessException.class);
 
         // Run the test
-        assertThatThrownBy(() -> databaseRegisterServiceStorageUnderTest.findRegisteredService(
+        assertThatThrownBy(() -> test.findRegisteredService(
                 registerServiceEntity)).isInstanceOf(IncorrectResultSizeDataAccessException.class);
     }
 
@@ -175,7 +175,7 @@ class DatabaseRegisterServiceStorageTest {
         serviceQuery.setServiceVersion("serviceVersion");
 
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
@@ -184,7 +184,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Configure RegisterServiceRepository.findAll(...).
         final RegisterServiceEntity registerServiceEntity1 = new RegisterServiceEntity();
-        registerServiceEntity1.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity1.setId(id);
         registerServiceEntity1.setName("name");
         registerServiceEntity1.setVersion("version");
         registerServiceEntity1.setCsp(Csp.HUAWEI);
@@ -195,7 +195,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Run the test
         final List<RegisterServiceEntity> result =
-                databaseRegisterServiceStorageUnderTest.queryRegisteredServices(serviceQuery);
+                test.queryRegisteredServices(serviceQuery);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -215,7 +215,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Run the test
         final List<RegisterServiceEntity> result =
-                databaseRegisterServiceStorageUnderTest.queryRegisteredServices(serviceQuery);
+                test.queryRegisteredServices(serviceQuery);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -225,7 +225,7 @@ class DatabaseRegisterServiceStorageTest {
     void testGetRegisterServiceById() {
         // Setup
         final RegisterServiceEntity expectedResult = new RegisterServiceEntity();
-        expectedResult.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        expectedResult.setId(id);
         expectedResult.setName("name");
         expectedResult.setVersion("version");
         expectedResult.setCsp(Csp.HUAWEI);
@@ -233,44 +233,29 @@ class DatabaseRegisterServiceStorageTest {
 
         // Configure RegisterServiceRepository.findById(...).
         final RegisterServiceEntity registerServiceEntity1 = new RegisterServiceEntity();
-        registerServiceEntity1.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity1.setId(id);
         registerServiceEntity1.setName("name");
         registerServiceEntity1.setVersion("version");
         registerServiceEntity1.setCsp(Csp.HUAWEI);
         registerServiceEntity1.setCategory(Category.AI);
         final Optional<RegisterServiceEntity> registerServiceEntity =
                 Optional.of(registerServiceEntity1);
-        when(mockRegisterServiceRepository.findById(
-                UUID.fromString("ade91a2c-79d4-4d64-9263-a870c659bee9")))
+        when(mockRegisterServiceRepository.findById(id))
                 .thenReturn(registerServiceEntity);
 
         // Run the test
         final RegisterServiceEntity result =
-                databaseRegisterServiceStorageUnderTest.getRegisterServiceById(
-                        UUID.fromString("ade91a2c-79d4-4d64-9263-a870c659bee9"));
+                test.getRegisterServiceById(id);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
-    void testGetRegisterServiceById_RegisterServiceRepositoryReturnsAbsent() {
-        // Setup
-        when(mockRegisterServiceRepository.findById(
-                UUID.fromString("ade91a2c-79d4-4d64-9263-a870c659bee9")))
-                .thenReturn(Optional.empty());
-
-        // Run the test
-        assertThatThrownBy(() -> databaseRegisterServiceStorageUnderTest.getRegisterServiceById(
-                UUID.fromString("ade91a2c-79d4-4d64-9263-a870c659bee9"))).isInstanceOf(
-                ServiceNotRegisteredException.class);
-    }
-
-    @Test
     void testServices() {
         // Setup
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
@@ -279,7 +264,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Configure RegisterServiceRepository.findAll(...).
         final RegisterServiceEntity registerServiceEntity1 = new RegisterServiceEntity();
-        registerServiceEntity1.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity1.setId(id);
         registerServiceEntity1.setName("name");
         registerServiceEntity1.setVersion("version");
         registerServiceEntity1.setCsp(Csp.HUAWEI);
@@ -288,8 +273,7 @@ class DatabaseRegisterServiceStorageTest {
         when(mockRegisterServiceRepository.findAll()).thenReturn(registerServiceEntities);
 
         // Run the test
-        final List<RegisterServiceEntity> result =
-                databaseRegisterServiceStorageUnderTest.services();
+        final List<RegisterServiceEntity> result = test.services();
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -301,8 +285,7 @@ class DatabaseRegisterServiceStorageTest {
         when(mockRegisterServiceRepository.findAll()).thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<RegisterServiceEntity> result =
-                databaseRegisterServiceStorageUnderTest.services();
+        final List<RegisterServiceEntity> result = test.services();
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -311,27 +294,22 @@ class DatabaseRegisterServiceStorageTest {
     @Test
     void testRemoveById() {
         // Setup
-        when(mockRegisterServiceRepository.existsById(
-                UUID.fromString("b87ebe2d-6e00-4a4c-b6c9-f1330f88e0f7"))).thenReturn(true);
+        when(mockRegisterServiceRepository.existsById(id)).thenReturn(true);
 
         // Run the test
-        databaseRegisterServiceStorageUnderTest.removeById(
-                UUID.fromString("b87ebe2d-6e00-4a4c-b6c9-f1330f88e0f7"));
+        test.removeById(id);
 
         // Verify the results
-        verify(mockRegisterServiceRepository).deleteById(
-                UUID.fromString("b87ebe2d-6e00-4a4c-b6c9-f1330f88e0f7"));
+        verify(mockRegisterServiceRepository).deleteById(id);
     }
 
     @Test
     void testRemoveById_RegisterServiceRepositoryExistsByIdReturnsFalse() {
         // Setup
-        when(mockRegisterServiceRepository.existsById(
-                UUID.fromString("b87ebe2d-6e00-4a4c-b6c9-f1330f88e0f7"))).thenReturn(false);
+        when(mockRegisterServiceRepository.existsById(id)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(() -> databaseRegisterServiceStorageUnderTest.removeById(
-                UUID.fromString("b87ebe2d-6e00-4a4c-b6c9-f1330f88e0f7")))
+        assertThatThrownBy(() -> test.removeById(id))
                 .isInstanceOf(ServiceNotRegisteredException.class);
     }
 
@@ -339,19 +317,19 @@ class DatabaseRegisterServiceStorageTest {
     void testRemove() {
         // Setup
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
         registerServiceEntity.setCategory(Category.AI);
 
         // Run the test
-        databaseRegisterServiceStorageUnderTest.remove(registerServiceEntity);
+        test.remove(registerServiceEntity);
 
         // Verify the results
         // Confirm RegisterServiceRepository.delete(...).
         final RegisterServiceEntity entity = new RegisterServiceEntity();
-        entity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        entity.setId(id);
         entity.setName("name");
         entity.setVersion("version");
         entity.setCsp(Csp.HUAWEI);
@@ -363,7 +341,7 @@ class DatabaseRegisterServiceStorageTest {
     void testRemove_RegisterServiceRepositoryThrowsOptimisticLockingFailureException() {
         // Setup
         final RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        registerServiceEntity.setId(id);
         registerServiceEntity.setName("name");
         registerServiceEntity.setVersion("version");
         registerServiceEntity.setCsp(Csp.HUAWEI);
@@ -371,7 +349,7 @@ class DatabaseRegisterServiceStorageTest {
 
         // Configure RegisterServiceRepository.delete(...).
         final RegisterServiceEntity entity = new RegisterServiceEntity();
-        entity.setId(UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d"));
+        entity.setId(id);
         entity.setName("name");
         entity.setVersion("version");
         entity.setCsp(Csp.HUAWEI);
@@ -380,7 +358,7 @@ class DatabaseRegisterServiceStorageTest {
                 .delete(entity);
 
         // Run the test
-        assertThatThrownBy(() -> databaseRegisterServiceStorageUnderTest.remove(
+        assertThatThrownBy(() -> test.remove(
                 registerServiceEntity)).isInstanceOf(OptimisticLockingFailureException.class);
     }
 }

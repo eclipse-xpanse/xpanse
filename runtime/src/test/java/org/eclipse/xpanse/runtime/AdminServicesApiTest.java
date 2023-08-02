@@ -65,4 +65,6 @@ class AdminServicesApiTest {
         assertEquals(resBody, response.getContentAsString());
 
     }
+
+
 }

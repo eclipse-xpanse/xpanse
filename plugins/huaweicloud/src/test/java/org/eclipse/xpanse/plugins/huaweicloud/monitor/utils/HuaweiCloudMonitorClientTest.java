@@ -70,7 +70,8 @@ class HuaweiCloudMonitorClientTest {
                 "The access key.", true, true, skValue);
         credentialVariables.add(sk);
         return new CredentialVariables(
-                Csp.FLEXIBLE_ENGINE, "xpanseUserName", "AK_SK", "The access key and security key.",
-                CredentialType.VARIABLES, credentialVariables);
+                Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK",
+                "The access key and security key.",
+                "userId", credentialVariables);
     }
 }

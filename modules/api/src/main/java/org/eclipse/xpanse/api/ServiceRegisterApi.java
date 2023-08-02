@@ -188,7 +188,7 @@ public class ServiceRegisterApi {
     /**
      * List registered service with query params.
      *
-     * @param category       name of category.
+     * @param categoryName   name of category.
      * @param cspName        name of cloud service provider.
      * @param serviceName    name of registered service.
      * @param serviceVersion version of registered service.
@@ -201,14 +201,14 @@ public class ServiceRegisterApi {
     @ResponseStatus(HttpStatus.OK)
     public List<RegisteredServiceVo> listRegisteredServices(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) Category category,
-            @Parameter(name = "cspName", description = "name of the service provider")
-            @RequestParam(name = "cspName", required = false) String cspName,
+            @RequestParam(name = "categoryName", required = false) Category categoryName,
+            @Parameter(name = "cspName", description = "name of the cloud service provider")
+            @RequestParam(name = "cspName", required = false) Csp cspName,
             @Parameter(name = "serviceName", description = "name of the service")
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
-        RegisteredServiceQuery query = getServicesQueryModel(category, cspName, serviceName,
+        RegisteredServiceQuery query = getServicesQueryModel(categoryName, cspName, serviceName,
                 serviceVersion);
         List<RegisterServiceEntity> serviceEntities =
                 registerService.queryRegisteredServices(query);
@@ -245,15 +245,16 @@ public class ServiceRegisterApi {
         return registeredServiceVo;
     }
 
-    private RegisteredServiceQuery getServicesQueryModel(Category category, String cspName,
+    private RegisteredServiceQuery getServicesQueryModel(Category category, Csp csp,
                                                          String serviceName,
                                                          String serviceVersion) {
         RegisteredServiceQuery query = new RegisteredServiceQuery();
-        if (StringUtils.isNotBlank(cspName)) {
-            query.setCsp(Csp.getByValue(cspName));
+        if (Objects.nonNull(category)) {
+            query.setCategory(category);
         }
-        query.setCategory(category);
-
+        if (Objects.nonNull(csp)) {
+            query.setCsp(csp);
+        }
         if (StringUtils.isNotBlank(serviceName)) {
             query.setServiceName(serviceName);
         }
@@ -261,7 +262,6 @@ public class ServiceRegisterApi {
             query.setServiceVersion(serviceVersion);
         }
         return query;
-
     }
 
     private RegisteredServiceVo convertToRegisteredServiceVo(RegisterServiceEntity serviceEntity) {

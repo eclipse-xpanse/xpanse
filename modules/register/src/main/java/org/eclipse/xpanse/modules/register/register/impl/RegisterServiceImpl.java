@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.register.register.impl;
 import jakarta.annotation.Resource;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -89,10 +90,9 @@ public class RegisterServiceImpl implements RegisterService {
     public RegisterServiceEntity updateRegisteredService(String id, Ocl ocl) {
         RegisterServiceEntity existedService = storage.getRegisterServiceById(UUID.fromString(id));
         if (Objects.isNull(existedService)) {
-            log.error("Registered service with id {} not existing.", id);
-            throw new ServiceNotRegisteredException(
-                    String.format("Registered service with id %s not "
-                            + "existed.", id));
+            String errMsg = String.format("Registered service with id %s not found.", id);
+            log.error(errMsg);
+            throw new ServiceNotRegisteredException(errMsg);
         }
         iconUpdate(existedService, ocl);
         checkParams(existedService, ocl);
@@ -197,7 +197,14 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     public RegisterServiceEntity getRegisteredService(String managedServiceId) {
         UUID uuid = UUID.fromString(managedServiceId);
-        return storage.getRegisterServiceById(uuid);
+        RegisterServiceEntity registerServiceEntity = storage.getRegisterServiceById(uuid);
+        if (Objects.isNull(registerServiceEntity)) {
+            String errMsg = String.format("Registered service with id %s not found.",
+                    managedServiceId);
+            log.error(errMsg);
+            throw new ServiceNotRegisteredException(errMsg);
+        }
+        return registerServiceEntity;
     }
 
     /**
@@ -256,7 +263,7 @@ public class RegisterServiceImpl implements RegisterService {
                 });
                 List<ProviderOclVo> sortedCspOclList =
                         cspVoList.stream().sorted(
-                                        (o1, o2) -> o1.getName().ordinal() - o2.getName().ordinal())
+                                        Comparator.comparingInt(o -> o.getName().ordinal()))
                                 .collect(Collectors.toList());
                 versionOclVo.setCloudProvider(sortedCspOclList);
                 versionVoList.add(versionOclVo);
@@ -292,9 +299,9 @@ public class RegisterServiceImpl implements RegisterService {
         UUID uuid = UUID.fromString(id);
         RegisterServiceEntity registerService = storage.getRegisterServiceById(uuid);
         if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
-            throw new ServiceNotRegisteredException(
-                    String.format("Registered service with id %s not "
-                            + "found.", id));
+            String errMsg = String.format("Registered service with id %s not found.", id);
+            log.error(errMsg);
+            throw new ServiceNotRegisteredException(errMsg);
         }
         String openApiUrl = registeredServicesOpenApiGenerator.getOpenApi(registerService);
         if (StringUtils.isBlank(openApiUrl)) {

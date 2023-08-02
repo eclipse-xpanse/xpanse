@@ -14,15 +14,15 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 public record CredentialCacheKey(Csp csp,
                                  CredentialType credentialType,
                                  String credentialName,
-                                 String userName) {
+                                 String userId) {
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof CredentialCacheKey key) {
             return key.csp == this.csp
+                    && key.credentialType == this.credentialType
                     && key.credentialName.equals(this.credentialName)
-                    && key.userName.equals(this.userName)
-                    && key.credentialType == this.credentialType;
+                    && key.userId.equals(this.userId);
         } else {
             return false;
         }
@@ -34,9 +34,9 @@ public record CredentialCacheKey(Csp csp,
         final int prime = 31;
         int result = 1;
         result = prime * result + ((csp == null) ? 0 : csp.hashCode());
-        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
-        result = prime * result + ((credentialName == null) ? 0 : credentialName.hashCode());
         result = prime * result + ((credentialType == null) ? 0 : credentialType.hashCode());
+        result = prime * result + ((credentialName == null) ? 0 : credentialName.hashCode());
+        result = prime * result + ((userId == null) ? 0 : userId.hashCode());
         return result;
     }
 }

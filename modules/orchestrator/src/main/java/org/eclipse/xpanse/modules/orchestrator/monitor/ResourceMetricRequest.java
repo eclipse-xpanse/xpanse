@@ -29,8 +29,8 @@ public class ResourceMetricRequest extends MetricRequest {
             Long to,
             Integer period,
             boolean onlyLastKnownMetric,
-            String xpanseUserName) {
-        super(monitorResourceType, from, to, period, onlyLastKnownMetric, xpanseUserName);
+            String userId) {
+        super(monitorResourceType, from, to, period, onlyLastKnownMetric, userId);
         this.deployResource = deployResource;
     }
 }

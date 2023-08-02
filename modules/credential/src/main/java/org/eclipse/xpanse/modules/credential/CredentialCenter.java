@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFou
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.config.AesUtil;
+import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -205,7 +205,7 @@ public class CredentialCenter {
                             updateCredential.getCsp(), updateCredential.getType()));
         }
         deleteCredential(updateCredential.getCsp(), updateCredential.getType(),
-                updateCredential.getName(), updateCredential.getXpanseUser());
+                updateCredential.getName(), updateCredential.getUserId());
         createCredential(credential);
     }
 
@@ -238,7 +238,7 @@ public class CredentialCenter {
                     String.format("No credential information found for the given Csp:%s.", csp));
         }
         Optional<AbstractCredentialInfo> credentialWithAllVariables = credentialInfos.stream()
-                .filter(credentialInfo -> !isAnyMandatoryCredentialVariableMissing(
+                .filter(credentialInfo -> allMandatoryCredentialVariableNotBlank(
                         (CredentialVariables) credentialInfo)).findFirst();
         if (credentialWithAllVariables.isEmpty()) {
             throw new CredentialVariablesNotComplete(Set.of(String.format(
@@ -361,7 +361,7 @@ public class CredentialCenter {
                     }
                 }
                 // Check if all variables have been successfully set.
-                if (!isAnyMandatoryCredentialVariableMissing(credentialVariables)) {
+                if (allMandatoryCredentialVariableNotBlank(credentialVariables)) {
                     return credentialAbility;
                 }
             }
@@ -369,11 +369,12 @@ public class CredentialCenter {
         return null;
     }
 
-    private boolean isAnyMandatoryCredentialVariableMissing(
+    private boolean allMandatoryCredentialVariableNotBlank(
             CredentialVariables credentialVariables) {
         return credentialVariables.getVariables().stream()
-                .anyMatch(credentialVariable -> credentialVariable.getIsMandatory()
-                        && Objects.isNull(credentialVariable.getValue()));
+                .filter(CredentialVariable::getIsMandatory)
+                .allMatch(credentialVariable -> StringUtils.isNotBlank(
+                        credentialVariable.getValue()));
     }
 
     private void checkNullParamAndFillValueFromEnv(AbstractCredentialInfo abstractCredentialInfo) {
@@ -416,8 +417,10 @@ public class CredentialCenter {
             }
             CredentialVariables maskedCredentialVariables =
                     new CredentialVariables(credentialVariables.getCsp(),
-                            credentialVariables.getXpanseUser(), credentialVariables.getName(),
-                            credentialVariables.getDescription(), credentialVariables.getType(),
+                            credentialVariables.getType(),
+                            credentialVariables.getName(),
+                            credentialVariables.getDescription(),
+                            credentialVariables.getUserId(),
                             maskedCredentialVariableList);
             maskedCredentialInfos.add(maskedCredentialVariables);
         }

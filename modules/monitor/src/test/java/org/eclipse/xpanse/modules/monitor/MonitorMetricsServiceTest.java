@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,12 +38,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {Monitor.class, PluginManager.class,
-        DeployResourceStorage.class, DeployServiceStorage.class})
-class MonitorTest {
+@ContextConfiguration(classes = {MonitorMetricsService.class, PluginManager.class,
+        DeployResourceStorage.class, DeployServiceStorage.class, IdentityProviderManager.class})
+class MonitorMetricsServiceTest {
 
     private final String resourceId = "8d1495ae-8420-4172-93c1-746c09b4a005";
     private final String serviceId = "23cc529b-64d9-4875-a2f0-08b415705964";
+    private final String userId = "defaultUserId";
     @MockBean
     DeployServiceStorage mockDeployServiceStorage;
     @MockBean
@@ -51,8 +53,10 @@ class MonitorTest {
     private PluginManager mockPluginManager;
     @MockBean
     private OrchestratorPlugin orchestratorPlugin;
+    @MockBean
+    private IdentityProviderManager identityProviderManager;
     @Autowired
-    private Monitor monitorUnderTest;
+    private MonitorMetricsService monitorMetricsServiceUnderTest;
 
     @Test
     void testGetMetricsByServiceId() {
@@ -68,7 +72,7 @@ class MonitorTest {
         // Configure DeployServiceStorage.findDeployServiceById(...).
         final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setId(UUID.fromString(serviceId));
-        deployServiceEntity.setUserName("xpanseUserName");
+        deployServiceEntity.setUserId(userId);
         deployServiceEntity.setCsp(Csp.HUAWEI);
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setResourceId(resourceId);
@@ -82,11 +86,11 @@ class MonitorTest {
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
         // Run the test
         final List<Metric> result =
-                monitorUnderTest.getMetricsByServiceId(serviceId,
+                monitorMetricsServiceUnderTest.getMetricsByServiceId(serviceId,
                         null, null, null, null, true);
 
         final List<Metric> result1 =
-                monitorUnderTest.getMetricsByServiceId(serviceId,
+                monitorMetricsServiceUnderTest.getMetricsByServiceId(serviceId,
                         null, null, null, null, false);
 
         // Verify the results
@@ -106,17 +110,20 @@ class MonitorTest {
                 .thenReturn(deployResourceEntity);
 
         Assertions.assertThrows(ResourceNotSupportedForMonitoringException.class,
-                () -> monitorUnderTest.getMetricsByResourceId(resourceId, null, null, null, null,
+                () -> monitorMetricsServiceUnderTest.getMetricsByResourceId(resourceId, null, null,
+                        null, null,
                         false));
 
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> monitorUnderTest.getMetricsByResourceId(UUID.randomUUID().toString(), null,
+                () -> monitorMetricsServiceUnderTest.getMetricsByResourceId(
+                        UUID.randomUUID().toString(), null,
                         Long.MAX_VALUE, Long.MAX_VALUE, null,
                         false));
 
         // Verify the results
         Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> monitorUnderTest.getMetricsByResourceId("id", null, null, null, null,
+                () -> monitorMetricsServiceUnderTest.getMetricsByResourceId("id", null, null, null,
+                        null,
                         false));
     }
 
@@ -138,7 +145,7 @@ class MonitorTest {
         deployResourceEntity.setResourceId(resourceId);
         final DeployServiceEntity deployService = new DeployServiceEntity();
         deployService.setId(UUID.fromString(serviceId));
-        deployService.setUserName("xpanseUserName");
+        deployService.setUserId(userId);
         deployService.setCsp(Csp.HUAWEI);
         deployService.setDeployResourceList(List.of(new DeployResourceEntity()));
         deployResourceEntity.setDeployService(deployService);
@@ -156,11 +163,13 @@ class MonitorTest {
 
         // Run the test
         final List<Metric> result =
-                monitorUnderTest.getMetricsByResourceId(resourceId, null, null, null, null,
+                monitorMetricsServiceUnderTest.getMetricsByResourceId(resourceId, null, null, null,
+                        null,
                         true);
 
         final List<Metric> result1 =
-                monitorUnderTest.getMetricsByResourceId(resourceId, null, null, null, null,
+                monitorMetricsServiceUnderTest.getMetricsByResourceId(resourceId, null, null, null,
+                        null,
                         false);
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -172,17 +181,20 @@ class MonitorTest {
     void testGetMetricsBySourceIdException() {
         long currentTimeMillis = System.currentTimeMillis();
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> monitorUnderTest.getMetricsByServiceId(UUID.randomUUID().toString(), null,
+                () -> monitorMetricsServiceUnderTest.getMetricsByServiceId(
+                        UUID.randomUUID().toString(), null,
                         currentTimeMillis, 1L, null,
                         false));
 
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> monitorUnderTest.getMetricsByServiceId(UUID.randomUUID().toString(), null,
+                () -> monitorMetricsServiceUnderTest.getMetricsByServiceId(
+                        UUID.randomUUID().toString(), null,
                         currentTimeMillis + 3000, currentTimeMillis + 5000, null,
                         false));
 
         Assertions.assertThrows(ServiceNotDeployedException.class,
-                () -> monitorUnderTest.getMetricsByServiceId(UUID.randomUUID().toString(), null,
+                () -> monitorMetricsServiceUnderTest.getMetricsByServiceId(
+                        UUID.randomUUID().toString(), null,
                         null, null, null,
                         false));
     }

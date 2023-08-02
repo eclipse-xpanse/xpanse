@@ -24,11 +24,8 @@ import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
-import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
-import org.eclipse.xpanse.modules.security.zitadel.ZitadelAuthorizationService;
-import org.eclipse.xpanse.modules.security.zitadel.common.ZitadelUserAuthenticationConverter;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -50,9 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminServicesApi {
 
     @Resource
-    private ApplicationContext applicationContext;
-    @Value("${spring.profiles.active:default}")
-    private String activeProfiles;
+    private IdentityProviderManager identityProviderManager;
+
     @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
     private String dataSourceUrl;
 
@@ -98,13 +94,8 @@ public class AdminServicesApi {
     }
 
     private BackendSystemStatus getIdentityProviderStatus() {
-        List<String> profileSet = Arrays.asList(activeProfiles.split(","));
-        if (profileSet.contains(IdentityProviderType.ZITADEL.toValue())) {
-            ZitadelAuthorizationService authorizationService =
-                    applicationContext.getBean(ZitadelAuthorizationService.class);
-            return authorizationService.getIdentityProviderStatus();
-        }
-        return null;
+        return identityProviderManager.getActiveIdentityProviderService()
+                .getIdentityProviderStatus();
     }
 
 
@@ -130,11 +121,8 @@ public class AdminServicesApi {
     }
 
     private void processShownFields(BackendSystemStatus backendSystemStatus) {
-        CurrentUserInfo currentUserInfo = null;
-        List<String> profileSet = Arrays.asList(activeProfiles.split(","));
-        if (profileSet.contains(IdentityProviderType.ZITADEL.toValue())) {
-            currentUserInfo = ZitadelUserAuthenticationConverter.getCurrentUserInfo();
-        }
+        CurrentUserInfo currentUserInfo =
+                identityProviderManager.getActiveIdentityProviderService().getCurrentUserInfo();
         boolean allFieldsShown = Objects.nonNull(currentUserInfo) && !CollectionUtils.isEmpty(
                 currentUserInfo.getRoles()) && currentUserInfo.getRoles().contains(ROLE_ADMIN);
         if (!allFieldsShown) {

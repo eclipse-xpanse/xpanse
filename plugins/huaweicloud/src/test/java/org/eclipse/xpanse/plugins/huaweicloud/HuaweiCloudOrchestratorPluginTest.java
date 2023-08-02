@@ -50,7 +50,7 @@ public class HuaweiCloudOrchestratorPluginTest {
         //Verify that the attribute values of the CredentialVariables object match expectations
         CredentialVariables credentialVariables = (CredentialVariables) result.get(0);
         assertEquals(plugin.getCsp(), credentialVariables.getCsp());
-        assertNull(credentialVariables.getXpanseUser());
+        assertNull(credentialVariables.getUserId());
         assertEquals(HuaweiCloudMonitorConstants.IAM, credentialVariables.getName());
         assertEquals("Using The access key and security key authentication.",
                 credentialVariables.getDescription());

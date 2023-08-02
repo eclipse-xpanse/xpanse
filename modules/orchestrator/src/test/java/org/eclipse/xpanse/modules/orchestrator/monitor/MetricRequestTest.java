@@ -14,7 +14,7 @@ class MetricRequestTest {
 
     @BeforeEach
     void setUp() {
-        test = new MetricRequest(MonitorResourceType.CPU, 0L, 0L, 1, false, "user");
+        test = new MetricRequest(MonitorResourceType.CPU, 0L, 0L, 1, false, "userId");
     }
 
     @Test
@@ -24,7 +24,7 @@ class MetricRequestTest {
         assertEquals(0L, test.getTo());
         assertEquals(1, test.getGranularity());
         assertFalse(test.isOnlyLastKnownMetric());
-        assertEquals("user", test.getXpanseUserName());
+        assertEquals("userId", test.getUserId());
     }
 
     @Test
@@ -98,8 +98,8 @@ class MetricRequestTest {
         assertNotEquals(test2.hashCode(), test3.hashCode());
 
 
-        test1.setXpanseUserName("user");
-        test2.setXpanseUserName("user1");
+        test1.setUserId("userId1");
+        test2.setUserId("userId2");
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test, test3);
@@ -114,7 +114,7 @@ class MetricRequestTest {
         assertNotEquals(test.toString(), null);
 
         String exceptedString = "MetricRequest(monitorResourceType=CPU, from=0, "
-                + "to=0, granularity=1, onlyLastKnownMetric=false, xpanseUserName=user)";
+                + "to=0, granularity=1, onlyLastKnownMetric=false, userId=userId)";
         assertEquals(test.toString(), exceptedString);
     }
 

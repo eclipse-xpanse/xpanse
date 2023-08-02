@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Bean to manage all service task to database.
  */
-
+@Slf4j
 @Component
 @Transactional
 public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
@@ -122,7 +123,7 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
     public RegisterServiceEntity getRegisterServiceById(UUID uuid) {
         Optional<RegisterServiceEntity> optional = repository.findById(uuid);
         return optional.orElseThrow(() -> new ServiceNotRegisteredException(
-                String.format("Registered service %s not found.", uuid)
+                String.format("Registered service with id %s not found.", uuid)
         ));
     }
 
@@ -146,8 +147,9 @@ public class DatabaseRegisterServiceStorage implements RegisterServiceStorage {
         if (repository.existsById(uuid)) {
             repository.deleteById(uuid);
         } else {
-            throw new ServiceNotRegisteredException(
-                    String.format("Registered service %s not found.", uuid));
+            String errMsg = String.format("Registered service with id %s not found.", uuid);
+            log.error(errMsg);
+            throw new ServiceNotRegisteredException(errMsg);
         }
 
     }

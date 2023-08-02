@@ -365,7 +365,6 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                                             "name",
                                             "timeToLive",
                                             "type",
-                                            "userName",
                                             "variables"
                                         ],
                                         "type": "object",
@@ -374,11 +373,6 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                                                 "type": "string",
                                                 "example": "%s",
                                                 "description": "The name of the credential"
-                                            },
-                                            "userName": {
-                                                "type": "string",
-                                                "example": "%s",
-                                                "description": "User who create the credential."
                                             },
                                             "csp": {
                                                 "type": "string",
@@ -453,7 +447,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                         }
                         """,
                 csp, appVersion, serviceUrl, csp, type, csp, credentialVariables.getName(),
-                credentialVariables.getXpanseUser(), csp, credentialVariables.getDescription(),
+                csp, credentialVariables.getDescription(),
                 type, variablesExampleStr);
     }
 }

@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class CreateRequestTest {
 
     private static final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
-    private static final String userName = "userName";
+    private static final String userId = "userId";
     private static final Category category = Category.COMPUTE;
     private static final String serviceName = "service";
     private static final String customerServiceName = "customerService";
@@ -40,7 +40,7 @@ class CreateRequestTest {
     void setUp() {
         request = new CreateRequest();
         request.setId(id);
-        request.setUserName(userName);
+        request.setUserId(userId);
         request.setCategory(category);
         request.setServiceName(serviceName);
         request.setCustomerServiceName(customerServiceName);
@@ -55,7 +55,7 @@ class CreateRequestTest {
     @Test
     void testGetterAndSetter() {
         assertEquals(id, request.getId());
-        assertEquals(userName, request.getUserName());
+        assertEquals(userId, request.getUserId());
         assertEquals(category, request.getCategory());
         assertEquals(serviceName, request.getServiceName());
         assertEquals(customerServiceName, request.getCustomerServiceName());
@@ -92,7 +92,7 @@ class CreateRequestTest {
         assertNotEquals(request.hashCode(), request1.hashCode());
         assertNotEquals(request1.hashCode(), request2.hashCode());
 
-        request1.setUserName(userName);
+        request1.setUserId(userId);
         assertNotEquals(request, request1);
         assertNotEquals(request1, request2);
         assertNotEquals(request.hashCode(), request1.hashCode());
@@ -157,7 +157,7 @@ class CreateRequestTest {
     void testToString() {
         CreateRequest request = new CreateRequest();
         request.setId(id);
-        request.setUserName(userName);
+        request.setUserId(userId);
         request.setCategory(category);
         request.setServiceName(serviceName);
         request.setCustomerServiceName(customerServiceName);
@@ -170,7 +170,7 @@ class CreateRequestTest {
 
         String expectedToString = "CreateRequest(" +
                 "id=" + id +
-                ", userName=" + userName +
+                ", userId=" + userId +
                 ", category=" + category +
                 ", serviceName=" + serviceName +
                 ", customerServiceName=" + customerServiceName +

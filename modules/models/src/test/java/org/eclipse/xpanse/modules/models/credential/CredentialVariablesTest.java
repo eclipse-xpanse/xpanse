@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 class CredentialVariablesTest {
 
     private static final Csp csp = Csp.AWS;
-    private static final String xpanseUser = "user";
+    private static final String userId = "user";
     private static final String name = "credential";
     private static final String description = "Test credential";
     private static final CredentialType type = CredentialType.VARIABLES;
@@ -32,10 +32,10 @@ class CredentialVariablesTest {
     @Test
     public void testConstructorAndGetters() {
         CredentialVariables credentialVariables =
-                new CredentialVariables(csp, xpanseUser, name, description, type, variables);
+                new CredentialVariables(csp, type, name, description, userId, variables);
 
         assertEquals(csp, credentialVariables.getCsp());
-        assertEquals(xpanseUser, credentialVariables.getXpanseUser());
+        assertEquals(userId, credentialVariables.getUserId());
         assertEquals(name, credentialVariables.getName());
         assertEquals(description, credentialVariables.getDescription());
         assertEquals(type, credentialVariables.getType());
@@ -46,7 +46,7 @@ class CredentialVariablesTest {
     public void testConstructorWithCreateCredential() {
         CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(csp);
-        createCredential.setXpanseUser(xpanseUser);
+        createCredential.setUserId(userId);
         createCredential.setName(name);
         createCredential.setDescription(description);
         createCredential.setType(type);
@@ -56,7 +56,7 @@ class CredentialVariablesTest {
         CredentialVariables credentialVariables = new CredentialVariables(createCredential);
 
         assertEquals(createCredential.getCsp(), credentialVariables.getCsp());
-        assertEquals(createCredential.getXpanseUser(), credentialVariables.getXpanseUser());
+        assertEquals(createCredential.getUserId(), credentialVariables.getUserId());
         assertEquals(createCredential.getName(), credentialVariables.getName());
         assertEquals(createCredential.getDescription(), credentialVariables.getDescription());
         assertEquals(createCredential.getType(), credentialVariables.getType());

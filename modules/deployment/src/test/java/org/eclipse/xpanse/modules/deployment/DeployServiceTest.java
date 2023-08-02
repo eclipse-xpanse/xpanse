@@ -51,7 +51,8 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
-import org.eclipse.xpanse.modules.security.config.AesUtil;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ import org.springframework.util.CollectionUtils;
 class DeployServiceTest {
 
     private static final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
-    private static final String userName = "user";
+    private static final String userId = "defaultUserId";
     private static DeployTask deployTask;
     private static Deployment deploymentMock;
     private static RegisterServiceEntity serviceEntity;
@@ -96,6 +97,9 @@ class DeployServiceTest {
     @Mock
     private PluginManager pluginManager;
 
+    @Mock
+    private IdentityProviderManager identityProviderManager;
+
     @InjectMocks
     private DeployService deployService;
 
@@ -113,7 +117,7 @@ class DeployServiceTest {
 
         createRequest = new CreateRequest();
         createRequest.setId(uuid);
-        createRequest.setUserName(userName);
+        createRequest.setUserId(userId);
         createRequest.setCategory(Category.COMPUTE);
         createRequest.setCsp(Csp.HUAWEI);
         createRequest.setServiceName("service");
@@ -140,7 +144,7 @@ class DeployServiceTest {
         deployServiceEntity.setId(uuid);
         deployServiceEntity.setName("deployServiceEntity");
         deployServiceEntity.setCsp(Csp.HUAWEI);
-        deployServiceEntity.setUserName(userName);
+        deployServiceEntity.setUserId(userId);
         deployServiceEntity.setCreateRequest(createRequest);
         deployServiceEntity.setProperties(Map.of("key", "value"));
         deployServiceEntity.setPrivateProperties(Map.of("key", "value"));
@@ -190,7 +194,7 @@ class DeployServiceTest {
         assertEquals(Category.COMPUTE, entity.getCategory());
         assertEquals("customerService", entity.getCustomerServiceName());
         assertEquals("flavor", entity.getFlavor());
-        assertEquals("user", entity.getUserName());
+        assertEquals("defaultUserId", entity.getUserId());
         assertEquals(deployTask.getCreateRequest(), entity.getCreateRequest());
         assertTrue(CollectionUtils.isEmpty(entity.getDeployResourceList()));
     }
@@ -336,13 +340,13 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testGetDeployedServices() {
+    public void testListMyDeployedServices() {
         List<DeployServiceEntity> deployServices = new ArrayList<>();
         deployServices.add(deployServiceEntity);
 
         when(deployServiceStorage.services()).thenReturn(deployServices);
 
-        List<ServiceVo> result = deployService.getDeployedServices();
+        List<ServiceVo> result = deployService.listMyDeployedServices();
 
         assertEquals(1, result.size());
 
@@ -356,7 +360,7 @@ class DeployServiceTest {
         when(deployServiceStorage.findDeployServiceById(uuid))
                 .thenReturn(deployServiceEntity);
 
-        ServiceDetailVo result = deployService.getDeployServiceDetails(uuid, userName);
+        ServiceDetailVo result = deployService.getDeployServiceDetails(uuid);
 
         assertNotNull(result);
         assertEquals(uuid, result.getId());
@@ -372,7 +376,7 @@ class DeployServiceTest {
                 .thenReturn(null);
 
         assertThrows(ServiceNotDeployedException.class,
-                () -> deployService.getDeployServiceDetails(uuid, userName));
+                () -> deployService.getDeployServiceDetails(uuid));
     }
 
     @Test
@@ -385,8 +389,6 @@ class DeployServiceTest {
 
     @Test
     public void testGetDestroyHandler_ServiceStateIsDestroying_ThrowsInvalidServiceStateException() {
-        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setCreateRequest(new CreateRequest());
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
 
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(
@@ -473,10 +475,8 @@ class DeployServiceTest {
     @Test
     void testGetDeployment() {
         DeployService deployService = new DeployService();
-
-        Assertions.assertThrows(DeployerNotFoundException.class, () -> {
-            deployService.getDeployment(DeployerKind.TERRAFORM);
-        });
+        Assertions.assertThrows(DeployerNotFoundException.class, () ->
+                deployService.getDeployment(DeployerKind.TERRAFORM));
     }
 
 }

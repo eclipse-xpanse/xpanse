@@ -40,7 +40,7 @@ class DeploymentWithMariaDbTest extends AbstractMariaDbIntegrationTest {
     void testServiceDeployment() throws Exception {
         RegisteredServiceVo registeredServiceVo = registerService();
         CreateRequest createRequest = new CreateRequest();
-        createRequest.setUserName("admin");
+        createRequest.setUserId("userId");
         createRequest.setServiceName(registeredServiceVo.getName());
         createRequest.setVersion(registeredServiceVo.getVersion());
         createRequest.setCsp(registeredServiceVo.getCsp());
@@ -54,13 +54,11 @@ class DeploymentWithMariaDbTest extends AbstractMariaDbIntegrationTest {
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
         UUID deployUUid = serviceDeployerApi.deploy(createRequest);
-        await()
-                .ignoreException(ServiceNotDeployedException.class)
-                .until(() -> serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString(),
-                        createRequest.getUserName()) != null);
+        await().ignoreException(ServiceNotDeployedException.class)
+                .until(() -> serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString())
+                        != null);
         ServiceDetailVo serviceDetailVo =
-                serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString(),
-                        createRequest.getUserName());
+                serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString());
         Assertions.assertNotNull(serviceDetailVo);
         Assertions.assertEquals(ServiceDeploymentState.DEPLOY_FAILED,
                 serviceDetailVo.getServiceDeploymentState());

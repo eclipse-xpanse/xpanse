@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.modules.models.credential;
 
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,10 +26,8 @@ public class CreateCredential {
     @Schema(description = "The name of the credential")
     private String name;
 
-    @NotNull
-    @NotBlank
-    @Schema(description = "The user who create the credential.")
-    private String xpanseUser;
+    @Hidden
+    private String userId;
 
     @Schema(description = "The cloud service provider of the credential.")
     @NotNull

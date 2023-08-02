@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -20,6 +21,7 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
@@ -27,31 +29,36 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Monitor.
+ * Monitor metrics service.
  */
 @Slf4j
-@Component
-public class Monitor {
+@Service
+public class MonitorMetricsService {
 
     private static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
     private final DeployServiceStorage deployServiceStorage;
     private final DeployResourceStorage deployResourceStorage;
     private final PluginManager pluginManager;
+    private final IdentityProviderManager identityProviderManager;
 
     /**
      * The constructor of Monitor.
      */
-    public Monitor(DeployServiceStorage deployServiceStorage,
-            DeployResourceStorage deployResourceStorage,
-            PluginManager pluginManager) {
+    public MonitorMetricsService(DeployServiceStorage deployServiceStorage,
+                                 DeployResourceStorage deployResourceStorage,
+                                 PluginManager pluginManager,
+                                 IdentityProviderManager identityProviderManager) {
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
         this.pluginManager = pluginManager;
+        this.identityProviderManager = identityProviderManager;
     }
 
     /**
@@ -76,12 +83,17 @@ public class Monitor {
             throw new ResourceNotFoundException("No resource found in the service.");
         }
 
+        if (!StringUtils.equals(getCurrentLoginUserId(), serviceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No right to get metrics of service belong to other users.");
+        }
+
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
 
         ServiceMetricRequest serviceMetricRequest =
                 getServiceMetricRequest(vmResources, monitorType, from,
-                        to, granularity, onlyLastKnownMetric, serviceEntity.getUserName());
+                        to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
 
         return orchestratorPlugin.getMetricsForService(serviceMetricRequest);
     }
@@ -102,7 +114,6 @@ public class Monitor {
         if (Objects.isNull(resourceEntity)) {
             throw new ResourceNotFoundException("Resource not found.");
         }
-
         if (!DeployResourceKind.VM.equals(resourceEntity.getKind())) {
             String errorMsg =
                     String.format("Resource kind %s not support.", resourceEntity.getKind());
@@ -113,11 +124,17 @@ public class Monitor {
         BeanUtils.copyProperties(resourceEntity, deployResource);
         DeployServiceEntity serviceEntity = findDeployServiceEntity(
                 resourceEntity.getDeployService().getId());
+
+        if (!StringUtils.equals(getCurrentLoginUserId(), serviceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No right to get metrics of service belong to other users.");
+        }
+
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
         ResourceMetricRequest resourceMetricRequest =
                 getResourceMetricRequest(deployResource, monitorType, from,
-                        to, granularity, onlyLastKnownMetric, serviceEntity.getUserName());
+                        to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
     }
 
@@ -137,7 +154,7 @@ public class Monitor {
                                                            Long to,
                                                            Integer granularity,
                                                            boolean onlyLastKnownMetric,
-                                                           String xpanseUserName) {
+                                                           String userId) {
         if (onlyLastKnownMetric) {
             from = null;
             to = null;
@@ -151,7 +168,17 @@ public class Monitor {
         }
 
         return new ResourceMetricRequest(deployResource, monitorType, from, to,
-                granularity, onlyLastKnownMetric, xpanseUserName);
+                granularity, onlyLastKnownMetric, userId);
+    }
+
+    private String getCurrentLoginUserId() {
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)
+                && StringUtils.isNotBlank(currentUserInfo.getUserId())) {
+            return currentUserInfo.getUserId();
+        } else {
+            return "defaultUserId";
+        }
     }
 
     private ServiceMetricRequest getServiceMetricRequest(List<DeployResource> deployResources,
@@ -160,7 +187,7 @@ public class Monitor {
                                                          Long to,
                                                          Integer granularity,
                                                          boolean onlyLastKnownMetric,
-                                                         String xpanseUserName) {
+                                                         String userId) {
         if (onlyLastKnownMetric) {
             from = null;
             to = null;
@@ -173,7 +200,7 @@ public class Monitor {
             }
         }
         return new ServiceMetricRequest(deployResources, monitorType, from, to,
-                granularity, onlyLastKnownMetric, xpanseUserName);
+                granularity, onlyLastKnownMetric, userId);
     }
 
     private void validateToAndFromValues(Long from, Long to) {

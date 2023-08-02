@@ -83,8 +83,9 @@ class FlexibleEngineMonitorClientTest {
 
         List<CredentialVariable> definedCredentialVariables = new ArrayList<>();
         CredentialVariables credentialVariables = new CredentialVariables(
-                Csp.FLEXIBLE_ENGINE, null, "AK_SK", "The access key and security key.",
-                CredentialType.VARIABLES, definedCredentialVariables);
+                Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK",
+                "The access key and security key.",
+                null, definedCredentialVariables);
         definedCredentialVariables.add(
                 new CredentialVariable(FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
                         "The access key.", true));

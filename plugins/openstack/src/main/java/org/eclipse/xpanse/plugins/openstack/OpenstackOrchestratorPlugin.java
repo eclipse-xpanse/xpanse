@@ -85,9 +85,9 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                 new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN,
                         "The domain of the openstack installation to be used.", true, false));
         CredentialVariables httpAuth = new CredentialVariables(
-                getCsp(), null, "Variables",
+                getCsp(), CredentialType.VARIABLES, "Variables",
                 "Authenticate at the specified URL using an account and password.",
-                CredentialType.VARIABLES, credentialVariables);
+                null, credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(httpAuth);
 
@@ -129,7 +129,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                     serviceMetricRequest.getTo(),
                     serviceMetricRequest.getGranularity(),
                     serviceMetricRequest.isOnlyLastKnownMetric(),
-                    serviceMetricRequest.getXpanseUserName()
+                    serviceMetricRequest.getUserId()
             );
             metrics.addAll(this.metricsManager.getMetrics(resourceMetricRequest));
         }

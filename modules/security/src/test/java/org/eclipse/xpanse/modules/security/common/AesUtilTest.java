@@ -1,4 +1,4 @@
-package org.eclipse.xpanse.modules.security.config;
+package org.eclipse.xpanse.modules.security.common;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

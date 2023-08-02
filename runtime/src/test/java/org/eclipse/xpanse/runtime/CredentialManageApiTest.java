@@ -6,221 +6,334 @@
 
 package org.eclipse.xpanse.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockBearerTokenAuthentication;
+import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.eclipse.xpanse.api.CredentialManageApi;
-import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.Link;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Test for CredentialManageApiTest.
+ * Test for CredentialManageApi.
  */
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("default")
-@SpringBootTest(classes = {XpanseApplication.class, CredentialManageApi.class})
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CredentialManageApiTest {
 
-    @Mock
-    private CredentialCenter mockCredentialCenter;
-
-    private CredentialManageApi credentialManageApiUnderTest;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        credentialManageApiUnderTest = new CredentialManageApi(mockCredentialCenter);
-    }
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Resource
+    private MockMvc mockMvc;
 
     @Test
-    void testGetCredentialTypesByCsp() {
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_ADMIN,
+            attributes = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    void testGetCredentialTypesByCsp() throws Exception {
         // Setup
-        when(mockCredentialCenter.getAvailableCredentialTypesByCsp(Csp.AWS)).thenReturn(
-                List.of(CredentialType.VARIABLES));
+        List<CredentialType> types = List.of(CredentialType.VARIABLES);
+        String result = objectMapper.writeValueAsString(types);
 
         // Run the test
-        final List<CredentialType> result =
-                credentialManageApiUnderTest.getCredentialTypesByCsp(Csp.AWS);
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/auth/csp/{cspName}/credential/types", Csp.HUAWEI)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
 
         // Verify the results
-        assertThat(result).isEqualTo(List.of(CredentialType.VARIABLES));
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
     }
 
     @Test
-    void testGetCredentialTypesByCsp_CredentialCenterReturnsNoItems() {
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testGetCredentialTypesByCsp_PluginNotFoundException() throws Exception {
         // Setup
-        when(mockCredentialCenter.getAvailableCredentialTypesByCsp(Csp.AWS)).thenReturn(
-                Collections.emptyList());
+        Response responseModel = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
+                Collections.singletonList("Can't find suitable plugin for the Csp AWS"));
+        String result = objectMapper.writeValueAsString(responseModel);
 
         // Run the test
-        final List<CredentialType> result =
-                credentialManageApiUnderTest.getCredentialTypesByCsp(Csp.AWS);
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/auth/csp/{cspName}/credential/types", Csp.AWS)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
 
         // Verify the results
-        assertThat(result).isEqualTo(Collections.emptyList());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
     }
 
     @Test
-    void testGetCredentialCapabilitiesByCsp() {
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testGetCredentialCapabilitiesByCsp() throws Exception {
         // Setup
-        when(mockCredentialCenter.getCredentialCapabilitiesByCsp(Csp.AWS,
-                CredentialType.VARIABLES, "AK_SK")).thenReturn(List.of());
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.", true));
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.", true));
+        CredentialVariables accessKey = new CredentialVariables(
+                Csp.HUAWEI, CredentialType.VARIABLES, HuaweiCloudMonitorConstants.IAM,
+                "Using The access key and security key authentication.", null
+                , credentialVariables);
+
+        accessKey.getVariables().forEach(credentialVariable -> credentialVariable.setValue(
+                "value to be provided by creating credential or adding environment variables."));
+        List<AbstractCredentialInfo> responseModel = List.of(accessKey);
+        String result = objectMapper.writeValueAsString(responseModel);
 
         // Run the test
-        final List<AbstractCredentialInfo> result =
-                credentialManageApiUnderTest.getCredentialCapabilitiesByCsp(Csp.AWS,
-                        CredentialType.VARIABLES, "AK_SK");
+        final MockHttpServletResponse response = mockMvc.perform(
+                        get("/xpanse/auth/csp/{cspName}/credential/capabilities", Csp.HUAWEI)
+                                .param("type", "VARIABLES")
+                                .param("name", "AK_SK")
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
 
         // Verify the results
-        assertThat(result).isEqualTo(Collections.emptyList());
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
     }
 
     @Test
-    void testGetCredentialCapabilitiesByCsp_CredentialCenterReturnsNoItems() {
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testGetCredentialCapabilitiesByCsp_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
-        when(mockCredentialCenter.getCredentialCapabilitiesByCsp(Csp.AWS,
-                CredentialType.VARIABLES, "AK_SK")).thenReturn(Collections.emptyList());
+        String result = "[]";
 
         // Run the test
-        final List<AbstractCredentialInfo> result =
-                credentialManageApiUnderTest.getCredentialCapabilitiesByCsp(Csp.AWS,
-                        CredentialType.VARIABLES, "AK_SK");
+        final MockHttpServletResponse response = mockMvc.perform(
+                        get("/xpanse/auth/csp/{cspName}/credential/capabilities", Csp.HUAWEI)
+                                .param("type", "VARIABLES")
+                                .param("name", "name")
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
 
         // Verify the results
-        assertThat(result).isEqualTo(Collections.emptyList());
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
     }
 
     @Test
-    void testGetCredentialDefinitionsByCsp() {
-
-        // Configure CredentialCenter.getCredentialDefinitionsByCsp(...).
-        final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.AWS, "userName", "name", "description",
-                        CredentialType.VARIABLES,
-                        List.of(new CredentialVariable("name", "description", false))));
-        when(mockCredentialCenter.getCredentials(Csp.AWS,
-                CredentialType.VARIABLES, "userName")).thenReturn(credentialVariables);
-
-        // Run the test
-        final List<AbstractCredentialInfo> result =
-                credentialManageApiUnderTest.getCredentials(Csp.AWS,
-                        CredentialType.VARIABLES, "userName");
-
-        // Verify the results
-        assertThat(result).isEqualTo(credentialVariables);
-    }
-
-    @Test
-    void testGetCredentialDefinitionsByCsp_CredentialCenterReturnsNoItems() {
+    @Order(1)
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testGetCredentialsByUser_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
-        when(mockCredentialCenter.getCredentials(Csp.AWS,
-                CredentialType.VARIABLES, "userName")).thenReturn(Collections.emptyList());
-
+        String result = "[]";
         // Run the test
-        final List<AbstractCredentialInfo> result =
-                credentialManageApiUnderTest.getCredentials(Csp.AWS,
-                        CredentialType.VARIABLES, "userName");
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/auth/user/credentials")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
 
         // Verify the results
-        assertThat(result).isEqualTo(Collections.emptyList());
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
     }
 
     @Test
-    void testGetCredentialOpenApi() {
-        // Setup
-        final Link expectedResult = Link.of("href", "OpenApi");
-        when(mockCredentialCenter.getCredentialOpenApiUrl(Csp.AWS,
-                CredentialType.VARIABLES)).thenReturn("href");
-
-        // Run the test
-        final Link result = credentialManageApiUnderTest.getCredentialOpenApi(Csp.AWS,
-                CredentialType.VARIABLES);
-
-        // Verify the results
-        assertThat(result).isEqualTo(expectedResult);
-    }
-
-    @Test
-    void testAddCredential() {
+    @Order(2)
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testAddCredential() throws Exception {
         // Setup
         final CreateCredential createCredential = new CreateCredential();
-        createCredential.setName("name");
-        createCredential.setXpanseUser("userName");
-        createCredential.setCsp(Csp.AWS);
-        createCredential.setDescription("description");
+        createCredential.setCsp(Csp.HUAWEI);
         createCredential.setType(CredentialType.VARIABLES);
+        createCredential.setName("AK_SK");
+        createCredential.setDescription("description");
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.", true, true, "AK_VALUE"));
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.", true, true, "SK_VALUE"));
+        createCredential.setVariables(credentialVariables);
+        createCredential.setTimeToLive(3000);
+        String requestBody = objectMapper.writeValueAsString(createCredential);
 
-        // Configure CredentialCenter.addCredential(...).
-        final CreateCredential createCredential1 = new CreateCredential();
-        createCredential1.setName("name");
-        createCredential1.setXpanseUser("userName");
-        createCredential1.setCsp(Csp.AWS);
-        createCredential1.setDescription("description");
-        createCredential1.setType(CredentialType.VARIABLES);
-        doThrow(new RuntimeException("test")).when(mockCredentialCenter)
-                .addCredential(any(CreateCredential.class));
+        String addResult = "";
+        createCredential.setUserId("userId");
+        CredentialVariables credentialVariables1 = new CredentialVariables(createCredential);
+        String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
+        // Run the test
+        final MockHttpServletResponse addResponse =
+                mockMvc.perform(post("/xpanse/auth/csp/credential")
+                                .content(requestBody).contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        final MockHttpServletResponse queryResponse =
+                mockMvc.perform(get("/xpanse/auth/user/credentials")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
 
         // Verify the results
-        Assertions.assertThrows(RuntimeException.class,
-                () -> credentialManageApiUnderTest.addCredential(createCredential));
+        Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), addResponse.getStatus());
+        Assertions.assertEquals(addResult, addResponse.getContentAsString());
+
+        Assertions.assertEquals(HttpStatus.OK.value(), queryResponse.getStatus());
+        Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
     }
 
     @Test
-    void testUpdateCredential() {
+    @Order(3)
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId2", preferredUsername = "userName"))
+    void testGetCredentials_CredentialCenterReturnsNoItems() throws Exception {
+        // Setup
+        String result = "[]";
+
+        // Run the test
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/auth/csp/{cspName}/credentials", Csp.HUAWEI)
+                                .param("type", "VARIABLES")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
+    }
+
+    @Test
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testGetCredentialOpenApi() throws Exception {
+        // Setup
+        Link link = Link.of("http://localhost/openapi/huawei_variables_credentialApi.html",
+                "OpenApi");
+        String result = objectMapper.writeValueAsString(link);
+
+        // Run the test
+        final MockHttpServletResponse response = mockMvc.perform(
+                        get("/xpanse/auth/csp/{cspName}/openapi/{type}", Csp.HUAWEI,
+                                CredentialType.VARIABLES)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
+    }
+
+
+    @Test
+    @Order(4)
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testUpdateCredential() throws Exception {
         // Setup
         final CreateCredential updateCredential = new CreateCredential();
-        updateCredential.setName("name");
-        updateCredential.setXpanseUser("userName");
-        updateCredential.setCsp(Csp.AWS);
-        updateCredential.setDescription("description");
+        updateCredential.setCsp(Csp.HUAWEI);
         updateCredential.setType(CredentialType.VARIABLES);
+        updateCredential.setName("AK_SK");
+        updateCredential.setDescription("description");
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.", true, true, "AK_VALUE_2"));
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.", true, true, "SK_VALUE_2"));
+        updateCredential.setVariables(credentialVariables);
+        updateCredential.setTimeToLive(3000);
 
-        // Configure CredentialCenter.updateCredential(...).
-        final CreateCredential updateCredential1 = new CreateCredential();
-        updateCredential1.setName("name");
-        updateCredential1.setXpanseUser("userName");
-        updateCredential1.setCsp(Csp.AWS);
-        updateCredential1.setDescription("description");
-        updateCredential1.setType(CredentialType.VARIABLES);
-        doThrow(new RuntimeException("test")).when(mockCredentialCenter)
-                .updateCredential(any(CreateCredential.class));
+        String requestBody = objectMapper.writeValueAsString(updateCredential);
+        String updateResult = "";
+        updateCredential.setUserId("userId");
+        CredentialVariables credentialVariables1 = new CredentialVariables(updateCredential);
+        String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
+
 
         // Run the test
-        Assertions.assertThrows(RuntimeException.class,
-                () -> credentialManageApiUnderTest.updateCredential(updateCredential));
+        final MockHttpServletResponse updateResponse =
+                mockMvc.perform(put("/xpanse/auth/csp/credential")
+                                .content(requestBody).contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        final MockHttpServletResponse queryResponse =
+                mockMvc.perform(get("/xpanse/auth/user/credentials")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), updateResponse.getStatus());
+        Assertions.assertEquals(updateResult, updateResponse.getContentAsString());
+
+        Assertions.assertEquals(HttpStatus.OK.value(), queryResponse.getStatus());
+        Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
     }
 
     @Test
-    void testDeleteCredential() {
+    @Order(5)
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testDeleteCredential() throws Exception {
         // Setup
-        doThrow(new RuntimeException("test")).when(mockCredentialCenter)
-                .deleteCredential(any(Csp.class), any(CredentialType.class), any(String.class),
-                        any(String.class));
+        String deleteResult = "";
+        String queryResult = "[]";
 
         // Run the test
-        Assertions.assertThrows(RuntimeException.class,
-                () -> credentialManageApiUnderTest.deleteCredential(Csp.AWS,
-                        CredentialType.VARIABLES, "AK_SK", "user"));
+        final MockHttpServletResponse deleteResponse =
+                mockMvc.perform(delete("/xpanse/auth/csp/{cspName}/credential", Csp.HUAWEI)
+                                .param("type", "VARIABLES")
+                                .param("name", "AK_SK")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        final MockHttpServletResponse queryResponse =
+                mockMvc.perform(get("/xpanse/auth/csp/{cspName}/credentials", Csp.HUAWEI)
+                                .param("type", "VARIABLES")
+                                .param("name", "AK_SK")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.getStatus());
+        Assertions.assertEquals(deleteResult, deleteResponse.getContentAsString());
+
+        Assertions.assertEquals(HttpStatus.OK.value(), queryResponse.getStatus());
+        Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
     }
+
 }
