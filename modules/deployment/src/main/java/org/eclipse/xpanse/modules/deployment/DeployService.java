@@ -233,7 +233,7 @@ public class DeployService {
         }
         if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No right to destroy resource or data belong to other users.");
+                    "No right to destroy service belong to other users.");
         }
         // Get state of service.
         ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
