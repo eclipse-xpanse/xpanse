@@ -34,16 +34,16 @@ import org.springframework.context.annotation.Profile;
 @SecurityScheme(
         name = "OAuth2 Flow",
         type = SecuritySchemeType.OAUTH2,
-        flows = @OAuthFlows(
-                authorizationCode = @OAuthFlow(
-                        authorizationUrl = "${springdoc.oAuthFlow.authorizationUrl}",
-                        tokenUrl = "${springdoc.oAuthFlow.tokenUrl}",
-                        scopes = {
-                                @OAuthScope(name = "openid"),
-                                @OAuthScope(name = "email"),
-                                @OAuthScope(name = "profile")
-                        }
-                )
+        flows = @OAuthFlows(authorizationCode =
+        @OAuthFlow(
+                authorizationUrl = "${springdoc.oAuthFlow.authorizationUrl}",
+                tokenUrl = "${springdoc.oAuthFlow.tokenUrl}",
+                scopes = {
+                        @OAuthScope(name = "openid", description = "mandatory must be selected"),
+                        @OAuthScope(name = "profile", description = "mandatory must be selected"),
+                        @OAuthScope(name = "email")
+                }
+        )
         )
 )
 @Configuration
