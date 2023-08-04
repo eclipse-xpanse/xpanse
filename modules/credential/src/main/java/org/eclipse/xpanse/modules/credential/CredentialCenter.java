@@ -120,7 +120,7 @@ public class CredentialCenter {
         for (Csp csp : pluginManager.getPluginsMap().keySet()) {
             abstractCredentialInfos.addAll(getUserCredentials(csp, null, xpanseUser));
         }
-        return abstractCredentialInfos;
+        return maskSensitiveValues(abstractCredentialInfos);
     }
 
     /**
@@ -415,14 +415,15 @@ public class CredentialCenter {
                 }
                 maskedCredentialVariableList.add(maskedCredentialVariable);
             }
-            CredentialVariables maskedCredentialVariables =
+            AbstractCredentialInfo maskedAbstractCredentialInfo =
                     new CredentialVariables(credentialVariables.getCsp(),
                             credentialVariables.getType(),
                             credentialVariables.getName(),
                             credentialVariables.getDescription(),
                             credentialVariables.getUserId(),
                             maskedCredentialVariableList);
-            maskedCredentialInfos.add(maskedCredentialVariables);
+            maskedAbstractCredentialInfo.setTimeToLive(credentialVariables.getTimeToLive());
+            maskedCredentialInfos.add(maskedAbstractCredentialInfo);
         }
         return maskedCredentialInfos;
     }

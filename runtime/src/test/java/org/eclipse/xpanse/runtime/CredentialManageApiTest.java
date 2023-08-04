@@ -172,7 +172,53 @@ class CredentialManageApiTest {
     @Order(2)
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
             attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
-    void testAddCredential() throws Exception {
+    void testAddCredentialWithSensitiveIsFalse() throws Exception {
+        // Setup
+        final CreateCredential createCredential = new CreateCredential();
+        createCredential.setCsp(Csp.HUAWEI);
+        createCredential.setType(CredentialType.VARIABLES);
+        createCredential.setName("AK_SK");
+        createCredential.setDescription("description");
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.", true, false, "AK_VALUE"));
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.", true, false, "SK_VALUE"));
+        createCredential.setVariables(credentialVariables);
+        createCredential.setTimeToLive(3000);
+        String requestBody = objectMapper.writeValueAsString(createCredential);
+
+        String addResult = "";
+        createCredential.setUserId("userId");
+        CredentialVariables credentialVariables1 = new CredentialVariables(createCredential);
+        String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
+        // Run the test
+        final MockHttpServletResponse addResponse =
+                mockMvc.perform(post("/xpanse/auth/csp/credential")
+                                .content(requestBody).contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        final MockHttpServletResponse queryResponse =
+                mockMvc.perform(get("/xpanse/auth/user/credentials")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), addResponse.getStatus());
+        Assertions.assertEquals(addResult, addResponse.getContentAsString());
+
+        Assertions.assertEquals(HttpStatus.OK.value(), queryResponse.getStatus());
+        Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
+    }
+
+    @Test
+    @Order(3)
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
+            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testAddCredentialWithSensitiveIsTrue() throws Exception {
         // Setup
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.HUAWEI);
@@ -211,11 +257,11 @@ class CredentialManageApiTest {
         Assertions.assertEquals(addResult, addResponse.getContentAsString());
 
         Assertions.assertEquals(HttpStatus.OK.value(), queryResponse.getStatus());
-        Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
+        Assertions.assertNotEquals(queryResult, queryResponse.getContentAsString());
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
             attributes = @OpenIdClaims(sub = "userId2", preferredUsername = "userName"))
     void testGetCredentials_CredentialCenterReturnsNoItems() throws Exception {
@@ -257,7 +303,7 @@ class CredentialManageApiTest {
 
 
     @Test
-    @Order(4)
+    @Order(5)
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
             attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testUpdateCredential() throws Exception {
@@ -270,10 +316,10 @@ class CredentialManageApiTest {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true, true, "AK_VALUE_2"));
+                        "The access key.", true, false, "AK_VALUE_2"));
         credentialVariables.add(
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true, true, "SK_VALUE_2"));
+                        "The security key.", true, false, "SK_VALUE_2"));
         updateCredential.setVariables(credentialVariables);
         updateCredential.setTimeToLive(3000);
 
@@ -305,7 +351,7 @@ class CredentialManageApiTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
             attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testDeleteCredential() throws Exception {
