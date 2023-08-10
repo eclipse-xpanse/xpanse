@@ -89,10 +89,11 @@ public class TerraformExecutor {
     private SystemCmdResult executeWithVariables(StringBuilder command) {
         for (Map.Entry<String, String> entry : this.variables.entrySet()) {
             if (Objects.nonNull(entry.getKey()) && Objects.nonNull(entry.getValue())) {
-                command.append("-var=")
+                command.append("-var \"")
                         .append(entry.getKey())
                         .append("=")
                         .append(entry.getValue())
+                        .append("\"")
                         .append(" ");
             }
         }
