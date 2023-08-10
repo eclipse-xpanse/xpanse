@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.api;
 
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,7 +61,7 @@ public class AdminServicesApi {
     @Operation(description = "Check health of API service and backend systems.")
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_USER})
+    @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     public SystemStatus healthCheck() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
