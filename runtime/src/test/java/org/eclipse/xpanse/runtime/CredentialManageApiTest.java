@@ -15,6 +15,7 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockBearerTokenAuthentication;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -59,14 +60,34 @@ class CredentialManageApiTest {
     @Test
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_ADMIN,
             attributes = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
-    void testGetCredentialTypesByCsp() throws Exception {
+    void testListCredentialTypes() throws Exception {
+        // Setup
+        List<CredentialType> types = Arrays.asList(CredentialType.values());
+        String result = objectMapper.writeValueAsString(types);
+
+        // Run the test
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/credential_types")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
+    }
+
+    @Test
+    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_ADMIN,
+            attributes = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    void testListCredentialTypes_WithCsp() throws Exception {
         // Setup
         List<CredentialType> types = List.of(CredentialType.VARIABLES);
         String result = objectMapper.writeValueAsString(types);
 
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/auth/csp/{cspName}/credential/types", Csp.HUAWEI)
+                mockMvc.perform(get("/xpanse/credential_types")
+                                .param("cspName", "huawei")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -78,7 +99,7 @@ class CredentialManageApiTest {
     @Test
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
             attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
-    void testGetCredentialTypesByCsp_PluginNotFoundException() throws Exception {
+    void testListCredentialTypes_PluginNotFoundException() throws Exception {
         // Setup
         Response responseModel = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList("Can't find suitable plugin for the Csp AWS"));
@@ -86,7 +107,8 @@ class CredentialManageApiTest {
 
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/auth/csp/{cspName}/credential/types", Csp.AWS)
+                mockMvc.perform(get("/xpanse/credential_types")
+                                .param("cspName", "aws")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -98,7 +120,7 @@ class CredentialManageApiTest {
     @Test
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
             attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
-    void testGetCredentialCapabilitiesByCsp() throws Exception {
+    void testListCredentialCapabilities() throws Exception {
         // Setup
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
@@ -119,7 +141,8 @@ class CredentialManageApiTest {
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/auth/csp/{cspName}/credential/capabilities", Csp.HUAWEI)
+                        get("/xpanse/credentials/capabilities")
+                                .param("cspName", "huawei")
                                 .param("type", "VARIABLES")
                                 .param("name", "AK_SK")
                                 .accept(MediaType.APPLICATION_JSON))
@@ -133,13 +156,14 @@ class CredentialManageApiTest {
     @Test
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
             attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
-    void testGetCredentialCapabilitiesByCsp_CredentialCenterReturnsNoItems() throws Exception {
+    void testListCredentialCapabilities_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
         String result = "[]";
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/auth/csp/{cspName}/credential/capabilities", Csp.HUAWEI)
+                        get("/xpanse/credentials/capabilities")
+                                .param("cspName", "huawei")
                                 .param("type", "VARIABLES")
                                 .param("name", "name")
                                 .accept(MediaType.APPLICATION_JSON))
@@ -154,12 +178,12 @@ class CredentialManageApiTest {
     @Order(1)
     @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
             attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
-    void testGetCredentialsByUser_CredentialCenterReturnsNoItems() throws Exception {
+    void testListCredentials_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
         String result = "[]";
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/auth/user/credentials")
+                mockMvc.perform(get("/xpanse/credentials")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -196,13 +220,13 @@ class CredentialManageApiTest {
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
         final MockHttpServletResponse addResponse =
-                mockMvc.perform(post("/xpanse/auth/csp/credential")
+                mockMvc.perform(post("/xpanse/credentials")
                                 .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/auth/user/credentials")
+                mockMvc.perform(get("/xpanse/credentials")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -242,13 +266,13 @@ class CredentialManageApiTest {
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
         final MockHttpServletResponse addResponse =
-                mockMvc.perform(post("/xpanse/auth/csp/credential")
+                mockMvc.perform(post("/xpanse/credentials")
                                 .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/auth/user/credentials")
+                mockMvc.perform(get("/xpanse/credentials")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -270,7 +294,8 @@ class CredentialManageApiTest {
 
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/auth/csp/{cspName}/credentials", Csp.HUAWEI)
+                mockMvc.perform(get("/xpanse/credentials")
+                                .param("cspName", "huawei")
                                 .param("type", "VARIABLES")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
@@ -291,7 +316,7 @@ class CredentialManageApiTest {
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/auth/csp/{cspName}/openapi/{type}", Csp.HUAWEI,
+                        get("/xpanse/credentials/openapi/{csp}/{type}", Csp.HUAWEI,
                                 CredentialType.VARIABLES)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -332,13 +357,13 @@ class CredentialManageApiTest {
 
         // Run the test
         final MockHttpServletResponse updateResponse =
-                mockMvc.perform(put("/xpanse/auth/csp/credential")
+                mockMvc.perform(put("/xpanse/credentials")
                                 .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/auth/user/credentials")
+                mockMvc.perform(get("/xpanse/credentials")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -361,14 +386,15 @@ class CredentialManageApiTest {
 
         // Run the test
         final MockHttpServletResponse deleteResponse =
-                mockMvc.perform(delete("/xpanse/auth/csp/{cspName}/credential", Csp.HUAWEI)
+                mockMvc.perform(delete("/xpanse/credentials")
+                                .param("cspName", "huawei")
                                 .param("type", "VARIABLES")
                                 .param("name", "AK_SK")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/auth/csp/{cspName}/credentials", Csp.HUAWEI)
+                mockMvc.perform(get("/xpanse/credentials", Csp.HUAWEI)
                                 .param("type", "VARIABLES")
                                 .param("name", "AK_SK")
                                 .accept(MediaType.APPLICATION_JSON))

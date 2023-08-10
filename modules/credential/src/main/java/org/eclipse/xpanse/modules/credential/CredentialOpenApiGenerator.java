@@ -235,7 +235,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                             "openapi": "3.0.1",
                             "info": {
                                 "title": "OpenAPI definition",
-                                "description": "OpenAPI for user adding credential of the cloud service provider %s",
+                                "description": "OpenAPI for users adding credential to connect the cloud service provider %s",
                                 "version": "%s"
                             },
                             "servers": [
@@ -251,7 +251,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                                 }
                             ],
                             "paths": {
-                                "/xpanse/auth/csp/%s/credential": {
+                                "/xpanse/credentials": {
                                     "post": {
                                         "tags": [
                                             "Credentials Management"
@@ -446,7 +446,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                             }
                         }
                         """,
-                csp, appVersion, serviceUrl, csp, type, csp, credentialVariables.getName(),
+                csp, appVersion, serviceUrl, type, csp, credentialVariables.getName(),
                 csp, credentialVariables.getDescription(),
                 type, variablesExampleStr);
     }

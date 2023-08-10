@@ -74,13 +74,13 @@ class CredentialCenterTest {
                 expectedCredentialTypes);
 
         List<CredentialType> actualCredentialTypes =
-                credentialCenter.getAvailableCredentialTypesByCsp(csp);
+                credentialCenter.listAvailableCredentialTypesByCsp(csp);
 
         assertEquals(expectedCredentialTypes, actualCredentialTypes);
     }
 
     @Test
-    public void testGetCredentialCapabilitiesByCsp_WithValidType() {
+    public void testListCredentialCapabilities_WithValidType() {
         Csp csp = Csp.OPENSTACK;
         CredentialType credentialType = CredentialType.VARIABLES;
 
@@ -93,7 +93,7 @@ class CredentialCenterTest {
         when(orchestratorPlugin.getCredentialDefinitions()).thenReturn(credentialVariables);
 
         List<AbstractCredentialInfo> credentials =
-                this.credentialCenter.getCredentialCapabilitiesByCsp(csp, credentialType,
+                this.credentialCenter.listCredentialCapabilities(csp, credentialType,
                         credentialName);
 
         Assertions.assertTrue(Objects.nonNull(credentials));
@@ -101,7 +101,7 @@ class CredentialCenterTest {
     }
 
     @Test
-    public void testGetCredentialCapabilitiesByCsp_WithNullType() {
+    public void testListCredentialCapabilities_WithNullType() {
         Csp csp = Csp.OPENSTACK;
         final List<AbstractCredentialInfo> credentialVariables =
                 List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
@@ -112,13 +112,13 @@ class CredentialCenterTest {
         when(orchestratorPlugin.getCredentialDefinitions()).thenReturn(credentialVariables);
 
         List<AbstractCredentialInfo> credentials =
-                credentialCenter.getCredentialCapabilitiesByCsp(csp, null, null);
+                credentialCenter.listCredentialCapabilities(csp, null, null);
 
         assertEquals(credentialVariables, credentials);
     }
 
     @Test
-    public void testGetCredentialCapabilitiesByCsp_WithNoMatchingType() {
+    public void testListCredentialCapabilities_WithNoMatchingType() {
         Csp csp = Csp.OPENSTACK;
         CredentialType credentialType = CredentialType.API_KEY;
         final List<AbstractCredentialInfo> credentialVariables =
@@ -130,7 +130,7 @@ class CredentialCenterTest {
         when(orchestratorPlugin.getCredentialDefinitions()).thenReturn(credentialVariables);
 
         List<AbstractCredentialInfo> credentials =
-                credentialCenter.getCredentialCapabilitiesByCsp(csp, credentialType, "name");
+                credentialCenter.listCredentialCapabilities(csp, credentialType, "name");
 
         assertEquals(Collections.emptyList(), credentials);
     }
@@ -139,7 +139,7 @@ class CredentialCenterTest {
     public void testGetCredentialOpenApiUrl() {
         Csp csp = Csp.OPENSTACK;
         CredentialType credentialType = CredentialType.VARIABLES;
-        String expectedUrl = "http://example.com/credential/openapi";
+        String expectedUrl = "https://example.com/credential/openapi";
 
         when(credentialOpenApiGenerator.getCredentialOpenApiUrl(csp, credentialType))
                 .thenReturn(expectedUrl);
@@ -150,35 +150,36 @@ class CredentialCenterTest {
     }
 
     @Test
-    public void testGetCredentialsByUser_WithNullUser() {
+    public void testListCredentials_WithNullUser() {
 
-        List<AbstractCredentialInfo> credentials = credentialCenter.getCredentialsByUser("");
+        List<AbstractCredentialInfo> credentials =
+                credentialCenter.listCredentials(null, null, null);
 
         assertEquals(Collections.emptyList(), credentials);
     }
 
     @Test
-    public void testGetCredentialsByUser_WithNoMatchingUser() {
-        String xpanseUser1 = "user1";
-        String xpanseUser2 = "user2";
+    public void testListCredentialsOnlyUserId() {
+        String userId1 = "userId1";
+        String userId2 = "userId2";
 
         List<AbstractCredentialInfo> credentials1 =
-                credentialCenter.getCredentialsByUser(xpanseUser2);
+                credentialCenter.listCredentials(null, null, userId1);
         List<AbstractCredentialInfo> credentials2 =
-                credentialCenter.getCredentialsByUser(xpanseUser1);
+                credentialCenter.listCredentials(null, null, userId2);
 
         assertEquals(Collections.emptyList(), credentials1);
         assertEquals(Collections.emptyList(), credentials2);
     }
 
     @Test
-    void testGetCredentials_WithoutXpanseUser() {
+    void testListCredentials_WithoutuserId() {
         Csp csp = Csp.OPENSTACK;
-        String xpanseUser = "";
+        String userId = "";
         CredentialType requestedCredentialType = CredentialType.VARIABLES;
 
-        List<AbstractCredentialInfo> result = credentialCenter.getCredentials(
-                csp, requestedCredentialType, xpanseUser);
+        List<AbstractCredentialInfo> result = credentialCenter.listCredentials(
+                csp, requestedCredentialType, userId);
 
         assertEquals(Collections.emptyList(), result);
     }
@@ -186,13 +187,13 @@ class CredentialCenterTest {
     @Test
     void testDeleteCredential() {
         Csp csp = Csp.OPENSTACK;
-        String xpanseUser = "user123";
+        String userId = "user123";
         CredentialType credentialType = CredentialType.API_KEY;
 
-        credentialCenter.deleteCredential(csp, credentialType, "AK_SK", xpanseUser);
+        credentialCenter.deleteCredential(csp, credentialType, "AK_SK", userId);
 
         verify(credentialsStore).deleteCredential(eq(csp), eq(credentialType), eq("AK_SK"),
-                eq(xpanseUser));
+                eq(userId));
     }
 
     @Test
