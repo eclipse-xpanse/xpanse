@@ -313,7 +313,8 @@ public class FlexibleEngineMetricsService {
                 flexibleEngineMetricsConverter.buildListMetricsUrl(deployResource,
                         project.getId());
         ListMetricsResponse listMetricsResponse = queryMetricItemList(credential, url);
-        if (Objects.nonNull(listMetricsResponse)) {
+        if (Objects.nonNull(listMetricsResponse)
+                && !CollectionUtils.isEmpty(listMetricsResponse.getMetrics())) {
             List<MetricInfoList> metrics = listMetricsResponse.getMetrics();
             if (Objects.isNull(monitorResourceType)) {
                 for (MonitorResourceType type : MonitorResourceType.values()) {

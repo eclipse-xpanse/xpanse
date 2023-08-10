@@ -241,7 +241,8 @@ public class HuaweiCloudMetricsService {
                 .backoffStrategy(
                         new HuaweiCloudRetryStrategy(HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS))
                 .invoke();
-        if (Objects.nonNull(listMetricsResponse)) {
+        if (Objects.nonNull(listMetricsResponse)
+                && !CollectionUtils.isEmpty(listMetricsResponse.getMetrics())) {
             List<MetricInfoList> metricInfoLists = listMetricsResponse.getMetrics();
             if (Objects.isNull(monitorResourceType)) {
                 for (MonitorResourceType type : MonitorResourceType.values()) {
