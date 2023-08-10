@@ -13,10 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class FlexibleEngineMonitorConverterTest {
+class FlexibleEngineMetricsConverterTest {
 
 
-    private final FlexibleEngineMonitorConverter converter = new FlexibleEngineMonitorConverter();
+    private final FlexibleEngineMetricsConverter converter = new FlexibleEngineMetricsConverter();
 
 
     @Test

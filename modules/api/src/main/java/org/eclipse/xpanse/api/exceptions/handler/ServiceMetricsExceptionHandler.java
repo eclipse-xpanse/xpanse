@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.api.exceptions;
+package org.eclipse.xpanse.api.exceptions.handler;
 
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
-public class MonitoringExceptionHandler {
+public class ServiceMetricsExceptionHandler {
 
     /**
      * Exception handler for ClientApiCallFailedException.

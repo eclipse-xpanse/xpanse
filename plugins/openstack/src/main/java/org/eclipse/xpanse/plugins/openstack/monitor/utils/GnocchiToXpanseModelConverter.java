@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.aggregates.AggregationRequest;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.filter.MetricsFilter;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.measures.Measure;
@@ -90,7 +90,7 @@ public class GnocchiToXpanseModelConverter {
      * @param resourceMetricRequest ResourceMetricRequest object
      * @return Returns Gnocchi MetricsFilter object.
      */
-    public MetricsFilter buildMetricsFilter(ResourceMetricRequest resourceMetricRequest) {
+    public MetricsFilter buildMetricsFilter(ResourceMetricsRequest resourceMetricRequest) {
         return MetricsFilter.builder()
                 .end(resourceMetricRequest.getTo())
                 .start(resourceMetricRequest.getFrom())

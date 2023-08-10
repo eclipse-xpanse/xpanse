@@ -8,13 +8,13 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class MetricRequestTest {
+class MetricsRequestTest {
 
-    private MetricRequest test;
+    private MetricsRequest test;
 
     @BeforeEach
     void setUp() {
-        test = new MetricRequest(MonitorResourceType.CPU, 0L, 0L, 1, false, "userId");
+        test = new MetricsRequest(MonitorResourceType.CPU, 0L, 0L, 1, false, "userId");
     }
 
     @Test
@@ -36,9 +36,9 @@ class MetricRequestTest {
         assertNotEquals(test, object);
         assertNotEquals(test.hashCode(), object.hashCode());
 
-        MetricRequest test1 = new MetricRequest(null, null, null, null, true, null);
-        MetricRequest test2 = new MetricRequest(null, null, null, null, true, null);
-        MetricRequest test3 = new MetricRequest(null, null, null, null, false, null);
+        MetricsRequest test1 = new MetricsRequest(null, null, null, null, true, null);
+        MetricsRequest test2 = new MetricsRequest(null, null, null, null, true, null);
+        MetricsRequest test3 = new MetricsRequest(null, null, null, null, false, null);
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test, test3);
@@ -113,7 +113,7 @@ class MetricRequestTest {
     void testToString() {
         assertNotEquals(test.toString(), null);
 
-        String exceptedString = "MetricRequest(monitorResourceType=CPU, from=0, "
+        String exceptedString = "MetricsRequest(monitorResourceType=CPU, from=0, "
                 + "to=0, granularity=1, onlyLastKnownMetric=false, userId=userId)";
         assertEquals(test.toString(), exceptedString);
     }

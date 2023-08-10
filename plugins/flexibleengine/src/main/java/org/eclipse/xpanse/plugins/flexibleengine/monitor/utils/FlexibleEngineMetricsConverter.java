@@ -36,9 +36,9 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.orchestrator.monitor.MetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.MetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
@@ -50,7 +50,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Component
-public class FlexibleEngineMonitorConverter {
+public class FlexibleEngineMetricsConverter {
 
     private final Map<String, MonitorResourceType> metricNameToResourceTypeMap = new HashMap<>();
 
@@ -59,7 +59,7 @@ public class FlexibleEngineMonitorConverter {
      * Initializes the metricNameToResourceTypeMap with the mapping of metric names to monitor
      * resource types.
      */
-    public FlexibleEngineMonitorConverter() {
+    public FlexibleEngineMetricsConverter() {
         metricNameToResourceTypeMap.putAll(Map.of(
                 FlexibleEngineMonitorMetrics.CPU_USAGE, MonitorResourceType.CPU,
                 FlexibleEngineMonitorMetrics.CPU_UTILIZED, MonitorResourceType.CPU,
@@ -109,7 +109,7 @@ public class FlexibleEngineMonitorConverter {
      * @param metricInfoMap        metricInfoMap.
      */
     public static BatchListMetricDataRequest buildBatchListMetricDataRequest(
-            ServiceMetricRequest serviceMetricRequest,
+            ServiceMetricsRequest serviceMetricRequest,
             Map<String, List<MetricInfoList>> metricInfoMap) {
         List<MetricInfo> metricInfos = new ArrayList<>();
         checkNullParamAndFillValue(serviceMetricRequest);
@@ -125,7 +125,7 @@ public class FlexibleEngineMonitorConverter {
         return request;
     }
 
-    private static void buildMetricsDimesion(ServiceMetricRequest serviceMetricRequest,
+    private static void buildMetricsDimesion(ServiceMetricsRequest serviceMetricRequest,
                                              Map<String, List<MetricInfoList>> map,
                                              List<MetricInfo> metricInfos) {
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
@@ -146,7 +146,7 @@ public class FlexibleEngineMonitorConverter {
         }
     }
 
-    private static <T extends MetricRequest> void checkNullParamAndFillValue(T metricRequest) {
+    private static <T extends MetricsRequest> void checkNullParamAndFillValue(T metricRequest) {
         Long from = metricRequest.getFrom();
         Long to = metricRequest.getTo();
         if (Objects.isNull(from)) {
@@ -213,7 +213,7 @@ public class FlexibleEngineMonitorConverter {
      * @return Returns list of request url.
      */
     public String buildMonitorMetricUrl(
-            ResourceMetricRequest resourceMetricRequest,
+            ResourceMetricsRequest resourceMetricRequest,
             String projectId,
             MetricInfoList metricInfo) {
         DeployResource resource = resourceMetricRequest.getDeployResource();
@@ -380,7 +380,7 @@ public class FlexibleEngineMonitorConverter {
     }
 
     private Map<String, String> getFlexibleEngineMonitorParams(
-            ResourceMetricRequest resourceMetricRequest,
+            ResourceMetricsRequest resourceMetricRequest,
             MetricInfoList metricInfo) {
         checkNullParamAndFillValue(resourceMetricRequest);
         Map<String, String> params = new HashMap<>();

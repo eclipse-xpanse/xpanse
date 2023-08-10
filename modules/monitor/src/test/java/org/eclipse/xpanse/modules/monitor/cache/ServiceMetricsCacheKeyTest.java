@@ -5,21 +5,21 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class MonitorMetricCacheKeyTest {
+class ServiceMetricsCacheKeyTest {
 
-    private final MonitorMetricCacheKey testCacheKey =
-            new MonitorMetricCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
+    private final ServiceMetricsCacheKey testCacheKey =
+            new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
 
     @Test
     void testEquals() {
         // Setup
 
-        final MonitorMetricCacheKey cacheKey1 =
-                new MonitorMetricCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
-        final MonitorMetricCacheKey cacheKey2 =
-                new MonitorMetricCacheKey(Csp.HUAWEI, "resourceId1", MonitorResourceType.CPU);
-        final MonitorMetricCacheKey cacheKey3 =
-                new MonitorMetricCacheKey(null, null, null);
+        final ServiceMetricsCacheKey cacheKey1 =
+                new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
+        final ServiceMetricsCacheKey cacheKey2 =
+                new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId1", MonitorResourceType.CPU);
+        final ServiceMetricsCacheKey cacheKey3 =
+                new ServiceMetricsCacheKey(null, null, null);
         final Object object = new Object();
 
         // Run the test
@@ -38,12 +38,12 @@ class MonitorMetricCacheKeyTest {
     @Test
     void testHashCode() {
         // Setup
-        final MonitorMetricCacheKey cacheKey1 =
-                new MonitorMetricCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
-        final MonitorMetricCacheKey cacheKey2 =
-                new MonitorMetricCacheKey(Csp.HUAWEI, "resourceId1", MonitorResourceType.CPU);
-        final MonitorMetricCacheKey cacheKey3 =
-                new MonitorMetricCacheKey(null, null, null);
+        final ServiceMetricsCacheKey cacheKey1 =
+                new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
+        final ServiceMetricsCacheKey cacheKey2 =
+                new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId1", MonitorResourceType.CPU);
+        final ServiceMetricsCacheKey cacheKey3 =
+                new ServiceMetricsCacheKey(null, null, null);
         // Run the test
         final int result = testCacheKey.hashCode();
         final int result1 = cacheKey1.hashCode();

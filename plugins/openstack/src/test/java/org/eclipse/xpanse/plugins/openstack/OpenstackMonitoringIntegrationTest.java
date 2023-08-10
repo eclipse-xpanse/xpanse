@@ -5,8 +5,16 @@
 
 package org.eclipse.xpanse.plugins.openstack;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import java.time.Instant;
+import java.util.List;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -16,9 +24,9 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;
@@ -35,26 +43,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.openstack4j.openstack.OSFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.Instant;
-import java.util.List;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {OpenstackOrchestratorPlugin.class, MetricsManager.class,
         KeystoneManager.class, ResourcesService.class, GnocchiToXpanseModelConverter.class,
         AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class,
-        CredentialCenter.class, MonitorMetricStore.class})
+        CredentialCenter.class, ServiceMetricsStore.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpenstackMonitoringIntegrationTest {
 
@@ -69,7 +67,7 @@ class OpenstackMonitoringIntegrationTest {
     @MockBean
     CredentialCenter credentialCenter;
     @MockBean
-    MonitorMetricStore monitorMetricStore;
+    ServiceMetricsStore serviceMetricsStore;
 
     @BeforeAll
     void setEnvVar() {
@@ -77,21 +75,23 @@ class OpenstackMonitoringIntegrationTest {
                 wireMockExtension.getRuntimeInfo().getHttpBaseUrl() + "/identity/v3");
     }
 
-    public ResourceMetricRequest setupResourceRequest(Long from, Long to, Integer period,
-                                                      boolean onlyLastKnownMetric) {
-        return new ResourceMetricRequest(
+    public ResourceMetricsRequest setupResourceRequest(Long from, Long to, Integer period,
+                                                       boolean onlyLastKnownMetric) {
+        return new ResourceMetricsRequest(
                 Instancio.of(DeployResource.class).set(Select.field(DeployResource::getKind),
                         DeployResourceKind.VM).set(Select.field(DeployResource::getResourceId),
                         "7b5b6ee6-cab4-4e72-be6e-854a67c6d381").create(),
                 null, from, to, period, onlyLastKnownMetric, "user");
     }
 
-    public ServiceMetricRequest setupServiceRequest(Long from, Long to, Integer period,
-                                                    boolean onlyLastKnownMetric) {
-        return new ServiceMetricRequest(
-                List.of(Instancio.of(DeployResource.class).set(Select.field(DeployResource::getKind),
-                        DeployResourceKind.VM).set(Select.field(DeployResource::getResourceId),
-                        "7b5b6ee6-cab4-4e72-be6e-854a67c6d381").create()),
+    public ServiceMetricsRequest setupServiceRequest(Long from, Long to, Integer period,
+                                                     boolean onlyLastKnownMetric) {
+        return new ServiceMetricsRequest(
+                List.of(Instancio.of(DeployResource.class)
+                        .set(Select.field(DeployResource::getKind),
+                                DeployResourceKind.VM)
+                        .set(Select.field(DeployResource::getResourceId),
+                                "7b5b6ee6-cab4-4e72-be6e-854a67c6d381").create()),
                 null, from, to, period, onlyLastKnownMetric, "user");
     }
 

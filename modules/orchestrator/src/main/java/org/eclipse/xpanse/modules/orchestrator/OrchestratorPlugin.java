@@ -10,14 +10,14 @@ import java.util.List;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.credential.AuthenticationCapabilities;
 import org.eclipse.xpanse.modules.orchestrator.deployment.ServiceResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.monitor.MetricsExporter;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
 
 /**
  * This interface describes orchestrator plugin in charge of interacting with backend fundamental
  * APIs.
  */
 public interface OrchestratorPlugin
-        extends ServiceResourceHandler, AuthenticationCapabilities, MetricsExporter {
+        extends ServiceResourceHandler, AuthenticationCapabilities, ServiceMetricsExporter {
 
     /**
      * get the Csp of the plugin.

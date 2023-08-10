@@ -12,13 +12,13 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 /**
  * Defines resource metrics cache key.
  */
-public record MonitorMetricCacheKey(Csp csp,
-                                    String resourceId,
-                                    MonitorResourceType monitorResourceType) {
+public record ServiceMetricsCacheKey(Csp csp,
+                                     String resourceId,
+                                     MonitorResourceType monitorResourceType) {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MonitorMetricCacheKey key) {
+        if (obj instanceof ServiceMetricsCacheKey key) {
             return key.csp == this.csp
                     && key.resourceId.equals(this.resourceId)
                     && key.monitorResourceType == this.monitorResourceType;

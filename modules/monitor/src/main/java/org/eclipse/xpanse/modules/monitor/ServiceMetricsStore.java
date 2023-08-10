@@ -8,8 +8,8 @@ package org.eclipse.xpanse.modules.monitor;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.monitor.cache.MonitorMetricCacheKey;
-import org.eclipse.xpanse.modules.monitor.cache.MonitorMetricCacheManager;
+import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheKey;
+import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,18 +17,18 @@ import org.springframework.stereotype.Component;
  * Component which acts as the gateway to monitor metric stored in cache.
  */
 @Component
-public class MonitorMetricStore {
+public class ServiceMetricsStore {
 
-    private final MonitorMetricCacheManager monitorMetricCacheManager;
+    private final ServiceMetricsCacheManager serviceMetricsCacheManager;
 
     /**
      * Constructor for ResourceMetricsStore.
      *
-     * @param monitorMetricCacheManager instance of MonitorMetricCacheManager class.
+     * @param serviceMetricsCacheManager instance of MonitorMetricCacheManager class.
      */
     @Autowired
-    public MonitorMetricStore(MonitorMetricCacheManager monitorMetricCacheManager) {
-        this.monitorMetricCacheManager = monitorMetricCacheManager;
+    public ServiceMetricsStore(ServiceMetricsCacheManager serviceMetricsCacheManager) {
+        this.serviceMetricsCacheManager = serviceMetricsCacheManager;
     }
 
     /**
@@ -41,9 +41,9 @@ public class MonitorMetricStore {
      */
     public void storeMonitorMetric(Csp csp, String resourceId, MonitorResourceType type,
                                    Metric metric) {
-        MonitorMetricCacheKey monitorMetricCacheKey =
-                new MonitorMetricCacheKey(csp, resourceId, type);
-        this.monitorMetricCacheManager.put(monitorMetricCacheKey, metric);
+        ServiceMetricsCacheKey serviceMetricsCacheKey =
+                new ServiceMetricsCacheKey(csp, resourceId, type);
+        this.serviceMetricsCacheManager.put(serviceMetricsCacheKey, metric);
     }
 
 
@@ -56,9 +56,9 @@ public class MonitorMetricStore {
      * @return metric item list.
      */
     public Metric getMonitorMetric(Csp csp, String resourceId, MonitorResourceType type) {
-        MonitorMetricCacheKey monitorMetricCacheKey =
-                new MonitorMetricCacheKey(csp, resourceId, type);
-        return this.monitorMetricCacheManager.get(monitorMetricCacheKey);
+        ServiceMetricsCacheKey serviceMetricsCacheKey =
+                new ServiceMetricsCacheKey(csp, resourceId, type);
+        return this.serviceMetricsCacheManager.get(serviceMetricsCacheKey);
     }
 
     /**
@@ -69,8 +69,8 @@ public class MonitorMetricStore {
      * @param type       tye of the resource monitor.
      */
     public void deleteMonitorMetric(Csp csp, String resourceId, MonitorResourceType type) {
-        MonitorMetricCacheKey monitorMetricCacheKey =
-                new MonitorMetricCacheKey(csp, resourceId, type);
-        this.monitorMetricCacheManager.remove(monitorMetricCacheKey);
+        ServiceMetricsCacheKey serviceMetricsCacheKey =
+                new ServiceMetricsCacheKey(csp, resourceId, type);
+        this.serviceMetricsCacheManager.remove(serviceMetricsCacheKey);
     }
 }

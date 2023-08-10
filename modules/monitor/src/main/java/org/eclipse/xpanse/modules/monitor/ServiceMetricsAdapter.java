@@ -27,8 +27,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
@@ -40,7 +40,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Service
-public class MonitorMetricsService {
+public class ServiceMetricsAdapter {
 
     private static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
     private final DeployServiceStorage deployServiceStorage;
@@ -51,7 +51,7 @@ public class MonitorMetricsService {
     /**
      * The constructor of Monitor.
      */
-    public MonitorMetricsService(DeployServiceStorage deployServiceStorage,
+    public ServiceMetricsAdapter(DeployServiceStorage deployServiceStorage,
                                  DeployResourceStorage deployResourceStorage,
                                  PluginManager pluginManager,
                                  IdentityProviderManager identityProviderManager) {
@@ -91,7 +91,7 @@ public class MonitorMetricsService {
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
 
-        ServiceMetricRequest serviceMetricRequest =
+        ServiceMetricsRequest serviceMetricRequest =
                 getServiceMetricRequest(vmResources, monitorType, from,
                         to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
 
@@ -132,7 +132,7 @@ public class MonitorMetricsService {
 
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
-        ResourceMetricRequest resourceMetricRequest =
+        ResourceMetricsRequest resourceMetricRequest =
                 getResourceMetricRequest(deployResource, monitorType, from,
                         to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
@@ -148,13 +148,13 @@ public class MonitorMetricsService {
         return serviceEntity;
     }
 
-    private ResourceMetricRequest getResourceMetricRequest(DeployResource deployResource,
-                                                           MonitorResourceType monitorType,
-                                                           Long from,
-                                                           Long to,
-                                                           Integer granularity,
-                                                           boolean onlyLastKnownMetric,
-                                                           String userId) {
+    private ResourceMetricsRequest getResourceMetricRequest(DeployResource deployResource,
+                                                            MonitorResourceType monitorType,
+                                                            Long from,
+                                                            Long to,
+                                                            Integer granularity,
+                                                            boolean onlyLastKnownMetric,
+                                                            String userId) {
         if (onlyLastKnownMetric) {
             from = null;
             to = null;
@@ -167,7 +167,7 @@ public class MonitorMetricsService {
             }
         }
 
-        return new ResourceMetricRequest(deployResource, monitorType, from, to,
+        return new ResourceMetricsRequest(deployResource, monitorType, from, to,
                 granularity, onlyLastKnownMetric, userId);
     }
 
@@ -181,13 +181,13 @@ public class MonitorMetricsService {
         }
     }
 
-    private ServiceMetricRequest getServiceMetricRequest(List<DeployResource> deployResources,
-                                                         MonitorResourceType monitorType,
-                                                         Long from,
-                                                         Long to,
-                                                         Integer granularity,
-                                                         boolean onlyLastKnownMetric,
-                                                         String userId) {
+    private ServiceMetricsRequest getServiceMetricRequest(List<DeployResource> deployResources,
+                                                          MonitorResourceType monitorType,
+                                                          Long from,
+                                                          Long to,
+                                                          Integer granularity,
+                                                          boolean onlyLastKnownMetric,
+                                                          String userId) {
         if (onlyLastKnownMetric) {
             from = null;
             to = null;
@@ -199,7 +199,7 @@ public class MonitorMetricsService {
                 to = System.currentTimeMillis();
             }
         }
-        return new ServiceMetricRequest(deployResources, monitorType, from, to,
+        return new ServiceMetricsRequest(deployResources, monitorType, from, to,
                 granularity, onlyLastKnownMetric, userId);
     }
 

@@ -38,9 +38,9 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.orchestrator.monitor.MetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.MetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudMonitorMetrics;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudNameSpaceKind;
@@ -90,7 +90,7 @@ public class HuaweiCloudDataModelConverter {
      * Build ShowMetricDataRequest for HuaweiCloud Monitor client.
      */
     public ShowMetricDataRequest buildShowMetricDataRequest(
-            ResourceMetricRequest resourceMetricRequest,
+            ResourceMetricsRequest resourceMetricRequest,
             MetricInfoList metricInfoList) {
         checkNullParamAndFillValue(resourceMetricRequest);
         return new ShowMetricDataRequest()
@@ -108,7 +108,7 @@ public class HuaweiCloudDataModelConverter {
      * Build BatchListMetricDataRequest for HuaweiCloud Monitor client.
      */
     public BatchListMetricDataRequest buildBatchListMetricDataRequest(
-            ServiceMetricRequest serviceMetricRequest,
+            ServiceMetricsRequest serviceMetricRequest,
             Map<String, List<MetricInfoList>> map) {
         checkNullParamAndFillValue(serviceMetricRequest);
         List<MetricInfo> metricInfos = new ArrayList<>();
@@ -245,7 +245,7 @@ public class HuaweiCloudDataModelConverter {
         return metric;
     }
 
-    private void buildMetricsDimension(ServiceMetricRequest serviceMetricRequest,
+    private void buildMetricsDimension(ServiceMetricsRequest serviceMetricRequest,
                                        Map<String, List<MetricInfoList>> map,
                                        List<MetricInfo> metricInfos) {
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
@@ -266,7 +266,7 @@ public class HuaweiCloudDataModelConverter {
         }
     }
 
-    private <T extends MetricRequest> void checkNullParamAndFillValue(T metricRequest) {
+    private <T extends MetricsRequest> void checkNullParamAndFillValue(T metricRequest) {
 
         if (Objects.isNull(metricRequest.getFrom())) {
             metricRequest.setFrom(System.currentTimeMillis()

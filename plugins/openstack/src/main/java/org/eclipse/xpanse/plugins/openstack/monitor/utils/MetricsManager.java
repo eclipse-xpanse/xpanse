@@ -15,9 +15,9 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
-import org.eclipse.xpanse.modules.orchestrator.monitor.MetricsExporter;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
+import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.ResourcesService;
@@ -49,7 +49,7 @@ public class MetricsManager {
 
     private final CredentialCenter credentialCenter;
 
-    private final MonitorMetricStore monitorMetricStore;
+    private final ServiceMetricsStore serviceMetricsStore;
 
     /**
      * Constructor for the MetricsManager bean.
@@ -59,30 +59,30 @@ public class MetricsManager {
      * @param gnocchiToXpanseModelConverter GnocchiToXpanseModelConverter bean.
      * @param aggregationService            AggregationService bean.
      * @param measuresService               MeasuresService bean.
-     * @param monitorMetricStore            MonitorMetricStore bean.
+     * @param serviceMetricsStore           MonitorMetricStore bean.
      */
     @Autowired
     public MetricsManager(KeystoneManager keystoneManager, ResourcesService resourcesService,
                           GnocchiToXpanseModelConverter gnocchiToXpanseModelConverter,
                           AggregationService aggregationService, MeasuresService measuresService,
                           CredentialCenter credentialCenter,
-                          MonitorMetricStore monitorMetricStore) {
+                          ServiceMetricsStore serviceMetricsStore) {
         this.keystoneManager = keystoneManager;
         this.resourcesService = resourcesService;
         this.gnocchiToXpanseModelConverter = gnocchiToXpanseModelConverter;
         this.aggregationService = aggregationService;
         this.measuresService = measuresService;
         this.credentialCenter = credentialCenter;
-        this.monitorMetricStore = monitorMetricStore;
+        this.serviceMetricsStore = serviceMetricsStore;
     }
 
     /**
      * Method which does the actual implementation for MetricsExporter. {@link
-     * MetricsExporter#getMetricsForResource} (ResourceMetricRequest metricQueryRequest)}().
+     * ServiceMetricsExporter#getMetricsForResource} (ResourceMetricRequest metricQueryRequest)}().
      *
      * @return returns list of Metrics.
      */
-    public List<Metric> getMetrics(ResourceMetricRequest resourceMetricRequest) {
+    public List<Metric> getMetrics(ResourceMetricsRequest resourceMetricRequest) {
 
         keystoneManager.authenticate(credentialCenter.getCredential(
                 Csp.OPENSTACK, CredentialType.VARIABLES,
@@ -138,7 +138,7 @@ public class MetricsManager {
     }
 
 
-    private Metric getCpuUsage(ResourceMetricRequest resourceMetricRequest, String metricId) {
+    private Metric getCpuUsage(ResourceMetricsRequest resourceMetricRequest, String metricId) {
         AggregationRequest aggregationRequest = this.gnocchiToXpanseModelConverter
                 .buildAggregationRequestToGetCpuMeasureAsPercentage(
                         metricId);
@@ -155,7 +155,7 @@ public class MetricsManager {
         return metric;
     }
 
-    private Metric getMemoryUsage(ResourceMetricRequest resourceMetricRequest, String metricId) {
+    private Metric getMemoryUsage(ResourceMetricsRequest resourceMetricRequest, String metricId) {
         MetricsFilter metricsFilter =
                 this.gnocchiToXpanseModelConverter.buildMetricsFilter(resourceMetricRequest);
         Metric metric = this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
@@ -168,7 +168,7 @@ public class MetricsManager {
         return metric;
     }
 
-    private Metric getNetworkUsage(ResourceMetricRequest resourceMetricRequest, String metricId,
+    private Metric getNetworkUsage(ResourceMetricsRequest resourceMetricRequest, String metricId,
                                    MonitorResourceType monitorResourceType) {
         AggregationRequest aggregationRequest = this.gnocchiToXpanseModelConverter
                 .buildAggregationRequestToGetNetworkRate(
@@ -187,17 +187,17 @@ public class MetricsManager {
     }
 
 
-    private void doCacheActionForResourceMetrics(ResourceMetricRequest resourceMetricRequest,
+    private void doCacheActionForResourceMetrics(ResourceMetricsRequest resourceMetricRequest,
                                                  MonitorResourceType monitorResourceType,
                                                  Metric metric) {
         if (resourceMetricRequest.isOnlyLastKnownMetric()) {
             String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
             if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                monitorMetricStore.storeMonitorMetric(Csp.OPENSTACK,
+                serviceMetricsStore.storeMonitorMetric(Csp.OPENSTACK,
                         resourceId, monitorResourceType, metric);
 
             } else {
-                Metric cacheMetric = monitorMetricStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
+                Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
                         monitorResourceType);
                 if (Objects.nonNull(cacheMetric)
                         && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {

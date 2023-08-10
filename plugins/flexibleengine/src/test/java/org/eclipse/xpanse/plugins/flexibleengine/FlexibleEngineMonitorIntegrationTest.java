@@ -20,14 +20,14 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
-import org.eclipse.xpanse.modules.monitor.cache.MonitorMetricCacheManager;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
+import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMonitorConverter;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.MetricsService;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsConverter;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,10 +39,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {FlexibleEngineOrchestratorPlugin.class, MetricsService.class,
+@ContextConfiguration(classes = {FlexibleEngineOrchestratorPlugin.class,
+        FlexibleEngineMetricsService.class,
         FlexibleEngineMonitorClient.class, RetryTemplateService.class,
-        FlexibleEngineMonitorConverter.class, CredentialCenter.class,
-        MonitorMetricStore.class, MonitorMetricCacheManager.class})
+        FlexibleEngineMetricsConverter.class, CredentialCenter.class,
+        ServiceMetricsStore.class, ServiceMetricsCacheManager.class})
 class FlexibleEngineMonitorIntegrationTest {
 
     @RegisterExtension
@@ -55,7 +56,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Autowired
     FlexibleEngineOrchestratorPlugin plugin;
     @Autowired
-    FlexibleEngineMonitorConverter converter;
+    FlexibleEngineMetricsConverter converter;
 
     @MockBean
     CredentialCenter credentialCenter;
@@ -63,15 +64,15 @@ class FlexibleEngineMonitorIntegrationTest {
     @MockBean
     FlexibleEngineMonitorClient client;
 
-    ResourceMetricRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
-                                                     Long from, Long to,
-                                                     boolean onlyLastKnownMetric) {
+    ResourceMetricsRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
+                                                      Long from, Long to,
+                                                      boolean onlyLastKnownMetric) {
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
-        return new ResourceMetricRequest(deployResource, monitorResourceType, from, to, null,
+        return new ResourceMetricsRequest(deployResource, monitorResourceType, from, to, null,
                 onlyLastKnownMetric, "userId");
 
     }
@@ -111,15 +112,15 @@ class FlexibleEngineMonitorIntegrationTest {
     }
 
 
-    ServiceMetricRequest setUpServiceMetricRequest(MonitorResourceType monitorResourceType,
-                                                   Long from, Long to,
-                                                   boolean onlyLastKnownMetric) {
+    ServiceMetricsRequest setUpServiceMetricRequest(MonitorResourceType monitorResourceType,
+                                                    Long from, Long to,
+                                                    boolean onlyLastKnownMetric) {
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
-        return new ServiceMetricRequest(List.of(deployResource), monitorResourceType, from, to,
+        return new ServiceMetricsRequest(List.of(deployResource), monitorResourceType, from, to,
                 null,
                 onlyLastKnownMetric, "userId");
     }
@@ -129,7 +130,7 @@ class FlexibleEngineMonitorIntegrationTest {
     void testGetMetricsForResourceWithParamsOnlyLastKnownMetricTrue() throws Exception {
 
         // Setup
-        ResourceMetricRequest resourceMetricRequest =
+        ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(null, null, null, true);
         mockClientHttpRequest();
 
@@ -148,7 +149,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForResourceWithParamsFromAndTo() throws Exception {
         // Setup
-        ResourceMetricRequest resourceMetricRequest =
+        ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(null, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
@@ -169,7 +170,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForResourceWithParamsTypeCpu() throws Exception {
         // Setup
-        ResourceMetricRequest resourceMetricRequest =
+        ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.THREE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
@@ -189,7 +190,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForResourceWithParamsTypeMem() throws Exception {
         // Setup
-        ResourceMetricRequest resourceMetricRequest =
+        ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.TEN_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
@@ -209,7 +210,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForResourceWithParamsTypeVmNetworkIncoming() throws Exception {
         // Setup
-        ResourceMetricRequest resourceMetricRequest =
+        ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
                         System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_MONTH_MILLISECONDS,
@@ -231,7 +232,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForResourceWithParamsTypeVmNetworkOutgoing() throws Exception {
         // Setup
-        ResourceMetricRequest resourceMetricRequest =
+        ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
                         System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_MONTH_MILLISECONDS - 1,
@@ -253,7 +254,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForServiceWithParamsOnlyLastKnownMetricTrue() throws Exception {
         // Setup
-        ServiceMetricRequest serviceMetricRequest =
+        ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(null, null, null, true);
         mockClientHttpRequest();
 
@@ -272,7 +273,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForServiceWithParamsFromAndTo() throws Exception {
         // Setup
-        ServiceMetricRequest serviceMetricRequest =
+        ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(null, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
@@ -292,7 +293,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForServiceWithParamsTypeCpu() throws Exception {
         // Setup
-        ServiceMetricRequest serviceMetricRequest =
+        ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
@@ -310,7 +311,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForServiceWithParamsTypeMem() throws Exception {
         // Setup
-        ServiceMetricRequest serviceMetricRequest =
+        ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
@@ -328,7 +329,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForServiceWithParamsTypeVmNetworkIncoming() throws Exception {
         // Setup
-        ServiceMetricRequest serviceMetricRequest =
+        ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
                         System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
@@ -348,7 +349,7 @@ class FlexibleEngineMonitorIntegrationTest {
     @Test
     void testGetMetricsForServiceWithParamsTypeVmNetworkOutgoing() throws Exception {
         // Setup
-        ServiceMetricRequest serviceMetricRequest =
+        ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
                         System.currentTimeMillis() -
                                 FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
