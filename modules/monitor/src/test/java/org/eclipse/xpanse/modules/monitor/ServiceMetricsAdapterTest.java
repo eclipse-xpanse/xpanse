@@ -26,8 +26,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDep
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,9 +38,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {MonitorMetricsService.class, PluginManager.class,
+@ContextConfiguration(classes = {ServiceMetricsAdapter.class, PluginManager.class,
         DeployResourceStorage.class, DeployServiceStorage.class, IdentityProviderManager.class})
-class MonitorMetricsServiceTest {
+class ServiceMetricsAdapterTest {
 
     private final String resourceId = "8d1495ae-8420-4172-93c1-746c09b4a005";
     private final String serviceId = "23cc529b-64d9-4875-a2f0-08b415705964";
@@ -56,7 +56,7 @@ class MonitorMetricsServiceTest {
     @MockBean
     private IdentityProviderManager identityProviderManager;
     @Autowired
-    private MonitorMetricsService monitorMetricsServiceUnderTest;
+    private ServiceMetricsAdapter serviceMetricsAdapterUnderTest;
 
     @Test
     void testGetMetricsByServiceId() {
@@ -86,11 +86,11 @@ class MonitorMetricsServiceTest {
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
         // Run the test
         final List<Metric> result =
-                monitorMetricsServiceUnderTest.getMetricsByServiceId(serviceId,
+                serviceMetricsAdapterUnderTest.getMetricsByServiceId(serviceId,
                         null, null, null, null, true);
 
         final List<Metric> result1 =
-                monitorMetricsServiceUnderTest.getMetricsByServiceId(serviceId,
+                serviceMetricsAdapterUnderTest.getMetricsByServiceId(serviceId,
                         null, null, null, null, false);
 
         // Verify the results
@@ -110,19 +110,19 @@ class MonitorMetricsServiceTest {
                 .thenReturn(deployResourceEntity);
 
         Assertions.assertThrows(ResourceNotSupportedForMonitoringException.class,
-                () -> monitorMetricsServiceUnderTest.getMetricsByResourceId(resourceId, null, null,
+                () -> serviceMetricsAdapterUnderTest.getMetricsByResourceId(resourceId, null, null,
                         null, null,
                         false));
 
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> monitorMetricsServiceUnderTest.getMetricsByResourceId(
+                () -> serviceMetricsAdapterUnderTest.getMetricsByResourceId(
                         UUID.randomUUID().toString(), null,
                         Long.MAX_VALUE, Long.MAX_VALUE, null,
                         false));
 
         // Verify the results
         Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> monitorMetricsServiceUnderTest.getMetricsByResourceId("id", null, null, null,
+                () -> serviceMetricsAdapterUnderTest.getMetricsByResourceId("id", null, null, null,
                         null,
                         false));
     }
@@ -163,12 +163,12 @@ class MonitorMetricsServiceTest {
 
         // Run the test
         final List<Metric> result =
-                monitorMetricsServiceUnderTest.getMetricsByResourceId(resourceId, null, null, null,
+                serviceMetricsAdapterUnderTest.getMetricsByResourceId(resourceId, null, null, null,
                         null,
                         true);
 
         final List<Metric> result1 =
-                monitorMetricsServiceUnderTest.getMetricsByResourceId(resourceId, null, null, null,
+                serviceMetricsAdapterUnderTest.getMetricsByResourceId(resourceId, null, null, null,
                         null,
                         false);
         // Verify the results
@@ -181,19 +181,19 @@ class MonitorMetricsServiceTest {
     void testGetMetricsBySourceIdException() {
         long currentTimeMillis = System.currentTimeMillis();
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> monitorMetricsServiceUnderTest.getMetricsByServiceId(
+                () -> serviceMetricsAdapterUnderTest.getMetricsByServiceId(
                         UUID.randomUUID().toString(), null,
                         currentTimeMillis, 1L, null,
                         false));
 
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> monitorMetricsServiceUnderTest.getMetricsByServiceId(
+                () -> serviceMetricsAdapterUnderTest.getMetricsByServiceId(
                         UUID.randomUUID().toString(), null,
                         currentTimeMillis + 3000, currentTimeMillis + 5000, null,
                         false));
 
         Assertions.assertThrows(ServiceNotDeployedException.class,
-                () -> monitorMetricsServiceUnderTest.getMetricsByServiceId(
+                () -> serviceMetricsAdapterUnderTest.getMetricsByServiceId(
                         UUID.randomUUID().toString(), null,
                         null, null, null,
                         false));
@@ -228,13 +228,13 @@ class MonitorMetricsServiceTest {
 
             @Override
             public List<Metric> getMetricsForResource(
-                    ResourceMetricRequest resourceMetricRequest) {
+                    ResourceMetricsRequest resourceMetricRequest) {
                 return metrics;
             }
 
             @Override
             public List<Metric> getMetricsForService(
-                    ServiceMetricRequest serviceMetricRequest) {
+                    ServiceMetricsRequest serviceMetricRequest) {
                 return metrics;
             }
         };

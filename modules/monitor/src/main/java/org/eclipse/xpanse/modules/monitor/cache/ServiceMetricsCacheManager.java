@@ -19,16 +19,16 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @SuppressWarnings("UnnecessarilyFullyQualified")
-public class MonitorMetricCacheManager {
+public class ServiceMetricsCacheManager {
 
-    private static final Cache<MonitorMetricCacheKey, Metric> RESOURCE_METRICS_CACHE =
+    private static final Cache<ServiceMetricsCacheKey, Metric> RESOURCE_METRICS_CACHE =
             monitorMetricCache();
 
-    private static Cache<MonitorMetricCacheKey, Metric> monitorMetricCache() {
+    private static Cache<ServiceMetricsCacheKey, Metric> monitorMetricCache() {
         return Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
                 .removalListener(
-                        (MonitorMetricCacheKey key,
+                        (ServiceMetricsCacheKey key,
                          Metric graph,
                          RemovalCause cause) -> {
                             assert key != null;
@@ -41,15 +41,15 @@ public class MonitorMetricCacheManager {
                 .build();
     }
 
-    public void put(MonitorMetricCacheKey key, Metric value) {
+    public void put(ServiceMetricsCacheKey key, Metric value) {
         RESOURCE_METRICS_CACHE.put(key, value);
     }
 
-    public Metric get(MonitorMetricCacheKey key) {
+    public Metric get(ServiceMetricsCacheKey key) {
         return RESOURCE_METRICS_CACHE.getIfPresent(key);
     }
 
-    public void remove(MonitorMetricCacheKey key) {
+    public void remove(ServiceMetricsCacheKey key) {
         RESOURCE_METRICS_CACHE.invalidate(key);
     }
 

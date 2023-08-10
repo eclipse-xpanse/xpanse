@@ -17,21 +17,21 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
-import org.eclipse.xpanse.modules.monitor.cache.MonitorMetricCacheManager;
+import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
+import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMonitorConverter;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.MetricsService;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsConverter;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
 import org.junit.jupiter.api.Test;
 
 public class FlexibleEngineOrchestratorPluginTest {
 
     private final FlexibleEngineOrchestratorPlugin plugin = new FlexibleEngineOrchestratorPlugin(
-            new MetricsService(new FlexibleEngineMonitorClient(),
-                    new FlexibleEngineMonitorConverter(),
-                    new MonitorMetricStore(new MonitorMetricCacheManager()),
+            new FlexibleEngineMetricsService(new FlexibleEngineMonitorClient(),
+                    new FlexibleEngineMetricsConverter(),
+                    new ServiceMetricsStore(new ServiceMetricsCacheManager()),
                     new RetryTemplateService(), null));
 
     @Test

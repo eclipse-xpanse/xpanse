@@ -10,15 +10,16 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ServiceMetricRequestTest {
+class ServiceMetricsRequestTest {
 
     DeployResource deployResource = new DeployResource();
-    private ServiceMetricRequest test;
+    private ServiceMetricsRequest test;
 
     @BeforeEach
     void setUp() {
 
-        test = new ServiceMetricRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L, 1,
+        test = new ServiceMetricsRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                1,
                 false,
                 "userId");
     }
@@ -43,14 +44,14 @@ class ServiceMetricRequestTest {
         assertNotEquals(test, object);
         assertNotEquals(test.hashCode(), object.hashCode());
 
-        ServiceMetricRequest test1 =
-                new ServiceMetricRequest(List.of(deployResource), null, null, null, null, true,
+        ServiceMetricsRequest test1 =
+                new ServiceMetricsRequest(List.of(deployResource), null, null, null, null, true,
                         null);
-        ServiceMetricRequest test2 =
-                new ServiceMetricRequest(List.of(new DeployResource()), null, null, null, null,
+        ServiceMetricsRequest test2 =
+                new ServiceMetricsRequest(List.of(new DeployResource()), null, null, null, null,
                         true, null);
-        ServiceMetricRequest test3 =
-                new ServiceMetricRequest(null, null, null, null, null, false, null);
+        ServiceMetricsRequest test3 =
+                new ServiceMetricsRequest(null, null, null, null, null, false, null);
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test, test3);
@@ -124,7 +125,7 @@ class ServiceMetricRequestTest {
     void testToString() {
         assertNotEquals(test.toString(), null);
 
-        String exceptedString = "MetricRequest(monitorResourceType=CPU, from=0, "
+        String exceptedString = "MetricsRequest(monitorResourceType=CPU, from=0, "
                 + "to=0, granularity=1, onlyLastKnownMetric=false, userId=userId)";
         assertEquals(test.toString(), exceptedString);
     }

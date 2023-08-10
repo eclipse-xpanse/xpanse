@@ -11,7 +11,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.monitor.cache.MonitorMetricCacheManager;
+import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,15 +19,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ContextConfiguration(classes = {MonitorMetricStore.class, MonitorMetricCacheManager.class})
+@ContextConfiguration(classes = {ServiceMetricsStore.class, ServiceMetricsCacheManager.class})
 @ExtendWith(SpringExtension.class)
-class MonitorMetricStoreTest {
+class ServiceMetricsStoreTest {
 
     @Autowired
-    MonitorMetricCacheManager mockMonitorMetricCacheManager;
+    ServiceMetricsCacheManager mockServiceMetricsCacheManager;
 
     @Autowired
-    MonitorMetricStore monitorMetricStore;
+    ServiceMetricsStore serviceMetricsStore;
 
     Metric setUpMetric() {
         MetricItem metricItem = new MetricItem();
@@ -48,42 +48,42 @@ class MonitorMetricStoreTest {
 
     @Test
     void testWriteToCache() {
-        monitorMetricStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
+        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
                 setUpMetric());
         Assertions.assertTrue(Objects.nonNull(
-                monitorMetricStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
                         MonitorResourceType.CPU)));
     }
 
     @Test
     void testCacheKey() {
-        monitorMetricStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
+        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
                 setUpMetric());
         Assertions.assertTrue(Objects.nonNull(
-                monitorMetricStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
                         MonitorResourceType.CPU)));
         Assertions.assertTrue(Objects.isNull(
-                monitorMetricStore.getMonitorMetric(Csp.OPENSTACK, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.OPENSTACK, "resourceId",
                         MonitorResourceType.CPU)));
         Assertions.assertTrue(Objects.isNull(
-                monitorMetricStore.getMonitorMetric(Csp.HUAWEI, "resourceId1",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId1",
                         MonitorResourceType.CPU)));
         Assertions.assertTrue(Objects.isNull(
-                monitorMetricStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
                         MonitorResourceType.MEM)));
     }
 
     @Test
     void testCacheDeletion() {
-        monitorMetricStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
+        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
                 setUpMetric());
         Assertions.assertTrue(Objects.nonNull(
-                monitorMetricStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
                         MonitorResourceType.CPU)));
-        monitorMetricStore.deleteMonitorMetric(Csp.HUAWEI, "resourceId",
+        serviceMetricsStore.deleteMonitorMetric(Csp.HUAWEI, "resourceId",
                 MonitorResourceType.CPU);
         Assertions.assertTrue(Objects.isNull(
-                monitorMetricStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
                         MonitorResourceType.CPU)));
     }
 }

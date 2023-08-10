@@ -16,13 +16,13 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
  * The model to query metrics for resource instance.
  */
 @EqualsAndHashCode(callSuper = true)
-public class ResourceMetricRequest extends MetricRequest {
+public class ResourceMetricsRequest extends MetricsRequest {
 
     @NotNull
     @Getter
     private final DeployResource deployResource;
 
-    public ResourceMetricRequest(
+    public ResourceMetricsRequest(
             DeployResource deployResource,
             MonitorResourceType monitorResourceType,
             Long from,

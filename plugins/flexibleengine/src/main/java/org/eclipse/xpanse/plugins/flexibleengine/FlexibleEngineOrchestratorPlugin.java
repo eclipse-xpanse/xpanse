@@ -18,10 +18,10 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.MetricsService;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,11 +32,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final MetricsService metricsService;
+    private final FlexibleEngineMetricsService flexibleEngineMetricsService;
 
     @Autowired
-    public FlexibleEngineOrchestratorPlugin(MetricsService metricsService) {
-        this.metricsService = metricsService;
+    public FlexibleEngineOrchestratorPlugin(
+            FlexibleEngineMetricsService flexibleEngineMetricsService) {
+        this.flexibleEngineMetricsService = flexibleEngineMetricsService;
     }
 
     @Override
@@ -92,8 +93,8 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
      * @return Returns list of metric result.
      */
     @Override
-    public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
-        return metricsService.getMetricsForResource(resourceMetricRequest);
+    public List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest) {
+        return flexibleEngineMetricsService.getMetricsForResource(resourceMetricRequest);
     }
 
     /**
@@ -103,7 +104,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
      * @return Returns list of metric result.
      */
     @Override
-    public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
-        return metricsService.getMetricsForService(serviceMetricRequest);
+    public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
+        return flexibleEngineMetricsService.getMetricsForService(serviceMetricRequest);
     }
 }

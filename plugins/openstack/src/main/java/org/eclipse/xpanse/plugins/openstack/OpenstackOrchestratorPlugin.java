@@ -18,8 +18,8 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.monitor.utils.MetricsManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,7 +108,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      * @return Returns list of metric result.
      */
     @Override
-    public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
+    public List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest) {
         return this.metricsManager.getMetrics(resourceMetricRequest);
     }
 
@@ -119,10 +119,10 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      * @return Returns list of metric result.
      */
     @Override
-    public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
+    public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
-            ResourceMetricRequest resourceMetricRequest = new ResourceMetricRequest(
+            ResourceMetricsRequest resourceMetricRequest = new ResourceMetricsRequest(
                     deployResource,
                     serviceMetricRequest.getMonitorResourceType(),
                     serviceMetricRequest.getFrom(),

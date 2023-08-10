@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 @Data
 @AllArgsConstructor
 @SuppressWarnings("UnnecessarilyFullyQualified")
-public class MetricRequest {
+public class MetricsRequest {
 
     private MonitorResourceType monitorResourceType;
 

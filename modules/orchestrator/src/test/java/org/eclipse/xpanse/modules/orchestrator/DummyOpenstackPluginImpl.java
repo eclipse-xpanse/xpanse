@@ -13,8 +13,8 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -53,7 +53,7 @@ public class DummyOpenstackPluginImpl implements OrchestratorPlugin {
      * @return Returns list of metric result.
      */
     @Override
-    public List<Metric> getMetricsForResource(ResourceMetricRequest resourceMetricRequest) {
+    public List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest) {
         return null;
     }
 
@@ -64,7 +64,7 @@ public class DummyOpenstackPluginImpl implements OrchestratorPlugin {
      * @return Returns list of metric result.
      */
     @Override
-    public List<Metric> getMetricsForService(ServiceMetricRequest serviceMetricRequest) {
+    public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
         return null;
     }
 }

@@ -31,9 +31,9 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.monitor.MonitorMetricStore;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricRequest;
+import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.models.HuaweiCloudRetryStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,7 +48,7 @@ public class HuaweiCloudMetricsService {
 
     private final HuaweiCloudMonitorClient huaweiCloudMonitorClient;
 
-    private final MonitorMetricStore monitorMetricStore;
+    private final ServiceMetricsStore serviceMetricsStore;
 
     private final HuaweiCloudDataModelConverter huaweiCloudDataModelConverter;
 
@@ -60,11 +60,11 @@ public class HuaweiCloudMetricsService {
     @Autowired
     public HuaweiCloudMetricsService(
             HuaweiCloudMonitorClient huaweiCloudMonitorClient,
-            MonitorMetricStore monitorMetricStore,
+            ServiceMetricsStore serviceMetricsStore,
             HuaweiCloudDataModelConverter huaweiCloudDataModelConverter,
             CredentialCenter credentialCenter) {
         this.huaweiCloudMonitorClient = huaweiCloudMonitorClient;
-        this.monitorMetricStore = monitorMetricStore;
+        this.serviceMetricsStore = serviceMetricsStore;
         this.huaweiCloudDataModelConverter = huaweiCloudDataModelConverter;
         this.credentialCenter = credentialCenter;
     }
@@ -75,7 +75,7 @@ public class HuaweiCloudMetricsService {
      * @param resourceMetricRequest The request model to query metrics.
      * @return Returns list of metric result.
      */
-    public List<Metric> getMetricsByResource(ResourceMetricRequest resourceMetricRequest) {
+    public List<Metric> getMetricsByResource(ResourceMetricsRequest resourceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
@@ -123,7 +123,7 @@ public class HuaweiCloudMetricsService {
      * @param serviceMetricRequest The request model to query metrics.
      * @return Returns list of metric result.
      */
-    public List<Metric> getMetricsByService(ServiceMetricRequest serviceMetricRequest) {
+    public List<Metric> getMetricsByService(ServiceMetricsRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
                 Csp.HUAWEI,
@@ -164,17 +164,17 @@ public class HuaweiCloudMetricsService {
     }
 
 
-    private void doCacheActionForResourceMetrics(ResourceMetricRequest resourceMetricRequest,
+    private void doCacheActionForResourceMetrics(ResourceMetricsRequest resourceMetricRequest,
                                                  MonitorResourceType monitorResourceType,
                                                  Metric metric) {
         if (resourceMetricRequest.isOnlyLastKnownMetric()) {
             String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
             if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                monitorMetricStore.storeMonitorMetric(Csp.OPENSTACK,
+                serviceMetricsStore.storeMonitorMetric(Csp.OPENSTACK,
                         resourceId, monitorResourceType, metric);
 
             } else {
-                Metric cacheMetric = monitorMetricStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
+                Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
                         monitorResourceType);
                 if (Objects.nonNull(cacheMetric)
                         && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
@@ -184,7 +184,7 @@ public class HuaweiCloudMetricsService {
         }
     }
 
-    private void doCacheActionForServiceMetrics(ServiceMetricRequest serviceMetricRequest,
+    private void doCacheActionForServiceMetrics(ServiceMetricsRequest serviceMetricRequest,
                                                 Map<String, List<MetricInfoList>> resourceMetricMap,
                                                 List<Metric> metrics) {
         if (serviceMetricRequest.isOnlyLastKnownMetric()) {
@@ -196,7 +196,7 @@ public class HuaweiCloudMetricsService {
                                     metricInfo.getMetricName());
                     if (CollectionUtils.isEmpty(metrics)) {
                         Metric metricCache =
-                                monitorMetricStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
+                                serviceMetricsStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
                                         resourceId, type);
                         metrics.add(metricCache);
                     } else {
@@ -208,12 +208,12 @@ public class HuaweiCloudMetricsService {
                                         metric.getLabels().get("id"))
                         ).findAny();
                         if (metricOptional.isPresent()) {
-                            monitorMetricStore.storeMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId,
+                            serviceMetricsStore.storeMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId,
                                     type,
                                     metricOptional.get());
                         } else {
                             Metric metricCache =
-                                    monitorMetricStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
+                                    serviceMetricsStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
                                             resourceId, type);
                             metrics.add(metricCache);
                         }
