@@ -41,6 +41,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFo
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -340,13 +341,13 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testListMyDeployedServices() {
+    public void testListDeployedServices() {
         List<DeployServiceEntity> deployServices = new ArrayList<>();
         deployServices.add(deployServiceEntity);
 
-        when(deployServiceStorage.services()).thenReturn(deployServices);
+        when(deployServiceStorage.listServices(any())).thenReturn(deployServices);
 
-        List<ServiceVo> result = deployService.listMyDeployedServices();
+        List<ServiceVo> result = deployService.listDeployedServices(new ServiceQueryModel());
 
         assertEquals(1, result.size());
 

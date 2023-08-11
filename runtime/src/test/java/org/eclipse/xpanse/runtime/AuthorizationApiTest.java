@@ -134,7 +134,7 @@ class AuthorizationApiTest {
             attributes = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
     void testCallApiWell() throws Exception {
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/deployed")
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
