@@ -20,18 +20,19 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.models.service.register.Ocl;
-import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
-import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -41,6 +42,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class,
         TerraformVersionProvider.class})
+@TestPropertySource(properties = {"terraform.provider.huaweicloud.version=~> 1.51.0"})
 public class TerraformDeploymentTest {
 
     @Autowired
@@ -52,18 +54,17 @@ public class TerraformDeploymentTest {
     @MockBean
     DeployEnvironments deployEnvironments;
 
-    @Disabled
     @Test
     public void basicTest() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test.yaml"));
+        Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
 
         CreateRequest deployRequest = new CreateRequest();
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setCustomerServiceName("test");
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
-        deployRequest.setVersion(ocl.getVersion());
+        deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
 
         Map<String, String> property = new HashMap<>();
@@ -102,8 +103,8 @@ public class TerraformDeploymentTest {
     public void throwExceptionWhenDeployFails() {
         UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
 
-        org.eclipse.xpanse.modules.models.service.register.Deployment deployment =
-                new org.eclipse.xpanse.modules.models.service.register.Deployment();
+        Deployment deployment =
+                new Deployment();
         deployment.setKind(DeployerKind.TERRAFORM);
         deployment.setDeployer("deployer");
 

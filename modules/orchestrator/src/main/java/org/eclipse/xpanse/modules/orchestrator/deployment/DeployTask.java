@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.orchestrator.deployment;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
-import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 
 /**
  * The task for the deployment.

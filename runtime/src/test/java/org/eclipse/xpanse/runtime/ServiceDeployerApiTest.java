@@ -15,21 +15,21 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.ServiceDeployerApi;
-import org.eclipse.xpanse.api.ServiceRegisterApi;
+import org.eclipse.xpanse.api.ServiceTemplateApi;
 import org.eclipse.xpanse.common.openapi.OpenApiUtil;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
-import org.eclipse.xpanse.modules.models.service.register.Ocl;
-import org.eclipse.xpanse.modules.models.service.register.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
-import org.eclipse.xpanse.modules.models.service.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.service.view.RegisteredServiceVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
-import org.eclipse.xpanse.modules.register.register.utils.RegisteredServicesOpenApiGenerator;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
+import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -66,7 +66,7 @@ class ServiceDeployerApiTest {
     @Autowired
     private ServiceDeployerApi serviceDeployerApi;
     @Autowired
-    private ServiceRegisterApi serviceRegisterApi;
+    private ServiceTemplateApi serviceTemplateApi;
 
     @BeforeAll
     static void init() throws Exception {
@@ -87,42 +87,42 @@ class ServiceDeployerApiTest {
     @Test
     @Order(1)
     void testDownLoadOpenApiJar() {
-        RegisterServiceEntity registerServiceEntity = new RegisterServiceEntity();
-        registerServiceEntity.setId(UUID.randomUUID());
-        registerServiceEntity.setName("kafka");
-        registerServiceEntity.setVersion("2.0");
-        registerServiceEntity.setCsp(Csp.HUAWEI);
-        registerServiceEntity.setCategory(Category.MIDDLEWARE);
-        registerServiceEntity.setOcl(oclRegister);
-        registerServiceEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        serviceTemplateEntity.setId(UUID.randomUUID());
+        serviceTemplateEntity.setName("kafka");
+        serviceTemplateEntity.setVersion("2.0");
+        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCategory(Category.MIDDLEWARE);
+        serviceTemplateEntity.setOcl(oclRegister);
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
         OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
                 OPENAPI_PATH, SERVICER_PORT);
-        RegisteredServicesOpenApiGenerator
-                registeredServicesOpenApiUtil = new RegisteredServicesOpenApiGenerator(
+        ServiceTemplateOpenApiGenerator
+                registeredServicesOpenApiUtil = new ServiceTemplateOpenApiGenerator(
                 deployVariableValidator, openApiUtil
         );
-        registeredServicesOpenApiUtil.createServiceApi(registerServiceEntity);
+        registeredServicesOpenApiUtil.createServiceApi(serviceTemplateEntity);
         String openApiWorkdir = openApiUtil.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir,
-                registerServiceEntity.getId().toString() + ".html");
+                serviceTemplateEntity.getId().toString() + ".html");
         Assertions.assertTrue(htmlFile.exists());
     }
 
     @Disabled
     @Test
     void getDeployedServiceDetailsById() throws Exception {
-        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
+        ServiceTemplateVo serviceTemplateVo = serviceTemplateApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserId(userId);
-        createRequest.setServiceName(registeredServiceVo.getName());
-        createRequest.setVersion(registeredServiceVo.getVersion());
-        createRequest.setCsp(registeredServiceVo.getCsp());
-        createRequest.setCategory(registeredServiceVo.getCategory());
-        createRequest.setFlavor(registeredServiceVo.getOcl().getFlavors().get(0).toString());
+        createRequest.setServiceName(serviceTemplateVo.getName());
+        createRequest.setVersion(serviceTemplateVo.getVersion());
+        createRequest.setCsp(serviceTemplateVo.getCsp());
+        createRequest.setCategory(serviceTemplateVo.getCategory());
+        createRequest.setFlavor(serviceTemplateVo.getOcl().getFlavors().get(0).toString());
         createRequest.setRegion(
-                registeredServiceVo.getOcl().getCloudServiceProvider().getRegions().get(0)
+                serviceTemplateVo.getOcl().getCloudServiceProvider().getRegions().get(0)
                         .toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
@@ -138,17 +138,17 @@ class ServiceDeployerApiTest {
     @Disabled
     @Test
     void listMyDeployedServices() throws Exception {
-        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
+        ServiceTemplateVo serviceTemplateVo = serviceTemplateApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserId(userId);
-        createRequest.setServiceName(registeredServiceVo.getName());
-        createRequest.setVersion(registeredServiceVo.getVersion());
-        createRequest.setCsp(registeredServiceVo.getCsp());
-        createRequest.setCategory(registeredServiceVo.getCategory());
-        createRequest.setFlavor(registeredServiceVo.getOcl().getFlavors().get(0).toString());
+        createRequest.setServiceName(serviceTemplateVo.getName());
+        createRequest.setVersion(serviceTemplateVo.getVersion());
+        createRequest.setCsp(serviceTemplateVo.getCsp());
+        createRequest.setCategory(serviceTemplateVo.getCategory());
+        createRequest.setFlavor(serviceTemplateVo.getOcl().getFlavors().get(0).toString());
         createRequest.setRegion(
-                registeredServiceVo.getOcl().getCloudServiceProvider().getRegions().get(0)
+                serviceTemplateVo.getOcl().getCloudServiceProvider().getRegions().get(0)
                         .toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
@@ -164,17 +164,17 @@ class ServiceDeployerApiTest {
     @Disabled
     @Test
     void deploy() throws Exception {
-        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
+        ServiceTemplateVo serviceTemplateVo = serviceTemplateApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserId(userId);
-        createRequest.setServiceName(registeredServiceVo.getName());
-        createRequest.setVersion(registeredServiceVo.getVersion());
-        createRequest.setCsp(registeredServiceVo.getCsp());
-        createRequest.setCategory(registeredServiceVo.getCategory());
-        createRequest.setFlavor(registeredServiceVo.getOcl().getFlavors().get(0).toString());
+        createRequest.setServiceName(serviceTemplateVo.getName());
+        createRequest.setVersion(serviceTemplateVo.getVersion());
+        createRequest.setCsp(serviceTemplateVo.getCsp());
+        createRequest.setCategory(serviceTemplateVo.getCategory());
+        createRequest.setFlavor(serviceTemplateVo.getOcl().getFlavors().get(0).toString());
         createRequest.setRegion(
-                registeredServiceVo.getOcl().getCloudServiceProvider().getRegions().get(0)
+                serviceTemplateVo.getOcl().getCloudServiceProvider().getRegions().get(0)
                         .toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
@@ -189,17 +189,17 @@ class ServiceDeployerApiTest {
     @Disabled
     @Test
     void destroy() throws Exception {
-        RegisteredServiceVo registeredServiceVo = serviceRegisterApi.register(oclRegister);
+        ServiceTemplateVo serviceTemplateVo = serviceTemplateApi.register(oclRegister);
         Thread.sleep(3000);
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserId(userId);
-        createRequest.setServiceName(registeredServiceVo.getName());
-        createRequest.setVersion(registeredServiceVo.getVersion());
-        createRequest.setCsp(registeredServiceVo.getCsp());
-        createRequest.setCategory(registeredServiceVo.getCategory());
-        createRequest.setFlavor(registeredServiceVo.getOcl().getFlavors().get(0).toString());
+        createRequest.setServiceName(serviceTemplateVo.getName());
+        createRequest.setVersion(serviceTemplateVo.getVersion());
+        createRequest.setCsp(serviceTemplateVo.getCsp());
+        createRequest.setCategory(serviceTemplateVo.getCategory());
+        createRequest.setFlavor(serviceTemplateVo.getOcl().getFlavors().get(0).toString());
         createRequest.setRegion(
-                registeredServiceVo.getOcl().getCloudServiceProvider().getRegions().get(0)
+                serviceTemplateVo.getOcl().getCloudServiceProvider().getRegions().get(0)
                         .toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");

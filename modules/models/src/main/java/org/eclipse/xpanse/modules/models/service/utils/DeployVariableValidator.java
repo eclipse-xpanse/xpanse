@@ -16,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.VariableValidator;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
-import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
-import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableDataType;
-import org.eclipse.xpanse.modules.models.service.register.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 

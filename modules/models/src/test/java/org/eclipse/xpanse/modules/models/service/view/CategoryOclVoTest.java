@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.CategoryOclVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.VersionOclVo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

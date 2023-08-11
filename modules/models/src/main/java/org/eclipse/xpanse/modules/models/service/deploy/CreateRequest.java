@@ -15,7 +15,7 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 
 /**
  * Request body for service creation.

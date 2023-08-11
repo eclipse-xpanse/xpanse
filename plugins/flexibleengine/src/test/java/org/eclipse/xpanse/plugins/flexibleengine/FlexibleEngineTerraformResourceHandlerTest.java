@@ -19,7 +19,7 @@ public class FlexibleEngineTerraformResourceHandlerTest {
     @Test
     void handler() throws IOException {
         TfState tfState = objectMapper.readValue(
-                new URL("file:./target/test-classes/flexible-tfstate.json"), TfState.class);
+                new URL("file:src/test/resources/flexible-tfstate.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.getPrivateProperties().put("stateFile",
                 objectMapper.writeValueAsString(tfState));
@@ -32,7 +32,7 @@ public class FlexibleEngineTerraformResourceHandlerTest {
     @Test
     void handler_destroy() throws IOException {
         TfState tfState = objectMapper.readValue(
-                new URL("file:./target/test-classes/flexible-tfstate-destroy.json"), TfState.class);
+                new URL("file:src/test/resources/flexible-tfstate-destroy.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.getPrivateProperties().put("stateFile",
                 objectMapper.writeValueAsString(tfState));

@@ -10,21 +10,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.eclipse.xpanse.modules.models.service.register.Deployment;
-import org.eclipse.xpanse.modules.models.service.register.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.junit.jupiter.api.Test;
 
 public class OclTest {
 
     @Test
-    public void testDeepCopyAnEmptyOcl() throws Exception {
+    public void testDeepCopyAnEmptyOcl() {
         Ocl ocl = new Ocl();
         Ocl aCopy = ocl.deepCopy();
         assertNull(aCopy.getName());
     }
 
     @Test
-    public void testDeepCopy() throws Exception {
+    public void testDeepCopy() {
         Ocl ocl = new Ocl();
         ocl.setName("foo");
         Deployment deployment = new Deployment();

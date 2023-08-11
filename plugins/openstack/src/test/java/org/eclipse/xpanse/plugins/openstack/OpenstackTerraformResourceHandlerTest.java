@@ -19,7 +19,7 @@ public class OpenstackTerraformResourceHandlerTest {
     @Test
     void handler() throws IOException {
         TfState tfState = objectMapper.readValue(
-                new URL("file:./target/test-classes/openstack-tfstate.json"), TfState.class);
+                new URL("file:src/test/resources/openstack-tfstate.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.getPrivateProperties()
                 .put("stateFile", objectMapper.writeValueAsString(tfState));
@@ -32,7 +32,7 @@ public class OpenstackTerraformResourceHandlerTest {
     @Test
     void handler_destroy() throws IOException {
         TfState tfState = objectMapper.readValue(
-                new URL("file:./target/test-classes/openstack-tfstate-destroy.json"),
+                new URL("file:src/test/resources/openstack-tfstate-destroy.json"),
                 TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.getPrivateProperties()

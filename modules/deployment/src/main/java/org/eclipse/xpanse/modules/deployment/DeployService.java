@@ -17,12 +17,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
@@ -33,13 +33,13 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFo
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.service.register.DeployVariable;
-import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
-import org.eclipse.xpanse.modules.models.service.register.enums.SensitiveScope;
-import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -70,7 +70,7 @@ public class DeployService {
     @Resource
     private ApplicationContext applicationContext;
     @Resource
-    private RegisterServiceStorage registerServiceStorage;
+    private ServiceTemplateStorage serviceTemplateStorage;
     @Resource
     private DeployServiceStorage deployServiceStorage;
     @Resource
@@ -126,43 +126,45 @@ public class DeployService {
 
         deployTask.getCreateRequest().setUserId(getCurrentLoginUserId());
 
-        // Find the registered service and fill Ocl.
-        RegisterServiceEntity serviceEntity = new RegisterServiceEntity();
-        serviceEntity.setName(
+        // Find the registered service template and fill Ocl.
+        ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
+        serviceTemplate.setName(
                 StringUtils.lowerCase(deployTask.getCreateRequest().getServiceName()));
-        serviceEntity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
-        serviceEntity.setCsp(deployTask.getCreateRequest().getCsp());
-        serviceEntity.setCategory(deployTask.getCreateRequest().getCategory());
-        serviceEntity = registerServiceStorage.findRegisteredService(serviceEntity);
-        if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
-            throw new ServiceNotRegisteredException("Registered service not found");
+        serviceTemplate.setVersion(
+                StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
+        serviceTemplate.setCsp(deployTask.getCreateRequest().getCsp());
+        serviceTemplate.setCategory(deployTask.getCreateRequest().getCategory());
+        serviceTemplate = serviceTemplateStorage.findServiceTemplate(serviceTemplate);
+        if (Objects.isNull(serviceTemplate) || Objects.isNull(serviceTemplate.getOcl())) {
+            throw new ServiceTemplateNotRegistered("Service template not found.");
         }
         // Check context validation
-        if (Objects.nonNull(serviceEntity.getOcl().getDeployment()) && Objects.nonNull(
+        if (Objects.nonNull(serviceTemplate.getOcl().getDeployment()) && Objects.nonNull(
                 deployTask.getCreateRequest().getServiceRequestProperties())) {
-            List<DeployVariable> deployVariables = serviceEntity.getOcl().getDeployment()
+            List<DeployVariable> deployVariables = serviceTemplate.getOcl().getDeployment()
                     .getVariables();
             deployVariableValidator.isVariableValid(deployVariables,
                     deployTask.getCreateRequest().getServiceRequestProperties());
         }
-        encodeDeployVariable(serviceEntity,
+        encodeDeployVariable(serviceTemplate,
                 deployTask.getCreateRequest().getServiceRequestProperties());
         // Set Ocl and CreateRequest
-        deployTask.setOcl(serviceEntity.getOcl());
-        deployTask.getCreateRequest().setOcl(serviceEntity.getOcl());
+        deployTask.setOcl(serviceTemplate.getOcl());
+        deployTask.getCreateRequest().setOcl(serviceTemplate.getOcl());
         // Fill the handler
         fillHandler(deployTask);
         // get the deployment.
         return getDeployment(deployTask.getOcl().getDeployment().getKind());
     }
 
-    private void encodeDeployVariable(RegisterServiceEntity serviceEntity,
+    private void encodeDeployVariable(ServiceTemplateEntity serviceTemplate,
                                       Map<String, String> serviceRequestProperties) {
-        if (Objects.isNull(serviceEntity.getOcl().getDeployment())
-                || CollectionUtils.isEmpty(serviceEntity.getOcl().getDeployment().getVariables())) {
+        if (Objects.isNull(serviceTemplate.getOcl().getDeployment())
+                || CollectionUtils.isEmpty(serviceTemplate.getOcl()
+                .getDeployment().getVariables())) {
             return;
         }
-        serviceEntity.getOcl().getDeployment().getVariables().forEach(variable -> {
+        serviceTemplate.getOcl().getDeployment().getVariables().forEach(variable -> {
             if (Objects.nonNull(variable) && !SensitiveScope.NONE.toValue()
                     .equals(variable.getSensitiveScope().toValue())
                     && serviceRequestProperties.containsKey(variable.getName())) {
@@ -285,12 +287,11 @@ public class DeployService {
                     deployServiceEntity.setDeployResourceList(
                             getDeployResourceEntityList(resources, deployServiceEntity));
                 }
-                deployServiceStorage.storeAndFlush(deployServiceEntity);
             } else {
                 deployServiceEntity.setServiceDeploymentState(
                         ServiceDeploymentState.DESTROY_FAILED);
-                deployServiceStorage.storeAndFlush(deployServiceEntity);
             }
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
         } catch (Exception e) {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());

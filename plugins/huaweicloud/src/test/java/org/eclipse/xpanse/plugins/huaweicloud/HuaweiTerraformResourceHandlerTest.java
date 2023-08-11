@@ -19,7 +19,7 @@ public class HuaweiTerraformResourceHandlerTest {
     @Test
     void handler() throws IOException {
         TfState tfState = objectMapper.readValue(
-                new URL("file:./target/test-classes/huawei-tfstate.json"), TfState.class);
+                new URL("file:src/test/resources/huawei-tfstate.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.getPrivateProperties()
                 .put("stateFile", objectMapper.writeValueAsString(tfState));
@@ -32,7 +32,7 @@ public class HuaweiTerraformResourceHandlerTest {
     @Test
     void handler_destroy() throws IOException {
         TfState tfState = objectMapper.readValue(
-                new URL("file:./target/test-classes/huawei-tfstate-destroy.json"), TfState.class);
+                new URL("file:src/test/resources/huawei-tfstate-destroy.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.getPrivateProperties()
                 .put("stateFile", objectMapper.writeValueAsString(tfState));
