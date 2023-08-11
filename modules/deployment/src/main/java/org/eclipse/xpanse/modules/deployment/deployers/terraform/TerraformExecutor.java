@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmdResult;
@@ -24,6 +23,10 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult
  */
 @Slf4j
 public class TerraformExecutor {
+
+    private static final String VARS_FILE_NAME = "variables.tfvars.json";
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final Map<String, String> env;
     private final Map<String, String> variables;
@@ -87,16 +90,12 @@ public class TerraformExecutor {
      * @return Returns result of SystemCmd executes.
      */
     private SystemCmdResult executeWithVariables(StringBuilder command) {
-        for (Map.Entry<String, String> entry : this.variables.entrySet()) {
-            if (Objects.nonNull(entry.getKey()) && Objects.nonNull(entry.getValue())) {
-                command.append("-var=")
-                        .append(entry.getKey())
-                        .append("=")
-                        .append(entry.getValue())
-                        .append(" ");
-            }
-        }
-        return execute(command.toString());
+        createVariablesFile();
+        command.append(" -var-file=");
+        command.append(VARS_FILE_NAME);
+        SystemCmdResult systemCmdResult = execute(command.toString());
+        cleanUpVariablesFile();
+        return systemCmdResult;
     }
 
     /**
@@ -198,5 +197,27 @@ public class TerraformExecutor {
         }
     }
 
+    private void createVariablesFile() {
+        try {
+            log.info("creating variables file");
+            OBJECT_MAPPER.writeValue(new File(getVariablesFilePath()), variables);
+        } catch (IOException ioException) {
+            throw new TerraformExecutorException("Creating variables file failed", ioException);
+        }
+    }
+
+    private void cleanUpVariablesFile() {
+        File file = new File(getVariablesFilePath());
+        try {
+            log.info("cleaning up variables file");
+            Files.deleteIfExists(file.toPath());
+        } catch (IOException ioException) {
+            log.error("Cleanup of variables file failed", ioException);
+        }
+    }
+
+    private String getVariablesFilePath() {
+        return this.workspace + File.separator + VARS_FILE_NAME;
+    }
 
 }
