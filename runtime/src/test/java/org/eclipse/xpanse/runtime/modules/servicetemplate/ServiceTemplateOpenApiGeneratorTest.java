@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.servicetemplate;
+package org.eclipse.xpanse.runtime.modules.servicetemplate;
 
 import java.io.File;
 import java.net.URL;

@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -43,8 +46,8 @@ public class OpenApiUtil {
     @Autowired
     public OpenApiUtil(@Value("${openapi.download-generator-client-url:https://repo1.maven.org/"
             + "maven2/org/openapitools/openapi-generator-cli/6.6.0/"
-            + "openapi-generator-cli.6.6.0.jar}")
-                       String clientDownLoadUrl,
+            + "openapi-generator-cli-6.6.0.jar}")
+                               String clientDownLoadUrl,
                        @Value("${openapi.path:openapi/}") String openapiPath,
                        @Value("${server.port:8080}") Integer port) {
         this.clientDownLoadUrl = clientDownLoadUrl;
@@ -128,6 +131,48 @@ public class OpenApiUtil {
         }
         return true;
     }
+
+    /**
+     * Get the openapi-generator-cli.jar from Resources.
+     * The download part is only for local development and is not required when building a "jar"
+     * or using the Docker image of the application.
+     *
+     * @return File  The openapi-generator-cli.jar path.
+     */
+    public File getClientJarFromAllSources(String workdir) throws IOException {
+        String jarFileName = "openapi-generator-cli.jar";
+        ClassPathResource resource = new ClassPathResource(jarFileName);
+
+        if (resource.exists()) {
+            log.info("openapi-generator-cli.jar found in resources. Using it");
+            try (InputStream inputStream = resource.getInputStream()) {
+                File tempFile = File.createTempFile("openapi-generator-cli", ".jar");
+                tempFile.deleteOnExit();
+
+                try (OutputStream outputStream = new FileOutputStream(tempFile)) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                }
+                return tempFile;
+            } catch (OpenApiFileGenerationException e) {
+                throw new OpenApiFileGenerationException(
+                        "Error creating openapi-generator-cli.jar tempFile from resources");
+            }
+        } else {
+            log.info("openapi-generator-cli.jar not found. Downloading it");
+            if (this.downloadClientJar(workdir)) {
+                return new File(workdir, "openapi-generator-cli.jar");
+            } else {
+                throw new OpenApiFileGenerationException(
+                        "openapi-generator-cli.jar resource is not available and download failed");
+            }
+        }
+    }
+
 
     /**
      * Get the work directory of the openApi.
