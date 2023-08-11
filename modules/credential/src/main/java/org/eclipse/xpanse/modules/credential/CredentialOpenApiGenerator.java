@@ -127,8 +127,8 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                 apiWriter.write(apiDocsJson);
             }
             log.info("credentialApi jsonFile:{} creation successful.", jsonFile.getName());
-            if (jsonFile.exists() && openApiUtil.downloadClientJar(credentialApiDir)) {
-                File jarPath = new File(credentialApiDir, "openapi-generator-cli.jar");
+            File jarPath = getJarPath(credentialApiDir);
+            if (jsonFile.exists() && jarPath != null) {
                 String comm = String.format("java -jar %s generate -g html2 "
                         + "-i %s -o %s", jarPath.getPath(), jsonFile.getPath(), credentialApiDir);
                 ProcessBuilder processBuilder = new ProcessBuilder(comm.split("\\s+"));
@@ -167,6 +167,16 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                 }
             }
         }
+    }
+
+    /**
+     * Get the path of the openapi-generator-cli.jar used.
+     *
+     * @return File  The openapi-generator-cli.jar path.
+     */
+    private File getJarPath(String openApiDir)
+            throws IOException {
+        return this.openApiUtil.getClientJarFromAllSources(openApiDir);
     }
 
     /**

@@ -133,8 +133,8 @@ public class ServiceTemplateOpenApiGenerator {
                 }
                 log.info("Service openApi yamlFile:{} create successful.", yamlFile.getPath());
             }
-            if (yamlFile.exists() && this.openApiUtil.downloadClientJar(openApiDir)) {
-                File jarPath = new File(openApiDir, "openapi-generator-cli.jar");
+            File jarPath = getJarPath(openApiDir);
+            if (yamlFile.exists() && jarPath != null) {
                 String comm = String.format("java -jar %s generate -g html2 "
                         + "-i %s -o %s", jarPath.getPath(), yamlFile.getPath(), openApiDir);
                 Process exec = Runtime.getRuntime().exec(comm);
@@ -173,6 +173,17 @@ public class ServiceTemplateOpenApiGenerator {
             }
         }
     }
+
+    /**
+     * Get the path of the openapi-generator-cli.jar used.
+     *
+     * @return File  The openapi-generator-cli.jar path.
+     */
+    private File getJarPath(String openApiDir)
+            throws IOException {
+        return this.openApiUtil.getClientJarFromAllSources(openApiDir);
+    }
+
 
     private String getApiDocsJson(ServiceTemplateEntity registerService) {
         if (Objects.isNull(registerService)) {

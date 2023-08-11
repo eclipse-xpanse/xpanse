@@ -223,8 +223,33 @@
                 </executions>
                 <configuration>
                     <outputDirectory>${project.parent.basedir}/target/coverage-reports</outputDirectory>
-                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                    <dataFile>${project.parent.basedir}/jacoco.exec</dataFile>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-openapi-generator-cli</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.openapitools</groupId>
+                                    <artifactId>openapi-generator-cli</artifactId>
+                                    <version>6.6.0</version>
+                                    <destFileName>openapi-generator-cli.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
