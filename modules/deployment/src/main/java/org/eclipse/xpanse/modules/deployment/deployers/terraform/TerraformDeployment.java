@@ -23,8 +23,8 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.models.service.register.Ocl;
-import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
@@ -177,7 +177,7 @@ public class TerraformDeployment implements Deployment {
         log.info("start create terraform script");
         String version = terraformVersionProvider.getTerraformVersionByCsp(csp);
         if (StringUtils.isBlank(version)) {
-            log.error("Csp does't exist,csp: {}", csp);
+            log.error("Csp doesn't exist,csp: {}", csp);
             return;
         }
         String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;

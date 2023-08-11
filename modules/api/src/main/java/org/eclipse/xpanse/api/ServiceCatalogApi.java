@@ -20,13 +20,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.register.query.RegisteredServiceQuery;
-import org.eclipse.xpanse.modules.models.service.view.CategoryOclVo;
-import org.eclipse.xpanse.modules.models.service.view.UserAvailableServiceVo;
-import org.eclipse.xpanse.modules.register.register.RegisterService;
+import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.CategoryOclVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
+import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -52,7 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServiceCatalogApi {
 
     @Resource
-    private RegisterService registerService;
+    private ServiceTemplateManage serviceTemplateManage;
 
     /**
      * Returns the list of all registered services that are available for user to order/deploy.
@@ -79,10 +79,10 @@ public class ServiceCatalogApi {
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
-        RegisteredServiceQuery query = getServicesQueryModel(categoryName, cspName, serviceName,
-                serviceVersion);
-        List<RegisterServiceEntity> serviceEntities =
-                registerService.queryRegisteredServices(query);
+        ServiceTemplateQueryModel query = getServiceTemplatesQueryModel(
+                categoryName, cspName, serviceName, serviceVersion);
+        List<ServiceTemplateEntity> serviceEntities =
+                serviceTemplateManage.listServiceTemplates(query);
         String successMsg = String.format("Listing available services with query model %s "
                 + "successful.", query);
         List<UserAvailableServiceVo> userAvailableServiceVos =
@@ -116,10 +116,10 @@ public class ServiceCatalogApi {
     public List<CategoryOclVo> getAvailableServicesTree(
             @Parameter(name = "categoryName", description = "category of the service")
             @PathVariable(name = "categoryName") Category category) {
-        RegisteredServiceQuery query = new RegisteredServiceQuery();
+        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
         query.setCategory(category);
         List<CategoryOclVo> categoryOclList =
-                registerService.getManagedServicesTree(query);
+                serviceTemplateManage.getManagedServicesTree(query);
         String successMsg = String.format(
                 "Get the tree of available services with category %s "
                         + "successful.", category.toValue());
@@ -143,7 +143,7 @@ public class ServiceCatalogApi {
             @Parameter(name = "id", description = "The id of available service.")
             @PathVariable("id") String id) {
         UserAvailableServiceVo userAvailableServiceVo = convertToUserAvailableServiceVo(
-                registerService.getRegisteredService(id));
+                serviceTemplateManage.getServiceTemplateDetails(id));
         String successMsg = String.format(
                 "Get available service with id %s successful.", id);
         log.info(successMsg);
@@ -163,17 +163,17 @@ public class ServiceCatalogApi {
     @Operation(description = "Get the API document of the available service.")
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     public Link openApi(@PathVariable("id") String id) {
-        String apiUrl = this.registerService.getOpenApiUrl(id);
+        String apiUrl = this.serviceTemplateManage.getOpenApiUrl(id);
         String successMsg = String.format(
                 "Get API document of the available service successful with Url %s.", apiUrl);
         log.info(successMsg);
         return Link.of(apiUrl, "OpenApi");
     }
 
-    private RegisteredServiceQuery getServicesQueryModel(Category category, Csp csp,
-                                                         String serviceName,
-                                                         String serviceVersion) {
-        RegisteredServiceQuery query = new RegisteredServiceQuery();
+    private ServiceTemplateQueryModel getServiceTemplatesQueryModel(Category category, Csp csp,
+                                                                    String serviceName,
+                                                                    String serviceVersion) {
+        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
         if (Objects.nonNull(category)) {
             query.setCategory(category);
         }
@@ -190,7 +190,7 @@ public class ServiceCatalogApi {
     }
 
     private UserAvailableServiceVo convertToUserAvailableServiceVo(
-            RegisterServiceEntity serviceEntity) {
+            ServiceTemplateEntity serviceEntity) {
         if (Objects.nonNull(serviceEntity)) {
             UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
             BeanUtils.copyProperties(serviceEntity, userAvailableServiceVo);

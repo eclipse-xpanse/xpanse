@@ -8,8 +8,8 @@ package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 import java.io.IOException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
-import org.eclipse.xpanse.modules.models.service.register.Ocl;
-import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 
 /**
  * Interface to produce a service.

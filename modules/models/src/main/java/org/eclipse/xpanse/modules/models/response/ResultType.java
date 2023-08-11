@@ -33,13 +33,13 @@ public enum ResultType {
     SERVICE_STATE_INVALID("Invalid Service State"),
     RESOURCE_TYPE_INVALID_FOR_MONITORING("Resource Invalid For Monitoring"),
     UNHANDLED_EXCEPTION("Unhandled Exception"),
-    SERVICE_ALREADY_REGISTERED("Service Already Registered"),
+    SERVICE_TEMPLATE_ALREADY_REGISTERED("Service Template Already Registered"),
     ICON_PROCESSING_FAILED("Icon Processing Failed"),
-    SERVICE_NOT_REGISTERED("Service Not Registered"),
+    SERVICE_TEMPLATE_NOT_REGISTERED("Service Template Not Registered"),
     SERVICE_DEPLOYMENT_NOT_FOUND("Service Deployment Not Found"),
     RESOURCE_NOT_FOUND("Resource Not Found"),
     DEPLOYMENT_VARIABLE_INVALID("Deployment Variable Invalid"),
-    SERVICE_UPDATE_NOT_ALLOWED("Service Update Not Allowed"),
+    SERVICE_TEMPLATE_UPDATE_NOT_ALLOWED("Service Template Update Not Allowed"),
     UNAUTHORIZED("Unauthorized"),
     ACCESS_DENIED("Access Denied"),
     SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION("Sensitive "
@@ -60,13 +60,29 @@ public enum ResultType {
         return this.value;
     }
 
+
+    /**
+     * Get ResultType by value.
+     *
+     * @param value value
+     * @return ResultType
+     */
+    public static ResultType getResultTypeByValue(String value) {
+        for (ResultType resultType : values()) {
+            if (StringUtils.endsWithIgnoreCase(resultType.value, value)) {
+                return resultType;
+            }
+        }
+        return null;
+    }
+
     /**
      * For ResultType serialize.
      */
     @JsonCreator
-    public ResultType getByValue(String name) {
+    public ResultType getByValue(String value) {
         for (ResultType resultType : values()) {
-            if (resultType.value.equals(StringUtils.lowerCase(name))) {
+            if (StringUtils.endsWithIgnoreCase(resultType.value, value)) {
                 return resultType;
             }
         }

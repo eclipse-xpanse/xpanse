@@ -24,11 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceStorage;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
@@ -41,11 +41,11 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFo
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.service.register.Ocl;
-import org.eclipse.xpanse.modules.models.service.register.enums.DeployerKind;
-import org.eclipse.xpanse.modules.models.service.register.exceptions.ServiceNotRegisteredException;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -75,12 +75,12 @@ class DeployServiceTest {
     private static final String userId = "defaultUserId";
     private static DeployTask deployTask;
     private static Deployment deploymentMock;
-    private static RegisterServiceEntity serviceEntity;
+    private static ServiceTemplateEntity serviceEntity;
     private static DeployServiceEntity deployServiceEntity;
     private static DeployResult deployResult;
     private static List<DeployResourceEntity> deployResourceEntities;
     private static CreateRequest createRequest;
-    private static org.eclipse.xpanse.modules.models.service.register.Deployment deployment;
+    private static org.eclipse.xpanse.modules.models.servicetemplate.Deployment deployment;
 
     @Mock
     private AesUtil aesUtil;
@@ -89,7 +89,7 @@ class DeployServiceTest {
     private ApplicationContext applicationContext;
 
     @Mock
-    private RegisterServiceStorage registerServiceStorage;
+    private ServiceTemplateStorage serviceTemplateStorage;
 
     @Mock
     private DeployServiceStorage deployServiceStorage;
@@ -108,7 +108,7 @@ class DeployServiceTest {
         MockitoAnnotations.openMocks(this);
 
         deployment =
-                new org.eclipse.xpanse.modules.models.service.register.Deployment();
+                new org.eclipse.xpanse.modules.models.servicetemplate.Deployment();
         deployment.setKind(DeployerKind.TERRAFORM);
 
         Ocl ocl = new Ocl();
@@ -133,7 +133,7 @@ class DeployServiceTest {
 
         deploymentMock = mock(Deployment.class);
 
-        serviceEntity = new RegisterServiceEntity();
+        serviceEntity = new ServiceTemplateEntity();
         serviceEntity.setName("service");
         serviceEntity.setVersion("1.0");
         serviceEntity.setCsp(Csp.HUAWEI);
@@ -208,7 +208,7 @@ class DeployServiceTest {
         pluginsMap.put(Csp.HUAWEI, plugin);
         when(pluginManager.getPluginsMap()).thenReturn(pluginsMap);
 
-        when(registerServiceStorage.findRegisteredService(any(RegisterServiceEntity.class)))
+        when(serviceTemplateStorage.findServiceTemplate(any(ServiceTemplateEntity.class)))
                 .thenReturn(serviceEntity);
 
         when(deploymentMock.getDeployerKind()).thenReturn(DeployerKind.TERRAFORM);
@@ -237,7 +237,7 @@ class DeployServiceTest {
         pluginsMap.put(Csp.HUAWEI, plugin);
         when(pluginManager.getPluginsMap()).thenReturn(pluginsMap);
 
-        when(registerServiceStorage.findRegisteredService(any(RegisterServiceEntity.class)))
+        when(serviceTemplateStorage.findServiceTemplate(any(ServiceTemplateEntity.class)))
                 .thenReturn(serviceEntity);
 
         Deployment deploymentMock = mock(Deployment.class);
@@ -256,10 +256,10 @@ class DeployServiceTest {
 
     @Test
     void testGetDeployHandler_ServiceNotRegisteredException() {
-        when(registerServiceStorage.findRegisteredService(any(RegisterServiceEntity.class)))
+        when(serviceTemplateStorage.findServiceTemplate(any(ServiceTemplateEntity.class)))
                 .thenReturn(null);
 
-        assertThrows(ServiceNotRegisteredException.class,
+        assertThrows(ServiceTemplateNotRegistered.class,
                 () -> deployService.getDeployHandler(deployTask));
     }
 

@@ -24,7 +24,7 @@
         <module>models</module>
         <module>database</module>
         <module>deployment</module>
-        <module>register</module>
+        <module>servicetemplate</module>
         <module>monitor</module>
         <module>credential</module>
         <module>logging</module>
