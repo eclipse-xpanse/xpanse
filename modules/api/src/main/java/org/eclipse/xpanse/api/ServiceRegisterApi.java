@@ -8,7 +8,7 @@ package org.eclipse.xpanse.api;
 
 
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,7 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/xpanse")
 @CrossOrigin
-@Secured({ROLE_ADMIN, ROLE_CSP})
+@Secured({ROLE_ADMIN, ROLE_ISV})
 public class ServiceRegisterApi {
 
     @Resource
