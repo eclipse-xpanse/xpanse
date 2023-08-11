@@ -233,7 +233,7 @@ public class ServiceTemplateOpenApiGenerator {
                                "info": {
                                    "title": "OpenAPI definition",
                                    "version": "%s",
-                                   "description": "OpenAPI for starting a task to deploy the registered service."
+                                   "description": "OpenAPI for starting a task to deploy service using registered service template."
                                },
                                "servers": [
                                    {
@@ -248,12 +248,12 @@ public class ServiceTemplateOpenApiGenerator {
                                    }
                                ],
                                "paths": {
-                                   "/xpanse/service": {
+                                   "/xpanse/services": {
                                        "post": {
                                            "tags": [
                                                "Service"
                                            ],
-                                           "description": "Start a task to deploy registered service.",
+                                           "description": "Start a task to deploy service using registered service template.",
                                            "operationId": "deploy",
                                            "requestBody": {
                                                "content": {
@@ -277,6 +277,7 @@ public class ServiceTemplateOpenApiGenerator {
                                                        }
                                                    }
                                                },
+                                               
                                                "400": {
                                                    "description": "Bad Request",
                                                    "content": {

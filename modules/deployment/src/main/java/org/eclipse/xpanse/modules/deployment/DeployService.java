@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
@@ -33,6 +32,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFo
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
@@ -160,8 +160,8 @@ public class DeployService {
     private void encodeDeployVariable(ServiceTemplateEntity serviceTemplate,
                                       Map<String, String> serviceRequestProperties) {
         if (Objects.isNull(serviceTemplate.getOcl().getDeployment())
-                || CollectionUtils.isEmpty(serviceTemplate.getOcl()
-                .getDeployment().getVariables())) {
+                ||
+                CollectionUtils.isEmpty(serviceTemplate.getOcl().getDeployment().getVariables())) {
             return;
         }
         serviceTemplate.getOcl().getDeployment().getVariables().forEach(variable -> {
@@ -227,11 +227,11 @@ public class DeployService {
         // Find the deployed service.
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
-        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
-                deployServiceEntity.getCreateRequest())) {
-            throw new ServiceNotDeployedException(
-                    String.format("Deployed service with id %s not found",
-                            deployTask.getId()));
+        if (Objects.isNull(deployServiceEntity)
+                || Objects.isNull(deployServiceEntity.getCreateRequest())) {
+            String errorMsg = String.format("Service with id %s not found.", deployTask.getId());
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
         }
         if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
@@ -266,9 +266,9 @@ public class DeployService {
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
         if (Objects.isNull(deployServiceEntity)) {
-            throw new ServiceNotDeployedException(
-                    String.format("Deployed service with id %s not found",
-                            deployTask.getId()));
+            String errorMsg = String.format("Service with id %s not found.", deployTask.getId());
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
         }
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
@@ -287,11 +287,12 @@ public class DeployService {
                     deployServiceEntity.setDeployResourceList(
                             getDeployResourceEntityList(resources, deployServiceEntity));
                 }
+                deployServiceStorage.storeAndFlush(deployServiceEntity);
             } else {
                 deployServiceEntity.setServiceDeploymentState(
                         ServiceDeploymentState.DESTROY_FAILED);
+                deployServiceStorage.storeAndFlush(deployServiceEntity);
             }
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
         } catch (Exception e) {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());
@@ -302,21 +303,18 @@ public class DeployService {
     }
 
     /**
-     * List deploy services for user.
+     * List deploy services with query model.
      *
+     * @param query service query model.
      * @return serviceVos
      */
-    public List<ServiceVo> listMyDeployedServices() {
+    public List<ServiceVo> listDeployedServices(ServiceQueryModel query) {
+
+        query.setMyUserId(getCurrentLoginUserId());
         List<DeployServiceEntity> deployServices =
-                deployServiceStorage.services();
-        String currentUserId = getCurrentLoginUserId();
+                deployServiceStorage.listServices(query);
         return deployServices.stream()
-                .filter(service -> StringUtils.equals(currentUserId, service.getUserId()))
-                .map(service -> {
-                    ServiceVo serviceVo = new ServiceVo();
-                    BeanUtils.copyProperties(service, serviceVo);
-                    return serviceVo;
-                }).collect(Collectors.toList());
+                .map(this::convertToServiceVo).toList();
 
     }
 
@@ -329,7 +327,9 @@ public class DeployService {
     public ServiceDetailVo getDeployServiceDetails(UUID id) {
         DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
         if (Objects.isNull(deployServiceEntity)) {
-            throw new ServiceNotDeployedException("Service not found.");
+            String errorMsg = String.format("Service with id %s not found.", id);
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
         }
 
         if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
@@ -386,6 +386,15 @@ public class DeployService {
         } else {
             return "defaultUserId";
         }
+    }
+
+    private ServiceVo convertToServiceVo(DeployServiceEntity serviceEntity) {
+        if (Objects.nonNull(serviceEntity)) {
+            ServiceVo serviceVo = new ServiceVo();
+            BeanUtils.copyProperties(serviceEntity, serviceVo);
+            return serviceVo;
+        }
+        return null;
     }
 
 }

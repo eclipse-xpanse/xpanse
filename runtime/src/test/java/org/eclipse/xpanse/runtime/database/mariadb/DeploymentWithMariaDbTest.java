@@ -55,10 +55,10 @@ class DeploymentWithMariaDbTest extends AbstractMariaDbIntegrationTest {
 
         UUID deployUUid = serviceDeployerApi.deploy(createRequest);
         await().ignoreException(ServiceNotDeployedException.class)
-                .until(() -> serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString())
+                .until(() -> serviceDeployerApi.getServiceDetailsById(deployUUid.toString())
                         != null);
         ServiceDetailVo serviceDetailVo =
-                serviceDeployerApi.getDeployedServiceDetailsById(deployUUid.toString());
+                serviceDeployerApi.getServiceDetailsById(deployUUid.toString());
         Assertions.assertNotNull(serviceDetailVo);
         Assertions.assertEquals(ServiceDeploymentState.DEPLOY_FAILED,
                 serviceDetailVo.getServiceDeploymentState());

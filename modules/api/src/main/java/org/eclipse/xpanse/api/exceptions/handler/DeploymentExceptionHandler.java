@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.api.exceptions;
+package org.eclipse.xpanse.api.exceptions.handler;
 
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;

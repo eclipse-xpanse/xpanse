@@ -126,8 +126,7 @@ public class HuaweiCloudMetricsService {
     public List<Metric> getMetricsByService(ServiceMetricsRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
         AbstractCredentialInfo credential = credentialCenter.getCredential(
-                Csp.HUAWEI,
-                CredentialType.VARIABLES, serviceMetricRequest.getUserId());
+                Csp.HUAWEI, CredentialType.VARIABLES, serviceMetricRequest.getUserId());
         MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
         ICredential icredential = huaweiCloudMonitorClient.getCredentialForClient(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
@@ -170,11 +169,10 @@ public class HuaweiCloudMetricsService {
         if (resourceMetricRequest.isOnlyLastKnownMetric()) {
             String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
             if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                serviceMetricsStore.storeMonitorMetric(Csp.OPENSTACK,
-                        resourceId, monitorResourceType, metric);
-
+                serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, resourceId,
+                        monitorResourceType, metric);
             } else {
-                Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
+                Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, resourceId,
                         monitorResourceType);
                 if (Objects.nonNull(cacheMetric)
                         && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
@@ -196,24 +194,25 @@ public class HuaweiCloudMetricsService {
                                     metricInfo.getMetricName());
                     if (CollectionUtils.isEmpty(metrics)) {
                         Metric metricCache =
-                                serviceMetricsStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
+                                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI,
                                         resourceId, type);
                         metrics.add(metricCache);
                     } else {
                         Optional<Metric> metricOptional = metrics.stream().filter(
-                                metric -> StringUtils.equals(metric.getName(),
+                                metric -> Objects.nonNull(metric)
+                                        && StringUtils.equals(metric.getName(),
                                         metricInfo.getMetricName())
                                         && !CollectionUtils.isEmpty(metric.getMetrics())
                                         && StringUtils.equals(resourceId,
                                         metric.getLabels().get("id"))
                         ).findAny();
                         if (metricOptional.isPresent()) {
-                            serviceMetricsStore.storeMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId,
+                            serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, resourceId,
                                     type,
                                     metricOptional.get());
                         } else {
                             Metric metricCache =
-                                    serviceMetricsStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE,
+                                    serviceMetricsStore.getMonitorMetric(Csp.HUAWEI,
                                             resourceId, type);
                             metrics.add(metricCache);
                         }
