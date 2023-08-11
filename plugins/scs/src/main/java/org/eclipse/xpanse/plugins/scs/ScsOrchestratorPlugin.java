@@ -4,9 +4,10 @@
  *
  */
 
-package org.eclipse.xpanse.plugins.openstack;
+package org.eclipse.xpanse.plugins.scs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -15,34 +16,25 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
-import org.eclipse.xpanse.plugins.openstack.monitor.utils.MetricsManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.eclipse.xpanse.plugins.scs.constants.ScsEnvironmentConstants;
 import org.springframework.stereotype.Component;
 
 /**
- * xpanse plugin implementation for openstack cloud.
+ * xpanse plugin implementation for SCS cloud.
  */
 @Slf4j
 @Component
-public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
+public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final DeployResourceHandler resourceHandler = new OpenstackTerraformResourceHandler();
+    private final DeployResourceHandler resourceHandler = new ScsTerraformResourceHandler();
 
-    private final MetricsManager metricsManager;
-
-    @Autowired
-    public OpenstackOrchestratorPlugin(MetricsManager metricsManager) {
-        this.metricsManager = metricsManager;
-    }
 
     /**
-     * Get the resource handler for OpenStack.
+     * Get the resource handler for SCS.
      */
     @Override
     public DeployResourceHandler getResourceHandler() {
@@ -54,12 +46,12 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public Csp getCsp() {
-        return Csp.OPENSTACK;
+        return Csp.SCS;
     }
 
     @Override
     public List<String> requiredProperties() {
-        return List.of(OpenstackEnvironmentConstants.AUTH_URL);
+        return List.of(ScsEnvironmentConstants.AUTH_URL);
     }
 
     @Override
@@ -73,17 +65,17 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.PROJECT,
+                new CredentialVariable(ScsEnvironmentConstants.PROJECT,
                         "The Name of the Tenant or Project to use.", true, false));
         credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.USERNAME,
+                new CredentialVariable(ScsEnvironmentConstants.USERNAME,
                         "The Username to login with.", true, false));
         credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.PASSWORD,
+                new CredentialVariable(ScsEnvironmentConstants.PASSWORD,
                         "The Password to login with.", true, true));
         credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN,
-                        "The domain of the openstack installation to be used.", true, false));
+                new CredentialVariable(ScsEnvironmentConstants.DOMAIN,
+                        "The domain of the SCS installation to be used.", true, false));
         CredentialVariables httpAuth = new CredentialVariables(
                 getCsp(), CredentialType.VARIABLES, "Variables",
                 "Authenticate at the specified URL using an account and password.",
@@ -109,31 +101,17 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest) {
-        return this.metricsManager.getMetrics(resourceMetricRequest);
+        return Collections.emptyList();
     }
 
     /**
      * Get metrics for service instance by the @serviceMetricRequest.
      *
      * @param serviceMetricRequest The request model to query metrics for service instance.
-     * @return Returns list of metric result.
+     * @return Returns list of metric results.
      */
     @Override
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
-        List<Metric> metrics = new ArrayList<>();
-        for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
-            ResourceMetricsRequest resourceMetricRequest = new ResourceMetricsRequest(
-                    deployResource,
-                    serviceMetricRequest.getMonitorResourceType(),
-                    serviceMetricRequest.getFrom(),
-                    serviceMetricRequest.getTo(),
-                    serviceMetricRequest.getGranularity(),
-                    serviceMetricRequest.isOnlyLastKnownMetric(),
-                    serviceMetricRequest.getUserId()
-            );
-            metrics.addAll(this.metricsManager.getMetrics(resourceMetricRequest));
-        }
-        return metrics;
+        return Collections.emptyList();
     }
-
 }

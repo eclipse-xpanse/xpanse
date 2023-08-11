@@ -52,6 +52,9 @@ public class GnocchiToXpanseModelConverter {
                 MetricItem metricItem = new MetricItem();
                 metricItem.setType(MetricItemType.VALUE);
                 metricItem.setValue(measures.get(measures.size() - 1).getValue());
+                metricItem.setTimeStamp(
+                        Instant.parse(measures.get(measures.size() - 1).getTimestamp())
+                                .getEpochSecond());
                 metric.setMetrics(List.of(metricItem));
             } else {
                 metric.setMetrics(new ArrayList<>());

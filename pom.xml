@@ -49,7 +49,6 @@
         <module>runtime</module>
         <module>modules</module>
         <module>plugins</module>
-        <module>modules/common</module>
     </modules>
     <properties>
         <java.version>17</java.version>

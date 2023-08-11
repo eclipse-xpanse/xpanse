@@ -85,9 +85,11 @@ public class KeystoneManager {
                 this.environment.getProperty(OpenstackEnvironmentConstants.SERVICE_PROJECT);
         String proxyHost = this.environment.getProperty(OpenstackEnvironmentConstants.PROXY_HOST);
         String proxyPort = this.environment.getProperty(OpenstackEnvironmentConstants.PROXY_PORT);
+        String sslDisabled = this.environment.getProperty(
+                OpenstackEnvironmentConstants.SSL_VERIFICATION_DISABLED);
         OSFactory
                 .builderV3()
-                .withConfig(buildClientConfig(url, proxyHost, proxyPort))
+                .withConfig(buildClientConfig(url, proxyHost, proxyPort, sslDisabled))
                 .credentials(userName, password, Identifier.byName(domain))
                 .scopeToProject(
                         Identifier.byName(Objects.isNull(serviceTenant) ? tenant : serviceTenant),
@@ -104,11 +106,17 @@ public class KeystoneManager {
         }
     }
 
-    private Config buildClientConfig(String url, String proxyHost, String proxyPort) {
-        return Config.newConfig()
+    private Config buildClientConfig(String url, String proxyHost, String proxyPort,
+                                     String sslDisabled) {
+        Config config = Config.newConfig()
                 .withEndpointNATResolution(getIpAddressFromUrl(url))
                 .withEndpointURLResolver(new CustomEndPointResolver())
+                .withSSLVerificationDisabled()
                 .withProxy(Objects.nonNull(proxyHost)
                         ? ProxyHost.of(proxyHost, Integer.parseInt(proxyPort)) : null);
+        if (Objects.nonNull(sslDisabled) && sslDisabled.equals("true")) {
+            config.withSSLVerificationDisabled();
+        }
+        return config;
     }
 }

@@ -30,6 +30,7 @@
         <module>logging</module>
         <module>orchestrator</module>
         <module>security</module>
+        <module>common</module>
     </modules>
 
 </project>
