@@ -43,7 +43,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class,
         TerraformVersionProvider.class})
 @TestPropertySource(properties = {"terraform.provider.huaweicloud.version=~> 1.51.0"})
-public class TerraformDeploymentTest {
+class TerraformDeploymentTest {
 
     @Autowired
     TerraformDeployment terraformDeployment;
@@ -55,7 +55,7 @@ public class TerraformDeploymentTest {
     DeployEnvironments deployEnvironments;
 
     @Test
-    public void basicTest() throws Exception {
+    void basicTest() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
@@ -87,7 +87,7 @@ public class TerraformDeploymentTest {
     }
 
     @Test
-    public void throwExceptionWhenDestroyFails() {
+    void throwExceptionWhenDestroyFails() {
         CreateRequest createRequest =
                 Instancio.of(CreateRequest.class).set(field(CreateRequest::getCsp),
                         Csp.OPENSTACK).create();
@@ -100,7 +100,7 @@ public class TerraformDeploymentTest {
     }
 
     @Test
-    public void throwExceptionWhenDeployFails() {
+    void throwExceptionWhenDeployFails() {
         UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
 
         Deployment deployment =
