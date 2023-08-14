@@ -24,7 +24,7 @@ jobs:
           distribution: adopt
 
       - name: Test
-        run: mvn --batch-mode --update-snapshots --no-transfer-progress test
+        run: mvn --batch-mode --update-snapshots --no-transfer-progress -Djacoco.skip=false test
 
       - name: Extract Coverage Percentage
         run: |
