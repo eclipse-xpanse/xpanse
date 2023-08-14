@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -20,8 +20,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         + "/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar",
         "openapi.path=openapi",
         "server.port=8080"})
-@ContextConfiguration(classes = {OpenApiUtil.class, String.class})
-class OpenApiUtilTest {
+@ContextConfiguration(classes = {OpenApiUrlManage.class, String.class, OpenApiGeneratorJarManage.class})
+class OpenApiUrlManageTest {
 
     @Value("${openapi.download-generator-client-url}")
     private String clientDownloadUrl;
@@ -30,12 +30,15 @@ class OpenApiUtilTest {
     @Value("${server.port}")
     private Integer serverPort;
 
-    @InjectMocks
-    private OpenApiUtil openApiUtilTest;
+    @Autowired
+    private OpenApiUrlManage openApiUrlManageTest;
+
+    @Autowired
+    private OpenApiGeneratorJarManage openApiGeneratorJarManage;
 
     @BeforeEach
     void setUp() {
-        openApiUtilTest = new OpenApiUtil(clientDownloadUrl, openApiPath, serverPort);
+        openApiUrlManageTest = new OpenApiUrlManage(openApiPath, serverPort);
     }
 
     @Test
@@ -44,7 +47,7 @@ class OpenApiUtilTest {
         String host = InetAddress.getLocalHost().getHostAddress();
         String serviceUrl = "http://" + host + ":" + serverPort;
         // Run the test
-        String result = openApiUtilTest.getServiceUrl();
+        String result = openApiUrlManageTest.getServiceUrl();
         // Verify the results
         Assertions.assertEquals(serviceUrl, result);
     }
@@ -54,9 +57,9 @@ class OpenApiUtilTest {
         // SetUp
         String id = UUID.randomUUID().toString();
         String openApiUrl =
-                openApiUtilTest.getServiceUrl() + "/" + openApiPath + "/" + id + ".html";
+                openApiUrlManageTest.getServiceUrl() + "/" + openApiPath + "/" + id + ".html";
         // Run the test
-        String result = openApiUtilTest.getOpenApiUrl(id);
+        String result = openApiUrlManageTest.getOpenApiUrl(id);
         // Verify the results
         Assertions.assertEquals(openApiUrl, result);
     }
@@ -69,7 +72,7 @@ class OpenApiUtilTest {
             jarFile.delete();
         }
         // Run the test
-        boolean result = openApiUtilTest.downloadClientJar(openApiPath);
+        boolean result = openApiGeneratorJarManage.downloadClientJar();
         // Verify the results
         Assertions.assertTrue(result);
     }
@@ -77,7 +80,7 @@ class OpenApiUtilTest {
     @Test
     void testGetClientDownLoadUrl() {
         // Run the test
-        String result = openApiUtilTest.getClientDownLoadUrl();
+        String result = openApiGeneratorJarManage.getClientDownLoadUrl();
         // Verify the results
         Assertions.assertEquals(clientDownloadUrl, result);
     }
@@ -85,7 +88,7 @@ class OpenApiUtilTest {
     @Test
     void testGetOpenapiPath() {
         // Run the test
-        String result = openApiUtilTest.getOpenapiPath();
+        String result = openApiGeneratorJarManage.getOpenapiPath();
         // Verify the results
         Assertions.assertEquals(openApiPath, result);
     }

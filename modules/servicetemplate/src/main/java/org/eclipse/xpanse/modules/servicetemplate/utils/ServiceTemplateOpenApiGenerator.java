@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.common.openapi.OpenApiUtil;
+import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
+import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
@@ -43,14 +45,26 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ServiceTemplateOpenApiGenerator {
 
+    private static final String OPENAPI_FILE_EXTENSION = ".html";
     private final DeployVariableValidator deployVariableValidator;
-    private final OpenApiUtil openApiUtil;
+    private final OpenApiUrlManage openApiUrlManage;
 
+    private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
+
+    /**
+     * Constructor to instantiate ServiceTemplateOpenApiGenerator bean.
+     *
+     * @param deployVariableValidator   DeployVariableValidator bean
+     * @param openApiUrlManage          OpenApiUrlManage bean
+     * @param openApiGeneratorJarManage OpenApiGeneratorJarManage bean
+     */
     @Autowired
     public ServiceTemplateOpenApiGenerator(DeployVariableValidator deployVariableValidator,
-                                           OpenApiUtil openApiUtil) {
+                                           OpenApiUrlManage openApiUrlManage,
+                                           OpenApiGeneratorJarManage openApiGeneratorJarManage) {
         this.deployVariableValidator = deployVariableValidator;
-        this.openApiUtil = openApiUtil;
+        this.openApiUrlManage = openApiUrlManage;
+        this.openApiGeneratorJarManage = openApiGeneratorJarManage;
     }
 
     /**
@@ -64,9 +78,10 @@ public class ServiceTemplateOpenApiGenerator {
             throw new ServiceTemplateNotRegistered("Registered service is null.");
         }
         String id = serviceTemplateEntity.getId().toString();
-        File apiFile = new File(this.openApiUtil.getOpenApiWorkdir(), id + ".html");
+        File apiFile = new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
+                id + OPENAPI_FILE_EXTENSION);
         if (apiFile.exists()) {
-            return this.openApiUtil.getOpenApiUrl(id);
+            return this.openApiUrlManage.getOpenApiUrl(id);
         } else {
             return createServiceApi(serviceTemplateEntity);
         }
@@ -90,7 +105,8 @@ public class ServiceTemplateOpenApiGenerator {
     @Async("taskExecutor")
     public void updateServiceApi(ServiceTemplateEntity registerService) {
         File file =
-                new File(this.openApiUtil.getOpenApiWorkdir(), registerService.getId() + ".html");
+                new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
+                        registerService.getId() + OPENAPI_FILE_EXTENSION);
         if (file.exists()) {
             log.info("Delete old openApi file:{}, success:{}", file.getName(), file.delete());
         }
@@ -104,7 +120,8 @@ public class ServiceTemplateOpenApiGenerator {
      */
     @Async("taskExecutor")
     public void deleteServiceApi(String id) {
-        File file = new File(this.openApiUtil.getOpenApiWorkdir(), id + ".html");
+        File file = new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
+                id + OPENAPI_FILE_EXTENSION);
         if (file.exists()) {
             log.info("Delete openApi html file:{}, success:{}", file.getName(), file.delete());
         }
@@ -119,13 +136,13 @@ public class ServiceTemplateOpenApiGenerator {
         // ID of registered service.
         String serviceId = registerService.getId().toString();
         String yamlFileName = serviceId + ".yaml";
-        String openApiDir = this.openApiUtil.getOpenApiWorkdir();
+        String openApiDir = this.openApiGeneratorJarManage.getOpenApiWorkdir();
         File yamlFile = new File(openApiDir, yamlFileName);
-        File htmlFile = new File(openApiDir, serviceId + ".html");
+        File htmlFile = new File(openApiDir, serviceId + OPENAPI_FILE_EXTENSION);
         try {
             if (yamlFile.exists()) {
                 log.info("Service openApi is being generated. serviceId:{}", serviceId);
-                return this.openApiUtil.getOpenApiUrl(serviceId);
+                return this.openApiUrlManage.getOpenApiUrl(serviceId);
             } else {
                 String apiDocsJson = getApiDocsJson(registerService);
                 try (FileWriter apiWriter = new FileWriter(yamlFile.getPath())) {
@@ -133,8 +150,8 @@ public class ServiceTemplateOpenApiGenerator {
                 }
                 log.info("Service openApi yamlFile:{} create successful.", yamlFile.getPath());
             }
-            File jarPath = getJarPath(openApiDir);
-            if (yamlFile.exists() && jarPath != null) {
+            File jarPath = getJarPath();
+            if (yamlFile.exists() && jarPath.exists()) {
                 String comm = String.format("java -jar %s generate -g html2 "
                         + "-i %s -o %s", jarPath.getPath(), yamlFile.getPath(), openApiDir);
                 Process exec = Runtime.getRuntime().exec(comm);
@@ -153,13 +170,16 @@ public class ServiceTemplateOpenApiGenerator {
                 // Modify the file name to serviceId.html
                 File tempHtmlFile = new File(openApiDir, "index.html");
                 if (tempHtmlFile.exists() && (tempHtmlFile.renameTo(htmlFile))) {
-                    log.info("Create service openApi html file:{} success.",
+                    log.info("Createed service openApi html file:{} successfully.",
                             htmlFile.getName());
                     if (htmlFile.exists()) {
-                        return this.openApiUtil.getOpenApiUrl(serviceId);
+                        return this.openApiUrlManage.getOpenApiUrl(serviceId);
                     }
 
                 }
+            } else {
+                log.error("Not generating {} file. Missing json or openapi-generator jar file",
+                        htmlFile.getName());
             }
             return StringUtils.EMPTY;
         } catch (IOException | InterruptedException | RuntimeException ex) {
@@ -169,7 +189,13 @@ public class ServiceTemplateOpenApiGenerator {
         } finally {
             // Delete the temp file named serviceId.yaml
             if (yamlFile.exists()) {
-                log.info("Delete service openApi temp yaml file success:{}", yamlFile.delete());
+                try {
+                    Files.delete(yamlFile.toPath());
+                    log.info("Deleted temp json file:{} successfully.", yamlFile.getName());
+                } catch (IOException ioException) {
+                    log.info("Deleting temp json file:{} failed.", yamlFile.getName(), ioException);
+
+                }
             }
         }
     }
@@ -177,11 +203,11 @@ public class ServiceTemplateOpenApiGenerator {
     /**
      * Get the path of the openapi-generator-cli.jar used.
      *
-     * @return File  The openapi-generator-cli.jar path.
+     * @return File The openapi-generator-cli.jar path.
      */
-    private File getJarPath(String openApiDir)
+    private File getJarPath()
             throws IOException {
-        return this.openApiUtil.getClientJarFromAllSources(openApiDir);
+        return this.openApiGeneratorJarManage.getCliFile();
     }
 
 
@@ -190,7 +216,7 @@ public class ServiceTemplateOpenApiGenerator {
             return StringUtils.EMPTY;
         }
         // service url.
-        String serviceUrl = this.openApiUtil.getServiceUrl();
+        String serviceUrl = this.openApiUrlManage.getServiceUrl();
         // string of required fields list.
         String createRequiredStr = null;
         // category value of registered service.
