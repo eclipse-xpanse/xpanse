@@ -29,6 +29,9 @@ public class TerraformVersionProvider {
     @Value("${terraform.provider.aws.version}")
     private String terraformAwsCloudVersion;
 
+    @Value("${terraform.provider.scs.version}")
+    private String terraformScsVersion;
+
     /**
      * get the Terraform version corresponding to the cloud provider.
      */
@@ -41,6 +44,8 @@ public class TerraformVersionProvider {
             return terraformOpenStackVersion;
         } else if (csp == Csp.AWS) {
             return terraformAwsCloudVersion;
+        } else if (csp == Csp.SCS) {
+            return terraformScsVersion;
         } else {
             throw new TerraformExecutorException("Get Terraform Version,Csp does not exist");
         }

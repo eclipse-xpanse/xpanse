@@ -11,6 +11,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Aws;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.FlexibleEngine;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Huawei;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Openstack;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.providers.Scs;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
 
@@ -21,7 +22,8 @@ public enum TerraformProviders {
     AWS(Csp.AWS, new Aws()),
     HUAWEI(Csp.HUAWEI, new Huawei()),
     FLEXIBLE_ENGINE(Csp.FLEXIBLE_ENGINE, new FlexibleEngine()),
-    OPENSTACK(Csp.OPENSTACK, new Openstack());
+    OPENSTACK(Csp.OPENSTACK, new Openstack()),
+    SCS(Csp.SCS, new Scs());
 
     final Csp csp;
 

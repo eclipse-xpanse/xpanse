@@ -20,6 +20,7 @@
         <module>openstack</module>
         <module>huaweicloud</module>
         <module>flexibleengine</module>
+        <module>scs</module>
     </modules>
 
 </project>

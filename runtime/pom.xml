@@ -140,6 +140,11 @@
             <version>6.1.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.plugins</groupId>
+            <artifactId>scs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

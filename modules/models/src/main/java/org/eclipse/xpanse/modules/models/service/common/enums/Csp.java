@@ -20,7 +20,8 @@ public enum Csp {
     ALICLOUD("alicloud"),
     AWS("aws"),
     AZURE("azure"),
-    GOOGLE("google");
+    GOOGLE("google"),
+    SCS("scs");
 
     private final String value;
 

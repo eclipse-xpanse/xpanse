@@ -19,6 +19,7 @@ public class OpenstackEnvironmentConstants {
     public static final String SERVICE_PROJECT = "OS_SERVICE_PROJECT";
     public static final String PROXY_HOST = "OS_PROXY_HOST";
     public static final String PROXY_PORT = "OS_PROXY_PORT";
+    public static final String SSL_VERIFICATION_DISABLED = "OS_SSL_VERIFICATION_DISABLED";
 
     private OpenstackEnvironmentConstants() {
         // private constructor.

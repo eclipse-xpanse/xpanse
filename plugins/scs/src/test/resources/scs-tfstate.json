@@ -1,0 +1,778 @@
+{
+  "version": 4,
+  "terraform_version": "1.3.8",
+  "serial": 87,
+  "lineage": "8c11ccb4-805f-e1e7-bc61-674dbd9df2ad",
+  "outputs": {
+    "admin_passwd": {
+      "value": "%ecfzM2Y3vXr",
+      "type": "string"
+    },
+    "zookeeper_server": {
+      "value": "192.168.10.192:2181",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "openstack_compute_availability_zones_v2",
+      "name": "osc-az",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "3928017685",
+            "names": [
+              "nova"
+            ],
+            "region": "RegionOne",
+            "state": "available"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "openstack_images_image_v2",
+      "name": "image",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "checksum": "b874c39491a2377b8490f5f1e89761a4",
+            "container_format": "bare",
+            "created_at": "2023-03-29T04:07:11Z",
+            "disk_format": "qcow2",
+            "file": "/v2/images/629385a0-8427-48b2-a8a3-096a05f4d80b/file",
+            "hidden": false,
+            "id": "629385a0-8427-48b2-a8a3-096a05f4d80b",
+            "member_status": null,
+            "metadata": {},
+            "min_disk_gb": 0,
+            "min_ram_mb": 0,
+            "most_recent": true,
+            "name": "cirros-0.5.2-x86_64-disk",
+            "owner": "3f2326d071594924b75785bda2c51e23",
+            "properties": {
+              "hw_rng_model": "virtio",
+              "os_hash_algo": "sha512",
+              "os_hash_value": "6b813aa46bb90b4da216a4d19376593fa3f4fc7e617f03a92b7fe11e9a3981cbe8f0959dbebe36225e5f53dc4492341a4863cac4ed1ee0909f3fc78ef9c3e869",
+              "owner_specified.openstack.md5": "",
+              "owner_specified.openstack.object": "images/cirros-0.5.2-x86_64-disk",
+              "owner_specified.openstack.sha256": ""
+            },
+            "protected": false,
+            "region": "RegionOne",
+            "schema": "/v2/schemas/image",
+            "size_bytes": 16300544,
+            "size_max": null,
+            "size_min": null,
+            "sort_direction": "asc",
+            "sort_key": "name",
+            "tag": null,
+            "tags": [],
+            "updated_at": "2023-03-29T04:07:12Z",
+            "visibility": "public"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_compute_instance_v2",
+      "name": "kafka-broker",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.177",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "all_metadata": {},
+            "all_tags": [],
+            "availability_zone": "nova",
+            "availability_zone_hints": null,
+            "block_device": [],
+            "config_drive": null,
+            "flavor_id": "c1",
+            "flavor_name": "cirros256",
+            "floating_ip": null,
+            "force_delete": false,
+            "id": "775cadb2-7c49-4ead-8f42-9e9f7927bdb3",
+            "image_id": "629385a0-8427-48b2-a8a3-096a05f4d80b",
+            "image_name": "cirros-0.5.2-x86_64-disk",
+            "key_pair": "keypair-k8s-b1102602",
+            "metadata": null,
+            "name": "kafka-broker-0-b1102602",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.177",
+                "fixed_ip_v6": "",
+                "floating_ip": "",
+                "mac": "fa:16:3e:ca:b2:fb",
+                "name": "kafka-vpc-default-b1102602",
+                "port": "",
+                "uuid": "b715444b-ec06-4429-af27-c7631c113d5a"
+              }
+            ],
+            "network_mode": null,
+            "personality": [],
+            "power_state": "active",
+            "region": "RegionOne",
+            "scheduler_hints": [],
+            "security_groups": [
+              "kafka-secgroup-default-b1102602"
+            ],
+            "stop_before_destroy": false,
+            "tags": null,
+            "timeouts": null,
+            "user_data": "c20cbceb205aaa0824e24914388a8867925b776b",
+            "vendor_options": [],
+            "volume": []
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.openstack_compute_availability_zones_v2.osc-az",
+            "data.openstack_images_image_v2.image",
+            "data.openstack_networking_network_v2.existing",
+            "data.openstack_networking_secgroup_v2.existing",
+            "openstack_compute_instance_v2.zookeeper",
+            "openstack_compute_keypair_v2.keypair",
+            "openstack_networking_network_v2.new",
+            "openstack_networking_secgroup_v2.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        },
+        {
+          "index_key": 1,
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.165",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "all_metadata": {},
+            "all_tags": [],
+            "availability_zone": "nova",
+            "availability_zone_hints": null,
+            "block_device": [],
+            "config_drive": null,
+            "flavor_id": "c1",
+            "flavor_name": "cirros256",
+            "floating_ip": null,
+            "force_delete": false,
+            "id": "a7a867d9-406c-4361-9b61-b95975f26123",
+            "image_id": "629385a0-8427-48b2-a8a3-096a05f4d80b",
+            "image_name": "cirros-0.5.2-x86_64-disk",
+            "key_pair": "keypair-k8s-b1102602",
+            "metadata": null,
+            "name": "kafka-broker-1-b1102602",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.165",
+                "fixed_ip_v6": "",
+                "floating_ip": "",
+                "mac": "fa:16:3e:7a:88:4a",
+                "name": "kafka-vpc-default-b1102602",
+                "port": "",
+                "uuid": "b715444b-ec06-4429-af27-c7631c113d5a"
+              }
+            ],
+            "network_mode": null,
+            "personality": [],
+            "power_state": "active",
+            "region": "RegionOne",
+            "scheduler_hints": [],
+            "security_groups": [
+              "kafka-secgroup-default-b1102602"
+            ],
+            "stop_before_destroy": false,
+            "tags": null,
+            "timeouts": null,
+            "user_data": "255e9bfb7858ea43904c9772dbcd0771610cc9e5",
+            "vendor_options": [],
+            "volume": []
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.openstack_compute_availability_zones_v2.osc-az",
+            "data.openstack_images_image_v2.image",
+            "data.openstack_networking_network_v2.existing",
+            "data.openstack_networking_secgroup_v2.existing",
+            "openstack_compute_instance_v2.zookeeper",
+            "openstack_compute_keypair_v2.keypair",
+            "openstack_networking_network_v2.new",
+            "openstack_networking_secgroup_v2.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        },
+        {
+          "index_key": 2,
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.28",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "all_metadata": {},
+            "all_tags": [],
+            "availability_zone": "nova",
+            "availability_zone_hints": null,
+            "block_device": [],
+            "config_drive": null,
+            "flavor_id": "c1",
+            "flavor_name": "cirros256",
+            "floating_ip": null,
+            "force_delete": false,
+            "id": "cded9c70-742f-464e-b77d-cd76ed4daa78",
+            "image_id": "629385a0-8427-48b2-a8a3-096a05f4d80b",
+            "image_name": "cirros-0.5.2-x86_64-disk",
+            "key_pair": "keypair-k8s-b1102602",
+            "metadata": null,
+            "name": "kafka-broker-2-b1102602",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.28",
+                "fixed_ip_v6": "",
+                "floating_ip": "",
+                "mac": "fa:16:3e:d8:4b:29",
+                "name": "kafka-vpc-default-b1102602",
+                "port": "",
+                "uuid": "b715444b-ec06-4429-af27-c7631c113d5a"
+              }
+            ],
+            "network_mode": null,
+            "personality": [],
+            "power_state": "active",
+            "region": "RegionOne",
+            "scheduler_hints": [],
+            "security_groups": [
+              "kafka-secgroup-default-b1102602"
+            ],
+            "stop_before_destroy": false,
+            "tags": null,
+            "timeouts": null,
+            "user_data": "a5eb02c04e62c39908457bdb46891119a8501e8b",
+            "vendor_options": [],
+            "volume": []
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.openstack_compute_availability_zones_v2.osc-az",
+            "data.openstack_images_image_v2.image",
+            "data.openstack_networking_network_v2.existing",
+            "data.openstack_networking_secgroup_v2.existing",
+            "openstack_compute_instance_v2.zookeeper",
+            "openstack_compute_keypair_v2.keypair",
+            "openstack_networking_network_v2.new",
+            "openstack_networking_secgroup_v2.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_compute_instance_v2",
+      "name": "zookeeper",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access_ip_v4": "192.168.10.192",
+            "access_ip_v6": "",
+            "admin_pass": null,
+            "all_metadata": {},
+            "all_tags": [],
+            "availability_zone": "nova",
+            "availability_zone_hints": null,
+            "block_device": [],
+            "config_drive": null,
+            "flavor_id": "c1",
+            "flavor_name": "cirros256",
+            "floating_ip": null,
+            "force_delete": false,
+            "id": "6f235cad-7c81-4736-8130-977b81043ba7",
+            "image_id": "629385a0-8427-48b2-a8a3-096a05f4d80b",
+            "image_name": "cirros-0.5.2-x86_64-disk",
+            "key_pair": "keypair-k8s-b1102602",
+            "metadata": null,
+            "name": "kafka-zookeeper-b1102602",
+            "network": [
+              {
+                "access_network": false,
+                "fixed_ip_v4": "192.168.10.192",
+                "fixed_ip_v6": "",
+                "floating_ip": "",
+                "mac": "fa:16:3e:d1:92:bd",
+                "name": "kafka-vpc-default-b1102602",
+                "port": "",
+                "uuid": "b715444b-ec06-4429-af27-c7631c113d5a"
+              }
+            ],
+            "network_mode": null,
+            "personality": [],
+            "power_state": "active",
+            "region": "RegionOne",
+            "scheduler_hints": [],
+            "security_groups": [
+              "kafka-secgroup-default-b1102602"
+            ],
+            "stop_before_destroy": false,
+            "tags": null,
+            "timeouts": null,
+            "user_data": "e911289adb51a8727a5d3c8d2e5f8e0b12d5427c",
+            "vendor_options": [],
+            "volume": []
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "user_data"
+              }
+            ]
+          ],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.openstack_compute_availability_zones_v2.osc-az",
+            "data.openstack_images_image_v2.image",
+            "data.openstack_networking_network_v2.existing",
+            "data.openstack_networking_secgroup_v2.existing",
+            "openstack_compute_keypair_v2.keypair",
+            "openstack_networking_network_v2.new",
+            "openstack_networking_secgroup_v2.new",
+            "random_id.new",
+            "random_password.password"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_compute_keypair_v2",
+      "name": "keypair",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "fingerprint": "9d:61:ea:0d:d2:91:3f:47:57:62:45:51:5f:5c:fe:1c",
+            "id": "keypair-k8s-b1102602",
+            "name": "keypair-k8s-b1102602",
+            "private_key": "xxxxxxxxx",
+            "public_key": "xxxxxxxx",
+            "region": "RegionOne",
+            "user_id": "",
+            "value_specs": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_networking_network_v2",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "admin_state_up": true,
+            "all_tags": [],
+            "availability_zone_hints": [],
+            "description": "",
+            "dns_domain": "",
+            "external": false,
+            "id": "b715444b-ec06-4429-af27-c7631c113d5a",
+            "mtu": 1442,
+            "name": "kafka-vpc-default-b1102602",
+            "port_security_enabled": true,
+            "qos_policy_id": "",
+            "region": "RegionOne",
+            "segments": [],
+            "shared": false,
+            "tags": [],
+            "tenant_id": "55a93d3bbb784dcba80a297ab9bc1c4d",
+            "timeouts": null,
+            "transparent_vlan": false,
+            "value_specs": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.openstack_networking_network_v2.existing",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_networking_secgroup_rule_v2",
+      "name": "secgroup_rule_0",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "09f78aa6-2260-410e-a743-ccbe39003716",
+            "port_range_max": 22,
+            "port_range_min": 22,
+            "protocol": "tcp",
+            "region": "RegionOne",
+            "remote_group_id": "",
+            "remote_ip_prefix": "127.0.0.1/32",
+            "security_group_id": "6b597142-c9ec-4dc5-9371-a9ed8f81836b",
+            "tenant_id": "55a93d3bbb784dcba80a297ab9bc1c4d",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.openstack_networking_secgroup_v2.existing",
+            "openstack_networking_secgroup_v2.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_networking_secgroup_rule_v2",
+      "name": "secgroup_rule_1",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "2ee80db4-cd38-4698-87f4-154930e330dd",
+            "port_range_max": 2181,
+            "port_range_min": 2181,
+            "protocol": "tcp",
+            "region": "RegionOne",
+            "remote_group_id": "",
+            "remote_ip_prefix": "127.0.0.1/32",
+            "security_group_id": "6b597142-c9ec-4dc5-9371-a9ed8f81836b",
+            "tenant_id": "55a93d3bbb784dcba80a297ab9bc1c4d",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.openstack_networking_secgroup_v2.existing",
+            "openstack_networking_secgroup_v2.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_networking_secgroup_rule_v2",
+      "name": "secgroup_rule_2",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "description": "",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "id": "95234e86-67ba-45b6-9fd8-96ad849cf3be",
+            "port_range_max": 9093,
+            "port_range_min": 9092,
+            "protocol": "tcp",
+            "region": "RegionOne",
+            "remote_group_id": "",
+            "remote_ip_prefix": "127.0.0.1/32",
+            "security_group_id": "6b597142-c9ec-4dc5-9371-a9ed8f81836b",
+            "tenant_id": "55a93d3bbb784dcba80a297ab9bc1c4d",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxx",
+          "dependencies": [
+            "data.openstack_networking_secgroup_v2.existing",
+            "openstack_networking_secgroup_v2.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_networking_secgroup_v2",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "all_tags": [],
+            "delete_default_rules": null,
+            "description": "Kafka cluster security group",
+            "id": "6b597142-c9ec-4dc5-9371-a9ed8f81836b",
+            "name": "kafka-secgroup-default-b1102602",
+            "region": "RegionOne",
+            "tags": [],
+            "tenant_id": "55a93d3bbb784dcba80a297ab9bc1c4d",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.openstack_networking_secgroup_v2.existing",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_networking_subnet_v2",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "all_tags": [],
+            "allocation_pool": [
+              {
+                "end": "192.168.10.254",
+                "start": "192.168.10.2"
+              }
+            ],
+            "allocation_pools": [
+              {
+                "end": "192.168.10.254",
+                "start": "192.168.10.2"
+              }
+            ],
+            "cidr": "192.168.10.0/24",
+            "description": "",
+            "dns_nameservers": [],
+            "enable_dhcp": true,
+            "gateway_ip": "192.168.10.1",
+            "host_routes": [],
+            "id": "0b278cbd-da58-4dac-8469-3c9ff237e498",
+            "ip_version": 4,
+            "ipv6_address_mode": "",
+            "ipv6_ra_mode": "",
+            "name": "kafka-subnet-default-b1102602",
+            "network_id": "b715444b-ec06-4429-af27-c7631c113d5a",
+            "no_gateway": false,
+            "prefix_length": null,
+            "region": "RegionOne",
+            "subnetpool_id": "",
+            "tags": [],
+            "tenant_id": "55a93d3bbb784dcba80a297ab9bc1c4d",
+            "timeouts": null,
+            "value_specs": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "data.openstack_networking_network_v2.existing",
+            "data.openstack_networking_subnet_v2.existing",
+            "openstack_networking_network_v2.new",
+            "random_id.new"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "random_id",
+      "name": "new",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "b64_std": "sRAmAg==",
+            "b64_url": "sRAmAg",
+            "byte_length": 4,
+            "dec": "2970625538",
+            "hex": "b1102602",
+            "id": "sRAmAg",
+            "keepers": null,
+            "prefix": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "random_password",
+      "name": "password",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+      "instances": [
+        {
+          "schema_version": 3,
+          "attributes": {
+            "bcrypt_hash": "$2a$10$r11U/i2kBTINCqyX66Ytbe1VSeS/HSFu5Sf6p9VXd.2x/6dLAXKmG",
+            "id": "none",
+            "keepers": null,
+            "length": 12,
+            "lower": true,
+            "min_lower": 0,
+            "min_numeric": 0,
+            "min_special": 1,
+            "min_upper": 0,
+            "number": true,
+            "numeric": true,
+            "override_special": "#%@",
+            "result": "%ecfzM2Y3vXr",
+            "special": true,
+            "upper": true
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_blockstorage_volume_v3",
+      "name": "volume",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "attachment": [],
+            "availability_zone": "RegionOne",
+            "cascade": false,
+            "consistency_group_id": null,
+            "description": "my volume",
+            "id": "dfa9c658-c398-4366-a7ae-29113a829e8c",
+            "image_id": null,
+            "metadata": {},
+            "multiattach": false,
+            "name": "volume",
+            "region": "RegionOne",
+            "size": 20,
+            "snapshot_id": "",
+            "source_replica": null,
+            "source_vol_id": "",
+            "tags": null,
+            "timeouts": null,
+            "volume_type": "SAS"
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "data.openstack_compute_availability_zones_v2.osc-az"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "openstack_networking_floatingip_v2",
+      "name": "osc-eip-kafka-zookeeper",
+      "provider": "provider[\"registry.terraform.io/terraform-provider-openstack/openstack\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": "127.0.0.1",
+            "auto_pay": null,
+            "auto_renew": null,
+            "bandwidth": [
+              {
+                "charge_mode": "traffic",
+                "id": "a8299462-3a3a-4385-89f1-d9b8f1173831",
+                "name": "osc-eip-kafka-zookeeper-27e7c494",
+                "share_type": "PER",
+                "size": 5
+              }
+            ],
+            "charging_mode": null,
+            "tenant_id": "55a93d3bbb784dcba80a297ab9bc1c4d",
+            "id": "db9a443b-a59c-48e2-9d48-911d13b4c744",
+            "ipv6_address": "",
+            "name": "",
+            "period": null,
+            "period_unit": null,
+            "port_id": "",
+            "private_ip": "",
+            "publicip": [
+              {
+                "ip_address": "127.0.0.1",
+                "ip_version": 4,
+                "port_id": "",
+                "type": "5_sbgp"
+              }
+            ],
+            "region": "RegionOne",
+            "status": "UNBOUND",
+            "tags": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "xxxxxxxxx",
+          "dependencies": [
+            "random_id.new"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
