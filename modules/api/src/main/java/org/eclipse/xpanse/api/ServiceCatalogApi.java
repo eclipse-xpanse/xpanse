@@ -24,7 +24,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.CategoryOclVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.beans.BeanUtils;
@@ -55,7 +54,7 @@ public class ServiceCatalogApi {
     private ServiceTemplateManage serviceTemplateManage;
 
     /**
-     * Returns the list of all registered services that are available for user to order/deploy.
+     * List all registered service templates which are available for user to order/deploy.
      *
      * @param categoryName   name of category.
      * @param cspName        name of cloud service provider.
@@ -63,11 +62,11 @@ public class ServiceCatalogApi {
      * @param serviceVersion version of registered service.
      * @return response
      */
-    @Tag(name = "Service Catalog",
-            description = "APIs to query the services which are available for the user to order.")
+    @Tag(name = "Service Catalog", description =
+            "APIs to query service templates which are available for the user to order.")
     @Operation(description =
-            "Returns the list of all registered services that are available for user to order.")
-    @GetMapping(value = "/services/available",
+            "List of all registered services which are available for user to order.")
+    @GetMapping(value = "/catalog/services",
             produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     @ResponseStatus(HttpStatus.OK)
     public List<UserAvailableServiceVo> listAvailableServices(
@@ -97,37 +96,6 @@ public class ServiceCatalogApi {
     }
 
     /**
-     * Returns the list of all registered services in a tree structure
-     * with service name
-     * representing the root of the tree and service versions
-     * representing the branches of the tree.
-     * This method is used for providing different views of the available services.
-     *
-     * @param category name of category.
-     * @return response
-     */
-    @Tag(name = "Service Catalog",
-            description = "APIs to query the services which are available for the user to order.")
-    @Operation(description = "Get the available services by tree.")
-    @GetMapping(value = "/services/available/category/{categoryName}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
-    public List<CategoryOclVo> getAvailableServicesTree(
-            @Parameter(name = "categoryName", description = "category of the service")
-            @PathVariable(name = "categoryName") Category category) {
-        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
-        query.setCategory(category);
-        List<CategoryOclVo> categoryOclList =
-                serviceTemplateManage.getManagedServicesTree(query);
-        String successMsg = String.format(
-                "Get the tree of available services with category %s "
-                        + "successful.", category.toValue());
-        log.info(successMsg);
-        return categoryOclList;
-    }
-
-    /**
      * Get deployable service by id.
      *
      * @param id The id of deployable service.
@@ -136,7 +104,7 @@ public class ServiceCatalogApi {
     @Tag(name = "Service Catalog",
             description = "APIs to query the services which are available for the user to order.")
     @Operation(description = "Get deployable service by id.")
-    @GetMapping(value = "/services/available/{id}",
+    @GetMapping(value = "/catalog/services/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public UserAvailableServiceVo availableServiceDetails(
@@ -157,7 +125,7 @@ public class ServiceCatalogApi {
      */
     @Tag(name = "Service Catalog",
             description = "APIs to query the services which are available for the user to order.")
-    @GetMapping(value = "/services/available/{id}/openapi",
+    @GetMapping(value = "/catalog/services/{id}/openapi",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the available service.")

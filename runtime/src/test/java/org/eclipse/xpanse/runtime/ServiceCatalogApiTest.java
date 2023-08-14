@@ -115,7 +115,7 @@ class ServiceCatalogApiTest {
         String result = objectMapper.writeValueAsString(userAvailableServiceVos);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/available")
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/catalog/services")
                         .param("categoryName", "middleware")
                         .param("cspName", "huawei")
                         .param("serviceName", "kafka-cluster")
@@ -142,7 +142,7 @@ class ServiceCatalogApiTest {
         userAvailableServiceVo.setRegions(
                 serviceTemplateVo.getOcl().getCloudServiceProvider().getRegions());
         userAvailableServiceVo.add(
-                Link.of(String.format("http://localhost/xpanse/services/available/%s/openapi",
+                Link.of(String.format("http://localhost/xpanse/catalog/services/%s/openapi",
                         serviceTemplateVo.getId().toString()), "openApi"));
 
         return userAvailableServiceVo;
@@ -155,7 +155,7 @@ class ServiceCatalogApiTest {
                 Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY, List.of(errorMessage));
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/available")
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/catalog/services")
                         .param("categoryName", "errorCategoryName")
                         .param("cspName", "cspName")
                         .param("serviceName", "serviceName")
@@ -175,7 +175,7 @@ class ServiceCatalogApiTest {
         // Setup
         String result = "[]";
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/available")
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/catalog/services")
                         .param("categoryName", "AI")
                         .param("cspName", "huawei")
                         .param("serviceName", "serviceName")
@@ -196,7 +196,7 @@ class ServiceCatalogApiTest {
 
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/services/available/{id}", id)
+                mockMvc.perform(get("/xpanse/catalog/services/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -216,7 +216,7 @@ class ServiceCatalogApiTest {
 
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/services/available/{id}", uuid)
+                mockMvc.perform(get("/xpanse/catalog/services/{id}", uuid)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -234,7 +234,7 @@ class ServiceCatalogApiTest {
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/services/available/{id}/openapi",
+                        get("/xpanse/catalog/services/{id}/openapi",
                                 id)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -256,7 +256,7 @@ class ServiceCatalogApiTest {
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/services/available/{id}/openapi",
+                        get("/xpanse/catalog/services/{id}/openapi",
                                 uuid)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();

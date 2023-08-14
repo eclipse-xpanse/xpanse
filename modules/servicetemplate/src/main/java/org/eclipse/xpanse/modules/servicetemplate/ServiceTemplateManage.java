@@ -8,11 +8,8 @@ package org.eclipse.xpanse.modules.servicetemplate;
 
 import jakarta.annotation.Resource;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,9 +19,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
@@ -33,18 +28,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.CategoryOclVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.ProviderOclVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.VersionOclVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
-import org.springframework.beans.BeanUtils;
-import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Implement Interface to manage service template entity in database.
@@ -226,83 +214,6 @@ public class ServiceTemplateManage {
         storage.removeById(uuid);
         serviceTemplateOpenApiGenerator.deleteServiceApi(serviceTemplateId);
     }
-
-    /**
-     * Search registered service tree by query model.
-     *
-     * @param query the query model for search registered service.
-     * @return Returns Tree of RegisterService View
-     */
-    public List<CategoryOclVo> getManagedServicesTree(ServiceTemplateQueryModel query) {
-        List<ServiceTemplateEntity> serviceList = storage.listServiceTemplates(query);
-        if (CollectionUtils.isEmpty(serviceList)) {
-            return new ArrayList<>();
-        }
-        List<CategoryOclVo> oclTrees = new ArrayList<>();
-        Map<String, List<ServiceTemplateEntity>> nameListMap =
-                serviceList.stream().collect(Collectors.groupingBy(ServiceTemplateEntity::getName));
-        nameListMap.forEach((name, nameList) -> {
-            CategoryOclVo categoryOclVo = new CategoryOclVo();
-            categoryOclVo.setName(name);
-            List<VersionOclVo> versionVoList = new ArrayList<>();
-            Map<String, List<ServiceTemplateEntity>> versionListMap =
-                    nameList.stream()
-                            .collect(Collectors.groupingBy(ServiceTemplateEntity::getVersion));
-            versionListMap.forEach((version, versionList) -> {
-                VersionOclVo versionOclVo = new VersionOclVo();
-                versionOclVo.setVersion(version);
-                List<ProviderOclVo> cspVoList = new ArrayList<>();
-                Map<Csp, List<ServiceTemplateEntity>> cspListMap =
-                        versionList.stream()
-                                .collect(Collectors.groupingBy(ServiceTemplateEntity::getCsp));
-                cspListMap.forEach((csp, cspList) -> {
-                    ProviderOclVo providerOclVo = new ProviderOclVo();
-                    providerOclVo.setName(csp);
-                    List<UserAvailableServiceVo> details = cspList.stream()
-                            .map(this::convertToUserAvailableServiceVo)
-                            .collect(Collectors.toList());
-                    providerOclVo.setDetails(details);
-                    List<Region> regions = new ArrayList<>();
-                    for (UserAvailableServiceVo userAvailableServiceVo : details) {
-                        regions.addAll(userAvailableServiceVo.getRegions());
-                    }
-                    providerOclVo.setRegions(regions);
-                    cspVoList.add(providerOclVo);
-                });
-                List<ProviderOclVo> sortedCspOclList =
-                        cspVoList.stream().sorted(
-                                        Comparator.comparingInt(o -> o.getName().ordinal()))
-                                .collect(Collectors.toList());
-                versionOclVo.setCloudProvider(sortedCspOclList);
-                versionVoList.add(versionOclVo);
-            });
-            categoryOclVo.setVersions(versionVoList);
-            oclTrees.add(categoryOclVo);
-        });
-        return oclTrees;
-    }
-
-    private UserAvailableServiceVo convertToUserAvailableServiceVo(
-            ServiceTemplateEntity serviceEntity) {
-        if (Objects.isNull(serviceEntity)) {
-            return null;
-        }
-        UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
-        BeanUtils.copyProperties(serviceEntity, userAvailableServiceVo);
-        userAvailableServiceVo.setIcon(serviceEntity.getOcl().getIcon());
-        userAvailableServiceVo.setDescription(serviceEntity.getOcl().getDescription());
-        userAvailableServiceVo.setNamespace(serviceEntity.getOcl().getNamespace());
-        userAvailableServiceVo.setBilling(serviceEntity.getOcl().getBilling());
-        userAvailableServiceVo.setFlavors(serviceEntity.getOcl().getFlavors());
-        userAvailableServiceVo.setVariables(serviceEntity.getOcl().getDeployment().getVariables());
-        userAvailableServiceVo.setDeployment(serviceEntity.getOcl().getDeployment());
-        userAvailableServiceVo.setRegions(
-                serviceEntity.getOcl().getCloudServiceProvider().getRegions());
-        String openApiUrl = getOpenApiUrl(serviceEntity.getId().toString());
-        userAvailableServiceVo.add(Link.of(openApiUrl, "openApi"));
-        return userAvailableServiceVo;
-    }
-
 
     /**
      * generate OpenApi for service template using the ID.
