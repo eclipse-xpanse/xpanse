@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -25,8 +26,11 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult
 public class TerraformExecutor {
 
     private static final String VARS_FILE_NAME = "variables.tfvars.json";
-
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    static {
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    }
 
     private final Map<String, String> env;
     private final Map<String, String> variables;
