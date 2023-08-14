@@ -13,13 +13,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.common.openapi.OpenApiUtil;
+import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
+import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -44,21 +46,23 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final String appVersion;
-    private final OpenApiUtil openApiUtil;
+    private final OpenApiUrlManage openApiUrlManage;
     private final PluginManager pluginManager;
-
+    private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
 
     /**
      * Constructor of CredentialApiUtil.
      */
     @Autowired
     public CredentialOpenApiGenerator(PluginManager pluginManager,
-                                      OpenApiUtil openApiUtil,
+                                      OpenApiUrlManage openApiUrlManage,
                                       @Value("${app.version:1.0.0}")
-                                              String appVersion) {
+                                      String appVersion,
+                                      OpenApiGeneratorJarManage openApiGeneratorJarManage) {
         this.pluginManager = pluginManager;
-        this.openApiUtil = openApiUtil;
+        this.openApiUrlManage = openApiUrlManage;
         this.appVersion = appVersion;
+        this.openApiGeneratorJarManage = openApiGeneratorJarManage;
     }
 
     /**
@@ -67,7 +71,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
      * @return serviceUrl
      */
     public String getServiceUrl() {
-        return openApiUtil.getServiceUrl();
+        return openApiUrlManage.getServiceUrl();
     }
 
     /**
@@ -76,7 +80,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
      * @return workdir  The work directory of the credentialApi.
      */
     private String getCredentialApiDir() {
-        return openApiUtil.getOpenApiWorkdir();
+        return this.openApiGeneratorJarManage.getOpenApiWorkdir();
     }
 
     @Override
@@ -127,8 +131,8 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                 apiWriter.write(apiDocsJson);
             }
             log.info("credentialApi jsonFile:{} creation successful.", jsonFile.getName());
-            File jarPath = getJarPath(credentialApiDir);
-            if (jsonFile.exists() && jarPath != null) {
+            File jarPath = getJarPath();
+            if (jsonFile.exists() && jarPath.exists()) {
                 String comm = String.format("java -jar %s generate -g html2 "
                         + "-i %s -o %s", jarPath.getPath(), jsonFile.getPath(), credentialApiDir);
                 ProcessBuilder processBuilder = new ProcessBuilder(comm.split("\\s+"));
@@ -148,12 +152,13 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                             htmlFile.getName(), stdErrOut);
                 }
                 File tempHtmlFile = new File(credentialApiDir, "index.html");
-                if (tempHtmlFile.exists()) {
-                    if (tempHtmlFile.renameTo(htmlFile)) {
-                        log.info("credentialApi htmlFile:{} creation successful.",
-                                htmlFile.getName());
-                    }
+                if (tempHtmlFile.exists() && (tempHtmlFile.renameTo(htmlFile))) {
+                    log.info("credentialApi htmlFile:{} creation successful.", htmlFile.getName());
+
                 }
+            } else {
+                log.error("Not generating {} file. Missing json or openapi-generator jar file",
+                        htmlFile.getName());
             }
         } catch (IOException | InterruptedException ex) {
             log.error("credentialApi html file:{} creation failed.", htmlFile.getName(), ex);
@@ -162,8 +167,12 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
         } finally {
             // Delete the json file named ${Csp}_credentialApi.yaml
             if (jsonFile.exists()) {
-                if (jsonFile.delete()) {
-                    log.info("Delete temp json file:{} successfully.", jsonFile.getName());
+                try {
+                    Files.delete(jsonFile.toPath());
+                    log.info("Deleted temp json file:{} successfully.", jsonFile.getName());
+                } catch (IOException ioException) {
+                    log.info("Deleting temp json file:{} failed.", jsonFile.getName(), ioException);
+
                 }
             }
         }
@@ -172,11 +181,10 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     /**
      * Get the path of the openapi-generator-cli.jar used.
      *
-     * @return File  The openapi-generator-cli.jar path.
+     * @return File The openapi-generator-cli.jar path.
      */
-    private File getJarPath(String openApiDir)
-            throws IOException {
-        return this.openApiUtil.getClientJarFromAllSources(openApiDir);
+    private File getJarPath() {
+        return this.openApiGeneratorJarManage.getCliFile();
     }
 
     /**
@@ -212,10 +220,12 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                 throw new NoCredentialDefinitionAvailable(errorMsg);
             }
         }
-        if (openApiUtil.getOpenapiPath().endsWith("/")) {
-            return getServiceUrl() + "/" + openApiUtil.getOpenapiPath() + htmlFileName;
+        if (openApiGeneratorJarManage.getOpenapiPath().endsWith("/")) {
+            return getServiceUrl() + "/" + openApiGeneratorJarManage.getOpenapiPath()
+                    + htmlFileName;
         }
-        return getServiceUrl() + "/" + openApiUtil.getOpenapiPath() + "/" + htmlFileName;
+        return getServiceUrl() + "/" + openApiGeneratorJarManage.getOpenapiPath() + "/"
+                + htmlFileName;
     }
 
     private String getCredentialApiFileName(Csp csp, CredentialType type, String suffix) {

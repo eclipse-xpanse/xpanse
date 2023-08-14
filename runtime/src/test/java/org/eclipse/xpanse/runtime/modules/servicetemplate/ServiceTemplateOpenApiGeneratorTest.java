@@ -9,7 +9,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.common.openapi.OpenApiUtil;
+import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
+import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -52,12 +53,13 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setOcl(ocl);
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
-        OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL, OPENAPI_PATH, SERVICER_PORT);
+        OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
+        OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
                 new ServiceTemplateOpenApiGenerator(
-                        deployVariableValidator, openApiUtil);
+                        deployVariableValidator, openApiUrlManage, openApiGeneratorJarManage);
         serviceTemplateOpenApiGenerator.createServiceApi(serviceTemplateEntity);
-        String openApiWorkdir = openApiUtil.getOpenApiWorkdir();
+        String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");
         Assertions.assertTrue(htmlFile.exists());
     }
@@ -76,11 +78,12 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setOcl(ocl);
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
-        OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
-                OPENAPI_PATH, SERVICER_PORT);
+        OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
+        OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
                 new ServiceTemplateOpenApiGenerator(
-                        deployVariableValidator, openApiUtil);
+                        deployVariableValidator, openApiUrlManage,
+                        openApiGeneratorJarManage);
         Assertions.assertDoesNotThrow(
                 () -> serviceTemplateOpenApiGenerator.updateServiceApi(serviceTemplateEntity));
     }
@@ -89,13 +92,14 @@ class ServiceTemplateOpenApiGeneratorTest {
     @Order(3)
     void deleteServiceApi_test() {
         DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
-        OpenApiUtil openApiUtil = new OpenApiUtil(CLIENT_DOWNLOAD_URL,
-                OPENAPI_PATH, SERVICER_PORT);
+        OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
+        OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
                 new ServiceTemplateOpenApiGenerator(
-                        deployVariableValidator, openApiUtil);
+                        deployVariableValidator, openApiUrlManage,
+                        openApiGeneratorJarManage);
         serviceTemplateOpenApiGenerator.deleteServiceApi(ID);
-        String openApiWorkdir = openApiUtil.getOpenApiWorkdir();
+        String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");
         Assertions.assertFalse(htmlFile.exists());
     }

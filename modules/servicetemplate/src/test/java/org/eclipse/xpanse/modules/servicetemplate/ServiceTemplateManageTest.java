@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.common.openapi.OpenApiUtil;
+import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
@@ -64,7 +64,7 @@ class ServiceTemplateManageTest {
     @Mock
     private DeployService mockDeployService;
     @Mock
-    private OpenApiUtil openApiUtil;
+    private OpenApiUrlManage openApiUrlManage;
     @InjectMocks
     private ServiceTemplateManage serviceTemplateManageTest;
 

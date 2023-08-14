@@ -7,7 +7,7 @@ package org.eclipse.xpanse.runtime.modules.credential;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import org.eclipse.xpanse.common.openapi.OpenApiUtil;
+import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.credential.CredentialOpenApiGenerator;
 import org.eclipse.xpanse.modules.credential.CredentialsStore;
 import org.eclipse.xpanse.modules.credential.cache.CaffeineCredentialCacheManager;
@@ -30,7 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @ActiveProfiles("default")
 @SpringBootTest(classes = {XpanseApplication.class, CaffeineCredentialCacheManager.class,
         CredentialsStore.class,
-        ServletUriComponentsBuilder.class, OpenApiUtil.class, PluginManager.class})
+        ServletUriComponentsBuilder.class, OpenApiUrlManage.class, PluginManager.class})
 class CredentialOpenApiGeneratorTest {
 
     @Autowired
