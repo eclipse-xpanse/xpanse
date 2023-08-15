@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -109,12 +110,11 @@ public class TerraformDeployment implements Deployment {
      */
     @Override
     public DeployResult destroy(DeployTask task, String tfState) throws IOException {
-        DeployResult result = new DeployResult();
         if (StringUtils.isBlank(tfState)) {
-            log.error("Deployed service with tfState not found, id:{}", task.getId());
-            result.setId(task.getId());
-            result.setState(TerraformExecState.DESTROY_FAILED);
-            return result;
+            String errorMsg = String.format("tfState of deployed service with id %s not found.",
+                    task.getId());
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
         }
         String taskId = task.getId().toString();
         String workspace = getWorkspacePath(taskId);
@@ -123,6 +123,7 @@ public class TerraformDeployment implements Deployment {
         TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
         executor.destroy();
         deleteWorkSpace(workspace);
+        DeployResult result = new DeployResult();
         result.setId(task.getId());
         result.setState(TerraformExecState.DESTROY_SUCCESS);
         return result;
