@@ -94,6 +94,8 @@ public class TerraformDeployment implements Deployment {
         } else {
             deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
             deployResult.getPrivateProperties().put("stateFile", tfState);
+            Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
+            deployResult.getPrivateProperties().putAll(importantFileContentMap);
         }
 
         if (task.getDeployResourceHandler() != null) {
@@ -109,7 +111,7 @@ public class TerraformDeployment implements Deployment {
      * @param task the task for the deployment.
      */
     @Override
-    public DeployResult destroy(DeployTask task, String tfState) throws IOException {
+    public DeployResult destroy(DeployTask task, String tfState) {
         if (StringUtils.isBlank(tfState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
                     task.getId());
@@ -122,11 +124,16 @@ public class TerraformDeployment implements Deployment {
                 task.getCreateRequest().getRegion(), workspace, tfState);
         TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
         executor.destroy();
-        deleteWorkSpace(workspace);
         DeployResult result = new DeployResult();
         result.setId(task.getId());
         result.setState(TerraformExecState.DESTROY_SUCCESS);
         return result;
+    }
+
+    @Override
+    public void deleteTaskWorkspace(String taskId) {
+        String workspace = getWorkspacePath(taskId);
+        deleteWorkSpace(workspace);
     }
 
     /**
@@ -172,7 +179,7 @@ public class TerraformDeployment implements Deployment {
      *
      * @param csp       the cloud service provider.
      * @param workspace the workspace for terraform.
-     * @param script    the terraform scripts of the task.
+     * @param script    terraform scripts of the task.
      */
     private void createScriptFile(Csp csp, String region, String workspace, String script) {
         log.info("start create terraform script");
@@ -183,12 +190,10 @@ public class TerraformDeployment implements Deployment {
         }
         String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
-        try {
-            try (FileWriter verWriter = new FileWriter(verScriptPath);
-                    FileWriter scriptWriter = new FileWriter(scriptPath)) {
-                verWriter.write(TerraformProviders.getProvider(csp).getProvider(version, region));
-                scriptWriter.write(script);
-            }
+        try (FileWriter verWriter = new FileWriter(verScriptPath);
+                FileWriter scriptWriter = new FileWriter(scriptPath)) {
+            verWriter.write(TerraformProviders.getProvider(csp).getProvider(version, region));
+            scriptWriter.write(script);
             log.info("terraform script create success");
         } catch (IOException ex) {
             log.error("create version file failed.", ex);
@@ -201,10 +206,9 @@ public class TerraformDeployment implements Deployment {
      *
      * @param csp       the cloud service provider.
      * @param workspace the workspace for terraform.
-     * @param tfState   the terraform scripts of the tfstate.
+     * @param tfState   terraform file tfstate of the task.
      */
-    private void createDestroyScriptFile(Csp csp, String region, String workspace, String tfState)
-            throws IOException {
+    private void createDestroyScriptFile(Csp csp, String region, String workspace, String tfState) {
         log.info("start create terraform destroy workspace and script");
         File parentPath = new File(workspace);
         if (!parentPath.exists() || !parentPath.isDirectory()) {
@@ -221,8 +225,13 @@ public class TerraformDeployment implements Deployment {
                 FileWriter scriptWriter = new FileWriter(scriptPath)) {
             verWriter.write(TerraformProviders.getProvider(csp).getProvider(version, region));
             scriptWriter.write(tfState);
+            log.info("create terraform destroy workspace and script success.");
+        } catch (IOException e) {
+            log.error("create terraform destroy workspace and script failed.", e);
+            throw new TerraformExecutorException(
+                    "create terraform destroy workspace and script failed.", e);
         }
-        log.info("terraform workspace and script create success");
+
     }
 
     /**

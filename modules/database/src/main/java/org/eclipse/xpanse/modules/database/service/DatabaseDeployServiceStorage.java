@@ -39,8 +39,9 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
      * @param deployServiceEntity the model of registered service.
      */
     @Override
-    public void store(DeployServiceEntity deployServiceEntity) {
+    public boolean store(DeployServiceEntity deployServiceEntity) {
         this.deployServiceRepository.save(deployServiceEntity);
+        return true;
     }
 
     /**
@@ -49,8 +50,9 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
      * @param deployServiceEntity the model of registered service.
      */
     @Override
-    public void storeAndFlush(DeployServiceEntity deployServiceEntity) {
+    public boolean storeAndFlush(DeployServiceEntity deployServiceEntity) {
         this.deployServiceRepository.saveAndFlush(deployServiceEntity);
+        return true;
     }
 
     @Override

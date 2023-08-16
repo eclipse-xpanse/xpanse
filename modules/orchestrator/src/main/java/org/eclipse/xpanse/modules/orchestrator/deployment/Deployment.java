@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
-import java.io.IOException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -18,7 +17,9 @@ public interface Deployment {
 
     DeployResult deploy(DeployTask task);
 
-    DeployResult destroy(DeployTask task, String tfState) throws IOException;
+    DeployResult destroy(DeployTask task, String tfState);
+
+    void deleteTaskWorkspace(String taskId);
 
     DeployerKind getDeployerKind();
 
