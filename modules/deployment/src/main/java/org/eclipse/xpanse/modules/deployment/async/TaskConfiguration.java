@@ -34,6 +34,8 @@ public class TaskConfiguration {
         executor.setKeepAliveSeconds(300);
         executor.setThreadNamePrefix("thread-pool-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(300);
         executor.initialize();
         return executor;
     }
