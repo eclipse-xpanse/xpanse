@@ -20,14 +20,14 @@ public interface DeployServiceStorage {
      *
      * @param deployServiceEntity the model of deployed service.
      */
-    void store(DeployServiceEntity deployServiceEntity);
+    boolean store(DeployServiceEntity deployServiceEntity);
 
     /**
      * Add or update deployed service data to database.
      *
      * @param deployServiceEntity the model of deployed service.
      */
-    void storeAndFlush(DeployServiceEntity deployServiceEntity);
+    boolean storeAndFlush(DeployServiceEntity deployServiceEntity);
 
     /**
      * Method to get all stored database entries.

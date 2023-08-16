@@ -273,7 +273,7 @@ public class DeployService {
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
-            String stateFile = deployServiceEntity.getPrivateProperties().get("stateFile");
+            String stateFile = deployServiceEntity.getPrivateProperties().get("terraform.tfstate");
             DeployResult deployResult = deployment.destroy(deployTask, stateFile);
             if (deployResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
                 deployServiceEntity.setServiceDeploymentState(
@@ -291,12 +291,16 @@ public class DeployService {
                 deployServiceEntity.setServiceDeploymentState(
                         ServiceDeploymentState.DESTROY_FAILED);
             }
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
+                deployment.deleteTaskWorkspace(deployTask.getId().toString());
+            }
         } catch (Exception e) {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
+                deployment.deleteTaskWorkspace(deployTask.getId().toString());
+            }
         }
 
     }

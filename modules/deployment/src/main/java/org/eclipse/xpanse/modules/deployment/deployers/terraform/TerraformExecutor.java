@@ -12,7 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmdResult;
@@ -26,7 +30,10 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult
 public class TerraformExecutor {
 
     private static final String VARS_FILE_NAME = "variables.tfvars.json";
+    private static final String STATE_FILE_NAME = "terraform.tfstate";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final List<String> EXCLUDED_FILE_SUFFIX_LIST =
+            Arrays.asList(".tf", ".tfstate", ".hcl");
 
     static {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -168,17 +175,54 @@ public class TerraformExecutor {
      * @return file contents as string.
      */
     public String getTerraformState() {
-        File tfState = new File(workspace + File.separator + "terraform.tfstate");
+        File tfState = new File(workspace + File.separator + STATE_FILE_NAME);
         if (!tfState.exists()) {
             log.info("Terraform state file not exists.");
             return null;
         }
         try {
-            return Files.readString(tfState.toPath());
+            return readFile(tfState);
         } catch (IOException ex) {
             throw new TerraformExecutorException("Read state file failed.", ex);
         }
     }
+
+    /**
+     * Reads the contents of the other important file from the terraform workspace.
+     *
+     * @return Map fileName as key, contents as value.
+     */
+    public Map<String, String> getImportantFilesContent() {
+        Map<String, String> fileContentMap = new HashMap<>();
+        File workPath = new File(workspace);
+        if (workPath.isDirectory() && workPath.exists()) {
+            File[] files = workPath.listFiles();
+            if (Objects.nonNull(files)) {
+                List<File> importantFiles = Arrays.stream(files)
+                        .filter(file -> file.isFile() && !isExcludedFile(file.getName())).toList();
+                for (File importantFile : importantFiles) {
+                    try {
+                        String content = readFile(importantFile);
+                        fileContentMap.put(importantFile.getName(), content);
+                    } catch (IOException e) {
+                        log.error("Read content of file with name:{} error.",
+                                importantFile.getName(), e);
+                    }
+                }
+            }
+        }
+        return fileContentMap;
+    }
+
+    private boolean isExcludedFile(String fileName) {
+        String fileSuffix = fileName.substring(fileName.lastIndexOf("."));
+        return EXCLUDED_FILE_SUFFIX_LIST.contains(fileSuffix);
+    }
+
+    private String readFile(File file) throws IOException {
+        return Files.readString(file.toPath());
+    }
+
 
     /**
      * Executes terraform validate command.
