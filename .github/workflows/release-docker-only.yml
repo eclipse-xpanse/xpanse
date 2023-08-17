@@ -3,18 +3,11 @@
 # SPDX-FileCopyrightText: Huawei Inc.
 #
 ---
-name: xpanse-cd
-
+name: xpanse-cd-docker-only
+# This job simply builds a new image of the last available code and application version in the main branch and pushes the
+# image to GitHub packages. No changes to POM are pushed to the repository.
 on:
   workflow_dispatch:
-    inputs:
-      ReleaseType:
-        type: choice
-        description: Select the next development version
-        options:
-          - Major Version
-          - Minor Version
-          - Patch Version
 
 env:
   BOT_USER_NAME: eclipse-xpanse-bot
@@ -25,10 +18,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: github.repository == 'eclipse-xpanse/xpanse'
-    outputs:
-      next-version: ${{ steps.new_version.outputs.next-version }}
     permissions:
-      contents: write
       packages: write
     steps:
       - name: Checkout
@@ -42,29 +32,6 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
-
-      - name: Set current version env variable
-        run: |
-          echo "CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed s/-SNAPSHOT/""/g)" >> $GITHUB_ENV
-
-      - name: Map input to next action
-        run: |
-          if [ "${{github.event.inputs.ReleaseType}}" = "Major Version" ]; then
-            echo "VERSION_FRAGMENT=major" >> $GITHUB_ENV
-          elif [ "${{github.event.inputs.ReleaseType}}" = "Minor Version" ]; then
-            echo "VERSION_FRAGMENT=feature" >> $GITHUB_ENV
-          elif [ "${{github.event.inputs.ReleaseType}}" = "Patch Version" ]; then
-            echo "VERSION_FRAGMENT=bug" >> $GITHUB_ENV
-          else
-            echo "No matching feature type  found"
-          fi
-
-      - name: Set next development version environment variable
-        id: new_version
-        uses: christian-draeger/increment-semantic-version@1.1.0
-        with:
-          current-version: ${{ env.CURRENT_VERSION }}
-          version-fragment: ${{ env.VERSION_FRAGMENT }}
 
       - name: Remove SNAPSHOT from POM version
         run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false
