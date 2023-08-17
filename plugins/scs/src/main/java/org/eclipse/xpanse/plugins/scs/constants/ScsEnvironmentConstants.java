@@ -15,7 +15,6 @@ public class ScsEnvironmentConstants {
     public static final String PASSWORD = "OS_PASSWORD";
     public static final String PROJECT = "OS_PROJECT_NAME";
     public static final String DOMAIN = "OS_DOMAIN_NAME";
-    public static final String AUTH_URL = "OS_AUTH_URL";
 
     private ScsEnvironmentConstants() {
         // private constructor.

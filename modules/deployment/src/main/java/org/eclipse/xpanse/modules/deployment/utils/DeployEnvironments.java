@@ -118,8 +118,7 @@ public class DeployEnvironments {
                 variables.put(variable.getName(), System.getenv(variable.getName()));
             }
 
-            if (variable.getKind() == DeployVariableKind.FIX_VARIABLE
-                    && request.containsKey(variable.getName())) {
+            if (variable.getKind() == DeployVariableKind.FIX_VARIABLE) {
                 variables.put(variable.getName(),
                         !SensitiveScope.NONE.toValue()
                                 .equals(variable.getSensitiveScope().toValue())

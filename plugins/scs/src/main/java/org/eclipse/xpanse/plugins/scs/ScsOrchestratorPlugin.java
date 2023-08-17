@@ -51,7 +51,7 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> requiredProperties() {
-        return List.of(ScsEnvironmentConstants.AUTH_URL);
+        return Collections.emptyList();
     }
 
     @Override
