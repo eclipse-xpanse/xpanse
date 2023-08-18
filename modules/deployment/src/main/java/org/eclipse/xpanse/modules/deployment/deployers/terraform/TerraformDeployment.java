@@ -93,7 +93,7 @@ public class TerraformDeployment implements Deployment {
             deployResult.setState(TerraformExecState.DEPLOY_FAILED);
         } else {
             deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
-            deployResult.getPrivateProperties().put("stateFile", tfState);
+            deployResult.getPrivateProperties().put(STATE_FILE_NAME, tfState);
             Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
             deployResult.getPrivateProperties().putAll(importantFileContentMap);
         }

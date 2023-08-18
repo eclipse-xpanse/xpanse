@@ -1,5 +1,7 @@
 package org.eclipse.xpanse.plugins.flexibleengine;
 
+import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URL;
@@ -21,8 +23,8 @@ public class FlexibleEngineTerraformResourceHandlerTest {
         TfState tfState = objectMapper.readValue(
                 new URL("file:src/test/resources/flexible-tfstate.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getPrivateProperties().put("stateFile",
-                objectMapper.writeValueAsString(tfState));
+        deployResult.getPrivateProperties()
+                .put(STATE_FILE_NAME, objectMapper.writeValueAsString(tfState));
         flexibleHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(deployResult.getResources()));
         Assertions.assertFalse(deployResult.getProperties().isEmpty());
@@ -34,7 +36,7 @@ public class FlexibleEngineTerraformResourceHandlerTest {
         TfState tfState = objectMapper.readValue(
                 new URL("file:src/test/resources/flexible-tfstate-destroy.json"), TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getPrivateProperties().put("stateFile",
+        deployResult.getPrivateProperties().put(STATE_FILE_NAME,
                 objectMapper.writeValueAsString(tfState));
         flexibleHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isEmpty(deployResult.getResources()));

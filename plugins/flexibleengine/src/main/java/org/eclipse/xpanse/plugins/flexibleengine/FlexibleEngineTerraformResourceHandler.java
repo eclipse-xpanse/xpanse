@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine;
 
+import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ public class FlexibleEngineTerraformResourceHandler implements DeployResourceHan
         List<DeployResource> deployResourceList = new ArrayList<>();
         TfState tfState;
         try {
-            var stateFile = deployResult.getPrivateProperties().get("stateFile");
+            var stateFile = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
             tfState = objectMapper.readValue(stateFile, TfState.class);
         } catch (IOException ex) {
             log.error("Parse terraform state content failed.");
