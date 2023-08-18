@@ -33,6 +33,11 @@ jobs:
           java-version: 17
           distribution: 'temurin'
 
+      - name: Set current version env variable
+        run: |
+          echo "CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed s/-SNAPSHOT/""/g)" >> $GITHUB_ENV
+
+
       - name: Remove SNAPSHOT from POM version
         run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false
 
