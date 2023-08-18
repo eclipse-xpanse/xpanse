@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -265,10 +266,10 @@ class DeployServiceTest {
     }
 
     @Test
-    void testAsyncDestroyService() throws IOException {
+    void testAsyncDestroyService() {
         deployResult.setState(TerraformExecState.DESTROY_SUCCESS);
 
-        String stateFile = deployServiceEntity.getPrivateProperties().get("stateFile");
+        String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
         when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
 
@@ -277,7 +278,7 @@ class DeployServiceTest {
         // Verify the expected interactions
         verify(deployServiceStorage, times(1)).findDeployServiceById(uuid);
         verify(deploymentMock, times(1)).destroy(deployTask,
-                deployServiceEntity.getPrivateProperties().get("stateFile"));
+                deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
         verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
     }
 
@@ -303,12 +304,12 @@ class DeployServiceTest {
     }
 
     @Test
-    void testAsyncDestroyService_resourcesEmpty() throws IOException {
+    void testAsyncDestroyService_resourcesEmpty() {
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
         deployResult.setResources(null);
         deployResult.setState(TerraformExecState.DESTROY_SUCCESS);
 
-        String stateFile = deployServiceEntity.getPrivateProperties().get("stateFile");
+        String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
 
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
         when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
@@ -318,15 +319,15 @@ class DeployServiceTest {
         // Verify the expected interactions
         verify(deployServiceStorage, times(1)).findDeployServiceById(deployTask.getId());
         verify(deploymentMock, times(1)).destroy(deployTask,
-                deployServiceEntity.getPrivateProperties().get("stateFile"));
+                deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
         verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
     }
 
 
     @Test
-    void testAsyncDestroyService_DESTROY_FAILED() throws IOException {
+    void testAsyncDestroyService_DESTROY_FAILED() {
         deployResult.setState(TerraformExecState.DESTROY_FAILED);
-        String stateFile = deployServiceEntity.getPrivateProperties().get("stateFile");
+        String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
 
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
         when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
@@ -336,7 +337,7 @@ class DeployServiceTest {
         // Verify the expected interactions
         verify(deployServiceStorage, times(1)).findDeployServiceById(deployTask.getId());
         verify(deploymentMock, times(1)).destroy(deployTask,
-                deployServiceEntity.getPrivateProperties().get("stateFile"));
+                deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
         verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
     }
 

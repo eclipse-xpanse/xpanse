@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
+
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
@@ -273,7 +275,7 @@ public class DeployService {
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
-            String stateFile = deployServiceEntity.getPrivateProperties().get("terraform.tfstate");
+            String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
             DeployResult deployResult = deployment.destroy(deployTask, stateFile);
             if (deployResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
                 deployServiceEntity.setServiceDeploymentState(
