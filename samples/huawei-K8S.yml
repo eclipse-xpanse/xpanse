@@ -76,23 +76,26 @@ deployment:
       mandatory: false
       validator: minLength=8|maxLength=16|pattern=^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
     - name: vpc_name
-      description: The vpc name of all nodes in the K8S cluster. If the value is empty, will use the example value to find or create VPC.
+      description: The vpc name of all nodes in the K8S cluster. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
       example: "k8s-vpc-default"
       mandatory: false
+      value: "k8s-vpc-default"
     - name: subnet_name
-      description: The sub network name of all nodes in the K8S cluster. If the value is empty, will use the example value to find or create subnet.
+      description: The sub network name of all nodes in the K8S cluster. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
       example: "k8s-subnet-default"
       mandatory: false
+      value: "k8s-subnet-default"
     - name: secgroup_name
-      description: The security group name of all nodes in the K8S cluster. If the value is empty, will use the example value to find or create security group.
+      description: The security group name of all nodes in the K8S cluster. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
       example: "k8s-secgroup-default"
       mandatory: false
+      value: "k8s-secgroup-default"
   deployer: |
     variable "flavor_id" {
       type        = string

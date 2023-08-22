@@ -86,23 +86,26 @@ deployment:
       mandatory: false
       validator: minLength=8|maxLength=16|pattern=^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
     - name: vpc_name
-      description: The vpc name of all nodes in the Kafka cluster. If the value is empty, will use the example value to find or create VPC.
+      description: The vpc name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
       example: "kafka-vpc-default"
       mandatory: false
+      value: "kafka-vpc-default"
     - name: subnet_name
-      description: The sub network name of all nodes in the Kafka cluster. If the value is empty, will use the example value to find or create subnet.
+      description: The sub network name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
       example: "kafka-subnet-default"
       mandatory: false
+      value: "kafka-subnet-default"
     - name: secgroup_name
-      description: The security group name of all nodes in the Kafka cluster. If the value is empty, will use the example value to find or create security group.
+      description: The security group name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
       example: "kafka-secgroup-default"
       mandatory: false
+      vlue: "kafka-secgroup-default"
   deployer: |
     variable "flavor_id" {
       type        = string
