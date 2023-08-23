@@ -32,7 +32,7 @@ public class DeployVariable {
     @Schema(description = "The type of the deploy variable")
     private DeployVariableDataType dataType;
 
-    @Schema(description = "The default value of the deploy variable")
+    @Schema(description = "The example value of the deploy variable")
     private String example;
 
     @NotNull
