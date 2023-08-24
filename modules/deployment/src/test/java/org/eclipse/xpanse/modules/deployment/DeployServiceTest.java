@@ -13,13 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
@@ -43,10 +45,13 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServic
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
+import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -105,6 +110,9 @@ class DeployServiceTest {
     @InjectMocks
     private DeployService deployService;
 
+    @Mock
+    private DeployVariableValidator deployVariableValidator;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -112,7 +120,15 @@ class DeployServiceTest {
         deployment =
                 new org.eclipse.xpanse.modules.models.servicetemplate.Deployment();
         deployment.setKind(DeployerKind.TERRAFORM);
+        DeployVariable deployVariable = new DeployVariable();
+        deployVariable.setName("test");
+        deployVariable.setMandatory(false);
+        deployVariable.setValue("test");
+        deployVariable.setSensitiveScope(SensitiveScope.ALWAYS);
+        deployment.setVariables(List.of(deployVariable));
 
+        Map<String, String> requestProperties = new HashMap<>();
+        requestProperties.put("test", "test");
         Ocl ocl = new Ocl();
         ocl.setName("oclName");
         ocl.setDeployment(deployment);
@@ -127,7 +143,7 @@ class DeployServiceTest {
         createRequest.setVersion("1.0");
         createRequest.setOcl(ocl);
         createRequest.setFlavor("flavor");
-
+        createRequest.setServiceRequestProperties(requestProperties);
         deployTask = new DeployTask();
         deployTask.setId(uuid);
         deployTask.setOcl(ocl);
@@ -219,8 +235,8 @@ class DeployServiceTest {
         deploymentBeans.put("deploymentBean", deploymentMock);
 
         when(applicationContext.getBeansOfType(Deployment.class)).thenReturn(deploymentBeans);
-
-        Map<DeployerKind, Deployment> deploymentMap = deployService.deploymentMap();
+        when(deployVariableValidator.isVariableValid(anyList(), anyMap())).thenReturn(true);
+        deployService.deploymentMap();
 
         Deployment result = deployService.getDeployHandler(deployTask);
 
@@ -250,7 +266,7 @@ class DeployServiceTest {
 
         when(applicationContext.getBeansOfType(Deployment.class)).thenReturn(deploymentBeans);
 
-        Map<DeployerKind, Deployment> deploymentMap = deployService.deploymentMap();
+        deployService.deploymentMap();
 
         assertThrows(PluginNotFoundException.class,
                 () -> deployService.getDeployHandler(deployTask));
@@ -342,12 +358,14 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testListDeployedServices() {
+    void testListDeployedServices() {
         List<DeployServiceEntity> deployServices = new ArrayList<>();
+        CurrentUserInfo currentUserInfo = new CurrentUserInfo();
+        currentUserInfo.setUserId("12344556");
         deployServices.add(deployServiceEntity);
 
         when(deployServiceStorage.listServices(any())).thenReturn(deployServices);
-
+        when(identityProviderManager.getCurrentUserInfo()).thenReturn(currentUserInfo);
         List<ServiceVo> result = deployService.listDeployedServices(new ServiceQueryModel());
 
         assertEquals(1, result.size());
@@ -358,7 +376,7 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testGetDeployServiceDetails_ValidIdAndUser_ReturnsServiceDetailVo() {
+    void testGetDeployServiceDetails_ValidIdAndUser_ReturnsServiceDetailVo() {
         when(deployServiceStorage.findDeployServiceById(uuid))
                 .thenReturn(deployServiceEntity);
 
@@ -373,7 +391,7 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testGetDeployServiceDetails_ServiceNotDeployedException() {
+    void testGetDeployServiceDetails_ServiceNotDeployedException() {
         when(deployServiceStorage.findDeployServiceById(deployTask.getId()))
                 .thenReturn(null);
 
@@ -382,7 +400,7 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testGetDestroyHandler_DeployedServiceNotFound_ThrowsServiceNotDeployedException() {
+    void testGetDestroyHandler_DeployedServiceNotFound_ThrowsServiceNotDeployedException() {
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(null);
 
         assertThrows(ServiceNotDeployedException.class,
@@ -390,7 +408,7 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testGetDestroyHandler_ServiceStateIsDestroying_ThrowsInvalidServiceStateException() {
+    void testGetDestroyHandler_ServiceStateIsDestroying_ThrowsInvalidServiceStateException() {
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
 
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(
@@ -401,7 +419,7 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testGetDestroyHandler() {
+    void testGetDestroyHandler() {
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
 
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(
@@ -423,7 +441,7 @@ class DeployServiceTest {
 
         when(applicationContext.getBeansOfType(Deployment.class)).thenReturn(deploymentBeans);
 
-        Map<DeployerKind, Deployment> deploymentMap = deployService.deploymentMap();
+        deployService.deploymentMap();
 
         Deployment result = deployService.getDestroyHandler(deployTask);
 
@@ -435,7 +453,7 @@ class DeployServiceTest {
     }
 
     @Test
-    public void testAsyncDeployService() {
+    void testAsyncDeployService() {
         when(deploymentMock.deploy(deployTask)).thenReturn(deployResult);
 
         deployService.asyncDeployService(deploymentMock, deployTask);
@@ -452,10 +470,11 @@ class DeployServiceTest {
                 capturedEntity.getServiceDeploymentState());
         assertEquals(deployResult.getProperties(), capturedEntity.getProperties());
         assertEquals(deployResult.getPrivateProperties(), capturedEntity.getPrivateProperties());
+        assertEquals("********", capturedEntity.getCreateRequest().getServiceRequestProperties().get("test"));
     }
 
     @Test
-    public void testAsyncDeployService_RuntimeException() {
+    void testAsyncDeployService_RuntimeException() {
         when(deploymentMock.deploy(deployTask)).thenThrow(new RuntimeException());
 
         deployService.asyncDeployService(deploymentMock, deployTask);

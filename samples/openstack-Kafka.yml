@@ -105,7 +105,7 @@ deployment:
       dataType: string
       example: "kafka-secgroup-default"
       mandatory: false
-      vlue: "kafka-secgroup-default"
+      value: "kafka-secgroup-default"
   deployer: |
     variable "flavor_id" {
       type        = string

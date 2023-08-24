@@ -163,7 +163,8 @@ public class DeployService {
                                       Map<String, String> serviceRequestProperties) {
         if (Objects.isNull(serviceTemplate.getOcl().getDeployment())
                 ||
-                CollectionUtils.isEmpty(serviceTemplate.getOcl().getDeployment().getVariables())) {
+                CollectionUtils.isEmpty(serviceTemplate.getOcl().getDeployment().getVariables())
+                || Objects.isNull(serviceRequestProperties)) {
             return;
         }
         serviceTemplate.getOcl().getDeployment().getVariables().forEach(variable -> {
@@ -195,11 +196,13 @@ public class DeployService {
             deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
             deployServiceEntity.setDeployResourceList(
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
+            maskSensitiveFields(deployServiceEntity);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
         } catch (RuntimeException e) {
             log.error("asyncDeployService failed.", e);
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
             deployServiceEntity.setResultMessage(e.getMessage());
+            maskSensitiveFields(deployServiceEntity);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
         }
 
@@ -402,4 +405,20 @@ public class DeployService {
         return null;
     }
 
+    private void maskSensitiveFields(DeployServiceEntity deployServiceEntity) {
+        log.debug("masking sensitive input data after deployment");
+        if (Objects.nonNull(deployServiceEntity.getCreateRequest().getServiceRequestProperties())) {
+            for (DeployVariable deployVariable
+                    : deployServiceEntity.getCreateRequest().getOcl().getDeployment()
+                            .getVariables()) {
+                if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
+                        && (deployServiceEntity.getCreateRequest().getServiceRequestProperties()
+                                .containsKey(deployVariable.getName()))) {
+                    deployServiceEntity.getCreateRequest().getServiceRequestProperties()
+                            .put(deployVariable.getName(), "********");
+
+                }
+            }
+        }
+    }
 }
