@@ -299,6 +299,7 @@
                 <version>${checkstyle-maven-plugin.version}</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
+                    <suppressionsLocation>suppressions.xml</suppressionsLocation>
                     <headerLocation>license.header</headerLocation>
                     <failsOnError>true</failsOnError>
                     <violationSeverity>warning</violationSeverity>

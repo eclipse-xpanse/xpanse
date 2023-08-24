@@ -1,0 +1,658 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:9090",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Terraform",
+      "description": "APIs for running Terraform commands"
+    }
+  ],
+  "paths": {
+    "/terraform-boot/deploy/{module_directory}": {
+      "post": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Deploy resources via Terraform",
+        "operationId": "deploy",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the Terraform module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformDeployRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/deploy/async/{module_directory}": {
+      "post": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "async deploy resources via Terraform",
+        "operationId": "asyncDeploy",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the Terraform module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformAsyncDeployRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
+          }
+        }
+      }
+    },
+    "/terraform-boot/validate/{module_directory}": {
+      "get": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Validate the Terraform modules",
+        "operationId": "validate",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the Terraform module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/health": {
+      "get": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Check health of Terraform API service",
+        "operationId": "healthCheck",
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/destroy/{module_directory}": {
+      "delete": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Destroy the Terraform modules",
+        "operationId": "destroy",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the Terraform module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformDestroyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/destroy/async/{module_directory}": {
+      "delete": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Async destroy the Terraform modules",
+        "operationId": "asyncDestroy",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the Terraform module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformAsyncDestroyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Response": {
+        "required": [
+          "details",
+          "resultType",
+          "success"
+        ],
+        "type": "object",
+        "properties": {
+          "resultType": {
+            "type": "string",
+            "description": "The result code of response.",
+            "enum": [
+              "Success",
+              "Runtime Error",
+              "Parameters Invalid",
+              "Terraform Script Invalid",
+              "Unprocessable Entity",
+              "Response Not Valid",
+              "Failure while connecting to backend",
+              "Credential Capability Not Found",
+              "Credentials Not Found",
+              "Credential Variables Not Complete",
+              "Flavor Invalid",
+              "Terraform Execution Failed",
+              "Plugin Not Found",
+              "Deployer Not Found",
+              "Terraform Provider Not Found",
+              "No Credential Definition Available",
+              "Invalid Service State",
+              "Resource Invalid For Monitoring",
+              "Unhandled Exception",
+              "Service Already Registered",
+              "Icon Processing Failed",
+              "Service Not Registered",
+              "Service Deployment Not Found",
+              "Resource Not Found",
+              "Deployment Variable Invalid",
+              "Service Update Not Allowed",
+              "Unauthorized",
+              "Access Denied",
+              "Sensitive Field Encryption Or Decryption Failed Exception",
+              "Unsupported Enum Value"
+            ]
+          },
+          "details": {
+            "type": "array",
+            "description": "Details of the errors occurred",
+            "items": {
+              "type": "string",
+              "description": "Details of the errors occurred"
+            }
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Describes if the request is successful"
+          }
+        }
+      },
+      "TerraformDeployRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          }
+        }
+      },
+      "TerraformResult": {
+        "type": "object",
+        "properties": {
+          "commandStdOutput": {
+            "type": "string"
+          },
+          "commandStdError": {
+            "type": "string"
+          },
+          "commandSuccessful": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TerraformAsyncDeployRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
+      "WebhookConfig": {
+        "required": [
+          "authType",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Callback address after deployment/destroy is completed."
+          },
+          "authType": {
+            "type": "string",
+            "description": "The permission type when calling back.",
+            "enum": [
+              "NONE",
+              "OAUTH2"
+            ]
+          }
+        },
+        "description": "Configuration information of webhook."
+      },
+      "TerraformValidateDiagnostics": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string"
+          }
+        }
+      },
+      "TerraformValidationResult": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TerraformValidateDiagnostics"
+            }
+          }
+        }
+      },
+      "SystemStatus": {
+        "required": [
+          "healthStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "healthStatus": {
+            "type": "string",
+            "description": "The health status of Xpanse api service.",
+            "enum": [
+              "OK",
+              "NOK"
+            ]
+          }
+        }
+      },
+      "TerraformDestroyRequest": {
+        "required": [
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          }
+        }
+      },
+      "TerraformAsyncDestroyRequest": {
+        "required": [
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      }
+    }
+  }
+}
