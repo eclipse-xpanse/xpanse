@@ -16,11 +16,11 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 public enum ServiceDeploymentState {
 
     DEPLOYING("deploying"),
-    DEPLOY_SUCCESS("deploy_success"),
-    DEPLOY_FAILED("deploy_failed"),
+    DEPLOY_SUCCESS("deployment successful"),
+    DEPLOY_FAILED("deployment failed"),
     DESTROYING("destroying"),
-    DESTROY_SUCCESS("destroy_success"),
-    DESTROY_FAILED("destroy_failed");
+    DESTROY_SUCCESS("destroy successful"),
+    DESTROY_FAILED("destroy failed");
 
 
     private final String state;
