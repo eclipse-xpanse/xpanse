@@ -25,7 +25,7 @@ class ServiceRegistrationStateTest {
 
     @Test
     void testToValue() {
-        assertEquals("REGISTERED", ServiceRegistrationState.REGISTERED.toValue());
-        assertEquals("UPDATED", ServiceRegistrationState.UPDATED.toValue());
+        assertEquals("registered", ServiceRegistrationState.REGISTERED.toValue());
+        assertEquals("updated", ServiceRegistrationState.UPDATED.toValue());
     }
 }

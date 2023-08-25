@@ -37,12 +37,12 @@ class ServiceDeploymentStateTest {
 
     @Test
     void testToValue() {
-        assertEquals("DEPLOYING", ServiceDeploymentState.DEPLOYING.toValue());
-        assertEquals("DEPLOY_SUCCESS", ServiceDeploymentState.DEPLOY_SUCCESS.toValue());
-        assertEquals("DEPLOY_FAILED", ServiceDeploymentState.DEPLOY_FAILED.toValue());
-        assertEquals("DESTROYING", ServiceDeploymentState.DESTROYING.toValue());
-        assertEquals("DESTROY_SUCCESS", ServiceDeploymentState.DESTROY_SUCCESS.toValue());
-        assertEquals("DESTROY_FAILED", ServiceDeploymentState.DESTROY_FAILED.toValue());
+        assertEquals("deploying", ServiceDeploymentState.DEPLOYING.toValue());
+        assertEquals("deployment successful", ServiceDeploymentState.DEPLOY_SUCCESS.toValue());
+        assertEquals("deployment failed", ServiceDeploymentState.DEPLOY_FAILED.toValue());
+        assertEquals("destroying", ServiceDeploymentState.DESTROYING.toValue());
+        assertEquals("destroy successful", ServiceDeploymentState.DESTROY_SUCCESS.toValue());
+        assertEquals("destroy failed", ServiceDeploymentState.DESTROY_FAILED.toValue());
     }
 
 }
