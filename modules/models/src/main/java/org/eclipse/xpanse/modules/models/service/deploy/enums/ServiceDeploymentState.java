@@ -48,6 +48,6 @@ public enum ServiceDeploymentState {
      */
     @JsonValue
     public String toValue() {
-        return this.name();
+        return this.state;
     }
 }
