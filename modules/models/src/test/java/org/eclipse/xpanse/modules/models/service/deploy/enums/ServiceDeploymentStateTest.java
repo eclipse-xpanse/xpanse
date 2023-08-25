@@ -22,15 +22,15 @@ class ServiceDeploymentStateTest {
         assertEquals(ServiceDeploymentState.DEPLOYING,
                 ServiceDeploymentState.DEPLOYING.getByValue("deploying"));
         assertEquals(ServiceDeploymentState.DEPLOY_SUCCESS,
-                ServiceDeploymentState.DEPLOY_SUCCESS.getByValue("deploy_success"));
+                ServiceDeploymentState.DEPLOY_SUCCESS.getByValue("deployment successful"));
         assertEquals(ServiceDeploymentState.DEPLOY_FAILED,
-                ServiceDeploymentState.DEPLOY_FAILED.getByValue("deploy_failed"));
+                ServiceDeploymentState.DEPLOY_FAILED.getByValue("deployment failed"));
         assertEquals(ServiceDeploymentState.DESTROYING,
                 ServiceDeploymentState.DESTROYING.getByValue("destroying"));
         assertEquals(ServiceDeploymentState.DESTROY_SUCCESS,
-                ServiceDeploymentState.DESTROY_SUCCESS.getByValue("destroy_success"));
+                ServiceDeploymentState.DESTROY_SUCCESS.getByValue("destroy successful"));
         assertEquals(ServiceDeploymentState.DESTROY_FAILED,
-                ServiceDeploymentState.DESTROY_FAILED.getByValue("destroy_failed"));
+                ServiceDeploymentState.DESTROY_FAILED.getByValue("destroy failed"));
         assertThrows(UnsupportedEnumValueException.class,
                 () -> ServiceDeploymentState.DESTROY_FAILED.getByValue("unavailable"));
     }
