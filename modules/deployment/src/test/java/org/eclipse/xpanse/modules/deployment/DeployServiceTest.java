@@ -9,7 +9,6 @@ import static org.eclipse.xpanse.modules.deployment.deployers.terraform.Terrafor
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -489,8 +488,8 @@ class DeployServiceTest {
         DeployServiceEntity capturedEntity = entityCaptor.getValue();
         assertEquals(ServiceDeploymentState.DEPLOY_FAILED,
                 capturedEntity.getServiceDeploymentState());
-        assertNull(capturedEntity.getProperties());
-        assertNull(capturedEntity.getPrivateProperties());
+        assertTrue(capturedEntity.getProperties().isEmpty());
+        assertTrue(capturedEntity.getPrivateProperties().isEmpty());
     }
 
     @Test

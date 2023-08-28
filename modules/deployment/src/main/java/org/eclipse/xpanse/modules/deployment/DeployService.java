@@ -187,10 +187,11 @@ public class DeployService {
     public void asyncDeployService(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
+        DeployResult deployResult = new DeployResult();
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
-            DeployResult deployResult = deployment.deploy(deployTask);
+            deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
             deployServiceEntity.setProperties(deployResult.getProperties());
             deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
@@ -202,8 +203,41 @@ public class DeployService {
             log.error("asyncDeployService failed.", e);
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
             deployServiceEntity.setResultMessage(e.getMessage());
+            deployServiceEntity.setProperties(deployResult.getProperties());
+            deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
+            deployServiceEntity.setDeployResourceList(
+                    getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
             maskSensitiveFields(deployServiceEntity);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
+            rollbackOnDeploymentFailure(deployServiceEntity, deployResult, deployment, deployTask);
+        }
+    }
+
+    /**
+     * Perform rollback when deployment fails and destroy the created resources.
+     */
+    private void rollbackOnDeploymentFailure(DeployServiceEntity deployServiceEntity,
+                                             DeployResult deployResult, Deployment deployment,
+                                             DeployTask deployTask) {
+        if (!CollectionUtils.isEmpty(deployResult.getResources())) {
+            log.info("Performing rollback of already provisioned resources.");
+            String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
+            DeployResult destroyResult = deployment.destroy(deployTask, stateFile);
+            if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
+                deployServiceEntity.setProperties(destroyResult.getProperties());
+                deployServiceEntity.setPrivateProperties(destroyResult.getPrivateProperties());
+                deployServiceEntity.setDeployResourceList(
+                        getDeployResourceEntityList(destroyResult.getResources(),
+                                deployServiceEntity));
+            } else {
+                deployServiceEntity.setServiceDeploymentState(
+                        ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
+            }
+            if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
+                deployment.deleteTaskWorkspace(deployTask.getId().toString());
+            }
+        } else {
+            log.info("No resources to rollback.");
         }
 
     }
