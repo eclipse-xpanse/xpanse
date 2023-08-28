@@ -20,7 +20,8 @@ public enum ServiceDeploymentState {
     DEPLOY_FAILED("deployment failed"),
     DESTROYING("destroying"),
     DESTROY_SUCCESS("destroy successful"),
-    DESTROY_FAILED("destroy failed");
+    DESTROY_FAILED("destroy failed"),
+    MANUAL_CLEANUP_REQUIRED("manual cleanup required");
 
 
     private final String state;
