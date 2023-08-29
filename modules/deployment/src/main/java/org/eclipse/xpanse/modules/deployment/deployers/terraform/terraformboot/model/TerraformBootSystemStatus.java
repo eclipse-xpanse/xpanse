@@ -24,13 +24,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * SystemStatus
+ * TerraformBootSystemStatus
  */
 @JsonPropertyOrder({
-  SystemStatus.JSON_PROPERTY_HEALTH_STATUS
+  TerraformBootSystemStatus.JSON_PROPERTY_HEALTH_STATUS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-24T09:52:10.012096600+08:00[Asia/Shanghai]")
-public class SystemStatus {
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-29T19:58:56.131485900+08:00[Asia/Shanghai]")
+public class TerraformBootSystemStatus {
   /**
    * The health status of Xpanse api service.
    */
@@ -69,10 +69,10 @@ public class SystemStatus {
   public static final String JSON_PROPERTY_HEALTH_STATUS = "healthStatus";
   private HealthStatusEnum healthStatus;
 
-  public SystemStatus() {
+  public TerraformBootSystemStatus() {
   }
 
-  public SystemStatus healthStatus(HealthStatusEnum healthStatus) {
+  public TerraformBootSystemStatus healthStatus(HealthStatusEnum healthStatus) {
     
     this.healthStatus = healthStatus;
     return this;
@@ -105,8 +105,8 @@ public class SystemStatus {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    SystemStatus systemStatus = (SystemStatus) o;
-    return Objects.equals(this.healthStatus, systemStatus.healthStatus);
+    TerraformBootSystemStatus terraformBootSystemStatus = (TerraformBootSystemStatus) o;
+    return Objects.equals(this.healthStatus, terraformBootSystemStatus.healthStatus);
   }
 
   @Override
@@ -117,7 +117,7 @@ public class SystemStatus {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class SystemStatus {\n");
+    sb.append("class TerraformBootSystemStatus {\n");
     sb.append("    healthStatus: ").append(toIndentedString(healthStatus)).append("\n");
     sb.append("}");
     return sb.toString();
