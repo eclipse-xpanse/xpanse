@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -497,6 +498,58 @@ class DeployServiceTest {
         DeployService deployService = new DeployService();
         Assertions.assertThrows(DeployerNotFoundException.class, () ->
                 deployService.getDeployment(DeployerKind.TERRAFORM));
+    }
+
+    @Test
+    void testPurgeServiceSuccess() {
+        deployServiceEntity.setServiceDeploymentState(
+                ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
+        when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
+        String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
+        when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
+
+        deployService.purgeService(deploymentMock, deployTask);
+        // Verify the expected interactions
+        verify(deployServiceStorage, times(2)).findDeployServiceById(uuid);
+        verify(deployServiceStorage, times(1)).deleteDeployService(deployServiceEntity);
+        verify(deploymentMock, times(1)).destroy(deployTask,
+                deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
+        verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
+    }
+
+    @Test
+    void testPurgeServiceRefuse() {
+        when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(
+                deployServiceEntity);
+
+        Assertions.assertThrows(InvalidServiceStateException.class, () ->
+                deployService.purgeService(deploymentMock, deployTask));
+    }
+
+    @Test
+    void testAsyncPurgeServiceSuccess() {
+        when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
+        String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
+        when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
+
+        deployService.asyncPurgeService(deploymentMock, deployTask, deployServiceEntity);
+
+        // Verify the expected interactions
+        verify(deployServiceStorage, times(1)).findDeployServiceById(uuid);
+        verify(deployServiceStorage, times(1)).deleteDeployService(deployServiceEntity);
+        verify(deploymentMock, times(1)).destroy(deployTask,
+                deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
+        verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
+    }
+
+    @Test
+    void testAsyncPurgeService_NoReources() {
+        deployServiceEntity.setDeployResourceList(Arrays.asList());
+
+        deployService.asyncPurgeService(deploymentMock, deployTask, deployServiceEntity);
+
+        // Verify the expected interactions
+        verify(deployServiceStorage, times(1)).deleteDeployService(deployServiceEntity);
     }
 
 }

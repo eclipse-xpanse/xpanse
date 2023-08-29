@@ -159,6 +159,26 @@ public class ServiceDeployerApi {
         return Response.successResponse(Collections.singletonList(successMsg));
     }
 
+    /**
+     * Start a task to purge the deployed service using id.
+     *
+     * @param id ID of deployed service.
+     * @return response
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Start a task to purge the deployed service using id.")
+    @DeleteMapping(value = "/services/purge/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Response purge(@PathVariable("id") String id) {
+        log.info("Purging managed service with id {}", id);
+        DeployTask deployTask = new DeployTask();
+        deployTask.setId(UUID.fromString(id));
+        Deployment deployment = this.deployService.getDestroyHandler(deployTask);
+        this.deployService.purgeService(deployment, deployTask);
+        String successMsg = String.format("Purging task for service with ID %s has started.", id);
+        return Response.successResponse(Collections.singletonList(successMsg));
+    }
+
     private ServiceQueryModel getServiceQueryModel(Category category, Csp csp,
                                                    String serviceName,
                                                    String serviceVersion,
