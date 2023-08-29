@@ -16,22 +16,22 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ZitadelAuthoritiesOpaqueTokenIntrospector.class, String.class})
-class ZitadelAuthoritiesOpaqueTokenIntrospectorTest {
+@ContextConfiguration(classes = {ZitadelOpaqueTokenIntrospector.class, String.class})
+class ZitadelOpaqueTokenIntrospectorTest {
 
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
                     .extensions(new ResponseTemplateTransformer(true)))
             .build();
-    private ZitadelAuthoritiesOpaqueTokenIntrospector testOpaqueTokenIntrospector;
+    private ZitadelOpaqueTokenIntrospector testOpaqueTokenIntrospector;
 
     @BeforeEach
     void setUp() {
         String introspectionUri = wireMockExtension.getRuntimeInfo().getHttpBaseUrl()
                 + "/oauth/v2/introspect";
         testOpaqueTokenIntrospector =
-                new ZitadelAuthoritiesOpaqueTokenIntrospector(introspectionUri,
+                new ZitadelOpaqueTokenIntrospector(introspectionUri,
                         "clientId", "clientSecret");
     }
 

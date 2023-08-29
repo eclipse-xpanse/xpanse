@@ -6,6 +6,11 @@
 
 package org.eclipse.xpanse.modules.security.zitadel;
 
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.AUTH_TYPE_JWT;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.REQUIRED_SCOPES;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERID_KEY;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERNAME_KEY;
+
 import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -16,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
@@ -31,9 +37,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -49,11 +57,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @Service
 public class ZitadelIdentityProviderService implements IdentityProviderService {
 
-    private static final String USER_ID_KEY = "sub";
     private static final Map<String, String> CODE_CHALLENGE_MAP = initCodeChallengeMap();
-    private static final String USER_NAME_KEY = "preferred_username";
     @Resource
     private RestTemplate restTemplate;
+    @Value("${authorization-token-type:JWT}")
+    private String authTokenType;
     @Value("${authorization-server-endpoint}")
     private String iamServerEndpoint;
     @Value("${authorization-swagger-ui-client-id}")
@@ -112,24 +120,33 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
 
     @Override
     public CurrentUserInfo getCurrentUserInfo() {
-        BearerTokenAuthentication tokenAuthentication =
-                (BearerTokenAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        if (Objects.nonNull(tokenAuthentication)) {
-            Map<String, Object> claimsMap = tokenAuthentication.getTokenAttributes();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (Objects.isNull(authentication)) {
+            return null;
+        }
+        Map<String, Object> claimsMap;
+        if (StringUtils.endsWithIgnoreCase(AUTH_TYPE_JWT, authTokenType)) {
+            claimsMap = ((JwtAuthenticationToken) authentication).getTokenAttributes();
+        } else {
+            claimsMap = ((BearerTokenAuthentication) authentication).getTokenAttributes();
+        }
+
+        if (Objects.nonNull(claimsMap) && !claimsMap.isEmpty()) {
             CurrentUserInfo currentUserInfo = new CurrentUserInfo();
-            if (claimsMap.containsKey(USER_ID_KEY)) {
-                currentUserInfo.setUserId(String.valueOf(claimsMap.get(USER_ID_KEY)));
+            if (claimsMap.containsKey(USERID_KEY)) {
+                currentUserInfo.setUserId(String.valueOf(claimsMap.get(USERID_KEY)));
             }
 
-            if (claimsMap.containsKey(USER_NAME_KEY)) {
-                currentUserInfo.setUserName(String.valueOf(claimsMap.get(USER_NAME_KEY)));
+            if (claimsMap.containsKey(USERNAME_KEY)) {
+                currentUserInfo.setUserName(String.valueOf(claimsMap.get(USERNAME_KEY)));
             }
 
-            List<String> roles = tokenAuthentication.getAuthorities().stream()
+            List<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority).toList();
             currentUserInfo.setRoles(roles);
             return currentUserInfo;
         }
+
         return null;
     }
 
@@ -141,7 +158,7 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
         stringBuilder.append(iamServerEndpoint).append("/oauth/v2/authorize").append("?")
                 .append("client_id=").append(clientId).append("&")
                 .append("response_type=code").append("&")
-                .append("scope=openid").append("&")
+                .append("scope=").append(REQUIRED_SCOPES).append("&")
                 .append("redirect_uri=").append(redirectUrl).append("&")
                 .append("code_challenge_method=S256").append("&")
                 .append("code_challenge=").append(CODE_CHALLENGE_MAP.get("code_challenge"));
