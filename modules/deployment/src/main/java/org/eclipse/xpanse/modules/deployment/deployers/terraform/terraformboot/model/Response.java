@@ -13,17 +13,14 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model;
 
-import java.util.Objects;
-import java.util.Arrays;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.Objects;
 
 /**
  * Response
@@ -33,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   Response.JSON_PROPERTY_DETAILS,
   Response.JSON_PROPERTY_SUCCESS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-24T09:52:10.012096600+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-29T19:58:56.131485900+08:00[Asia/Shanghai]")
 public class Response {
   /**
    * The result code of response.
@@ -97,7 +94,9 @@ public class Response {
     
     SENSITIVE_FIELD_ENCRYPTION_OR_DECRYPTION_FAILED_EXCEPTION("Sensitive Field Encryption Or Decryption Failed Exception"),
     
-    UNSUPPORTED_ENUM_VALUE("Unsupported Enum Value");
+    UNSUPPORTED_ENUM_VALUE("Unsupported Enum Value"),
+    
+    SERVICE_UNAVAILABLE("Service Unavailable");
 
     private String value;
 

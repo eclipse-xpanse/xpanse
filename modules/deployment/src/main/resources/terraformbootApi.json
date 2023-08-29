@@ -46,8 +46,8 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -66,8 +66,18 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -118,8 +128,8 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -138,8 +148,18 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -173,8 +193,8 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -193,8 +213,18 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -224,8 +254,8 @@
         "description": "Check health of Terraform API service",
         "operationId": "healthCheck",
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -244,8 +274,18 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -259,7 +299,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SystemStatus"
+                  "$ref": "#/components/schemas/TerraformBootSystemStatus"
                 }
               }
             }
@@ -296,8 +336,8 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -316,8 +356,18 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -368,8 +418,8 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -388,8 +438,18 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -448,7 +508,8 @@
               "Unauthorized",
               "Access Denied",
               "Sensitive Field Encryption Or Decryption Failed Exception",
-              "Unsupported Enum Value"
+              "Unsupported Enum Value",
+              "Service Unavailable"
             ]
           },
           "details": {
@@ -585,7 +646,7 @@
           }
         }
       },
-      "SystemStatus": {
+      "TerraformBootSystemStatus": {
         "required": [
           "healthStatus"
         ],
