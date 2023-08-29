@@ -345,6 +345,58 @@ public class DeployService {
     }
 
     /**
+     * purge the service based on the serviceDeploymentState.
+     *
+     * @param deployment deployment
+     * @param deployTask deployTask
+     */
+    public void purgeService(Deployment deployment, DeployTask deployTask) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(deployTask.getId());
+        ServiceDeploymentState serviceDeploymentState =
+                deployServiceEntity.getServiceDeploymentState();
+        if (serviceDeploymentState == ServiceDeploymentState.DEPLOY_FAILED
+                || serviceDeploymentState == ServiceDeploymentState.DESTROY_FAILED
+                || serviceDeploymentState == ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED) {
+            asyncPurgeService(deployment, deployTask, deployServiceEntity);
+        } else {
+            throw new InvalidServiceStateException(
+                    String.format("Service %s is not in the state allowed for purging.",
+                            deployServiceEntity.getId()));
+        }
+    }
+
+    /**
+     * Async method to purge deployed service.
+     *
+     * @param deployment          deployment
+     * @param deployTask          deployTask
+     * @param deployServiceEntity deployServiceEntity
+     */
+    @Async("taskExecutor")
+    public void asyncPurgeService(Deployment deployment, DeployTask deployTask,
+                                  DeployServiceEntity deployServiceEntity) {
+        MDC.put(TASK_ID, deployTask.getId().toString());
+        if (!deployServiceEntity.getDeployResourceList().isEmpty()) {
+            log.info("Purging created resources for service with ID: {}",
+                    deployServiceEntity.getId());
+            try {
+                asyncDestroyService(deployment, deployTask);
+            } catch (RuntimeException e) {
+                log.error("Error purging created resources for service with ID: {}. Ignoring.",
+                        deployServiceEntity.getId(), e);
+            }
+        } else {
+            log.info("No resources to purge for service with ID: {}",
+                    deployServiceEntity.getId());
+        }
+        deployServiceStorage.deleteDeployService(deployServiceEntity);
+        log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
+
+
+    }
+
+    /**
      * List deploy services with query model.
      *
      * @param query service query model.

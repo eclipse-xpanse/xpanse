@@ -2,6 +2,8 @@ package org.eclipse.xpanse.modules.database.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -149,5 +151,15 @@ class DatabaseDeployServiceStorageTest {
                 databaseDeployServiceStorageUnderTest.findDeployServiceById(
                         id);
         assertThat(result).isNull();
+    }
+
+    @Test
+    void testDeleteDeployService() {
+        final DeployServiceEntity expectedResult = new DeployServiceEntity();
+        doNothing().when(mockDeployServiceRepository).delete(expectedResult);
+        databaseDeployServiceStorageUnderTest.deleteDeployService(
+                expectedResult);
+
+        verify(mockDeployServiceRepository, times(1)).delete(expectedResult);
     }
 }

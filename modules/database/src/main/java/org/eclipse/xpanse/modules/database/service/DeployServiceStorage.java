@@ -51,4 +51,11 @@ public interface DeployServiceStorage {
      * @return registerServiceEntity
      */
     DeployServiceEntity findDeployServiceById(UUID id);
+
+    /**
+     * purge deployed service using service model.
+     *
+     * @param deployServiceEntity the model of deployed service.
+     */
+    void deleteDeployService(DeployServiceEntity deployServiceEntity);
 }

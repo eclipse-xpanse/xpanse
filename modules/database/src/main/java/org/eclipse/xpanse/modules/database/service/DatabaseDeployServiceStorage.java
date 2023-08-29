@@ -117,4 +117,9 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
                 this.deployServiceRepository.findById(id);
         return optional.orElse(null);
     }
+
+    @Override
+    public void deleteDeployService(DeployServiceEntity deployServiceEntity) {
+        this.deployServiceRepository.delete(deployServiceEntity);
+    }
 }

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceRepository;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -41,6 +42,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
@@ -83,6 +85,11 @@ class ServiceDeployerApiTest {
         deleteDestroyedServiceRecord();
     }
 
+    @BeforeEach
+    void setUp() {
+        deleteDestroyedServiceRecord();
+    }
+
     @Test
     void testServiceDeployer() throws Exception {
         testDeploy();
@@ -108,6 +115,59 @@ class ServiceDeployerApiTest {
         testDeployThrowsException();
         testGetServiceDetailsThrowsException();
         testDestroyThrowsException();
+    }
+
+    @Test
+    void testServicePurgeSuccess() throws Exception {
+        testDeploy();
+        boolean deploySuccess = deploySuccess(taskId);
+
+        testPurgeSuccess(deploySuccess);
+        deleteDestroyedServiceRecord();
+    }
+
+    @Test
+    void testServicePurgeRefuse() throws Exception {
+        testDeploy();
+        boolean deploySuccess = deploySuccess(taskId);
+
+        testPurgeRefuse(deploySuccess);
+        deleteDestroyedServiceRecord();
+    }
+
+    void testPurgeRefuse(boolean deploySuccess) throws Exception {
+        // SetUp
+        String refuseMsg = String.format(
+                "Service %s is not in the state allowed for purging.", taskId);
+        Response response = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
+                Collections.singletonList(refuseMsg));
+        String result = objectMapper.writeValueAsString(response);
+        DeployServiceEntity referenceById = deployServiceRepository.getReferenceById(taskId);
+        referenceById.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
+
+        // Run the test
+        final MockHttpServletResponse purgeResponse =
+                mockMvc.perform(delete("/xpanse/services/purge/{id}", taskId))
+                        .andReturn().getResponse();
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
+        Assertions.assertEquals(result, purgeResponse.getContentAsString());
+    }
+
+    void testPurgeSuccess(boolean deploySuccess) throws Exception {
+        // SetUp
+        String successMsg = String.format(
+                "Purging task for service with ID %s has started.", taskId);
+        Response response = Response.successResponse(Collections.singletonList(successMsg));
+        String result = objectMapper.writeValueAsString(response);
+        DeployServiceEntity referenceById = deployServiceRepository.getReferenceById(taskId);
+        referenceById.setServiceDeploymentState(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
+
+        // Run the test
+        final MockHttpServletResponse purgeResponse =
+                mockMvc.perform(delete("/xpanse/services/purge/{id}", taskId))
+                        .andReturn().getResponse();
+        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), purgeResponse.getStatus());
+        Assertions.assertEquals(result, purgeResponse.getContentAsString());
     }
 
     void registerServiceTemplate() throws Exception {
