@@ -57,9 +57,7 @@ class AuthorizationApiTest {
     void testAuthorize() throws Exception {
 
         // Setup
-        String redirectUrl = "https://iam.xpanse.site/oauth/v2/authorize?"
-                + "client_id=221664356859969539@eclipse-xpanse&response_type=code&"
-                + "scope=openid&redirect_uri=http://localhost/auth/token";
+        String redirectUrl = "https://iam.xpanse.site/oauth/v2/authorize?";
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/auth/authorize")

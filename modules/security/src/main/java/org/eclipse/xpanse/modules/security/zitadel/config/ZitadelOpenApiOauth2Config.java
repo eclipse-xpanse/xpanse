@@ -6,6 +6,11 @@
 
 package org.eclipse.xpanse.modules.security.zitadel.config;
 
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.GRANTED_ROLES_SCOPE;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.METADATA_SCOPE;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.OPENID_SCOPE;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.PROFILE_SCOPE;
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -29,7 +34,7 @@ import org.springframework.context.annotation.Profile;
                 version = "${app.version}"
         ),
         security = @SecurityRequirement(name = "OAuth2 Flow",
-                scopes = {"openid", "email", "profile"})
+                scopes = {OPENID_SCOPE, PROFILE_SCOPE, GRANTED_ROLES_SCOPE, METADATA_SCOPE})
 )
 @SecurityScheme(
         name = "OAuth2 Flow",
@@ -39,11 +44,13 @@ import org.springframework.context.annotation.Profile;
                 authorizationUrl = "${springdoc.oAuthFlow.authorizationUrl}",
                 tokenUrl = "${springdoc.oAuthFlow.tokenUrl}",
                 scopes = {
-                        @OAuthScope(name = "openid", description = "mandatory must be selected"),
-                        @OAuthScope(name = "profile", description = "mandatory must be selected"),
-                        @OAuthScope(name = "email")
-                }
-        )
+                        @OAuthScope(name = OPENID_SCOPE,
+                                description = "mandatory must be selected."),
+                        @OAuthScope(name = PROFILE_SCOPE,
+                                description = "mandatory must be selected."),
+                        @OAuthScope(name = GRANTED_ROLES_SCOPE,
+                                description = "mandatory must be selected.")
+                })
         )
 )
 @Configuration

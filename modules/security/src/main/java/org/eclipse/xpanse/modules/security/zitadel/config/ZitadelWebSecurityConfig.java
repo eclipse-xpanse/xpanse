@@ -6,26 +6,51 @@
 
 package org.eclipse.xpanse.modules.security.zitadel.config;
 
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.AUTH_TYPE_JWT;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.AUTH_TYPE_TOKEN;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.DEFAULT_ROLE;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.GRANTED_ROLES_KEY;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERID_KEY;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
+import java.time.Duration;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.security.zitadel.introspector.ZitadelAuthoritiesOpaqueTokenIntrospector;
+import org.eclipse.xpanse.modules.security.zitadel.introspector.ZitadelOpaqueTokenIntrospector;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -46,6 +71,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity(securedEnabled = true)
 public class ZitadelWebSecurityConfig {
 
+    @Value("${authorization-token-type:JWT}")
+    private String authTokenType;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
+
     @Value("${spring.security.oauth2.resourceserver.opaquetoken.introspection-uri}")
     private String introspectionUri;
 
@@ -65,6 +96,7 @@ public class ZitadelWebSecurityConfig {
         // accept cors requests and allow preflight checks
         http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(
                 corsConfigurationSource()));
+
         http.authorizeHttpRequests(arc -> {
             // add permit for h2-console html and resource
             arc.requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll();
@@ -84,13 +116,6 @@ public class ZitadelWebSecurityConfig {
                 new XFrameOptionsHeaderWriter(
                         XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)));
 
-        // use custom implementation of OpaqueTokenIntrospector
-        http.oauth2ResourceServer(oauth2 ->
-                oauth2.opaqueToken(opaque ->
-                        opaque.introspector(zitadelIntrospector())
-                )
-        );
-
         // set custom exception handler
         http.exceptionHandling(exceptionHandlingConfigurer ->
                 exceptionHandlingConfigurer.authenticationEntryPoint(
@@ -109,32 +134,26 @@ public class ZitadelWebSecurityConfig {
                         }
                 ));
 
+        if (StringUtils.equalsIgnoreCase(AUTH_TYPE_TOKEN, authTokenType)) {
+            // Config custom OpaqueTokenIntrospector
+            http.oauth2ResourceServer(oauth2 ->
+                    oauth2.opaqueToken(opaque ->
+                            opaque.introspector(
+                                    new ZitadelOpaqueTokenIntrospector(introspectionUri,
+                                            clientId, clientSecret))
+                    )
+            );
+        }
+
+        if (StringUtils.equalsIgnoreCase(AUTH_TYPE_JWT, authTokenType)) {
+            // Config custom JwtAuthenticationConverter
+            http.oauth2ResourceServer(oauth2 -> oauth2
+                    .jwt(jwt ->
+                            jwt.jwtAuthenticationConverter(grantedAuthoritiesExtractor())
+                    )
+            );
+        }
         return http.build();
-    }
-
-    /**
-     * Customize the ZitadelAuthoritiesOpaqueTokenIntrospector as the implementation class of
-     * OpaqueTokenIntrospector to instead of the SpringOpaqueTokenIntrospector
-     * as default implementation class.
-     * The SpringOpaqueTokenIntrospector get roles of user from the filed 'authorities' default.
-     * The IAM 'zitadel' put roles of user into other filed not 'authorities'. In this case,
-     * we could not get roles of user the default SpringOpaqueTokenIntrospector.
-     * So we need to customize the ZitadelAuthoritiesOpaqueTokenIntrospector, in which
-     * we get the roles of user from the real filed.
-     *
-     * @return custom NimbusOpaqueTokenIntrospector
-     */
-    @Bean
-    public OpaqueTokenIntrospector zitadelIntrospector() {
-        return new ZitadelAuthoritiesOpaqueTokenIntrospector(
-                this.introspectionUri,
-                this.clientId,
-                this.clientSecret);
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
     }
 
     CorsConfigurationSource corsConfigurationSource() {
@@ -146,6 +165,48 @@ public class ZitadelWebSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
+    @ConditionalOnProperty("authorization-token-type=JWT")
+    JwtDecoder jwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
+        OAuth2TokenValidator<Jwt> withClockSkew = new DelegatingOAuth2TokenValidator<>(
+                new JwtTimestampValidator(Duration.ofSeconds(60)),
+                new JwtIssuerValidator(issuerUri));
+        jwtDecoder.setJwtValidator(withClockSkew);
+        return jwtDecoder;
+    }
+
+    Converter<Jwt, ? extends AbstractAuthenticationToken> grantedAuthoritiesExtractor() {
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(new GrantedAuthoritiesExtractor());
+        return jwtConverter;
+    }
+
+    static class GrantedAuthoritiesExtractor
+            implements Converter<Jwt, Collection<GrantedAuthority>> {
+
+        public Collection<GrantedAuthority> convert(Jwt jwt) {
+            Set<GrantedAuthority> roles;
+            String userId = jwt.getClaimAsString(USERID_KEY);
+            Map<String, Object> rolesClaim = jwt.getClaim(GRANTED_ROLES_KEY);
+            if (Objects.isNull(rolesClaim) || rolesClaim.isEmpty()) {
+                roles = Set.of(new SimpleGrantedAuthority(DEFAULT_ROLE));
+                log.info("Get user [id:{}] granted authorities is empty,"
+                        + " set default authority user", userId);
+            } else {
+                roles = rolesClaim.keySet().stream().map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toSet());
+                log.info("Get user [id:{}] granted authorities:{}.", userId, roles);
+            }
+            return roles;
+        }
     }
 
 

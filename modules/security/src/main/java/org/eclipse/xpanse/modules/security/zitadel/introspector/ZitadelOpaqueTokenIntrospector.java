@@ -6,6 +6,11 @@
 
 package org.eclipse.xpanse.modules.security.zitadel.introspector;
 
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.DEFAULT_ROLE;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.GRANTED_ROLES_KEY;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERID_KEY;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERNAME_KEY;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
@@ -24,12 +29,7 @@ import org.springframework.util.CollectionUtils;
  * Customize the ZitadelAuthoritiesOpaqueTokenIntrospector implements OpaqueTokenIntrospector.
  */
 @Slf4j
-public class ZitadelAuthoritiesOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
-
-    private static final String ATTRIBUTE_USERNAME = "preferred_username";
-    private static final String ATTRIBUTE_USERID = "sub";
-    private static final String ATTRIBUTE_ROLES = "urn:zitadel:iam:org:project:roles";
-    private static final String DEFAULT_ROLE = "user";
+public class ZitadelOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
     private final OpaqueTokenIntrospector delegate;
 
     /**
@@ -39,9 +39,9 @@ public class ZitadelAuthoritiesOpaqueTokenIntrospector implements OpaqueTokenInt
      * @param clientId         The id of api client created in IAM server.
      * @param clientSecret     The secret of api client created in IAM server.
      */
-    public ZitadelAuthoritiesOpaqueTokenIntrospector(String introspectionUri,
-                                                     String clientId,
-                                                     String clientSecret) {
+    public ZitadelOpaqueTokenIntrospector(String introspectionUri,
+                                          String clientId,
+                                          String clientSecret) {
         delegate = new NimbusOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
     }
 
@@ -67,9 +67,9 @@ public class ZitadelAuthoritiesOpaqueTokenIntrospector implements OpaqueTokenInt
             OAuth2AuthenticatedPrincipal principal) {
 
         Collection<GrantedAuthority> roleSet;
-        JSONObject roleObject = principal.getAttribute(ATTRIBUTE_ROLES);
-        String userName = principal.getAttribute(ATTRIBUTE_USERNAME);
-        String userId = principal.getAttribute(ATTRIBUTE_USERID);
+        JSONObject roleObject = principal.getAttribute(GRANTED_ROLES_KEY);
+        String userName = principal.getAttribute(USERNAME_KEY);
+        String userId = principal.getAttribute(USERID_KEY);
 
         if (Objects.isNull(roleObject)) {
             roleSet = Set.of(new SimpleGrantedAuthority(DEFAULT_ROLE));
