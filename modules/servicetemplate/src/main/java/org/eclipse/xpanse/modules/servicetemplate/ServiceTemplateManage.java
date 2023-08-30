@@ -94,28 +94,28 @@ public class ServiceTemplateManage {
 
         String oldCategory = existedService.getCategory().name();
         String newCategory = ocl.getCategory().name();
-        compare(oldCategory, newCategory);
+        compare(oldCategory, newCategory, "category");
 
         String oldName = existedService.getName();
         String newName = ocl.getName();
-        compare(oldName, newName);
+        compare(oldName, newName, "service name");
 
         String oldVersion = existedService.getVersion();
         String newVersion = ocl.getServiceVersion();
-        compare(oldVersion, newVersion);
+        compare(oldVersion, newVersion, "service version");
 
         String oldCsp = existedService.getCsp().name();
         String newCsp = ocl.getCloudServiceProvider().getName().name();
-        compare(oldCsp, newCsp);
+        compare(oldCsp, newCsp, "csp");
     }
 
-    private void compare(String oldParams, String newParams) {
+    private void compare(String oldParams, String newParams, String type) {
         if (!newParams.toLowerCase(Locale.ROOT).equals(oldParams.toLowerCase(Locale.ROOT))) {
-            log.error("Update service failed, Field {} cannot changed with update request",
-                    oldParams);
+            log.error("Update service failed, Value of {} cannot be changed with an update request",
+                    type);
             throw new ServiceTemplateUpdateNotAllowed(String.format(
-                    "Update service failed, Field %s cannot changed with update request",
-                    oldParams));
+                    "Update service failed, Value of %s be cannot changed with an update request",
+                    type));
         }
     }
 
