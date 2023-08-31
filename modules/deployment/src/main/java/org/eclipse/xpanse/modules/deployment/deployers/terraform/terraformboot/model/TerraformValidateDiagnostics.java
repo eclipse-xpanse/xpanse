@@ -13,10 +13,15 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model;
 
+import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * TerraformValidateDiagnostics
@@ -24,7 +29,7 @@ import java.util.Objects;
 @JsonPropertyOrder({
   TerraformValidateDiagnostics.JSON_PROPERTY_DETAIL
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-29T19:58:56.131485900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
 public class TerraformValidateDiagnostics {
   public static final String JSON_PROPERTY_DETAIL = "detail";
   private String detail;

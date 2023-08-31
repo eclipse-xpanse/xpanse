@@ -1,9 +1,12 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.auth;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-29T19:58:56.131485900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
 public class HttpBearerAuth implements Authentication {
     private final String scheme;
     private String bearerToken;

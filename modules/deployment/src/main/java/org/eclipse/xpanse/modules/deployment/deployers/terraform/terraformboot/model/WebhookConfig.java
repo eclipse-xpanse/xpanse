@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   WebhookConfig.JSON_PROPERTY_URL,
   WebhookConfig.JSON_PROPERTY_AUTH_TYPE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-29T19:58:56.131485900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
 public class WebhookConfig {
   public static final String JSON_PROPERTY_URL = "url";
   private String url;

@@ -3,7 +3,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-29T19:58:56.131485900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
 public class ApiKeyAuth implements Authentication {
     private final String location;
     private final String paramName;
