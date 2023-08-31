@@ -1,29 +1,40 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api;
 
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
+
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.Response;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDeployFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDeployFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDeployWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDestroyWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDeployRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDestroyRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDeployRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDestroyRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-29T19:58:56.131485900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
 public class TerraformApi {
     private ApiClient apiClient;
 
@@ -46,48 +57,38 @@ public class TerraformApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncDeployRequest  (required)
+     * @param terraformAsyncDeployFromDirectoryRequest  (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDeploy(String moduleDirectory, TerraformAsyncDeployRequest terraformAsyncDeployRequest) throws RestClientException {
-        asyncDeployWithHttpInfo(moduleDirectory, terraformAsyncDeployRequest);
+    public void asyncDeployWithScripts(TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest) throws RestClientException {
+        asyncDeployWithScriptsWithHttpInfo(terraformAsyncDeployFromDirectoryRequest);
     }
 
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncDeployRequest  (required)
+     * @param terraformAsyncDeployFromDirectoryRequest  (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDeployWithHttpInfo(String moduleDirectory, TerraformAsyncDeployRequest terraformAsyncDeployRequest) throws RestClientException {
-        Object localVarPostBody = terraformAsyncDeployRequest;
+    public ResponseEntity<Void> asyncDeployWithScriptsWithHttpInfo(TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest) throws RestClientException {
+        Object localVarPostBody = terraformAsyncDeployFromDirectoryRequest;
         
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling asyncDeploy");
+        // verify the required parameter 'terraformAsyncDeployFromDirectoryRequest' is set
+        if (terraformAsyncDeployFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformAsyncDeployFromDirectoryRequest' when calling asyncDeployWithScripts");
         }
         
-        // verify the required parameter 'terraformAsyncDeployRequest' is set
-        if (terraformAsyncDeployRequest == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformAsyncDeployRequest' when calling asyncDeploy");
-        }
-        
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
@@ -106,53 +107,43 @@ public class TerraformApi {
         String[] localVarAuthNames = new String[] {  };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/deploy/async/{module_directory}", HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/deploy/scripts/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncDestroyRequest  (required)
+     * @param terraformAsyncDestroyFromDirectoryRequest  (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDestroy(String moduleDirectory, TerraformAsyncDestroyRequest terraformAsyncDestroyRequest) throws RestClientException {
-        asyncDestroyWithHttpInfo(moduleDirectory, terraformAsyncDestroyRequest);
+    public void asyncDestroyWithScripts(TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest) throws RestClientException {
+        asyncDestroyWithScriptsWithHttpInfo(terraformAsyncDestroyFromDirectoryRequest);
     }
 
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncDestroyRequest  (required)
+     * @param terraformAsyncDestroyFromDirectoryRequest  (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDestroyWithHttpInfo(String moduleDirectory, TerraformAsyncDestroyRequest terraformAsyncDestroyRequest) throws RestClientException {
-        Object localVarPostBody = terraformAsyncDestroyRequest;
+    public ResponseEntity<Void> asyncDestroyWithScriptsWithHttpInfo(TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest) throws RestClientException {
+        Object localVarPostBody = terraformAsyncDestroyFromDirectoryRequest;
         
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling asyncDestroy");
+        // verify the required parameter 'terraformAsyncDestroyFromDirectoryRequest' is set
+        if (terraformAsyncDestroyFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformAsyncDestroyFromDirectoryRequest' when calling asyncDestroyWithScripts");
         }
         
-        // verify the required parameter 'terraformAsyncDestroyRequest' is set
-        if (terraformAsyncDestroyRequest == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformAsyncDestroyRequest' when calling asyncDestroy");
-        }
-        
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
@@ -171,49 +162,49 @@ public class TerraformApi {
         String[] localVarAuthNames = new String[] {  };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/destroy/async/{module_directory}", HttpMethod.DELETE, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/destroy/scripts/async", HttpMethod.DELETE, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformDeployRequest  (required)
+     * @param terraformDeployFromDirectoryRequest  (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult deploy(String moduleDirectory, TerraformDeployRequest terraformDeployRequest) throws RestClientException {
-        return deployWithHttpInfo(moduleDirectory, terraformDeployRequest).getBody();
+    public TerraformResult deploy(String moduleDirectory, TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest) throws RestClientException {
+        return deployWithHttpInfo(moduleDirectory, terraformDeployFromDirectoryRequest).getBody();
     }
 
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformDeployRequest  (required)
+     * @param terraformDeployFromDirectoryRequest  (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> deployWithHttpInfo(String moduleDirectory, TerraformDeployRequest terraformDeployRequest) throws RestClientException {
-        Object localVarPostBody = terraformDeployRequest;
+    public ResponseEntity<TerraformResult> deployWithHttpInfo(String moduleDirectory, TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest) throws RestClientException {
+        Object localVarPostBody = terraformDeployFromDirectoryRequest;
         
         // verify the required parameter 'moduleDirectory' is set
         if (moduleDirectory == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling deploy");
         }
         
-        // verify the required parameter 'terraformDeployRequest' is set
-        if (terraformDeployRequest == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformDeployRequest' when calling deploy");
+        // verify the required parameter 'terraformDeployFromDirectoryRequest' is set
+        if (terraformDeployFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformDeployFromDirectoryRequest' when calling deploy");
         }
         
         // create path and map variables
@@ -241,45 +232,101 @@ public class TerraformApi {
     }
     /**
      * 
-     * Destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
+     * Deploy resources via Terraform
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformDestroyRequest  (required)
+     * @param terraformDeployWithScriptsRequest  (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult destroy(String moduleDirectory, TerraformDestroyRequest terraformDestroyRequest) throws RestClientException {
-        return destroyWithHttpInfo(moduleDirectory, terraformDestroyRequest).getBody();
+    public TerraformResult deployWithScripts(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest) throws RestClientException {
+        return deployWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest).getBody();
+    }
+
+    /**
+     * 
+     * Deploy resources via Terraform
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
+     * @param terraformDeployWithScriptsRequest  (required)
+     * @return ResponseEntity&lt;TerraformResult&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<TerraformResult> deployWithScriptsWithHttpInfo(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest) throws RestClientException {
+        Object localVarPostBody = terraformDeployWithScriptsRequest;
+        
+        // verify the required parameter 'terraformDeployWithScriptsRequest' is set
+        if (terraformDeployWithScriptsRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformDeployWithScriptsRequest' when calling deployWithScripts");
+        }
+        
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] localVarAccepts = { 
+            "*/*", "application/json"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] {  };
+
+        ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
+        return apiClient.invokeAPI("/terraform-boot/deploy/scripts", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Destroy the Terraform modules
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
+     * @param moduleDirectory directory name where the Terraform module files exist. (required)
+     * @param terraformDestroyFromDirectoryRequest  (required)
+     * @return TerraformResult
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public TerraformResult destroy(String moduleDirectory, TerraformDestroyFromDirectoryRequest terraformDestroyFromDirectoryRequest) throws RestClientException {
+        return destroyWithHttpInfo(moduleDirectory, terraformDestroyFromDirectoryRequest).getBody();
     }
 
     /**
      * 
      * Destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformDestroyRequest  (required)
+     * @param terraformDestroyFromDirectoryRequest  (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> destroyWithHttpInfo(String moduleDirectory, TerraformDestroyRequest terraformDestroyRequest) throws RestClientException {
-        Object localVarPostBody = terraformDestroyRequest;
+    public ResponseEntity<TerraformResult> destroyWithHttpInfo(String moduleDirectory, TerraformDestroyFromDirectoryRequest terraformDestroyFromDirectoryRequest) throws RestClientException {
+        Object localVarPostBody = terraformDestroyFromDirectoryRequest;
         
         // verify the required parameter 'moduleDirectory' is set
         if (moduleDirectory == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling destroy");
         }
         
-        // verify the required parameter 'terraformDestroyRequest' is set
-        if (terraformDestroyRequest == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformDestroyRequest' when calling destroy");
+        // verify the required parameter 'terraformDestroyFromDirectoryRequest' is set
+        if (terraformDestroyFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformDestroyFromDirectoryRequest' when calling destroy");
         }
         
         // create path and map variables
@@ -307,11 +354,67 @@ public class TerraformApi {
     }
     /**
      * 
-     * Check health of Terraform API service
-     * <p><b>502</b> - Bad Gateway
+     * Destroy resources via Terraform
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
+     * @param terraformDestroyWithScriptsRequest  (required)
+     * @return TerraformResult
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public TerraformResult destroyWithScripts(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest) throws RestClientException {
+        return destroyWithScriptsWithHttpInfo(terraformDestroyWithScriptsRequest).getBody();
+    }
+
+    /**
+     * 
+     * Destroy resources via Terraform
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
+     * @param terraformDestroyWithScriptsRequest  (required)
+     * @return ResponseEntity&lt;TerraformResult&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<TerraformResult> destroyWithScriptsWithHttpInfo(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest) throws RestClientException {
+        Object localVarPostBody = terraformDestroyWithScriptsRequest;
+        
+        // verify the required parameter 'terraformDestroyWithScriptsRequest' is set
+        if (terraformDestroyWithScriptsRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformDestroyWithScriptsRequest' when calling destroyWithScripts");
+        }
+        
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] localVarAccepts = { 
+            "*/*", "application/json"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] {  };
+
+        ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
+        return apiClient.invokeAPI("/terraform-boot/destroy/scripts", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Check health of Terraform API service
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @return TerraformBootSystemStatus
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -323,10 +426,10 @@ public class TerraformApi {
     /**
      * 
      * Check health of Terraform API service
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @return ResponseEntity&lt;TerraformBootSystemStatus&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -355,10 +458,10 @@ public class TerraformApi {
     /**
      * 
      * Validate the Terraform modules
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @return TerraformValidationResult
@@ -371,10 +474,10 @@ public class TerraformApi {
     /**
      * 
      * Validate the Terraform modules
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
-     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;

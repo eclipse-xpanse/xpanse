@@ -17,6 +17,77 @@
     }
   ],
   "paths": {
+    "/terraform-boot/destroy/scripts": {
+      "post": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Destroy resources via Terraform",
+        "operationId": "destroyWithScripts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformDestroyWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/terraform-boot/deploy/{module_directory}": {
       "post": {
         "tags": [
@@ -39,15 +110,15 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDeployRequest"
+                "$ref": "#/components/schemas/TerraformDeployFromDirectoryRequest"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -76,8 +147,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -99,37 +170,26 @@
         }
       }
     },
-    "/terraform-boot/deploy/async/{module_directory}": {
+    "/terraform-boot/deploy/scripts": {
       "post": {
         "tags": [
           "Terraform"
         ],
-        "description": "async deploy resources via Terraform",
-        "operationId": "asyncDeploy",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "description": "Deploy resources via Terraform",
+        "operationId": "deployWithScripts",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncDeployRequest"
+                "$ref": "#/components/schemas/TerraformDeployWithScriptsRequest"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -158,8 +218,79 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/deploy/scripts/async": {
+      "post": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "async deploy resources via Terraform",
+        "operationId": "asyncDeployWithScripts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformAsyncDeployFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
           "400": {
             "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -193,8 +324,8 @@
           }
         ],
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -223,8 +354,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -254,8 +385,8 @@
         "description": "Check health of Terraform API service",
         "operationId": "healthCheck",
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -284,8 +415,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -329,15 +460,15 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDestroyRequest"
+                "$ref": "#/components/schemas/TerraformDestroyFromDirectoryRequest"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -366,8 +497,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -389,37 +520,26 @@
         }
       }
     },
-    "/terraform-boot/destroy/async/{module_directory}": {
+    "/terraform-boot/destroy/scripts/async": {
       "delete": {
         "tags": [
           "Terraform"
         ],
         "description": "Async destroy the Terraform modules",
-        "operationId": "asyncDestroy",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "operationId": "asyncDestroyWithScripts",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncDestroyRequest"
+                "$ref": "#/components/schemas/TerraformAsyncDestroyFromDirectoryRequest"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -448,8 +568,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -526,7 +646,68 @@
           }
         }
       },
-      "TerraformDeployRequest": {
+      "TerraformDestroyWithScriptsRequest": {
+        "required": [
+          "scripts",
+          "tfState",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for destroy requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for destroy requests deployed via scripts"
+            }
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          }
+        }
+      },
+      "TerraformResult": {
+        "type": "object",
+        "properties": {
+          "commandStdOutput": {
+            "type": "string"
+          },
+          "commandStdError": {
+            "type": "string"
+          },
+          "terraformState": {
+            "type": "string"
+          },
+          "importantFileContentMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "commandSuccessful": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TerraformDeployFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
           "variables"
@@ -555,23 +736,48 @@
           }
         }
       },
-      "TerraformResult": {
+      "TerraformDeployWithScriptsRequest": {
+        "required": [
+          "isPlanOnly",
+          "scripts",
+          "variables"
+        ],
         "type": "object",
         "properties": {
-          "commandStdOutput": {
-            "type": "string"
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "commandStdError": {
-            "type": "string"
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
           },
-          "commandSuccessful": {
-            "type": "boolean"
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for deployment requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for deployment requests deployed via scripts"
+            }
           }
         }
       },
-      "TerraformAsyncDeployRequest": {
+      "TerraformAsyncDeployFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
+          "scripts",
           "variables",
           "webhookConfig"
         ],
@@ -596,6 +802,14 @@
               "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for deployment requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for deployment requests deployed via scripts"
+            }
           },
           "webhookConfig": {
             "$ref": "#/components/schemas/WebhookConfig"
@@ -662,7 +876,7 @@
           }
         }
       },
-      "TerraformDestroyRequest": {
+      "TerraformDestroyFromDirectoryRequest": {
         "required": [
           "variables"
         ],
@@ -686,8 +900,10 @@
           }
         }
       },
-      "TerraformAsyncDestroyRequest": {
+      "TerraformAsyncDestroyFromDirectoryRequest": {
         "required": [
+          "scripts",
+          "tfState",
           "variables",
           "webhookConfig"
         ],
@@ -708,6 +924,18 @@
               "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for destroy requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for destroy requests deployed via scripts"
+            }
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
           },
           "webhookConfig": {
             "$ref": "#/components/schemas/WebhookConfig"

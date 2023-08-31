@@ -13,10 +13,17 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model;
 
+import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.HashMap;
+import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * TerraformResult
@@ -24,15 +31,23 @@ import java.util.Objects;
 @JsonPropertyOrder({
   TerraformResult.JSON_PROPERTY_COMMAND_STD_OUTPUT,
   TerraformResult.JSON_PROPERTY_COMMAND_STD_ERROR,
+  TerraformResult.JSON_PROPERTY_TERRAFORM_STATE,
+  TerraformResult.JSON_PROPERTY_IMPORTANT_FILE_CONTENT_MAP,
   TerraformResult.JSON_PROPERTY_COMMAND_SUCCESSFUL
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-29T19:58:56.131485900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
 public class TerraformResult {
   public static final String JSON_PROPERTY_COMMAND_STD_OUTPUT = "commandStdOutput";
   private String commandStdOutput;
 
   public static final String JSON_PROPERTY_COMMAND_STD_ERROR = "commandStdError";
   private String commandStdError;
+
+  public static final String JSON_PROPERTY_TERRAFORM_STATE = "terraformState";
+  private String terraformState;
+
+  public static final String JSON_PROPERTY_IMPORTANT_FILE_CONTENT_MAP = "importantFileContentMap";
+  private Map<String, String> importantFileContentMap = new HashMap<>();
 
   public static final String JSON_PROPERTY_COMMAND_SUCCESSFUL = "commandSuccessful";
   private Boolean commandSuccessful;
@@ -92,6 +107,66 @@ public class TerraformResult {
   }
 
 
+  public TerraformResult terraformState(String terraformState) {
+    
+    this.terraformState = terraformState;
+    return this;
+  }
+
+   /**
+   * Get terraformState
+   * @return terraformState
+  **/
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_TERRAFORM_STATE)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public String getTerraformState() {
+    return terraformState;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TERRAFORM_STATE)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setTerraformState(String terraformState) {
+    this.terraformState = terraformState;
+  }
+
+
+  public TerraformResult importantFileContentMap(Map<String, String> importantFileContentMap) {
+    
+    this.importantFileContentMap = importantFileContentMap;
+    return this;
+  }
+
+  public TerraformResult putImportantFileContentMapItem(String key, String importantFileContentMapItem) {
+    if (this.importantFileContentMap == null) {
+      this.importantFileContentMap = new HashMap<>();
+    }
+    this.importantFileContentMap.put(key, importantFileContentMapItem);
+    return this;
+  }
+
+   /**
+   * Get importantFileContentMap
+   * @return importantFileContentMap
+  **/
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_IMPORTANT_FILE_CONTENT_MAP)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public Map<String, String> getImportantFileContentMap() {
+    return importantFileContentMap;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_IMPORTANT_FILE_CONTENT_MAP)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setImportantFileContentMap(Map<String, String> importantFileContentMap) {
+    this.importantFileContentMap = importantFileContentMap;
+  }
+
+
   public TerraformResult commandSuccessful(Boolean commandSuccessful) {
     
     this.commandSuccessful = commandSuccessful;
@@ -128,12 +203,14 @@ public class TerraformResult {
     TerraformResult terraformResult = (TerraformResult) o;
     return Objects.equals(this.commandStdOutput, terraformResult.commandStdOutput) &&
         Objects.equals(this.commandStdError, terraformResult.commandStdError) &&
+        Objects.equals(this.terraformState, terraformResult.terraformState) &&
+        Objects.equals(this.importantFileContentMap, terraformResult.importantFileContentMap) &&
         Objects.equals(this.commandSuccessful, terraformResult.commandSuccessful);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(commandStdOutput, commandStdError, commandSuccessful);
+    return Objects.hash(commandStdOutput, commandStdError, terraformState, importantFileContentMap, commandSuccessful);
   }
 
   @Override
@@ -142,6 +219,8 @@ public class TerraformResult {
     sb.append("class TerraformResult {\n");
     sb.append("    commandStdOutput: ").append(toIndentedString(commandStdOutput)).append("\n");
     sb.append("    commandStdError: ").append(toIndentedString(commandStdError)).append("\n");
+    sb.append("    terraformState: ").append(toIndentedString(terraformState)).append("\n");
+    sb.append("    importantFileContentMap: ").append(toIndentedString(importantFileContentMap)).append("\n");
     sb.append("    commandSuccessful: ").append(toIndentedString(commandSuccessful)).append("\n");
     sb.append("}");
     return sb.toString();
