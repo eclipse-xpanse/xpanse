@@ -55,7 +55,8 @@ import java.time.OffsetDateTime;
 
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.auth.Authentication;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient")
 public class ApiClient extends JavaTimeFormatter {
     public enum CollectionFormat {
         CSV(","), TSV("\t"), SSV(" "), PIPES("|"), MULTI(null);
@@ -89,6 +90,7 @@ public class ApiClient extends JavaTimeFormatter {
         init();
     }
 
+    @Autowired
     public ApiClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
         init();

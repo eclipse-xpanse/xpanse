@@ -35,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   TerraformResult.JSON_PROPERTY_IMPORTANT_FILE_CONTENT_MAP,
   TerraformResult.JSON_PROPERTY_COMMAND_SUCCESSFUL
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
 public class TerraformResult {
   public static final String JSON_PROPERTY_COMMAND_STD_OUTPUT = "commandStdOutput";
   private String commandStdOutput;

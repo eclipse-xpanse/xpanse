@@ -38,7 +38,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   TerraformAsyncDestroyFromDirectoryRequest.JSON_PROPERTY_TF_STATE,
   TerraformAsyncDestroyFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
 public class TerraformAsyncDestroyFromDirectoryRequest {
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
