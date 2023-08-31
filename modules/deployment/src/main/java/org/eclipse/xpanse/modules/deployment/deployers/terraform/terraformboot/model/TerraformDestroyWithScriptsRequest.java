@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   TerraformDestroyWithScriptsRequest.JSON_PROPERTY_SCRIPTS,
   TerraformDestroyWithScriptsRequest.JSON_PROPERTY_TF_STATE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
 public class TerraformDestroyWithScriptsRequest {
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();

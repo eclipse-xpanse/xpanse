@@ -33,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   TerraformDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
   TerraformDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
 public class TerraformDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
   private Boolean isPlanOnly;

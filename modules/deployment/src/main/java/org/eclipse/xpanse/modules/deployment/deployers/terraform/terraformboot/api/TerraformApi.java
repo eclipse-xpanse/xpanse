@@ -1,8 +1,10 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
-
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.Response;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDeployFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDestroyFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
@@ -12,29 +14,21 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.m
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDestroyWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-08-31T14:40:02.713101900+08:00[Asia/Shanghai]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi")
 public class TerraformApi {
     private ApiClient apiClient;
 
@@ -42,6 +36,7 @@ public class TerraformApi {
         this(new ApiClient());
     }
 
+    @Autowired
     public TerraformApi(ApiClient apiClient) {
         this.apiClient = apiClient;
     }
@@ -57,9 +52,9 @@ public class TerraformApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
@@ -72,9 +67,9 @@ public class TerraformApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
@@ -112,9 +107,9 @@ public class TerraformApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
@@ -127,9 +122,9 @@ public class TerraformApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
@@ -167,9 +162,9 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
@@ -184,9 +179,9 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
@@ -233,9 +228,9 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
@@ -249,9 +244,9 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
@@ -289,9 +284,9 @@ public class TerraformApi {
     /**
      * 
      * Destroy the Terraform modules
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
@@ -306,9 +301,9 @@ public class TerraformApi {
     /**
      * 
      * Destroy the Terraform modules
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
@@ -355,9 +350,9 @@ public class TerraformApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
@@ -371,9 +366,9 @@ public class TerraformApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
@@ -411,9 +406,9 @@ public class TerraformApi {
     /**
      * 
      * Check health of Terraform API service
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @return TerraformBootSystemStatus
@@ -426,9 +421,9 @@ public class TerraformApi {
     /**
      * 
      * Check health of Terraform API service
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @return ResponseEntity&lt;TerraformBootSystemStatus&gt;
@@ -458,9 +453,9 @@ public class TerraformApi {
     /**
      * 
      * Validate the Terraform modules
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
@@ -474,9 +469,9 @@ public class TerraformApi {
     /**
      * 
      * Validate the Terraform modules
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)

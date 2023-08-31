@@ -95,7 +95,8 @@
                             <inputSpec>${project.basedir}/src/main/resources/terraformbootApi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
-                            <apiPackage>org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api
+                            <apiPackage>
+                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api
                             </apiPackage>
                             <modelPackage>
                                 org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model
@@ -111,6 +112,8 @@
                                 ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java
                             </supportingFilesToGenerate>
                             <configOptions>
+                                <generateClientAsBean>true</generateClientAsBean>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
                                 <useJakartaEe>true</useJakartaEe>
                             </configOptions>
                         </configuration>
