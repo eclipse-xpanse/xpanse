@@ -205,6 +205,9 @@
                     <outputDirectory>${project.parent.basedir}/target/coverage-reports</outputDirectory>
                     <dataFile>${project.parent.basedir}/target/coverage-reports/jacoco.exec</dataFile>
                     <skip>${jacoco.skip}</skip>
+                    <excludes>
+                        <exclude>**/org/eclipse/xpanse/modules/deployment/deployers/terraform/terraformboot/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
