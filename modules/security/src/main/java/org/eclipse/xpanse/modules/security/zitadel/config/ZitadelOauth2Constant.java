@@ -50,7 +50,7 @@ public class ZitadelOauth2Constant {
      * All scopes to request putting all required info of the user into the claims.
      */
     public static final String REQUIRED_SCOPES =
-            "openid profile urn:zitadel:iam:org:projects:roles";
+            "openid profile urn:zitadel:iam:org:projects:roles urn:zitadel:iam:user:metadata";
 
     /**
      * Key in claims for getting the id of the user.
@@ -91,5 +91,10 @@ public class ZitadelOauth2Constant {
      * Key in claims for getting the address of the user.
      */
     public static final String ADDRESS_KEY = "address";
+
+    /**
+     * Key in metadata for getting the specified value from the metadata of the user.
+     */
+    public static final String NAMESPACE_KEY = "namespace";
 
 }

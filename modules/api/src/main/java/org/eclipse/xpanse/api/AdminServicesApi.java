@@ -121,8 +121,7 @@ public class AdminServicesApi {
     }
 
     private void processShownFields(BackendSystemStatus backendSystemStatus) {
-        CurrentUserInfo currentUserInfo =
-                identityProviderManager.getActiveIdentityProviderService().getCurrentUserInfo();
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
         boolean allFieldsShown = Objects.nonNull(currentUserInfo) && !CollectionUtils.isEmpty(
                 currentUserInfo.getRoles()) && currentUserInfo.getRoles().contains(ROLE_ADMIN);
         if (!allFieldsShown) {

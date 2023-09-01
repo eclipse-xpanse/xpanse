@@ -25,6 +25,7 @@ class ServiceTemplateVoTest {
     private static final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
     private static final String name = "kafka";
     private static final String version = "1.0";
+    private static final String namespace = "huawei";
     private static final Csp csp = Csp.HUAWEI;
     private static final Ocl ocl = new Ocl();
     private static final ServiceRegistrationState serviceState =
@@ -39,6 +40,7 @@ class ServiceTemplateVoTest {
         serviceTemplateVo.setId(id);
         serviceTemplateVo.setName(name);
         serviceTemplateVo.setVersion(version);
+        serviceTemplateVo.setNamespace(namespace);
         serviceTemplateVo.setCsp(csp);
         serviceTemplateVo.setOcl(ocl);
         serviceTemplateVo.setServiceRegistrationState(serviceState);
@@ -51,6 +53,7 @@ class ServiceTemplateVoTest {
         assertEquals(version, serviceTemplateVo.getVersion());
         assertEquals(csp, serviceTemplateVo.getCsp());
         assertEquals(ocl, serviceTemplateVo.getOcl());
+        assertEquals(namespace, serviceTemplateVo.getNamespace());
         assertEquals(serviceState, serviceTemplateVo.getServiceRegistrationState());
         assertEquals(category, serviceTemplateVo.getCategory());
         assertEquals(createTime, serviceTemplateVo.getCreateTime());
@@ -63,6 +66,7 @@ class ServiceTemplateVoTest {
         serviceTemplateVo1.setId(id);
         serviceTemplateVo1.setName(name);
         serviceTemplateVo1.setVersion(version);
+        serviceTemplateVo1.setNamespace(namespace);
         serviceTemplateVo1.setCsp(csp);
         serviceTemplateVo1.setOcl(ocl);
         serviceTemplateVo1.setServiceRegistrationState(serviceState);
@@ -72,6 +76,7 @@ class ServiceTemplateVoTest {
         serviceTemplateVo2.setId(id);
         serviceTemplateVo2.setName(name);
         serviceTemplateVo2.setVersion(version);
+        serviceTemplateVo2.setNamespace(namespace);
         serviceTemplateVo2.setCsp(csp);
         serviceTemplateVo2.setOcl(ocl);
         serviceTemplateVo2.setServiceRegistrationState(serviceState);
@@ -102,6 +107,7 @@ class ServiceTemplateVoTest {
         serviceTemplateVo.setVersion(version);
         serviceTemplateVo.setCsp(csp);
         serviceTemplateVo.setCategory(category);
+        serviceTemplateVo.setNamespace(namespace);
         serviceTemplateVo.setOcl(ocl);
         serviceTemplateVo.setCreateTime(createTime);
         serviceTemplateVo.setLastModifiedTime(lastModifiedTime);
@@ -112,6 +118,7 @@ class ServiceTemplateVoTest {
                 ", version=" + version +
                 ", csp=" + csp +
                 ", category=" + category +
+                ", namespace=" + namespace +
                 ", ocl=" + ocl +
                 ", createTime=" + createTime +
                 ", lastModifiedTime=" + lastModifiedTime +

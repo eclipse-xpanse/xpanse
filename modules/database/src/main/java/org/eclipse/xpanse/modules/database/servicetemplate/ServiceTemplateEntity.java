@@ -58,6 +58,9 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    @Column(name = "NAMESPACE")
+    private String namespace;
+
     @Column(name = "OCL", columnDefinition = "json", nullable = false)
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)

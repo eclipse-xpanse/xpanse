@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -30,6 +31,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQu
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.springframework.stereotype.Service;
@@ -49,7 +51,8 @@ public class ServiceTemplateManage {
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
     @Resource
     private DeployService deployService;
-
+    @Resource
+    private IdentityProviderManager identityProviderManager;
 
     /**
      * Update service template using id and the ocl file url.
@@ -157,6 +160,13 @@ public class ServiceTemplateManage {
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
         validateTerraformScript(ocl);
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)
+                && StringUtils.isNotEmpty(currentUserInfo.getNamespace())) {
+            newEntity.setNamespace(currentUserInfo.getNamespace());
+        } else {
+            newEntity.setNamespace(ocl.getNamespace());
+        }
         storage.store(newEntity);
         serviceTemplateOpenApiGenerator.generateServiceApi(newEntity);
         return newEntity;

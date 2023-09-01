@@ -49,6 +49,8 @@ import org.springframework.context.annotation.Profile;
                         @OAuthScope(name = PROFILE_SCOPE,
                                 description = "mandatory must be selected."),
                         @OAuthScope(name = GRANTED_ROLES_SCOPE,
+                                description = "mandatory must be selected."),
+                        @OAuthScope(name = METADATA_SCOPE,
                                 description = "mandatory must be selected.")
                 })
         )

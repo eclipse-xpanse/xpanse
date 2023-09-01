@@ -50,6 +50,11 @@ public class ServiceTemplateVo extends RepresentationModel<ServiceTemplateVo> {
     private Category category;
 
     @NotNull
+    @NotBlank
+    @Schema(description = "Namespace of the user who registered service template.")
+    private String namespace;
+
+    @NotNull
     @Schema(description = "Ocl model of the registered service.")
     private Ocl ocl;
 

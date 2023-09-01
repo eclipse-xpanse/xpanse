@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,7 +46,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * Test for ServiceTemplateImpl.
  */
 @Slf4j
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class})
 class ServiceTemplateManageTest {
 
     private static final String oclLocation = "file:src/test/resources/ocl_test.yaml";
@@ -63,6 +64,8 @@ class ServiceTemplateManageTest {
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
     @Mock
     private DeployService mockDeployService;
+    @Mock
+    private IdentityProviderManager identityProviderManager;
     @Mock
     private OpenApiUrlManage openApiUrlManage;
     @InjectMocks

@@ -38,6 +38,7 @@ class ServiceTemplateEntityTest {
         test.setVersion(VERSION);
         test.setCsp(CSP);
         test.setCategory(CATEGORY);
+        test.setNamespace("test");
         test.setOcl(OCL);
         test.setServiceRegistrationState(SERVICE_STATE);
     }
@@ -50,6 +51,7 @@ class ServiceTemplateEntityTest {
                         + "version=" + VERSION + ", "
                         + "csp=" + CSP + ", "
                         + "category=" + CATEGORY + ", "
+                        + "namespace=test, "
                         + "ocl=" + OCL + ", "
                         + "serviceRegistrationState=" + SERVICE_STATE + ")";
         assertEquals(expectedToString, test.toString());
@@ -102,6 +104,13 @@ class ServiceTemplateEntityTest {
         assertNotEquals(test1.hashCode(), test2.hashCode());
 
         test1.setCategory(CATEGORY);
+        assertNotEquals(test, test1);
+        assertNotEquals(test, test2);
+        assertNotEquals(test1, test2);
+        assertNotEquals(test.hashCode(), test1.hashCode());
+        assertNotEquals(test1.hashCode(), test2.hashCode());
+
+        test1.setNamespace("test");
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test1, test2);

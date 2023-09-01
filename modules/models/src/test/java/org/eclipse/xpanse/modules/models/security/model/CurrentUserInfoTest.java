@@ -1,6 +1,7 @@
 package org.eclipse.xpanse.modules.models.security.model;
 
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ class CurrentUserInfoTest {
         test.setUserId("userId");
         test.setUserName("userName");
         test.setRoles(List.of("admin"));
+        test.setMetadata(Map.of("namespace", "test"));
+        test.setNamespace("test");
     }
 
     @Test
@@ -22,6 +25,9 @@ class CurrentUserInfoTest {
         Assertions.assertEquals("userId", test.getUserId());
         Assertions.assertEquals("userName", test.getUserName());
         Assertions.assertEquals("admin", test.getRoles().get(0));
+        Assertions.assertTrue(test.getMetadata().containsKey("namespace"));
+        Assertions.assertEquals("test", test.getMetadata().get("namespace"));
+        Assertions.assertEquals("test", test.getNamespace());
     }
 
 
@@ -70,12 +76,33 @@ class CurrentUserInfoTest {
         Assertions.assertNotEquals(test2, test3);
         Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
         Assertions.assertNotEquals(test2.hashCode(), test3.hashCode());
+
+        test2.setMetadata(Map.of("namespace", "test"));
+        test3.setMetadata(Map.of("namespace", "test1"));
+        Assertions.assertNotEquals(test, test1);
+        Assertions.assertNotEquals(test, test2);
+        Assertions.assertNotEquals(test, test3);
+        Assertions.assertNotEquals(test1, test2);
+        Assertions.assertNotEquals(test2, test3);
+        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
+        Assertions.assertNotEquals(test2.hashCode(), test3.hashCode());
+
+        test2.setNamespace("test");
+        test3.setNamespace("test1");
+        Assertions.assertNotEquals(test, test1);
+        Assertions.assertNotEquals(test, test2);
+        Assertions.assertNotEquals(test, test3);
+        Assertions.assertNotEquals(test1, test2);
+        Assertions.assertNotEquals(test2, test3);
+        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
+        Assertions.assertNotEquals(test2.hashCode(), test3.hashCode());
     }
 
 
     @Test
     void testToString() {
-        String exceptedString = "CurrentUserInfo(userId=userId, userName=userName, roles=[admin])";
+        String exceptedString = "CurrentUserInfo(userId=userId, userName=userName, roles=[admin],"
+                + " metadata={namespace=test}, namespace=test)";
         Assertions.assertEquals(test.toString(), exceptedString);
         Assertions.assertNotEquals(test.toString(), null);
     }

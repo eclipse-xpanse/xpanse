@@ -7,10 +7,13 @@
 package org.eclipse.xpanse.modules.security.zitadel;
 
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.AUTH_TYPE_JWT;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.METADATA_KEY;
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.NAMESPACE_KEY;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.REQUIRED_SCOPES;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERID_KEY;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERNAME_KEY;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -58,6 +61,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class ZitadelIdentityProviderService implements IdentityProviderService {
 
     private static final Map<String, String> CODE_CHALLENGE_MAP = initCodeChallengeMap();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     @Resource
     private RestTemplate restTemplate;
     @Value("${authorization-token-type:JWT}")
@@ -144,9 +148,29 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
             List<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority).toList();
             currentUserInfo.setRoles(roles);
+
+            if (claimsMap.containsKey(METADATA_KEY)) {
+                Object metadataObject = claimsMap.get(METADATA_KEY);
+                if (Objects.nonNull(metadataObject)) {
+                    Map<String, String> metadataMap =
+                            OBJECT_MAPPER.convertValue(metadataObject, Map.class);
+                    if (!metadataMap.isEmpty()) {
+                        Map<String, String> userMetadata = new HashMap<>();
+                        for (String key : metadataMap.keySet()) {
+                            String value = new String(
+                                    java.util.Base64.getDecoder().decode(metadataMap.get(key)),
+                                    StandardCharsets.UTF_8);
+                            userMetadata.put(key, value);
+                            if (StringUtils.equals(NAMESPACE_KEY, key)) {
+                                currentUserInfo.setNamespace(value);
+                            }
+                        }
+                        currentUserInfo.setMetadata(userMetadata);
+                    }
+                }
+            }
             return currentUserInfo;
         }
-
         return null;
     }
 
