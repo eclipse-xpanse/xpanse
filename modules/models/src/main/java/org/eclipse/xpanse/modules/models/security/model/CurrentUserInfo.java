@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.models.security.model;
 
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 
 /**
@@ -20,5 +21,9 @@ public class CurrentUserInfo {
     private String userName;
 
     private List<String> roles;
+
+    private Map<String, String> metadata;
+
+    private String namespace;
 
 }
