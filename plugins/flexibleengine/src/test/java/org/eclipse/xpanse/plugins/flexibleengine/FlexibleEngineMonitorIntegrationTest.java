@@ -5,11 +5,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.when;
 
+import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.huaweicloud.sdk.core.http.HttpMethod;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -50,7 +53,9 @@ class FlexibleEngineMonitorIntegrationTest {
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
                     .dynamicPort()
-                    .extensions(new ResponseTemplateTransformer(true)))
+                    .extensions(new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
+                            false, new ClasspathFileSource("src/test/resources/mappings"),
+                            Collections.emptyList())))
             .build();
 
     @Autowired

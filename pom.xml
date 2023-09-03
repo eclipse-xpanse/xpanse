@@ -8,25 +8,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-    <!--
-
-         Licensed under the Apache License, Version 2.0 (the "License");
-         you may not use this file except in compliance with the License.
-         You may obtain a copy of the License at
-
-              http://www.apache.org/licenses/LICENSE-2.0
-
-         Unless required by applicable law or agreed to in writing, software
-         distributed under the License is distributed on an "AS IS" BASIS,
-         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-         See the License for the specific language governing permissions and
-         limitations under the License.
-
-    -->
-
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.eclipse.xpanse</groupId>
     <artifactId>xpanse-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
@@ -37,12 +19,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.3</version>
     </parent>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
     <modules>
@@ -52,18 +34,45 @@
     </modules>
     <properties>
         <java.version>17</java.version>
-        <spring-boot.version>3.1.1</spring-boot.version>
+        <spring-boot.version>3.1.3</spring-boot.version>
+        <spring.retry.version>2.0.1</spring.retry.version>
         <junit.version>5.9.3</junit.version>
         <lombok.version>1.18.28</lombok.version>
-        <logback.version>1.3.5</logback.version>
         <checkstyle-maven-plugin.version>3.3.0</checkstyle-maven-plugin.version>
-        <logbook.version>3.1.0</logbook.version>
-        <wiremock.version>3.0.0-beta-10</wiremock.version>
+        <logbook.version>3.3.0</logbook.version>
+        <wiremock.version>3.0.1</wiremock.version>
         <instancio.version>2.16.0</instancio.version>
-        <caffeine.cache.version>3.1.6</caffeine.cache.version>
+        <caffeine.cache.version>3.1.8</caffeine.cache.version>
         <awaitility.version>4.2.0</awaitility.version>
         <jacoco.version>0.8.10</jacoco.version>
-        <springdoc.version>2.1.0</springdoc.version>
+        <springdoc.version>2.2.0</springdoc.version>
+        <slf4j-api.version>2.0.7</slf4j-api.version>
+        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <hypersistence-utils-hibernate.version>3.5.2</hypersistence-utils-hibernate.version>
+        <mockito.version>5.5.0</mockito.version>
+        <testcontainers.version>1.19.0</testcontainers.version>
+        <apache.commons.io.version>2.13.0</apache.commons.io.version>
+        <apache.commons.net.version>3.9.0</apache.commons.net.version>
+        <apache.commons.collections.version>4.4</apache.commons.collections.version>
+        <apache.commons.validator.version>1.7</apache.commons.validator.version>
+        <mariadb.client.version>3.2.0</mariadb.client.version>
+        <system.stubs.version>2.0.2</system.stubs.version>
+        <junit4.version>4.13.2</junit4.version>
+        <json.smart.version>2.5.0</json.smart.version>
+        <spring.oauth.addon.test.version>6.1.2</spring.oauth.addon.test.version>
+        <openstack4j.version>3.11</openstack4j.version>
+        <huawei.apigateway.version>3.1.2</huawei.apigateway.version>
+        <jackson.databind.version>2.15.2</jackson.databind.version>
+        <huaweicloud.sdk.version>3.1.41</huaweicloud.sdk.version>
+        <maven.clean.plugin.version>3.1.0</maven.clean.plugin.version>
+        <maven.compile.plugin.version>3.10.1</maven.compile.plugin.version>
+        <maven.javadoc.plugin.version>3.4.1</maven.javadoc.plugin.version>
+        <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
+        <maven.dependency.plugin.version>3.3.0</maven.dependency.plugin.version>
+        <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
+        <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
+        <openapi.generator.plugin.version>6.6.0</openapi.generator.plugin.version>
+        <nimbusds.oidc.sdk.version>10.7</nimbusds.oidc.sdk.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
@@ -83,7 +92,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.4.1</version>
+                        <version>${maven.javadoc.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>attach-javadoc</id>
@@ -96,7 +105,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.2.1</version>
+                        <version>${maven.source.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>attach-source</id>
@@ -105,19 +114,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>releaseDeploy</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jreleaser</groupId>
-                        <artifactId>jreleaser-maven-plugin</artifactId>
-                        <version>1.6.0</version>
-                        <inherited>false</inherited>
                     </plugin>
                 </plugins>
             </build>
@@ -149,17 +145,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-validation</artifactId>
-            </dependency>
-            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
@@ -169,7 +154,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.3</version>
+                <version>${slf4j-api.version}</version>
             </dependency>
             <!-- test -->
             <dependency>
@@ -193,13 +178,8 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>3.7.7</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.14.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -287,7 +267,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>${maven.compile.plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -296,7 +276,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>${maven.surefire.plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

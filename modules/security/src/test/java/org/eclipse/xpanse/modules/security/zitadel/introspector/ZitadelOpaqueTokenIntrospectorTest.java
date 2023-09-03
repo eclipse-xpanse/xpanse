@@ -4,8 +4,11 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +25,10 @@ class ZitadelOpaqueTokenIntrospectorTest {
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
-                    .extensions(new ResponseTemplateTransformer(true)))
+                    .dynamicPort()
+                    .extensions(new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
+                            false, new ClasspathFileSource("src/test/resources/mappings"),
+                            Collections.emptyList())))
             .build();
     private ZitadelOpaqueTokenIntrospector testOpaqueTokenIntrospector;
 

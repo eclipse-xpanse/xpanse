@@ -53,7 +53,6 @@
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>database</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.instancio</groupId>
@@ -65,18 +64,11 @@
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>orchestrator</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>credential</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.1</version>
         </dependency>
     </dependencies>
 
@@ -85,7 +77,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>6.6.0</version>
+                <version>${openapi.generator.plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -115,6 +107,7 @@
                                 <generateClientAsBean>true</generateClientAsBean>
                                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
                                 <useJakartaEe>true</useJakartaEe>
+                                <openApiNullable>false</openApiNullable>
                             </configOptions>
                         </configuration>
                         <phase>generate-sources</phase>
@@ -126,7 +119,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>${maven.clean.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>clean-terraformboot-generated-files</id>

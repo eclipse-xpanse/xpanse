@@ -5,13 +5,13 @@ import static org.eclipse.xpanse.modules.deployment.deployers.terraform.Terrafor
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URL;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfState;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class OpenstackTerraformResourceHandlerTest {
+class OpenstackTerraformResourceHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

@@ -4,13 +4,16 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.huaweicloud.sdk.ces.v1.CesClient;
 import com.huaweicloud.sdk.core.HcClient;
 import com.huaweicloud.sdk.core.auth.BasicCredentials;
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.core.http.HttpConfig;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
@@ -48,7 +51,9 @@ class HuaweiCloudMonitorIntegrationTest {
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
                     .dynamicPort()
-                    .extensions(new ResponseTemplateTransformer(true)))
+                    .extensions(new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
+                            false, new ClasspathFileSource("src/test/resources/mappings"),
+                            Collections.emptyList())))
             .build();
 
     @Autowired
@@ -361,7 +366,7 @@ class HuaweiCloudMonitorIntegrationTest {
                 .withSk(HuaweiCloudMonitorConstants.HW_SECRET_KEY);
         HcClient hcClient = new HcClient(HttpConfig.getDefaultHttpConfig());
         hcClient.withCredential(iCredential);
-        hcClient.withEndpoint(wireMockExtension.getRuntimeInfo().getHttpBaseUrl());
+        hcClient.withEndpoints(Collections.singletonList(wireMockExtension.getRuntimeInfo().getHttpBaseUrl()));
         return new CesClient(hcClient);
     }
 

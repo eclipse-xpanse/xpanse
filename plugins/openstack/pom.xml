@@ -58,10 +58,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <artifactId>commons-collections</artifactId>
-            <groupId>commons-collections</groupId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
             <scope>test</scope>
-            <version>3.2.2</version>
+            <version>${apache.commons.collections.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -72,7 +72,7 @@
         <dependency>
             <groupId>com.github.openstack4j.core</groupId>
             <artifactId>openstack4j</artifactId>
-            <version>3.11</version>
+            <version>${openstack4j.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>

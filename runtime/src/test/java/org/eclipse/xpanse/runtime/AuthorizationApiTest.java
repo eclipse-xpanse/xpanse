@@ -12,7 +12,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockBearerTokenAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import jakarta.annotation.Resource;
 import java.util.Collections;
@@ -43,7 +45,10 @@ class AuthorizationApiTest {
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
-                    .extensions(new ResponseTemplateTransformer(true)))
+                    .dynamicPort()
+                    .extensions(new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
+                            false, new ClasspathFileSource("src/test/resources/mappings"),
+                            Collections.emptyList())))
             .build();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -65,7 +70,7 @@ class AuthorizationApiTest {
                 .andReturn().getResponse();
 
         // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.FOUND.value());
+        assertEquals(HttpStatus.FOUND.value(), response.getStatus());
         assertTrue(StringUtils.isEmpty(response.getContentAsString()));
         assertTrue(StringUtils.isNotEmpty(response.getRedirectedUrl()));
         assertTrue(response.getRedirectedUrl().startsWith(redirectUrl));
@@ -86,7 +91,7 @@ class AuthorizationApiTest {
                 .andReturn().getResponse();
 
         // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
     }
 
