@@ -8,6 +8,7 @@ package org.eclipse.xpanse.api.exceptions.handler;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
 import org.eclipse.xpanse.modules.models.response.Response;
@@ -61,6 +62,18 @@ public class ServiceMetricsExceptionHandler {
     public Response handleResourceNotFoundException(
             ResourceNotFoundException ex) {
         return Response.errorResponse(ResultType.RESOURCE_NOT_FOUND,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for MetricsDataNotYetAvailableException.
+     */
+    @ExceptionHandler({MetricsDataNotYetAvailableException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleMetricsDataNotYetAvailableException(
+            MetricsDataNotYetAvailableException ex) {
+        return Response.errorResponse(ResultType.METRICS_DATA_NOT_READY,
                 Collections.singletonList(ex.getMessage()));
     }
 }
