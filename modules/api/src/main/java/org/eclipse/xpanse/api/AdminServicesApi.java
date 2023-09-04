@@ -18,6 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
@@ -51,6 +54,12 @@ public class AdminServicesApi {
 
     @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
     private String dataSourceUrl;
+
+    @Resource
+    private TerraformApi terraformApi;
+
+    @Resource
+    private ApiClient apiClient;
 
     /**
      * Method to find out the current state of the system.
@@ -89,8 +98,38 @@ public class AdminServicesApi {
                     backendSystemStatuses.add(databaseStatus);
                 }
             }
+            if (Objects.equals(BackendSystemType.TERRAFORM_BOOT, type)) {
+                BackendSystemStatus terraformBootStatus = getTerraformBootStatus();
+                if (terraformBootStatus.getHealthStatus().equals(HealthStatus.OK)) {
+                    processShownFields(terraformBootStatus);
+                    backendSystemStatuses.add(terraformBootStatus);
+                }
+            }
         }
         return backendSystemStatuses;
+    }
+
+    private boolean isTerraformBootApiAccessible() {
+        try {
+            TerraformBootSystemStatus terraformBootSystemStatus = terraformApi.healthCheck();
+            return terraformBootSystemStatus.getHealthStatus()
+                    .equals(TerraformBootSystemStatus.HealthStatusEnum.OK);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private BackendSystemStatus getTerraformBootStatus() {
+        BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
+        terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
+        terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
+        if (isTerraformBootApiAccessible()) {
+            terraformBootStatus.setHealthStatus(HealthStatus.OK);
+            terraformBootStatus.setEndpoint(apiClient.getBasePath());
+        } else {
+            terraformBootStatus.setHealthStatus(HealthStatus.NOK);
+        }
+        return terraformBootStatus;
     }
 
     private BackendSystemStatus getIdentityProviderStatus() {

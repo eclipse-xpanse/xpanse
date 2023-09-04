@@ -19,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
@@ -44,7 +47,8 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=mariadb,zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {
+        "spring.profiles.active=mariadb,zitadel,zitadel-testbed,terraform-boot"})
 @AutoConfigureMockMvc
 class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrationTest {
 
@@ -58,6 +62,12 @@ class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrati
 
     @Resource
     private MockMvc mockMvc;
+
+    @Resource
+    private TerraformApi terraformApi;
+
+    @Resource
+    private ApiClient apiClient;
 
     @Test
     void testHealthCheckUnauthorized() throws Exception {
@@ -135,16 +145,34 @@ class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrati
         identityProviderStatus.setHealthStatus(HealthStatus.OK);
         identityProviderStatus.setName(IdentityProviderType.ZITADEL.toValue());
 
+        BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
+        terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
+        terraformBootStatus.setHealthStatus(HealthStatus.OK);
+        terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
+
         if (isAdmin) {
             databaseStatus.setEndpoint(dataSourceUrl);
             identityProviderStatus.setEndpoint(iamServerEndpoint);
+            terraformBootStatus.setEndpoint(apiClient.getBasePath());
         }
         List<BackendSystemStatus> backendSystemStatuses = new ArrayList<>();
         backendSystemStatuses.add(identityProviderStatus);
         backendSystemStatuses.add(databaseStatus);
+        if (isTerraformBootApiAccessible()) {
+            backendSystemStatuses.add(terraformBootStatus);
+        }
 
         return backendSystemStatuses;
     }
 
+    private boolean isTerraformBootApiAccessible() {
+        try {
+            TerraformBootSystemStatus terraformBootSystemStatus = terraformApi.healthCheck();
+            return terraformBootSystemStatus.getHealthStatus()
+                    .equals(TerraformBootSystemStatus.HealthStatusEnum.OK);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 }

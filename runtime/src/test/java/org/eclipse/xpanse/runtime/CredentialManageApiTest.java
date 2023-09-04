@@ -48,7 +48,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
  * Test for CredentialManageApi.
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed,terraform-boot"})
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CredentialManageApiTest {

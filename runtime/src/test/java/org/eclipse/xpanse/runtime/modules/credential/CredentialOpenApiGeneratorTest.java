@@ -27,7 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  * Test of CredentialOpenApiGenerator.
  */
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("default")
+@ActiveProfiles("terraform-boot")
 @SpringBootTest(classes = {XpanseApplication.class, CaffeineCredentialCacheManager.class,
         CredentialsStore.class,
         ServletUriComponentsBuilder.class, OpenApiUrlManage.class, PluginManager.class})
