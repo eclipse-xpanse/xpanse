@@ -62,7 +62,7 @@
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.7</version>
+            <version>${apache.commons.validator.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>com.huawei.apigateway</groupId>
             <artifactId>java-sdk-core</artifactId>
-            <version>3.1.2</version>
+            <version>${huawei.apigateway.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -84,17 +84,12 @@
         <dependency>
             <groupId>com.huaweicloud.sdk</groupId>
             <artifactId>huaweicloud-sdk-ces</artifactId>
-            <version>3.1.41</version>
+            <version>${huaweicloud.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aspects</artifactId>
-            <version>6.0.9</version>
+            <version>${spring.retry.version}</version>
         </dependency>
         <!-- test -->
         <dependency>

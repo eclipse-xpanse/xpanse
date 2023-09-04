@@ -53,10 +53,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
  * Configuration applied on all web endpoints defined for this
@@ -91,21 +93,25 @@ public class ZitadelWebSecurityConfig {
      * @param http security configuration
      */
     @Bean
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiFilterChain(HttpSecurity http,
+                                              HandlerMappingIntrospector introspector)
+            throws Exception {
         // accept cors requests and allow preflight checks
         http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(
                 corsConfigurationSource()));
 
+        MvcRequestMatcher.Builder mvcMatcherBuilder =
+                new MvcRequestMatcher.Builder(introspector).servletPath("/");
+
         http.authorizeHttpRequests(arc -> {
-            // add permit for h2-console html and resource
-            arc.requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll();
-            // add permit for swagger-ui docs and resource
-            arc.requestMatchers("/swagger-ui/**", "/v3/**", "/favicon.ico", "/error").permitAll();
-            // add permit for auth apis and openAPI html
-            arc.requestMatchers("/auth/**", "/openapi/**").permitAll();
-            // declarative route configuration
-            arc.requestMatchers("/xpanse/**").authenticated();
-            // add additional routes
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll();
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-ui/**")).permitAll();
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/v3/**")).permitAll();
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/favicon.ico")).permitAll();
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll();
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/openapi/**")).permitAll();
+            arc.requestMatchers(mvcMatcherBuilder.pattern("/xpanse/**")).authenticated();
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll();
             arc.anyRequest().authenticated();
         });
 

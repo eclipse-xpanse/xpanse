@@ -40,12 +40,12 @@
         <dependency>
             <groupId>io.hypersistence</groupId>
             <artifactId>hypersistence-utils-hibernate-60</artifactId>
-            <version>3.1.2</version>
+            <version>${hypersistence-utils-hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.1.4</version>
+            <version>${mariadb.client.version}</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>

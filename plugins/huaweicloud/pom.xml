@@ -35,7 +35,7 @@
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.7</version>
+            <version>${apache.commons.validator.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -47,23 +47,21 @@
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>deployment</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>monitor</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <artifactId>huaweicloud-sdk-ces</artifactId>
             <groupId>com.huaweicloud.sdk</groupId>
-            <version>3.1.26</version>
+            <version>${huaweicloud.sdk.version}</version>
         </dependency>
         <dependency>
             <artifactId>huaweicloud-sdk-aom</artifactId>
             <groupId>com.huaweicloud.sdk</groupId>
-            <version>3.1.26</version>
+            <version>${huaweicloud.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
