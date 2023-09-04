@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
@@ -339,9 +340,16 @@ public class FlexibleEngineMetricsService {
                             monitorResourceType.toValue(), deployResource.getResourceId());
                 }
             }
-        }
-        return targetMetricsMap;
+            return targetMetricsMap;
 
+        } else {
+            log.error(
+                    "No monitor metrics available for the service, "
+                            + "Please wait for 3-5 minutes and try again.");
+            throw new MetricsDataNotYetAvailableException(
+                    "No monitor metrics available for the service, "
+                            + "Please wait for 3-5 minutes and try again.");
+        }
     }
 
 

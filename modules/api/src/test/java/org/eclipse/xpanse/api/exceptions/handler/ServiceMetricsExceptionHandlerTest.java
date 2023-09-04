@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.eclipse.xpanse.api.ServiceMetricsApi;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsAdapter;
@@ -91,6 +92,21 @@ class ServiceMetricsExceptionHandlerTest {
                         .param("onlyLastKnownMetric", "true"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Resource Not Found"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testMetricsDataNotYetAvailableException() throws Exception {
+        when(serviceMetricsAdapter
+                .getMetricsByResourceId(resourceId, null, null, null, null, true))
+                .thenThrow(new MetricsDataNotYetAvailableException("test error"));
+
+        this.mockMvc.perform(get("/xpanse/metrics")
+                        .param("serviceId", serviceId)
+                        .param("resourceId", resourceId)
+                        .param("onlyLastKnownMetric", "true"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Metrics Data Not Ready"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }
