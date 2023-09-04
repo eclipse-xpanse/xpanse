@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -200,7 +201,7 @@ public class ServiceTemplateApi {
     @Operation(description = "List service templates with query params.")
     @GetMapping(value = "/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ServiceTemplateVo> listServiceTemplates(
+    public List<UserAvailableServiceVo> listServiceTemplates(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category categoryName,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
@@ -215,11 +216,11 @@ public class ServiceTemplateApi {
                 serviceTemplateManage.listServiceTemplates(query);
         String successMsg = String.format("Listing service templates with query model %s "
                 + "successful.", query);
-        List<ServiceTemplateVo> serviceTemplateVos =
-                serviceEntities.stream().map(this::convertToServiceTemplateVo)
+        List<UserAvailableServiceVo> userAvailableServiceVos =
+                serviceEntities.stream().map(this::convertToUserAvailableServiceVo)
                         .collect(Collectors.toList());
         log.info(successMsg);
-        return serviceTemplateVos;
+        return userAvailableServiceVos;
     }
 
     /**
@@ -277,4 +278,15 @@ public class ServiceTemplateApi {
         return null;
     }
 
+    private UserAvailableServiceVo convertToUserAvailableServiceVo(
+            ServiceTemplateEntity serviceTemplateEntity) {
+        UserAvailableServiceVo catalogVo =
+                serviceTemplateManage.convertToUserAvailableServiceVo(serviceTemplateEntity);
+        if (Objects.nonNull(catalogVo)) {
+            catalogVo.add(
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
+                            .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
+        }
+        return catalogVo;
+    }
 }
