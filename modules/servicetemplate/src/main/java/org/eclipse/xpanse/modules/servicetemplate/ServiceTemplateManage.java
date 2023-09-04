@@ -36,6 +36,7 @@ import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -84,6 +85,14 @@ public class ServiceTemplateManage {
             String errMsg = String.format("Service template with id %s not found.", id);
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
+        }
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)) {
+            if (!StringUtils.equals(existedService.getNamespace(),
+                    currentUserInfo.getNamespace())) {
+                throw new AccessDeniedException("No right to update service template belong to "
+                        + "other namespaces.");
+            }
         }
         iconUpdate(existedService, ocl);
         checkParams(existedService, ocl);
@@ -193,13 +202,23 @@ public class ServiceTemplateManage {
      * @return Returns service template DB entity.
      */
 
-    public ServiceTemplateEntity getServiceTemplateDetails(String id) {
+    public ServiceTemplateEntity getServiceTemplateDetails(String id, boolean checkNamespace) {
         UUID uuid = UUID.fromString(id);
         ServiceTemplateEntity serviceTemplateEntity = storage.getServiceTemplateById(uuid);
         if (Objects.isNull(serviceTemplateEntity)) {
             String errMsg = String.format("Service template with id %s not found.", id);
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
+        }
+        if (checkNamespace) {
+            CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+            if (Objects.nonNull(currentUserInfo)) {
+                if (!StringUtils.equals(serviceTemplateEntity.getNamespace(),
+                        currentUserInfo.getNamespace())) {
+                    throw new AccessDeniedException("No right to view details of service template "
+                            + "belong to other namespaces.");
+                }
+            }
         }
         return serviceTemplateEntity;
     }
@@ -218,13 +237,26 @@ public class ServiceTemplateManage {
     /**
      * Unregister service template using the ID of service template.
      *
-     * @param serviceTemplateId ID of service template.
+     * @param id ID of service template.
      */
-
-    public void unregisterServiceTemplate(String serviceTemplateId) {
-        UUID uuid = UUID.fromString(serviceTemplateId);
+    public void unregisterServiceTemplate(String id) {
+        UUID uuid = UUID.fromString(id);
+        ServiceTemplateEntity existedService = storage.getServiceTemplateById(uuid);
+        if (Objects.isNull(existedService)) {
+            String errMsg = String.format("Service template with id %s not found.", id);
+            log.error(errMsg);
+            throw new ServiceTemplateNotRegistered(errMsg);
+        }
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)) {
+            if (!StringUtils.equals(existedService.getNamespace(),
+                    currentUserInfo.getNamespace())) {
+                throw new AccessDeniedException("No right to unregister service template belong to "
+                        + "other namespaces.");
+            }
+        }
         storage.removeById(uuid);
-        serviceTemplateOpenApiGenerator.deleteServiceApi(serviceTemplateId);
+        serviceTemplateOpenApiGenerator.deleteServiceApi(id);
     }
 
     /**

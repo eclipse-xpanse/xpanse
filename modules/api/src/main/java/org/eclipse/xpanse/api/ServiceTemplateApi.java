@@ -23,12 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -61,6 +63,9 @@ public class ServiceTemplateApi {
 
     @Resource
     private ServiceTemplateManage serviceTemplateManage;
+
+    @Resource
+    private IdentityProviderManager identityProviderManager;
 
     /**
      * Register new service template using ocl model.
@@ -239,7 +244,7 @@ public class ServiceTemplateApi {
             @Parameter(name = "id", description = "id of service template")
             @PathVariable("id") String id) {
         ServiceTemplateVo serviceTemplateVo = convertToServiceTemplateVo(
-                serviceTemplateManage.getServiceTemplateDetails(id));
+                serviceTemplateManage.getServiceTemplateDetails(id, true));
         String successMsg = String.format(
                 "Get detail of service template with id %s success.", id);
         log.info(successMsg);
@@ -261,6 +266,11 @@ public class ServiceTemplateApi {
         }
         if (StringUtils.isNotBlank(serviceVersion)) {
             query.setServiceVersion(serviceVersion);
+        }
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)
+                && StringUtils.isNotEmpty(currentUserInfo.getNamespace())) {
+            query.setNamespace(currentUserInfo.getNamespace());
         }
         return query;
     }

@@ -190,7 +190,7 @@ class ServiceTemplateManageTest {
 
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         ServiceTemplateEntity ServiceTemplate =
-                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString());
+                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString(), false);
         Assertions.assertEquals(serviceTemplateEntity, ServiceTemplate);
     }
 
