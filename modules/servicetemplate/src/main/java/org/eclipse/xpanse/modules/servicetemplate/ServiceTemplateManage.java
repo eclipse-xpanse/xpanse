@@ -29,11 +29,13 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -245,6 +247,35 @@ public class ServiceTemplateManage {
             throw new OpenApiFileGenerationException("Get openApi Url is Empty.");
         }
         return openApiUrl;
+    }
+
+
+    /**
+     * Convert ServiceTemplateEntity to UserAvailableServiceVo.
+     *
+     * @param serviceTemplateEntity serviceTemplateEntity
+     * @return UserAvailableServiceVo
+     */
+    public UserAvailableServiceVo convertToUserAvailableServiceVo(
+            ServiceTemplateEntity serviceTemplateEntity) {
+        if (Objects.nonNull(serviceTemplateEntity)) {
+            UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
+            BeanUtils.copyProperties(serviceTemplateEntity, userAvailableServiceVo);
+            userAvailableServiceVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
+            userAvailableServiceVo.setDescription(
+                    serviceTemplateEntity.getOcl().getDescription());
+            userAvailableServiceVo.setNamespace(serviceTemplateEntity.getOcl().getNamespace());
+            userAvailableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
+            userAvailableServiceVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());
+            userAvailableServiceVo.setDeployment(serviceTemplateEntity.getOcl().getDeployment());
+            userAvailableServiceVo.setVariables(
+                    serviceTemplateEntity.getOcl().getDeployment().getVariables());
+            userAvailableServiceVo.setRegions(
+                    serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
+            return userAvailableServiceVo;
+        } else {
+            return null;
+        }
     }
 
     private void validateTerraformScript(Ocl ocl) {

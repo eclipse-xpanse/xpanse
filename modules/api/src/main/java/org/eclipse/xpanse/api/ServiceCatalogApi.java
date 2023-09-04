@@ -26,7 +26,6 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
-import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -158,27 +157,14 @@ public class ServiceCatalogApi {
     }
 
     private UserAvailableServiceVo convertToUserAvailableServiceVo(
-            ServiceTemplateEntity serviceEntity) {
-        if (Objects.nonNull(serviceEntity)) {
-            UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
-            BeanUtils.copyProperties(serviceEntity, userAvailableServiceVo);
-            userAvailableServiceVo.setIcon(serviceEntity.getOcl().getIcon());
-            userAvailableServiceVo.setDescription(serviceEntity.getOcl().getDescription());
-            userAvailableServiceVo.setNamespace(serviceEntity.getOcl().getNamespace());
-            userAvailableServiceVo.setBilling(serviceEntity.getOcl().getBilling());
-            userAvailableServiceVo.setFlavors(serviceEntity.getOcl().getFlavors());
-            userAvailableServiceVo.setDeployment(serviceEntity.getOcl().getDeployment());
-            userAvailableServiceVo.setVariables(
-                    serviceEntity.getOcl().getDeployment().getVariables());
-            userAvailableServiceVo.setRegions(
-                    serviceEntity.getOcl().getCloudServiceProvider().getRegions());
-            userAvailableServiceVo.add(
+            ServiceTemplateEntity serviceTemplateEntity) {
+        UserAvailableServiceVo catalogVo =
+                serviceTemplateManage.convertToUserAvailableServiceVo(serviceTemplateEntity);
+        if (Objects.nonNull(catalogVo)) {
+            catalogVo.add(
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
-                                    .openApi(serviceEntity.getId().toString()))
-                            .withRel("openApi"));
-            return userAvailableServiceVo;
-        } else {
-            return null;
+                            .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
         }
+        return catalogVo;
     }
 }
