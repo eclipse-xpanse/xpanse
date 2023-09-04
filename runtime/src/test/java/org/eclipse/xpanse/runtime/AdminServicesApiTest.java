@@ -15,6 +15,8 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
@@ -35,23 +37,37 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=default"})
+@SpringBootTest(properties = {"spring.profiles.active=default,terraform-boot"})
 @AutoConfigureMockMvc
 class AdminServicesApiTest {
 
     @Resource
     private MockMvc mockMvc;
 
+    @Resource
+    private TerraformApi terraformApi;
+
     @Test
     void testHealthCheck() throws Exception {
         // SetUp
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
-        BackendSystemStatus backendSystemStatus = new BackendSystemStatus();
-        backendSystemStatus.setBackendSystemType(BackendSystemType.DATABASE);
-        backendSystemStatus.setHealthStatus(HealthStatus.OK);
-        backendSystemStatus.setName(DatabaseType.H2DB.toValue());
-        systemStatus.setBackendSystemStatuses(List.of(backendSystemStatus));
+        BackendSystemStatus dataBaseSystemStatus = new BackendSystemStatus();
+        dataBaseSystemStatus.setBackendSystemType(BackendSystemType.DATABASE);
+        dataBaseSystemStatus.setHealthStatus(HealthStatus.OK);
+        dataBaseSystemStatus.setName(DatabaseType.H2DB.toValue());
+
+        if (isTerraformBootApiAccessible()) {
+            BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
+            terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
+            terraformBootStatus.setHealthStatus(HealthStatus.OK);
+            terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
+            systemStatus.setBackendSystemStatuses(
+                    List.of(dataBaseSystemStatus, terraformBootStatus));
+        } else {
+            systemStatus.setBackendSystemStatuses(List.of(dataBaseSystemStatus));
+        }
+
         String resBody = new ObjectMapper().writeValueAsString(systemStatus);
 
         // Run the test
@@ -66,5 +82,14 @@ class AdminServicesApiTest {
 
     }
 
+    private boolean isTerraformBootApiAccessible() {
+        try {
+            TerraformBootSystemStatus terraformBootSystemStatus = terraformApi.healthCheck();
+            return terraformBootSystemStatus.getHealthStatus()
+                    .equals(TerraformBootSystemStatus.HealthStatusEnum.OK);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 }

@@ -24,6 +24,9 @@ class BackendSystemTypeTest {
         BackendSystemType type1 = BackendSystemType.getByValue("database");
         Assertions.assertEquals(type1, BackendSystemType.DATABASE);
 
+        BackendSystemType type2 = BackendSystemType.getByValue("terraform boot");
+        Assertions.assertEquals(type2, BackendSystemType.TERRAFORM_BOOT);
+
         Assertions.assertThrows(UnsupportedEnumValueException.class,
                 () -> BackendSystemType.getByValue(null));
     }
@@ -47,6 +50,15 @@ class BackendSystemTypeTest {
 
         String string1 = BackendSystemType.DATABASE.toString();
         Assertions.assertEquals("DATABASE", string1);
+
+        String value2 = BackendSystemType.TERRAFORM_BOOT.toValue();
+        Assertions.assertEquals("Terraform Boot", value2);
+
+        String name2 = BackendSystemType.TERRAFORM_BOOT.name();
+        Assertions.assertEquals("TERRAFORM_BOOT", name2);
+
+        String string2 = BackendSystemType.TERRAFORM_BOOT.toString();
+        Assertions.assertEquals("TERRAFORM_BOOT", string2);
     }
 
     @Test
@@ -57,6 +69,9 @@ class BackendSystemTypeTest {
 
         Assertions.assertEquals(BackendSystemType.DATABASE.hashCode(),
                 BackendSystemType.DATABASE.hashCode());
+
+        Assertions.assertEquals(BackendSystemType.TERRAFORM_BOOT.hashCode(),
+                BackendSystemType.TERRAFORM_BOOT.hashCode());
 
         Assertions.assertNotEquals(BackendSystemType.IDENTITY_PROVIDER.hashCode(),
                 BackendSystemType.DATABASE.hashCode());
