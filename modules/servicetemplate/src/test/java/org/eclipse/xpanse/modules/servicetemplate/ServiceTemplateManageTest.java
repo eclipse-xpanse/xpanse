@@ -190,7 +190,7 @@ class ServiceTemplateManageTest {
 
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         ServiceTemplateEntity ServiceTemplate =
-                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString());
+                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString(), false);
         Assertions.assertEquals(serviceTemplateEntity, ServiceTemplate);
     }
 
@@ -236,6 +236,16 @@ class ServiceTemplateManageTest {
 
     @Test
     void testUnregisterServiceTemplate() {
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        serviceTemplateEntity.setName(oclRegister.getName());
+        serviceTemplateEntity.setId(UUID.randomUUID());
+        serviceTemplateEntity.setCategory(oclRegister.getCategory());
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+        serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
+        serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
+        serviceTemplateEntity.setOcl(oclRegister);
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+
         serviceTemplateManageTest.unregisterServiceTemplate(uuid.toString());
         verify(mockStorage).removeById(uuid);
         verify(serviceTemplateOpenApiGenerator).deleteServiceApi(uuid.toString());
