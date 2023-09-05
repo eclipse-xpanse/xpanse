@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
@@ -163,7 +162,6 @@ public class HuaweiCloudMetricsService {
         return metrics;
     }
 
-
     private void doCacheActionForResourceMetrics(ResourceMetricsRequest resourceMetricRequest,
                                                  MonitorResourceType monitorResourceType,
                                                  Metric metric) {
@@ -187,37 +185,64 @@ public class HuaweiCloudMetricsService {
                                                 Map<String, List<MetricInfoList>> resourceMetricMap,
                                                 List<Metric> metrics) {
         if (serviceMetricRequest.isOnlyLastKnownMetric()) {
-            for (Map.Entry<String, List<MetricInfoList>> entry : resourceMetricMap.entrySet()) {
-                String resourceId = entry.getKey();
-                for (MetricInfoList metricInfo : entry.getValue()) {
-                    MonitorResourceType type =
-                            huaweiCloudDataModelConverter.getMonitorResourceTypeByMetricName(
-                                    metricInfo.getMetricName());
-                    if (CollectionUtils.isEmpty(metrics)) {
-                        Metric metricCache =
-                                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI,
-                                        resourceId, type);
+            if (metrics.isEmpty()) {
+                fetchAndAddMetricsFromCache(resourceMetricMap, metrics);
+            } else {
+                updateMetricsFromCache(resourceMetricMap, metrics);
+            }
+        }
+    }
+
+    private void fetchAndAddMetricsFromCache(Map<String, List<MetricInfoList>> resourceMetricMap,
+                                             List<Metric> metrics) {
+        Map<String, Metric> metricCacheMap = new HashMap<>();
+        for (Map.Entry<String, List<MetricInfoList>> entry : resourceMetricMap.entrySet()) {
+            String resourceId = entry.getKey();
+            for (MetricInfoList metricInfo : entry.getValue()) {
+                MonitorResourceType type =
+                        huaweiCloudDataModelConverter.getMonitorResourceTypeByMetricName(
+                                metricInfo.getMetricName());
+                Metric metricCache =
+                        serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, resourceId, type);
+                if (Objects.nonNull(metricCache)) {
+                    metricCacheMap.put(metricInfo.getMetricName(), metricCache);
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(metricCacheMap)) {
+            metrics.addAll(metricCacheMap.values());
+        } else {
+            log.error("No monitor metrics available for the service, "
+                    + "Please wait for 3-5 minutes and try again.");
+            throw new MetricsDataNotYetAvailableException(
+                    "No monitor metrics available for the service, "
+                            + "Please wait for 3-5 minutes and try again.");
+        }
+    }
+
+    private void updateMetricsFromCache(Map<String, List<MetricInfoList>> resourceMetricMap,
+                                        List<Metric> metrics) {
+        for (Map.Entry<String, List<MetricInfoList>> entry : resourceMetricMap.entrySet()) {
+            String resourceId = entry.getKey();
+            for (MetricInfoList metricInfo : entry.getValue()) {
+                MonitorResourceType type =
+                        huaweiCloudDataModelConverter.getMonitorResourceTypeByMetricName(
+                                metricInfo.getMetricName());
+                Metric metric = metrics.stream()
+                        .filter(m -> Objects.nonNull(m)
+                                && StringUtils.equals(m.getName(), metricInfo.getMetricName())
+                                && !CollectionUtils.isEmpty(m.getMetrics())
+                                && StringUtils.equals(resourceId, m.getLabels().get("id")))
+                        .findAny()
+                        .orElse(null);
+                if (metric == null) {
+                    Metric metricCache =
+                            serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, resourceId, type);
+                    if (Objects.nonNull(metricCache)) {
                         metrics.add(metricCache);
-                    } else {
-                        Optional<Metric> metricOptional = metrics.stream().filter(
-                                metric -> Objects.nonNull(metric)
-                                        && StringUtils.equals(metric.getName(),
-                                        metricInfo.getMetricName())
-                                        && !CollectionUtils.isEmpty(metric.getMetrics())
-                                        && StringUtils.equals(resourceId,
-                                        metric.getLabels().get("id"))
-                        ).findAny();
-                        if (metricOptional.isPresent()) {
-                            serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, resourceId,
-                                    type,
-                                    metricOptional.get());
-                        } else {
-                            Metric metricCache =
-                                    serviceMetricsStore.getMonitorMetric(Csp.HUAWEI,
-                                            resourceId, type);
-                            metrics.add(metricCache);
-                        }
                     }
+                } else {
+                    serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, resourceId, type, metric);
                 }
             }
         }
