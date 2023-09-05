@@ -85,7 +85,7 @@ public class ServiceMetricsAdapter {
 
         if (!StringUtils.equals(getCurrentLoginUserId(), serviceEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No right to get metrics of service belong to other users.");
+                    "No permissions to view metrics of services belonging to other users.");
         }
 
         OrchestratorPlugin orchestratorPlugin =
@@ -127,7 +127,7 @@ public class ServiceMetricsAdapter {
 
         if (!StringUtils.equals(getCurrentLoginUserId(), serviceEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No right to get metrics of service belong to other users.");
+                    "No permissions to view metrics of services belonging to other users.");
         }
 
         OrchestratorPlugin orchestratorPlugin =

@@ -23,6 +23,7 @@ class ServiceTemplateQueryModelTest {
     private static final Category category = Category.COMPUTE;
     private static final String serviceName = "kafka";
     private static final String serviceVersion = "v1.0.0";
+    private static final String namespace = "huawei";
     private static ServiceTemplateQueryModel serviceTemplateQueryModel;
 
     @BeforeEach
@@ -32,6 +33,7 @@ class ServiceTemplateQueryModelTest {
         serviceTemplateQueryModel.setCategory(category);
         serviceTemplateQueryModel.setServiceName(serviceName);
         serviceTemplateQueryModel.setServiceVersion(serviceVersion);
+        serviceTemplateQueryModel.setNamespace(namespace);
     }
 
     @Test
@@ -40,6 +42,7 @@ class ServiceTemplateQueryModelTest {
         assertEquals(category, serviceTemplateQueryModel.getCategory());
         assertEquals(serviceName, serviceTemplateQueryModel.getServiceName());
         assertEquals(serviceVersion, serviceTemplateQueryModel.getServiceVersion());
+        assertEquals(namespace, serviceTemplateQueryModel.getNamespace());
     }
 
     @Test
@@ -88,6 +91,14 @@ class ServiceTemplateQueryModelTest {
                 serviceTemplateQueryModel2.hashCode());
 
         serviceTemplateQueryModel1.setServiceVersion(serviceVersion);
+        assertNotEquals(serviceTemplateQueryModel, serviceTemplateQueryModel1);
+        assertNotEquals(serviceTemplateQueryModel1, serviceTemplateQueryModel2);
+        assertNotEquals(serviceTemplateQueryModel.hashCode(),
+                serviceTemplateQueryModel1.hashCode());
+        assertNotEquals(serviceTemplateQueryModel1.hashCode(),
+                serviceTemplateQueryModel2.hashCode());
+
+        serviceTemplateQueryModel1.setNamespace(namespace);
         assertEquals(serviceTemplateQueryModel, serviceTemplateQueryModel1);
         assertNotEquals(serviceTemplateQueryModel1, serviceTemplateQueryModel2);
         assertEquals(serviceTemplateQueryModel.hashCode(), serviceTemplateQueryModel1.hashCode());
@@ -102,6 +113,7 @@ class ServiceTemplateQueryModelTest {
                 ", category=" + category + "" +
                 ", serviceName=" + serviceName + "" +
                 ", serviceVersion=" + serviceVersion + "" +
+                ", namespace=" + namespace + "" +
                 ")";
         assertEquals(expectedString, serviceTemplateQueryModel.toString());
     }

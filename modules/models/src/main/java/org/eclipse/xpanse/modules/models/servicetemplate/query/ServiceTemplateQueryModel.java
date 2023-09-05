@@ -26,4 +26,5 @@ public class ServiceTemplateQueryModel {
 
     private String serviceVersion;
 
+    private String namespace;
 }

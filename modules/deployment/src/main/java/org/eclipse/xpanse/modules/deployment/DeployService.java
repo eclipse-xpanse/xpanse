@@ -274,7 +274,7 @@ public class DeployService {
         }
         if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No right to destroy service belong to other users.");
+                    "No permissions to destroy services belonging to other users.");
         }
         // Get state of service.
         ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
@@ -428,7 +428,7 @@ public class DeployService {
 
         if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No right to view details of service belong to other users.");
+                    "No permissions to view details of services belonging to other users.");
         }
 
         ServiceDetailVo serviceDetailVo = new ServiceDetailVo();

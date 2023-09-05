@@ -110,7 +110,7 @@ public class ServiceCatalogApi {
             @Parameter(name = "id", description = "The id of available service.")
             @PathVariable("id") String id) {
         UserAvailableServiceVo userAvailableServiceVo = convertToUserAvailableServiceVo(
-                serviceTemplateManage.getServiceTemplateDetails(id));
+                serviceTemplateManage.getServiceTemplateDetails(id, false));
         String successMsg = String.format(
                 "Get available service with id %s successful.", id);
         log.info(successMsg);

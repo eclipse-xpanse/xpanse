@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceTemplateApi.class, ServiceTemplateManage.class,
-        CommonExceptionHandler.class})
+        IdentityProviderManager.class, CommonExceptionHandler.class})
 @WebMvcTest
 class CommonExceptionHandlerTest {
 
