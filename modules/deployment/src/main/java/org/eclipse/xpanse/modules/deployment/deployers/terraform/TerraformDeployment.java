@@ -12,63 +12,74 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Implementation of th deployment with terraform.
  */
 @Slf4j
 @Component
+@ConditionalOnMissingBean(TerraformBootDeployment.class)
 public class TerraformDeployment implements Deployment {
 
     public static final String VERSION_FILE_NAME = "version.tf";
     public static final String SCRIPT_FILE_NAME = "resources.tf";
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
-    private final String workspaceDirectory;
-    private final String debugLogLevel;
-    private final boolean isDebugEnabled;
     private final DeployEnvironments deployEnvironments;
     private final TerraformVersionProvider terraformVersionProvider;
+    private final DeployServiceStorage deployServiceStorage;
+    private final DeployResourceStorage deployResourceStorage;
+    private final TerraformLocalConfig terraformLocalConfig;
 
     /**
      * Initializes the Terraform deployer.
-     *
-     * @param workspaceDirectory workspace directory from where Terraform CLI is executed.
-     * @param isDebugEnabled     Runs Terraform CLI with debug if enabled.
-     * @param debugLogLevel      Level of debug level logs when debug is enabled.
      */
     @Autowired
     public TerraformDeployment(
-            @Value("${terraform.workspace.directory:xpanse_deploy_ws}") String workspaceDirectory,
-            @Value("${terraform.debug.enabled:false}") boolean isDebugEnabled,
-            @Value("${terraform.debug.level:DEBUG}") String debugLogLevel,
             DeployEnvironments deployEnvironments,
-            TerraformVersionProvider terraformVersionProvider) {
-        this.workspaceDirectory = workspaceDirectory;
-        this.isDebugEnabled = isDebugEnabled;
-        this.debugLogLevel = debugLogLevel;
+            TerraformVersionProvider terraformVersionProvider,
+            DeployServiceStorage deployServiceStorage,
+            DeployResourceStorage deployResourceStorage,
+            TerraformLocalConfig terraformLocalConfig) {
         this.deployEnvironments = deployEnvironments;
         this.terraformVersionProvider = terraformVersionProvider;
+        this.deployServiceStorage = deployServiceStorage;
+        this.deployResourceStorage = deployResourceStorage;
+        this.terraformLocalConfig = terraformLocalConfig;
     }
 
     /**
@@ -101,6 +112,7 @@ public class TerraformDeployment implements Deployment {
         if (task.getDeployResourceHandler() != null) {
             task.getDeployResourceHandler().handler(deployResult);
         }
+        flushDeployServiceEntity(deployResult, task.getId());
         return deployResult;
     }
 
@@ -127,7 +139,88 @@ public class TerraformDeployment implements Deployment {
         DeployResult result = new DeployResult();
         result.setId(task.getId());
         result.setState(TerraformExecState.DESTROY_SUCCESS);
+        flushDestroyServiceEntity(result, task.getId());
         return result;
+    }
+
+    private void flushDestroyServiceEntity(DeployResult result, UUID taskId) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(taskId);
+        if (Objects.isNull(deployServiceEntity)
+                || Objects.isNull(deployServiceEntity.getCreateRequest())) {
+            String errorMsg = String.format("Service with id %s not found.", taskId);
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
+        if (result.getState() == TerraformExecState.DESTROY_SUCCESS) {
+            deployServiceEntity.setServiceDeploymentState(
+                    ServiceDeploymentState.DESTROY_SUCCESS);
+            deployServiceEntity.setProperties(result.getProperties());
+            deployServiceEntity.setPrivateProperties(result.getPrivateProperties());
+            List<DeployResource> resources = result.getResources();
+            if (CollectionUtils.isEmpty(resources)) {
+                deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
+            } else {
+                deployServiceEntity.setDeployResourceList(
+                        getDeployResourceEntityList(resources, deployServiceEntity));
+            }
+        } else {
+            deployServiceEntity.setServiceDeploymentState(
+                    ServiceDeploymentState.DESTROY_FAILED);
+        }
+        if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
+            deleteTaskWorkspace(taskId.toString());
+        }
+    }
+
+    private void flushDeployServiceEntity(DeployResult deployResult, UUID taskId) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(taskId);
+        if (Objects.isNull(deployServiceEntity)
+                || Objects.isNull(deployServiceEntity.getCreateRequest())) {
+            String errorMsg = String.format("Service with id %s not found.", taskId);
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
+        deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
+        deployServiceEntity.setProperties(deployResult.getProperties());
+        deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
+        deployServiceEntity.setDeployResourceList(
+                getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
+        maskSensitiveFields(deployServiceEntity);
+        deployServiceStorage.storeAndFlush(deployServiceEntity);
+    }
+
+    private List<DeployResourceEntity> getDeployResourceEntityList(
+            List<DeployResource> deployResources, DeployServiceEntity deployServiceEntity) {
+        List<DeployResourceEntity> deployResourceEntities = new ArrayList<>();
+        if (CollectionUtils.isEmpty(deployResources)) {
+            return deployResourceEntities;
+        }
+        for (DeployResource resource : deployResources) {
+            DeployResourceEntity deployResource = new DeployResourceEntity();
+            BeanUtils.copyProperties(resource, deployResource);
+            deployResource.setDeployService(deployServiceEntity);
+            deployResourceEntities.add(deployResource);
+        }
+        return deployResourceEntities;
+    }
+
+    private void maskSensitiveFields(DeployServiceEntity deployServiceEntity) {
+        log.debug("masking sensitive input data after deployment");
+        if (Objects.nonNull(deployServiceEntity.getCreateRequest().getServiceRequestProperties())) {
+            for (DeployVariable deployVariable
+                    : deployServiceEntity.getCreateRequest().getOcl().getDeployment()
+                    .getVariables()) {
+                if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
+                        && (deployServiceEntity.getCreateRequest().getServiceRequestProperties()
+                        .containsKey(deployVariable.getName()))) {
+                    deployServiceEntity.getCreateRequest().getServiceRequestProperties()
+                            .put(deployVariable.getName(), "********");
+
+                }
+            }
+        }
     }
 
     @Override
@@ -167,9 +260,10 @@ public class TerraformDeployment implements Deployment {
 
     private TerraformExecutor getExecutor(Map<String, String> envVariables,
                                           Map<String, String> inputVariables, String workspace) {
-        if (this.isDebugEnabled) {
-            log.info("Debug enabled for Terraform CLI with level {}", this.debugLogLevel);
-            envVariables.put(TF_DEBUG_FLAG, this.debugLogLevel);
+        if (terraformLocalConfig.isDebugEnabled()) {
+            log.info("Debug enabled for Terraform CLI with level {}",
+                    terraformLocalConfig.getDebugLogLevel());
+            envVariables.put(TF_DEBUG_FLAG, terraformLocalConfig.getDebugLogLevel());
         }
         return new TerraformExecutor(envVariables, inputVariables, workspace);
     }
@@ -255,8 +349,8 @@ public class TerraformDeployment implements Deployment {
      * @param taskId The id of the task.
      */
     private String getWorkspacePath(String taskId) {
-        return System.getProperty("java.io.tmpdir")
-                + File.separator + this.workspaceDirectory + File.separator + taskId;
+        return System.getProperty("java.io.tmpdir") + File.separator
+                + terraformLocalConfig.getWorkspaceDirectory() + File.separator + taskId;
     }
 
 

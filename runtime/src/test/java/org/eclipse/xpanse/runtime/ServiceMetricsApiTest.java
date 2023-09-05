@@ -32,7 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * Test for MonitorApiTest.
  */
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("terraform-boot")
+@ActiveProfiles("default")
 @SpringBootTest(classes = {XpanseApplication.class, ServiceMetricsApi.class})
 @AutoConfigureMockMvc
 class ServiceMetricsApiTest {

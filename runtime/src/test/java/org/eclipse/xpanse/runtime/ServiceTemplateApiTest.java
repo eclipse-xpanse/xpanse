@@ -49,7 +49,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("terraform-boot")
+@ActiveProfiles("default")
 @SpringBootTest(classes = {XpanseApplication.class})
 @AutoConfigureMockMvc
 class ServiceTemplateApiTest {
@@ -150,7 +150,8 @@ class ServiceTemplateApiTest {
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), response.getStatus());
-        Assertions.assertEquals(expectedResponse.getResultType(), actualResponse.getResultType());
+        Assertions.assertEquals(expectedResponse.getResultType(),
+                actualResponse.getResultType());
         Assertions.assertFalse(actualResponse.getSuccess());
         Assertions.assertEquals(expectedResponse.getSuccess(), actualResponse.getSuccess());
     }

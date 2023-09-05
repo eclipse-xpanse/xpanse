@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.deployment;
 import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -295,7 +296,7 @@ class DeployServiceTest {
         verify(deployServiceStorage, times(1)).findDeployServiceById(uuid);
         verify(deploymentMock, times(1)).destroy(deployTask,
                 deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
-        verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
+        verify(deployServiceStorage, times(1)).storeAndFlush(deployServiceEntity);
     }
 
     @Test
@@ -336,7 +337,7 @@ class DeployServiceTest {
         verify(deployServiceStorage, times(1)).findDeployServiceById(deployTask.getId());
         verify(deploymentMock, times(1)).destroy(deployTask,
                 deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
-        verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
+        verify(deployServiceStorage, times(1)).storeAndFlush(deployServiceEntity);
     }
 
 
@@ -354,7 +355,7 @@ class DeployServiceTest {
         verify(deployServiceStorage, times(1)).findDeployServiceById(deployTask.getId());
         verify(deploymentMock, times(1)).destroy(deployTask,
                 deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
-        verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
+        verify(deployServiceStorage, times(1)).storeAndFlush(deployServiceEntity);
     }
 
     @Test
@@ -459,18 +460,18 @@ class DeployServiceTest {
         deployService.asyncDeployService(deploymentMock, deployTask);
 
         // Verify the interactions and assertions
-        verify(deployServiceStorage, times(2)).storeAndFlush(any(DeployServiceEntity.class));
+        verify(deployServiceStorage, times(1)).storeAndFlush(any(DeployServiceEntity.class));
 
         // Verify the captured DeployServiceEntity
         ArgumentCaptor<DeployServiceEntity> entityCaptor =
                 ArgumentCaptor.forClass(DeployServiceEntity.class);
-        verify(deployServiceStorage, times(2)).storeAndFlush(entityCaptor.capture());
+        verify(deployServiceStorage, times(1)).storeAndFlush(entityCaptor.capture());
         DeployServiceEntity capturedEntity = entityCaptor.getValue();
-        assertEquals(ServiceDeploymentState.DEPLOY_SUCCESS,
+        assertEquals(ServiceDeploymentState.DEPLOYING,
                 capturedEntity.getServiceDeploymentState());
-        assertEquals(deployResult.getProperties(), capturedEntity.getProperties());
-        assertEquals(deployResult.getPrivateProperties(), capturedEntity.getPrivateProperties());
-        assertEquals("********", capturedEntity.getCreateRequest().getServiceRequestProperties().get("test"));
+        assertNotEquals(deployResult.getProperties(), capturedEntity.getProperties());
+        assertNotEquals(deployResult.getPrivateProperties(), capturedEntity.getPrivateProperties());
+        assertEquals("test", capturedEntity.getCreateRequest().getServiceRequestProperties().get("test"));
     }
 
     @Test
@@ -514,7 +515,7 @@ class DeployServiceTest {
         verify(deployServiceStorage, times(1)).deleteDeployService(deployServiceEntity);
         verify(deploymentMock, times(1)).destroy(deployTask,
                 deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
-        verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
+        verify(deployServiceStorage, times(1)).storeAndFlush(deployServiceEntity);
     }
 
     @Test
@@ -539,7 +540,7 @@ class DeployServiceTest {
         verify(deployServiceStorage, times(1)).deleteDeployService(deployServiceEntity);
         verify(deploymentMock, times(1)).destroy(deployTask,
                 deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME));
-        verify(deployServiceStorage, times(2)).storeAndFlush(deployServiceEntity);
+        verify(deployServiceStorage, times(1)).storeAndFlush(deployServiceEntity);
     }
 
     @Test
