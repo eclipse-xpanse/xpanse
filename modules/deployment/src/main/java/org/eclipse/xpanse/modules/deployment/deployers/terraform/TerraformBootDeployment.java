@@ -6,11 +6,14 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDeployFromDirectoryRequest;
@@ -30,6 +33,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +49,9 @@ public class TerraformBootDeployment implements Deployment {
     private final DeployEnvironments deployEnvironments;
     private final TerraformVersionProvider terraformVersionProvider;
     private final TerraformBootConfig terraformBootConfig;
+
+    @Value("${server.port}")
+    private String port;
 
     @Autowired
     private TerraformApi terraformApi;
@@ -134,7 +141,7 @@ public class TerraformBootDeployment implements Deployment {
         request.setVariables(getInputVariables(task));
         request.setEnvVariables(getEnvironmentVariables(task));
         WebhookConfig hookConfig = new WebhookConfig();
-        String callbackUrl = terraformBootConfig.getClientRequestBaseUrl() + "/"
+        String callbackUrl = getClientRequestBaseUrl(port)
                 + terraformBootConfig.getDestroyCallbackUri();
         hookConfig.setUrl(callbackUrl + task.getId());
         hookConfig.setAuthType(AuthTypeEnum.NONE);
@@ -151,12 +158,26 @@ public class TerraformBootDeployment implements Deployment {
         request.setVariables(getInputVariables(task));
         request.setEnvVariables(getEnvironmentVariables(task));
         WebhookConfig hookConfig = new WebhookConfig();
-        String callbackUrl = terraformBootConfig.getClientRequestBaseUrl() + "/"
+        String callbackUrl = getClientRequestBaseUrl(port)
                 + terraformBootConfig.getDeployCallbackUri();
         hookConfig.setUrl(callbackUrl + task.getId());
         hookConfig.setAuthType(AuthTypeEnum.NONE);
         request.setWebhookConfig(hookConfig);
         return request;
+    }
+
+    private String getClientRequestBaseUrl(String port) throws TerraformBootRequestFailedException {
+        try {
+            String clientBaseUri = terraformBootConfig.getClientBaseUri();
+            if (StringUtils.isBlank(clientBaseUri)) {
+                return String.format("http://%s:%s", InetAddress.getLocalHost().getHostAddress(),
+                        port);
+            } else {
+                return clientBaseUri;
+            }
+        } catch (UnknownHostException e) {
+            throw new TerraformBootRequestFailedException(e.getMessage());
+        }
     }
 
     private List<String> getFiles(DeployTask task) {
