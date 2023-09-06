@@ -11,22 +11,26 @@ import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -36,6 +40,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,6 +56,9 @@ public class AdminServicesApi {
 
     @Resource
     private IdentityProviderManager identityProviderManager;
+
+    @Resource
+    private PluginManager pluginManager;
 
     @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
     private String dataSourceUrl;
@@ -81,6 +89,29 @@ public class AdminServicesApi {
         return systemStatus;
     }
 
+
+    /**
+     * List supported cloud service provider.
+     *
+     * @return Returns list of cloud service provider.
+     */
+    @Tag(name = "Admin", description = "APIs for administrating Xpanse")
+    @Operation(description = "List cloud service provider.")
+    @GetMapping(value = "/csp", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
+    public List<Csp> getCsps(
+            @Parameter(name = "active",
+                    description = "Whether only list cloud service provider with active plugin.")
+            @RequestParam(name = "active") Boolean active) {
+        if (Objects.nonNull(active) && active) {
+            Set<Csp> cspSet = pluginManager.getPluginsMap().keySet();
+            log.info("List cloud service provider:{} with active plugin.", cspSet);
+            return cspSet.stream().sorted().toList();
+        }
+        return Arrays.asList(Csp.values());
+    }
+
     private List<BackendSystemStatus> checkHealthOfBackendSystem() {
         List<BackendSystemStatus> backendSystemStatuses = new ArrayList<>();
         for (BackendSystemType type : BackendSystemType.values()) {
@@ -100,10 +131,8 @@ public class AdminServicesApi {
             }
             if (Objects.equals(BackendSystemType.TERRAFORM_BOOT, type)) {
                 BackendSystemStatus terraformBootStatus = getTerraformBootStatus();
-                if (terraformBootStatus.getHealthStatus().equals(HealthStatus.OK)) {
-                    processShownFields(terraformBootStatus);
-                    backendSystemStatuses.add(terraformBootStatus);
-                }
+                processShownFields(terraformBootStatus);
+                backendSystemStatuses.add(terraformBootStatus);
             }
         }
         return backendSystemStatuses;
@@ -123,9 +152,9 @@ public class AdminServicesApi {
         BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
         terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
         terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
+        terraformBootStatus.setEndpoint(apiClient.getBasePath());
         if (isTerraformBootApiAccessible()) {
             terraformBootStatus.setHealthStatus(HealthStatus.OK);
-            terraformBootStatus.setEndpoint(apiClient.getBasePath());
         } else {
             terraformBootStatus.setHealthStatus(HealthStatus.NOK);
         }
