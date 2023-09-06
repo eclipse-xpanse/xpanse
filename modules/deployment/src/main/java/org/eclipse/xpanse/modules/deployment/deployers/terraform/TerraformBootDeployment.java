@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation of th deployment with terraform.
+ * Implementation of the deployment with terraform-boot.
  */
 @Slf4j
 @Profile("terraform-boot")
@@ -49,36 +49,32 @@ public class TerraformBootDeployment implements Deployment {
     private final DeployEnvironments deployEnvironments;
     private final TerraformVersionProvider terraformVersionProvider;
     private final TerraformBootConfig terraformBootConfig;
-
-    @Value("${server.port}")
-    private String port;
-
-    @Autowired
-    private TerraformApi terraformApi;
+    private final String port;
+    private final TerraformApi terraformApi;
 
     /**
-     * Initializes the Terraform deployer.
+     * Initializes the TerraformBoot deployer.
      */
     @Autowired
     public TerraformBootDeployment(
             DeployEnvironments deployEnvironments,
             TerraformVersionProvider terraformVersionProvider,
-            TerraformBootConfig terraformBootConfig) {
+            TerraformBootConfig terraformBootConfig,
+            TerraformApi terraformApi,
+            @Value("${server.port}") String port) {
         this.deployEnvironments = deployEnvironments;
         this.terraformVersionProvider = terraformVersionProvider;
         this.terraformBootConfig = terraformBootConfig;
+        this.terraformApi = terraformApi;
+        this.port = port;
     }
 
     @Override
     public DeployResult deploy(DeployTask deployTask) {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromDirectoryRequest request;
-        try {
-            request = getDeployRequest(deployTask);
-            terraformApi.asyncDeployWithScripts(request);
-        } catch (TerraformBootRequestFailedException e) {
-            e.printStackTrace();
-        }
+        request = getDeployRequest(deployTask);
+        terraformApi.asyncDeployWithScripts(request);
         return result;
     }
 
@@ -86,12 +82,8 @@ public class TerraformBootDeployment implements Deployment {
     public DeployResult destroy(DeployTask task, String stateFile) {
         DeployResult result = new DeployResult();
         TerraformAsyncDestroyFromDirectoryRequest request;
-        try {
-            request = getDestroyRequest(task, stateFile);
-            terraformApi.asyncDestroyWithScripts(request);
-        } catch (TerraformBootRequestFailedException e) {
-            e.printStackTrace();
-        }
+        request = getDestroyRequest(task, stateFile);
+        terraformApi.asyncDestroyWithScripts(request);
         return result;
     }
 
@@ -100,6 +92,7 @@ public class TerraformBootDeployment implements Deployment {
      */
     @Override
     public void deleteTaskWorkspace(String taskId) {
+        // No workspace created from xpanse.
     }
 
     /**
