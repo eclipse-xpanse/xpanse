@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,12 +47,16 @@ class AuthorizationApiTest {
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
                     .dynamicPort()
-                    .extensions(new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
-                            false, new ClasspathFileSource("src/test/resources/mappings"),
-                            Collections.emptyList())))
+                    .extensions(
+                            new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
+                                    false, new ClasspathFileSource("src/test/resources/mappings"),
+                                    Collections.emptyList())))
             .build();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${authorization-server-endpoint}")
+    private String iamServiceEndpoint;
 
     @Resource
     private MockMvc mockMvc;
@@ -62,7 +67,7 @@ class AuthorizationApiTest {
     void testAuthorize() throws Exception {
 
         // Setup
-        String redirectUrl = "https://iam.xpanse.site/oauth/v2/authorize?";
+        String redirectUrl = iamServiceEndpoint + "/oauth/v2/authorize?";
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/auth/authorize")

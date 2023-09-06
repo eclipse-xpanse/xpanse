@@ -147,21 +147,23 @@ class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrati
 
         BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
         terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
-        terraformBootStatus.setHealthStatus(HealthStatus.OK);
         terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
+        if (isTerraformBootApiAccessible()) {
+            terraformBootStatus.setHealthStatus(HealthStatus.OK);
+        } else {
+            terraformBootStatus.setHealthStatus(HealthStatus.NOK);
+        }
 
         if (isAdmin) {
             databaseStatus.setEndpoint(dataSourceUrl);
             identityProviderStatus.setEndpoint(iamServerEndpoint);
             terraformBootStatus.setEndpoint(apiClient.getBasePath());
         }
+
         List<BackendSystemStatus> backendSystemStatuses = new ArrayList<>();
         backendSystemStatuses.add(identityProviderStatus);
         backendSystemStatuses.add(databaseStatus);
-        if (isTerraformBootApiAccessible()) {
-            backendSystemStatuses.add(terraformBootStatus);
-        }
-
+        backendSystemStatuses.add(terraformBootStatus);
         return backendSystemStatuses;
     }
 
