@@ -47,8 +47,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {
-        "spring.profiles.active=mariadb,zitadel,zitadel-testbed,terraform-boot"})
+@SpringBootTest(properties = {"spring.profiles.active=mariadb,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrationTest {
 

@@ -6,11 +6,10 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
-
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,7 +24,9 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
@@ -44,6 +45,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -66,6 +68,8 @@ import org.springframework.util.CollectionUtils;
 public class DeployService {
 
     private static final String TASK_ID = "TASK_ID";
+
+    public static final String STATE_FILE_NAME = "terraform.tfstate";
 
     private final Map<DeployerKind, Deployment> deploymentMap = new ConcurrentHashMap<>();
 
@@ -191,14 +195,7 @@ public class DeployService {
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
-            deployResult = deployment.deploy(deployTask);
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
-            deployServiceEntity.setProperties(deployResult.getProperties());
-            deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
-            deployServiceEntity.setDeployResourceList(
-                    getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
-            maskSensitiveFields(deployServiceEntity);
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            deployment.deploy(deployTask);
         } catch (RuntimeException e) {
             log.error("asyncDeployService failed.", e);
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
@@ -313,26 +310,7 @@ public class DeployService {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
-            DeployResult deployResult = deployment.destroy(deployTask, stateFile);
-            if (deployResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
-                deployServiceEntity.setServiceDeploymentState(
-                        ServiceDeploymentState.DESTROY_SUCCESS);
-                deployServiceEntity.setProperties(deployResult.getProperties());
-                deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
-                List<DeployResource> resources = deployResult.getResources();
-                if (CollectionUtils.isEmpty(resources)) {
-                    deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
-                } else {
-                    deployServiceEntity.setDeployResourceList(
-                            getDeployResourceEntityList(resources, deployServiceEntity));
-                }
-            } else {
-                deployServiceEntity.setServiceDeploymentState(
-                        ServiceDeploymentState.DESTROY_FAILED);
-            }
-            if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
-                deployment.deleteTaskWorkspace(deployTask.getId().toString());
-            }
+            deployment.destroy(deployTask, stateFile);
         } catch (Exception e) {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());
@@ -445,17 +423,82 @@ public class DeployService {
         return serviceDetailVo;
     }
 
+    /**
+     * Callback method after deployment is complete.
+     */
+    public void deployCallback(String taskId, TerraformResult result) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(UUID.fromString(taskId));
+        if (Objects.isNull(deployServiceEntity)) {
+            String errorMsg = String.format("Service with id %s not found.", taskId);
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
+        DeployResult deployResult = handlerDeployResource(result);
+        getResourceHandler(deployServiceEntity.getCsp()).handler(deployResult);
+        if (result.getCommandSuccessful()) {
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
+        } else {
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
+        }
+        deployServiceEntity.setProperties(deployResult.getProperties());
+        deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
+        deployServiceEntity.getDeployResourceList().clear();
+        deployServiceEntity.getDeployResourceList()
+                .addAll(getDeployResourceEntityList(deployResult.getResources(),
+                        deployServiceEntity));
+        deployServiceStorage.storeAndFlush(deployServiceEntity);
+    }
 
-    private void fillHandler(DeployTask deployTask) {
-        // Find the deployment plugin and resource handler
+
+    /**
+     * Callback method after destroy is complete.
+     */
+    public void destroyCallback(String taskId, TerraformResult result) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(UUID.fromString(taskId));
+        if (Objects.isNull(deployServiceEntity)) {
+            String errorMsg = String.format("Service with id %s not found.", taskId);
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
+        if (result.getCommandSuccessful()) {
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
+            deployServiceEntity.setProperties(new HashMap<>());
+            deployServiceEntity.setPrivateProperties(new HashMap<>());
+            deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
+        } else {
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
+        }
+    }
+
+    private DeployResult handlerDeployResource(TerraformResult result) {
+        DeployResult deployResult = new DeployResult();
+        if (StringUtils.isBlank(result.getTerraformState())) {
+            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+        } else {
+            deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
+            deployResult.getPrivateProperties().put(STATE_FILE_NAME, result.getTerraformState());
+            deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
+        }
+        return deployResult;
+    }
+
+    private DeployResourceHandler getResourceHandler(Csp csp) {
         OrchestratorPlugin plugin =
-                pluginManager.getPluginsMap().get(deployTask.getCreateRequest().getCsp());
+                pluginManager.getPluginsMap().get(csp);
         if (Objects.isNull(plugin) || Objects.isNull(plugin.getResourceHandler())) {
             throw new PluginNotFoundException(
                     "Can't find suitable plugin and resource handler for the "
                             + "Task.");
         }
-        deployTask.setDeployResourceHandler(plugin.getResourceHandler());
+        return plugin.getResourceHandler();
+    }
+
+    private void fillHandler(DeployTask deployTask) {
+        DeployResourceHandler resourceHandler =
+                getResourceHandler(deployTask.getCreateRequest().getCsp());
+        deployTask.setDeployResourceHandler(resourceHandler);
     }
 
     /**

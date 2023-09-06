@@ -20,11 +20,14 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformVersionProvider;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -70,6 +73,12 @@ class ServiceTemplateManageTest {
     private OpenApiUrlManage openApiUrlManage;
     @InjectMocks
     private ServiceTemplateManage serviceTemplateManageTest;
+    @Mock
+    DeployServiceStorage deployServiceStorage;
+    @Mock
+    DeployResourceStorage deployResourceStorage;
+    @Mock
+    TerraformLocalConfig terraformLocalConfig;
 
     @BeforeAll
     static void init() throws Exception {
@@ -95,8 +104,9 @@ class ServiceTemplateManageTest {
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(ocl);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
-                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments(null, null),
-                        terraformVersionProvider);
+                new TerraformDeployment(new DeployEnvironments(null, null),
+                        terraformVersionProvider, deployServiceStorage, deployResourceStorage,
+                        terraformLocalConfig);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
 
         ServiceTemplateEntity ServiceTemplateEntityByUrl =
@@ -131,8 +141,9 @@ class ServiceTemplateManageTest {
 
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
-                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments(null, null)
-                        , terraformVersionProvider);
+                new TerraformDeployment(new DeployEnvironments(null, null)
+                        , terraformVersionProvider, deployServiceStorage, deployResourceStorage,
+                        terraformLocalConfig);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
 
         ServiceTemplateEntity updateServiceTemplateEntity =
@@ -146,8 +157,9 @@ class ServiceTemplateManageTest {
     @Test
     void testRegisterServiceTemplate() {
         TerraformDeployment deployment =
-                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments(null, null)
-                        , terraformVersionProvider);
+                new TerraformDeployment(new DeployEnvironments(null, null)
+                        , terraformVersionProvider, deployServiceStorage, deployResourceStorage,
+                        terraformLocalConfig);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplate(oclRegister);
@@ -160,8 +172,9 @@ class ServiceTemplateManageTest {
     void testRegisterServiceTemplateByUrl() throws Exception {
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(oclRegister);
         TerraformDeployment deployment =
-                new TerraformDeployment("test", true, "DEBUG", new DeployEnvironments(null, null)
-                        , terraformVersionProvider);
+                new TerraformDeployment(new DeployEnvironments(null, null)
+                        , terraformVersionProvider, deployServiceStorage, deployResourceStorage,
+                        terraformLocalConfig);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplateByUrl(oclLocation);

@@ -11,10 +11,12 @@ import jakarta.annotation.Resource;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Configure ApiClient for communication with Terraform-boot service.
  */
+@Profile("terraform-boot")
 @Configuration
 public class TerraformBootApiClientConfig {
 

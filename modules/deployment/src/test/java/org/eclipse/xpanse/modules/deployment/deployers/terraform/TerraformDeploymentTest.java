@@ -14,11 +14,15 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -41,7 +45,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class,
-        TerraformVersionProvider.class})
+        TerraformVersionProvider.class, DeployServiceStorage.class, DeployResourceStorage.class,
+        TerraformLocalConfig.class})
 @TestPropertySource(properties = {"terraform.provider.huaweicloud.version=~> 1.51.0"})
 class TerraformDeploymentTest {
 
@@ -53,6 +58,15 @@ class TerraformDeploymentTest {
 
     @MockBean
     DeployEnvironments deployEnvironments;
+
+    @MockBean
+    DeployServiceStorage deployServiceStorage;
+
+    @MockBean
+    DeployResourceStorage deployResourceStorage;
+
+    @MockBean
+    TerraformLocalConfig terraformLocalConfig;
 
     @Test
     void basicTest() throws Exception {
@@ -77,12 +91,13 @@ class TerraformDeploymentTest {
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setCreateRequest(deployRequest);
         TerraformDeployment terraformDeployment =
-                new TerraformDeployment("test", false, "DEBUG", new DeployEnvironments(null,
-                        null), terraformVersionProvider);
+                new TerraformDeployment(new DeployEnvironments(null,
+                        null), terraformVersionProvider, deployServiceStorage,
+                        deployResourceStorage, terraformLocalConfig);
 
-        DeployResult deployResult = terraformDeployment.deploy(xpanseDeployTask);
-
-        Assertions.assertNotNull(deployResult);
+        Assertions.assertThrows(ServiceNotDeployedException.class, ()->{
+                    terraformDeployment.deploy(xpanseDeployTask);
+                });
 
     }
 

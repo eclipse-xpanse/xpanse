@@ -18,7 +18,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = {"mariadb","terraform-boot"})
+@ActiveProfiles(profiles = "mariadb")
 public abstract class AbstractMariaDbIntegrationTest {
 
     private static final MariaDBContainer<?> mariaDBContainer;

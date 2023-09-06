@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploy
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
 import org.springframework.core.Ordered;
@@ -129,6 +130,19 @@ public class DeploymentExceptionHandler {
         return Response.errorResponse(ResultType.DEPLOYMENT_VARIABLE_INVALID,
                 Collections.singletonList(ex.getMessage()));
 
+    }
+
+
+    /**
+     * Exception handler for TerraformBootRequestFailedException.
+     */
+    @ExceptionHandler({TerraformBootRequestFailedException.class})
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ResponseBody
+    public Response handleTerraformBootRequestFailedException(
+            TerraformBootRequestFailedException ex) {
+        return Response.errorResponse(ResultType.TERRAFORM_BOOT_REQUEST_FAILED,
+                Collections.singletonList(ex.getMessage()));
     }
 
 }

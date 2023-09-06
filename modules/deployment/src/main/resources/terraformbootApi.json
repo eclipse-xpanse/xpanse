@@ -17,26 +17,26 @@
     }
   ],
   "paths": {
-    "/terraform-boot/destroy/scripts": {
+    "/terraform-boot/validate/scripts": {
       "post": {
         "tags": [
           "Terraform"
         ],
-        "description": "Destroy resources via Terraform",
-        "operationId": "destroyWithScripts",
+        "description": "Deploy resources via Terraform",
+        "operationId": "validateWithScripts",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDestroyWithScriptsRequest"
+                "$ref": "#/components/schemas/TerraformDeployWithScriptsRequest"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -45,8 +45,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -65,8 +65,79 @@
               }
             }
           },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/destroy/scripts": {
+      "post": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Destroy resources via Terraform",
+        "operationId": "destroyWithScripts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformDestroyWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
           "502": {
             "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -117,8 +188,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -127,8 +198,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -147,8 +218,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -188,8 +259,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -198,8 +269,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -218,8 +289,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -259,8 +330,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -269,8 +340,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -289,8 +360,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -324,8 +395,8 @@
           }
         ],
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -334,8 +405,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -354,8 +425,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -385,8 +456,8 @@
         "description": "Check health of Terraform API service",
         "operationId": "healthCheck",
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -395,8 +466,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -415,8 +486,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -467,8 +538,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -477,8 +548,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -497,8 +568,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -538,8 +609,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -548,8 +619,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -568,8 +639,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -643,6 +714,66 @@
           "success": {
             "type": "boolean",
             "description": "Describes if the request is successful"
+          }
+        }
+      },
+      "TerraformDeployWithScriptsRequest": {
+        "required": [
+          "isPlanOnly",
+          "scripts",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for deployment requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for deployment requests deployed via scripts"
+            }
+          }
+        }
+      },
+      "TerraformValidateDiagnostics": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string"
+          }
+        }
+      },
+      "TerraformValidationResult": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TerraformValidateDiagnostics"
+            }
           }
         }
       },
@@ -736,44 +867,6 @@
           }
         }
       },
-      "TerraformDeployWithScriptsRequest": {
-        "required": [
-          "isPlanOnly",
-          "scripts",
-          "variables"
-        ],
-        "type": "object",
-        "properties": {
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "description": "Key-value pairs of variables that must be used to execute the Terraform request."
-            },
-            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string",
-              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for deployment requests deployed via scripts",
-            "items": {
-              "type": "string",
-              "description": "List of script files for deployment requests deployed via scripts"
-            }
-          }
-        }
-      },
       "TerraformAsyncDeployFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
@@ -837,28 +930,6 @@
           }
         },
         "description": "Configuration information of webhook."
-      },
-      "TerraformValidateDiagnostics": {
-        "type": "object",
-        "properties": {
-          "detail": {
-            "type": "string"
-          }
-        }
-      },
-      "TerraformValidationResult": {
-        "type": "object",
-        "properties": {
-          "valid": {
-            "type": "boolean"
-          },
-          "diagnostics": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TerraformValidateDiagnostics"
-            }
-          }
-        }
       },
       "TerraformBootSystemStatus": {
         "required": [

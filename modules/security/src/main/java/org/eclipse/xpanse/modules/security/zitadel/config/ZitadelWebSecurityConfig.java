@@ -112,6 +112,7 @@ public class ZitadelWebSecurityConfig {
             arc.requestMatchers(AntPathRequestMatcher.antMatcher("/openapi/**")).permitAll();
             arc.requestMatchers(mvcMatcherBuilder.pattern("/xpanse/**")).authenticated();
             arc.requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll();
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/webhook/**")).permitAll();
             arc.anyRequest().authenticated();
         });
 

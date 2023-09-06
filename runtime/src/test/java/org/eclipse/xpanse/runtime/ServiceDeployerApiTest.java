@@ -62,7 +62,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("terraform-boot")
+@ActiveProfiles("default")
 @SpringBootTest(classes = {XpanseApplication.class})
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest {

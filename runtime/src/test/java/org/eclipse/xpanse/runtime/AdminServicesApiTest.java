@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=default,terraform-boot"})
+@SpringBootTest(properties = {"spring.profiles.active=default"})
 @AutoConfigureMockMvc
 class AdminServicesApiTest {
 
