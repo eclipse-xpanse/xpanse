@@ -435,11 +435,16 @@ public class DeployService {
             throw new ServiceNotDeployedException(errorMsg);
         }
         DeployResult deployResult = handlerDeployResource(result);
-        getResourceHandler(deployServiceEntity.getCsp()).handler(deployResult);
+        if (!CollectionUtils.isEmpty(deployResult.getPrivateProperties())
+                && !CollectionUtils.isEmpty(deployResult.getProperties())) {
+            getResourceHandler(deployServiceEntity.getCsp()).handler(deployResult);
+        }
         if (result.getCommandSuccessful()) {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
         } else {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
+            deployServiceEntity.setResultMessage(result.getCommandStdError());
+
         }
         deployServiceEntity.setProperties(deployResult.getProperties());
         deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
