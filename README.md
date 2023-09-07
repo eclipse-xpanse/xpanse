@@ -39,7 +39,7 @@ Details can be found on the project website [here](https://eclipse-xpanse.github
 2. Copy the JSON content and place it in the resources folder under the deployment package under the modules module in the xpanse project, naming it 'terraformbootApi. json'.
 3. Use the maven command to generate the RESTful API client and data models for the deployment module:
 ```ssh
-  mvn clean generate-sources -Dgenerate.terraform.boot.client.skip=false
+  mvn clean generate-sources -DskipTerraformBootClientGeneration=false
 ```
 
 ## Static Code Analysis using CheckStyle

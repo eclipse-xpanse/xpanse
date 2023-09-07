@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
-        <generate.terraform.boot.client.skip>true</generate.terraform.boot.client.skip>
+        <skipTerraformBootClientGeneration>true</skipTerraformBootClientGeneration>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -99,7 +99,7 @@
                             <generateModelTests>false</generateModelTests>
                             <generateApiTests>false</generateApiTests>
                             <library>resttemplate</library>
-                            <skip>${generate.terraform.boot.client.skip}</skip>
+                            <skip>${skipTerraformBootClientGeneration}</skip>
                             <supportingFilesToGenerate>
                                 ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java
                             </supportingFilesToGenerate>
@@ -139,7 +139,7 @@
                                     </excludes>
                                 </fileset>
                             </filesets>
-                            <skip>${generate.terraform.boot.client.skip}</skip>
+                            <skip>${skipTerraformBootClientGeneration}</skip>
                         </configuration>
                     </execution>
                 </executions>
