@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
@@ -27,6 +28,7 @@ import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -55,6 +57,11 @@ class AdminServicesApiTest {
     @Resource
     private PluginManager pluginManager;
 
+    private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
+
+    @Value("${spring.profiles.active:}")
+    private String springProfilesActive;
+
     @Test
     void testHealthCheck() throws Exception {
         // SetUp
@@ -64,16 +71,15 @@ class AdminServicesApiTest {
         dataBaseSystemStatus.setBackendSystemType(BackendSystemType.DATABASE);
         dataBaseSystemStatus.setHealthStatus(HealthStatus.OK);
         dataBaseSystemStatus.setName(DatabaseType.H2DB.toValue());
-        BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
-        terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
-        terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
-        if (isTerraformBootApiAccessible()) {
-            terraformBootStatus.setHealthStatus(HealthStatus.OK);
+
+        BackendSystemStatus terraformBootStatus = getTerraformBootStatus();
+        if (Objects.nonNull(terraformBootStatus)) {
+            systemStatus.setBackendSystemStatuses(
+                    List.of(dataBaseSystemStatus, terraformBootStatus));
         } else {
-            terraformBootStatus.setHealthStatus(HealthStatus.NOK);
+            systemStatus.setBackendSystemStatuses(List.of(dataBaseSystemStatus));
         }
 
-        systemStatus.setBackendSystemStatuses(List.of(dataBaseSystemStatus, terraformBootStatus));
         String resBody = objectMapper.writeValueAsString(systemStatus);
 
         // Run the test
@@ -122,6 +128,22 @@ class AdminServicesApiTest {
         assertEquals(response.getStatus(), HttpStatus.OK.value());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resultBody, response.getContentAsString());
+    }
+
+    private BackendSystemStatus getTerraformBootStatus() {
+        List<String> configSplitList = Arrays.asList(springProfilesActive.split(","));
+        if (configSplitList.contains(TERRAFORM_BOOT_PROFILE_NAME)) {
+            BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
+            terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
+            terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
+            if (isTerraformBootApiAccessible()) {
+                terraformBootStatus.setHealthStatus(HealthStatus.OK);
+            } else {
+                terraformBootStatus.setHealthStatus(HealthStatus.NOK);
+            }
+            return terraformBootStatus;
+        }
+        return null;
     }
 
     private boolean isTerraformBootApiAccessible() {
