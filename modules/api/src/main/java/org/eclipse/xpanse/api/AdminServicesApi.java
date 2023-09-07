@@ -69,6 +69,12 @@ public class AdminServicesApi {
     @Resource
     private ApiClient apiClient;
 
+    private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
+
+    @Value("${spring.profiles.active:}")
+    private String springProfilesActive;
+
+
     /**
      * Method to find out the current state of the system.
      *
@@ -131,8 +137,10 @@ public class AdminServicesApi {
             }
             if (Objects.equals(BackendSystemType.TERRAFORM_BOOT, type)) {
                 BackendSystemStatus terraformBootStatus = getTerraformBootStatus();
-                processShownFields(terraformBootStatus);
-                backendSystemStatuses.add(terraformBootStatus);
+                if (Objects.nonNull(terraformBootStatus)) {
+                    processShownFields(terraformBootStatus);
+                    backendSystemStatuses.add(terraformBootStatus);
+                }
             }
         }
         return backendSystemStatuses;
@@ -149,16 +157,20 @@ public class AdminServicesApi {
     }
 
     private BackendSystemStatus getTerraformBootStatus() {
-        BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
-        terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
-        terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
-        terraformBootStatus.setEndpoint(apiClient.getBasePath());
-        if (isTerraformBootApiAccessible()) {
-            terraformBootStatus.setHealthStatus(HealthStatus.OK);
-        } else {
-            terraformBootStatus.setHealthStatus(HealthStatus.NOK);
+        List<String> configSplitList = Arrays.asList(springProfilesActive.split(","));
+        if (configSplitList.contains(TERRAFORM_BOOT_PROFILE_NAME)) {
+            BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
+            terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
+            terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
+            terraformBootStatus.setEndpoint(apiClient.getBasePath());
+            if (isTerraformBootApiAccessible()) {
+                terraformBootStatus.setHealthStatus(HealthStatus.OK);
+            } else {
+                terraformBootStatus.setHealthStatus(HealthStatus.NOK);
+            }
+            return terraformBootStatus;
         }
-        return terraformBootStatus;
+        return null;
     }
 
     private BackendSystemStatus getIdentityProviderStatus() {

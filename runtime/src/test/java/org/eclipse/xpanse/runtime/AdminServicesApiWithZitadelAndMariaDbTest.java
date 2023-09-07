@@ -15,8 +15,10 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockBearerT
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
@@ -67,6 +69,11 @@ class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrati
 
     @Resource
     private ApiClient apiClient;
+
+    private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
+
+    @Value("${spring.profiles.active:}")
+    private String springProfilesActive;
 
     @Test
     void testHealthCheckUnauthorized() throws Exception {
@@ -144,26 +151,39 @@ class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrati
         identityProviderStatus.setHealthStatus(HealthStatus.OK);
         identityProviderStatus.setName(IdentityProviderType.ZITADEL.toValue());
 
-        BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
-        terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
-        terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
-        if (isTerraformBootApiAccessible()) {
-            terraformBootStatus.setHealthStatus(HealthStatus.OK);
-        } else {
-            terraformBootStatus.setHealthStatus(HealthStatus.NOK);
-        }
-
         if (isAdmin) {
             databaseStatus.setEndpoint(dataSourceUrl);
             identityProviderStatus.setEndpoint(iamServerEndpoint);
-            terraformBootStatus.setEndpoint(apiClient.getBasePath());
         }
 
         List<BackendSystemStatus> backendSystemStatuses = new ArrayList<>();
         backendSystemStatuses.add(identityProviderStatus);
         backendSystemStatuses.add(databaseStatus);
-        backendSystemStatuses.add(terraformBootStatus);
+
+        BackendSystemStatus terraformBootStatus = getTerraformBootStatus();
+        if (isAdmin && Objects.nonNull(terraformBootStatus)) {
+            terraformBootStatus.setEndpoint(apiClient.getBasePath());
+        }
+        if (Objects.nonNull(terraformBootStatus)) {
+            backendSystemStatuses.add(terraformBootStatus);
+        }
         return backendSystemStatuses;
+    }
+
+    private BackendSystemStatus getTerraformBootStatus() {
+        List<String> configSplitList = Arrays.asList(springProfilesActive.split(","));
+        if (configSplitList.contains(TERRAFORM_BOOT_PROFILE_NAME)) {
+            BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
+            terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
+            terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
+            if (isTerraformBootApiAccessible()) {
+                terraformBootStatus.setHealthStatus(HealthStatus.OK);
+            } else {
+                terraformBootStatus.setHealthStatus(HealthStatus.NOK);
+            }
+            return terraformBootStatus;
+        }
+        return null;
     }
 
     private boolean isTerraformBootApiAccessible() {
