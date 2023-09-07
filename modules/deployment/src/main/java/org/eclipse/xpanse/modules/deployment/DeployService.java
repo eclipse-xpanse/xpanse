@@ -334,7 +334,7 @@ public class DeployService {
         ServiceDeploymentState serviceDeploymentState =
                 deployServiceEntity.getServiceDeploymentState();
         if (serviceDeploymentState == ServiceDeploymentState.DEPLOY_FAILED
-                || serviceDeploymentState == ServiceDeploymentState.DESTROY_FAILED
+                || serviceDeploymentState == ServiceDeploymentState.DESTROY_SUCCESS
                 || serviceDeploymentState == ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED) {
             asyncPurgeService(deployment, deployTask, deployServiceEntity);
         } else {
