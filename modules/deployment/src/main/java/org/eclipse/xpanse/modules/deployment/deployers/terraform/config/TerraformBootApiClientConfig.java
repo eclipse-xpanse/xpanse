@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.api.config;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.config;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;

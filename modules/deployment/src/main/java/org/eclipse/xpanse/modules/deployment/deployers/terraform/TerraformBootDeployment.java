@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.m
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig.AuthTypeEnum;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
+import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
@@ -72,8 +73,7 @@ public class TerraformBootDeployment implements Deployment {
     @Override
     public DeployResult deploy(DeployTask deployTask) {
         DeployResult result = new DeployResult();
-        TerraformAsyncDeployFromDirectoryRequest request;
-        request = getDeployRequest(deployTask);
+        TerraformAsyncDeployFromDirectoryRequest request = getDeployRequest(deployTask);
         terraformApi.asyncDeployWithScripts(request);
         return result;
     }
@@ -81,8 +81,7 @@ public class TerraformBootDeployment implements Deployment {
     @Override
     public DeployResult destroy(DeployTask task, String stateFile) {
         DeployResult result = new DeployResult();
-        TerraformAsyncDestroyFromDirectoryRequest request;
-        request = getDestroyRequest(task, stateFile);
+        TerraformAsyncDestroyFromDirectoryRequest request = getDestroyRequest(task, stateFile);
         terraformApi.asyncDestroyWithScripts(request);
         return result;
     }
@@ -142,8 +141,7 @@ public class TerraformBootDeployment implements Deployment {
         return request;
     }
 
-    private TerraformAsyncDeployFromDirectoryRequest getDeployRequest(DeployTask task)
-            throws TerraformBootRequestFailedException {
+    private TerraformAsyncDeployFromDirectoryRequest getDeployRequest(DeployTask task) {
         TerraformAsyncDeployFromDirectoryRequest request =
                 new TerraformAsyncDeployFromDirectoryRequest();
         request.setIsPlanOnly(false);
@@ -159,7 +157,7 @@ public class TerraformBootDeployment implements Deployment {
         return request;
     }
 
-    private String getClientRequestBaseUrl(String port) throws TerraformBootRequestFailedException {
+    private String getClientRequestBaseUrl(String port) {
         try {
             String clientBaseUri = terraformBootConfig.getClientBaseUri();
             if (StringUtils.isBlank(clientBaseUri)) {
@@ -169,6 +167,7 @@ public class TerraformBootDeployment implements Deployment {
                 return clientBaseUri;
             }
         } catch (UnknownHostException e) {
+            log.error(ResultType.TERRAFORM_BOOT_REQUEST_FAILED.toValue());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
