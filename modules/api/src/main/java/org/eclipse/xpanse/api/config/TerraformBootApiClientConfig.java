@@ -23,7 +23,7 @@ public class TerraformBootApiClientConfig {
     @Resource
     private ApiClient apiClient;
 
-    @Value("${terraform-boot.endpoint}")
+    @Value("${terraform.boot.endpoint}")
     private String terraformBootBaseUrl;
 
     @PostConstruct
