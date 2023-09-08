@@ -200,6 +200,9 @@ public class TerraformBootDeployment implements Deployment {
     }
 
     private Map<String, String> getEnvironmentVariables(DeployTask deployTask) {
-        return deployEnvironments.getEnv(deployTask);
+        Map<String, String> envVariables = new HashMap<>();
+        envVariables.putAll(deployEnvironments.getEnv(deployTask));
+        envVariables.putAll(this.deployEnvironments.getCredentialVariables(deployTask));
+        return envVariables;
     }
 }
