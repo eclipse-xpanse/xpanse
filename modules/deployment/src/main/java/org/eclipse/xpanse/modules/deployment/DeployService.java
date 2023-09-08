@@ -435,16 +435,8 @@ public class DeployService {
             throw new ServiceNotDeployedException(errorMsg);
         }
         DeployResult deployResult = handlerDeployResource(result);
-        if (!CollectionUtils.isEmpty(deployResult.getPrivateProperties())
-                && !CollectionUtils.isEmpty(deployResult.getProperties())) {
+        if (StringUtils.isNotBlank(result.getTerraformState())) {
             getResourceHandler(deployServiceEntity.getCsp()).handler(deployResult);
-        }
-        if (result.getCommandSuccessful()) {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
-        } else {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
-            deployServiceEntity.setResultMessage(result.getCommandStdError());
-
         }
         deployServiceEntity.setProperties(deployResult.getProperties());
         deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
@@ -452,9 +444,28 @@ public class DeployService {
         deployServiceEntity.getDeployResourceList()
                 .addAll(getDeployResourceEntityList(deployResult.getResources(),
                         deployServiceEntity));
-        deployServiceStorage.storeAndFlush(deployServiceEntity);
+        maskSensitiveFields(deployServiceEntity);
+        if (result.getCommandSuccessful()) {
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+        } else {
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
+            deployServiceEntity.setResultMessage(result.getCommandStdError());
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            rollbackOnDeploymentFailure(deployServiceEntity, deployResult,
+                    deploymentMap.get(DeployerKind.TERRAFORM),
+                    getDeployTask(taskId, deployServiceEntity));
+        }
     }
 
+    private DeployTask getDeployTask(String taskId, DeployServiceEntity deployServiceEntity) {
+        DeployTask task = new DeployTask();
+        task.setId(UUID.fromString(taskId));
+        task.setOcl(deployServiceEntity.getCreateRequest().getOcl());
+        task.setCreateRequest(deployServiceEntity.getCreateRequest());
+        fillHandler(task);
+        return task;
+    }
 
     /**
      * Callback method after destroy is complete.
