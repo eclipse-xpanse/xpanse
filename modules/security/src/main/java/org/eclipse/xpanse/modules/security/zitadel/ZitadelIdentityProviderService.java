@@ -33,6 +33,7 @@ import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
 import org.eclipse.xpanse.modules.security.IdentityProviderService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
@@ -62,6 +63,8 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
 
     private static final Map<String, String> CODE_CHALLENGE_MAP = initCodeChallengeMap();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    @Qualifier("zitadelRestTemplate")
     @Resource
     private RestTemplate restTemplate;
     @Value("${authorization-token-type:JWT}")

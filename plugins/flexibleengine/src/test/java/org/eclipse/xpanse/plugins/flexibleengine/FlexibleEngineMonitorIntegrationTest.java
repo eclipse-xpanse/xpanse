@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
+import org.eclipse.xpanse.modules.logging.RestTemplateLoggingInterceptor;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
@@ -31,6 +32,7 @@ import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngine
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineRestTemplateConfig;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +48,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         FlexibleEngineMetricsService.class,
         FlexibleEngineMonitorClient.class, RetryTemplateService.class,
         FlexibleEngineMetricsConverter.class, CredentialCenter.class,
-        ServiceMetricsStore.class, ServiceMetricsCacheManager.class})
+        ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
+        FlexibleEngineRestTemplateConfig.class, RestTemplateLoggingInterceptor.class})
 class FlexibleEngineMonitorIntegrationTest {
 
     @RegisterExtension

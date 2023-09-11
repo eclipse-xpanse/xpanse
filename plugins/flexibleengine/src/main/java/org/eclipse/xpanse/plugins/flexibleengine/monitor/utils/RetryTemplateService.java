@@ -10,6 +10,7 @@ import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
 import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.internal.model.KeystoneListProjectsResponse;
+import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +47,10 @@ public class RetryTemplateService {
     private static final int RETRY_TIMES = 5;
     private static final long DELAY_MILLISECONDS = 2000L;
     private static final double DELAY_MULTIPLIER = 1.5D;
-    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Resource
+    @Qualifier("flexibleEngineRestTemplate")
+    private RestTemplate restTemplate;
 
     /**
      * Query project info using RestTemplate with Spring-Retry.
