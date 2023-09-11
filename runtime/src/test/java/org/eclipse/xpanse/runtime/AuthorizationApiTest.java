@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,8 +59,11 @@ class AuthorizationApiTest {
     @Value("${authorization-server-endpoint}")
     private String iamServiceEndpoint;
 
+    @Qualifier("zitadelRestTemplate")
     @Resource
     private MockMvc mockMvc;
+
+
     @MockBean
     private RestTemplate restTemplate;
 

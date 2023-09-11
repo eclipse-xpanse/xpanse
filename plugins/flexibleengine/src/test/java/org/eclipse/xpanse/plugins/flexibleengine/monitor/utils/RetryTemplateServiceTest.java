@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Objects;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.eclipse.xpanse.modules.logging.RestTemplateLoggingInterceptor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +28,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {RetryTemplateService.class})
+@ContextConfiguration(classes = {RetryTemplateService.class, FlexibleEngineRestTemplateConfig.class,
+        RestTemplateLoggingInterceptor.class})
 class RetryTemplateServiceTest {
 
     @RegisterExtension
