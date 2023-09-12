@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockBearerTokenAuthentication;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
@@ -113,7 +114,7 @@ class AuthorizationApiTest {
                 .andReturn().getResponse();
 
         // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.UNAUTHORIZED.value());
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
     }
@@ -132,14 +133,14 @@ class AuthorizationApiTest {
                 .andReturn().getResponse();
 
         // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.FORBIDDEN.value());
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
     }
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = {"user"},
-            attributes = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
+    @WithMockJwtAuth(authorities = {"user"},
+            claims = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
     void testCallApiWell() throws Exception {
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services")
@@ -147,7 +148,7 @@ class AuthorizationApiTest {
                 .andReturn().getResponse();
 
         // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals("[]", response.getContentAsString());
     }
