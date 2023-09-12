@@ -48,7 +48,7 @@ public class TerraformBootDeployment implements Deployment {
 
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     private final DeployEnvironments deployEnvironments;
-    private final TerraformVersionProvider terraformVersionProvider;
+    private final TerraformProviderVersion terraformProviderVersion;
     private final TerraformBootConfig terraformBootConfig;
     private final String port;
     private final TerraformApi terraformApi;
@@ -59,12 +59,12 @@ public class TerraformBootDeployment implements Deployment {
     @Autowired
     public TerraformBootDeployment(
             DeployEnvironments deployEnvironments,
-            TerraformVersionProvider terraformVersionProvider,
+            TerraformProviderVersion terraformProviderVersion,
             TerraformBootConfig terraformBootConfig,
             TerraformApi terraformApi,
             @Value("${server.port}") String port) {
         this.deployEnvironments = deployEnvironments;
-        this.terraformVersionProvider = terraformVersionProvider;
+        this.terraformProviderVersion = terraformProviderVersion;
         this.terraformBootConfig = terraformBootConfig;
         this.terraformApi = terraformApi;
         this.port = port;
@@ -174,7 +174,7 @@ public class TerraformBootDeployment implements Deployment {
 
     private List<String> getFiles(DeployTask task) {
         Csp csp = task.getCreateRequest().getCsp();
-        String version = terraformVersionProvider.getTerraformVersionByCsp(csp);
+        String version = terraformProviderVersion.getTerraformVersionByCsp(csp);
         String region = task.getCreateRequest().getRegion();
         String provider = TerraformProviders.getProvider(csp).getProvider(version, region);
         String deployer = task.getOcl().getDeployment().getDeployer();
@@ -184,7 +184,7 @@ public class TerraformBootDeployment implements Deployment {
     private List<String> getFilesByOcl(Ocl ocl) {
         Csp csp = ocl.getCloudServiceProvider().getName();
         String version =
-                terraformVersionProvider.getTerraformVersionByCsp(
+                terraformProviderVersion.getTerraformVersionByCsp(
                         ocl.getCloudServiceProvider().getName());
         String region = ocl.getCloudServiceProvider().getRegions().get(0).getName();
         String provider = TerraformProviders.getProvider(csp).getProvider(version, region);

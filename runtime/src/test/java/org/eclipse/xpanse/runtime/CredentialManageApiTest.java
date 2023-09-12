@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockBearerTokenAuthentication;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,8 +58,8 @@ class CredentialManageApiTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_ADMIN,
-            attributes = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testListCredentialTypes() throws Exception {
         // Setup
         List<CredentialType> types = Arrays.asList(CredentialType.values());
@@ -77,8 +77,8 @@ class CredentialManageApiTest {
     }
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_ADMIN,
-            attributes = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testListCredentialTypes_WithCsp() throws Exception {
         // Setup
         List<CredentialType> types = List.of(CredentialType.VARIABLES);
@@ -97,8 +97,8 @@ class CredentialManageApiTest {
     }
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testListCredentialTypes_PluginNotFoundException() throws Exception {
         // Setup
         Response responseModel = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
@@ -118,8 +118,8 @@ class CredentialManageApiTest {
     }
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testListCredentialCapabilities() throws Exception {
         // Setup
         List<CredentialVariable> credentialVariables = new ArrayList<>();
@@ -154,8 +154,8 @@ class CredentialManageApiTest {
     }
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testListCredentialCapabilities_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
         String result = "[]";
@@ -176,8 +176,8 @@ class CredentialManageApiTest {
 
     @Test
     @Order(1)
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testListCredentials_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
         String result = "[]";
@@ -194,8 +194,8 @@ class CredentialManageApiTest {
 
     @Test
     @Order(2)
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testAddCredentialWithSensitiveIsFalse() throws Exception {
         // Setup
         final CreateCredential createCredential = new CreateCredential();
@@ -240,8 +240,8 @@ class CredentialManageApiTest {
 
     @Test
     @Order(3)
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testAddCredentialWithSensitiveIsTrue() throws Exception {
         // Setup
         final CreateCredential createCredential = new CreateCredential();
@@ -286,8 +286,8 @@ class CredentialManageApiTest {
 
     @Test
     @Order(4)
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId2", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId2", preferredUsername = "userName"))
     void testGetCredentials_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
         String result = "[]";
@@ -306,8 +306,8 @@ class CredentialManageApiTest {
     }
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testGetCredentialOpenApi() throws Exception {
         // Setup
         Link link = Link.of("http://localhost/openapi/huawei_variables_credentialApi.html",
@@ -329,8 +329,8 @@ class CredentialManageApiTest {
 
     @Test
     @Order(5)
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testUpdateCredential() throws Exception {
         // Setup
         final CreateCredential updateCredential = new CreateCredential();
@@ -377,8 +377,8 @@ class CredentialManageApiTest {
 
     @Test
     @Order(6)
-    @WithMockBearerTokenAuthentication(authorities = RoleConstants.ROLE_USER,
-            attributes = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
     void testDeleteCredential() throws Exception {
         // Setup
         String deleteResult = "";

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * Version configuration classes for Terraform cloud providers.
  */
 @Configuration
-public class TerraformVersionProvider {
+public class TerraformProviderVersion {
 
     @Value("${terraform.provider.huaweicloud.version}")
     private String terraformHuaweiCloudVersion;
@@ -47,7 +47,9 @@ public class TerraformVersionProvider {
         } else if (csp == Csp.SCS) {
             return terraformScsVersion;
         } else {
-            throw new TerraformExecutorException("Get Terraform Version,Csp does not exist");
+            throw new TerraformExecutorException(
+                    String.format("Terraform provider version for CSP %s is not configured",
+                            csp.toValue()));
         }
     }
 }

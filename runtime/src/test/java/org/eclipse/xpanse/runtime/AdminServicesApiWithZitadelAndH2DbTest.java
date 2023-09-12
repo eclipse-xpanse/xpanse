@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockBearerTokenAuthentication;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ class AdminServicesApiWithZitadelAndH2DbTest {
                 .andReturn().getResponse();
 
         // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.UNAUTHORIZED.value());
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
 
@@ -95,8 +95,8 @@ class AdminServicesApiWithZitadelAndH2DbTest {
 
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = {"admin"},
-            attributes = @OpenIdClaims(sub = "admin-id", preferredUsername = "xpanse-admin"))
+    @WithMockJwtAuth(authorities = {"admin"},
+            claims = @OpenIdClaims(sub = "admin-id", preferredUsername = "xpanse-admin"))
     void testHealthCheckWithRoleAdmin() throws Exception {
         // SetUp
         SystemStatus systemStatus = new SystemStatus();
@@ -110,7 +110,7 @@ class AdminServicesApiWithZitadelAndH2DbTest {
                 .andReturn().getResponse();
 
         // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
 
@@ -118,8 +118,8 @@ class AdminServicesApiWithZitadelAndH2DbTest {
 
 
     @Test
-    @WithMockBearerTokenAuthentication(authorities = {"user", "csp"},
-            attributes = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
+    @WithMockJwtAuth(authorities = {"user", "csp"},
+            claims = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
     void testHealthCheckWithRoleNotAdmin() throws Exception {
         // SetUp
         SystemStatus systemStatus = new SystemStatus();
@@ -133,7 +133,7 @@ class AdminServicesApiWithZitadelAndH2DbTest {
                 .andReturn().getResponse();
 
         // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
 
