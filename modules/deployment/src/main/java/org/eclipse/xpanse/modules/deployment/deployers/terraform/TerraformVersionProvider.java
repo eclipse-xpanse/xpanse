@@ -47,7 +47,8 @@ public class TerraformVersionProvider {
         } else if (csp == Csp.SCS) {
             return terraformScsVersion;
         } else {
-            throw new TerraformExecutorException("Get Terraform Version,Csp does not exist");
+            throw new TerraformExecutorException(
+                    "Terraform provider version for CSP %s is not configured", csp.toValue());
         }
     }
 }
