@@ -60,7 +60,7 @@ public class TerraformDeployment implements Deployment {
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
     private final DeployEnvironments deployEnvironments;
-    private final TerraformVersionProvider terraformVersionProvider;
+    private final TerraformProviderVersion terraformProviderVersion;
     private final DeployServiceStorage deployServiceStorage;
     private final DeployResourceStorage deployResourceStorage;
     private final TerraformLocalConfig terraformLocalConfig;
@@ -71,12 +71,12 @@ public class TerraformDeployment implements Deployment {
     @Autowired
     public TerraformDeployment(
             DeployEnvironments deployEnvironments,
-            TerraformVersionProvider terraformVersionProvider,
+            TerraformProviderVersion terraformProviderVersion,
             DeployServiceStorage deployServiceStorage,
             DeployResourceStorage deployResourceStorage,
             TerraformLocalConfig terraformLocalConfig) {
         this.deployEnvironments = deployEnvironments;
-        this.terraformVersionProvider = terraformVersionProvider;
+        this.terraformProviderVersion = terraformProviderVersion;
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
         this.terraformLocalConfig = terraformLocalConfig;
@@ -277,7 +277,7 @@ public class TerraformDeployment implements Deployment {
      */
     private void createScriptFile(Csp csp, String region, String workspace, String script) {
         log.info("start create terraform script");
-        String version = terraformVersionProvider.getTerraformVersionByCsp(csp);
+        String version = terraformProviderVersion.getTerraformVersionByCsp(csp);
         if (StringUtils.isBlank(version)) {
             log.error("Csp doesn't exist,csp: {}", csp);
             return;
@@ -308,7 +308,7 @@ public class TerraformDeployment implements Deployment {
         if (!parentPath.exists() || !parentPath.isDirectory()) {
             parentPath.mkdirs();
         }
-        String version = terraformVersionProvider.getTerraformVersionByCsp(csp);
+        String version = terraformProviderVersion.getTerraformVersionByCsp(csp);
         if (StringUtils.isBlank(version)) {
             log.error("Csp does't exist,csp: {}", csp);
             return;
