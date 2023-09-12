@@ -16,9 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -222,8 +222,12 @@ public class ServiceTemplateApi {
         String successMsg = String.format("Listing service templates with query model %s "
                 + "successful.", query);
         List<UserAvailableServiceVo> userAvailableServiceVos =
-                serviceEntities.stream().map(this::convertToUserAvailableServiceVo)
-                        .collect(Collectors.toList());
+                serviceEntities.stream().map(this::convertToUserAvailableServiceVo).sorted(
+                                Comparator.comparingInt(o -> {
+                                    assert o != null;
+                                    return o.getCsp().ordinal();
+                                }))
+                        .toList();
         log.info(successMsg);
         return userAvailableServiceVos;
     }
