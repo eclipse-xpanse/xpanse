@@ -73,6 +73,7 @@
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
         <openapi.generator.plugin.version>6.6.0</openapi.generator.plugin.version>
         <nimbusds.oidc.sdk.version>10.7</nimbusds.oidc.sdk.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
