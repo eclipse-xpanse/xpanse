@@ -72,7 +72,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableMethodSecurity(securedEnabled = true)
 public class ZitadelWebSecurityConfig {
 
-    @Value("${authorization-token-type:JWT}")
+    @Value("${authorization.token.type:JWT}")
     private String authTokenType;
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
