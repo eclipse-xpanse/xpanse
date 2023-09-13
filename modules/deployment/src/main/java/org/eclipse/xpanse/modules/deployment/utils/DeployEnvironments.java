@@ -20,9 +20,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,10 +37,26 @@ public class DeployEnvironments {
 
     private final CredentialCenter credentialCenter;
 
+    private final PluginManager pluginManager;
+
+    private final Environment environment;
+
+    /**
+     * Constructor to initialize DeployEnvironments bean.
+     *
+     * @param credentialCenter CredentialCenter bean
+     * @param aesUtil AesUtil bean
+     * @param pluginManager PluginManager bean
+     * @param environment Environment bean
+     */
+
     @Autowired
-    public DeployEnvironments(CredentialCenter credentialCenter, AesUtil aesUtil) {
+    public DeployEnvironments(CredentialCenter credentialCenter, AesUtil aesUtil,
+                              PluginManager pluginManager, Environment environment) {
         this.credentialCenter = credentialCenter;
         this.aesUtil = aesUtil;
+        this.pluginManager = pluginManager;
+        this.environment = environment;
     }
 
     /**
@@ -136,25 +154,31 @@ public class DeployEnvironments {
      */
     public Map<String, String> getCredentialVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-
-        if (this.credentialCenter == null) {
-            return variables;
-        }
-
         CredentialType credentialType = task.getOcl().getDeployment().getCredentialType();
         Csp csp = task.getOcl().getCloudServiceProvider().getName();
 
         AbstractCredentialInfo abstractCredentialInfo =
                 this.credentialCenter.getCredential(csp, credentialType,
                         task.getCreateRequest().getUserId());
-
         if (Objects.nonNull(abstractCredentialInfo)) {
             for (CredentialVariable variable
                     : ((CredentialVariables) abstractCredentialInfo).getVariables()) {
                 variables.put(variable.getName(), variable.getValue());
             }
         }
+        return variables;
+    }
 
+    /**
+     * Get plugin's mandatory variables.
+     *
+     * @param task the DeployTask.
+     */
+    public Map<String, String> getPluginMandatoryVariables(DeployTask task) {
+        Map<String, String> variables = new HashMap<>();
+        this.pluginManager.getOrchestratorPlugin(task.getCreateRequest().getCsp())
+                .requiredProperties().forEach(variable -> variables.put(variable,
+                        this.environment.getRequiredProperty(variable)));
         return variables;
     }
 }
