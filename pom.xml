@@ -40,7 +40,7 @@
         <lombok.version>1.18.28</lombok.version>
         <checkstyle-maven-plugin.version>3.3.0</checkstyle-maven-plugin.version>
         <logbook.version>3.3.0</logbook.version>
-        <wiremock.version>3.0.1</wiremock.version>
+        <wiremock.version>3.0.4</wiremock.version>
         <instancio.version>2.16.0</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
         <awaitility.version>4.2.0</awaitility.version>
@@ -73,6 +73,7 @@
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
         <openapi.generator.plugin.version>6.6.0</openapi.generator.plugin.version>
         <nimbusds.oidc.sdk.version>10.7</nimbusds.oidc.sdk.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
@@ -191,6 +192,12 @@
                         <artifactId>jul-to-slf4j</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.wiremock</groupId>
+                <artifactId>wiremock</artifactId>
+                <version>${wiremock.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
