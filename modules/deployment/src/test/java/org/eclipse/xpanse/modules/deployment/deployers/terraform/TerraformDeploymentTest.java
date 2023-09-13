@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
 import static org.instancio.Select.field;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.net.URL;
@@ -89,11 +90,7 @@ class TerraformDeploymentTest {
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setCreateRequest(deployRequest);
-        TerraformDeployment terraformDeployment =
-                new TerraformDeployment(new DeployEnvironments(null,
-                        null), terraformProviderVersion, deployServiceStorage,
-                        deployResourceStorage, terraformLocalConfig);
-
+        doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any(DeployTask.class));
         Assertions.assertThrows(ServiceNotDeployedException.class, ()->{
                     terraformDeployment.deploy(xpanseDeployTask);
                 });

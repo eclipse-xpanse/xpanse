@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.env.Environment;
 
 /**
  * Test of DeployEnvironments.
@@ -58,6 +60,10 @@ class DeployEnvironmentsTest {
     private AesUtil aesUtil;
     @Mock
     private CredentialCenter mockCredentialCenter;
+    @Mock
+    private PluginManager pluginManager;
+    @Mock
+    private Environment environment;
     private DeployEnvironments deployEnvironmentsUnderTest;
 
     @BeforeEach
@@ -114,7 +120,8 @@ class DeployEnvironmentsTest {
         task.setCreateRequest(createRequest);
         task.setOcl(ocl);
 
-        deployEnvironmentsUnderTest = new DeployEnvironments(mockCredentialCenter, aesUtil);
+        deployEnvironmentsUnderTest = new DeployEnvironments(mockCredentialCenter, aesUtil,
+                pluginManager, environment);
     }
 
     @Test
