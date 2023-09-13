@@ -57,7 +57,7 @@ class AdminServicesApiWithZitadelAndH2DbTest {
     @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
     private String dataSourceUrl;
 
-    @Value("${authorization-server-endpoint}")
+    @Value("${authorization.server.endpoint}")
     private String iamServerEndpoint;
 
     @Resource

@@ -67,11 +67,11 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     @Qualifier("zitadelRestTemplate")
     @Resource
     private RestTemplate restTemplate;
-    @Value("${authorization-token-type:JWT}")
+    @Value("${authorization.token.type:JWT}")
     private String authTokenType;
-    @Value("${authorization-server-endpoint}")
+    @Value("${authorization.server.endpoint}")
     private String iamServerEndpoint;
-    @Value("${authorization-swagger-ui-client-id}")
+    @Value("${authorization.swagger.ui.client.id}")
     private String clientId;
 
     private static Map<String, String> initCodeChallengeMap() {

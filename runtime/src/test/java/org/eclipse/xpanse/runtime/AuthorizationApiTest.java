@@ -57,7 +57,7 @@ class AuthorizationApiTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${authorization-server-endpoint}")
+    @Value("${authorization.server.endpoint}")
     private String iamServiceEndpoint;
 
     @Qualifier("zitadelRestTemplate")
