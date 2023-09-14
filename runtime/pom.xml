@@ -19,8 +19,6 @@
     </parent>
     <properties>
         <jacoco.skip>true</jacoco.skip>
-        <docker.skip>true</docker.skip>
-        <image.name>xpanse</image.name>
     </properties>
     <dependencies>
         <dependency>

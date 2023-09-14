@@ -18,10 +18,6 @@
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <properties>
-        <docker.skip>true</docker.skip>
-        <image.name>xpanse</image.name>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
