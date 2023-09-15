@@ -22,7 +22,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableJpaRepositories(basePackages = "org.eclipse.xpanse")
 @EntityScan(basePackages = "org.eclipse.xpanse")
 @ComponentScan(basePackages = "org.eclipse.xpanse")
-@EnableJpaAuditing
+@EnableJpaAuditing(dateTimeProviderRef = "auditDateTimeProviderConfig")
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class XpanseApplication {
 

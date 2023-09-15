@@ -9,15 +9,15 @@ package org.eclipse.xpanse.modules.database.common;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class CreateModifiedTimeTest {
 
-    private static final Date createTime = new Date();
+    private static final OffsetDateTime createTime = OffsetDateTime.now();
 
-    private static final Date lastModifiedTime = new Date();
+    private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
 
     private CreateModifiedTime test;
 

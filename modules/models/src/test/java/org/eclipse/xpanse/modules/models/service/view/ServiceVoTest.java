@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.models.service.view;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -32,8 +32,8 @@ class ServiceVoTest {
     private static final String flavor = "basic";
     private static final ServiceDeploymentState serviceDeploymentState =
             ServiceDeploymentState.DEPLOY_SUCCESS;
-    private static final Date createTime = new Date();
-    private static final Date lastModifiedTime = new Date();
+    private static final OffsetDateTime createTime = OffsetDateTime.now();
+    private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private static ServiceVo serviceVo;
 
     @BeforeEach

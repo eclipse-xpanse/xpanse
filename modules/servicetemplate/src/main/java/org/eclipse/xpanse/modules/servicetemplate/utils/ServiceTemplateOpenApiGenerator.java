@@ -170,7 +170,7 @@ public class ServiceTemplateOpenApiGenerator {
                 // Modify the file name to serviceId.html
                 File tempHtmlFile = new File(openApiDir, "index.html");
                 if (tempHtmlFile.exists() && (tempHtmlFile.renameTo(htmlFile))) {
-                    log.info("Createed service openApi html file:{} successfully.",
+                    log.info("Created service openApi html file:{} successfully.",
                             htmlFile.getName());
                     if (htmlFile.exists()) {
                         return this.openApiUrlManage.getOpenApiUrl(serviceId);
