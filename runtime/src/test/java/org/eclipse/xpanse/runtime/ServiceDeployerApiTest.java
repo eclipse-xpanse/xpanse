@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -37,6 +39,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
@@ -58,8 +61,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.event.annotation.AfterTestExecution;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -69,12 +70,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("default")
-@SpringBootTest(classes = {XpanseApplication.class})
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest {
 
-    private static final String userId = "defaultUserId";
+    private static final String userId = "adminId";
     private static ServiceTemplateVo serviceTemplateVo;
     private static ServiceDetailVo serviceDetailVo;
     private static Ocl ocl;
@@ -86,11 +86,6 @@ class ServiceDeployerApiTest {
 
     @Resource
     private DeployServiceRepository deployServiceRepository;
-
-    @AfterTestExecution
-    public void cleanUp() {
-        deleteDestroyedServiceRecord();
-    }
 
     @BeforeEach
     void setUp() {
@@ -108,6 +103,8 @@ class ServiceDeployerApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testServiceDeployer() throws Exception {
         testDeploy();
         boolean deploySuccess = deploySuccess(taskId);
@@ -128,6 +125,8 @@ class ServiceDeployerApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testServiceDeployerThrowsException() throws Exception {
         testDeployThrowsException();
         testGetServiceDetailsThrowsException();
@@ -135,24 +134,28 @@ class ServiceDeployerApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testServicePurgeSuccess() throws Exception {
         testDeploy();
         boolean deploySuccess = deploySuccess(taskId);
 
-        testPurgeSuccess(deploySuccess);
+        testPurgeSuccess();
         deleteDestroyedServiceRecord();
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testServicePurgeRefuse() throws Exception {
         testDeploy();
-        boolean deploySuccess = deploySuccess(taskId);
+        deploySuccess(taskId);
 
-        testPurgeRefuse(deploySuccess);
+        testPurgeRefuse();
         deleteDestroyedServiceRecord();
     }
 
-    void testPurgeRefuse(boolean deploySuccess) throws Exception {
+    void testPurgeRefuse() throws Exception {
         // SetUp
         String refuseMsg = String.format(
                 "Service %s is not in the state allowed for purging.", taskId);
@@ -170,7 +173,7 @@ class ServiceDeployerApiTest {
         Assertions.assertEquals(result, purgeResponse.getContentAsString());
     }
 
-    void testPurgeSuccess(boolean deploySuccess) throws Exception {
+    void testPurgeSuccess() throws Exception {
         // SetUp
         String successMsg = String.format(
                 "Purging task for service with ID %s has started.", taskId);

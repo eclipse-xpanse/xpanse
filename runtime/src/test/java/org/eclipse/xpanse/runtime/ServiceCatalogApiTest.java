@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -27,6 +29,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
@@ -42,7 +45,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -52,8 +54,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("default")
-@SpringBootTest(classes = {XpanseApplication.class})
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServiceCatalogApiTest {
 
@@ -77,6 +78,8 @@ class ServiceCatalogApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testAvailableServices() throws Exception {
         registerService();
         Thread.sleep(3000);
@@ -87,6 +90,8 @@ class ServiceCatalogApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testAvailableServicesThrowsException() throws Exception {
         testAvailableServiceDetailsThrowsException();
         testListAvailableServicesThrowsException();

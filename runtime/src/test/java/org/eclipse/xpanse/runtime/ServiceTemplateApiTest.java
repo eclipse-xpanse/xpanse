@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -29,6 +31,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -46,7 +49,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -56,14 +58,12 @@ import org.springframework.test.web.servlet.MockMvc;
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("default")
-@SpringBootTest(classes = {XpanseApplication.class})
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServiceTemplateApiTest {
 
     private static String id;
     private static ServiceTemplateVo serviceTemplateVo;
-    private static UserAvailableServiceVo userAvailableServiceVo;
     private static Ocl ocl;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -81,6 +81,8 @@ class ServiceTemplateApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testManageServiceTemplate() throws Exception {
         testRegister();
         Thread.sleep(1000);
@@ -91,6 +93,8 @@ class ServiceTemplateApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testFetchMethods() throws Exception {
         ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
         testFetch();
@@ -99,6 +103,8 @@ class ServiceTemplateApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testRegisterServiceThrowsException() throws Exception {
         testRegisterException();
         testDetailThrowsException();
@@ -109,6 +115,8 @@ class ServiceTemplateApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testFetchMethodsThrowsException() throws Exception {
         testFetchThrowsException();
         testDetailThrowsException();
@@ -383,7 +391,6 @@ class ServiceTemplateApiTest {
         Assertions.assertEquals(result, response.getContentAsString());
     }
 
-    @Test
     void testDetailThrowsException() throws Exception {
         // Setup
         String uuid = UUID.randomUUID().toString();
