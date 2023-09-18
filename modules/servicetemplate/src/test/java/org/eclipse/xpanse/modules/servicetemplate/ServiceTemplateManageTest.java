@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.Terrafor
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
@@ -71,14 +72,16 @@ class ServiceTemplateManageTest {
     private IdentityProviderManager identityProviderManager;
     @Mock
     private OpenApiUrlManage openApiUrlManage;
-    @InjectMocks
-    private ServiceTemplateManage serviceTemplateManageTest;
     @Mock
     DeployServiceStorage deployServiceStorage;
     @Mock
     DeployResourceStorage deployResourceStorage;
     @Mock
     TerraformLocalConfig terraformLocalConfig;
+    @Mock
+    ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
+    @InjectMocks
+    private ServiceTemplateManage serviceTemplateManageTest;
 
     @BeforeAll
     static void init() throws Exception {
@@ -107,6 +110,7 @@ class ServiceTemplateManageTest {
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformProviderVersion, deployServiceStorage, deployResourceStorage,
                         terraformLocalConfig);
+
         doReturn(deployment).when(mockDeployService).getDeployment(any());
 
         ServiceTemplateEntity ServiceTemplateEntityByUrl =

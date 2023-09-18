@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDep
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -145,4 +146,15 @@ public class DeploymentExceptionHandler {
                 Collections.singletonList(ex.getMessage()));
     }
 
+    /**
+     * Exception handler for VariableInvalidException.
+     */
+    @ExceptionHandler({VariableInvalidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleVariableInvalidException(
+            VariableInvalidException ex) {
+        return Response.errorResponse(ResultType.VARIABLE_VALIDATION_FAILED,
+                Collections.singletonList(ex.getMessage()));
+    }
 }

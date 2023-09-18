@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -28,6 +29,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
@@ -56,6 +58,8 @@ public class ServiceTemplateManage {
     private DeployService deployService;
     @Resource
     private IdentityProviderManager identityProviderManager;
+    @Resource
+    private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
 
     /**
      * Update service template using id and the ocl file url.
@@ -64,7 +68,6 @@ public class ServiceTemplateManage {
      * @param oclLocation url of the ocl file.
      * @return Returns service template DB entity.
      */
-
     public ServiceTemplateEntity updateServiceTemplateByUrl(String id, String oclLocation)
             throws Exception {
         Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
@@ -78,7 +81,6 @@ public class ServiceTemplateManage {
      * @param ocl the Ocl model describing the service template.
      * @return Returns service template DB entity.
      */
-
     public ServiceTemplateEntity updateServiceTemplate(String id, Ocl ocl) {
         ServiceTemplateEntity existedService = storage.getServiceTemplateById(UUID.fromString(id));
         if (Objects.isNull(existedService)) {
@@ -99,6 +101,10 @@ public class ServiceTemplateManage {
         validateTerraformScript(ocl);
         existedService.setOcl(ocl);
         existedService.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
+        JsonObjectSchema jsonObjectSchema =
+                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                        existedService.getOcl().getDeployment().getVariables());
+        existedService.setJsonObjectSchema(jsonObjectSchema);
         storage.store(existedService);
         serviceTemplateOpenApiGenerator.updateServiceApi(existedService);
         return existedService;
@@ -158,7 +164,6 @@ public class ServiceTemplateManage {
      * @param ocl the Ocl model describing the service template.
      * @return Returns service template DB entity.
      */
-
     public ServiceTemplateEntity registerServiceTemplate(Ocl ocl) {
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
         ServiceTemplateEntity newEntity = getNewServiceTemplateEntity(ocl);
@@ -178,6 +183,10 @@ public class ServiceTemplateManage {
         } else {
             newEntity.setNamespace(ocl.getNamespace());
         }
+        JsonObjectSchema jsonObjectSchema =
+                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                        newEntity.getOcl().getDeployment().getVariables());
+        newEntity.setJsonObjectSchema(jsonObjectSchema);
         storage.store(newEntity);
         serviceTemplateOpenApiGenerator.generateServiceApi(newEntity);
         return newEntity;
@@ -189,7 +198,6 @@ public class ServiceTemplateManage {
      * @param oclLocation the url of the ocl file.
      * @return Returns service template DB entity.
      */
-
     public ServiceTemplateEntity registerServiceTemplateByUrl(String oclLocation) throws Exception {
         Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
         return registerServiceTemplate(ocl);
@@ -201,7 +209,6 @@ public class ServiceTemplateManage {
      * @param id the ID of
      * @return Returns service template DB entity.
      */
-
     public ServiceTemplateEntity getServiceTemplateDetails(String id, boolean checkNamespace) {
         UUID uuid = UUID.fromString(id);
         ServiceTemplateEntity serviceTemplateEntity = storage.getServiceTemplateById(uuid);
@@ -229,7 +236,6 @@ public class ServiceTemplateManage {
      * @param query the query model for search service template.
      * @return Returns list of service template entity.
      */
-
     public List<ServiceTemplateEntity> listServiceTemplates(ServiceTemplateQueryModel query) {
         return storage.listServiceTemplates(query);
     }
@@ -265,7 +271,6 @@ public class ServiceTemplateManage {
      * @param id ID of service template.
      * @return path of openapi.html
      */
-
     public String getOpenApiUrl(String id) {
         UUID uuid = UUID.fromString(id);
         ServiceTemplateEntity serviceTemplate = storage.getServiceTemplateById(uuid);

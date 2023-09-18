@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.api.ServiceDeployerApi;
 import org.eclipse.xpanse.modules.deployment.DeployService;
@@ -22,6 +23,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoun
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,5 +143,17 @@ class DeploymentExceptionHandlerTest {
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Deployment Variable Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testVariableInvalidException() throws Exception {
+        when(deployService.listDeployedServices(any(ServiceQueryModel.class)))
+                .thenThrow(new VariableInvalidException(List.of("test error")));
+
+        this.mockMvc.perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Variable Validation Failed"))
+                .andExpect(
+                        jsonPath("$.details[0]").value("Variable validation failed: [test error]"));
     }
 }

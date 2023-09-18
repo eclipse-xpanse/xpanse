@@ -31,8 +31,6 @@ import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGeneration
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
-import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -45,24 +43,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ServiceTemplateOpenApiGenerator {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String OPENAPI_FILE_EXTENSION = ".html";
-    private final DeployVariableValidator deployVariableValidator;
     private final OpenApiUrlManage openApiUrlManage;
-
     private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
 
     /**
      * Constructor to instantiate ServiceTemplateOpenApiGenerator bean.
      *
-     * @param deployVariableValidator   DeployVariableValidator bean
      * @param openApiUrlManage          OpenApiUrlManage bean
      * @param openApiGeneratorJarManage OpenApiGeneratorJarManage bean
      */
     @Autowired
-    public ServiceTemplateOpenApiGenerator(DeployVariableValidator deployVariableValidator,
-                                           OpenApiUrlManage openApiUrlManage,
+    public ServiceTemplateOpenApiGenerator(OpenApiUrlManage openApiUrlManage,
                                            OpenApiGeneratorJarManage openApiGeneratorJarManage) {
-        this.deployVariableValidator = deployVariableValidator;
         this.openApiUrlManage = openApiUrlManage;
         this.openApiGeneratorJarManage = openApiGeneratorJarManage;
     }
@@ -237,16 +231,14 @@ public class ServiceTemplateOpenApiGenerator {
         String propertiesRequiredStr = null;
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        List<DeployVariable> deployVariables = registerService.getOcl().getDeployment()
-                .getVariables();
+
         try {
             createRequiredStr = mapper.writeValueAsString(getRequiredFields(new CreateRequest()));
-            propertiesStr =
-                    mapper.writeValueAsString(
-                            deployVariableValidator.getVariableApiInfoMap(deployVariables)).replace(
-                            "\"[", "[").replace("]\"", "]").replace("\\", "").replace("'", "");
-            propertiesRequiredStr = mapper.writeValueAsString(
-                    deployVariableValidator.getRequiredKeySet(deployVariables));
+            propertiesStr = objectMapper.writeValueAsString(
+                    registerService.getJsonObjectSchema().getProperties());
+            propertiesRequiredStr =
+                    objectMapper.writeValueAsString(
+                            registerService.getJsonObjectSchema().getRequired());
             cspValuesStr = mapper.writeValueAsString(getCspValues());
             categoryValuesStr = mapper.writeValueAsString(getCategoryValues());
         } catch (JsonProcessingException e) {

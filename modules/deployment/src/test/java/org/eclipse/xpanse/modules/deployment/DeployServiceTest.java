@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -46,7 +47,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServic
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
-import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
@@ -108,11 +109,12 @@ class DeployServiceTest {
     @Mock
     private IdentityProviderManager identityProviderManager;
 
+    @Mock
+    private ServiceVariablesJsonSchemaValidator serviceVariablesJsonSchemaValidator;
+
     @InjectMocks
     private DeployService deployService;
 
-    @Mock
-    private DeployVariableValidator deployVariableValidator;
 
     @BeforeEach
     void setUp() {
@@ -236,7 +238,9 @@ class DeployServiceTest {
         deploymentBeans.put("deploymentBean", deploymentMock);
 
         when(applicationContext.getBeansOfType(Deployment.class)).thenReturn(deploymentBeans);
-        when(deployVariableValidator.isVariableValid(anyList(), anyMap())).thenReturn(true);
+        doNothing().when(serviceVariablesJsonSchemaValidator)
+                .validateDeployVariables(anyList(), anyMap(), any());
+
         deployService.deploymentMap();
 
         Deployment result = deployService.getDeployHandler(deployTask);

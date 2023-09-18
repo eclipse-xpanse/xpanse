@@ -14,9 +14,10 @@ import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
@@ -44,6 +45,12 @@ class ServiceTemplateOpenApiGeneratorTest {
     void createServiceApi_test() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_testOpenApi.yaml"));
+
+        ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
+                new ServiceVariablesJsonSchemaGenerator();
+        JsonObjectSchema jsonObjectSchema =
+                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                        ocl.getDeployment().getVariables());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(RANDOM_UUID);
         serviceTemplateEntity.setName("kafka2");
@@ -52,12 +59,11 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setCategory(Category.MIDDLEWARE);
         serviceTemplateEntity.setOcl(ocl);
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
-        DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
+        serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
         OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
-                new ServiceTemplateOpenApiGenerator(
-                        deployVariableValidator, openApiUrlManage, openApiGeneratorJarManage);
+                new ServiceTemplateOpenApiGenerator(openApiUrlManage, openApiGeneratorJarManage);
         serviceTemplateOpenApiGenerator.createServiceApi(serviceTemplateEntity);
         String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");
@@ -69,6 +75,11 @@ class ServiceTemplateOpenApiGeneratorTest {
     void updateServiceApi_test() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_testOpenApi.yaml"));
+        ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
+                new ServiceVariablesJsonSchemaGenerator();
+        JsonObjectSchema jsonObjectSchema =
+                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                        ocl.getDeployment().getVariables());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(RANDOM_UUID);
         serviceTemplateEntity.setName("kafka");
@@ -77,12 +88,13 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setCategory(Category.AI);
         serviceTemplateEntity.setOcl(ocl);
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
-        DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
+        serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
         OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
+
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
                 new ServiceTemplateOpenApiGenerator(
-                        deployVariableValidator, openApiUrlManage,
+                        openApiUrlManage,
                         openApiGeneratorJarManage);
         Assertions.assertDoesNotThrow(
                 () -> serviceTemplateOpenApiGenerator.updateServiceApi(serviceTemplateEntity));
@@ -91,12 +103,12 @@ class ServiceTemplateOpenApiGeneratorTest {
     @Test
     @Order(3)
     void deleteServiceApi_test() {
-        DeployVariableValidator deployVariableValidator = new DeployVariableValidator();
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
         OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
+
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
                 new ServiceTemplateOpenApiGenerator(
-                        deployVariableValidator, openApiUrlManage,
+                        openApiUrlManage,
                         openApiGeneratorJarManage);
         serviceTemplateOpenApiGenerator.deleteServiceApi(ID);
         String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();

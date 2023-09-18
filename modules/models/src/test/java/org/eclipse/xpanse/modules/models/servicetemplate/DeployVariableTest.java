@@ -9,6 +9,8 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.Map;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.VariableValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
@@ -27,7 +29,7 @@ class DeployVariableTest {
     private static final String description = "description";
     private static final String value = "value";
     private static final Boolean mandatory = true;
-    private static final String validator = "validator";
+    private static final Map<VariableValidator,Object> validatorMap  = Map.of(VariableValidator.MINLENGTH,"10");
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
     private static DeployVariable deployVariable;
 
@@ -41,7 +43,7 @@ class DeployVariableTest {
         deployVariable.setDescription(description);
         deployVariable.setValue(value);
         deployVariable.setMandatory(mandatory);
-        deployVariable.setValidator(validator);
+        deployVariable.setValueSchema(validatorMap);
         deployVariable.setSensitiveScope(sensitiveScope);
     }
 
@@ -54,7 +56,7 @@ class DeployVariableTest {
         assertEquals(description, deployVariable.getDescription());
         assertEquals(value, deployVariable.getValue());
         assertEquals(mandatory, deployVariable.getMandatory());
-        assertEquals(validator, deployVariable.getValidator());
+        assertEquals(validatorMap, deployVariable.getValueSchema());
         assertEquals(sensitiveScope, deployVariable.getSensitiveScope());
     }
 
@@ -119,7 +121,7 @@ class DeployVariableTest {
         assertNotEquals(deployVariable.hashCode(), deployVariable1.hashCode());
         assertNotEquals(deployVariable1.hashCode(), deployVariable2.hashCode());
 
-        deployVariable1.setValidator(validator);
+        deployVariable1.setValueSchema(validatorMap);
         assertNotEquals(deployVariable, deployVariable1);
         assertNotEquals(deployVariable1, deployVariable2);
         assertNotEquals(deployVariable.hashCode(), deployVariable1.hashCode());
@@ -142,7 +144,7 @@ class DeployVariableTest {
                 ", description=" + description + "" +
                 ", value=" + value + "" +
                 ", mandatory=" + mandatory + "" +
-                ", validator=" + validator + "" +
+                ", valueSchema=" + validatorMap + "" +
                 ", sensitiveScope=" + sensitiveScope + "" +
                 ")";
         assertEquals(expectedString, deployVariable.toString());
