@@ -7,8 +7,8 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +110,7 @@ public class DeployService {
     public DeployServiceEntity getNewDeployServiceTask(DeployTask deployTask) {
         DeployServiceEntity entity = new DeployServiceEntity();
         entity.setId(deployTask.getId());
-        entity.setCreateTime(new Date());
+        entity.setCreateTime(OffsetDateTime.now());
         entity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
         entity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getServiceName()));
         entity.setCsp(deployTask.getCreateRequest().getCsp());

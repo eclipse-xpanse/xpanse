@@ -7,10 +7,12 @@
 package org.eclipse.xpanse.modules.models.servicetemplate.view;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -60,13 +62,15 @@ public class ServiceTemplateVo extends RepresentationModel<ServiceTemplateVo> {
 
     @NotNull
     @Schema(description = "createTime of the registered service.")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
+    private OffsetDateTime createTime;
 
     @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
     @Schema(description = "Last updateTime of the registered service.")
-    private Date lastModifiedTime;
+    private OffsetDateTime lastModifiedTime;
 
     @NotNull
     @Schema(description = "State of service.")

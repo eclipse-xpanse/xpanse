@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import jakarta.validation.Valid;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
@@ -38,8 +38,8 @@ class UserAvailableServiceVoTest {
     private static final String namespace = "namespace";
     private static final String icon = "icon";
     private static final Deployment DEPLOYMENT = new Deployment();
-    private static final Date createTime = new Date();
-    private static final Date lastModifiedTime = new Date();
+    private static final OffsetDateTime createTime = OffsetDateTime.now();
+    private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private static final ServiceRegistrationState serviceRegistrationState =
             ServiceRegistrationState.REGISTERED;
     private static List<@Valid Region> regions;

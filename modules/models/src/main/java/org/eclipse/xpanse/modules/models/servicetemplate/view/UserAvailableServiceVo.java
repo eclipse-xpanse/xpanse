@@ -7,12 +7,14 @@
 package org.eclipse.xpanse.modules.models.servicetemplate.view;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
@@ -93,14 +95,17 @@ public class UserAvailableServiceVo extends RepresentationModel<UserAvailableSer
     private Billing billing;
 
     @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "The registration time of the service.")
-    private Date createTime;
+    @Schema(description = "createTime of the registered service.")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
+    private OffsetDateTime createTime;
 
     @NotNull
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "The latest update time of the available service.")
-    private Date lastModifiedTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
+    @Schema(description = "Last updateTime of the registered service.")
+    private OffsetDateTime lastModifiedTime;
+
 
     @NotNull
     @Schema(description = "The state of the available service.")
