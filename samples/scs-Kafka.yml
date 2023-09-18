@@ -78,7 +78,9 @@ deployment:
       kind: fix_env
       dataType: string
       mandatory: true
-      validator: length(1-256)
+      valueSchema:
+        minLength: 1
+        maxLength: 256
       sensitiveScope: none
       value: "https://api.gx-scs.sovereignit.cloud:5000/v3"
     - name: admin_passwd
@@ -86,7 +88,10 @@ deployment:
       kind: variable
       dataType: string
       mandatory: false
-      validator: minLength=8|maxLength=16|pattern=^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+      valueSchema:
+        minLength: 8
+        maxLength: 16
+        pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
       sensitiveScope: always
     - name: vpc_name
       description: The vpc name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create VPC.

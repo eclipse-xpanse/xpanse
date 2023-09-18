@@ -36,7 +36,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServic
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
-import org.eclipse.xpanse.modules.models.service.utils.DeployVariableValidator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
@@ -82,13 +82,13 @@ public class DeployService {
     @Resource
     private DeployResourceStorage deployResourceStorage;
     @Resource
-    private DeployVariableValidator deployVariableValidator;
-    @Resource
     private PluginManager pluginManager;
     @Resource
     private IdentityProviderManager identityProviderManager;
     @Resource
     private AesUtil aesUtil;
+    @Resource
+    private ServiceVariablesJsonSchemaValidator serviceVariablesJsonSchemaValidator;
 
     /**
      * Get all Deployment group by DeployerKind.
@@ -149,8 +149,10 @@ public class DeployService {
                 deployTask.getCreateRequest().getServiceRequestProperties())) {
             List<DeployVariable> deployVariables = serviceTemplate.getOcl().getDeployment()
                     .getVariables();
-            deployVariableValidator.isVariableValid(deployVariables,
-                    deployTask.getCreateRequest().getServiceRequestProperties());
+
+            serviceVariablesJsonSchemaValidator.validateDeployVariables(deployVariables,
+                    deployTask.getCreateRequest().getServiceRequestProperties(),
+                    serviceTemplate.getJsonObjectSchema());
         }
         encodeDeployVariable(serviceTemplate,
                 deployTask.getCreateRequest().getServiceRequestProperties());

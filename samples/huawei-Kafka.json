@@ -5,7 +5,6 @@
   "category": "middleware",
   "flavor": "1-zookeeper-with-3-worker-nodes-normal",
   "region": "cn-southwest-2",
-  "userName": "default",
   "customerServiceName": "default-kafka",
   "serviceRequestProperties": {}
 }

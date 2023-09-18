@@ -16,6 +16,7 @@ import org.eclipse.xpanse.api.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -34,6 +35,9 @@ class DeploymentWithMariaDbTest extends AbstractMariaDbIntegrationTest {
     ServiceTemplateApi ServiceTemplateApi;
 
     @Autowired
+    ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
+
+    @Autowired
     OclLoader oclLoader;
 
     @Test
@@ -50,7 +54,7 @@ class DeploymentWithMariaDbTest extends AbstractMariaDbIntegrationTest {
                 serviceTemplate.getOcl().getCloudServiceProvider().getRegions().get(0)
                         .toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("secgroup_id", "e2d4de73-1518-40f7-8de1-60f184ea6e1d");
+        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
         UUID deployUUid = serviceDeployerApi.deploy(createRequest);

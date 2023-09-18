@@ -8,7 +8,9 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.Map;
 import lombok.Data;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.VariableValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
@@ -48,8 +50,8 @@ public class DeployVariable {
     @Schema(description = "Indicates if the variable is mandatory")
     private Boolean mandatory;
 
-    @Schema(description = "Validator of the variable")
-    private String validator;
+    @Schema(description = "valueSchema of the variable")
+    private Map<VariableValidator, Object> valueSchema;
 
     @Schema(description = "Sensitive scope of variable storage")
     private SensitiveScope sensitiveScope = SensitiveScope.NONE;
