@@ -88,13 +88,9 @@ public class ServiceTemplateManage {
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)) {
-            if (!StringUtils.equals(existedService.getNamespace(),
-                    currentUserInfo.getNamespace())) {
-                throw new AccessDeniedException("No permissions to update services templates "
-                        + "belonging to other namespaces.");
-            }
+        if (!StringUtils.equals(getUserNamespace(), existedService.getNamespace())) {
+            throw new AccessDeniedException("No permissions to update service templates "
+                    + "belonging to other namespaces.");
         }
         iconUpdate(existedService, ocl);
         checkParams(existedService, ocl);
@@ -176,10 +172,8 @@ public class ServiceTemplateManage {
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
         validateTerraformScript(ocl);
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)
-                && StringUtils.isNotEmpty(currentUserInfo.getNamespace())) {
-            newEntity.setNamespace(currentUserInfo.getNamespace());
+        if (StringUtils.isNotBlank(getUserNamespace())) {
+            newEntity.setNamespace(getUserNamespace());
         } else {
             newEntity.setNamespace(ocl.getNamespace());
         }
@@ -211,23 +205,19 @@ public class ServiceTemplateManage {
      */
     public ServiceTemplateEntity getServiceTemplateDetails(String id, boolean checkNamespace) {
         UUID uuid = UUID.fromString(id);
-        ServiceTemplateEntity serviceTemplateEntity = storage.getServiceTemplateById(uuid);
-        if (Objects.isNull(serviceTemplateEntity)) {
+        ServiceTemplateEntity existedService = storage.getServiceTemplateById(uuid);
+        if (Objects.isNull(existedService)) {
             String errMsg = String.format("Service template with id %s not found.", id);
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
         if (checkNamespace) {
-            CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-            if (Objects.nonNull(currentUserInfo)) {
-                if (!StringUtils.equals(serviceTemplateEntity.getNamespace(),
-                        currentUserInfo.getNamespace())) {
-                    throw new AccessDeniedException("No permissions to view details of services "
-                            + "templates belonging to other namespaces.");
-                }
+            if (!StringUtils.equals(getUserNamespace(), existedService.getNamespace())) {
+                throw new AccessDeniedException("No permissions to view details of service "
+                        + "templates belonging to other namespaces.");
             }
         }
-        return serviceTemplateEntity;
+        return existedService;
     }
 
     /**
@@ -253,13 +243,9 @@ public class ServiceTemplateManage {
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)) {
-            if (!StringUtils.equals(existedService.getNamespace(),
-                    currentUserInfo.getNamespace())) {
-                throw new AccessDeniedException("No permissions to unregister services templates "
-                        + "belonging to other namespaces.");
-            }
+        if (!StringUtils.equals(getUserNamespace(), existedService.getNamespace())) {
+            throw new AccessDeniedException("No permissions to unregister service templates "
+                    + "belonging to other namespaces.");
         }
         storage.removeById(uuid);
         serviceTemplateOpenApiGenerator.deleteServiceApi(id);
@@ -327,6 +313,16 @@ public class ServiceTemplateManage {
                                 .collect(Collectors.toList()));
             }
         }
+    }
+
+    private String getUserNamespace() {
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)) {
+            return StringUtils.isBlank(currentUserInfo.getNamespace())
+                    ? currentUserInfo.getUserId()
+                    : currentUserInfo.getNamespace();
+        }
+        return null;
     }
 
 }
