@@ -75,6 +75,7 @@
         <nimbusds.oidc.sdk.version>10.7</nimbusds.oidc.sdk.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <json-schema-validator.version>1.0.87</json-schema-validator.version>
+        <archunit.version>1.1.0</archunit.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
@@ -198,6 +199,12 @@
                 <groupId>org.wiremock</groupId>
                 <artifactId>wiremock</artifactId>
                 <version>${wiremock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit-junit5</artifactId>
+                <version>${archunit.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
