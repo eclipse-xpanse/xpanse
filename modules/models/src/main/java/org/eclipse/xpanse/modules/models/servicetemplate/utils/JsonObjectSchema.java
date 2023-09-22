@@ -15,9 +15,9 @@ import lombok.Data;
 @Data
 public class JsonObjectSchema {
 
-    private static final String TYPE = "object";
+    private String type = "object";
     private Map<String, Map<String, Object>> properties;
     private List<String> required;
-    private final boolean additionalProperties = false;
+    private boolean additionalProperties;
 
 }

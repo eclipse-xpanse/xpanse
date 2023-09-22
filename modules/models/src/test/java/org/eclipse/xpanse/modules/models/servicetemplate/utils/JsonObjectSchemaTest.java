@@ -82,7 +82,8 @@ public class JsonObjectSchemaTest {
     @Test
     void testToString() {
         String expectedString = "JsonObjectSchema(" +
-                "properties=" + properties + "" +
+                "type=object, " +
+                "properties=" + properties +
                 ", required=" + required +
                 ", additionalProperties=" + false +
                 ")";
