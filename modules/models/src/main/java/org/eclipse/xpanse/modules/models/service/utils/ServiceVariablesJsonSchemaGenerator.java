@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -40,32 +41,35 @@ public class ServiceVariablesJsonSchemaGenerator {
         Map<String, Map<String, Object>> jsonObjectSchemaProperties = new HashMap<>();
         List<String> requiredList = new ArrayList<>();
         for (DeployVariable variable : deployVariables) {
-            Map<String, Object> validationProperties = new HashMap<>();
+            if (variable.getKind() == DeployVariableKind.VARIABLE
+                    || variable.getKind() == DeployVariableKind.ENV) {
+                Map<String, Object> validationProperties = new HashMap<>();
 
-            if (variable.getMandatory()) {
-                requiredList.add(variable.getName());
-            }
+                if (Boolean.TRUE.equals(variable.getMandatory())) {
+                    requiredList.add(variable.getName());
+                }
 
-            if (!CollectionUtils.isEmpty(variable.getValueSchema())) {
-                variable.getValueSchema().forEach((validator, value) ->
-                        validationProperties.put(validator.toValue(), value)
-                );
-            }
+                if (!CollectionUtils.isEmpty(variable.getValueSchema())) {
+                    variable.getValueSchema().forEach((validator, value) ->
+                            validationProperties.put(validator.toValue(), value)
+                    );
+                }
 
-            if (Objects.nonNull(variable.getDataType())) {
-                validationProperties.put(VARIABLE_TYPE_KEY, variable.getDataType().toValue());
-            }
+                if (Objects.nonNull(variable.getDataType())) {
+                    validationProperties.put(VARIABLE_TYPE_KEY, variable.getDataType().toValue());
+                }
 
-            if (Objects.nonNull(variable.getDescription())) {
-                validationProperties.put(VARIABLE_DESCRIPTION_KEY, variable.getDescription());
-            }
+                if (Objects.nonNull(variable.getDescription())) {
+                    validationProperties.put(VARIABLE_DESCRIPTION_KEY, variable.getDescription());
+                }
 
-            if (Objects.nonNull(variable.getExample())) {
-                validationProperties.put(VARIABLE_EXAMPLE_KEY, variable.getExample());
-            }
+                if (Objects.nonNull(variable.getExample())) {
+                    validationProperties.put(VARIABLE_EXAMPLE_KEY, variable.getExample());
+                }
 
-            if (!validationProperties.isEmpty()) {
-                jsonObjectSchemaProperties.put(variable.getName(), validationProperties);
+                if (!validationProperties.isEmpty()) {
+                    jsonObjectSchemaProperties.put(variable.getName(), validationProperties);
+                }
             }
         }
 
