@@ -41,7 +41,7 @@ public class IdentityProviderManager {
                 applicationContext.getBeansOfType(IdentityProviderService.class)
                         .values().stream().toList();
         if (CollectionUtils.isEmpty(identityProviderServices)) {
-            log.error("Not found any identity provider service is active.");
+            log.info("Not found any identity provider service is active.");
             activeIdentityProviderService = new IdentityProviderService() {
                 @Override
                 public IdentityProviderType getIdentityProviderType() {

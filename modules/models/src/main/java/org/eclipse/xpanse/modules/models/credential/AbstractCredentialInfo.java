@@ -64,8 +64,7 @@ public abstract class AbstractCredentialInfo {
      */
     @Getter
     @Setter
-    @NotNull
-    @Schema(description = "The id of user who create the credential.")
+    @Schema(description = "The id of user who created the credential.")
     String userId;
 
     /**

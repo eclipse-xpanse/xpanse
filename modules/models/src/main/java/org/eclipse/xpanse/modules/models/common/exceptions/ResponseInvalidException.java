@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Exception thrown when response beans does not match our own data model.
+ * Exception thrown when response beans do not match our own data model.
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
