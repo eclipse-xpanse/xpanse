@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudMetricsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,14 +33,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final DeployResourceHandler resourceHandler = new HuaweiTerraformResourceHandler();
+    @Value("${terraform.provider.huaweicloud.version}")
+    private String terraformHuaweiCloudVersion;
+
+    private final HuaweiTerraformResourceHandler huaweiTerraformResourceHandler;
 
     @Resource
     private HuaweiCloudMetricsService huaweiCloudMetricsService;
 
+    public HuaweiCloudOrchestratorPlugin(
+            HuaweiTerraformResourceHandler huaweiTerraformResourceHandler) {
+        this.huaweiTerraformResourceHandler = huaweiTerraformResourceHandler;
+    }
+
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return resourceHandler;
+        return this.huaweiTerraformResourceHandler;
     }
 
     @Override
@@ -107,4 +116,21 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
         return huaweiCloudMetricsService.getMetricsByService(serviceMetricRequest);
     }
 
+    @Override
+    public String getProvider(String region) {
+        return String.format("""
+            terraform {
+              required_providers {
+                huaweicloud = {
+                  source = "huaweicloud/huaweicloud"
+                  version = "%s"
+                }
+              }
+            }
+                        
+            provider "huaweicloud" {
+              region = "%s"
+            }
+            """, terraformHuaweiCloudVersion, region);
+    }
 }

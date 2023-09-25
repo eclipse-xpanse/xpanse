@@ -19,7 +19,7 @@ public class SystemStatus {
 
     @NotNull
     @Schema(description = "The health status of Xpanse api service.")
-    private HealthStatus healthStatus;
+    private     HealthStatus healthStatus;
 
     @Schema(description = "The health status of backend systems. "
             + "This list contains status of identity provider and status of database."

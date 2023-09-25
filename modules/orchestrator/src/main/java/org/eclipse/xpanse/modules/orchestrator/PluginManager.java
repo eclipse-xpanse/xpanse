@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /**
- * The instance to manage the all the plugins.
+ * The instance to manage all the plugins.
  */
 @Slf4j
 @Component
@@ -71,6 +71,10 @@ public class PluginManager {
                     "Can't find suitable plugin for the Csp " + csp.name());
         }
         return plugin;
+    }
+
+    public String getTerraformProviderForRegionByCsp(Csp csp, String region) {
+        return getOrchestratorPlugin(csp).getProvider(region);
     }
 
     private boolean isPluginUsable(List<String> requiredProperties, Csp csp) {

@@ -49,7 +49,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         FlexibleEngineMonitorClient.class, RetryTemplateService.class,
         FlexibleEngineMetricsConverter.class, CredentialCenter.class,
         ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
-        FlexibleEngineRestTemplateConfig.class, RestTemplateLoggingInterceptor.class})
+        FlexibleEngineRestTemplateConfig.class, RestTemplateLoggingInterceptor.class,
+        FlexibleEngineTerraformResourceHandler.class})
 class FlexibleEngineMonitorIntegrationTest {
 
     @RegisterExtension

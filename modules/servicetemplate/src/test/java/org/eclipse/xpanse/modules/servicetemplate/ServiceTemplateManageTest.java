@@ -26,7 +26,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformProviderVersion;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
@@ -36,6 +35,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
@@ -59,7 +59,7 @@ class ServiceTemplateManageTest {
     private static UUID uuid;
 
     @Mock
-    private TerraformProviderVersion terraformProviderVersion;
+    private PluginManager pluginManager;
     @Mock
     private ServiceTemplateStorage mockStorage;
     @Mock
@@ -108,11 +108,23 @@ class ServiceTemplateManageTest {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformProviderVersion, deployServiceStorage, deployResourceStorage,
-                        terraformLocalConfig);
+                        deployServiceStorage, deployResourceStorage, terraformLocalConfig, pluginManager);
 
         doReturn(deployment).when(mockDeployService).getDeployment(any());
-
+        doReturn("""
+            terraform {
+              required_providers {
+                huaweicloud = {
+                  source = "huaweicloud/huaweicloud"
+                  version = "~> 1.51.0"
+                }
+              }
+            }
+                        
+            provider "huaweicloud" {
+              region = "test"
+            }
+            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
         ServiceTemplateEntity ServiceTemplateEntityByUrl =
                 serviceTemplateManageTest.updateServiceTemplateByUrl(uuid.toString(),
                         oclLocation);
@@ -145,11 +157,24 @@ class ServiceTemplateManageTest {
 
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
-                new TerraformDeployment(new DeployEnvironments(null, null, null, null)
-                        , terraformProviderVersion, deployServiceStorage, deployResourceStorage,
-                        terraformLocalConfig);
+                new TerraformDeployment(new DeployEnvironments(null, null, null, null),
+                        deployServiceStorage, deployResourceStorage,
+                        terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
-
+        doReturn("""
+            terraform {
+              required_providers {
+                huaweicloud = {
+                  source = "huaweicloud/huaweicloud"
+                  version = "~> 1.51.0"
+                }
+              }
+            }
+                        
+            provider "huaweicloud" {
+              region = "test"
+            }
+            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
         ServiceTemplateEntity updateServiceTemplateEntity =
                 serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl);
         log.error(updateServiceTemplateEntity.toString());
@@ -162,9 +187,23 @@ class ServiceTemplateManageTest {
     void testRegisterServiceTemplate() {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null)
-                        , terraformProviderVersion, deployServiceStorage, deployResourceStorage,
-                        terraformLocalConfig);
+                        , deployServiceStorage, deployResourceStorage,
+                        terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
+        doReturn("""
+            terraform {
+              required_providers {
+                huaweicloud = {
+                  source = "huaweicloud/huaweicloud"
+                  version = "~> 1.51.0"
+                }
+              }
+            }
+                        
+            provider "huaweicloud" {
+              region = "test"
+            }
+            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplate(oclRegister);
         Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
@@ -177,9 +216,23 @@ class ServiceTemplateManageTest {
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(oclRegister);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null)
-                        , terraformProviderVersion, deployServiceStorage, deployResourceStorage,
-                        terraformLocalConfig);
+                        , deployServiceStorage, deployResourceStorage,
+                        terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
+        doReturn("""
+            terraform {
+              required_providers {
+                huaweicloud = {
+                  source = "huaweicloud/huaweicloud"
+                  version = "~> 1.51.0"
+                }
+              }
+            }
+                        
+            provider "huaweicloud" {
+              region = "test"
+            }
+            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplateByUrl(oclLocation);
         Assertions.assertEquals(ServiceRegistrationState.REGISTERED,

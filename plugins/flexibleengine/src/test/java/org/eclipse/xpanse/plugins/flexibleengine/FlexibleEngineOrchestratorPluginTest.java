@@ -26,13 +26,13 @@ import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMet
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
 import org.junit.jupiter.api.Test;
 
-public class FlexibleEngineOrchestratorPluginTest {
+class FlexibleEngineOrchestratorPluginTest {
 
     private final FlexibleEngineOrchestratorPlugin plugin = new FlexibleEngineOrchestratorPlugin(
             new FlexibleEngineMetricsService(new FlexibleEngineMonitorClient(),
                     new FlexibleEngineMetricsConverter(),
                     new ServiceMetricsStore(new ServiceMetricsCacheManager()),
-                    new RetryTemplateService(), null));
+                    new RetryTemplateService(), null), new FlexibleEngineTerraformResourceHandler());
 
     @Test
     void getResourceHandler() {

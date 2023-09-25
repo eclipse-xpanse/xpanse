@@ -55,7 +55,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {OpenstackOrchestratorPlugin.class, MetricsManager.class,
         KeystoneManager.class, ResourcesService.class, GnocchiToXpanseModelConverter.class,
         AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class,
-        CredentialCenter.class, ServiceMetricsStore.class})
+        CredentialCenter.class, ServiceMetricsStore.class, OpenstackTerraformResourceHandler.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpenstackMonitoringIntegrationTest {
 

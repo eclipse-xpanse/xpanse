@@ -10,6 +10,7 @@ import java.util.List;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.credential.AuthenticationCapabilities;
 import org.eclipse.xpanse.modules.orchestrator.deployment.ServiceResourceHandler;
+import org.eclipse.xpanse.modules.orchestrator.deployment.TerraformProvider;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
 
 /**
@@ -17,7 +18,8 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
  * APIs.
  */
 public interface OrchestratorPlugin
-        extends ServiceResourceHandler, AuthenticationCapabilities, ServiceMetricsExporter {
+        extends ServiceResourceHandler, AuthenticationCapabilities, ServiceMetricsExporter,
+        TerraformProvider {
 
     /**
      * get the Csp of the plugin.

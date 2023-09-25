@@ -21,6 +21,8 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.scs.constants.ScsEnvironmentConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +32,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final DeployResourceHandler resourceHandler = new ScsTerraformResourceHandler();
+    private final ScsTerraformResourceHandler scsTerraformResourceHandler;
+
+    @Value("${terraform.provider.scs.version}")
+    private String terraformScsVersion;
+
+    @Autowired
+    public ScsOrchestratorPlugin(ScsTerraformResourceHandler scsTerraformResourceHandler) {
+        this.scsTerraformResourceHandler = scsTerraformResourceHandler;
+    }
 
 
     /**
@@ -38,7 +48,7 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return resourceHandler;
+        return scsTerraformResourceHandler;
     }
 
     /**
@@ -113,5 +123,23 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public String getProvider(String region) {
+        return String.format("""
+            terraform {
+              required_providers {
+                openstack = {
+                      source  = "terraform-provider-openstack/openstack"
+                      version = "%s"
+                    }
+              }
+            }
+                        
+            provider "openstack" {
+              region = "%s"
+            }
+            """, terraformScsVersion, region);
     }
 }

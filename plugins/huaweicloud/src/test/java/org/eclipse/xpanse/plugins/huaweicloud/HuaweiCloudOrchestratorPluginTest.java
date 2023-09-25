@@ -20,9 +20,10 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Test;
 
-public class HuaweiCloudOrchestratorPluginTest {
+class HuaweiCloudOrchestratorPluginTest {
 
-    private final HuaweiCloudOrchestratorPlugin plugin = new HuaweiCloudOrchestratorPlugin();
+    private final HuaweiCloudOrchestratorPlugin plugin = new HuaweiCloudOrchestratorPlugin(
+            new HuaweiTerraformResourceHandler());
 
     @Test
     void getResourceHandler() {

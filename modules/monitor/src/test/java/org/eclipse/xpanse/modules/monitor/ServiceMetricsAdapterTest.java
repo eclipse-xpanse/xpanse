@@ -202,6 +202,11 @@ class ServiceMetricsAdapterTest {
     private OrchestratorPlugin getOrchestratorPlugin(Csp csp, List<Metric> metrics) {
         return new OrchestratorPlugin() {
             @Override
+            public String getProvider(String region) {
+                return null;
+            }
+
+            @Override
             public Csp getCsp() {
                 return csp;
             }

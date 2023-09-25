@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,17 +33,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
+    private final FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler;
     private final FlexibleEngineMetricsService flexibleEngineMetricsService;
+
+    @Value("${terraform.provider.flexibleengine.version}")
+    private String terraformFlexibleEngineVersion;
 
     @Autowired
     public FlexibleEngineOrchestratorPlugin(
-            FlexibleEngineMetricsService flexibleEngineMetricsService) {
+            FlexibleEngineMetricsService flexibleEngineMetricsService,
+            FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler) {
         this.flexibleEngineMetricsService = flexibleEngineMetricsService;
+        this.flexibleEngineTerraformResourceHandler = flexibleEngineTerraformResourceHandler;
     }
 
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return new FlexibleEngineTerraformResourceHandler();
+        return this.flexibleEngineTerraformResourceHandler;
     }
 
     @Override
@@ -106,5 +113,23 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
         return flexibleEngineMetricsService.getMetricsForService(serviceMetricRequest);
+    }
+
+    @Override
+    public String getProvider(String region) {
+        return String.format("""         
+            terraform {
+              required_providers {
+                flexibleengine = {
+                  source  = "FlexibleEngineCloud/flexibleengine"
+                  version = "%s"
+                }
+              }
+            }
+                        
+            provider "flexibleengine" {
+              region = "%s"
+            }
+            """, terraformFlexibleEngineVersion, region);
     }
 }

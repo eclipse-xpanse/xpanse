@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
@@ -36,7 +37,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -45,16 +45,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class,
-        TerraformProviderVersion.class, DeployServiceStorage.class, DeployResourceStorage.class,
+        PluginManager.class, DeployServiceStorage.class, DeployResourceStorage.class,
         TerraformLocalConfig.class})
-@TestPropertySource(properties = {"terraform.provider.huaweicloud.version=~> 1.51.0"})
 class TerraformDeploymentTest {
 
     @Autowired
     TerraformDeployment terraformDeployment;
-
-    @Autowired
-    TerraformProviderVersion terraformProviderVersion;
 
     @MockBean
     DeployEnvironments deployEnvironments;
@@ -67,6 +63,9 @@ class TerraformDeploymentTest {
 
     @MockBean
     TerraformLocalConfig terraformLocalConfig;
+
+    @MockBean
+    PluginManager pluginManager;
 
     @Test
     void basicTest() throws Exception {
@@ -91,6 +90,20 @@ class TerraformDeploymentTest {
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setCreateRequest(deployRequest);
         doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any(DeployTask.class));
+        doReturn("""
+            terraform {
+              required_providers {
+                openstack = {
+                      source  = "terraform-provider-openstack/openstack"
+                      version = ">= 1.48.0"
+                    }
+              }
+            }
+                        
+            provider "openstack" {
+              region = "test"
+            }
+            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
         Assertions.assertThrows(ServiceNotDeployedException.class, ()->{
                     terraformDeployment.deploy(xpanseDeployTask);
                 });
@@ -106,6 +119,20 @@ class TerraformDeploymentTest {
                 .set(field(DeployTask::getCreateRequest), createRequest).create();
         when(this.deployEnvironments.getFlavorVariables(any(DeployTask.class))).thenReturn(
                 new HashMap<>());
+        doReturn("""
+            terraform {
+              required_providers {
+                openstack = {
+                      source  = "terraform-provider-openstack/openstack"
+                      version = ">= 1.48.0"
+                    }
+              }
+            }
+                        
+            provider "openstack" {
+              region = "test"
+            }
+            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
         Assertions.assertThrows(TerraformExecutorException.class,
                 () -> this.terraformDeployment.destroy(deployTask, "test"));
     }
@@ -139,7 +166,20 @@ class TerraformDeploymentTest {
         deployTask.setId(uuid);
         deployTask.setCreateRequest(createRequest);
         deployTask.setOcl(ocl);
-
+        doReturn("""
+            terraform {
+              required_providers {
+                openstack = {
+                      source  = "terraform-provider-openstack/openstack"
+                      version = ">= 1.48.0"
+                    }
+              }
+            }
+                        
+            provider "openstack" {
+              region = "test"
+            }
+            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
         Assertions.assertThrows(TerraformExecutorException.class,
                 () -> this.terraformDeployment.deploy(deployTask));
     }
