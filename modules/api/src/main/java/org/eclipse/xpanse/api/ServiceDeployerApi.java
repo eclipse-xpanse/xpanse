@@ -6,14 +6,15 @@
 
 package org.eclipse.xpanse.api;
 
-
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 
+import io.nflow.engine.service.WorkflowInstanceService;
+import io.nflow.engine.workflow.instance.WorkflowInstance;
+import io.nflow.engine.workflow.instance.WorkflowInstanceFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,8 @@ import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.nflow.definition.ServiceMigrationWorkflow;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -58,9 +61,20 @@ import org.springframework.web.bind.annotation.RestController;
 @Secured({ROLE_ADMIN, ROLE_USER})
 public class ServiceDeployerApi {
 
-    @Resource
-    private DeployService deployService;
+    private final DeployService deployService;
 
+    private final WorkflowInstanceService workflowInstances;
+
+    private final WorkflowInstanceFactory workflowInstanceFactory;
+
+    @Autowired
+    public ServiceDeployerApi(DeployService deployService,
+            WorkflowInstanceService workflowInstances,
+            WorkflowInstanceFactory workflowInstanceFactory) {
+        this.deployService = deployService;
+        this.workflowInstances = workflowInstances;
+        this.workflowInstanceFactory = workflowInstanceFactory;
+    }
 
     /**
      * Get details of the managed service by id.
@@ -177,6 +191,37 @@ public class ServiceDeployerApi {
         this.deployService.purgeService(deployment, deployTask);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
+    }
+
+    /**
+     * Start a task to migrate the deployed service using id
+     *
+     * @param deployRequest the managed service to create.
+     * @param oldId            ID of deployed service
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Start a task to migrate the deployed service using id.")
+    @PostMapping(value = "/services/migrate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public UUID migrate(@Valid @RequestBody CreateRequest deployRequest,
+            @PathVariable("id") String oldId) {
+        log.info("Migrate managed service with id {}", oldId);
+        UUID newId = UUID.randomUUID();
+        workflowInstances.insertWorkflowInstance(
+                getWorkflowInstance(oldId, deployRequest, newId));
+        return newId;
+    }
+
+    private WorkflowInstance getWorkflowInstance(String oldId,
+            CreateRequest deployRequest, UUID newId) {
+        return workflowInstanceFactory.newWorkflowInstanceBuilder()
+                .setType(ServiceMigrationWorkflow.TYPE)
+                .putStateVariable(ServiceMigrationWorkflow.NEW_ID, newId)
+                .putStateVariable(ServiceMigrationWorkflow.DEPLOY_REQUEST, deployRequest)
+                .putStateVariable(ServiceMigrationWorkflow.OLD_ID, oldId)
+                .setBusinessKey(newId.toString())
+                .setExternalId(newId.toString())
+                .build();
     }
 
     private ServiceQueryModel getServiceQueryModel(Category category, Csp csp,

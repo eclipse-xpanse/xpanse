@@ -191,6 +191,16 @@ public class DeployService {
      */
     @Async("taskExecutor")
     public void asyncDeployService(Deployment deployment, DeployTask deployTask) {
+        deployService(deployment, deployTask);
+    }
+
+    /**
+     * Method to deploy service.
+     *
+     * @param deployment deployment
+     * @param deployTask deployTask
+     */
+    public void deployService(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
         DeployResult deployResult = new DeployResult();
@@ -300,6 +310,16 @@ public class DeployService {
      */
     @Async("taskExecutor")
     public void asyncDestroyService(Deployment deployment, DeployTask deployTask) {
+        destroyService(deployment, deployTask);
+    }
+
+    /**
+     * Method to destroy service.
+     *
+     * @param deployment deployment
+     * @param deployTask deployTask
+     */
+    public void destroyService(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());

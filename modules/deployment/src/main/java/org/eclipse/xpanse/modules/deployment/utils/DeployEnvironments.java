@@ -119,7 +119,7 @@ public class DeployEnvironments {
         Map<String, String> variables = new HashMap<>();
         Map<String, String> request = task.getCreateRequest().getServiceRequestProperties();
         for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {
-            if (variable.getKind() == DeployVariableKind.VARIABLE) {
+            if (!Objects.isNull(request) && variable.getKind() == DeployVariableKind.VARIABLE) {
                 if (request.containsKey(variable.getName())
                         && request.get(variable.getName()) != null) {
                     variables.put(variable.getName(),

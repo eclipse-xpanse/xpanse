@@ -83,5 +83,15 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.nflow</groupId>
+            <artifactId>nflow-engine</artifactId>
+            <version>${nflow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>workflow</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
