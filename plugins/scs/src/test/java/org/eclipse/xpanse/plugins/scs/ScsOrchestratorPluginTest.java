@@ -25,7 +25,8 @@ import org.junit.jupiter.api.Test;
 
 class ScsOrchestratorPluginTest {
 
-    private final ScsOrchestratorPlugin plugin = new ScsOrchestratorPlugin();
+    private final ScsOrchestratorPlugin plugin = new ScsOrchestratorPlugin(
+            new ScsTerraformResourceHandler());
 
     @Test
     void getResourceHandler() {

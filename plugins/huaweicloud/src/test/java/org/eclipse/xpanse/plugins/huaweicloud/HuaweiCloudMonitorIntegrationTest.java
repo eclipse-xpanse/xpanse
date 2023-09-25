@@ -44,7 +44,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class,
         HuaweiCloudMetricsService.class, HuaweiCloudMonitorClient.class,
         HuaweiCloudMonitorConstants.class, HuaweiCloudDataModelConverter.class,
-        CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class})
+        CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
+        HuaweiTerraformResourceHandler.class})
 class HuaweiCloudMonitorIntegrationTest {
 
     @RegisterExtension

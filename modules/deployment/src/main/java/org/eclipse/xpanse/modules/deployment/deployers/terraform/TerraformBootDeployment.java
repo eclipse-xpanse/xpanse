@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
@@ -48,7 +49,7 @@ public class TerraformBootDeployment implements Deployment {
 
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     private final DeployEnvironments deployEnvironments;
-    private final TerraformProviderVersion terraformProviderVersion;
+    private final PluginManager pluginManager;
     private final TerraformBootConfig terraformBootConfig;
     private final String port;
     private final TerraformApi terraformApi;
@@ -59,12 +60,12 @@ public class TerraformBootDeployment implements Deployment {
     @Autowired
     public TerraformBootDeployment(
             DeployEnvironments deployEnvironments,
-            TerraformProviderVersion terraformProviderVersion,
+            PluginManager pluginManager,
             TerraformBootConfig terraformBootConfig,
             TerraformApi terraformApi,
             @Value("${server.port}") String port) {
         this.deployEnvironments = deployEnvironments;
-        this.terraformProviderVersion = terraformProviderVersion;
+        this.pluginManager = pluginManager;
         this.terraformBootConfig = terraformBootConfig;
         this.terraformApi = terraformApi;
         this.port = port;
@@ -174,20 +175,16 @@ public class TerraformBootDeployment implements Deployment {
 
     private List<String> getFiles(DeployTask task) {
         Csp csp = task.getCreateRequest().getCsp();
-        String version = terraformProviderVersion.getTerraformVersionByCsp(csp);
         String region = task.getCreateRequest().getRegion();
-        String provider = TerraformProviders.getProvider(csp).getProvider(version, region);
+        String provider = this.pluginManager.getTerraformProviderForRegionByCsp(csp, region);
         String deployer = task.getOcl().getDeployment().getDeployer();
         return Arrays.asList(provider, deployer);
     }
 
     private List<String> getFilesByOcl(Ocl ocl) {
         Csp csp = ocl.getCloudServiceProvider().getName();
-        String version =
-                terraformProviderVersion.getTerraformVersionByCsp(
-                        ocl.getCloudServiceProvider().getName());
         String region = ocl.getCloudServiceProvider().getRegions().get(0).getName();
-        String provider = TerraformProviders.getProvider(csp).getProvider(version, region);
+        String provider = this.pluginManager.getTerraformProviderForRegionByCsp(csp, region);
         String deployer = ocl.getDeployment().getDeployer();
         return Arrays.asList(provider, deployer);
     }

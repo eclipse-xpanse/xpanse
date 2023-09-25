@@ -38,6 +38,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
@@ -48,7 +49,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Implementation of th deployment with terraform.
+ * Implementation of the deployment with terraform.
  */
 @Slf4j
 @Component
@@ -60,10 +61,10 @@ public class TerraformDeployment implements Deployment {
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
     private final DeployEnvironments deployEnvironments;
-    private final TerraformProviderVersion terraformProviderVersion;
     private final DeployServiceStorage deployServiceStorage;
     private final DeployResourceStorage deployResourceStorage;
     private final TerraformLocalConfig terraformLocalConfig;
+    private final PluginManager pluginManager;
 
     /**
      * Initializes the Terraform deployer.
@@ -71,15 +72,14 @@ public class TerraformDeployment implements Deployment {
     @Autowired
     public TerraformDeployment(
             DeployEnvironments deployEnvironments,
-            TerraformProviderVersion terraformProviderVersion,
             DeployServiceStorage deployServiceStorage,
             DeployResourceStorage deployResourceStorage,
-            TerraformLocalConfig terraformLocalConfig) {
+            TerraformLocalConfig terraformLocalConfig, PluginManager pluginManager) {
         this.deployEnvironments = deployEnvironments;
-        this.terraformProviderVersion = terraformProviderVersion;
         this.deployServiceStorage = deployServiceStorage;
         this.deployResourceStorage = deployResourceStorage;
         this.terraformLocalConfig = terraformLocalConfig;
+        this.pluginManager = pluginManager;
     }
 
     /**
@@ -238,7 +238,7 @@ public class TerraformDeployment implements Deployment {
             Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile)
                     .forEach(File::delete);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -278,16 +278,11 @@ public class TerraformDeployment implements Deployment {
      */
     private void createScriptFile(Csp csp, String region, String workspace, String script) {
         log.info("start create terraform script");
-        String version = terraformProviderVersion.getTerraformVersionByCsp(csp);
-        if (StringUtils.isBlank(version)) {
-            log.error("Csp doesn't exist,csp: {}", csp);
-            return;
-        }
         String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
         try (FileWriter verWriter = new FileWriter(verScriptPath);
                 FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(TerraformProviders.getProvider(csp).getProvider(version, region));
+            verWriter.write(pluginManager.getTerraformProviderForRegionByCsp(csp, region));
             scriptWriter.write(script);
             log.info("terraform script create success");
         } catch (IOException ex) {
@@ -309,16 +304,11 @@ public class TerraformDeployment implements Deployment {
         if (!parentPath.exists() || !parentPath.isDirectory()) {
             parentPath.mkdirs();
         }
-        String version = terraformProviderVersion.getTerraformVersionByCsp(csp);
-        if (StringUtils.isBlank(version)) {
-            log.error("Csp does't exist,csp: {}", csp);
-            return;
-        }
         String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + STATE_FILE_NAME;
         try (FileWriter verWriter = new FileWriter(verScriptPath);
                 FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(TerraformProviders.getProvider(csp).getProvider(version, region));
+            verWriter.write(pluginManager.getTerraformProviderForRegionByCsp(csp, region));
             scriptWriter.write(tfState);
             log.info("create terraform destroy workspace and script success.");
         } catch (IOException e) {

@@ -86,5 +86,10 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
         return null;
     }
+
+    @Override
+    public String getProvider(String region) {
+        return null;
+    }
 }
 

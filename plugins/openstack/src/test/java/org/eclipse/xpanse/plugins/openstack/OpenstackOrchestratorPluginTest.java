@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 class OpenstackOrchestratorPluginTest {
 
     private final OpenstackOrchestratorPlugin plugin = new OpenstackOrchestratorPlugin(
-            new MetricsManager(new KeystoneManager(null), new ResourcesService(),
+            new OpenstackTerraformResourceHandler(), new MetricsManager(new KeystoneManager(null), new ResourcesService(),
                     new GnocchiToXpanseModelConverter(),
                     new AggregationService(new MetricsQueryBuilder()),
                     new MeasuresService(new MetricsQueryBuilder()), null,

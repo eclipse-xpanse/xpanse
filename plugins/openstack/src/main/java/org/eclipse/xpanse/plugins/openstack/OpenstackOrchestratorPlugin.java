@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.monitor.utils.MetricsManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,12 +33,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final DeployResourceHandler resourceHandler = new OpenstackTerraformResourceHandler();
+    private final OpenstackTerraformResourceHandler openstackTerraformResourceHandler;
+
+    @Value("${terraform.provider.openstack.version}")
+    private String terraformOpenStackVersion;
 
     private final MetricsManager metricsManager;
 
     @Autowired
-    public OpenstackOrchestratorPlugin(MetricsManager metricsManager) {
+    public OpenstackOrchestratorPlugin(
+            OpenstackTerraformResourceHandler openstackTerraformResourceHandler,
+            MetricsManager metricsManager) {
+        this.openstackTerraformResourceHandler = openstackTerraformResourceHandler;
         this.metricsManager = metricsManager;
     }
 
@@ -46,7 +53,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return resourceHandler;
+        return this.openstackTerraformResourceHandler;
     }
 
     /**
@@ -134,6 +141,24 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
             metrics.addAll(this.metricsManager.getMetrics(resourceMetricRequest));
         }
         return metrics;
+    }
+
+    @Override
+    public String getProvider(String region) {
+        return String.format("""
+                terraform {
+                  required_providers {
+                    openstack = {
+                          source  = "terraform-provider-openstack/openstack"
+                          version = "%s"
+                        }
+                  }
+                }
+                            
+                provider "openstack" {
+                  region = "%s"
+                }
+                """, terraformOpenStackVersion, region);
     }
 
 }
