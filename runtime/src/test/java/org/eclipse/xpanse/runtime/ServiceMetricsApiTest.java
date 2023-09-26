@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.xpanse.api.ServiceMetricsApi;
+import org.eclipse.xpanse.api.controllers.ServiceMetricsApi;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.MetricItem;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
