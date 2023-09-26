@@ -34,7 +34,7 @@ public class ResponseValidator {
     }
 
     @AfterReturning(
-            pointcut = "execution(* org.eclipse.xpanse.api..*(..))",
+            pointcut = "execution(* org.eclipse.xpanse.api.controllers..*(..))",
             returning = "result")
     public void validateResponseData(Object result) {
         validateResponse(result);

@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.api;
+package org.eclipse.xpanse.api.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

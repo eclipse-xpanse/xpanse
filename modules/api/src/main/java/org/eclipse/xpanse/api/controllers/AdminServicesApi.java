@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.api;
+package org.eclipse.xpanse.api.controllers;
 
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;

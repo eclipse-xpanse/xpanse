@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.eclipse.xpanse.api.ServiceMetricsApi;
+import org.eclipse.xpanse.api.controllers.ServiceMetricsApi;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
