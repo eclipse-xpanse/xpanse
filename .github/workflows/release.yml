@@ -10,7 +10,7 @@ on:
     inputs:
       ReleaseType:
         type: choice
-        description: Select the next development version
+        description: Select the version to released
         options:
           - Major Version
           - Minor Version
@@ -72,8 +72,8 @@ jobs:
           current-version: ${{ env.CURRENT_VERSION }}
           version-fragment: ${{ env.VERSION_FRAGMENT }}
 
-      - name: Remove SNAPSHOT from POM version
-        run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false
+      - name: Update POMs to version to be released
+        run: mvn versions:set -DnewVersion=${{ steps.new_version.outputs.next-version }} -DgenerateBackupPoms=false
 
       - name: Build
         run: mvn clean deploy -PreleaseBuild -DskipTests
@@ -102,7 +102,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.CURRENT_VERSION }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.new_version.outputs.next-version }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
 
@@ -123,7 +123,7 @@ jobs:
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.ORG_GPG_PRIVATE_KEY }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.ORG_GPG_PUBLIC_KEY }}
-          JRELEASER_PROJECT_VERSION: ${{ env.CURRENT_VERSION }}
+          JRELEASER_PROJECT_VERSION: ${{ steps.new_version.outputs.next-version }}
         uses: jreleaser/release-action@v2
         with:
           arguments: release
