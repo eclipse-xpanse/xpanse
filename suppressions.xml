@@ -5,4 +5,5 @@
 
 <suppressions>
     <suppress files="[\\/]modules[\\/]deployment[\\/]src[\\/]main[\\/]java[\\/]org[\\/]eclipse[\\/]xpanse[\\/]modules[\\/]deployment[\\/]deployers[\\/]terraform[\\/]terraformboot[\\/]" checks=".*"/>
+    <suppress files="[\\/]modules[\\/]policy[\\/]src[\\/]main[\\/]java[\\/]org[\\/]eclipse[\\/]xpanse[\\/]modules[\\/]policy[\\/]policyman[\\/]generated[\\/]" checks=".*"/>
 </suppressions>
