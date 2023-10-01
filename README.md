@@ -35,11 +35,25 @@ Details can be found on the project website [here](https://eclipse-xpanse.github
 
 ## Generate terraform-boot client code
 
-1. Run the terraform-boot project and access “http://localhost:9090/v3/api-docs" get JSON(local run).
-2. Copy the JSON content and place it in the resources folder under the deployment package under the modules module in the xpanse project, naming it 'terraformbootApi. json'.
-3. Use the maven command to generate the RESTful API client and data models for the deployment module:
+1. Run the terraform-boot project and access “http://localhost:9090/v3/api-docs” to get the openapi json.
+2. Copy the JSON content and place in [this folder](modules/deployment/src/main/resources/) and name the file as '
+   terraformbootApi.json'.
+3. Run the below maven command to generate the REST API client and data models for terraform-boot. The command can be
+   executed directly inside the `deployment` module.
+
 ```ssh
   mvn clean generate-sources -DskipTerraformBootClientGeneration=false
+```
+
+## Generate policy-man client code
+
+1. Run the policy-man project and access “http://localhost:9443/swagger/doc.json” to get the openapi json.
+2. Copy the JSON content and place in [this folder](modules/policy/src/main/resources/) and name the file as 'policy-man-openapi.json'.
+3. Run the below maven command to generate the REST API client and data models for policy-man. The command can be
+   executed directly inside the `policy` module.
+
+```ssh
+  mvn clean generate-sources -DskipPolicyManClientGeneration=false
 ```
 
 ## Static Code Analysis using CheckStyle

@@ -1,0 +1,482 @@
+{
+  "schemes": [],
+  "swagger": "2.0",
+  "info": {
+    "description": "OpenAPI of policy-man server",
+    "title": "OpenAPI of policy-man",
+    "contact": {},
+    "version": "1.0"
+  },
+  "host": "",
+  "basePath": "",
+  "paths": {
+    "/evaluate/policies": {
+      "post": {
+        "description": "Evaluate whether the input meets all the policies",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Policies Evaluation"
+        ],
+        "summary": "Evaluate the input by policies",
+        "parameters": [
+          {
+            "description": "evalCmdList",
+            "name": "cmdList",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvalCmdList"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/EvalResult"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          }
+        }
+      }
+    },
+    "/evaluate/policies/raw": {
+      "post": {
+        "description": "Evaluate the input by all the policies and get raw result",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Policies Evaluation"
+        ],
+        "summary": "Evaluate the input by policies",
+        "parameters": [
+          {
+            "description": "evalCmdList",
+            "name": "cmdList",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvalCmdList"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/rego.Result"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          }
+        }
+      }
+    },
+    "/evaluate/policy": {
+      "post": {
+        "description": "Evaluate whether the input meets the policy",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Policies Evaluation"
+        ],
+        "summary": "Evaluate the input by policies",
+        "parameters": [
+          {
+            "description": "evalCmd",
+            "name": "cmd",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvalCmd"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/EvalResult"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          }
+        }
+      }
+    },
+    "/evaluate/policy/raw": {
+      "post": {
+        "description": "Evaluate the input by the policy and get raw result",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Policies Evaluation"
+        ],
+        "summary": "Evaluate the input by policies",
+        "parameters": [
+          {
+            "description": "evalCmd",
+            "name": "cmd",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EvalCmd"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/rego.Result"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Check health status of service",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Check health",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/SystemStatus"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          }
+        }
+      }
+    },
+    "/validate/policies": {
+      "post": {
+        "description": "Validate the policies",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Policies Validate"
+        ],
+        "summary": "Validate the policies",
+        "parameters": [
+          {
+            "description": "policyList",
+            "name": "policyList",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ValidatePolicyList"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ValidateResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "schema": {
+              "$ref": "#/definitions/ErrorResult"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ErrorResult": {
+      "type": "object",
+      "required": [
+        "err_msg"
+      ],
+      "properties": {
+        "err_msg": {
+          "type": "string"
+        }
+      }
+    },
+    "EvalCmd": {
+      "type": "object",
+      "required": [
+        "input",
+        "policy"
+      ],
+      "properties": {
+        "input": {
+          "type": "string"
+        },
+        "policy": {
+          "type": "string"
+        }
+      }
+    },
+    "EvalCmdList": {
+      "type": "object",
+      "required": [
+        "input",
+        "policy_list"
+      ],
+      "properties": {
+        "input": {
+          "type": "string"
+        },
+        "policy_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "EvalResult": {
+      "type": "object",
+      "required": [
+        "input",
+        "isSuccessful",
+        "policy"
+      ],
+      "properties": {
+        "input": {
+          "type": "string"
+        },
+        "isSuccessful": {
+          "type": "boolean"
+        },
+        "policy": {
+          "type": "string"
+        }
+      }
+    },
+    "HealthStatus": {
+      "type": "string",
+      "enum": [
+        "OK",
+        "NOK"
+      ],
+      "x-enum-varnames": [
+        "healthOK",
+        "healthNOK"
+      ]
+    },
+    "SystemStatus": {
+      "type": "object",
+      "required": [
+        "healthStatus"
+      ],
+      "properties": {
+        "healthStatus": {
+          "$ref": "#/definitions/HealthStatus"
+        }
+      }
+    },
+    "ValidatePolicyList": {
+      "type": "object",
+      "required": [
+        "policy_list"
+      ],
+      "properties": {
+        "policy_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ValidateResponse": {
+      "type": "object",
+      "required": [
+        "err_msg",
+        "isSuccessful",
+        "policy"
+      ],
+      "properties": {
+        "err_msg": {
+          "type": "string"
+        },
+        "isSuccessful": {
+          "type": "boolean"
+        },
+        "policy": {
+          "type": "string"
+        }
+      }
+    },
+    "rego.ExpressionValue": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "$ref": "#/definitions/rego.Location"
+        },
+        "text": {
+          "type": "string"
+        },
+        "value": {}
+      }
+    },
+    "rego.Location": {
+      "type": "object",
+      "properties": {
+        "col": {
+          "type": "integer"
+        },
+        "row": {
+          "type": "integer"
+        }
+      }
+    },
+    "rego.Result": {
+      "type": "object",
+      "properties": {
+        "bindings": {
+          "$ref": "#/definitions/rego.Vars"
+        },
+        "expressions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/rego.ExpressionValue"
+          }
+        }
+      }
+    },
+    "rego.Vars": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

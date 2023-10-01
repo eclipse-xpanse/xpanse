@@ -31,6 +31,7 @@
         <module>orchestrator</module>
         <module>security</module>
         <module>common</module>
+        <module>policy</module>
     </modules>
 
 </project>
