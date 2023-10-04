@@ -115,7 +115,7 @@ jobs:
           author_email: ${{ env.BOT_EMAIL_ID }}
           committer_email: ${{ env.BOT_EMAIL_ID }}
 
-      - name: Release to Maven Central
+      - name: Release Application
         env:
           JRELEASER_NEXUS2_MAVEN_CENTRAL_USERNAME: ${{ secrets.ORG_OSSRH_USERNAME }}
           JRELEASER_NEXUS2_MAVEN_CENTRAL_PASSWORD: ${{ secrets.ORG_OSSRH_PASSWORD }}
