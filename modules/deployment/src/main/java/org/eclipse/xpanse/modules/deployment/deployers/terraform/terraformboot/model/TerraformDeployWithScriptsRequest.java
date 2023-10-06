@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,7 +160,7 @@ public class TerraformDeployWithScriptsRequest {
   }
 
    /**
-   * List of script files for deployment requests deployed via scripts
+   * List of Terraform script files to be considered for deploying changes.
    * @return scripts
   **/
   @jakarta.annotation.Nonnull

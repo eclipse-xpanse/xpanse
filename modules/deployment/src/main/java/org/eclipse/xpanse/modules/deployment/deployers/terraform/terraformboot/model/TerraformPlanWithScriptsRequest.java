@@ -25,25 +25,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * TerraformAsyncDeployFromDirectoryRequest
+ * TerraformPlanWithScriptsRequest
  */
 @JsonPropertyOrder({
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_SCRIPTS,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+  TerraformPlanWithScriptsRequest.JSON_PROPERTY_VARIABLES,
+  TerraformPlanWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
+  TerraformPlanWithScriptsRequest.JSON_PROPERTY_SCRIPTS
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
-public class TerraformAsyncDeployFromDirectoryRequest {
-  public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
-  private Boolean isPlanOnly;
-
+public class TerraformPlanWithScriptsRequest {
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
 
@@ -53,45 +47,16 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_SCRIPTS = "scripts";
   private List<String> scripts = new ArrayList<>();
 
-  public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-  private WebhookConfig webhookConfig;
-
-  public TerraformAsyncDeployFromDirectoryRequest() {
+  public TerraformPlanWithScriptsRequest() {
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest isPlanOnly(Boolean isPlanOnly) {
-    
-    this.isPlanOnly = isPlanOnly;
-    return this;
-  }
-
-   /**
-   * Flag to control if the deployment must only generate the terraform or it must also apply the changes.
-   * @return isPlanOnly
-  **/
-  @jakarta.annotation.Nonnull
-  @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
-  public Boolean getIsPlanOnly() {
-    return isPlanOnly;
-  }
-
-
-  @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-  public void setIsPlanOnly(Boolean isPlanOnly) {
-    this.isPlanOnly = isPlanOnly;
-  }
-
-
-  public TerraformAsyncDeployFromDirectoryRequest variables(Map<String, Object> variables) {
+  public TerraformPlanWithScriptsRequest variables(Map<String, Object> variables) {
     
     this.variables = variables;
     return this;
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+  public TerraformPlanWithScriptsRequest putVariablesItem(String key, Object variablesItem) {
     this.variables.put(key, variablesItem);
     return this;
   }
@@ -116,13 +81,13 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest envVariables(Map<String, String> envVariables) {
+  public TerraformPlanWithScriptsRequest envVariables(Map<String, String> envVariables) {
     
     this.envVariables = envVariables;
     return this;
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+  public TerraformPlanWithScriptsRequest putEnvVariablesItem(String key, String envVariablesItem) {
     if (this.envVariables == null) {
       this.envVariables = new HashMap<>();
     }
@@ -150,13 +115,13 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest scripts(List<String> scripts) {
+  public TerraformPlanWithScriptsRequest scripts(List<String> scripts) {
     
     this.scripts = scripts;
     return this;
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest addScriptsItem(String scriptsItem) {
+  public TerraformPlanWithScriptsRequest addScriptsItem(String scriptsItem) {
     if (this.scripts == null) {
       this.scripts = new ArrayList<>();
     }
@@ -165,7 +130,7 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
    /**
-   * List of Terraform script files to be considered for deploying changes.
+   * List of terraform script files to be considered for generating terraform plan
    * @return scripts
   **/
   @jakarta.annotation.Nonnull
@@ -183,32 +148,6 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     this.scripts = scripts;
   }
 
-
-  public TerraformAsyncDeployFromDirectoryRequest webhookConfig(WebhookConfig webhookConfig) {
-    
-    this.webhookConfig = webhookConfig;
-    return this;
-  }
-
-   /**
-   * Get webhookConfig
-   * @return webhookConfig
-  **/
-  @jakarta.annotation.Nonnull
-  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
-  public WebhookConfig getWebhookConfig() {
-    return webhookConfig;
-  }
-
-
-  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-  public void setWebhookConfig(WebhookConfig webhookConfig) {
-    this.webhookConfig = webhookConfig;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -217,28 +156,24 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest = (TerraformAsyncDeployFromDirectoryRequest) o;
-    return Objects.equals(this.isPlanOnly, terraformAsyncDeployFromDirectoryRequest.isPlanOnly) &&
-        Objects.equals(this.variables, terraformAsyncDeployFromDirectoryRequest.variables) &&
-        Objects.equals(this.envVariables, terraformAsyncDeployFromDirectoryRequest.envVariables) &&
-        Objects.equals(this.scripts, terraformAsyncDeployFromDirectoryRequest.scripts) &&
-        Objects.equals(this.webhookConfig, terraformAsyncDeployFromDirectoryRequest.webhookConfig);
+    TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest = (TerraformPlanWithScriptsRequest) o;
+    return Objects.equals(this.variables, terraformPlanWithScriptsRequest.variables) &&
+        Objects.equals(this.envVariables, terraformPlanWithScriptsRequest.envVariables) &&
+        Objects.equals(this.scripts, terraformPlanWithScriptsRequest.scripts);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(isPlanOnly, variables, envVariables, scripts, webhookConfig);
+    return Objects.hash(variables, envVariables, scripts);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TerraformAsyncDeployFromDirectoryRequest {\n");
-    sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
+    sb.append("class TerraformPlanWithScriptsRequest {\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
     sb.append("    scripts: ").append(toIndentedString(scripts)).append("\n");
-    sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");
     sb.append("}");
     return sb.toString();
   }
