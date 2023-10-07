@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate.query;
 
-import jakarta.validation.Valid;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -15,7 +14,6 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
  * The query model for search register services.
  */
 @Data
-@Valid
 public class ServiceTemplateQueryModel {
 
     private Csp csp;
