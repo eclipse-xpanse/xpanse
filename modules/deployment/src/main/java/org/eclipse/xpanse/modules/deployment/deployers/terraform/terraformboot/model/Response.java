@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -39,67 +40,17 @@ public class Response {
    * The result code of response.
    */
   public enum ResultTypeEnum {
-    SUCCESS("Success"),
-    
-    RUNTIME_ERROR("Runtime Error"),
-    
     PARAMETERS_INVALID("Parameters Invalid"),
-    
-    TERRAFORM_SCRIPT_INVALID("Terraform Script Invalid"),
     
     UNPROCESSABLE_ENTITY("Unprocessable Entity"),
     
-    RESPONSE_NOT_VALID("Response Not Valid"),
-    
-    FAILURE_WHILE_CONNECTING_TO_BACKEND("Failure while connecting to backend"),
-    
-    CREDENTIAL_CAPABILITY_NOT_FOUND("Credential Capability Not Found"),
-    
-    CREDENTIALS_NOT_FOUND("Credentials Not Found"),
-    
-    CREDENTIAL_VARIABLES_NOT_COMPLETE("Credential Variables Not Complete"),
-    
-    FLAVOR_INVALID("Flavor Invalid"),
-    
     TERRAFORM_EXECUTION_FAILED("Terraform Execution Failed"),
-    
-    PLUGIN_NOT_FOUND("Plugin Not Found"),
-    
-    DEPLOYER_NOT_FOUND("Deployer Not Found"),
-    
-    TERRAFORM_PROVIDER_NOT_FOUND("Terraform Provider Not Found"),
-    
-    NO_CREDENTIAL_DEFINITION_AVAILABLE("No Credential Definition Available"),
-    
-    INVALID_SERVICE_STATE("Invalid Service State"),
-    
-    RESOURCE_INVALID_FOR_MONITORING("Resource Invalid For Monitoring"),
-    
-    UNHANDLED_EXCEPTION("Unhandled Exception"),
-    
-    SERVICE_ALREADY_REGISTERED("Service Already Registered"),
-    
-    ICON_PROCESSING_FAILED("Icon Processing Failed"),
-    
-    SERVICE_NOT_REGISTERED("Service Not Registered"),
-    
-    SERVICE_DEPLOYMENT_NOT_FOUND("Service Deployment Not Found"),
-    
-    RESOURCE_NOT_FOUND("Resource Not Found"),
-    
-    DEPLOYMENT_VARIABLE_INVALID("Deployment Variable Invalid"),
-    
-    SERVICE_UPDATE_NOT_ALLOWED("Service Update Not Allowed"),
-    
-    UNAUTHORIZED("Unauthorized"),
-    
-    ACCESS_DENIED("Access Denied"),
-    
-    SENSITIVE_FIELD_ENCRYPTION_OR_DECRYPTION_FAILED_EXCEPTION("Sensitive Field Encryption Or Decryption Failed Exception"),
     
     UNSUPPORTED_ENUM_VALUE("Unsupported Enum Value"),
     
-    SERVICE_UNAVAILABLE("Service Unavailable");
+    SERVICE_UNAVAILABLE("Service Unavailable"),
+    
+    UNAUTHORIZED("Unauthorized");
 
     private String value;
 

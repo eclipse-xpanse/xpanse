@@ -88,6 +88,159 @@
         }
       }
     },
+    "/terraform-boot/plan": {
+      "post": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Get Terraform Plan as JSON string from the list of script files provided",
+        "operationId": "planWithScripts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformPlanWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/plan/{module_directory}": {
+      "post": {
+        "tags": [
+          "Terraform"
+        ],
+        "description": "Get Terraform Plan as JSON string from a directory",
+        "operationId": "plan",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the Terraform module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformPlanFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/terraform-boot/destroy/scripts": {
       "post": {
         "tags": [
@@ -670,37 +823,12 @@
             "type": "string",
             "description": "The result code of response.",
             "enum": [
-              "Success",
-              "Runtime Error",
               "Parameters Invalid",
-              "Terraform Script Invalid",
               "Unprocessable Entity",
-              "Response Not Valid",
-              "Failure while connecting to backend",
-              "Credential Capability Not Found",
-              "Credentials Not Found",
-              "Credential Variables Not Complete",
-              "Flavor Invalid",
               "Terraform Execution Failed",
-              "Plugin Not Found",
-              "Deployer Not Found",
-              "Terraform Provider Not Found",
-              "No Credential Definition Available",
-              "Invalid Service State",
-              "Resource Invalid For Monitoring",
-              "Unhandled Exception",
-              "Service Already Registered",
-              "Icon Processing Failed",
-              "Service Not Registered",
-              "Service Deployment Not Found",
-              "Resource Not Found",
-              "Deployment Variable Invalid",
-              "Service Update Not Allowed",
-              "Unauthorized",
-              "Access Denied",
-              "Sensitive Field Encryption Or Decryption Failed Exception",
               "Unsupported Enum Value",
-              "Service Unavailable"
+              "Service Unavailable",
+              "Unauthorized"
             ]
           },
           "details": {
@@ -747,10 +875,10 @@
           },
           "scripts": {
             "type": "array",
-            "description": "List of script files for deployment requests deployed via scripts",
+            "description": "List of Terraform script files to be considered for deploying changes.",
             "items": {
               "type": "string",
-              "description": "List of script files for deployment requests deployed via scripts"
+              "description": "List of Terraform script files to be considered for deploying changes."
             }
           }
         }
@@ -774,6 +902,75 @@
             "items": {
               "$ref": "#/components/schemas/TerraformValidateDiagnostics"
             }
+          }
+        }
+      },
+      "TerraformPlanWithScriptsRequest": {
+        "required": [
+          "scripts",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of terraform script files to be considered for generating terraform plan",
+            "items": {
+              "type": "string",
+              "description": "List of terraform script files to be considered for generating terraform plan"
+            }
+          }
+        }
+      },
+      "TerraformPlan": {
+        "required": [
+          "plan"
+        ],
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "description": "Terraform plan as a JSON string"
+          }
+        }
+      },
+      "TerraformPlanFromDirectoryRequest": {
+        "required": [
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           }
         }
       },
@@ -898,10 +1095,10 @@
           },
           "scripts": {
             "type": "array",
-            "description": "List of script files for deployment requests deployed via scripts",
+            "description": "List of Terraform script files to be considered for deploying changes.",
             "items": {
               "type": "string",
-              "description": "List of script files for deployment requests deployed via scripts"
+              "description": "List of Terraform script files to be considered for deploying changes."
             }
           },
           "webhookConfig": {

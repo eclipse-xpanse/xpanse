@@ -1,6 +1,5 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.auth;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 

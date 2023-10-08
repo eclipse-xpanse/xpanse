@@ -10,6 +10,9 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.m
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDeployWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDestroyFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDestroyWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlan;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlanFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlanWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
 
@@ -456,6 +459,128 @@ public class TerraformApi {
 
         ParameterizedTypeReference<TerraformBootSystemStatus> localReturnType = new ParameterizedTypeReference<TerraformBootSystemStatus>() {};
         return apiClient.invokeAPI("/terraform-boot/health", HttpMethod.GET, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Get Terraform Plan as JSON string from a directory
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
+     * @param moduleDirectory directory name where the Terraform module files exist. (required)
+     * @param terraformPlanFromDirectoryRequest  (required)
+     * @return TerraformPlan
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public TerraformPlan plan(String moduleDirectory, TerraformPlanFromDirectoryRequest terraformPlanFromDirectoryRequest) throws RestClientException {
+        return planWithHttpInfo(moduleDirectory, terraformPlanFromDirectoryRequest).getBody();
+    }
+
+    /**
+     * 
+     * Get Terraform Plan as JSON string from a directory
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
+     * @param moduleDirectory directory name where the Terraform module files exist. (required)
+     * @param terraformPlanFromDirectoryRequest  (required)
+     * @return ResponseEntity&lt;TerraformPlan&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<TerraformPlan> planWithHttpInfo(String moduleDirectory, TerraformPlanFromDirectoryRequest terraformPlanFromDirectoryRequest) throws RestClientException {
+        Object localVarPostBody = terraformPlanFromDirectoryRequest;
+        
+        // verify the required parameter 'moduleDirectory' is set
+        if (moduleDirectory == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling plan");
+        }
+        
+        // verify the required parameter 'terraformPlanFromDirectoryRequest' is set
+        if (terraformPlanFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformPlanFromDirectoryRequest' when calling plan");
+        }
+        
+        // create path and map variables
+        final Map<String, Object> uriVariables = new HashMap<String, Object>();
+        uriVariables.put("module_directory", moduleDirectory);
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] localVarAccepts = { 
+            "*/*", "application/json"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] {  };
+
+        ParameterizedTypeReference<TerraformPlan> localReturnType = new ParameterizedTypeReference<TerraformPlan>() {};
+        return apiClient.invokeAPI("/terraform-boot/plan/{module_directory}", HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Get Terraform Plan as JSON string from the list of script files provided
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
+     * @param terraformPlanWithScriptsRequest  (required)
+     * @return TerraformPlan
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public TerraformPlan planWithScripts(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest) throws RestClientException {
+        return planWithScriptsWithHttpInfo(terraformPlanWithScriptsRequest).getBody();
+    }
+
+    /**
+     * 
+     * Get Terraform Plan as JSON string from the list of script files provided
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
+     * @param terraformPlanWithScriptsRequest  (required)
+     * @return ResponseEntity&lt;TerraformPlan&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<TerraformPlan> planWithScriptsWithHttpInfo(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest) throws RestClientException {
+        Object localVarPostBody = terraformPlanWithScriptsRequest;
+        
+        // verify the required parameter 'terraformPlanWithScriptsRequest' is set
+        if (terraformPlanWithScriptsRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformPlanWithScriptsRequest' when calling planWithScripts");
+        }
+        
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] localVarAccepts = { 
+            "*/*", "application/json"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] {  };
+
+        ParameterizedTypeReference<TerraformPlan> localReturnType = new ParameterizedTypeReference<TerraformPlan>() {};
+        return apiClient.invokeAPI("/terraform-boot/plan", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
