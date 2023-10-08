@@ -47,7 +47,7 @@ Details can be found on the project website [here](https://eclipse-xpanse.github
 
 ## Generate policy-man client code
 
-1. Run the policy-man project and access “http://localhost:9443/swagger/doc.json” to get the openapi json.
+1. Run the policy-man project and access “http://localhost:8090/swagger/doc.json” to get the openapi json.
 2. Copy the JSON content and place in [this folder](modules/policy/src/main/resources/) and name the file as 'policy-man-openapi.json'.
 3. Run the below maven command to generate the REST API client and data models for policy-man. The command can be
    executed directly inside the `policy` module.
