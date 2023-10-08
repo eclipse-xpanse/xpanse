@@ -100,7 +100,7 @@ public class TerraformDeployment implements Deployment {
         String tfState = executor.getTerraformState();
 
         DeployResult deployResult = new DeployResult();
-        if (StringUtils.isBlank(tfState)) {
+        if (StringUtils.isEmpty(tfState) || StringUtils.isBlank(tfState)) {
             deployResult.setState(TerraformExecState.DEPLOY_FAILED);
         } else {
             deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);

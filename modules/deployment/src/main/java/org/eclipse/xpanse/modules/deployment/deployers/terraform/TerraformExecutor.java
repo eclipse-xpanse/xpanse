@@ -69,7 +69,7 @@ public class TerraformExecutor {
     /**
      * Executes terraform plan command.
      *
-     * @return Returns result of SystemCmd executes.
+     * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfPlan() {
         return executeWithVariables(new StringBuilder("terraform plan -input=false -no-color "));
@@ -78,7 +78,7 @@ public class TerraformExecutor {
     /**
      * Executes terraform apply command.
      *
-     * @return Returns result of SystemCmd executes.
+     * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfApply() {
         return executeWithVariables(
@@ -88,7 +88,7 @@ public class TerraformExecutor {
     /**
      * Executes terraform destroy command.
      *
-     * @return Returns result of SystemCmd executes.
+     * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfDestroy() {
         return executeWithVariables(
@@ -98,7 +98,7 @@ public class TerraformExecutor {
     /**
      * Executes terraform commands with parameters.
      *
-     * @return Returns result of SystemCmd executes.
+     * @return Returns result of SystemCmd executed.
      */
     private SystemCmdResult executeWithVariables(StringBuilder command) {
         createVariablesFile();
@@ -177,7 +177,7 @@ public class TerraformExecutor {
     public String getTerraformState() {
         File tfState = new File(workspace + File.separator + STATE_FILE_NAME);
         if (!tfState.exists()) {
-            log.info("Terraform state file not exists.");
+            log.error("Terraform state file not found");
             return null;
         }
         try {
