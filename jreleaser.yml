@@ -16,6 +16,7 @@ project:
 release:
   github:
     overwrite: true
+    skipMergeCommits: true
 signing:
   active: ALWAYS
   armored: true
