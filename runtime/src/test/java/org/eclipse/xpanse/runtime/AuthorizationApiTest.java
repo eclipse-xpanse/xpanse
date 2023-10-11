@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -103,6 +104,17 @@ class AuthorizationApiTest {
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
+    }
+
+
+    @Test
+    void testGetAccessTokenThrowsIllegalArgumentException() {
+
+        // Run the test
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> mockMvc.perform(get("/auth/token")
+                                .accept(MediaType.APPLICATION_JSON).param("code", null))
+                        .andReturn().getResponse());
     }
 
     @Test

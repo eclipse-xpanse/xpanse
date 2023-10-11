@@ -7,6 +7,8 @@ package org.eclipse.xpanse.runtime.modules.credential;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.io.File;
+import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.credential.CredentialOpenApiGenerator;
 import org.eclipse.xpanse.modules.credential.CredentialsStore;
@@ -36,6 +38,9 @@ class CredentialOpenApiGeneratorTest {
     @Autowired
     private CredentialOpenApiGenerator credentialOpenApiGenerator;
 
+    @Autowired
+    private OpenApiGeneratorJarManage openApiGeneratorJarManage;
+
     @Test
     void testGetServiceUrl() {
 
@@ -53,6 +58,13 @@ class CredentialOpenApiGeneratorTest {
     void testGetCredentialOpenApiUrl() {
         Csp csp = Csp.HUAWEI;
         CredentialType type = CredentialType.VARIABLES;
+
+        String htmlFileName = csp.toValue() + "_" + type.toValue() + "_credentialApi.html";
+        String credentialApiDir = openApiGeneratorJarManage.getOpenApiWorkdir();
+        File htmlFile = new File(credentialApiDir, htmlFileName);
+        if (htmlFile.exists()) {
+            htmlFile.delete();
+        }
 
         String result = credentialOpenApiGenerator.getCredentialOpenApiUrl(csp, type);
 

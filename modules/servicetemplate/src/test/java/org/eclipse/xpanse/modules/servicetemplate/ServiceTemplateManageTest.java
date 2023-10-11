@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
@@ -28,11 +29,16 @@ import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -45,6 +51,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Test for ServiceTemplateImpl.
@@ -162,25 +169,68 @@ class ServiceTemplateManageTest {
                         terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
-            terraform {
-              required_providers {
-                huaweicloud = {
-                  source = "huaweicloud/huaweicloud"
-                  version = "~> 1.51.0"
-                }
-              }
-            }
-                        
-            provider "huaweicloud" {
-              region = "test"
-            }
-            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
+                terraform {
+                      required_providers {
+                        huaweicloud = {
+                          source = "huaweicloud/huaweicloud"
+                          version = "~> 1.51.0"
+                        }
+                      }
+                    }
+                                
+                    provider "huaweicloud" {
+                      region = "test"
+                        }
+                        """).when(this.pluginManager)
+                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
         ServiceTemplateEntity updateServiceTemplateEntity =
                 serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl);
         log.error(updateServiceTemplateEntity.toString());
         Assertions.assertEquals(ServiceRegistrationState.UPDATED,
                 updateServiceTemplateEntity.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).updateServiceApi(serviceTemplateEntity);
+    }
+
+    @Test
+    void testUpdateThrowsServiceTemplateUpdateNotAllowedException() throws Exception {
+        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        ocl.setServiceVersion("1.0");
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        serviceTemplateEntity.setName(oclRegister.getName());
+        serviceTemplateEntity.setId(UUID.randomUUID());
+        serviceTemplateEntity.setCategory(oclRegister.getCategory());
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+        serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
+        serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
+        serviceTemplateEntity.setOcl(oclRegister);
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+        Assertions.assertThrows(ServiceTemplateUpdateNotAllowed.class, () ->
+                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl));
+    }
+
+
+    @Test
+    void testUpdateThrowsAccessDeniedException() throws Exception {
+        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        serviceTemplateEntity.setNamespace("ISV-A");
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+        CurrentUserInfo currentUserInfo = new CurrentUserInfo();
+        currentUserInfo.setUserId("ISV-B");
+        currentUserInfo.setNamespace("ISV-B");
+        when(identityProviderManager.getCurrentUserInfo()).thenReturn(currentUserInfo);
+        Assertions.assertThrows(AccessDeniedException.class, () ->
+                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl));
+    }
+
+
+    @Test
+    void testUpdateThrowsServiceTemplateNotRegisteredException() throws Exception {
+        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        ocl.setServiceVersion("1.0");
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
+        Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
+                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl));
     }
 
     @Test
@@ -191,24 +241,54 @@ class ServiceTemplateManageTest {
                         terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
-            terraform {
-              required_providers {
-                huaweicloud = {
-                  source = "huaweicloud/huaweicloud"
-                  version = "~> 1.51.0"
+                    terraform {
+                  required_providers {
+                    huaweicloud = {
+                      source = "huaweicloud/huaweicloud"
+                      version = "~> 1.51.0"
+                    }
+                  }
                 }
-              }
-            }
-                        
-            provider "huaweicloud" {
-              region = "test"
-            }
-            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
+                            
+                provider "huaweicloud" {
+                      region = "test"
+                    }
+                    """).when(this.pluginManager)
+                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplate(oclRegister);
         Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
                 serviceTemplateEntity.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).generateServiceApi(serviceTemplateEntity);
+    }
+
+    @Test
+    void testRegisterThrowsServiceTemplateAlreadyRegistered() throws Exception {
+        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        ServiceTemplateEntity entity = new ServiceTemplateEntity();
+        entity.setName(StringUtils.lowerCase(ocl.getName()));
+        entity.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
+        entity.setCsp(ocl.getCloudServiceProvider().getName());
+        entity.setCategory(ocl.getCategory());
+        entity.setOcl(ocl);
+        entity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+
+        ServiceTemplateEntity existedServiceTemplateEntity = new ServiceTemplateEntity();
+
+        when(mockStorage.findServiceTemplate(entity)).thenReturn(existedServiceTemplateEntity);
+
+        Assertions.assertThrows(ServiceTemplateAlreadyRegistered.class, () ->
+                serviceTemplateManageTest.registerServiceTemplate(ocl));
+    }
+
+
+    @Test
+    void testRegisterIconThrowsProcessingFailedException() throws Exception {
+        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        ocl.setIcon(
+                "https://raw.githubusercontent.com/eclipse-xpanse/xpanse/main/static/full-logo.png");
+        Assertions.assertThrows(IconProcessingFailedException.class, () ->
+                serviceTemplateManageTest.registerServiceTemplate(ocl));
     }
 
     @Test
@@ -262,6 +342,15 @@ class ServiceTemplateManageTest {
         ServiceTemplateEntity ServiceTemplate =
                 serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString(), false);
         Assertions.assertEquals(serviceTemplateEntity, ServiceTemplate);
+    }
+
+
+    @Test
+    void testGetServiceTemplateThrowsServiceTemplateNotRegistered() {
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
+        Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
+                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString(), false));
+
     }
 
     @Test
@@ -322,6 +411,15 @@ class ServiceTemplateManageTest {
     }
 
     @Test
+    void testUnregisterThrowsServiceTemplateNotRegistered() {
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
+        Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
+                serviceTemplateManageTest.unregisterServiceTemplate(uuid.toString()));
+
+    }
+
+
+    @Test
     void testGetOpenApiUrl() {
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setName(oclRegister.getName());
@@ -339,5 +437,13 @@ class ServiceTemplateManageTest {
         String result =
                 serviceTemplateManageTest.getOpenApiUrl(uuid.toString());
         Assertions.assertEquals(result, "result");
+    }
+
+    @Test
+    void testGetOpenApiUrlThrowsServiceTemplateNotRegistered() {
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
+        Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
+                serviceTemplateManageTest.getOpenApiUrl(uuid.toString()));
+
     }
 }

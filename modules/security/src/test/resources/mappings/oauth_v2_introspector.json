@@ -44,6 +44,90 @@
           }
         }
       }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "urlPattern": "/oauth/v2/introspect/nullRoles"
+      },
+      "response": {
+        "transformers": [
+          "response-template"
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "status": 200,
+        "jsonBody": {
+          "active": true,
+          "aud": [
+            "221646087428047105@eclipse-xpanse",
+            "221689661079224577@eclipse-xpanse",
+            "222549669694210305@eclipse-xpanse",
+            "221645572887609601@eclipse-xpanse",
+            "221644807007633665"
+          ],
+          "client_id": "221689661079224577@eclipse-xpanse",
+          "exp": 1689693365,
+          "iat": 1689650165,
+          "iss": "https://xpanse-auth-fxndxo.zitadel.cloud",
+          "jti": "223395619052454145",
+          "nbf": 1689650165,
+          "scope": "openid urn:zitadel:iam:org:project:role:admin urn:zitadel:iam:org:project:role:csp urn:zitadel:iam:org:project:role:user",
+          "sub": "221647436064489729",
+          "username": "xpanse-admin",
+          "token_type": "Bearer",
+          "urn:zitadel:iam:org:project:221644807007633665:roles": {
+            "admin": {
+              "221363997012656385": "osc.zitadel.cloud"
+            }
+          },
+          "urn:zitadel:iam:org:project:roles": {
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "urlPattern": "/oauth/v2/introspect/emptyRoles"
+      },
+      "response": {
+        "transformers": [
+          "response-template"
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "status": 200,
+        "jsonBody": {
+          "active": true,
+          "aud": [
+            "221646087428047105@eclipse-xpanse",
+            "221689661079224577@eclipse-xpanse",
+            "222549669694210305@eclipse-xpanse",
+            "221645572887609601@eclipse-xpanse",
+            "221644807007633665"
+          ],
+          "client_id": "221689661079224577@eclipse-xpanse",
+          "exp": 1689693365,
+          "iat": 1689650165,
+          "iss": "https://xpanse-auth-fxndxo.zitadel.cloud",
+          "jti": "223395619052454145",
+          "nbf": 1689650165,
+          "scope": "openid urn:zitadel:iam:org:project:role:admin urn:zitadel:iam:org:project:role:csp urn:zitadel:iam:org:project:role:user",
+          "sub": "221647436064489729",
+          "username": "xpanse-admin",
+          "token_type": "Bearer",
+          "urn:zitadel:iam:org:project:221644807007633665:roles": {
+            "admin": {
+              "221363997012656385": "osc.zitadel.cloud"
+            }
+          },
+          "urn:zitadel:iam:org:project:roles": {
+          }
+        }
+      }
     }
   ]
 }

@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.runtime.modules.servicetemplate;
+package org.eclipse.xpanse.runtime.modules.servicetemplate.utils;
 
 import java.io.File;
 import java.net.URL;
@@ -61,7 +61,8 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
-        OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
+        OpenApiGeneratorJarManage openApiGeneratorJarManage =
+                new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
                 new ServiceTemplateOpenApiGenerator(openApiUrlManage, openApiGeneratorJarManage);
         serviceTemplateOpenApiGenerator.createServiceApi(serviceTemplateEntity);
@@ -90,7 +91,8 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
         serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
-        OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
+        OpenApiGeneratorJarManage openApiGeneratorJarManage =
+                new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
 
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
                 new ServiceTemplateOpenApiGenerator(
@@ -104,7 +106,8 @@ class ServiceTemplateOpenApiGeneratorTest {
     @Order(3)
     void deleteServiceApi_test() {
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
-        OpenApiGeneratorJarManage openApiGeneratorJarManage = new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
+        OpenApiGeneratorJarManage openApiGeneratorJarManage =
+                new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
 
         ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator =
                 new ServiceTemplateOpenApiGenerator(

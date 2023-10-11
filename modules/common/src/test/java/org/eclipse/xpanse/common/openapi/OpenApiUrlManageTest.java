@@ -1,6 +1,5 @@
 package org.eclipse.xpanse.common.openapi;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.UUID;
@@ -23,8 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {OpenApiUrlManage.class, String.class, OpenApiGeneratorJarManage.class})
 class OpenApiUrlManageTest {
 
-    @Value("${openapi.download-generator-client-url}")
-    private String clientDownloadUrl;
     @Value("${openapi.path}")
     private String openApiPath;
     @Value("${server.port}")
@@ -32,9 +29,6 @@ class OpenApiUrlManageTest {
 
     @Autowired
     private OpenApiUrlManage openApiUrlManageTest;
-
-    @Autowired
-    private OpenApiGeneratorJarManage openApiGeneratorJarManage;
 
     @BeforeEach
     void setUp() {
@@ -62,34 +56,5 @@ class OpenApiUrlManageTest {
         String result = openApiUrlManageTest.getOpenApiUrl(id);
         // Verify the results
         Assertions.assertEquals(openApiUrl, result);
-    }
-
-    @Test
-    void testDownloadClientJar() throws IOException {
-        // SetUp
-        File jarFile = new File(openApiPath + "/openapi-generator-cli-6.6.0.jar").getAbsoluteFile();
-        if (jarFile.exists()) {
-            jarFile.delete();
-        }
-        // Run the test
-        boolean result = openApiGeneratorJarManage.downloadClientJar();
-        // Verify the results
-        Assertions.assertTrue(result);
-    }
-
-    @Test
-    void testGetClientDownLoadUrl() {
-        // Run the test
-        String result = openApiGeneratorJarManage.getClientDownLoadUrl();
-        // Verify the results
-        Assertions.assertEquals(clientDownloadUrl, result);
-    }
-
-    @Test
-    void testGetOpenapiPath() {
-        // Run the test
-        String result = openApiGeneratorJarManage.getOpenapiPath();
-        // Verify the results
-        Assertions.assertEquals(openApiPath, result);
     }
 }

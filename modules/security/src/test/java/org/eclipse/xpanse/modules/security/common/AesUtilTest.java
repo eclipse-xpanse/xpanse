@@ -1,5 +1,6 @@
 package org.eclipse.xpanse.modules.security.common;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,10 +46,11 @@ class AesUtilTest {
         String string = "content";
 
         // Run the test
-        final String encodeString = aesUtilTest.encode(string);
+        final String encodedStr = aesUtilTest.encode(string);
 
         // Verify the results
-        Assertions.assertEquals(string, aesUtilTest.decode(encodeString));
+        Assertions.assertNotEquals(string, encodedStr);
+        Assertions.assertEquals(string, aesUtilTest.decode(encodedStr));
     }
 
 
@@ -58,10 +60,49 @@ class AesUtilTest {
         String string = "HelloWorld";
 
         // Run the test
-        final String decodeString = aesUtilTest.decode(aesUtilTest.encode(string));
+        final String decodedStr = aesUtilTest.decode(aesUtilTest.encode(string));
 
         // Verify the results
-        Assertions.assertEquals(string, decodeString);
+        Assertions.assertEquals(string, decodedStr);
+    }
+
+    @Test
+    void testEncodeFailed() {
+        ReflectionTestUtils.setField(aesUtilTest, "cipherAlgorithm", null);
+        // SetUp
+        String string = "HelloWorld";
+
+        // Run the test
+        final String encodedStr = aesUtilTest.encode(string);
+
+        // Verify the results
+        Assertions.assertEquals(string, encodedStr);
+    }
+
+    @Test
+    void testDecodeThrowsException() {
+        // SetUp
+        String string = "HelloWorld";
+        String encodedStr = aesUtilTest.encode(string);
+
+        ReflectionTestUtils.setField(aesUtilTest, "cipherAlgorithm", "");
+
+        // Verify the results
+        Assertions.assertThrows(SensitiveFieldEncryptionOrDecryptionFailedException.class, () ->
+                aesUtilTest.decode(encodedStr));
+    }
+
+    @Test
+    void testEncodeNotEnabled() {
+        // SetUp
+        String string = "content";
+        ReflectionTestUtils.setField(aesUtilTest, "aesKeyFileName",
+                "src/test/resources/aes_sec_not_existed");
+        // Run the test
+        final String encodedStr = aesUtilTest.encode(string);
+
+        // Verify the results
+        Assertions.assertEquals(string, encodedStr);
     }
 
 }
