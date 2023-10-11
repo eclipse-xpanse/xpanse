@@ -189,10 +189,10 @@ public class AdminServicesApi {
             databaseStatus.setEndpoint(dataSourceUrl);
             return databaseStatus;
         }
-        if (databaseUrlSplitList.contains(DatabaseType.MARIADB.toValue())) {
+        if (databaseUrlSplitList.contains(DatabaseType.MYSQL.toValue())) {
             BackendSystemStatus databaseStatus = new BackendSystemStatus();
             databaseStatus.setBackendSystemType(BackendSystemType.DATABASE);
-            databaseStatus.setName(DatabaseType.MARIADB.toValue());
+            databaseStatus.setName(DatabaseType.MYSQL.toValue());
             databaseStatus.setHealthStatus(HealthStatus.OK);
             databaseStatus.setEndpoint(dataSourceUrl);
             return databaseStatus;

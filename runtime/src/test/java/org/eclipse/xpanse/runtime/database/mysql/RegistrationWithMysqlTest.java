@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.runtime.database.mariadb;
+package org.eclipse.xpanse.runtime.database.mysql;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -29,9 +29,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=zitadel,mariadb,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,mysql,zitadel-testbed"})
 @AutoConfigureMockMvc
-class RegistrationWithMariaDbTest extends AbstractMariaDbIntegrationTest {
+class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     @Autowired
     private ServiceTemplateApi serviceTemplateApi;

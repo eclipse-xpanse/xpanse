@@ -20,8 +20,8 @@ class DatabaseTypeTest {
         DatabaseType type = DatabaseType.getByValue("h2");
         Assertions.assertEquals(type, DatabaseType.H2DB);
 
-        DatabaseType type1 = DatabaseType.getByValue("mariadb");
-        Assertions.assertEquals(type1, DatabaseType.MARIADB);
+        DatabaseType type1 = DatabaseType.getByValue("mysql");
+        Assertions.assertEquals(type1, DatabaseType.MYSQL);
 
         Assertions.assertThrows(UnsupportedEnumValueException.class,
                 () -> DatabaseType.getByValue(null));
@@ -38,21 +38,21 @@ class DatabaseTypeTest {
         String string = DatabaseType.H2DB.toString();
         Assertions.assertEquals("H2DB", string);
 
-        String value1 = DatabaseType.MARIADB.toValue();
-        Assertions.assertEquals("mariadb", value1);
+        String value1 = DatabaseType.MYSQL.toValue();
+        Assertions.assertEquals("mysql", value1);
 
-        String name1 = DatabaseType.MARIADB.name();
-        Assertions.assertEquals("MARIADB", name1);
+        String name1 = DatabaseType.MYSQL.name();
+        Assertions.assertEquals("MYSQL", name1);
 
-        String string1 = DatabaseType.MARIADB.toString();
-        Assertions.assertEquals("MARIADB", string1);
+        String string1 = DatabaseType.MYSQL.toString();
+        Assertions.assertEquals("MYSQL", string1);
     }
 
     @Test
     public void testEqualsAndHashCode() {
         Assertions.assertEquals(DatabaseType.H2DB.hashCode(), DatabaseType.H2DB.hashCode());
-        Assertions.assertEquals(DatabaseType.MARIADB.hashCode(), DatabaseType.MARIADB.hashCode());
-        Assertions.assertNotEquals(DatabaseType.H2DB.hashCode(), DatabaseType.MARIADB.hashCode());
+        Assertions.assertEquals(DatabaseType.MYSQL.hashCode(), DatabaseType.MYSQL.hashCode());
+        Assertions.assertNotEquals(DatabaseType.H2DB.hashCode(), DatabaseType.MYSQL.hashCode());
     }
 
 }

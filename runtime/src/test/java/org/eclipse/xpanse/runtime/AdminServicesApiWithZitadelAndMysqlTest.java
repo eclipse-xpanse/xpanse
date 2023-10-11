@@ -32,7 +32,7 @@ import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
-import org.eclipse.xpanse.runtime.database.mariadb.AbstractMariaDbIntegrationTest;
+import org.eclipse.xpanse.runtime.database.mysql.AbstractMysqlIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,13 +45,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * Test for AdminServicesApi with zitadel and mariadb is active.
+ * Test for AdminServicesApi with zitadel and mysql is active.
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=mariadb,zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=mysql,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrationTest {
+class AdminServicesApiWithZitadelAndMysqlTest extends AbstractMysqlIntegrationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -144,7 +144,7 @@ class AdminServicesApiWithZitadelAndMariaDbTest extends AbstractMariaDbIntegrati
         BackendSystemStatus databaseStatus = new BackendSystemStatus();
         databaseStatus.setBackendSystemType(BackendSystemType.DATABASE);
         databaseStatus.setHealthStatus(HealthStatus.OK);
-        databaseStatus.setName(DatabaseType.MARIADB.toValue());
+        databaseStatus.setName(DatabaseType.MYSQL.toValue());
 
         BackendSystemStatus identityProviderStatus = new BackendSystemStatus();
         identityProviderStatus.setBackendSystemType(BackendSystemType.IDENTITY_PROVIDER);

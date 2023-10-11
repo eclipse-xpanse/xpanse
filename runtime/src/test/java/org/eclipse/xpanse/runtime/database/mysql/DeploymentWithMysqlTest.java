@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.runtime.database.mariadb;
+package org.eclipse.xpanse.runtime.database.mysql;
 
 import static org.awaitility.Awaitility.await;
 
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-class DeploymentWithMariaDbTest extends AbstractMariaDbIntegrationTest {
+class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     @Autowired
     ServiceDeployerApi serviceDeployerApi;
