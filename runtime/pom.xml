@@ -73,12 +73,17 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>servicetemplate</artifactId>
+            <artifactId>policy</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>servicetemplate</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

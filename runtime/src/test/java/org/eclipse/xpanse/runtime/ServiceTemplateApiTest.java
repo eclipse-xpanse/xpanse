@@ -81,7 +81,7 @@ class ServiceTemplateApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
             claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testManageServiceTemplate() throws Exception {
         testRegister();
@@ -93,7 +93,7 @@ class ServiceTemplateApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
             claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testFetchMethods() throws Exception {
         ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
@@ -103,10 +103,11 @@ class ServiceTemplateApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
             claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testRegisterServiceThrowsException() throws Exception {
-        testRegisterException();
+        testRegisterThrowsMethodArgumentNotValidException();
+        testRegisterThrowsTerraformExecutionException();
         testDetailThrowsException();
         testUpdateThrowsException();
         testListRegisteredServicesThrowsException();
@@ -115,7 +116,7 @@ class ServiceTemplateApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
             claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testFetchMethodsThrowsException() throws Exception {
         testFetchThrowsException();
@@ -154,7 +155,35 @@ class ServiceTemplateApiTest {
         Assertions.assertEquals(ocl.getServiceVersion(), serviceTemplateVo.getVersion());
     }
 
-    void testRegisterException() throws Exception {
+    void testRegisterThrowsMethodArgumentNotValidException() throws Exception {
+        // Setup
+        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        ocl.setFlavors(null);
+        String requestBody = yamlMapper.writeValueAsString(ocl);
+
+        Response expectedResponse = Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY,
+                Collections.singletonList(
+                        "flavors:must not be null"));
+
+        // Run the test
+        final MockHttpServletResponse response =
+                mockMvc.perform(post("/xpanse/service_templates")
+                                .content(requestBody).contentType("application/x-yaml")
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        Response actualResponse =
+                objectMapper.readValue(response.getContentAsString(), Response.class);
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
+        Assertions.assertEquals(expectedResponse.getResultType(), actualResponse.getResultType());
+        Assertions.assertEquals(expectedResponse.getDetails(), actualResponse.getDetails());
+        Assertions.assertEquals(expectedResponse.getSuccess(), actualResponse.getSuccess());
+    }
+
+    void testRegisterThrowsTerraformExecutionException() throws Exception {
         // Setup
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test_dummy.yaml"));
@@ -186,6 +215,7 @@ class ServiceTemplateApiTest {
         ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test_dummy.yaml"));
+        ocl.setIcon("https://avatars.githubusercontent.com/u/127229590?s=48&v=4");
         String requestBody = yamlMapper.writeValueAsString(ocl);
 
         // Run the test

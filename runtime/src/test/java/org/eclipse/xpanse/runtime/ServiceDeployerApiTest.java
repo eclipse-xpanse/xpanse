@@ -88,7 +88,7 @@ class ServiceDeployerApiTest {
     private DeployServiceRepository deployServiceRepository;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         deleteDestroyedServiceRecord();
     }
 
@@ -224,12 +224,12 @@ class ServiceDeployerApiTest {
         Assertions.assertEquals(result, listResponse.getContentAsString());
     }
 
-    void deleteDestroyedServiceRecord() {
-        deployServiceRepository.deleteAll();
-        deployServiceRepository.flush();
+    void deleteDestroyedServiceRecord() throws Exception {
         taskId = null;
         serviceDetailVo = null;
         state = null;
+        deployServiceRepository.deleteAll();
+        deployServiceRepository.flush();
     }
 
 

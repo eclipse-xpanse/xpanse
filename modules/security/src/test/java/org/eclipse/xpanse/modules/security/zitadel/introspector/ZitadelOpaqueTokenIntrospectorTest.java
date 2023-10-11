@@ -9,7 +9,6 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemp
 import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.util.Collections;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {ZitadelOpaqueTokenIntrospector.class, String.class})
 class ZitadelOpaqueTokenIntrospectorTest {
 
+
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
@@ -32,10 +32,9 @@ class ZitadelOpaqueTokenIntrospectorTest {
             .build();
     private ZitadelOpaqueTokenIntrospector testOpaqueTokenIntrospector;
 
-    @BeforeEach
-    void setUp() {
+    void setUpHttpRequest(String uri) {
         String introspectionUri = wireMockExtension.getRuntimeInfo().getHttpBaseUrl()
-                + "/oauth/v2/introspect";
+                + "/oauth/v2/introspect" + uri;
         testOpaqueTokenIntrospector =
                 new ZitadelOpaqueTokenIntrospector(introspectionUri,
                         "clientId", "clientSecret");
@@ -44,6 +43,7 @@ class ZitadelOpaqueTokenIntrospectorTest {
     @Test
     void testIntrospect() {
         // Setup
+        setUpHttpRequest("");
         SimpleGrantedAuthority role = new SimpleGrantedAuthority("admin");
         String userId = "221647436064489729";
         String userName = "xpanse-admin";
@@ -52,6 +52,39 @@ class ZitadelOpaqueTokenIntrospectorTest {
                 testOpaqueTokenIntrospector.introspect("token");
         // Verify the results
         assertTrue(result.getAuthorities().contains(role));
+        assertEquals(userId, result.getAttribute("sub"));
+        assertEquals(userName, result.getAttribute("username"));
+    }
+
+    @Test
+    void testIntrospectNullRoles() {
+        // Setup
+        setUpHttpRequest("/nullRoles");
+        SimpleGrantedAuthority defaultRole = new SimpleGrantedAuthority("user");
+        String userId = "221647436064489729";
+        String userName = "xpanse-admin";
+        // Run the test
+        final OAuth2AuthenticatedPrincipal result =
+                testOpaqueTokenIntrospector.introspect("token");
+        // Verify the results
+        assertTrue(result.getAuthorities().contains(defaultRole));
+        assertEquals(userId, result.getAttribute("sub"));
+        assertEquals(userName, result.getAttribute("username"));
+    }
+
+
+    @Test
+    void testIntrospectEmptyRoles() {
+        // Setup
+        setUpHttpRequest("/emptyRoles");
+        SimpleGrantedAuthority defaultRole = new SimpleGrantedAuthority("user");
+        String userId = "221647436064489729";
+        String userName = "xpanse-admin";
+        // Run the test
+        final OAuth2AuthenticatedPrincipal result =
+                testOpaqueTokenIntrospector.introspect("token");
+        // Verify the results
+        assertTrue(result.getAuthorities().contains(defaultRole));
         assertEquals(userId, result.getAttribute("sub"));
         assertEquals(userName, result.getAttribute("username"));
     }
