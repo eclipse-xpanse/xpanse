@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 public enum DatabaseType {
 
     H2DB("h2"),
-    MARIADB("mariadb");
+    MYSQL("mysql");
 
     private final String code;
 

@@ -55,7 +55,7 @@
         <apache.commons.net.version>3.9.0</apache.commons.net.version>
         <apache.commons.collections.version>4.4</apache.commons.collections.version>
         <apache.commons.validator.version>1.7</apache.commons.validator.version>
-        <mariadb.client.version>3.2.0</mariadb.client.version>
+        <mysql.version>8.0.33</mysql.version>
         <system.stubs.version>2.0.2</system.stubs.version>
         <junit4.version>4.13.2</junit4.version>
         <json.smart.version>2.5.0</json.smart.version>
