@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse.xpanse</groupId>
     <artifactId>xpanse-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>xpanse</name>
     <description>Xpanse is here to make native cloud services configurable and portable.</description>
@@ -76,6 +76,7 @@
         <snakeyaml.version>2.2</snakeyaml.version>
         <json-schema-validator.version>1.0.87</json-schema-validator.version>
         <archunit.version>1.1.0</archunit.version>
+        <activiti.version>7.1.0.M6</activiti.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>

@@ -5,27 +5,34 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
-import static org.awaitility.Awaitility.await;
-
+import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
+import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
-import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-
+@Testcontainers
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,mysql,zitadel-testbed"})
+@AutoConfigureMockMvc
 class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     @Autowired
@@ -41,6 +48,9 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     OclLoader oclLoader;
 
     @Test
+    @WithMockJwtAuth(authorities = {RoleConstants.ROLE_ADMIN, RoleConstants.ROLE_ISV,
+            RoleConstants.ROLE_USER},
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testServiceDeployment() throws Exception {
         ServiceTemplateVo serviceTemplate = registerService();
         CreateRequest createRequest = new CreateRequest();
@@ -58,14 +68,9 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         createRequest.setServiceRequestProperties(serviceRequestProperties);
 
         UUID deployUUid = serviceDeployerApi.deploy(createRequest);
-        await().ignoreException(ServiceNotDeployedException.class)
-                .until(() -> serviceDeployerApi.getServiceDetailsById(deployUUid.toString())
-                        != null);
-        ServiceDetailVo serviceDetailVo =
-                serviceDeployerApi.getServiceDetailsById(deployUUid.toString());
-        Assertions.assertNotNull(serviceDetailVo);
-        Assertions.assertEquals(ServiceDeploymentState.DEPLOY_FAILED,
-                serviceDetailVo.getServiceDeploymentState());
+        Assertions.assertThrows(ServiceNotDeployedException.class,
+                () -> serviceDeployerApi.getServiceDetailsById(deployUUid.toString()));
+
     }
 
     private ServiceTemplateVo registerService() throws Exception {

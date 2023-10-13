@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>xpanse-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -32,6 +32,7 @@
         <module>security</module>
         <module>common</module>
         <module>policy</module>
+        <module>workflow</module>
     </modules>
 
 </project>

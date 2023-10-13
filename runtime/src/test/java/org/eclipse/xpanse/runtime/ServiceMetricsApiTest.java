@@ -32,8 +32,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * Test for MonitorApiTest.
  */
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("default")
-@SpringBootTest(classes = {XpanseApplication.class, ServiceMetricsApi.class})
+@SpringBootTest(classes = {XpanseApplication.class, ServiceMetricsApi.class},
+        properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServiceMetricsApiTest {
 
