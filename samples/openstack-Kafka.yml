@@ -1,11 +1,11 @@
-# The version of the OCL
-version: 2.0
+# The version of the Xpanse description language
+version: 1.0
 # The category of the service.
 category: middleware
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: kafka-cluster
-# The version of the service, if the end-user want to select the version when they want to deploy the service.
-serviceVersion: v3.3.2
+# The version of the service, the end-user can select the version they want to deploy.
+serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
 description: This is an ehanced Kafka cluster services by ISV-A.
 namespace: ISV-A
@@ -23,7 +23,7 @@ cloudServiceProvider:
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat
-  # The rental period (`daily`, `weekly`, `monthly`, `yearly`)
+  # The rental cycle (`daily`, `weekly`, `monthly`, `yearly`)
   period: monthly
   # The billing currency (`euro`, `usd`, ...)
   currency: euro
