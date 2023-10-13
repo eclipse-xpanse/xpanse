@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
@@ -21,7 +22,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
  * Request body for service creation.
  */
 @Data
-public class CreateRequest {
+public class CreateRequest implements Serializable {
 
     @Hidden
     private UUID id;

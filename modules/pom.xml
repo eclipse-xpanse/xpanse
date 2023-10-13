@@ -32,6 +32,7 @@
         <module>security</module>
         <module>common</module>
         <module>policy</module>
+        <module>workflow</module>
     </modules>
 
 </project>

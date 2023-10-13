@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.util.Arrays;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
+import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
@@ -42,7 +45,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=default"})
+@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class AdminServicesApiTest {
 
@@ -58,11 +61,20 @@ class AdminServicesApiTest {
     private PluginManager pluginManager;
 
     private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
+    private static final String ZITADEL = "zitadel";
 
     @Value("${spring.profiles.active:}")
     private String springProfilesActive;
 
+    @Value("${spring.datasource.url}")
+    private String endPoint;
+
+    @Value("${authorization.server.endpoint}")
+    private String serverEndPoint;
+
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testHealthCheck() throws Exception {
         // SetUp
         SystemStatus systemStatus = new SystemStatus();
@@ -71,13 +83,21 @@ class AdminServicesApiTest {
         dataBaseSystemStatus.setBackendSystemType(BackendSystemType.DATABASE);
         dataBaseSystemStatus.setHealthStatus(HealthStatus.OK);
         dataBaseSystemStatus.setName(DatabaseType.H2DB.toValue());
+        dataBaseSystemStatus.setEndpoint(endPoint);
+
+        BackendSystemStatus dataBaseSystemStatus1 = new BackendSystemStatus();
+        dataBaseSystemStatus1.setBackendSystemType(BackendSystemType.IDENTITY_PROVIDER);
+        dataBaseSystemStatus1.setHealthStatus(HealthStatus.OK);
+        dataBaseSystemStatus1.setName(ZITADEL);
+        dataBaseSystemStatus1.setEndpoint(serverEndPoint);
 
         BackendSystemStatus terraformBootStatus = getTerraformBootStatus();
         if (Objects.nonNull(terraformBootStatus)) {
             systemStatus.setBackendSystemStatuses(
-                    List.of(dataBaseSystemStatus, terraformBootStatus));
+                    List.of(dataBaseSystemStatus1, dataBaseSystemStatus, terraformBootStatus));
         } else {
-            systemStatus.setBackendSystemStatuses(List.of(dataBaseSystemStatus));
+            systemStatus.setBackendSystemStatuses(List.of(dataBaseSystemStatus1,
+                    dataBaseSystemStatus));
         }
 
         String resBody = objectMapper.writeValueAsString(systemStatus);
@@ -95,6 +115,8 @@ class AdminServicesApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testGetCsps() throws Exception {
         // SetUp
         List<Csp> cspList = Arrays.asList(Csp.values());
@@ -113,6 +135,8 @@ class AdminServicesApiTest {
     }
 
     @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testGetCspsWithActive() throws Exception {
         // SetUp
         List<Csp> cspList = pluginManager.getPluginsMap().keySet().stream().sorted().toList();

@@ -185,8 +185,10 @@ public class TerraformDeployment implements Deployment {
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
         deployServiceEntity.setProperties(deployResult.getProperties());
         deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
-        deployServiceEntity.setDeployResourceList(
-                getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
+        deployServiceEntity.getDeployResourceList().clear();
+        deployServiceEntity.getDeployResourceList()
+                .addAll(getDeployResourceEntityList(deployResult.getResources(),
+                        deployServiceEntity));
         maskSensitiveFields(deployServiceEntity);
         deployServiceStorage.storeAndFlush(deployServiceEntity);
     }

@@ -16,7 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -61,6 +64,8 @@ public class ServiceDeployerApi {
     @Resource
     private DeployService deployService;
 
+    @Resource
+    private WorkflowProcessUtils workflowProcessUtils;
 
     /**
      * Get details of the managed service by id.
@@ -177,6 +182,27 @@ public class ServiceDeployerApi {
         this.deployService.purgeService(deployment, deployTask);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
+    }
+
+    /**
+     * Start a task to migrate the deployed service using id.
+     *
+     * @param id ID of deployed service.
+     * @return response
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Start a task to migrate the deployed service using id.")
+    @PostMapping(value = "/services/migrate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public UUID migrate(@PathVariable("id") String id,
+            @Valid @RequestBody CreateRequest deployRequest) {
+        UUID newId = UUID.randomUUID();
+        Map<String, Object> variable = new HashMap<>();
+        variable.put("id", id);
+        variable.put("newId", newId);
+        variable.put("createRequest", deployRequest);
+        workflowProcessUtils.asyncStartProcess("migrate", variable);
+        return newId;
     }
 
     private ServiceQueryModel getServiceQueryModel(Category category, Csp csp,

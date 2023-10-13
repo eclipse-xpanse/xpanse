@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
@@ -191,6 +192,10 @@ public class DeployService {
      */
     @Async("taskExecutor")
     public void asyncDeployService(Deployment deployment, DeployTask deployTask) {
+        deploy(deployment, deployTask);
+    }
+
+    private boolean deploy(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
         DeployResult deployResult = new DeployResult();
@@ -198,6 +203,7 @@ public class DeployService {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             deployment.deploy(deployTask);
+            return true;
         } catch (RuntimeException e) {
             log.error("asyncDeployService failed.", e);
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
@@ -209,6 +215,7 @@ public class DeployService {
             maskSensitiveFields(deployServiceEntity);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             rollbackOnDeploymentFailure(deployServiceEntity, deployResult, deployment, deployTask);
+            return false;
         }
     }
 
@@ -300,19 +307,24 @@ public class DeployService {
      */
     @Async("taskExecutor")
     public void asyncDestroyService(Deployment deployment, DeployTask deployTask) {
+        destroy(deployment, deployTask);
+    }
+
+    private boolean destroy(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
         if (Objects.isNull(deployServiceEntity)) {
             String errorMsg = String.format("Service with id %s not found.", deployTask.getId());
             log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
+            throw new ServiceNotDeployedException("Service with id %s not found.");
         }
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
             deployment.destroy(deployTask, stateFile);
+            return true;
         } catch (Exception e) {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());
@@ -320,6 +332,7 @@ public class DeployService {
             if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
                 deployment.deleteTaskWorkspace(deployTask.getId().toString());
             }
+            return false;
         }
 
     }
@@ -567,5 +580,27 @@ public class DeployService {
                 }
             }
         }
+    }
+
+    /**
+     * Deployment service.
+     */
+    public boolean deployService(UUID newId, CreateRequest createRequest) {
+        DeployTask deployTask = new DeployTask();
+        createRequest.setId(newId);
+        deployTask.setId(newId);
+        deployTask.setCreateRequest(createRequest);
+        Deployment deployment = getDeployHandler(deployTask);
+        return deploy(deployment, deployTask);
+    }
+
+    /**
+     * Destroy service by deployed service id.
+     */
+    public boolean destroyService(String id) {
+        DeployTask deployTask = new DeployTask();
+        deployTask.setId(UUID.fromString(id));
+        Deployment deployment = getDestroyHandler(deployTask);
+        return destroy(deployment, deployTask);
     }
 }

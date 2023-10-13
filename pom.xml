@@ -76,6 +76,7 @@
         <snakeyaml.version>2.2</snakeyaml.version>
         <json-schema-validator.version>1.0.87</json-schema-validator.version>
         <archunit.version>1.1.0</archunit.version>
+        <activiti.version>7.1.0.M6</activiti.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
