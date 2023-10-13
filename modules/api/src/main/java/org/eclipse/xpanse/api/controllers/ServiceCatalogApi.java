@@ -24,8 +24,9 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
+import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -68,7 +69,7 @@ public class ServiceCatalogApi {
     @GetMapping(value = "/catalog/services",
             produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     @ResponseStatus(HttpStatus.OK)
-    public List<UserAvailableServiceVo> listAvailableServices(
+    public List<UserOrderableServiceVo> listOrderableServices(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category categoryName,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
@@ -81,24 +82,24 @@ public class ServiceCatalogApi {
                 categoryName, cspName, serviceName, serviceVersion);
         List<ServiceTemplateEntity> serviceEntities =
                 serviceTemplateManage.listServiceTemplates(query);
-        String successMsg = String.format("Listing available services with query model %s "
+        String successMsg = String.format("Listing orderable services with query model %s "
                 + "successful.", query);
-        List<UserAvailableServiceVo> userAvailableServiceVos =
-                serviceEntities.stream().map(this::convertToUserAvailableServiceVo).sorted(
+        List<UserOrderableServiceVo> userOrderableServiceVos =
+                serviceEntities.stream().map(this::convertToUserOrderableServiceVo).sorted(
                                 Comparator.comparingInt(o -> {
                                     assert o != null;
                                     return o.getCsp().ordinal();
                                 }))
                         .collect(Collectors.toList());
         log.info(successMsg);
-        return userAvailableServiceVos;
+        return userOrderableServiceVos;
     }
 
     /**
      * Get deployable service by id.
      *
      * @param id The id of deployable service.
-     * @return userAvailableServiceVo
+     * @return userorderableServiceVoVo
      */
     @Tag(name = "Service Catalog",
             description = "APIs to query the services which are available for the user to order.")
@@ -106,15 +107,15 @@ public class ServiceCatalogApi {
     @GetMapping(value = "/catalog/services/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public UserAvailableServiceVo availableServiceDetails(
-            @Parameter(name = "id", description = "The id of available service.")
+    public UserOrderableServiceVo getOrderableServiceDetails(
+            @Parameter(name = "id", description = "The id of orderable service.")
             @PathVariable("id") String id) {
-        UserAvailableServiceVo userAvailableServiceVo = convertToUserAvailableServiceVo(
+        UserOrderableServiceVo userOrderableServiceVo = convertToUserOrderableServiceVo(
                 serviceTemplateManage.getServiceTemplateDetails(id, false));
         String successMsg = String.format(
-                "Get available service with id %s successful.", id);
+                "Get orderable service with id %s successful.", id);
         log.info(successMsg);
-        return userAvailableServiceVo;
+        return userOrderableServiceVo;
     }
 
     /**
@@ -127,12 +128,12 @@ public class ServiceCatalogApi {
     @GetMapping(value = "/catalog/services/{id}/openapi",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Get the API document of the available service.")
+    @Operation(description = "Get the API document of the orderable service.")
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     public Link openApi(@PathVariable("id") String id) {
         String apiUrl = this.serviceTemplateManage.getOpenApiUrl(id);
         String successMsg = String.format(
-                "Get API document of the available service successful with Url %s.", apiUrl);
+                "Get API document of the orderable service successful with Url %s.", apiUrl);
         log.info(successMsg);
         return Link.of(apiUrl, "OpenApi");
     }
@@ -156,15 +157,25 @@ public class ServiceCatalogApi {
         return query;
     }
 
-    private UserAvailableServiceVo convertToUserAvailableServiceVo(
+    private UserOrderableServiceVo convertToUserOrderableServiceVo(
             ServiceTemplateEntity serviceTemplateEntity) {
-        UserAvailableServiceVo catalogVo =
-                serviceTemplateManage.convertToUserAvailableServiceVo(serviceTemplateEntity);
-        if (Objects.nonNull(catalogVo)) {
-            catalogVo.add(
+        if (Objects.nonNull(serviceTemplateEntity)) {
+            UserOrderableServiceVo userOrderableServiceVo = new UserOrderableServiceVo();
+            BeanUtils.copyProperties(serviceTemplateEntity, userOrderableServiceVo);
+            userOrderableServiceVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
+            userOrderableServiceVo.setDescription(
+                    serviceTemplateEntity.getOcl().getDescription());
+            userOrderableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
+            userOrderableServiceVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());
+            userOrderableServiceVo.setVariables(
+                    serviceTemplateEntity.getOcl().getDeployment().getVariables());
+            userOrderableServiceVo.setRegions(
+                    serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
+            userOrderableServiceVo.add(
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
                             .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
+            return userOrderableServiceVo;
         }
-        return catalogVo;
+        return null;
     }
 }

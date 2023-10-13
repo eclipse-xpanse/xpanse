@@ -28,8 +28,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.beans.BeanUtils;
@@ -81,11 +80,11 @@ public class ServiceTemplateApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public ServiceTemplateVo register(@Valid @RequestBody Ocl ocl) {
-        ServiceTemplateVo serviceTemplateVo = convertToServiceTemplateVo(
+    public ServiceTemplateDetailVo register(@Valid @RequestBody Ocl ocl) {
+        ServiceTemplateDetailVo serviceTemplateDetailVo = convertToServiceTemplateDetailVo(
                 serviceTemplateManage.registerServiceTemplate(ocl));
         log.info("Registering new service successful.");
-        return serviceTemplateVo;
+        return serviceTemplateDetailVo;
     }
 
     /**
@@ -102,15 +101,15 @@ public class ServiceTemplateApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public ServiceTemplateVo update(
+    public ServiceTemplateDetailVo update(
             @Parameter(name = "id", description = "id of service template")
             @PathVariable("id") String id, @Valid @RequestBody Ocl ocl) {
-        ServiceTemplateVo serviceTemplateVo = convertToServiceTemplateVo(
+        ServiceTemplateDetailVo serviceTemplateDetailVo = convertToServiceTemplateDetailVo(
                 serviceTemplateManage.updateServiceTemplate(id, ocl));
         String successMsg = String.format(
                 "Update service template with id %s successful.", id);
         log.info(successMsg);
-        return serviceTemplateVo;
+        return serviceTemplateDetailVo;
     }
 
     /**
@@ -125,17 +124,17 @@ public class ServiceTemplateApi {
     @PostMapping(value = "/service_templates/file", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public ServiceTemplateVo fetch(
+    public ServiceTemplateDetailVo fetch(
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation)
             throws Exception {
-        ServiceTemplateVo serviceTemplateVo =
-                convertToServiceTemplateVo(
+        ServiceTemplateDetailVo serviceTemplateDetailVo =
+                convertToServiceTemplateDetailVo(
                         serviceTemplateManage.registerServiceTemplateByUrl(oclLocation));
         String message = String.format("Register new service template by file with URL "
                 + "%s successful.", oclLocation);
         log.info(message);
-        return serviceTemplateVo;
+        return serviceTemplateDetailVo;
     }
 
 
@@ -153,20 +152,20 @@ public class ServiceTemplateApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public ServiceTemplateVo fetchUpdate(
+    public ServiceTemplateDetailVo fetchUpdate(
             @Parameter(name = "id", description = "id of service template")
             @PathVariable(name = "id") String id,
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation)
             throws Exception {
         log.info("Update service template {} with Url {}", id, oclLocation);
-        ServiceTemplateVo serviceTemplateVo = convertToServiceTemplateVo(
+        ServiceTemplateDetailVo serviceTemplateDetailVo = convertToServiceTemplateDetailVo(
                 serviceTemplateManage.updateServiceTemplateByUrl(id,
                         oclLocation));
         String successMsg = String.format(
                 "Update service template %s with Url %s", id, oclLocation);
         log.info(successMsg);
-        return serviceTemplateVo;
+        return serviceTemplateDetailVo;
     }
 
     /**
@@ -206,7 +205,7 @@ public class ServiceTemplateApi {
     @Operation(description = "List service templates with query params.")
     @GetMapping(value = "/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<UserAvailableServiceVo> listServiceTemplates(
+    public List<ServiceTemplateDetailVo> listServiceTemplates(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category categoryName,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
@@ -221,15 +220,15 @@ public class ServiceTemplateApi {
                 serviceTemplateManage.listServiceTemplates(query);
         String successMsg = String.format("Listing service templates with query model %s "
                 + "successful.", query);
-        List<UserAvailableServiceVo> userAvailableServiceVos =
-                serviceEntities.stream().map(this::convertToUserAvailableServiceVo).sorted(
+        List<ServiceTemplateDetailVo> serviceTemplateDetailVos =
+                serviceEntities.stream().map(this::convertToServiceTemplateDetailVo).sorted(
                                 Comparator.comparingInt(o -> {
                                     assert o != null;
                                     return o.getCsp().ordinal();
                                 }))
                         .toList();
         log.info(successMsg);
-        return userAvailableServiceVos;
+        return serviceTemplateDetailVos;
     }
 
     /**
@@ -244,15 +243,15 @@ public class ServiceTemplateApi {
     @GetMapping(value = "/service_templates/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ServiceTemplateVo details(
+    public ServiceTemplateDetailVo details(
             @Parameter(name = "id", description = "id of service template")
             @PathVariable("id") String id) {
-        ServiceTemplateVo serviceTemplateVo = convertToServiceTemplateVo(
+        ServiceTemplateDetailVo serviceTemplateDetailVo = convertToServiceTemplateDetailVo(
                 serviceTemplateManage.getServiceTemplateDetails(id, true));
         String successMsg = String.format(
                 "Get detail of service template with id %s success.", id);
         log.info(successMsg);
-        return serviceTemplateVo;
+        return serviceTemplateDetailVo;
     }
 
     private ServiceTemplateQueryModel getServiceTemplateQueryModel(Category category, Csp csp,
@@ -279,28 +278,27 @@ public class ServiceTemplateApi {
         return query;
     }
 
-    private ServiceTemplateVo convertToServiceTemplateVo(
+    private ServiceTemplateDetailVo convertToServiceTemplateDetailVo(
             ServiceTemplateEntity serviceTemplateEntity) {
         if (Objects.nonNull(serviceTemplateEntity)) {
-            ServiceTemplateVo serviceTemplateVo = new ServiceTemplateVo();
-            BeanUtils.copyProperties(serviceTemplateEntity, serviceTemplateVo);
-            serviceTemplateVo.add(
+            ServiceTemplateDetailVo serviceTemplateDetailVo = new ServiceTemplateDetailVo();
+            BeanUtils.copyProperties(serviceTemplateEntity, serviceTemplateDetailVo);
+            serviceTemplateDetailVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
+            serviceTemplateDetailVo.setDescription(
+                    serviceTemplateEntity.getOcl().getDescription());
+            serviceTemplateDetailVo.setNamespace(serviceTemplateEntity.getOcl().getNamespace());
+            serviceTemplateDetailVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
+            serviceTemplateDetailVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());
+            serviceTemplateDetailVo.setDeployment(serviceTemplateEntity.getOcl().getDeployment());
+            serviceTemplateDetailVo.setVariables(
+                    serviceTemplateEntity.getOcl().getDeployment().getVariables());
+            serviceTemplateDetailVo.setRegions(
+                    serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
+            serviceTemplateDetailVo.add(
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
                             .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
-            return serviceTemplateVo;
+            return serviceTemplateDetailVo;
         }
         return null;
-    }
-
-    private UserAvailableServiceVo convertToUserAvailableServiceVo(
-            ServiceTemplateEntity serviceTemplateEntity) {
-        UserAvailableServiceVo catalogVo =
-                serviceTemplateManage.convertToUserAvailableServiceVo(serviceTemplateEntity);
-        if (Objects.nonNull(catalogVo)) {
-            catalogVo.add(
-                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
-                            .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
-        }
-        return catalogVo;
     }
 }

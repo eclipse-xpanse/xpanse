@@ -36,16 +36,13 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -63,7 +60,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class ServiceTemplateApiTest {
 
     private static String id;
-    private static ServiceTemplateVo serviceTemplateVo;
+    private static ServiceTemplateDetailVo serviceTemplateDetailVo;
     private static Ocl ocl;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -138,21 +135,21 @@ class ServiceTemplateApiTest {
                                 .content(requestBody).contentType("application/x-yaml")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
-        serviceTemplateVo =
+        serviceTemplateDetailVo =
                 objectMapper.readValue(registerResponse.getContentAsString(),
-                        ServiceTemplateVo.class);
-        id = serviceTemplateVo.getId().toString();
+                        ServiceTemplateDetailVo.class);
+        id = serviceTemplateDetailVo.getId().toString();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), registerResponse.getStatus());
         Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
-                serviceTemplateVo.getServiceRegistrationState());
-        Assertions.assertEquals(ocl.getCategory(), serviceTemplateVo.getCategory());
+                serviceTemplateDetailVo.getServiceRegistrationState());
+        Assertions.assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
         Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
-                serviceTemplateVo.getCsp());
+                serviceTemplateDetailVo.getCsp());
         Assertions.assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
-                serviceTemplateVo.getName());
-        Assertions.assertEquals(ocl.getServiceVersion(), serviceTemplateVo.getVersion());
+                serviceTemplateDetailVo.getName());
+        Assertions.assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
     }
 
     void testRegisterThrowsMethodArgumentNotValidException() throws Exception {
@@ -225,18 +222,19 @@ class ServiceTemplateApiTest {
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
-        ServiceTemplateVo updatedServiceTemplateVo =
-                objectMapper.readValue(response.getContentAsString(), ServiceTemplateVo.class);
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
+                objectMapper.readValue(response.getContentAsString(),
+                        ServiceTemplateDetailVo.class);
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
         Assertions.assertEquals(ServiceRegistrationState.UPDATED,
-                updatedServiceTemplateVo.getServiceRegistrationState());
-        Assertions.assertEquals(id, updatedServiceTemplateVo.getId().toString());
-        Assertions.assertEquals(updatedServiceTemplateVo.getOcl().getNamespace(),
-                serviceTemplateVo.getOcl().getNamespace() + "_update");
+                updatedServiceTemplateDetailVo.getServiceRegistrationState());
+        Assertions.assertEquals(id, updatedServiceTemplateDetailVo.getId().toString());
+        Assertions.assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
+                serviceTemplateDetailVo.getNamespace() + "_update");
         Assertions.assertNotEquals(
-                updatedServiceTemplateVo.getOcl().getDeployment().getDeployer(),
-                serviceTemplateVo.getOcl().getDeployment().getDeployer());
+                updatedServiceTemplateDetailVo.getDeployment().getDeployer(),
+                serviceTemplateDetailVo.getDeployment().getDeployer());
     }
 
     void testUpdateThrowsException() throws Exception {
@@ -344,9 +342,9 @@ class ServiceTemplateApiTest {
     }
 
     void testListRegisteredServices() throws Exception {
-        List<UserAvailableServiceVo> serviceTemplateCatalogs = List.of(convertToServiceTemplateVo(
-                serviceTemplateVo));
-        String result = objectMapper.writeValueAsString(serviceTemplateCatalogs);
+        List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(
+                serviceTemplateDetailVo);
+        String result = objectMapper.writeValueAsString(serviceTemplateDetailVos);
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/service_templates")
@@ -408,7 +406,7 @@ class ServiceTemplateApiTest {
 
     void testDetail() throws Exception {
         // Setup
-        String result = objectMapper.writeValueAsString(serviceTemplateVo);
+        String result = objectMapper.writeValueAsString(serviceTemplateDetailVo);
 
         // Run the test
         final MockHttpServletResponse response =
@@ -452,21 +450,21 @@ class ServiceTemplateApiTest {
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
-        serviceTemplateVo =
+        serviceTemplateDetailVo =
                 objectMapper.readValue(fetchResponse.getContentAsString(),
-                        ServiceTemplateVo.class);
-        id = serviceTemplateVo.getId().toString();
+                        ServiceTemplateDetailVo.class);
+        id = serviceTemplateDetailVo.getId().toString();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), fetchResponse.getStatus());
         Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
-                serviceTemplateVo.getServiceRegistrationState());
-        Assertions.assertEquals(ocl.getCategory(), serviceTemplateVo.getCategory());
+                serviceTemplateDetailVo.getServiceRegistrationState());
+        Assertions.assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
         Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
-                serviceTemplateVo.getCsp());
+                serviceTemplateDetailVo.getCsp());
         Assertions.assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
-                serviceTemplateVo.getName());
-        Assertions.assertEquals(ocl.getServiceVersion(), serviceTemplateVo.getVersion());
+                serviceTemplateDetailVo.getName());
+        Assertions.assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
     }
 
     void testFetchUpdate() throws Exception {
@@ -479,39 +477,18 @@ class ServiceTemplateApiTest {
                                 .param("oclLocation", fileUrl)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
-        ServiceTemplateVo updatedServiceTemplateVo =
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
                 objectMapper.readValue(fetchUpdateResponse.getContentAsString(),
-                        ServiceTemplateVo.class);
+                        ServiceTemplateDetailVo.class);
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
         Assertions.assertEquals(ServiceRegistrationState.UPDATED,
-                updatedServiceTemplateVo.getServiceRegistrationState());
-        Assertions.assertEquals(id, updatedServiceTemplateVo.getId().toString());
-        Assertions.assertEquals(updatedServiceTemplateVo.getOcl().getNamespace(),
-                serviceTemplateVo.getOcl().getNamespace() + "_update");
+                updatedServiceTemplateDetailVo.getServiceRegistrationState());
+        Assertions.assertEquals(id, updatedServiceTemplateDetailVo.getId().toString());
+        Assertions.assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
+                serviceTemplateDetailVo.getNamespace() + "_update");
         Assertions.assertNotEquals(
-                updatedServiceTemplateVo.getOcl().getDeployment().getDeployer(),
-                serviceTemplateVo.getOcl().getDeployment().getDeployer());
-    }
-
-    UserAvailableServiceVo convertToServiceTemplateVo(
-            ServiceTemplateVo serviceTemplateVo) {
-        UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
-        BeanUtils.copyProperties(serviceTemplateVo, userAvailableServiceVo);
-        userAvailableServiceVo.setIcon(serviceTemplateVo.getOcl().getIcon());
-        userAvailableServiceVo.setDescription(serviceTemplateVo.getOcl().getDescription());
-        userAvailableServiceVo.setNamespace(serviceTemplateVo.getOcl().getNamespace());
-        userAvailableServiceVo.setBilling(serviceTemplateVo.getOcl().getBilling());
-        userAvailableServiceVo.setFlavors(serviceTemplateVo.getOcl().getFlavors());
-        userAvailableServiceVo.setDeployment(serviceTemplateVo.getOcl().getDeployment());
-        userAvailableServiceVo.setVariables(
-                serviceTemplateVo.getOcl().getDeployment().getVariables());
-        userAvailableServiceVo.setRegions(
-                serviceTemplateVo.getOcl().getCloudServiceProvider().getRegions());
-        userAvailableServiceVo.add(
-                Link.of(String.format("http://localhost/xpanse/catalog/services/%s/openapi",
-                        serviceTemplateVo.getId().toString()), "openApi"));
-
-        return userAvailableServiceVo;
+                updatedServiceTemplateDetailVo.getDeployment().getDeployer(),
+                serviceTemplateDetailVo.getDeployment().getDeployer());
     }
 }

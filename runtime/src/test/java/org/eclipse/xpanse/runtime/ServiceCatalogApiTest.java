@@ -32,8 +32,8 @@ import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.UserAvailableServiceVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -59,7 +59,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class ServiceCatalogApiTest {
 
     private static String id;
-    private static ServiceTemplateVo serviceTemplateVo;
+    private static ServiceTemplateDetailVo serviceTemplateDetailVo;
     private static Ocl ocl;
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
@@ -80,23 +80,23 @@ class ServiceCatalogApiTest {
     @Test
     @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
             claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
-    void testAvailableServices() throws Exception {
+    void testOrderableServices() throws Exception {
         registerService();
         Thread.sleep(3000);
         testOpenApi();
-        testAvailableServiceDetails();
-        testListAvailableServices();
+        testOrderableServiceDetails();
+        testListOrderableServices();
         unregisterService();
     }
 
     @Test
     @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
             claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
-    void testAvailableServicesThrowsException() throws Exception {
-        testAvailableServiceDetailsThrowsException();
-        testListAvailableServicesThrowsException();
+    void testOrderableServicesThrowsException() throws Exception {
+        testOrderableServiceDetailsThrowsException();
+        testListOrderableServicesThrowsException();
         testOpenApiThrowsException();
-        testListAvailableServicesReturnsNoItems();
+        testListOrderableServicesReturnsNoItems();
     }
 
     void registerService() throws Exception {
@@ -111,10 +111,10 @@ class ServiceCatalogApiTest {
                                 .content(requestBody).contentType("application/x-yaml")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
-        serviceTemplateVo =
+        serviceTemplateDetailVo =
                 objectMapper.readValue(registerResponse.getContentAsString(),
-                        ServiceTemplateVo.class);
-        id = serviceTemplateVo.getId().toString();
+                        ServiceTemplateDetailVo.class);
+        id = serviceTemplateDetailVo.getId().toString();
 
     }
 
@@ -126,15 +126,15 @@ class ServiceCatalogApiTest {
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        serviceTemplateVo = null;
+        serviceTemplateDetailVo = null;
         id = null;
     }
 
-    void testListAvailableServices() throws Exception {
+    void testListOrderableServices() throws Exception {
         // Setup
-        List<UserAvailableServiceVo> userAvailableServiceVos =
-                List.of(transUserAvailableServiceVo(serviceTemplateVo));
-        String result = objectMapper.writeValueAsString(userAvailableServiceVos);
+        List<UserOrderableServiceVo> userOrderableServiceVos =
+                List.of(transToUserOrderableServiceVo(serviceTemplateDetailVo));
+        String result = objectMapper.writeValueAsString(userOrderableServiceVos);
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/catalog/services")
@@ -150,27 +150,18 @@ class ServiceCatalogApiTest {
         Assertions.assertEquals(result, response.getContentAsString());
     }
 
-    UserAvailableServiceVo transUserAvailableServiceVo(ServiceTemplateVo serviceTemplateVo) {
-        UserAvailableServiceVo userAvailableServiceVo = new UserAvailableServiceVo();
-        BeanUtils.copyProperties(serviceTemplateVo, userAvailableServiceVo);
-        userAvailableServiceVo.setIcon(serviceTemplateVo.getOcl().getIcon());
-        userAvailableServiceVo.setDescription(serviceTemplateVo.getOcl().getDescription());
-        userAvailableServiceVo.setNamespace(serviceTemplateVo.getOcl().getNamespace());
-        userAvailableServiceVo.setBilling(serviceTemplateVo.getOcl().getBilling());
-        userAvailableServiceVo.setFlavors(serviceTemplateVo.getOcl().getFlavors());
-        userAvailableServiceVo.setDeployment(serviceTemplateVo.getOcl().getDeployment());
-        userAvailableServiceVo.setVariables(
-                serviceTemplateVo.getOcl().getDeployment().getVariables());
-        userAvailableServiceVo.setRegions(
-                serviceTemplateVo.getOcl().getCloudServiceProvider().getRegions());
-        userAvailableServiceVo.add(
+    UserOrderableServiceVo transToUserOrderableServiceVo(
+            ServiceTemplateDetailVo serviceTemplateDetailVo) {
+        UserOrderableServiceVo userOrderableServiceVo = new UserOrderableServiceVo();
+        BeanUtils.copyProperties(serviceTemplateDetailVo, userOrderableServiceVo);
+        userOrderableServiceVo.add(
                 Link.of(String.format("http://localhost/xpanse/catalog/services/%s/openapi",
-                        serviceTemplateVo.getId().toString()), "openApi"));
+                        serviceTemplateDetailVo.getId().toString()), "openApi"));
 
-        return userAvailableServiceVo;
+        return userOrderableServiceVo;
     }
 
-    void testListAvailableServicesThrowsException() throws Exception {
+    void testListOrderableServicesThrowsException() throws Exception {
         // Setup
         String errorMessage = "Failed to convert value of type 'java.lang.String' to required type";
         Response expectedResponse =
@@ -193,7 +184,7 @@ class ServiceCatalogApiTest {
         Assertions.assertEquals(expectedResponse.getSuccess(), resultResponse.getSuccess());
     }
 
-    void testListAvailableServicesReturnsNoItems() throws Exception {
+    void testListOrderableServicesReturnsNoItems() throws Exception {
         // Setup
         String result = "[]";
         // Run the test
@@ -210,11 +201,11 @@ class ServiceCatalogApiTest {
         Assertions.assertEquals(result, response.getContentAsString());
     }
 
-    void testAvailableServiceDetails() throws Exception {
+    void testOrderableServiceDetails() throws Exception {
         // Setup
 
         String result = objectMapper.writeValueAsString(
-                transUserAvailableServiceVo(serviceTemplateVo));
+                transToUserOrderableServiceVo(serviceTemplateDetailVo));
 
         // Run the test
         final MockHttpServletResponse response =
@@ -227,7 +218,7 @@ class ServiceCatalogApiTest {
         Assertions.assertEquals(result, response.getContentAsString());
     }
 
-    void testAvailableServiceDetailsThrowsException() throws Exception {
+    void testOrderableServiceDetailsThrowsException() throws Exception {
         // Setup
         String uuid = UUID.randomUUID().toString();
         Response expectedResponse = Response.errorResponse(

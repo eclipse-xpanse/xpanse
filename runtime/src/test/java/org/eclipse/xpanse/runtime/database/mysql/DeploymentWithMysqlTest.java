@@ -19,7 +19,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDep
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,17 +52,15 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
             RoleConstants.ROLE_USER},
             claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testServiceDeployment() throws Exception {
-        ServiceTemplateVo serviceTemplate = registerService();
+        ServiceTemplateDetailVo serviceTemplate = registerService();
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserId("userId");
         createRequest.setServiceName(serviceTemplate.getName());
         createRequest.setVersion(serviceTemplate.getVersion());
         createRequest.setCsp(serviceTemplate.getCsp());
         createRequest.setCategory(serviceTemplate.getCategory());
-        createRequest.setFlavor(serviceTemplate.getOcl().getFlavors().get(0).toString());
-        createRequest.setRegion(
-                serviceTemplate.getOcl().getCloudServiceProvider().getRegions().get(0)
-                        .toString());
+        createRequest.setFlavor(serviceTemplate.getFlavors().get(0).toString());
+        createRequest.setRegion(serviceTemplate.getRegions().get(0).toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         createRequest.setServiceRequestProperties(serviceRequestProperties);
@@ -73,7 +71,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     }
 
-    private ServiceTemplateVo registerService() throws Exception {
+    private ServiceTemplateDetailVo registerService() throws Exception {
         Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test_dummy.yaml"));
         return ServiceTemplateApi.register(ocl);
     }
