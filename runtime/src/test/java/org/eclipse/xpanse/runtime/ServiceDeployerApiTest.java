@@ -48,7 +48,7 @@ import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -75,7 +75,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class ServiceDeployerApiTest {
 
     private static final String userId = "adminId";
-    private static ServiceTemplateVo serviceTemplateVo;
+    private static ServiceTemplateDetailVo serviceTemplateDetailVo;
     private static ServiceDetailVo serviceDetailVo;
     private static Ocl ocl;
     private static UUID taskId;
@@ -202,9 +202,9 @@ class ServiceDeployerApiTest {
                                 .content(requestBody).contentType("application/x-yaml")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
-        serviceTemplateVo =
+        serviceTemplateDetailVo =
                 objectMapper.readValue(registerResponse.getContentAsString(),
-                        ServiceTemplateVo.class);
+                        ServiceTemplateDetailVo.class);
         Thread.sleep(1000);
     }
 
@@ -255,14 +255,12 @@ class ServiceDeployerApiTest {
 
         CreateRequest createRequest = new CreateRequest();
         createRequest.setUserId(userId);
-        createRequest.setServiceName(serviceTemplateVo.getName());
-        createRequest.setVersion(serviceTemplateVo.getVersion());
-        createRequest.setCsp(serviceTemplateVo.getCsp());
-        createRequest.setCategory(serviceTemplateVo.getCategory());
-        createRequest.setFlavor(serviceTemplateVo.getOcl().getFlavors().get(0).getName());
-        createRequest.setRegion(
-                serviceTemplateVo.getOcl().getCloudServiceProvider().getRegions().get(0)
-                        .toString());
+        createRequest.setServiceName(serviceTemplateDetailVo.getName());
+        createRequest.setVersion(serviceTemplateDetailVo.getVersion());
+        createRequest.setCsp(serviceTemplateDetailVo.getCsp());
+        createRequest.setCategory(serviceTemplateDetailVo.getCategory());
+        createRequest.setFlavor(serviceTemplateDetailVo.getFlavors().get(0).getName());
+        createRequest.setRegion(serviceTemplateDetailVo.getRegions().get(0).toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("secgroup_name", "secgroup_name");
         createRequest.setServiceRequestProperties(serviceRequestProperties);

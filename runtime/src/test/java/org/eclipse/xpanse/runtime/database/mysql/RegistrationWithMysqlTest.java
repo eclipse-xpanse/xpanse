@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,15 +43,16 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
     @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
             claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testRegisterNewService() throws Exception {
-        ServiceTemplateVo serviceTemplateVo = serviceTemplateApi.register(getOclFromFile());
-        Assertions.assertTrue(Objects.nonNull(serviceTemplateVo));
+        ServiceTemplateDetailVo serviceTemplateDetailVo =
+                serviceTemplateApi.register(getOclFromFile());
+        Assertions.assertTrue(Objects.nonNull(serviceTemplateDetailVo));
         Assertions.assertEquals(1, serviceTemplateApi.listServiceTemplates(
                 null, null, null, null
         ).stream().filter(registeredServiceVo1 -> registeredServiceVo1.getName()
-                .equals(serviceTemplateVo.getName())).toList().size());
+                .equals(serviceTemplateDetailVo.getName())).toList().size());
         Assertions.assertEquals("v3.3.2",
-                serviceTemplateApi.details(serviceTemplateVo.getId().toString()).getOcl()
-                        .getServiceVersion());
+                serviceTemplateApi.details(serviceTemplateDetailVo.getId().toString())
+                        .getVersion());
     }
 
     @Test
@@ -68,17 +69,19 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
     @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
             claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testServiceRegistrationUpdate() throws Exception {
-        ServiceTemplateVo serviceTemplateVo = serviceTemplateApi.register(getOclFromFile());
-        serviceTemplateVo.getOcl().setVersion("v3.3.3");
-        serviceTemplateApi.update(serviceTemplateVo.getId().toString(),
-                serviceTemplateVo.getOcl());
+        Ocl ocl = getOclFromFile();
+        ServiceTemplateDetailVo serviceTemplateDetailVo =
+                serviceTemplateApi.register(ocl);
+        ocl.setDescription("Hello");
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
+                serviceTemplateApi.update(serviceTemplateDetailVo.getId().toString(), ocl);
         Assertions.assertEquals(1, serviceTemplateApi.listServiceTemplates(
                 null, null, null, null
         ).stream().filter(registeredServiceVo1 -> registeredServiceVo1.getName()
-                .equals(serviceTemplateVo.getName())).toList().size());
-        Assertions.assertEquals("v3.3.3",
-                serviceTemplateApi.details(serviceTemplateVo.getId().toString()).getOcl()
-                        .getVersion());
+                .equals(serviceTemplateDetailVo.getName())).toList().size());
+        Assertions.assertEquals("Hello",
+                serviceTemplateApi.details(updatedServiceTemplateDetailVo.getId().toString())
+                        .getDescription());
     }
 
     private Ocl getOclFromFile() throws Exception {

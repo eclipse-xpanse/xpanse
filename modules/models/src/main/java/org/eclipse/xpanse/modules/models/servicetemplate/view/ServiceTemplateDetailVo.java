@@ -30,33 +30,38 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrati
 import org.springframework.hateoas.RepresentationModel;
 
 /**
- * The view model for the end-user to query the available services.
+ * Defines view object for query registered service.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UserAvailableServiceVo extends RepresentationModel<UserAvailableServiceVo> {
+public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplateDetailVo> {
 
     @NotNull
-    @Schema(description = "The id of the available service.")
+    @Schema(description = "ID of the registered service.")
     private UUID id;
 
     @NotNull
-    @Schema(description = "The catalog of the available service.")
-    private Category category;
-
-    @NotNull
     @NotBlank
-    @Schema(description = "The name of the available service.")
+    @Schema(description = "Name of the registered service.")
     private String name;
 
     @NotNull
     @NotBlank
-    @Schema(description = "The version of the available service.")
+    @Schema(description = "Version of the registered service.")
     private String version;
 
     @NotNull
-    @Schema(description = "The Cloud Service Provider of the available service.")
+    @Schema(description = "Csp of the registered service.")
     private Csp csp;
+
+    @NotNull
+    @Schema(description = "Category of the registered service.")
+    private Category category;
+
+    @NotNull
+    @NotBlank
+    @Schema(description = "Namespace of the user who registered service template.")
+    private String namespace;
 
     @NotEmpty
     @Schema(description = "The regions of the Cloud Service Provider.")
@@ -64,17 +69,12 @@ public class UserAvailableServiceVo extends RepresentationModel<UserAvailableSer
 
     @NotNull
     @NotBlank
-    @Schema(description = "The description of the available service.")
+    @Schema(description = "The description of the registered service.")
     private String description;
 
     @NotNull
     @NotBlank
-    @Schema(description = "The namespace of the available service.")
-    private String namespace;
-
-    @NotNull
-    @NotBlank
-    @Schema(description = "The icon of the available service.")
+    @Schema(description = "The icon of the registered service.")
     private String icon;
 
     @Valid
@@ -87,11 +87,11 @@ public class UserAvailableServiceVo extends RepresentationModel<UserAvailableSer
     private List<@Valid DeployVariable> variables;
 
     @NotNull
-    @Schema(description = "The flavors of the available service.")
+    @Schema(description = "The flavors of the registered service.")
     private List<@Valid Flavor> flavors;
 
     @NotNull
-    @Schema(description = "The billing policy of the available service.")
+    @Schema(description = "The billing policy of the registered service.")
     private Billing billing;
 
     @NotNull
@@ -106,9 +106,8 @@ public class UserAvailableServiceVo extends RepresentationModel<UserAvailableSer
     @Schema(description = "Last updateTime of the registered service.")
     private OffsetDateTime lastModifiedTime;
 
-
     @NotNull
-    @Schema(description = "The state of the available service.")
+    @Schema(description = "State of registered service.")
     private ServiceRegistrationState serviceRegistrationState;
 
 }
