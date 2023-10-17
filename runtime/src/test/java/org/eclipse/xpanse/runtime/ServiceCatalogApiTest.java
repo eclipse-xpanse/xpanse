@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
@@ -58,12 +59,10 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 class ServiceCatalogApiTest {
 
+    private final static ObjectMapper objectMapper = new ObjectMapper();
     private static String id;
     private static ServiceTemplateDetailVo serviceTemplateDetailVo;
     private static Ocl ocl;
-
-    private final static ObjectMapper objectMapper = new ObjectMapper();
-
     @Resource
     private MockMvc mockMvc;
 
@@ -154,6 +153,14 @@ class ServiceCatalogApiTest {
             ServiceTemplateDetailVo serviceTemplateDetailVo) {
         UserOrderableServiceVo userOrderableServiceVo = new UserOrderableServiceVo();
         BeanUtils.copyProperties(serviceTemplateDetailVo, userOrderableServiceVo);
+
+        List<FlavorBasic> flavorBasics = serviceTemplateDetailVo.getFlavors()
+                .stream().map(flavor -> {
+                    FlavorBasic flavorBasic = new FlavorBasic();
+                    BeanUtils.copyProperties(flavor, flavorBasic);
+                    return flavorBasic;
+                }).toList();
+        userOrderableServiceVo.setFlavors(flavorBasics);
         userOrderableServiceVo.add(
                 Link.of(String.format("http://localhost/xpanse/catalog/services/%s/openapi",
                         serviceTemplateDetailVo.getId().toString()), "openApi"));

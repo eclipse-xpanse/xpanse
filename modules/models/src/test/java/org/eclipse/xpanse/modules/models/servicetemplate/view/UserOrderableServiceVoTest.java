@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class UserOrderableServiceVoTest {
     private static final String icon = "icon";
     private static List<@Valid Region> regions;
     private static List<@Valid DeployVariable> variables;
-    private static List<Flavor> flavors;
+    private static List<FlavorBasic> flavorBasics;
     private static Billing billing;
     private static UserOrderableServiceVo userOrderableServiceVo;
 
@@ -50,9 +50,9 @@ class UserOrderableServiceVoTest {
         deployVariable.setName("HuaweiClouud AK");
         variables = List.of(deployVariable);
 
-        Flavor flavor = new Flavor();
-        flavor.setName("flavor");
-        flavors = List.of(flavor);
+        FlavorBasic flavorBasic = new FlavorBasic();
+        flavorBasic.setName("flavorBasic");
+        flavorBasics = List.of(flavorBasic);
 
         billing = new Billing();
         billing.setModel("model");
@@ -67,7 +67,7 @@ class UserOrderableServiceVoTest {
         userOrderableServiceVo.setDescription(description);
         userOrderableServiceVo.setIcon(icon);
         userOrderableServiceVo.setVariables(variables);
-        userOrderableServiceVo.setFlavors(flavors);
+        userOrderableServiceVo.setFlavors(flavorBasics);
         userOrderableServiceVo.setBilling(billing);
     }
 
@@ -158,7 +158,7 @@ class UserOrderableServiceVoTest {
         assertNotEquals(userOrderableServiceVo.hashCode(), userOrderableServiceVo1.hashCode());
         assertNotEquals(userOrderableServiceVo1.hashCode(), userOrderableServiceVo2.hashCode());
 
-        userOrderableServiceVo1.setFlavors(flavors);
+        userOrderableServiceVo1.setFlavors(flavorBasics);
         assertNotEquals(userOrderableServiceVo, userOrderableServiceVo1);
         assertNotEquals(userOrderableServiceVo1, userOrderableServiceVo2);
         assertNotEquals(userOrderableServiceVo.hashCode(), userOrderableServiceVo1.hashCode());
@@ -184,7 +184,7 @@ class UserOrderableServiceVoTest {
                 "description=" + description + ", " +
                 "icon=" + icon + ", " +
                 "variables=" + variables + ", " +
-                "flavors=" + flavors + ", " +
+                "flavors=" + flavorBasics + ", " +
                 "billing=" + billing + ")";
         assertEquals(expectedToString, userOrderableServiceVo.toString());
     }

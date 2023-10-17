@@ -6,24 +6,25 @@
 package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.Map;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * Defines for service flavor.
  */
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class Flavor extends FlavorBasic {
+public class FlavorBasic {
 
     @NotNull
+    @NotBlank
     @NotEmpty
-    @Schema(description = "The properties of the flavor")
-    private Map<String, String> properties;
+    @Schema(description = "The flavor name")
+    private String name;
+
+    @NotNull
+    @Schema(description = "The price of the flavor")
+    private Integer fixedPrice;
 
 }
