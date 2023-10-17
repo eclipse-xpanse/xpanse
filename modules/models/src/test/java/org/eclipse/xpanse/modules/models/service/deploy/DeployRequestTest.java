@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test of CreateRequest.
  */
-class CreateRequestTest {
+class DeployRequestTest {
 
     private static final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
     private static final String userId = "userId";
@@ -34,11 +34,11 @@ class CreateRequestTest {
     private static final String flavor = "flavor";
     private static final Ocl ocl = new Ocl();
     private static final Map<String, String> properties = Collections.singletonMap("key", "value");
-    private static CreateRequest request;
+    private static DeployRequest request;
 
     @BeforeEach
     void setUp() {
-        request = new CreateRequest();
+        request = new DeployRequest();
         request.setId(id);
         request.setUserId(userId);
         request.setCategory(category);
@@ -77,8 +77,8 @@ class CreateRequestTest {
         assertNotEquals(request, null);
         assertNotEquals(request.hashCode(), obj.hashCode());
 
-        CreateRequest request1 = new CreateRequest();
-        CreateRequest request2 = new CreateRequest();
+        DeployRequest request1 = new DeployRequest();
+        DeployRequest request2 = new DeployRequest();
         assertNotEquals(request, request1);
         assertNotEquals(request, request2);
         assertEquals(request1, request2);
@@ -155,7 +155,7 @@ class CreateRequestTest {
 
     @Test
     void testToString() {
-        CreateRequest request = new CreateRequest();
+        DeployRequest request = new DeployRequest();
         request.setId(id);
         request.setUserId(userId);
         request.setCategory(category);
@@ -168,9 +168,8 @@ class CreateRequestTest {
         request.setOcl(ocl);
         request.setServiceRequestProperties(properties);
 
-        String expectedToString = "CreateRequest(" +
-                "id=" + id +
-                ", userId=" + userId +
+        String expectedToString = "DeployRequest(super=DeployRequestBase(" +
+                "userId=" + userId +
                 ", category=" + category +
                 ", serviceName=" + serviceName +
                 ", customerServiceName=" + customerServiceName +
@@ -180,7 +179,7 @@ class CreateRequestTest {
                 ", flavor=" + flavor +
                 ", ocl=" + ocl +
                 ", serviceRequestProperties=" + properties +
-                ')';
+                "), id=" + id + ")";
         assertEquals(expectedToString, request.toString());
     }
 

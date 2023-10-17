@@ -36,7 +36,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
@@ -88,7 +88,7 @@ class DeployServiceTest {
     private static DeployServiceEntity deployServiceEntity;
     private static DeployResult deployResult;
     private static List<DeployResourceEntity> deployResourceEntities;
-    private static CreateRequest createRequest;
+    private static DeployRequest deployRequest;
     private static org.eclipse.xpanse.modules.models.servicetemplate.Deployment deployment;
 
     @Mock
@@ -136,21 +136,21 @@ class DeployServiceTest {
         ocl.setName("oclName");
         ocl.setDeployment(deployment);
 
-        createRequest = new CreateRequest();
-        createRequest.setId(uuid);
-        createRequest.setUserId(userId);
-        createRequest.setCategory(Category.COMPUTE);
-        createRequest.setCsp(Csp.HUAWEI);
-        createRequest.setServiceName("service");
-        createRequest.setCustomerServiceName("customerService");
-        createRequest.setVersion("1.0");
-        createRequest.setOcl(ocl);
-        createRequest.setFlavor("flavor");
-        createRequest.setServiceRequestProperties(requestProperties);
+        deployRequest = new DeployRequest();
+        deployRequest.setId(uuid);
+        deployRequest.setUserId(userId);
+        deployRequest.setCategory(Category.COMPUTE);
+        deployRequest.setCsp(Csp.HUAWEI);
+        deployRequest.setServiceName("service");
+        deployRequest.setCustomerServiceName("customerService");
+        deployRequest.setVersion("1.0");
+        deployRequest.setOcl(ocl);
+        deployRequest.setFlavor("flavor");
+        deployRequest.setServiceRequestProperties(requestProperties);
         deployTask = new DeployTask();
         deployTask.setId(uuid);
         deployTask.setOcl(ocl);
-        deployTask.setCreateRequest(createRequest);
+        deployTask.setDeployRequest(deployRequest);
 
         deploymentMock = mock(Deployment.class);
 
@@ -166,7 +166,7 @@ class DeployServiceTest {
         deployServiceEntity.setName("deployServiceEntity");
         deployServiceEntity.setCsp(Csp.HUAWEI);
         deployServiceEntity.setUserId(userId);
-        deployServiceEntity.setCreateRequest(createRequest);
+        deployServiceEntity.setDeployRequest(deployRequest);
         deployServiceEntity.setProperties(Map.of("key", "value"));
         deployServiceEntity.setPrivateProperties(Map.of("key", "value"));
         deployResourceEntities = new ArrayList<>();
@@ -216,7 +216,7 @@ class DeployServiceTest {
         assertEquals("customerService", entity.getCustomerServiceName());
         assertEquals("flavor", entity.getFlavor());
         assertEquals("defaultUserId", entity.getUserId());
-        assertEquals(deployTask.getCreateRequest(), entity.getCreateRequest());
+        assertEquals(deployTask.getDeployRequest(), entity.getDeployRequest());
         assertTrue(CollectionUtils.isEmpty(entity.getDeployResourceList()));
     }
 
@@ -248,7 +248,7 @@ class DeployServiceTest {
         assertNotNull(result);
         assertEquals(DeployerKind.TERRAFORM, result.getDeployerKind());
         assertEquals(serviceEntity.getOcl(), deployTask.getOcl());
-        assertEquals(serviceEntity.getOcl(), deployTask.getCreateRequest().getOcl());
+        assertEquals(serviceEntity.getOcl(), deployTask.getDeployRequest().getOcl());
     }
 
     @Test
@@ -475,7 +475,7 @@ class DeployServiceTest {
                 capturedEntity.getServiceDeploymentState());
         assertNotEquals(deployResult.getProperties(), capturedEntity.getProperties());
         assertNotEquals(deployResult.getPrivateProperties(), capturedEntity.getPrivateProperties());
-        assertEquals("test", capturedEntity.getCreateRequest().getServiceRequestProperties().get("test"));
+        assertEquals("test", capturedEntity.getDeployRequest().getServiceRequestProperties().get("test"));
     }
 
     @Test

@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 
 /**
@@ -25,7 +25,7 @@ public class DeployTask {
     /**
      * The Ocl object of the DeployTask.
      */
-    private CreateRequest createRequest;
+    private DeployRequest deployRequest;
 
     /**
      * The Ocl object of the DeployTask.

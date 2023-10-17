@@ -28,7 +28,8 @@ import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.MigrateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
@@ -121,7 +122,7 @@ public class ServiceDeployerApi {
     @Operation(description = "Start a task to deploy service using registered service template.")
     @PostMapping(value = "/services", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public UUID deploy(@Valid @RequestBody CreateRequest deployRequest) {
+    public UUID deploy(@Valid @RequestBody DeployRequest deployRequest) {
         log.info("Starting managed service with name {}, version {}, csp {}",
                 deployRequest.getServiceName(),
                 deployRequest.getVersion(), deployRequest.getCsp());
@@ -132,7 +133,7 @@ public class ServiceDeployerApi {
         DeployTask deployTask = new DeployTask();
         deployRequest.setId(id);
         deployTask.setId(id);
-        deployTask.setCreateRequest(deployRequest);
+        deployTask.setDeployRequest(deployRequest);
         Deployment deployment = this.deployService.getDeployHandler(deployTask);
         this.deployService.asyncDeployService(deployment, deployTask);
         String successMsg = String.format(
@@ -185,22 +186,20 @@ public class ServiceDeployerApi {
     }
 
     /**
-     * Start a task to migrate the deployed service using id.
+     * Create a job to migrate the deployed service.
      *
-     * @param id ID of deployed service.
      * @return response
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
-    @Operation(description = "Start a task to migrate the deployed service using id.")
-    @PostMapping(value = "/services/migrate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(description = "Create a job to migrate the deployed service.")
+    @PostMapping(value = "/services/migration", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public UUID migrate(@PathVariable("id") String id,
-            @Valid @RequestBody CreateRequest deployRequest) {
+    public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
         UUID newId = UUID.randomUUID();
         Map<String, Object> variable = new HashMap<>();
-        variable.put("id", id);
+        variable.put("id", migrateRequest.getId());
         variable.put("newId", newId);
-        variable.put("createRequest", deployRequest);
+        variable.put("createRequest", migrateRequest);
         workflowProcessUtils.asyncStartProcess("migrate", variable);
         return newId;
     }
@@ -228,12 +227,12 @@ public class ServiceDeployerApi {
         return query;
     }
 
-    private String generateCustomerServiceName(CreateRequest createRequest) {
-        if (createRequest.getServiceName().length() > 5) {
-            return createRequest.getServiceName().substring(0, 4) + "-"
+    private String generateCustomerServiceName(DeployRequest deployRequest) {
+        if (deployRequest.getServiceName().length() > 5) {
+            return deployRequest.getServiceName().substring(0, 4) + "-"
                     + RandomStringUtils.randomAlphanumeric(5);
         } else {
-            return createRequest.getServiceName() + "-"
+            return deployRequest.getServiceName() + "-"
                     + RandomStringUtils.randomAlphanumeric(5);
         }
     }

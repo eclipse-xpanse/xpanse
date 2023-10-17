@@ -30,7 +30,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -233,7 +233,7 @@ public class ServiceTemplateOpenApiGenerator {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         try {
-            createRequiredStr = mapper.writeValueAsString(getRequiredFields(new CreateRequest()));
+            createRequiredStr = mapper.writeValueAsString(getRequiredFields(new DeployRequest()));
             propertiesStr = objectMapper.writeValueAsString(
                     registerService.getJsonObjectSchema().getProperties());
             propertiesRequiredStr =

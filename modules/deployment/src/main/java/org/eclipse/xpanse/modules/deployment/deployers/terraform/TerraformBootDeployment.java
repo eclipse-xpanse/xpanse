@@ -174,8 +174,8 @@ public class TerraformBootDeployment implements Deployment {
     }
 
     private List<String> getFiles(DeployTask task) {
-        Csp csp = task.getCreateRequest().getCsp();
-        String region = task.getCreateRequest().getRegion();
+        Csp csp = task.getDeployRequest().getCsp();
+        String region = task.getDeployRequest().getRegion();
         String provider = this.pluginManager.getTerraformProviderForRegionByCsp(csp, region);
         String deployer = task.getOcl().getDeployment().getDeployer();
         return Arrays.asList(provider, deployer);

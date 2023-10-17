@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ class DeployServiceEntityTest {
     private final Csp CSP = Csp.HUAWEI;
     private final String FLAVOR = "1-zookeeper-with-3-worker-nodes-normal";
     private final ServiceDeploymentState SERVICE_STATE = ServiceDeploymentState.DEPLOYING;
-    private final CreateRequest CREATE_REQUEST = new CreateRequest();
+    private final DeployRequest CREATE_REQUEST = new DeployRequest();
     private final List<DeployResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
     private final Map<String, String> PROPERTIES = new HashMap<>();
     private final Map<String, String> PRIVATE_PROPERTIES = new HashMap<>();
@@ -52,7 +52,7 @@ class DeployServiceEntityTest {
         test.setCsp(CSP);
         test.setFlavor(FLAVOR);
         test.setServiceDeploymentState(SERVICE_STATE);
-        test.setCreateRequest(CREATE_REQUEST);
+        test.setDeployRequest(CREATE_REQUEST);
         test.setDeployResourceList(DEPLOY_RESOURCE_LIST);
         test.setProperties(PROPERTIES);
         test.setPrivateProperties(PRIVATE_PROPERTIES);
@@ -71,7 +71,7 @@ class DeployServiceEntityTest {
                         + "csp=" + CSP + ", "
                         + "flavor=" + FLAVOR + ", "
                         + "serviceDeploymentState=" + SERVICE_STATE + ", "
-                        + "createRequest=" + CREATE_REQUEST + ", "
+                        + "deployRequest=" + CREATE_REQUEST + ", "
                         //+ "deployResourceList=" + DEPLOY_RESOURCE_LIST+ ", "
                         + "properties=" + PROPERTIES + ", "
                         + "privateProperties=" + PRIVATE_PROPERTIES + ", "
@@ -161,7 +161,7 @@ class DeployServiceEntityTest {
         Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
         Assertions.assertNotEquals(test1.hashCode(), test2.hashCode());
 
-        test1.setCreateRequest(CREATE_REQUEST);
+        test1.setDeployRequest(CREATE_REQUEST);
         Assertions.assertNotEquals(test, test1);
         Assertions.assertNotEquals(test, test2);
         Assertions.assertNotEquals(test1, test2);

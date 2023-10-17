@@ -66,7 +66,7 @@ public class DeployEnvironments {
      */
     public Map<String, String> getEnv(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-        Map<String, String> request = task.getCreateRequest().getServiceRequestProperties();
+        Map<String, String> request = task.getDeployRequest().getServiceRequestProperties();
         for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {
             if (variable.getKind() == DeployVariableKind.ENV) {
                 if (request.containsKey(variable.getName())
@@ -103,7 +103,7 @@ public class DeployEnvironments {
      */
     public Map<String, String> getFlavorVariables(DeployTask task) {
         for (Flavor flavor : task.getOcl().getFlavors()) {
-            if (flavor.getName().equals(task.getCreateRequest().getFlavor())) {
+            if (flavor.getName().equals(task.getDeployRequest().getFlavor())) {
                 return flavor.getProperties();
             }
         }
@@ -117,7 +117,7 @@ public class DeployEnvironments {
      */
     public Map<String, String> getVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-        Map<String, String> request = task.getCreateRequest().getServiceRequestProperties();
+        Map<String, String> request = task.getDeployRequest().getServiceRequestProperties();
         for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {
             if (variable.getKind() == DeployVariableKind.VARIABLE) {
                 if (request.containsKey(variable.getName())
@@ -159,7 +159,7 @@ public class DeployEnvironments {
 
         AbstractCredentialInfo abstractCredentialInfo =
                 this.credentialCenter.getCredential(csp, credentialType,
-                        task.getCreateRequest().getUserId());
+                        task.getDeployRequest().getUserId());
         if (Objects.nonNull(abstractCredentialInfo)) {
             for (CredentialVariable variable
                     : ((CredentialVariables) abstractCredentialInfo).getVariables()) {
@@ -176,7 +176,7 @@ public class DeployEnvironments {
      */
     public Map<String, String> getPluginMandatoryVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-        this.pluginManager.getOrchestratorPlugin(task.getCreateRequest().getCsp())
+        this.pluginManager.getOrchestratorPlugin(task.getDeployRequest().getCsp())
                 .requiredProperties().forEach(variable -> variables.put(variable,
                         this.environment.getRequiredProperty(variable)));
         return variables;

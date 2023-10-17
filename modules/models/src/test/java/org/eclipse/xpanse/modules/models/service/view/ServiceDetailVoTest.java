@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,25 +41,25 @@ class ServiceDetailVoTest {
     private static final String resultSuccessMessage = "Deployment successful";
     private static DeployResource deployResource;
     private static Map<String, String> properties;
-    private static CreateRequest createRequest;
+    private static DeployRequest deployRequest;
     private static List<@Valid DeployResource> deployResources;
     private static Map<String, String> deployedServiceProperties;
     private static ServiceDetailVo serviceDetailVo;
 
     @BeforeEach
     void setUp() {
-        createRequest = new CreateRequest();
-        createRequest.setUserId(userId);
-        createRequest.setCategory(category);
-        createRequest.setServiceName(serviceName);
-        createRequest.setVersion(version);
-        createRequest.setRegion(region);
-        createRequest.setCsp(csp);
-        createRequest.setFlavor(flavor);
-        createRequest.setCustomerServiceName(customerServiceName);
+        deployRequest = new DeployRequest();
+        deployRequest.setUserId(userId);
+        deployRequest.setCategory(category);
+        deployRequest.setServiceName(serviceName);
+        deployRequest.setVersion(version);
+        deployRequest.setRegion(region);
+        deployRequest.setCsp(csp);
+        deployRequest.setFlavor(flavor);
+        deployRequest.setCustomerServiceName(customerServiceName);
         properties = new HashMap<>();
         properties.put("key", "value");
-        createRequest.setServiceRequestProperties(properties);
+        deployRequest.setServiceRequestProperties(properties);
 
         deployResources = new ArrayList<>();
         deployResource = new DeployResource();
@@ -74,7 +74,7 @@ class ServiceDetailVoTest {
         deployedServiceProperties.put("key2", "value2");
 
         serviceDetailVo = new ServiceDetailVo();
-        serviceDetailVo.setCreateRequest(createRequest);
+        serviceDetailVo.setDeployRequest(deployRequest);
         serviceDetailVo.setDeployResources(deployResources);
         serviceDetailVo.setDeployedServiceProperties(deployedServiceProperties);
         serviceDetailVo.setResultMessage(resultSuccessMessage);
@@ -82,22 +82,22 @@ class ServiceDetailVoTest {
 
     @Test
     public void testGetterAndSetter() {
-        assertEquals(userId, createRequest.getUserId());
-        assertEquals(category, createRequest.getCategory());
-        assertEquals(serviceName, createRequest.getServiceName());
-        assertEquals(version, createRequest.getVersion());
-        assertEquals(region, createRequest.getRegion());
-        assertEquals(csp, createRequest.getCsp());
-        assertEquals(flavor, createRequest.getFlavor());
-        assertEquals(customerServiceName, createRequest.getCustomerServiceName());
-        assertEquals(properties, createRequest.getServiceRequestProperties());
+        assertEquals(userId, deployRequest.getUserId());
+        assertEquals(category, deployRequest.getCategory());
+        assertEquals(serviceName, deployRequest.getServiceName());
+        assertEquals(version, deployRequest.getVersion());
+        assertEquals(region, deployRequest.getRegion());
+        assertEquals(csp, deployRequest.getCsp());
+        assertEquals(flavor, deployRequest.getFlavor());
+        assertEquals(customerServiceName, deployRequest.getCustomerServiceName());
+        assertEquals(properties, deployRequest.getServiceRequestProperties());
 
         assertEquals(uuid.toString(), deployResource.getResourceId());
         assertEquals(name, deployResource.getName());
         assertEquals(kind, deployResource.getKind());
         assertEquals(properties, deployResource.getProperties());
 
-        assertEquals(createRequest, serviceDetailVo.getCreateRequest());
+        assertEquals(deployRequest, serviceDetailVo.getDeployRequest());
         assertEquals(deployResources, serviceDetailVo.getDeployResources());
         assertEquals(deployedServiceProperties, serviceDetailVo.getDeployedServiceProperties());
         assertEquals(resultSuccessMessage, serviceDetailVo.getResultMessage());
@@ -122,7 +122,7 @@ class ServiceDetailVoTest {
         assertNotEquals(serviceDetailVo.hashCode(), serviceDetailVo2.hashCode());
         assertEquals(serviceDetailVo1.hashCode(), serviceDetailVo2.hashCode());
 
-        serviceDetailVo1.setCreateRequest(createRequest);
+        serviceDetailVo1.setDeployRequest(deployRequest);
         assertNotEquals(serviceDetailVo, serviceDetailVo1);
         assertNotEquals(serviceDetailVo1, serviceDetailVo2);
         assertNotEquals(serviceDetailVo.hashCode(), serviceDetailVo1.hashCode());
@@ -149,7 +149,7 @@ class ServiceDetailVoTest {
 
     @Test
     void testToString() {
-        String expectedToString = "ServiceDetailVo(createRequest=" + createRequest +
+        String expectedToString = "ServiceDetailVo(deployRequest=" + deployRequest +
                 ", deployResources=" + deployResources +
                 ", deployedServiceProperties=" + deployedServiceProperties +
                 ", resultMessage=" + resultSuccessMessage + ")";

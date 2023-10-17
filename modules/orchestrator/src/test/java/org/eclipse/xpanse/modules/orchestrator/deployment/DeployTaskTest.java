@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ class DeployTaskTest {
     DeployResourceHandler handler = deployResult -> {
     };
     Ocl ocl = new Ocl();
-    CreateRequest createRequest = new CreateRequest();
+    DeployRequest deployRequest = new DeployRequest();
     private DeployTask test;
 
     @BeforeEach
@@ -26,7 +26,7 @@ class DeployTaskTest {
         test = new DeployTask();
         test.setId(id);
         test.setOcl(ocl);
-        test.setCreateRequest(createRequest);
+        test.setDeployRequest(deployRequest);
     }
 
     @Test
@@ -34,7 +34,7 @@ class DeployTaskTest {
         assertEquals(id, test.getId());
         assertNotNull(test.getOcl());
         assertNull(test.getDeployResourceHandler());
-        assertNotNull(test.getCreateRequest());
+        assertNotNull(test.getDeployRequest());
     }
 
     @Test
@@ -64,10 +64,10 @@ class DeployTaskTest {
         assertNotEquals(test.hashCode(), test1.hashCode());
         assertNotEquals(test2.hashCode(), test3.hashCode());
 
-        test2.setCreateRequest(createRequest);
-        CreateRequest createRequest1 = new CreateRequest();
-        createRequest1.setCsp(Csp.HUAWEI);
-        test3.setCreateRequest(createRequest1);
+        test2.setDeployRequest(deployRequest);
+        DeployRequest deployRequest1 = new DeployRequest();
+        deployRequest1.setCsp(Csp.HUAWEI);
+        test3.setDeployRequest(deployRequest1);
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test, test3);
@@ -106,9 +106,9 @@ class DeployTaskTest {
         assertNotEquals(test.toString(), null);
 
         String exceptedString = "DeployTask(id=23cc529b-64d9-4875-a2f0-08b415705964, "
-                + "createRequest=CreateRequest(id=null, userId=null, category=null, "
+                + "deployRequest=DeployRequest(super=DeployRequestBase(userId=null, category=null, "
                 + "serviceName=null, customerServiceName=null, version=null, region=null, "
-                + "csp=null, flavor=null, ocl=null, serviceRequestProperties=null),"
+                + "csp=null, flavor=null, ocl=null, serviceRequestProperties=null), id=null),"
                 + " ocl=Ocl(category=null, version=null, name=null, serviceVersion=null, "
                 + "description=null, namespace=null, icon=null, cloudServiceProvider=null, "
                 + "deployment=null, flavors=null, billing=null), deployResourceHandler=null)";
