@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
@@ -166,7 +167,13 @@ public class ServiceCatalogApi {
             userOrderableServiceVo.setDescription(
                     serviceTemplateEntity.getOcl().getDescription());
             userOrderableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
-            userOrderableServiceVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());
+            List<FlavorBasic> flavorBasics = serviceTemplateEntity.getOcl().getFlavors()
+                    .stream().map(flavor -> {
+                        FlavorBasic flavorBasic = new FlavorBasic();
+                        BeanUtils.copyProperties(flavor, flavorBasic);
+                        return flavorBasic;
+                    }).toList();
+            userOrderableServiceVo.setFlavors(flavorBasics);
             userOrderableServiceVo.setVariables(
                     serviceTemplateEntity.getOcl().getDeployment().getVariables());
             userOrderableServiceVo.setRegions(

@@ -19,7 +19,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -72,7 +72,7 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
 
     @NotNull
     @Schema(description = "The flavors of the orderable service.")
-    private List<Flavor> flavors;
+    private List<FlavorBasic> flavors;
 
     @NotNull
     @Schema(description = "The billing policy of the orderable service.")

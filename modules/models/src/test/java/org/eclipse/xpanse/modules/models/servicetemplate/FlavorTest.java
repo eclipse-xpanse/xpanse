@@ -79,10 +79,9 @@ class FlavorTest {
     @Test
     void testToString() {
         String expectedString = "Flavor(" +
-                "name=" + name +
-                ", fixedPrice=" + fixedPrice + "" +
-                ", properties=" + properties + "" +
-                ")";
+                "super=FlavorBasic(name=" + name +
+                ", fixedPrice=" + fixedPrice + ")" +
+                ", properties=" + properties + ")";
         assertEquals(expectedString, flavor.toString());
     }
 
