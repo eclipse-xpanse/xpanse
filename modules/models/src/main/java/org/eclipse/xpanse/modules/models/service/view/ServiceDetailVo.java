@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 
 /**
@@ -24,7 +24,7 @@ public class ServiceDetailVo extends ServiceVo {
 
     @NotNull
     @Schema(description = "The create request of the deployed service.")
-    private CreateRequest createRequest;
+    private DeployRequest deployRequest;
 
     @Schema(description = "The resource list of the deployed service.")
     private List<@Valid DeployResource> deployResources;

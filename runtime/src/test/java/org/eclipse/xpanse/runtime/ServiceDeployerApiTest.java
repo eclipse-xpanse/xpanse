@@ -42,7 +42,7 @@ import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
@@ -253,18 +253,18 @@ class ServiceDeployerApiTest {
         registerServiceTemplate();
         addCredential();
 
-        CreateRequest createRequest = new CreateRequest();
-        createRequest.setUserId(userId);
-        createRequest.setServiceName(serviceTemplateDetailVo.getName());
-        createRequest.setVersion(serviceTemplateDetailVo.getVersion());
-        createRequest.setCsp(serviceTemplateDetailVo.getCsp());
-        createRequest.setCategory(serviceTemplateDetailVo.getCategory());
-        createRequest.setFlavor(serviceTemplateDetailVo.getFlavors().get(0).getName());
-        createRequest.setRegion(serviceTemplateDetailVo.getRegions().get(0).toString());
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setUserId(userId);
+        deployRequest.setServiceName(serviceTemplateDetailVo.getName());
+        deployRequest.setVersion(serviceTemplateDetailVo.getVersion());
+        deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
+        deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
+        deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().get(0).getName());
+        deployRequest.setRegion(serviceTemplateDetailVo.getRegions().get(0).toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("secgroup_name", "secgroup_name");
-        createRequest.setServiceRequestProperties(serviceRequestProperties);
-        String requestBody = objectMapper.writeValueAsString(createRequest);
+        deployRequest.setServiceRequestProperties(serviceRequestProperties);
+        String requestBody = objectMapper.writeValueAsString(deployRequest);
 
         // Run the test
         final MockHttpServletResponse deployResponse =
@@ -288,16 +288,16 @@ class ServiceDeployerApiTest {
                 Collections.singletonList("Service template not found."));
         String result = objectMapper.writeValueAsString(expectedResponse);
 
-        CreateRequest createRequest = new CreateRequest();
+        DeployRequest deployRequest = new DeployRequest();
 
-        createRequest.setUserId(userId);
-        createRequest.setServiceName("redis");
-        createRequest.setVersion("v1.0.0");
-        createRequest.setCsp(Csp.HUAWEI);
-        createRequest.setCategory(Category.AI);
-        createRequest.setFlavor("flavor2");
-        createRequest.setRegion("region");
-        String requestBody = objectMapper.writeValueAsString(createRequest);
+        deployRequest.setUserId(userId);
+        deployRequest.setServiceName("redis");
+        deployRequest.setVersion("v1.0.0");
+        deployRequest.setCsp(Csp.HUAWEI);
+        deployRequest.setCategory(Category.AI);
+        deployRequest.setFlavor("flavor2");
+        deployRequest.setRegion("region");
+        String requestBody = objectMapper.writeValueAsString(deployRequest);
 
         // Run the test
         final MockHttpServletResponse deployResponse =

@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
@@ -49,7 +49,7 @@ class DeployEnvironmentsTest {
 
     private static final String userId = "userId";
     private static DeployTask task;
-    private static CreateRequest createRequest;
+    private static DeployRequest deployRequest;
     private static Ocl ocl;
     private static Flavor flavor;
     private static DeployVariable deployVariable1;
@@ -73,10 +73,10 @@ class DeployEnvironmentsTest {
         serviceRequestProperties.put("key2", "value2");
         serviceRequestProperties.put("example", null);
 
-        createRequest = new CreateRequest();
-        createRequest.setUserId(userId);
-        createRequest.setFlavor("flavor");
-        createRequest.setServiceRequestProperties(serviceRequestProperties);
+        deployRequest = new DeployRequest();
+        deployRequest.setUserId(userId);
+        deployRequest.setFlavor("flavor");
+        deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
 
         Deployment deployment = new Deployment();
@@ -117,7 +117,7 @@ class DeployEnvironmentsTest {
         ocl.setCloudServiceProvider(cloudServiceProvider);
 
         task = new DeployTask();
-        task.setCreateRequest(createRequest);
+        task.setDeployRequest(deployRequest);
         task.setOcl(ocl);
 
         deployEnvironmentsUnderTest = new DeployEnvironments(mockCredentialCenter, aesUtil,
@@ -199,7 +199,7 @@ class DeployEnvironmentsTest {
                 new CredentialVariables(csp, credentialType, "AK_SK", "description", userId,
                         variables);
         when(mockCredentialCenter.getCredential(csp, credentialType,
-                createRequest.getUserId()))
+                deployRequest.getUserId()))
                 .thenReturn(abstractCredentialInfo);
 
         Map<String, String> variablesActual =

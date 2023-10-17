@@ -14,7 +14,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.eclipse.xpanse.modules.deployment.DeployService;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,8 +49,8 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
                 runtimeService.getVariables(processInstanceId);
         UUID newId = (UUID) variables.get("newId");
         runtimeService.updateBusinessKey(processInstanceId, newId.toString());
-        CreateRequest createRequest = (CreateRequest) variables.get("createRequest");
-        boolean isDeploySuccess = deployService.deployService(newId, createRequest);
+        DeployRequest deployRequest = (DeployRequest) variables.get("createRequest");
+        boolean isDeploySuccess = deployService.deployService(newId, deployRequest);
         runtimeService.setVariable(processInstanceId, "isDeploySuccess", isDeploySuccess);
     }
 }

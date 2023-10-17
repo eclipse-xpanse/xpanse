@@ -92,7 +92,7 @@ public class TerraformDeployment implements Deployment {
         String workspace = getWorkspacePath(task.getId().toString());
         // Create the workspace.
         buildWorkspace(workspace);
-        createScriptFile(task.getCreateRequest().getCsp(), task.getCreateRequest().getRegion(),
+        createScriptFile(task.getDeployRequest().getCsp(), task.getDeployRequest().getRegion(),
                 workspace, task.getOcl().getDeployment().getDeployer());
         // Execute the terraform command.
         TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
@@ -132,8 +132,8 @@ public class TerraformDeployment implements Deployment {
         }
         String taskId = task.getId().toString();
         String workspace = getWorkspacePath(taskId);
-        createDestroyScriptFile(task.getCreateRequest().getCsp(),
-                task.getCreateRequest().getRegion(), workspace, tfState);
+        createDestroyScriptFile(task.getDeployRequest().getCsp(),
+                task.getDeployRequest().getRegion(), workspace, tfState);
         TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
         executor.destroy();
         DeployResult result = new DeployResult();
@@ -147,7 +147,7 @@ public class TerraformDeployment implements Deployment {
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(taskId);
         if (Objects.isNull(deployServiceEntity)
-                || Objects.isNull(deployServiceEntity.getCreateRequest())) {
+                || Objects.isNull(deployServiceEntity.getDeployRequest())) {
             String errorMsg = String.format("Service with id %s not found.", taskId);
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
@@ -177,7 +177,7 @@ public class TerraformDeployment implements Deployment {
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(taskId);
         if (Objects.isNull(deployServiceEntity)
-                || Objects.isNull(deployServiceEntity.getCreateRequest())) {
+                || Objects.isNull(deployServiceEntity.getDeployRequest())) {
             String errorMsg = String.format("Service with id %s not found.", taskId);
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
@@ -210,14 +210,14 @@ public class TerraformDeployment implements Deployment {
 
     private void maskSensitiveFields(DeployServiceEntity deployServiceEntity) {
         log.debug("masking sensitive input data after deployment");
-        if (Objects.nonNull(deployServiceEntity.getCreateRequest().getServiceRequestProperties())) {
+        if (Objects.nonNull(deployServiceEntity.getDeployRequest().getServiceRequestProperties())) {
             for (DeployVariable deployVariable
-                    : deployServiceEntity.getCreateRequest().getOcl().getDeployment()
+                    : deployServiceEntity.getDeployRequest().getOcl().getDeployment()
                     .getVariables()) {
                 if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
-                        && (deployServiceEntity.getCreateRequest().getServiceRequestProperties()
+                        && (deployServiceEntity.getDeployRequest().getServiceRequestProperties()
                         .containsKey(deployVariable.getName()))) {
-                    deployServiceEntity.getCreateRequest().getServiceRequestProperties()
+                    deployServiceEntity.getDeployRequest().getServiceRequestProperties()
                             .put(deployVariable.getName(), "********");
 
                 }

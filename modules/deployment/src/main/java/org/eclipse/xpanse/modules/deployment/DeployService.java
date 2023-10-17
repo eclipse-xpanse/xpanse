@@ -27,7 +27,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
@@ -112,14 +112,14 @@ public class DeployService {
         DeployServiceEntity entity = new DeployServiceEntity();
         entity.setId(deployTask.getId());
         entity.setCreateTime(OffsetDateTime.now());
-        entity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
-        entity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getServiceName()));
-        entity.setCsp(deployTask.getCreateRequest().getCsp());
-        entity.setCategory(deployTask.getCreateRequest().getCategory());
-        entity.setCustomerServiceName(deployTask.getCreateRequest().getCustomerServiceName());
-        entity.setFlavor(deployTask.getCreateRequest().getFlavor());
-        entity.setUserId(deployTask.getCreateRequest().getUserId());
-        entity.setCreateRequest(deployTask.getCreateRequest());
+        entity.setVersion(StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
+        entity.setName(StringUtils.lowerCase(deployTask.getDeployRequest().getServiceName()));
+        entity.setCsp(deployTask.getDeployRequest().getCsp());
+        entity.setCategory(deployTask.getDeployRequest().getCategory());
+        entity.setCustomerServiceName(deployTask.getDeployRequest().getCustomerServiceName());
+        entity.setFlavor(deployTask.getDeployRequest().getFlavor());
+        entity.setUserId(deployTask.getDeployRequest().getUserId());
+        entity.setDeployRequest(deployTask.getDeployRequest());
         entity.setDeployResourceList(new ArrayList<>());
         return entity;
     }
@@ -131,35 +131,35 @@ public class DeployService {
      */
     public Deployment getDeployHandler(DeployTask deployTask) {
 
-        deployTask.getCreateRequest().setUserId(getCurrentLoginUserId());
+        deployTask.getDeployRequest().setUserId(getCurrentLoginUserId());
 
         // Find the registered service template and fill Ocl.
         ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setName(
-                StringUtils.lowerCase(deployTask.getCreateRequest().getServiceName()));
+                StringUtils.lowerCase(deployTask.getDeployRequest().getServiceName()));
         serviceTemplate.setVersion(
-                StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
-        serviceTemplate.setCsp(deployTask.getCreateRequest().getCsp());
-        serviceTemplate.setCategory(deployTask.getCreateRequest().getCategory());
+                StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
+        serviceTemplate.setCsp(deployTask.getDeployRequest().getCsp());
+        serviceTemplate.setCategory(deployTask.getDeployRequest().getCategory());
         serviceTemplate = serviceTemplateStorage.findServiceTemplate(serviceTemplate);
         if (Objects.isNull(serviceTemplate) || Objects.isNull(serviceTemplate.getOcl())) {
             throw new ServiceTemplateNotRegistered("Service template not found.");
         }
         // Check context validation
         if (Objects.nonNull(serviceTemplate.getOcl().getDeployment()) && Objects.nonNull(
-                deployTask.getCreateRequest().getServiceRequestProperties())) {
+                deployTask.getDeployRequest().getServiceRequestProperties())) {
             List<DeployVariable> deployVariables = serviceTemplate.getOcl().getDeployment()
                     .getVariables();
 
             serviceVariablesJsonSchemaValidator.validateDeployVariables(deployVariables,
-                    deployTask.getCreateRequest().getServiceRequestProperties(),
+                    deployTask.getDeployRequest().getServiceRequestProperties(),
                     serviceTemplate.getJsonObjectSchema());
         }
         encodeDeployVariable(serviceTemplate,
-                deployTask.getCreateRequest().getServiceRequestProperties());
+                deployTask.getDeployRequest().getServiceRequestProperties());
         // Set Ocl and CreateRequest
         deployTask.setOcl(serviceTemplate.getOcl());
-        deployTask.getCreateRequest().setOcl(serviceTemplate.getOcl());
+        deployTask.getDeployRequest().setOcl(serviceTemplate.getOcl());
         // Fill the handler
         fillHandler(deployTask);
         // get the deployment.
@@ -273,7 +273,7 @@ public class DeployService {
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
         if (Objects.isNull(deployServiceEntity)
-                || Objects.isNull(deployServiceEntity.getCreateRequest())) {
+                || Objects.isNull(deployServiceEntity.getDeployRequest())) {
             String errorMsg = String.format("Service with id %s not found.", deployTask.getId());
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
@@ -290,8 +290,8 @@ public class DeployService {
                     deployTask.getId(), state));
         }
         // Set Ocl and CreateRequest
-        deployTask.setCreateRequest(deployServiceEntity.getCreateRequest());
-        deployTask.setOcl(deployServiceEntity.getCreateRequest().getOcl());
+        deployTask.setDeployRequest(deployServiceEntity.getDeployRequest());
+        deployTask.setOcl(deployServiceEntity.getDeployRequest().getOcl());
         // Fill the handler
         fillHandler(deployTask);
         // get the deployment.
@@ -476,8 +476,8 @@ public class DeployService {
     private DeployTask getDeployTask(String taskId, DeployServiceEntity deployServiceEntity) {
         DeployTask task = new DeployTask();
         task.setId(UUID.fromString(taskId));
-        task.setOcl(deployServiceEntity.getCreateRequest().getOcl());
-        task.setCreateRequest(deployServiceEntity.getCreateRequest());
+        task.setOcl(deployServiceEntity.getDeployRequest().getOcl());
+        task.setDeployRequest(deployServiceEntity.getDeployRequest());
         fillHandler(task);
         return task;
     }
@@ -528,7 +528,7 @@ public class DeployService {
 
     private void fillHandler(DeployTask deployTask) {
         DeployResourceHandler resourceHandler =
-                getResourceHandler(deployTask.getCreateRequest().getCsp());
+                getResourceHandler(deployTask.getDeployRequest().getCsp());
         deployTask.setDeployResourceHandler(resourceHandler);
     }
 
@@ -567,14 +567,14 @@ public class DeployService {
 
     private void maskSensitiveFields(DeployServiceEntity deployServiceEntity) {
         log.debug("masking sensitive input data after deployment");
-        if (Objects.nonNull(deployServiceEntity.getCreateRequest().getServiceRequestProperties())) {
+        if (Objects.nonNull(deployServiceEntity.getDeployRequest().getServiceRequestProperties())) {
             for (DeployVariable deployVariable
-                    : deployServiceEntity.getCreateRequest().getOcl().getDeployment()
+                    : deployServiceEntity.getDeployRequest().getOcl().getDeployment()
                             .getVariables()) {
                 if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
-                        && (deployServiceEntity.getCreateRequest().getServiceRequestProperties()
+                        && (deployServiceEntity.getDeployRequest().getServiceRequestProperties()
                                 .containsKey(deployVariable.getName()))) {
-                    deployServiceEntity.getCreateRequest().getServiceRequestProperties()
+                    deployServiceEntity.getDeployRequest().getServiceRequestProperties()
                             .put(deployVariable.getName(), "********");
 
                 }
@@ -585,11 +585,11 @@ public class DeployService {
     /**
      * Deployment service.
      */
-    public boolean deployService(UUID newId, CreateRequest createRequest) {
+    public boolean deployService(UUID newId, DeployRequest deployRequest) {
         DeployTask deployTask = new DeployTask();
-        createRequest.setId(newId);
+        deployRequest.setId(newId);
         deployTask.setId(newId);
-        deployTask.setCreateRequest(createRequest);
+        deployTask.setDeployRequest(deployRequest);
         Deployment deployment = getDeployHandler(deployTask);
         return deploy(deployment, deployTask);
     }

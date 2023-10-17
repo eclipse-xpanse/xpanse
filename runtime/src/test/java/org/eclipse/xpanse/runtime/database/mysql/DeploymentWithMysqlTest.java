@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -53,19 +53,19 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
             claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
     void testServiceDeployment() throws Exception {
         ServiceTemplateDetailVo serviceTemplate = registerService();
-        CreateRequest createRequest = new CreateRequest();
-        createRequest.setUserId("userId");
-        createRequest.setServiceName(serviceTemplate.getName());
-        createRequest.setVersion(serviceTemplate.getVersion());
-        createRequest.setCsp(serviceTemplate.getCsp());
-        createRequest.setCategory(serviceTemplate.getCategory());
-        createRequest.setFlavor(serviceTemplate.getFlavors().get(0).toString());
-        createRequest.setRegion(serviceTemplate.getRegions().get(0).toString());
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setUserId("userId");
+        deployRequest.setServiceName(serviceTemplate.getName());
+        deployRequest.setVersion(serviceTemplate.getVersion());
+        deployRequest.setCsp(serviceTemplate.getCsp());
+        deployRequest.setCategory(serviceTemplate.getCategory());
+        deployRequest.setFlavor(serviceTemplate.getFlavors().get(0).toString());
+        deployRequest.setRegion(serviceTemplate.getRegions().get(0).toString());
         Map<String, String> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        createRequest.setServiceRequestProperties(serviceRequestProperties);
+        deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
-        UUID deployUUid = serviceDeployerApi.deploy(createRequest);
+        UUID deployUUid = serviceDeployerApi.deploy(deployRequest);
         Assertions.assertThrows(ServiceNotDeployedException.class,
                 () -> serviceDeployerApi.getServiceDetailsById(deployUUid.toString()));
 

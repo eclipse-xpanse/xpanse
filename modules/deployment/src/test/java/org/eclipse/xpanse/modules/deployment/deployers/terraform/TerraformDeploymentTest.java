@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.Terrafor
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.CreateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -73,7 +73,7 @@ class TerraformDeploymentTest {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
 
-        CreateRequest deployRequest = new CreateRequest();
+        DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setCustomerServiceName("test");
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
@@ -88,7 +88,7 @@ class TerraformDeploymentTest {
         xpanseDeployTask.setId(UUID.randomUUID());
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployResourceHandler(null);
-        xpanseDeployTask.setCreateRequest(deployRequest);
+        xpanseDeployTask.setDeployRequest(deployRequest);
         doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any(DeployTask.class));
         doReturn("""
             terraform {
@@ -112,11 +112,11 @@ class TerraformDeploymentTest {
 
     @Test
     void throwExceptionWhenDestroyFails() {
-        CreateRequest createRequest =
-                Instancio.of(CreateRequest.class).set(field(CreateRequest::getCsp),
+        DeployRequest deployRequest =
+                Instancio.of(DeployRequest.class).set(field(DeployRequest::getCsp),
                         Csp.OPENSTACK).create();
         DeployTask deployTask = Instancio.of(DeployTask.class)
-                .set(field(DeployTask::getCreateRequest), createRequest).create();
+                .set(field(DeployTask::getDeployRequest), deployRequest).create();
         when(this.deployEnvironments.getFlavorVariables(any(DeployTask.class))).thenReturn(
                 new HashMap<>());
         doReturn("""
@@ -150,21 +150,21 @@ class TerraformDeploymentTest {
         ocl.setName("oclName");
         ocl.setDeployment(deployment);
 
-        CreateRequest createRequest = new CreateRequest();
-        createRequest.setId(uuid);
-        createRequest.setUserId("UserId");
-        createRequest.setCategory(Category.COMPUTE);
-        createRequest.setCsp(Csp.HUAWEI);
-        createRequest.setServiceName("service");
-        createRequest.setCustomerServiceName("customerService");
-        createRequest.setVersion("1.0");
-        createRequest.setOcl(ocl);
-        createRequest.setFlavor("flavor");
-        createRequest.setRegion("cn-north-1");
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setId(uuid);
+        deployRequest.setUserId("UserId");
+        deployRequest.setCategory(Category.COMPUTE);
+        deployRequest.setCsp(Csp.HUAWEI);
+        deployRequest.setServiceName("service");
+        deployRequest.setCustomerServiceName("customerService");
+        deployRequest.setVersion("1.0");
+        deployRequest.setOcl(ocl);
+        deployRequest.setFlavor("flavor");
+        deployRequest.setRegion("cn-north-1");
 
         DeployTask deployTask = new DeployTask();
         deployTask.setId(uuid);
-        deployTask.setCreateRequest(createRequest);
+        deployTask.setDeployRequest(deployRequest);
         deployTask.setOcl(ocl);
         doReturn("""
             terraform {
