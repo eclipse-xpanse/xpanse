@@ -15,6 +15,9 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.MigrateRequest;
+import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,12 +48,30 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
     public void execute(DelegateExecution execution) {
 
         String processInstanceId = execution.getProcessInstanceId();
-        Map<String, Object> variables =
-                runtimeService.getVariables(processInstanceId);
-        UUID newId = (UUID) variables.get("newId");
+        Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
+        UUID newId = (UUID) variables.get(MigrateConstants.NEW_ID);
         runtimeService.updateBusinessKey(processInstanceId, newId.toString());
-        DeployRequest deployRequest = (DeployRequest) variables.get("createRequest");
+
+        int deployRetryNum = (int) variables.get(MigrateConstants.DEPLOY_RETRY_NUM);
+
+        runtimeService.setVariable(processInstanceId, MigrateConstants.DEPLOY_RETRY_NUM,
+                deployRetryNum + 1);
+        if (deployRetryNum > 0) {
+            log.info("Process instance: {} retry deployment service : {},RetryNum:{}",
+                    processInstanceId, newId, deployRetryNum);
+        }
+        MigrateRequest migrateRequest =
+                (MigrateRequest) variables.get(MigrateConstants.MIGRATE_REQUEST);
+        DeployRequest deployRequest = new DeployRequest();
+        BeanUtils.copyProperties(migrateRequest, deployRequest);
         boolean isDeploySuccess = deployService.deployService(newId, deployRequest);
-        runtimeService.setVariable(processInstanceId, "isDeploySuccess", isDeploySuccess);
+        if (!isDeploySuccess && deployRetryNum >= 1) {
+            UUID id = (UUID) variables.get(MigrateConstants.ID);
+            String userId = deployService.getDeployServiceDetails(id)
+                    .getDeployRequest().getUserId();
+            runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE, userId);
+        }
+        runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,
+                isDeploySuccess);
     }
 }

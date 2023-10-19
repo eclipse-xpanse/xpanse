@@ -6,10 +6,20 @@
 
 package org.eclipse.xpanse.modules.workflow.utils;
 
+import jakarta.annotation.Resource;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskInfo;
+import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
+import org.eclipse.xpanse.modules.models.workflow.enums.MigrateState;
+import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +29,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkflowProcessUtils {
 
-    @Autowired
+    @Resource
     private RuntimeService runtimeService;
+
+    @Resource
+    private TaskService taskService;
+
+    @Resource
+    private HistoryService historyService;
 
     /**
      * Start the process through the process definition key.
@@ -46,5 +62,85 @@ public class WorkflowProcessUtils {
     @Async("taskExecutor")
     public void asyncStartProcess(String processKey, Map<String, Object> variable) {
         startProcess(processKey, variable);
+    }
+
+    /**
+     * Get the user's to-do tasks through the ID of the currently logged in user.
+     *
+     * @param userId the ID of the currently logged in user.
+     */
+    public List<WorkFlowTask> todoTasks(String userId) {
+        List<Task> list = taskService.createTaskQuery().taskAssignee(userId).list();
+        return transTaskToWorkFlowTask(list);
+    }
+
+    /**
+     * Get the tasks that the user has done through the ID of the currently logged in user.
+     *
+     * @param userId the ID of the currently logged in user.
+     */
+    public List<WorkFlowTask> doneTasks(String userId) {
+        List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
+                .taskAssignee(userId)
+                .finished()
+                .list();
+        return transHistoricTaskInstanceToWorkFlowTask(list);
+    }
+
+    /**
+     * Query process status.
+     *
+     * @param processInstanceId Process instance ID
+     */
+    public String getWorkFlowState(String processInstanceId) {
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        Map<String, Object> processVariables = instance.getProcessVariables();
+        if (instance == null) {
+            if (processVariables.containsKey(MigrateConstants.IS_RETRY_TASK)
+                    && !(boolean) processVariables.get(MigrateConstants.IS_RETRY_TASK)) {
+                return MigrateState.MIGRATION_FAILED.toValue();
+            } else {
+                return MigrateState.MIGRATION_SUCCESS.toValue();
+            }
+        }
+        return MigrateState.MIGRATING.toValue();
+    }
+
+    /**
+     * Complete tasks based on task ID and set global process variables.
+     *
+     * @param taskId    taskId taskId.
+     * @param variables global process variables.
+     */
+    public void completeTask(String taskId, Map<String, Object> variables) {
+        taskService.complete(taskId, variables);
+    }
+
+
+    private WorkFlowTask getWorkFlow(TaskInfo task) {
+        WorkFlowTask workFlowTask = new WorkFlowTask();
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(task.getProcessInstanceId()).singleResult();
+        workFlowTask.setProcessInstanceId(task.getProcessInstanceId());
+        workFlowTask.setProcessInstanceName(instance.getName());
+        workFlowTask.setProcessDefinitionId(task.getProcessDefinitionId());
+        workFlowTask.setProcessDefinitionName(instance.getProcessDefinitionName());
+        workFlowTask.setExecutionId(task.getExecutionId());
+        workFlowTask.setTaskId(task.getId());
+        workFlowTask.setTaskName(task.getName());
+        workFlowTask.setBusinessKey(task.getBusinessKey());
+        workFlowTask.setCreateTime(task.getCreateTime());
+        return workFlowTask;
+    }
+
+    private List<WorkFlowTask> transTaskToWorkFlowTask(List<Task> list) {
+        return list.stream().map(task -> getWorkFlow(task)).collect(Collectors.toList());
+    }
+
+    private List<WorkFlowTask> transHistoricTaskInstanceToWorkFlowTask(
+            List<HistoricTaskInstance> list) {
+        return list.stream().map(task -> getWorkFlow(task)).collect(Collectors.toList());
     }
 }

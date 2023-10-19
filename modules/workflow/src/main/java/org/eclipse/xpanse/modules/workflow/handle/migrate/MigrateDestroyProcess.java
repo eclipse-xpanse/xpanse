@@ -13,6 +13,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,8 +44,17 @@ public class MigrateDestroyProcess implements Serializable, JavaDelegate {
     public void execute(DelegateExecution execution) {
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        String id = (String) variables.get("id");
+        String id = (String) variables.get(MigrateConstants.ID);
+        int destroyRetryNum = (int) variables.get(MigrateConstants.DESTROY_RETRY_NUM);
+        if (destroyRetryNum > 0) {
+            log.info("Process instance: {} retry destroy service : {},RetryNum:{}",
+                    processInstanceId, id, destroyRetryNum);
+        }
+        runtimeService.setVariable(processInstanceId, MigrateConstants.DESTROY_RETRY_NUM,
+                destroyRetryNum + 1);
+
         boolean isDestroySuccess = deployService.destroyService(id);
-        runtimeService.setVariable(processInstanceId, "isDestroySuccess", isDestroySuccess);
+        runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
+                isDestroySuccess);
     }
 }
