@@ -6,21 +6,20 @@
 
 package org.eclipse.xpanse.modules.workflow.handle.migrate;
 
-import java.io.Serializable;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.activiti.engine.delegate.DelegateTask;
+import org.activiti.engine.delegate.TaskListener;
 import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Migration process export data processing class.
+ * Monitoring class for manual processing after deployment failure and retry.
  */
 @Slf4j
 @Component
-public class MigrateExportDataProcess implements Serializable, JavaDelegate {
+public class DeployFailedManualHandlerListener implements TaskListener {
 
     private static RuntimeService runtimeService;
 
@@ -29,16 +28,11 @@ public class MigrateExportDataProcess implements Serializable, JavaDelegate {
         this.runtimeService = runtimeService;
     }
 
-    /**
-     * Migration process, export data link business logic(Not yet developed).
-     */
     @Override
-    public void execute(DelegateExecution delegateExecution) {
-        String processInstanceId = delegateExecution.getProcessInstanceId();
+    public void notify(DelegateTask delegateTask) {
+        String processInstanceId = delegateTask.getProcessInstanceId();
+        log.info("Start Manually Handler Deploy Failed. ProcessInstanceId:{}",
+                processInstanceId);
         runtimeService.setVariable(processInstanceId, MigrateConstants.DEPLOY_RETRY_NUM, 0);
-        //TODO Export data process not yet implemented. Skipping.
-        log.info("start export data.ProcessInstanceId:{}",
-                delegateExecution.getProcessInstanceId());
-
     }
 }

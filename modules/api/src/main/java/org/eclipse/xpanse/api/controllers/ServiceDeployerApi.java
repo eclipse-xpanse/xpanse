@@ -199,7 +199,7 @@ public class ServiceDeployerApi {
         Map<String, Object> variable = new HashMap<>();
         variable.put("id", migrateRequest.getId());
         variable.put("newId", newId);
-        variable.put("createRequest", migrateRequest);
+        variable.put("migrateRequest", migrateRequest);
         workflowProcessUtils.asyncStartProcess("migrate", variable);
         return newId;
     }

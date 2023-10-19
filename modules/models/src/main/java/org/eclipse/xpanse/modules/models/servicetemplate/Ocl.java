@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -26,7 +27,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 @Valid
 @Data
 @Slf4j
-public class Ocl {
+public class Ocl implements Serializable {
 
     private static ObjectMapper theMapper = new ObjectMapper();
 

@@ -8,6 +8,8 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.VariableValidator;
@@ -19,7 +21,10 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
  * Defines for the deploy variable.
  */
 @Data
-public class DeployVariable {
+public class DeployVariable implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 4180720936204332115L;
 
     @NotNull
     @NotBlank

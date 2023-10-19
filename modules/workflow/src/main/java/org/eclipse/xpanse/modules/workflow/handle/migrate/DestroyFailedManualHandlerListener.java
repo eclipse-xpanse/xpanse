@@ -6,21 +6,20 @@
 
 package org.eclipse.xpanse.modules.workflow.handle.migrate;
 
-import java.io.Serializable;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.activiti.engine.delegate.DelegateTask;
+import org.activiti.engine.delegate.TaskListener;
 import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Migration process import data processing class.
+ * Monitoring class for manual processing after destroy failure and retry.
  */
 @Slf4j
 @Component
-public class MigrateImportDataProcess implements Serializable, JavaDelegate {
+public class DestroyFailedManualHandlerListener implements TaskListener {
 
     private static RuntimeService runtimeService;
 
@@ -29,15 +28,11 @@ public class MigrateImportDataProcess implements Serializable, JavaDelegate {
         this.runtimeService = runtimeService;
     }
 
-    /**
-     * Migration process, import data link business logic(Not yet developed).
-     */
     @Override
-    public void execute(DelegateExecution delegateExecution) {
-        String processInstanceId = delegateExecution.getProcessInstanceId();
+    public void notify(DelegateTask delegateTask) {
+        String processInstanceId = delegateTask.getProcessInstanceId();
+        log.info("Start Manually Handler Destroy Failed. ProcessInstanceId:{}",
+                processInstanceId);
         runtimeService.setVariable(processInstanceId, MigrateConstants.DESTROY_RETRY_NUM, 0);
-        //TODO  Import data process not yet implemented. Skipping.
-        log.info("start import data.ProcessInstanceId:{}",
-                delegateExecution.getProcessInstanceId());
     }
 }

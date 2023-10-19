@@ -161,8 +161,9 @@ public class TerraformDeployment implements Deployment {
             if (CollectionUtils.isEmpty(resources)) {
                 deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
             } else {
-                deployServiceEntity.setDeployResourceList(
-                        getDeployResourceEntityList(resources, deployServiceEntity));
+                deployServiceEntity.getDeployResourceList().clear();
+                deployServiceEntity.getDeployResourceList()
+                        .addAll(getDeployResourceEntityList(resources, deployServiceEntity));
             }
         } else {
             deployServiceEntity.setServiceDeploymentState(
