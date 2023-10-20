@@ -47,7 +47,8 @@ public enum ResultType {
     UNSUPPORTED_ENUM_VALUE("Unsupported Enum Value"),
     TERRAFORM_BOOT_REQUEST_FAILED("Terraform Boot Request Failed"),
     METRICS_DATA_NOT_READY("Metrics Data Not Ready"),
-    VARIABLE_VALIDATION_FAILED("Variable Validation Failed");
+    VARIABLE_VALIDATION_FAILED("Variable Validation Failed"),
+    VARIABLE_SCHEMA_DEFINITION_INVALID("Variable Schema Definition Invalid");
 
     private final String value;
 

@@ -6,14 +6,17 @@
 
 package org.eclipse.xpanse.modules.models.service.utils;
 
+import com.networknt.schema.JsonMetaSchema;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -27,7 +30,7 @@ public class ServiceVariablesJsonSchemaGenerator {
 
     private static final String VARIABLE_TYPE_KEY = "type";
     private static final String VARIABLE_DESCRIPTION_KEY = "description";
-    private static final String VARIABLE_EXAMPLE_KEY = "example";
+    private static final String VARIABLE_EXAMPLE_KEY = "examples";
 
     /**
      * Generate JsonSchema objects to describe validation rules and metadata information for a set
@@ -50,9 +53,7 @@ public class ServiceVariablesJsonSchemaGenerator {
                 }
 
                 if (!CollectionUtils.isEmpty(variable.getValueSchema())) {
-                    variable.getValueSchema().forEach((validator, value) ->
-                            validationProperties.put(validator.toValue(), value)
-                    );
+                    validationProperties.putAll(variable.getValueSchema());
                 }
 
                 if (Objects.nonNull(variable.getDataType())) {
@@ -75,7 +76,24 @@ public class ServiceVariablesJsonSchemaGenerator {
 
         jsonObjectSchema.setRequired(requiredList);
         jsonObjectSchema.setProperties(jsonObjectSchemaProperties);
+        validateSchemaDefinition(jsonObjectSchema);
         return jsonObjectSchema;
+    }
+
+    private void validateSchemaDefinition(JsonObjectSchema jsonObjectSchema) {
+        Set<String> allowedKeys = JsonMetaSchema.getV202012().getKeywords().keySet();
+        List<String> invalidKeys = new ArrayList<>();
+        jsonObjectSchema.getProperties().forEach((deployVariable, variableValueSchema) ->
+                variableValueSchema.forEach((schemaDefKey, schemaDefValue) -> {
+                    if (!allowedKeys.contains(schemaDefKey)) {
+                        invalidKeys.add(String.format(
+                                "Value schema key %s in deploy variable  %s is invalid",
+                                schemaDefKey, deployVariable));
+                    }
+                }));
+        if (!invalidKeys.isEmpty()) {
+            throw new InvalidValueSchemaException(invalidKeys);
+        }
     }
 
 }

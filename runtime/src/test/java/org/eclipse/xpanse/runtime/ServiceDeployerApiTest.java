@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceRepository;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceRepository;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
@@ -86,6 +87,9 @@ class ServiceDeployerApiTest {
 
     @Resource
     private DeployServiceRepository deployServiceRepository;
+
+    @Resource
+    private DeployResourceRepository deployResourceRepository;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -224,7 +228,7 @@ class ServiceDeployerApiTest {
         Assertions.assertEquals(result, listResponse.getContentAsString());
     }
 
-    void deleteDestroyedServiceRecord() throws Exception {
+    void deleteDestroyedServiceRecord() {
         taskId = null;
         serviceDetailVo = null;
         state = null;
