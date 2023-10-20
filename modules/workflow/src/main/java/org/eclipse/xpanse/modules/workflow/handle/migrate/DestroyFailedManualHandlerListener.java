@@ -8,8 +8,8 @@ package org.eclipse.xpanse.modules.workflow.handle.migrate;
 
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
+import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.delegate.ExecutionListener;
 import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class DestroyFailedManualHandlerListener implements TaskListener {
+public class DestroyFailedManualHandlerListener implements ExecutionListener {
 
     private static RuntimeService runtimeService;
 
@@ -29,8 +29,8 @@ public class DestroyFailedManualHandlerListener implements TaskListener {
     }
 
     @Override
-    public void notify(DelegateTask delegateTask) {
-        String processInstanceId = delegateTask.getProcessInstanceId();
+    public void notify(DelegateExecution delegateExecution) {
+        String processInstanceId = delegateExecution.getProcessInstanceId();
         log.info("Start Manually Handler Destroy Failed. ProcessInstanceId:{}",
                 processInstanceId);
         runtimeService.setVariable(processInstanceId, MigrateConstants.DESTROY_RETRY_NUM, 0);

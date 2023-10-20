@@ -38,16 +38,16 @@
     <userTask id="sid-6c4c67be-0bcb-4727-a0da-5ec1fb65076f" activiti:assignee="${assignee}" name=" HandlingDeploymentFailuresManually">
       <documentation>Handling deployment failures manually</documentation>
       <extensionElements>
-        <activiti:executionListener class="org.eclipse.xpanse.modules.workflow.handle.migrate.DeployFailedManualHandlerListener"/>
+        <activiti:executionListener class="org.eclipse.xpanse.modules.workflow.handle.migrate.DeployFailedManualHandlerListener" event="end"/>
       </extensionElements>
     </userTask>
     <userTask id="sid-42ae4a3e-00bc-4935-ab95-142a1ee22fe1" activiti:assignee="${assignee}" name="ManuallyHandleDestructionFailure">
       <documentation>Manually handle destruction failure</documentation>
       <extensionElements>
-        <activiti:executionListener class="org.eclipse.xpanse.modules.workflow.handle.migrate.DestroyFailedManualHandlerListener"/>
+        <activiti:executionListener class="org.eclipse.xpanse.modules.workflow.handle.migrate.DestroyFailedManualHandlerListener" event="end"/>
       </extensionElements>
     </userTask>
-    <exclusiveGateway id="sid-a1fd872a-d645-490e-a280-026a0a47f19a"/>
+    <exclusiveGateway id="sid-a1fd872a-d645-490e-a280-026a0a47f19a" name="IsRetryDeployTask"/>
     <sequenceFlow id="sid-31a531de-521e-45f7-b9df-2a783d3eb389" sourceRef="sid-793fe6c0-8590-4cb9-b2ac-93440a2ff4d9" targetRef="sid-6c4c67be-0bcb-4727-a0da-5ec1fb65076f">
       <conditionExpression xsi:type="tFormalExpression">${isDeploySuccess==false &amp;&amp; deployRetryNum&gt;1}</conditionExpression>
     </sequenceFlow>
@@ -55,7 +55,7 @@
     <sequenceFlow id="sid-59b75ef7-21ce-4a8d-a350-a4c536da11f5" sourceRef="sid-a1fd872a-d645-490e-a280-026a0a47f19a" targetRef="sid-0f42fbfb-1227-4e2c-99fd-827c9011c3a9">
       <conditionExpression xsi:type="tFormalExpression">${isRetryTask==true}</conditionExpression>
     </sequenceFlow>
-    <exclusiveGateway id="sid-77bb6fba-8be1-4281-ad6d-ab1cab890d11"/>
+    <exclusiveGateway id="sid-77bb6fba-8be1-4281-ad6d-ab1cab890d11" name="IsRetryDestroyTask"/>
     <sequenceFlow id="sid-841accd9-7a42-472d-a149-a74cbd4b39d3" sourceRef="sid-42ae4a3e-00bc-4935-ab95-142a1ee22fe1" targetRef="sid-77bb6fba-8be1-4281-ad6d-ab1cab890d11"/>
     <sequenceFlow id="sid-6922923b-38ae-4d96-b3f7-3a9c91132b74" sourceRef="sid-67595470-2e00-43ea-b878-122e7cccd765" targetRef="sid-9d73f33b-8a2d-441b-b924-ec1482270e6a"/>
     <sequenceFlow id="sid-6e4678d3-0658-4f1b-b88a-035f44562fd2" sourceRef="sid-9d73f33b-8a2d-441b-b924-ec1482270e6a" targetRef="sid-67595470-2e00-43ea-b878-122e7cccd765">
