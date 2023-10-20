@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.workflow;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import lombok.Data;
 
@@ -49,7 +50,7 @@ public class WorkFlowTask {
     @Schema(description = "The businessKey of the Process")
     private String businessKey;
 
-    @NotEmpty
+    @NotNull
     @Schema(description = "The create time of the task")
     private Date createTime;
 }

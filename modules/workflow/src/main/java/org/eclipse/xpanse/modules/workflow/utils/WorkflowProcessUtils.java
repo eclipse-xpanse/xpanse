@@ -7,13 +7,16 @@
 package org.eclipse.xpanse.modules.workflow.utils;
 
 import jakarta.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
@@ -96,10 +99,17 @@ public class WorkflowProcessUtils {
         ProcessInstance instance = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .singleResult();
-        Map<String, Object> processVariables = instance.getProcessVariables();
+
+        List<HistoricVariableInstance> list = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstanceId).list();
+        Map<String, Object> variablesMap = new HashMap<>();
+        for (HistoricVariableInstance variableInstance : list) {
+            variablesMap.put(variableInstance.getVariableName(), variableInstance.getValue());
+        }
+
         if (instance == null) {
-            if (processVariables.containsKey(MigrateConstants.IS_RETRY_TASK)
-                    && !(boolean) processVariables.get(MigrateConstants.IS_RETRY_TASK)) {
+            if (variablesMap.containsKey(MigrateConstants.IS_RETRY_TASK)
+                    && !(boolean) variablesMap.get(MigrateConstants.IS_RETRY_TASK)) {
                 return MigrateState.MIGRATION_FAILED.toValue();
             } else {
                 return MigrateState.MIGRATION_SUCCESS.toValue();
@@ -121,16 +131,16 @@ public class WorkflowProcessUtils {
 
     private WorkFlowTask getWorkFlow(TaskInfo task) {
         WorkFlowTask workFlowTask = new WorkFlowTask();
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(task.getProcessInstanceId()).singleResult();
         workFlowTask.setProcessInstanceId(task.getProcessInstanceId());
-        workFlowTask.setProcessInstanceName(instance.getName());
+        workFlowTask.setProcessInstanceName(instance.getProcessDefinitionName());
         workFlowTask.setProcessDefinitionId(task.getProcessDefinitionId());
         workFlowTask.setProcessDefinitionName(instance.getProcessDefinitionName());
         workFlowTask.setExecutionId(task.getExecutionId());
         workFlowTask.setTaskId(task.getId());
         workFlowTask.setTaskName(task.getName());
-        workFlowTask.setBusinessKey(task.getBusinessKey());
+        workFlowTask.setBusinessKey(instance.getBusinessKey());
         workFlowTask.setCreateTime(task.getCreateTime());
         return workFlowTask;
     }
