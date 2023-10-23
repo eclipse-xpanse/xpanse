@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
@@ -103,6 +104,17 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(get("/xpanse/service_templates"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Template Update Not Allowed"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testInvalidValueSchemaException() throws Exception {
+        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+                .thenThrow(new InvalidValueSchemaException(List.of("test error")));
+
+        this.mockMvc.perform(get("/xpanse/service_templates"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Variable Schema Definition Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }

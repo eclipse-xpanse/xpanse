@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,6 +25,7 @@ import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.net.URL;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -344,6 +346,7 @@ class ServiceTemplateApiTest {
     void testListRegisteredServices() throws Exception {
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(
                 serviceTemplateDetailVo);
+
         String result = objectMapper.writeValueAsString(serviceTemplateDetailVos);
 
         // Run the test
@@ -357,7 +360,8 @@ class ServiceTemplateApiTest {
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
+        assertThat(serviceTemplateDetailVos).usingRecursiveFieldByFieldElementComparatorIgnoringFields("lastModifiedTime").isEqualTo(
+                Arrays.stream(objectMapper.readValue(response.getContentAsString(), ServiceTemplateDetailVo[].class)).toList());
     }
 
     void testListRegisteredServicesThrowsException() throws Exception {

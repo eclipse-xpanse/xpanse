@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.VariableValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
@@ -29,7 +28,7 @@ class DeployVariableTest {
     private static final String description = "description";
     private static final String value = "value";
     private static final Boolean mandatory = true;
-    private static final Map<VariableValidator,Object> validatorMap  = Map.of(VariableValidator.MINLENGTH,"10");
+    private static final Map<String,Object> validatorMap  = Map.of("minLength","10");
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
     private static DeployVariable deployVariable;
 

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
@@ -81,7 +82,7 @@ public class RegistrationExceptionHandler {
     }
 
     /**
-     * Exception handler for handleServiceUpdateNotAllowed.
+     * Exception handler for ServiceTemplateUpdateNotAllowed.
      */
     @ExceptionHandler({ServiceTemplateUpdateNotAllowed.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -90,5 +91,17 @@ public class RegistrationExceptionHandler {
             ServiceTemplateUpdateNotAllowed ex) {
         return Response.errorResponse(ResultType.SERVICE_TEMPLATE_UPDATE_NOT_ALLOWED,
                 Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceTemplateUpdateNotAllowed.
+     */
+    @ExceptionHandler({InvalidValueSchemaException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleInvalidValueSchemaException(
+            InvalidValueSchemaException ex) {
+        return Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+                ex.getInvalidValueSchemaKeys());
     }
 }

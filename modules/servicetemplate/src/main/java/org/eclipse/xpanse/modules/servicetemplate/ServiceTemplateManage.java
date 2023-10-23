@@ -169,15 +169,15 @@ public class ServiceTemplateManage {
             log.error(errorMsg);
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
+        JsonObjectSchema jsonObjectSchema =
+                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                        newEntity.getOcl().getDeployment().getVariables());
         validateTerraformScript(ocl);
         if (StringUtils.isNotBlank(getUserNamespace())) {
             newEntity.setNamespace(getUserNamespace());
         } else {
             newEntity.setNamespace(ocl.getNamespace());
         }
-        JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
-                        newEntity.getOcl().getDeployment().getVariables());
         newEntity.setJsonObjectSchema(jsonObjectSchema);
         storage.store(newEntity);
         serviceTemplateOpenApiGenerator.generateServiceApi(newEntity);

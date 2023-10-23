@@ -12,7 +12,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.VariableValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
@@ -55,8 +54,10 @@ public class DeployVariable implements Serializable {
     @Schema(description = "Indicates if the variable is mandatory")
     private Boolean mandatory;
 
-    @Schema(description = "valueSchema of the variable")
-    private Map<VariableValidator, Object> valueSchema;
+    @Schema(description = "valueSchema of the variable. "
+            + "The key be any keyword that is part of the JSON schema definition which can be "
+            + "found here https://json-schema.org/draft/2020-12/schema")
+    private Map<String, Object> valueSchema;
 
     @Schema(description = "Sensitive scope of variable storage")
     private SensitiveScope sensitiveScope = SensitiveScope.NONE;

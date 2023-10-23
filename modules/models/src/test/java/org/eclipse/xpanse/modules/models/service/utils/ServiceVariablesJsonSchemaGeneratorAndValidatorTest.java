@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceVariablesJsonSchemaGenerator.class,
         ServiceVariablesJsonSchemaValidator.class})
-public class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
+class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
 
     @Autowired
     ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
@@ -144,6 +145,14 @@ public class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
             Map<String, Object> stringObjectMap = properties.get(variable.getName());
             assertEquals(variable.getDataType().toValue(), stringObjectMap.get("type"));
         }
+    }
+
+    @Test
+    void throwExceptionWhenValueSchemaIsInvalid() {
+        variables.get(0).getValueSchema().put("enums", List.of(1, 2, 3));
+        assertThrows(InvalidValueSchemaException.class, () -> {
+            serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
+        });
     }
 
 }

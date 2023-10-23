@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,8 @@ public class ServiceTemplateOpenApiGenerator {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String OPENAPI_FILE_EXTENSION = ".html";
+    private static final String OPENAPI_EXAMPLE_KEYWORD = "example";
+    private static final String JSON_SCHEMA_DEF_EXAMPLE_KEYWORD = "examples";
     private final OpenApiUrlManage openApiUrlManage;
     private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
 
@@ -235,7 +238,8 @@ public class ServiceTemplateOpenApiGenerator {
         try {
             createRequiredStr = mapper.writeValueAsString(getRequiredFields(new DeployRequest()));
             propertiesStr = objectMapper.writeValueAsString(
-                    registerService.getJsonObjectSchema().getProperties());
+                    convertJsonSchemaSpecToOpenApiSpec(
+                            registerService.getJsonObjectSchema().getProperties()));
             propertiesRequiredStr =
                     objectMapper.writeValueAsString(
                             registerService.getJsonObjectSchema().getRequired());
@@ -431,5 +435,18 @@ public class ServiceTemplateOpenApiGenerator {
 
     private List<String> getCategoryValues() {
         return Arrays.stream(Category.values()).map(Category::toValue).collect(Collectors.toList());
+    }
+
+    private Map<String, Map<String, Object>> convertJsonSchemaSpecToOpenApiSpec(
+            Map<String, Map<String, Object>> properties) {
+        properties.forEach((key, value) -> {
+                    String exampleValue = (String) value.get(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
+                    if (Objects.nonNull(exampleValue)) {
+                        value.remove(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
+                        value.put(OPENAPI_EXAMPLE_KEYWORD, exampleValue);
+                    }
+                }
+        );
+        return properties;
     }
 }
