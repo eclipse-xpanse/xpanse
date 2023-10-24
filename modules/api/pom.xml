@@ -91,7 +91,6 @@
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>workflow</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

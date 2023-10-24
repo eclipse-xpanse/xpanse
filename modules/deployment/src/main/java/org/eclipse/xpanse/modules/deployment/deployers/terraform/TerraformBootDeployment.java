@@ -131,7 +131,7 @@ public class TerraformBootDeployment implements Deployment {
                 new TerraformAsyncDestroyFromDirectoryRequest();
         request.setScripts(getFiles(task));
         request.setTfState(stateFile);
-        request.setVariables(getInputVariables(task));
+        request.setVariables(getInputVariables(task, false));
         request.setEnvVariables(getEnvironmentVariables(task));
         WebhookConfig hookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port)
@@ -147,7 +147,7 @@ public class TerraformBootDeployment implements Deployment {
                 new TerraformAsyncDeployFromDirectoryRequest();
         request.setIsPlanOnly(false);
         request.setScripts(getFiles(task));
-        request.setVariables(getInputVariables(task));
+        request.setVariables(getInputVariables(task, true));
         request.setEnvVariables(getEnvironmentVariables(task));
         WebhookConfig hookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port)
@@ -189,9 +189,9 @@ public class TerraformBootDeployment implements Deployment {
         return Arrays.asList(provider, deployer);
     }
 
-    private Map<String, Object> getInputVariables(DeployTask deployTask) {
+    private Map<String, Object> getInputVariables(DeployTask deployTask, boolean isDeployRequest) {
         Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.putAll(this.deployEnvironments.getVariables(deployTask));
+        inputVariables.putAll(this.deployEnvironments.getVariables(deployTask, isDeployRequest));
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(deployTask));
         return inputVariables;
     }

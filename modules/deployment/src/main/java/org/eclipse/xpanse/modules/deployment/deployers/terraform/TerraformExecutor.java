@@ -40,7 +40,7 @@ public class TerraformExecutor {
     }
 
     private final Map<String, String> env;
-    private final Map<String, String> variables;
+    private final Map<String, Object> variables;
     private final String workspace;
 
     /**
@@ -50,7 +50,7 @@ public class TerraformExecutor {
      * @param variables variables for the terraform command line.
      * @param workspace workspace for the terraform command line.
      */
-    TerraformExecutor(Map<String, String> env, Map<String, String> variables,
+    TerraformExecutor(Map<String, String> env, Map<String, Object> variables,
                       String workspace) {
         this.env = env;
         this.variables = variables;
@@ -60,7 +60,7 @@ public class TerraformExecutor {
     /**
      * Executes terraform init command.
      *
-     * @return Returns result of SystemCmd executes.
+     * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfInit() {
         return execute("terraform init -no-color");
@@ -105,7 +105,7 @@ public class TerraformExecutor {
         command.append(" -var-file=");
         command.append(VARS_FILE_NAME);
         SystemCmdResult systemCmdResult = execute(command.toString());
-        cleanUpVariablesFile();
+        // cleanUpVariablesFile();
         return systemCmdResult;
     }
 

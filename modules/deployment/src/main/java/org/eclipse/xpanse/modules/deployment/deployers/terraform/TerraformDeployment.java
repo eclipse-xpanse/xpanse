@@ -95,7 +95,7 @@ public class TerraformDeployment implements Deployment {
         createScriptFile(task.getDeployRequest().getCsp(), task.getDeployRequest().getRegion(),
                 workspace, task.getOcl().getDeployment().getDeployer());
         // Execute the terraform command.
-        TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
+        TerraformExecutor executor = getExecutorForDeployTask(task, workspace, true);
         executor.deploy();
         String tfState = executor.getTerraformState();
 
@@ -134,7 +134,7 @@ public class TerraformDeployment implements Deployment {
         String workspace = getWorkspacePath(taskId);
         createDestroyScriptFile(task.getDeployRequest().getCsp(),
                 task.getDeployRequest().getRegion(), workspace, tfState);
-        TerraformExecutor executor = getExecutorForDeployTask(task, workspace);
+        TerraformExecutor executor = getExecutorForDeployTask(task, workspace, false);
         executor.destroy();
         DeployResult result = new DeployResult();
         result.setId(task.getId());
@@ -248,12 +248,16 @@ public class TerraformDeployment implements Deployment {
     /**
      * Get a TerraformExecutor.
      *
-     * @param task      the task for the deployment.
-     * @param workspace the workspace of the deployment.
+     * @param task         the task for the deployment.
+     * @param workspace    the workspace of the deployment.
+     * @param isDeployTask if the task is for deploying a service.
      */
-    private TerraformExecutor getExecutorForDeployTask(DeployTask task, String workspace) {
+    private TerraformExecutor getExecutorForDeployTask(DeployTask task,
+                                                       String workspace,
+                                                       boolean isDeployTask) {
         Map<String, String> envVariables = this.deployEnvironments.getEnv(task);
-        Map<String, String> inputVariables = this.deployEnvironments.getVariables(task);
+        Map<String, Object> inputVariables = this.deployEnvironments.getVariables(
+                task, isDeployTask);
         // load flavor variables also as input variables for terraform executor.
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(task));
         // load credential variables also as env variables for terraform executor.
@@ -263,7 +267,7 @@ public class TerraformDeployment implements Deployment {
     }
 
     private TerraformExecutor getExecutor(Map<String, String> envVariables,
-                                          Map<String, String> inputVariables, String workspace) {
+                                          Map<String, Object> inputVariables, String workspace) {
         if (terraformLocalConfig.isDebugEnabled()) {
             log.info("Debug enabled for Terraform CLI with level {}",
                     terraformLocalConfig.getDebugLogLevel());

@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import jakarta.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ class ServiceDetailVoTest {
     private static final DeployResourceKind kind = DeployResourceKind.VM;
     private static final String resultSuccessMessage = "Deployment successful";
     private static DeployResource deployResource;
-    private static Map<String, String> properties;
+    private static Map<String, Object> properties;
     private static DeployRequest deployRequest;
     private static List<@Valid DeployResource> deployResources;
     private static Map<String, String> deployedServiceProperties;
@@ -66,7 +67,7 @@ class ServiceDetailVoTest {
         deployResource.setResourceId(uuid.toString());
         deployResource.setName(name);
         deployResource.setKind(kind);
-        deployResource.setProperties(properties);
+        deployResource.setProperties(new HashMap<>());
         deployResources.add(deployResource);
 
         deployedServiceProperties = new HashMap<>();
@@ -81,7 +82,7 @@ class ServiceDetailVoTest {
     }
 
     @Test
-    public void testGetterAndSetter() {
+    void testGetterAndSetter() {
         assertEquals(userId, deployRequest.getUserId());
         assertEquals(category, deployRequest.getCategory());
         assertEquals(serviceName, deployRequest.getServiceName());
@@ -95,7 +96,7 @@ class ServiceDetailVoTest {
         assertEquals(uuid.toString(), deployResource.getResourceId());
         assertEquals(name, deployResource.getName());
         assertEquals(kind, deployResource.getKind());
-        assertEquals(properties, deployResource.getProperties());
+        assertEquals(Collections.emptyMap(), deployResource.getProperties());
 
         assertEquals(deployRequest, serviceDetailVo.getDeployRequest());
         assertEquals(deployResources, serviceDetailVo.getDeployResources());
@@ -104,13 +105,12 @@ class ServiceDetailVoTest {
     }
 
     @Test
-    public void testEqualsAndHashCode() {
-        assertEquals(serviceDetailVo, serviceDetailVo);
+    void testEqualsAndHashCode() {
         assertEquals(serviceDetailVo.hashCode(), serviceDetailVo.hashCode());
 
         Object obj = new Object();
         assertNotEquals(serviceDetailVo, obj);
-        assertNotEquals(serviceDetailVo, null);
+        assertNotEquals(null, serviceDetailVo);
         assertNotEquals(serviceDetailVo.hashCode(), obj.hashCode());
 
         ServiceDetailVo serviceDetailVo1 = new ServiceDetailVo();

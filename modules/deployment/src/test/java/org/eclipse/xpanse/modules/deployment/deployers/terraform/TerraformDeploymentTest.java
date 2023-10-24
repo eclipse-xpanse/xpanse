@@ -80,7 +80,7 @@ class TerraformDeploymentTest {
         deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
 
-        Map<String, String> property = new HashMap<>();
+        Map<String, Object> property = new HashMap<>();
         property.put("secgroup_id", "1234567890");
         deployRequest.setServiceRequestProperties(property);
 

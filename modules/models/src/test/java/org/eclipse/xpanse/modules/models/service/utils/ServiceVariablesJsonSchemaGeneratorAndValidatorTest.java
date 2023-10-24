@@ -53,7 +53,7 @@ public class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
 
-        Map<String, String> deployProperty = new HashMap<>();
+        Map<String, Object> deployProperty = new HashMap<>();
         deployProperty.put("admin_passwd", "123456@Qq");
 
         assertDoesNotThrow(() -> {
@@ -67,13 +67,13 @@ public class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
 
-        Map<String, String> validateMinLengthPro = new HashMap<>();
+        Map<String, Object> validateMinLengthPro = new HashMap<>();
         validateMinLengthPro.put("admin_passwd", "123456");
 
-        Map<String, String> validateMaxLengthPro = new HashMap<>();
+        Map<String, Object> validateMaxLengthPro = new HashMap<>();
         validateMaxLengthPro.put("admin_passwd", "1234566778980129342543654756768");
 
-        Map<String, String> validatePatternPro = new HashMap<>();
+        Map<String, Object> validatePatternPro = new HashMap<>();
         validatePatternPro.put("admin_passwd", "12335435@Q");
 
         assertThrows(VariableInvalidException.class, () -> {
@@ -102,7 +102,7 @@ public class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
 
-        Map<String, String> validateRequiredPro = new HashMap<>();
+        Map<String, Object> validateRequiredPro = new HashMap<>();
         validateRequiredPro.put("admin_passwd", "123456@Qq");
         validateRequiredPro.put("vpc_name", "123456");
         validateRequiredPro.put("subnet_name", "123456");
@@ -124,7 +124,7 @@ public class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
 
-        Map<String, String> validateRequiredPro = new HashMap<>();
+        Map<String, Object> validateRequiredPro = new HashMap<>();
         validateRequiredPro.put("admin_passwd", "123456@Qq");
 
         assertThrows(VariableInvalidException.class, () -> {

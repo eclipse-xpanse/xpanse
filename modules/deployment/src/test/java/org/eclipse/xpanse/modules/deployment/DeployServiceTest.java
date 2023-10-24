@@ -130,7 +130,7 @@ class DeployServiceTest {
         deployVariable.setSensitiveScope(SensitiveScope.ALWAYS);
         deployment.setVariables(List.of(deployVariable));
 
-        Map<String, String> requestProperties = new HashMap<>();
+        Map<String, Object> requestProperties = new HashMap<>();
         requestProperties.put("test", "test");
         Ocl ocl = new Ocl();
         ocl.setName("oclName");
