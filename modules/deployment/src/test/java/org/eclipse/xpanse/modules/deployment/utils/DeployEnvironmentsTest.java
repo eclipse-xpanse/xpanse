@@ -68,7 +68,7 @@ class DeployEnvironmentsTest {
 
     @BeforeEach
     void setUp() {
-        Map<String, String> serviceRequestProperties = new HashMap<>();
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("name", "value");
         serviceRequestProperties.put("key2", "value2");
         serviceRequestProperties.put("example", null);
@@ -170,7 +170,7 @@ class DeployEnvironmentsTest {
         expectedResult.put("key2", "value2");
         expectedResult.put("example", null);
 
-        final Map<String, String> result = deployEnvironmentsUnderTest.getVariables(task);
+        final Map<String, Object> result = deployEnvironmentsUnderTest.getVariables(task, true);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);

@@ -61,7 +61,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequest.setCategory(serviceTemplate.getCategory());
         deployRequest.setFlavor(serviceTemplate.getFlavors().get(0).toString());
         deployRequest.setRegion(serviceTemplate.getRegions().get(0).toString());
-        Map<String, String> serviceRequestProperties = new HashMap<>();
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
 

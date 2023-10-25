@@ -85,7 +85,7 @@ class TerraformBootDeploymentTest {
                 .thenReturn("result");
 
         // Configure DeployEnvironments.getVariables(...).
-        final Map<String, String> stringStringMap = Map.ofEntries(Map.entry("value", "value"));
+        final Map<String, Object> stringStringMap = Map.ofEntries(Map.entry("value", "value"));
         final DeployTask task = new DeployTask();
         task.setId(UUID.fromString("800b6caa-5710-4064-8bae-cb446a351cc1"));
         final DeployRequest deployRequest1 = new DeployRequest();
@@ -103,7 +103,7 @@ class TerraformBootDeploymentTest {
         deployment1.setDeployer("deployer");
         ocl1.setDeployment(deployment1);
         task.setOcl(ocl1);
-        when(mockDeployEnvironments.getVariables(task)).thenReturn(stringStringMap);
+        when(mockDeployEnvironments.getVariables(task, true)).thenReturn(stringStringMap);
 
         // Configure DeployEnvironments.getFlavorVariables(...).
         final Map<String, String> stringStringMap1 = Map.ofEntries(Map.entry("value", "value"));
@@ -247,7 +247,7 @@ class TerraformBootDeploymentTest {
                 .thenReturn("result");
 
         // Configure DeployEnvironments.getVariables(...).
-        final Map<String, String> stringStringMap = Map.ofEntries(Map.entry("value", "value"));
+        final Map<String, Object> stringStringMap = Map.ofEntries(Map.entry("value", "value"));
         final DeployTask task1 = new DeployTask();
         task1.setId(UUID.fromString("800b6caa-5710-4064-8bae-cb446a351cc1"));
         final DeployRequest deployRequest1 = new DeployRequest();
@@ -265,7 +265,7 @@ class TerraformBootDeploymentTest {
         deployment1.setDeployer("deployer");
         ocl1.setDeployment(deployment1);
         task1.setOcl(ocl1);
-        when(mockDeployEnvironments.getVariables(task1)).thenReturn(stringStringMap);
+        when(mockDeployEnvironments.getVariables(task1, true)).thenReturn(stringStringMap);
 
         // Configure DeployEnvironments.getFlavorVariables(...).
         final Map<String, String> stringStringMap1 = Map.ofEntries(Map.entry("value", "value"));

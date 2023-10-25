@@ -265,7 +265,7 @@ class ServiceDeployerApiTest {
         deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
         deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().get(0).getName());
         deployRequest.setRegion(serviceTemplateDetailVo.getRegions().get(0).toString());
-        Map<String, String> serviceRequestProperties = new HashMap<>();
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("secgroup_name", "secgroup_name");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
         String requestBody = objectMapper.writeValueAsString(deployRequest);

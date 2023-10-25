@@ -25,6 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -62,8 +63,7 @@ public class AesUtil {
             byte[] byteAes = cipher.doFinal(byteEncode);
             return Base64.encodeBase64String(byteAes);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("AES encode error, {}", e.getMessage());
+            log.error("AES encode error ", e);
         }
         return content;
     }
@@ -86,10 +86,34 @@ public class AesUtil {
             byte[] byteDecode = cipher.doFinal(byteContent);
             return new String(byteDecode, StandardCharsets.UTF_8);
         } catch (IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
-            log.error("AES decode error, {}", e.getMessage());
+            log.error("AES decode error ", e);
         }
         return content;
+    }
+
+    /**
+     * All values are encoded from string. This method decodes and also converts the original string
+     * back to its actual type.
+     *
+     * @param deployVariableDataType type of the data variable that is encoded.
+     * @param content                encoded string
+     * @return returns decoded value and the type converted based on the original data.
+     */
+
+    public Object decodeBackToOriginalType(DeployVariableDataType deployVariableDataType,
+                                           String content) {
+        String decodedContent = decode(content);
+        switch (deployVariableDataType) {
+            case NUMBER -> {
+                return Integer.valueOf(decodedContent);
+            }
+            case BOOLEAN -> {
+                return Boolean.parseBoolean(decodedContent);
+            }
+            default -> {
+                return decodedContent;
+            }
+        }
     }
 
     private Cipher getCipher(int mode) {
@@ -97,15 +121,13 @@ public class AesUtil {
         try (InputStream is = new FileInputStream(
                 System.getProperty("user.dir") + File.separator + aesKeyFileName)) {
             byte[] bytes = new byte[is.available()];
-            is.read(bytes);
             SecretKey secretKey = new SecretKeySpec(bytes, algorithmType);
             cipher = Cipher.getInstance(cipherAlgorithm);
             cipher.init(mode, secretKey, new IvParameterSpec(vi.getBytes()));
             return cipher;
         } catch (IOException | InvalidAlgorithmParameterException | NoSuchPaddingException
-                | NoSuchAlgorithmException | InvalidKeyException e) {
-            e.printStackTrace();
-            log.error("get Cipher error, {}", e.getMessage());
+                 | NoSuchAlgorithmException | InvalidKeyException e) {
+            log.error("get Cipher error ", e);
         }
         return null;
     }

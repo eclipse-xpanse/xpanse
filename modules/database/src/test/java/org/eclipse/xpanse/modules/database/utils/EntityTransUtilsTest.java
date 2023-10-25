@@ -61,7 +61,7 @@ class EntityTransUtilsTest {
     @Test
     void testTransResourceEntity_emptyProperties() {
         deployResourceEntity.setProperties(properties);
-        deployResource.setProperties(properties);
+        deployResource.setProperties(new HashMap<>());
         List<DeployResourceEntity> entities = List.of(deployResourceEntity);
         final List<DeployResource> expectedResult = List.of(deployResource);
         final List<DeployResource> result = EntityTransUtils.transResourceEntity(entities);

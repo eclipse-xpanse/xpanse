@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 @Data
 public class DeployRequestBase implements Serializable {
     /**
-     * The id of user who ordered the Service.
+     * The id of the user who ordered the Service.
      */
     @Hidden
     private String userId;
@@ -90,5 +90,5 @@ public class DeployRequestBase implements Serializable {
      * The property of the Service.
      */
     @Schema(description = "The properties for the requested service")
-    private Map<String, String> serviceRequestProperties;
+    private Map<String, Object> serviceRequestProperties;
 }

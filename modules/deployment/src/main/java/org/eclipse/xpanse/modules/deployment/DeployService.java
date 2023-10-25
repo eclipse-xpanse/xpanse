@@ -167,7 +167,7 @@ public class DeployService {
     }
 
     private void encodeDeployVariable(ServiceTemplateEntity serviceTemplate,
-                                      Map<String, String> serviceRequestProperties) {
+                                      Map<String, Object> serviceRequestProperties) {
         if (Objects.isNull(serviceTemplate.getOcl().getDeployment())
                 ||
                 CollectionUtils.isEmpty(serviceTemplate.getOcl().getDeployment().getVariables())
@@ -179,7 +179,8 @@ public class DeployService {
                     .equals(variable.getSensitiveScope().toValue())
                     && serviceRequestProperties.containsKey(variable.getName())) {
                 serviceRequestProperties.put(variable.getName(),
-                        aesUtil.encode(serviceRequestProperties.get(variable.getName())));
+                        aesUtil.encode(
+                                serviceRequestProperties.get(variable.getName()).toString()));
             }
         });
     }
@@ -570,10 +571,10 @@ public class DeployService {
         if (Objects.nonNull(deployServiceEntity.getDeployRequest().getServiceRequestProperties())) {
             for (DeployVariable deployVariable
                     : deployServiceEntity.getDeployRequest().getOcl().getDeployment()
-                            .getVariables()) {
+                    .getVariables()) {
                 if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
                         && (deployServiceEntity.getDeployRequest().getServiceRequestProperties()
-                                .containsKey(deployVariable.getName()))) {
+                        .containsKey(deployVariable.getName()))) {
                     deployServiceEntity.getDeployRequest().getServiceRequestProperties()
                             .put(deployVariable.getName(), "********");
 

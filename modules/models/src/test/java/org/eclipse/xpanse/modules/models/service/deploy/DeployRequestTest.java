@@ -33,7 +33,7 @@ class DeployRequestTest {
     private static final Csp csp = Csp.AWS;
     private static final String flavor = "flavor";
     private static final Ocl ocl = new Ocl();
-    private static final Map<String, String> properties = Collections.singletonMap("key", "value");
+    private static final Map<String, Object> properties = Collections.singletonMap("key", "value");
     private static DeployRequest request;
 
     @BeforeEach

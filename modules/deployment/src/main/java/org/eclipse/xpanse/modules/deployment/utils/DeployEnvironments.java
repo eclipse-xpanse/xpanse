@@ -45,9 +45,9 @@ public class DeployEnvironments {
      * Constructor to initialize DeployEnvironments bean.
      *
      * @param credentialCenter CredentialCenter bean
-     * @param aesUtil AesUtil bean
-     * @param pluginManager PluginManager bean
-     * @param environment Environment bean
+     * @param aesUtil          AesUtil bean
+     * @param pluginManager    PluginManager bean
+     * @param environment      Environment bean
      */
 
     @Autowired
@@ -66,7 +66,7 @@ public class DeployEnvironments {
      */
     public Map<String, String> getEnv(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-        Map<String, String> request = task.getDeployRequest().getServiceRequestProperties();
+        Map<String, Object> request = task.getDeployRequest().getServiceRequestProperties();
         for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {
             if (variable.getKind() == DeployVariableKind.ENV) {
                 if (request.containsKey(variable.getName())
@@ -74,8 +74,8 @@ public class DeployEnvironments {
                     variables.put(variable.getName(),
                             !SensitiveScope.NONE.toValue()
                                     .equals(variable.getSensitiveScope().toValue())
-                                    ? aesUtil.decode(request.get(variable.getName()))
-                                    : request.get(variable.getName()));
+                                    ? aesUtil.decode(request.get(variable.getName()).toString())
+                                    : request.get(variable.getName()).toString());
                 } else {
                     variables.put(variable.getName(), System.getenv(variable.getName()));
                 }
@@ -115,17 +115,18 @@ public class DeployEnvironments {
      *
      * @param task the DeployTask.
      */
-    public Map<String, String> getVariables(DeployTask task) {
-        Map<String, String> variables = new HashMap<>();
-        Map<String, String> request = task.getDeployRequest().getServiceRequestProperties();
+    public Map<String, Object> getVariables(DeployTask task, boolean isDeployRequest) {
+        Map<String, Object> variables = new HashMap<>();
+        Map<String, Object> request = task.getDeployRequest().getServiceRequestProperties();
         for (DeployVariable variable : task.getOcl().getDeployment().getVariables()) {
             if (variable.getKind() == DeployVariableKind.VARIABLE) {
                 if (request.containsKey(variable.getName())
                         && request.get(variable.getName()) != null) {
                     variables.put(variable.getName(),
-                            !SensitiveScope.NONE.toValue()
-                                    .equals(variable.getSensitiveScope().toValue())
-                                    ? aesUtil.decode(request.get(variable.getName()))
+                            (variable.getSensitiveScope() != SensitiveScope.NONE
+                                    && isDeployRequest)
+                                    ? aesUtil.decodeBackToOriginalType(variable.getDataType(),
+                                    request.get(variable.getName()).toString())
                                     : request.get(variable.getName()));
                 } else {
                     variables.put(variable.getName(), System.getenv(variable.getName()));
@@ -138,8 +139,7 @@ public class DeployEnvironments {
 
             if (variable.getKind() == DeployVariableKind.FIX_VARIABLE) {
                 variables.put(variable.getName(),
-                        !SensitiveScope.NONE.toValue()
-                                .equals(variable.getSensitiveScope().toValue())
+                        (variable.getSensitiveScope() != SensitiveScope.NONE && isDeployRequest)
                                 ? aesUtil.decode(variable.getValue()) : variable.getValue());
             }
         }
