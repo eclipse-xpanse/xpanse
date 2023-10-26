@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.database.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 public class DatabaseDeployServiceStorage implements DeployServiceStorage {
+
+    @PersistenceContext
+    public EntityManager entityManager;
 
     private final DeployServiceRepository deployServiceRepository;
 
@@ -121,5 +126,18 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
     @Override
     public void deleteDeployService(DeployServiceEntity deployServiceEntity) {
         this.deployServiceRepository.delete(deployServiceEntity);
+    }
+
+    @Override
+    public DeployServiceEntity queryRefreshDeployServiceById(UUID id) {
+        Optional<DeployServiceEntity> optionalEntity =
+                this.deployServiceRepository.findById(id);
+        if (optionalEntity.isPresent()) {
+            DeployServiceEntity entity = optionalEntity.get();
+            entityManager.refresh(entity);
+            return entity;
+        } else {
+            return null;
+        }
     }
 }

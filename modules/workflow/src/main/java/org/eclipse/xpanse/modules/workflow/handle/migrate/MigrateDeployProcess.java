@@ -9,6 +9,8 @@ package org.eclipse.xpanse.modules.workflow.handle.migrate;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -44,6 +46,7 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
     /**
      * Methods when performing deployment tasks.
      */
+    @SneakyThrows
     @Override
     public void execute(DelegateExecution execution) {
 
@@ -64,14 +67,17 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
                 (MigrateRequest) variables.get(MigrateConstants.MIGRATE_REQUEST);
         DeployRequest deployRequest = new DeployRequest();
         BeanUtils.copyProperties(migrateRequest, deployRequest);
-        boolean isDeploySuccess = deployService.deployService(newId, deployRequest);
-        if (!isDeploySuccess && deployRetryNum >= 1) {
+
+        CompletableFuture<Void> future = deployService.deployService(newId, deployRequest);
+        future.join();
+        boolean deploySuccess = deployService.isDeploySuccess(newId);
+        if (!deploySuccess && deployRetryNum >= 1) {
             UUID id = (UUID) variables.get(MigrateConstants.ID);
             String userId = deployService.getDeployServiceDetails(id)
                     .getDeployRequest().getUserId();
             runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE, userId);
         }
         runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,
-                isDeploySuccess);
+                deploySuccess);
     }
 }

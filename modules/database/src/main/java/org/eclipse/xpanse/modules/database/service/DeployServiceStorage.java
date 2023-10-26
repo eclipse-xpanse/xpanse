@@ -58,4 +58,6 @@ public interface DeployServiceStorage {
      * @param deployServiceEntity the model of deployed service.
      */
     void deleteDeployService(DeployServiceEntity deployServiceEntity);
+
+    DeployServiceEntity queryRefreshDeployServiceById(UUID id);
 }
