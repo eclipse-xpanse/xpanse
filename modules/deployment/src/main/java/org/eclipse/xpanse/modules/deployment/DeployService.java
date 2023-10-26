@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -196,7 +197,7 @@ public class DeployService {
         deploy(deployment, deployTask);
     }
 
-    private boolean deploy(Deployment deployment, DeployTask deployTask) {
+    private void deploy(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
         DeployResult deployResult = new DeployResult();
@@ -204,7 +205,6 @@ public class DeployService {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             deployment.deploy(deployTask);
-            return true;
         } catch (RuntimeException e) {
             log.error("asyncDeployService failed.", e);
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
@@ -216,7 +216,6 @@ public class DeployService {
             maskSensitiveFields(deployServiceEntity);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             rollbackOnDeploymentFailure(deployServiceEntity, deployResult, deployment, deployTask);
-            return false;
         }
     }
 
@@ -311,7 +310,7 @@ public class DeployService {
         destroy(deployment, deployTask);
     }
 
-    private boolean destroy(Deployment deployment, DeployTask deployTask) {
+    private void destroy(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
@@ -325,7 +324,6 @@ public class DeployService {
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
             deployment.destroy(deployTask, stateFile);
-            return true;
         } catch (Exception e) {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());
@@ -333,7 +331,6 @@ public class DeployService {
             if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
                 deployment.deleteTaskWorkspace(deployTask.getId().toString());
             }
-            return false;
         }
 
     }
@@ -586,22 +583,60 @@ public class DeployService {
     /**
      * Deployment service.
      */
-    public boolean deployService(UUID newId, DeployRequest deployRequest) {
+    @Async("taskExecutor")
+    public CompletableFuture<Void> deployService(UUID newId, DeployRequest deployRequest) {
+        MDC.put(TASK_ID, newId.toString());
+        log.info("start deploy service, service id : {}", newId.toString());
         DeployTask deployTask = new DeployTask();
         deployRequest.setId(newId);
         deployTask.setId(newId);
         deployTask.setDeployRequest(deployRequest);
         Deployment deployment = getDeployHandler(deployTask);
-        return deploy(deployment, deployTask);
+        deploy(deployment, deployTask);
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
      * Destroy service by deployed service id.
      */
-    public boolean destroyService(String id) {
+    @Async("taskExecutor")
+    public CompletableFuture<Void> destroyService(String id) {
+        MDC.put(TASK_ID, id);
+        log.info("start destroy service, service id : {}", id);
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.fromString(id));
         Deployment deployment = getDestroyHandler(deployTask);
-        return destroy(deployment, deployTask);
+        destroy(deployment, deployTask);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Method to determine whether deploy is successful.
+     */
+    public boolean isDeploySuccess(UUID id) {
+        MDC.put(TASK_ID, id.toString());
+        log.info(" starting to poll for status update.. , service id : {}", id.toString());
+        ServiceDeploymentState deployState = null;
+        while (deployState == ServiceDeploymentState.DEPLOYING || deployState == null) {
+            deployState = deployServiceStorage.queryRefreshDeployServiceById(id)
+                    .getServiceDeploymentState();
+        }
+        log.info("deployment status updated,state:{}", deployState);
+        return deployState == ServiceDeploymentState.DEPLOY_SUCCESS;
+    }
+
+    /**
+     * Method to determine whether destroy is successful.
+     */
+    public boolean isDestroySuccess(UUID id) {
+        ServiceDeploymentState destroyState = null;
+        MDC.put(TASK_ID, id.toString());
+        log.info(" starting to poll for status update.. , service id : {}", id.toString());
+        while (destroyState == ServiceDeploymentState.DESTROYING || destroyState == null) {
+            destroyState = deployServiceStorage.queryRefreshDeployServiceById(id)
+                    .getServiceDeploymentState();
+        }
+        log.info("destroy status updated,state:{}", destroyState);
+        return destroyState == ServiceDeploymentState.DESTROY_SUCCESS;
     }
 }
