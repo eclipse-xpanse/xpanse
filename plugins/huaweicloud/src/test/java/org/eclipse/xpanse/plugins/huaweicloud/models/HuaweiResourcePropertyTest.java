@@ -43,8 +43,8 @@ class HuaweiResourcePropertyTest {
     void testGetPropertiesByResourceKindVpc() {
         // Setup
         final Map<String, String> expectedResult = new HashMap<>();
-        expectedResult.put("subnet", "subnet_id");
-        expectedResult.put("vpc", "vpc_id");
+        expectedResult.put("cidr", "cidr");
+        expectedResult.put("region", "region");
 
         // Run the test
         final Map<String, String> result =
@@ -92,6 +92,22 @@ class HuaweiResourcePropertyTest {
         // Run the test
         final Map<String, String> result =
                 HuaweiResourceProperty.getProperties(DeployResourceKind.UNKNOWN);
+
+        // Verify the results
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testGetPropertiesByResourceKindSubnet() {
+        // Setup
+        final Map<String, String> expectedResult = new HashMap<>();
+        expectedResult.put("vpc", "vpc_id");
+        expectedResult.put("subnet", "cidr");
+        expectedResult.put("gateway", "gateway_ip");
+
+        // Run the test
+        final Map<String, String> result =
+                HuaweiResourceProperty.getProperties(DeployResourceKind.SUBNET);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);

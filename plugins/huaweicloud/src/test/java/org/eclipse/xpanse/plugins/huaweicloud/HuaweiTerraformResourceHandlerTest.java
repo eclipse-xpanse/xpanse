@@ -11,7 +11,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class HuaweiTerraformResourceHandlerTest {
+class HuaweiTerraformResourceHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

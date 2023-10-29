@@ -9,11 +9,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.PublicIp;
-import org.eclipse.xpanse.modules.models.service.deploy.Vm;
-import org.eclipse.xpanse.modules.models.service.deploy.Volume;
-import org.eclipse.xpanse.modules.models.service.deploy.Vpc;
 
 
 /**
@@ -25,28 +20,13 @@ public enum DeployResourceKind {
     PUBLIC_IP("publicIP"),
     VPC("vpc"),
     VOLUME("volume"),
-    UNKNOWN("unknown");
+    UNKNOWN("unknown"),
+    SUBNET("subnet");
 
     private final String kind;
 
     DeployResourceKind(String kind) {
         this.kind = kind;
-    }
-
-    /**
-     * get resourceInstance by resourceKind.
-     *
-     * @param resourceKind deployResourceKind
-     * @return resourceInstance
-     */
-    public static DeployResource getInstanceByKind(DeployResourceKind resourceKind) {
-        return switch (resourceKind) {
-            case VM -> new Vm();
-            case VPC -> new Vpc();
-            case VOLUME -> new Volume();
-            case PUBLIC_IP -> new PublicIp();
-            default -> new DeployResource();
-        };
     }
 
     /**

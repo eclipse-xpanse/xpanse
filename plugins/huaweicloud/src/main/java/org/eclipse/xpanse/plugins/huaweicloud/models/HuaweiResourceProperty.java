@@ -17,9 +17,9 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind
 public enum HuaweiResourceProperty {
     HUAWEI_VM_PROPERTY(DeployResourceKind.VM, new HuaweiVmProperty()),
     HUAWEI_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new HuaweiVolumeProperty()),
-    HUAWEI_VPC_PROPERTY(DeployResourceKind.VPC, new HuaweiVpcProperty()),
-    HUAWEI_PUBLICIP_PROPERTY(DeployResourceKind.PUBLIC_IP, new HuaweiPublicIpProperty());
-
+    HUAWEI_SUBNET_PROPERTY(DeployResourceKind.SUBNET, new HuaweiSubnetProperty()),
+    HUAWEI_PUBLIC_IP_PROPERTY(DeployResourceKind.PUBLIC_IP, new HuaweiPublicIpProperty()),
+    HUAWEI_VPC_PROPERTY(DeployResourceKind.VPC, new HuaweiVpcProperty());
     private final DeployResourceKind resourceKind;
     private final Map<String, String> properties;
 
@@ -96,8 +96,23 @@ public enum HuaweiResourceProperty {
          * Init method to put property key and value.
          */
         public HuaweiVpcProperty() {
+            this.put("cidr", "cidr");
+            this.put("region", "region");
+        }
+    }
+
+    /**
+     * Huawei cloud subnet property.
+     */
+    static class HuaweiSubnetProperty extends HashMap<String, String> {
+
+        /**
+         * Init method to put property key and value.
+         */
+        public HuaweiSubnetProperty() {
             this.put("vpc", "vpc_id");
-            this.put("subnet", "subnet_id");
+            this.put("subnet", "cidr");
+            this.put("gateway", "gateway_ip");
         }
     }
 }

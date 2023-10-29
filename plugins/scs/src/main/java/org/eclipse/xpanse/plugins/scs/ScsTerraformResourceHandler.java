@@ -21,10 +21,6 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStat
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
-import org.eclipse.xpanse.modules.models.service.deploy.PublicIp;
-import org.eclipse.xpanse.modules.models.service.deploy.Vm;
-import org.eclipse.xpanse.modules.models.service.deploy.Volume;
-import org.eclipse.xpanse.modules.models.service.deploy.Vpc;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -66,7 +62,7 @@ public class ScsTerraformResourceHandler implements DeployResourceHandler {
             for (TfStateResource tfStateResource : tfState.getResources()) {
                 if (tfStateResource.getType().equals("openstack_compute_instance_v2")) {
                     for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                        DeployResource deployResource = new Vm();
+                        DeployResource deployResource = new DeployResource();
                         deployResource.setKind(DeployResourceKind.VM);
                         TfResourceTransUtils.fillDeployResource(instance, deployResource,
                                 ScsResourceProperty.getProperties(DeployResourceKind.VM));
@@ -75,7 +71,7 @@ public class ScsTerraformResourceHandler implements DeployResourceHandler {
                 }
                 if (tfStateResource.getType().equals("openstack_networking_floatingip_v2")) {
                     for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                        DeployResource deployResource = new PublicIp();
+                        DeployResource deployResource = new DeployResource();
                         deployResource.setKind(DeployResourceKind.PUBLIC_IP);
                         TfResourceTransUtils.fillDeployResource(instance, deployResource,
                                 ScsResourceProperty.getProperties(
@@ -85,19 +81,28 @@ public class ScsTerraformResourceHandler implements DeployResourceHandler {
                 }
                 if (tfStateResource.getType().equals("openstack_networking_subnet_v2")) {
                     for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                        DeployResource deployResource = new Vpc();
-                        deployResource.setKind(DeployResourceKind.VPC);
+                        DeployResource deployResource = new DeployResource();
+                        deployResource.setKind(DeployResourceKind.SUBNET);
                         TfResourceTransUtils.fillDeployResource(instance, deployResource,
-                                ScsResourceProperty.getProperties(DeployResourceKind.VPC));
+                                ScsResourceProperty.getProperties(DeployResourceKind.SUBNET));
                         deployResourceList.add(deployResource);
                     }
                 }
                 if (tfStateResource.getType().equals("openstack_blockstorage_volume_v3")) {
                     for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                        DeployResource deployResource = new Volume();
+                        DeployResource deployResource = new DeployResource();
                         deployResource.setKind(DeployResourceKind.VOLUME);
                         TfResourceTransUtils.fillDeployResource(instance, deployResource,
                                 ScsResourceProperty.getProperties(DeployResourceKind.VOLUME));
+                        deployResourceList.add(deployResource);
+                    }
+                }
+                if (tfStateResource.getType().equals("openstack_networking_network_v2")) {
+                    for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                        DeployResource deployResource = new DeployResource();
+                        deployResource.setKind(DeployResourceKind.VPC);
+                        TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                                ScsResourceProperty.getProperties(DeployResourceKind.VPC));
                         deployResourceList.add(deployResource);
                     }
                 }

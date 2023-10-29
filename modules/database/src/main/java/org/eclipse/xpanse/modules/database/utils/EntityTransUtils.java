@@ -7,16 +7,11 @@
 
 package org.eclipse.xpanse.modules.database.utils;
 
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -25,6 +20,10 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 public class EntityTransUtils {
+
+    private EntityTransUtils() {
+        // block constructor.
+    }
 
 
     /**
@@ -37,36 +36,12 @@ public class EntityTransUtils {
         List<DeployResource> resources = new ArrayList<>();
         if (!CollectionUtils.isEmpty(entities)) {
             for (DeployResourceEntity entity : entities) {
-                DeployResource deployResource =
-                        DeployResourceKind.getInstanceByKind(entity.getKind());
+                DeployResource deployResource = new DeployResource();
                 BeanUtils.copyProperties(entity, deployResource);
-                fillChildFields(deployResource, entity.getProperties());
                 resources.add(deployResource);
             }
         }
         return resources;
-    }
-
-
-    private static void fillChildFields(DeployResource deployResource,
-                                        Map<String, String> properties) {
-        if (Objects.isNull(deployResource) || properties.isEmpty()) {
-            return;
-        }
-        Field[] fields = deployResource.getClass().getFields();
-        try {
-            for (Field field : fields) {
-                String fieldName = field.getName();
-                if (properties.containsKey(fieldName)) {
-                    String value = properties.get(fieldName);
-                    field.setAccessible(true);
-                    field.set(deployResource, value);
-                }
-            }
-        } catch (IllegalAccessException e) {
-            log.error("IllegalAccessException:", e);
-        }
-
     }
 
 }

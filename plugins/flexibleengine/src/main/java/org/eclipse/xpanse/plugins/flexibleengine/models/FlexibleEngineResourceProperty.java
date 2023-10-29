@@ -15,11 +15,12 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind
  * Enum for DeployResourceKind and FlexibleEngine Resource Property.
  */
 public enum FlexibleEngineResourceProperty {
-    FlexibleEngine_VM_PROPERTY(DeployResourceKind.VM, new FlexibleEngineVmProperty()),
-    FlexibleEngine_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new FlexibleEngineVolumeProperty()),
-    FlexibleEngine_VPC_PROPERTY(DeployResourceKind.VPC, new FlexibleEngineVpcProperty()),
-    FlexibleEngine_PUBLICIP_PROPERTY(DeployResourceKind.PUBLIC_IP,
-            new FlexibleEnginePublicIpProperty());
+    FLEXIBLE_ENGINE_VM_PROPERTY(DeployResourceKind.VM, new FlexibleEngineVmProperty()),
+    FLEXIBLE_ENGINE_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new FlexibleEngineVolumeProperty()),
+    FLEXIBLE_ENGINE_VPC_PROPERTY(DeployResourceKind.VPC, new FlexibleEngineVpcProperty()),
+    FLEXIBLE_ENGINE_PUBLIC_IP_PROPERTY(DeployResourceKind.PUBLIC_IP,
+            new FlexibleEnginePublicIpProperty()),
+    FLEXIBLE_ENGINE_SUBNET_PROPERTY(DeployResourceKind.SUBNET, new FlexibleEngineSubnetProperty());
 
     private final DeployResourceKind resourceKind;
     private final Map<String, String> properties;
@@ -98,8 +99,23 @@ public enum FlexibleEngineResourceProperty {
          * Init method to put property key and value.
          */
         public FlexibleEngineVpcProperty() {
+            this.put("cidr", "cidr");
+            this.put("region", "region");
+        }
+    }
+
+    /**
+     * FlexibleEngine cloud subnet property.
+     */
+    static class FlexibleEngineSubnetProperty extends HashMap<String, String> {
+
+        /**
+         * Init method to put property key and value.
+         */
+        public FlexibleEngineSubnetProperty() {
             this.put("vpc", "vpc_id");
-            this.put("subnet", "subnet_id");
+            this.put("subnet", "cidr");
+            this.put("gateway", "gateway_ip");
         }
     }
 }

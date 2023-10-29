@@ -458,7 +458,7 @@ public class DeployService {
                 .addAll(getDeployResourceEntityList(deployResult.getResources(),
                         deployServiceEntity));
         maskSensitiveFields(deployServiceEntity);
-        if (result.getCommandSuccessful()) {
+        if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
         } else {
@@ -481,7 +481,7 @@ public class DeployService {
     }
 
     /**
-     * Callback method after destroy is complete.
+     * Callback method after the service is destroyed.
      */
     public void destroyCallback(String taskId, TerraformResult result) {
         DeployServiceEntity deployServiceEntity =
@@ -491,7 +491,7 @@ public class DeployService {
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
-        if (result.getCommandSuccessful()) {
+        if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
             deployServiceEntity.setProperties(new HashMap<>());
             deployServiceEntity.setPrivateProperties(new HashMap<>());
@@ -508,7 +508,9 @@ public class DeployService {
         } else {
             deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
             deployResult.getPrivateProperties().put(STATE_FILE_NAME, result.getTerraformState());
-            deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
+            if (Objects.nonNull(result.getImportantFileContentMap())) {
+                deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
+            }
         }
         return deployResult;
     }
