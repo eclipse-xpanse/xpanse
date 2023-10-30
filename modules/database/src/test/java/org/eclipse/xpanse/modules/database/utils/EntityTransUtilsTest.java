@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.database.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,12 +26,9 @@ class EntityTransUtilsTest {
     private static final String RESOURCE_ID = "resourceId";
     private static final String NAME = "name";
     private static final DeployResourceKind KIND = DeployResourceKind.VM;
-    private DeployServiceEntity deployService = new DeployServiceEntity();
-    private Map<String, String> properties = new HashMap<>();
-
-
-    private DeployResource deployResource = new DeployResource();
-    private DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+    private final Map<String, String> properties = new HashMap<>();
+    private final DeployResource deployResource = new DeployResource();
+    private final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
 
 
     @BeforeEach
@@ -55,7 +50,7 @@ class EntityTransUtilsTest {
         List<DeployResourceEntity> entities = List.of(deployResourceEntity);
         final List<DeployResource> expectedResult = List.of(deployResource);
         final List<DeployResource> result = EntityTransUtils.transResourceEntity(entities);
-        assertThat(result).isNotEqualTo(expectedResult);
+        assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
@@ -65,7 +60,7 @@ class EntityTransUtilsTest {
         List<DeployResourceEntity> entities = List.of(deployResourceEntity);
         final List<DeployResource> expectedResult = List.of(deployResource);
         final List<DeployResource> result = EntityTransUtils.transResourceEntity(entities);
-        assertThat(result).isNotEqualTo(expectedResult);
+        assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
@@ -73,14 +68,6 @@ class EntityTransUtilsTest {
         List<DeployResourceEntity> entities = new ArrayList<>();
         final List<DeployResource> result = EntityTransUtils.transResourceEntity(entities);
         assertEquals(0, result.size());
-    }
-
-    @Test
-    void test_Constructor() {
-        EntityTransUtils utils = new EntityTransUtils();
-        EntityTransUtils utils1 = new EntityTransUtils();
-        assertNotEquals(utils, utils1);
-        assertNotEquals(utils, utils1);
     }
 
 }

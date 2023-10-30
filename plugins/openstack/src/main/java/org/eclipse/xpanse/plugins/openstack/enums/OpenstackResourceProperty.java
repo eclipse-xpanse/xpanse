@@ -15,10 +15,11 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind
  * Enum for DeployResourceKind and Openstack Resource Property.
  */
 public enum OpenstackResourceProperty {
-    Openstack_VM_PROPERTY(DeployResourceKind.VM, new OpenstackVmProperty()),
-    Openstack_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new OpenstackVolumeProperty()),
-    Openstack_VPC_PROPERTY(DeployResourceKind.VPC, new OpenstackVpcProperty()),
-    Openstack_PUBLICIP_PROPERTY(DeployResourceKind.PUBLIC_IP, new OpenstackPublicIpProperty());
+    OPENSTACK_VM_PROPERTY(DeployResourceKind.VM, new OpenstackVmProperty()),
+    OPENSTACK_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new OpenstackVolumeProperty()),
+    OPENSTACK_VPC_PROPERTY(DeployResourceKind.VPC, new OpenstackVpcProperty()),
+    OPENSTACK_PUBLIC_IP_PROPERTY(DeployResourceKind.PUBLIC_IP, new OpenstackPublicIpProperty()),
+    OPENSTACK_SUBNET_PROPERTY(DeployResourceKind.SUBNET, new OpenstackSubnetProperty());
 
     private final DeployResourceKind resourceKind;
     private final Map<String, String> properties;
@@ -96,8 +97,23 @@ public enum OpenstackResourceProperty {
          * Init method to put property key and value.
          */
         public OpenstackVpcProperty() {
+            this.put("region", "region");
+            this.put("mtu", "mtu");
+        }
+    }
+
+    /**
+     * Openstack cloud vpc property.
+     */
+    static class OpenstackSubnetProperty extends HashMap<String, String> {
+
+        /**
+         * Init method to put property key and value.
+         */
+        public OpenstackSubnetProperty() {
             this.put("vpc", "network_id");
-            this.put("subnet", "subnetpool_id");
+            this.put("subnet", "cidr");
+            this.put("gateway", "gateway_ip");
         }
     }
 }

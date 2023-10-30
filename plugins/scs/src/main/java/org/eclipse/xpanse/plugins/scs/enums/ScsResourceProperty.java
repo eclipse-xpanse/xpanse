@@ -18,7 +18,8 @@ public enum ScsResourceProperty {
     SCS_VM_PROPERTY(DeployResourceKind.VM, new ScsVmProperty()),
     SCS_VOLUME_PROPERTY(DeployResourceKind.VOLUME, new ScsVolumeProperty()),
     SCS_VPC_PROPERTY(DeployResourceKind.VPC, new ScsVpcProperty()),
-    SCS_PUBLICIP_PROPERTY(DeployResourceKind.PUBLIC_IP, new ScsPublicIpProperty());
+    SCS_PUBLIC_IP_PROPERTY(DeployResourceKind.PUBLIC_IP, new ScsPublicIpProperty()),
+    SCS_SUBNET_PROPERTY(DeployResourceKind.SUBNET, new ScsSubnetProperty());
 
     private final DeployResourceKind resourceKind;
     private final Map<String, String> properties;
@@ -96,8 +97,23 @@ public enum ScsResourceProperty {
          * Init method to put property key and value.
          */
         public ScsVpcProperty() {
+            this.put("region", "region");
+            this.put("mtu", "mtu");
+        }
+    }
+
+    /**
+     * SCS cloud Subnet property.
+     */
+    static class ScsSubnetProperty extends HashMap<String, String> {
+
+        /**
+         * Init method to put property key and value.
+         */
+        public ScsSubnetProperty() {
             this.put("vpc", "network_id");
-            this.put("subnet", "subnetpool_id");
+            this.put("subnet", "cidr");
+            this.put("gateway", "gateway_ip");
         }
     }
 }
