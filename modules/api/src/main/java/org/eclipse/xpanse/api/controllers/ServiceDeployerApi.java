@@ -137,7 +137,7 @@ public class ServiceDeployerApi {
         Deployment deployment = this.deployService.getDeployHandler(deployTask);
         this.deployService.asyncDeployService(deployment, deployTask);
         String successMsg = String.format(
-                "Task of start managed service %s-%s-%s start running. UUID %s",
+                "Task for starting managed service %s-%s-%s started. UUID %s",
                 deployRequest.getServiceName(),
                 deployRequest.getVersion(), deployRequest.getCsp(), deployTask.getId());
         log.info(successMsg);
@@ -159,9 +159,11 @@ public class ServiceDeployerApi {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.fromString(id));
         Deployment deployment = this.deployService.getDestroyHandler(deployTask);
+        this.deployService.updateServiceStatus(deployTask.getId(),
+                ServiceDeploymentState.DESTROYING);
         this.deployService.asyncDestroyService(deployment, deployTask);
         String successMsg = String.format(
-                "Task of stop managed service %s start running.", id);
+                "Task for destroying managed service %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
     }
 
