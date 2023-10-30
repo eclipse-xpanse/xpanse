@@ -641,4 +641,17 @@ public class DeployService {
         log.info("destroy status updated,state:{}", destroyState);
         return destroyState == ServiceDeploymentState.DESTROY_SUCCESS;
     }
+
+    /**
+     * Helper method to update service status in the database.
+     *
+     * @param id ID of the service
+     * @param serviceDeploymentState new status to be set for the service.
+     */
+    public void updateServiceStatus(UUID id, ServiceDeploymentState serviceDeploymentState) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(id);
+        deployServiceEntity.setServiceDeploymentState(serviceDeploymentState);
+        deployServiceStorage.storeAndFlush(deployServiceEntity);
+    }
 }

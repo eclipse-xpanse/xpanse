@@ -375,7 +375,7 @@ class ServiceDeployerApiTest {
 
         // SetUp
         String successMsg = String.format(
-                "Task of stop managed service %s start running.", taskId);
+                "Task for destroying managed service %s has started.", taskId);
         Response response = Response.successResponse(Collections.singletonList(successMsg));
 
         String result = objectMapper.writeValueAsString(response);
