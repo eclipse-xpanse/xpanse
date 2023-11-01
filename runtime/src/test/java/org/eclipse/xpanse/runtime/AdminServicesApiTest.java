@@ -14,24 +14,25 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
+import org.eclipse.xpanse.modules.database.DatabaseManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformBootManager;
 import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
-import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Test for AdminServicesApi.
@@ -53,24 +55,16 @@ class AdminServicesApiTest {
 
     @Resource
     private MockMvc mockMvc;
-
-    @Resource
-    private TerraformApi terraformApi;
-
     @Resource
     private PluginManager pluginManager;
-
-    private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
-    private static final String ZITADEL = "zitadel";
-
-    @Value("${spring.profiles.active:}")
-    private String springProfilesActive;
-
-    @Value("${spring.datasource.url}")
-    private String endPoint;
-
-    @Value("${authorization.server.endpoint}")
-    private String serverEndPoint;
+    @Resource
+    private IdentityProviderManager identityProviderManager;
+    @Resource
+    private DatabaseManager databaseManager;
+    @Resource
+    private TerraformBootManager terraformBootManager;
+    @Resource
+    private PolicyManager policyManager;
 
     @Test
     @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
@@ -79,25 +73,35 @@ class AdminServicesApiTest {
         // SetUp
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
-        BackendSystemStatus dataBaseSystemStatus = new BackendSystemStatus();
-        dataBaseSystemStatus.setBackendSystemType(BackendSystemType.DATABASE);
-        dataBaseSystemStatus.setHealthStatus(HealthStatus.OK);
-        dataBaseSystemStatus.setName(DatabaseType.H2DB.toValue());
-        dataBaseSystemStatus.setEndpoint(endPoint);
+        List<BackendSystemStatus> backendSystemStatuses = setUpBackendSystemStatusList(true);
+        if (!CollectionUtils.isEmpty(backendSystemStatuses)) {
+            systemStatus.setBackendSystemStatuses(backendSystemStatuses);
+        }
 
-        BackendSystemStatus dataBaseSystemStatus1 = new BackendSystemStatus();
-        dataBaseSystemStatus1.setBackendSystemType(BackendSystemType.IDENTITY_PROVIDER);
-        dataBaseSystemStatus1.setHealthStatus(HealthStatus.OK);
-        dataBaseSystemStatus1.setName(ZITADEL);
-        dataBaseSystemStatus1.setEndpoint(serverEndPoint);
+        String resBody = objectMapper.writeValueAsString(systemStatus);
 
-        BackendSystemStatus terraformBootStatus = getTerraformBootStatus();
-        if (Objects.nonNull(terraformBootStatus)) {
-            systemStatus.setBackendSystemStatuses(
-                    List.of(dataBaseSystemStatus1, dataBaseSystemStatus, terraformBootStatus));
-        } else {
-            systemStatus.setBackendSystemStatuses(List.of(dataBaseSystemStatus1,
-                    dataBaseSystemStatus));
+        // Run the test
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/health")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(response.getStatus(), HttpStatus.OK.value());
+        assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
+        assertEquals(resBody, response.getContentAsString());
+
+    }
+
+    @Test
+    @WithMockJwtAuth(authorities = {"isv", "user"},
+            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    void testHealthCheckWithRoleNotAdmin() throws Exception {
+        // SetUp
+        SystemStatus systemStatus = new SystemStatus();
+        systemStatus.setHealthStatus(HealthStatus.OK);
+        List<BackendSystemStatus> backendSystemStatuses = setUpBackendSystemStatusList(false);
+        if (!CollectionUtils.isEmpty(backendSystemStatuses)) {
+            systemStatus.setBackendSystemStatuses(backendSystemStatuses);
         }
 
         String resBody = objectMapper.writeValueAsString(systemStatus);
@@ -154,30 +158,45 @@ class AdminServicesApiTest {
         assertEquals(resultBody, response.getContentAsString());
     }
 
-    private BackendSystemStatus getTerraformBootStatus() {
-        List<String> configSplitList = Arrays.asList(springProfilesActive.split(","));
-        if (configSplitList.contains(TERRAFORM_BOOT_PROFILE_NAME)) {
-            BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
-            terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
-            terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
-            if (isTerraformBootApiAccessible()) {
-                terraformBootStatus.setHealthStatus(HealthStatus.OK);
-            } else {
-                terraformBootStatus.setHealthStatus(HealthStatus.NOK);
+    private List<BackendSystemStatus> setUpBackendSystemStatusList(boolean isAdmin) {
+        List<BackendSystemStatus> backendSystemStatuses = new ArrayList<>();
+        for (BackendSystemType type : BackendSystemType.values()) {
+            if (Objects.equals(BackendSystemType.IDENTITY_PROVIDER, type)) {
+                BackendSystemStatus identityProviderStatus =
+                        identityProviderManager.getActiveIdentityProviderService()
+                                .getIdentityProviderStatus();
+                if (Objects.nonNull(identityProviderStatus)) {
+                    backendSystemStatuses.add(identityProviderStatus);
+                }
             }
-            return terraformBootStatus;
+            if (Objects.equals(BackendSystemType.DATABASE, type)) {
+                BackendSystemStatus databaseStatus = databaseManager.getDatabaseStatus();
+                if (Objects.nonNull(databaseStatus)) {
+                    backendSystemStatuses.add(databaseStatus);
+                }
+            }
+            if (Objects.equals(BackendSystemType.TERRAFORM_BOOT, type)) {
+                BackendSystemStatus terraformBootStatus =
+                        terraformBootManager.getTerraformBootStatus();
+                if (Objects.nonNull(terraformBootStatus)) {
+                    backendSystemStatuses.add(terraformBootStatus);
+                }
+            }
+            if (Objects.equals(BackendSystemType.POLICY_MAN, type)) {
+                BackendSystemStatus terraformBootStatus =
+                        policyManager.getPolicyManStatus();
+                if (Objects.nonNull(terraformBootStatus)) {
+                    backendSystemStatuses.add(terraformBootStatus);
+                }
+            }
         }
-        return null;
-    }
-
-    private boolean isTerraformBootApiAccessible() {
-        try {
-            TerraformBootSystemStatus terraformBootSystemStatus = terraformApi.healthCheck();
-            return terraformBootSystemStatus.getHealthStatus()
-                    .equals(TerraformBootSystemStatus.HealthStatusEnum.OK);
-        } catch (Exception e) {
-            return false;
+        if (!isAdmin) {
+            backendSystemStatuses.forEach(backendSystemStatus -> {
+                backendSystemStatus.setEndpoint(null);
+                backendSystemStatus.setDetails(null);
+            });
         }
+        return backendSystemStatuses;
     }
 
 }

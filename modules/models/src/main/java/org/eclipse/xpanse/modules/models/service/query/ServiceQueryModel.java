@@ -27,6 +27,6 @@ public class ServiceQueryModel {
 
     private ServiceDeploymentState serviceState;
 
-    private String myUserId;
+    private String userId;
 
 }

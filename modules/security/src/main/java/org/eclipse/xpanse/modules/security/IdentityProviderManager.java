@@ -8,6 +8,8 @@ package org.eclipse.xpanse.modules.security;
 
 import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
@@ -86,6 +88,21 @@ public class IdentityProviderManager {
      */
     public CurrentUserInfo getCurrentUserInfo() {
         return activeIdentityProviderService.getCurrentUserInfo();
+    }
+
+
+    /**
+     * Get current login user id.
+     *
+     * @return current login user id.
+     */
+    public Optional<String> getCurrentLoginUserId() {
+        CurrentUserInfo currentUserInfo = getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)) {
+            return Optional.ofNullable(currentUserInfo.getUserId());
+        } else {
+            return Optional.empty();
+        }
     }
 
 }

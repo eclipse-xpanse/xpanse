@@ -48,7 +48,11 @@ public enum ResultType {
     TERRAFORM_BOOT_REQUEST_FAILED("Terraform Boot Request Failed"),
     METRICS_DATA_NOT_READY("Metrics Data Not Ready"),
     VARIABLE_VALIDATION_FAILED("Variable Validation Failed"),
-    VARIABLE_SCHEMA_DEFINITION_INVALID("Variable Schema Definition Invalid");
+    VARIABLE_SCHEMA_DEFINITION_INVALID("Variable Schema Definition Invalid"),
+    POLICY_NOT_FOUND("Policy Not Found"),
+    POLICY_DUPLICATE("Duplicate Policy"),
+    POLICY_VALIDATION_FAILED("Policy Validation Failed"),
+    POLICY_EVALUATION_FAILED("Policy Evaluation Failed");
 
     private final String value;
 

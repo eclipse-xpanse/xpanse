@@ -17,7 +17,8 @@ public enum BackendSystemType {
 
     IDENTITY_PROVIDER("IdentityProvider"),
     DATABASE("Database"),
-    TERRAFORM_BOOT("Terraform Boot");
+    TERRAFORM_BOOT("Terraform Boot"),
+    POLICY_MAN("PolicyMan");
 
     private final String code;
 

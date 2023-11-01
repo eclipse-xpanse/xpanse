@@ -27,13 +27,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
@@ -365,12 +365,9 @@ class DeployServiceTest {
     @Test
     void testListDeployedServices() {
         List<DeployServiceEntity> deployServices = new ArrayList<>();
-        CurrentUserInfo currentUserInfo = new CurrentUserInfo();
-        currentUserInfo.setUserId("12344556");
         deployServices.add(deployServiceEntity);
 
         when(deployServiceStorage.listServices(any())).thenReturn(deployServices);
-        when(identityProviderManager.getCurrentUserInfo()).thenReturn(currentUserInfo);
         List<ServiceVo> result = deployService.listDeployedServices(new ServiceQueryModel());
 
         assertEquals(1, result.size());
@@ -384,7 +381,7 @@ class DeployServiceTest {
     void testGetDeployServiceDetails_ValidIdAndUser_ReturnsServiceDetailVo() {
         when(deployServiceStorage.findDeployServiceById(uuid))
                 .thenReturn(deployServiceEntity);
-
+        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         ServiceDetailVo result = deployService.getDeployServiceDetails(uuid);
 
         assertNotNull(result);
@@ -419,6 +416,8 @@ class DeployServiceTest {
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(
                 deployServiceEntity);
 
+        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+
         assertThrows(InvalidServiceStateException.class,
                 () -> deployService.getDestroyHandler(deployTask));
     }
@@ -445,7 +444,7 @@ class DeployServiceTest {
         deploymentBeans.put("deploymentBean", deploymentMock);
 
         when(applicationContext.getBeansOfType(Deployment.class)).thenReturn(deploymentBeans);
-
+        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         deployService.deploymentMap();
 
         Deployment result = deployService.getDestroyHandler(deployTask);

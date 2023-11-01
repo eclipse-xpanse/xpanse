@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +27,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
@@ -131,8 +131,8 @@ public class DeployService {
      * @param deployTask the task of deploy managed service name.
      */
     public Deployment getDeployHandler(DeployTask deployTask) {
-
-        deployTask.getDeployRequest().setUserId(getCurrentLoginUserId());
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        deployTask.getDeployRequest().setUserId(userIdOptional.orElse(null));
 
         // Find the registered service template and fill Ocl.
         ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
@@ -278,7 +278,9 @@ public class DeployService {
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
-        if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
                     "No permissions to destroy services belonging to other users.");
         }
@@ -394,8 +396,8 @@ public class DeployService {
      * @return serviceVos
      */
     public List<ServiceVo> listDeployedServices(ServiceQueryModel query) {
-
-        query.setMyUserId(getCurrentLoginUserId());
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        query.setUserId(userIdOptional.orElse(null));
         List<DeployServiceEntity> deployServices =
                 deployServiceStorage.listServices(query);
         return deployServices.stream()
@@ -416,8 +418,8 @@ public class DeployService {
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
-
-        if (!StringUtils.equals(getCurrentLoginUserId(), deployServiceEntity.getUserId())) {
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
@@ -546,16 +548,6 @@ public class DeployService {
         return deployment;
     }
 
-    private String getCurrentLoginUserId() {
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)
-                && StringUtils.isNotBlank(currentUserInfo.getUserId())) {
-            return currentUserInfo.getUserId();
-        } else {
-            return "defaultUserId";
-        }
-    }
-
     private ServiceVo convertToServiceVo(DeployServiceEntity serviceEntity) {
         if (Objects.nonNull(serviceEntity)) {
             ServiceVo serviceVo = new ServiceVo();
@@ -588,7 +580,7 @@ public class DeployService {
     @Async("taskExecutor")
     public CompletableFuture<Void> deployService(UUID newId, DeployRequest deployRequest) {
         MDC.put(TASK_ID, newId.toString());
-        log.info("start deploy service, service id : {}", newId.toString());
+        log.info("start deploy service, service id : {}", newId);
         DeployTask deployTask = new DeployTask();
         deployRequest.setId(newId);
         deployTask.setId(newId);
@@ -617,7 +609,7 @@ public class DeployService {
      */
     public boolean isDeploySuccess(UUID id) {
         MDC.put(TASK_ID, id.toString());
-        log.info(" starting to poll for status update.. , service id : {}", id.toString());
+        log.info(" starting to poll for status update.. , service id : {}", id);
         ServiceDeploymentState deployState = null;
         while (deployState == ServiceDeploymentState.DEPLOYING || deployState == null) {
             deployState = deployServiceStorage.queryRefreshDeployServiceById(id)
@@ -633,7 +625,7 @@ public class DeployService {
     public boolean isDestroySuccess(UUID id) {
         ServiceDeploymentState destroyState = null;
         MDC.put(TASK_ID, id.toString());
-        log.info(" starting to poll for status update.. , service id : {}", id.toString());
+        log.info(" starting to poll for status update.. , service id : {}", id);
         while (destroyState == ServiceDeploymentState.DESTROYING || destroyState == null) {
             destroyState = deployServiceStorage.queryRefreshDeployServiceById(id)
                     .getServiceDeploymentState();

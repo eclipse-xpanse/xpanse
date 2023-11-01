@@ -101,7 +101,7 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
                                 serviceQuery.getServiceState()));
                     }
                     predicateList.add(criteriaBuilder.equal(root.get("userId"),
-                            serviceQuery.getMyUserId()));
+                            serviceQuery.getUserId()));
 
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();

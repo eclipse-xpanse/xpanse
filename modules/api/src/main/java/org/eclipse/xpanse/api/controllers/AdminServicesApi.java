@@ -20,19 +20,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
+import org.eclipse.xpanse.modules.database.DatabaseManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformBootManager;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
-import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -60,19 +58,14 @@ public class AdminServicesApi {
     @Resource
     private PluginManager pluginManager;
 
-    @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
-    private String dataSourceUrl;
+    @Resource
+    private DatabaseManager databaseManager;
 
     @Resource
-    private TerraformApi terraformApi;
+    private TerraformBootManager terraformBootManager;
 
     @Resource
-    private ApiClient apiClient;
-
-    private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
-
-    @Value("${spring.profiles.active:}")
-    private String springProfilesActive;
+    private PolicyManager policyManager;
 
 
     /**
@@ -88,7 +81,7 @@ public class AdminServicesApi {
     public SystemStatus healthCheck() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
-        List<BackendSystemStatus> backendSystemStatuses = checkHealthOfBackendSystem();
+        List<BackendSystemStatus> backendSystemStatuses = getBackendSystemStatuses();
         if (!CollectionUtils.isEmpty(backendSystemStatuses)) {
             systemStatus.setBackendSystemStatuses(backendSystemStatuses);
         }
@@ -118,86 +111,51 @@ public class AdminServicesApi {
         return Arrays.asList(Csp.values());
     }
 
-    private List<BackendSystemStatus> checkHealthOfBackendSystem() {
+
+    /**
+     * Get status of all active backend systems.
+     *
+     * @return list of system status.
+     */
+    private List<BackendSystemStatus> getBackendSystemStatuses() {
+        List<BackendSystemStatus> systemStatuses = checkHealthOfAllBackendSystems();
+        systemStatuses.forEach(this::processShownFields);
+        return systemStatuses;
+    }
+
+    private List<BackendSystemStatus> checkHealthOfAllBackendSystems() {
         List<BackendSystemStatus> backendSystemStatuses = new ArrayList<>();
         for (BackendSystemType type : BackendSystemType.values()) {
             if (Objects.equals(BackendSystemType.IDENTITY_PROVIDER, type)) {
-                BackendSystemStatus identityProviderStatus = getIdentityProviderStatus();
+                BackendSystemStatus identityProviderStatus =
+                        identityProviderManager.getActiveIdentityProviderService()
+                                .getIdentityProviderStatus();
                 if (Objects.nonNull(identityProviderStatus)) {
-                    processShownFields(identityProviderStatus);
                     backendSystemStatuses.add(identityProviderStatus);
                 }
             }
             if (Objects.equals(BackendSystemType.DATABASE, type)) {
-                BackendSystemStatus databaseStatus = getDatabaseStatus();
+                BackendSystemStatus databaseStatus = databaseManager.getDatabaseStatus();
                 if (Objects.nonNull(databaseStatus)) {
-                    processShownFields(databaseStatus);
                     backendSystemStatuses.add(databaseStatus);
                 }
             }
             if (Objects.equals(BackendSystemType.TERRAFORM_BOOT, type)) {
-                BackendSystemStatus terraformBootStatus = getTerraformBootStatus();
+                BackendSystemStatus terraformBootStatus =
+                        terraformBootManager.getTerraformBootStatus();
                 if (Objects.nonNull(terraformBootStatus)) {
-                    processShownFields(terraformBootStatus);
+                    backendSystemStatuses.add(terraformBootStatus);
+                }
+            }
+            if (Objects.equals(BackendSystemType.POLICY_MAN, type)) {
+                BackendSystemStatus terraformBootStatus =
+                        policyManager.getPolicyManStatus();
+                if (Objects.nonNull(terraformBootStatus)) {
                     backendSystemStatuses.add(terraformBootStatus);
                 }
             }
         }
         return backendSystemStatuses;
-    }
-
-    private boolean isTerraformBootApiAccessible() {
-        try {
-            TerraformBootSystemStatus terraformBootSystemStatus = terraformApi.healthCheck();
-            return terraformBootSystemStatus.getHealthStatus()
-                    .equals(TerraformBootSystemStatus.HealthStatusEnum.OK);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private BackendSystemStatus getTerraformBootStatus() {
-        List<String> configSplitList = Arrays.asList(springProfilesActive.split(","));
-        if (configSplitList.contains(TERRAFORM_BOOT_PROFILE_NAME)) {
-            BackendSystemStatus terraformBootStatus = new BackendSystemStatus();
-            terraformBootStatus.setBackendSystemType(BackendSystemType.TERRAFORM_BOOT);
-            terraformBootStatus.setName(BackendSystemType.TERRAFORM_BOOT.toValue());
-            terraformBootStatus.setEndpoint(apiClient.getBasePath());
-            if (isTerraformBootApiAccessible()) {
-                terraformBootStatus.setHealthStatus(HealthStatus.OK);
-            } else {
-                terraformBootStatus.setHealthStatus(HealthStatus.NOK);
-            }
-            return terraformBootStatus;
-        }
-        return null;
-    }
-
-    private BackendSystemStatus getIdentityProviderStatus() {
-        return identityProviderManager.getActiveIdentityProviderService()
-                .getIdentityProviderStatus();
-    }
-
-
-    private BackendSystemStatus getDatabaseStatus() {
-        List<String> databaseUrlSplitList = Arrays.asList(dataSourceUrl.split(":"));
-        if (databaseUrlSplitList.contains(DatabaseType.H2DB.toValue())) {
-            BackendSystemStatus databaseStatus = new BackendSystemStatus();
-            databaseStatus.setBackendSystemType(BackendSystemType.DATABASE);
-            databaseStatus.setName(DatabaseType.H2DB.toValue());
-            databaseStatus.setHealthStatus(HealthStatus.OK);
-            databaseStatus.setEndpoint(dataSourceUrl);
-            return databaseStatus;
-        }
-        if (databaseUrlSplitList.contains(DatabaseType.MYSQL.toValue())) {
-            BackendSystemStatus databaseStatus = new BackendSystemStatus();
-            databaseStatus.setBackendSystemType(BackendSystemType.DATABASE);
-            databaseStatus.setName(DatabaseType.MYSQL.toValue());
-            databaseStatus.setHealthStatus(HealthStatus.OK);
-            databaseStatus.setEndpoint(dataSourceUrl);
-            return databaseStatus;
-        }
-        return null;
     }
 
     private void processShownFields(BackendSystemStatus backendSystemStatus) {

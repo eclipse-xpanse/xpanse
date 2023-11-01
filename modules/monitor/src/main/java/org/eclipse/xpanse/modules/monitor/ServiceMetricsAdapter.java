@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.monitor;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,6 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
@@ -83,7 +83,8 @@ public class ServiceMetricsAdapter {
             throw new ResourceNotFoundException("No resource found in the service.");
         }
 
-        if (!StringUtils.equals(getCurrentLoginUserId(), serviceEntity.getUserId())) {
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), serviceEntity.getUserId())) {
             throw new AccessDeniedException(
                     "No permissions to view metrics of services belonging to other users.");
         }
@@ -125,7 +126,8 @@ public class ServiceMetricsAdapter {
         DeployServiceEntity serviceEntity = findDeployServiceEntity(
                 resourceEntity.getDeployService().getId());
 
-        if (!StringUtils.equals(getCurrentLoginUserId(), serviceEntity.getUserId())) {
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), serviceEntity.getUserId())) {
             throw new AccessDeniedException(
                     "No permissions to view metrics of services belonging to other users.");
         }
@@ -169,16 +171,6 @@ public class ServiceMetricsAdapter {
 
         return new ResourceMetricsRequest(deployResource, monitorType, from, to,
                 granularity, onlyLastKnownMetric, userId);
-    }
-
-    private String getCurrentLoginUserId() {
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)
-                && StringUtils.isNotBlank(currentUserInfo.getUserId())) {
-            return currentUserInfo.getUserId();
-        } else {
-            return "defaultUserId";
-        }
     }
 
     private ServiceMetricsRequest getServiceMetricRequest(List<DeployResource> deployResources,
