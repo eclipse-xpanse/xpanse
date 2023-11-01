@@ -37,7 +37,7 @@ class ServiceQueryModelTest {
         serviceQueryTest.setServiceName(serviceName);
         serviceQueryTest.setServiceVersion(serviceVersion);
         serviceQueryTest.setServiceState(serviceState);
-        serviceQueryTest.setMyUserId(userId);
+        serviceQueryTest.setUserId(userId);
     }
 
     @Test
@@ -46,7 +46,7 @@ class ServiceQueryModelTest {
         assertEquals(category, serviceQueryTest.getCategory());
         assertEquals(serviceName, serviceQueryTest.getServiceName());
         assertEquals(serviceVersion, serviceQueryTest.getServiceVersion());
-        assertEquals(userId, serviceQueryTest.getMyUserId());
+        assertEquals(userId, serviceQueryTest.getUserId());
         assertEquals(serviceState, serviceQueryTest.getServiceState());
     }
 
@@ -99,7 +99,7 @@ class ServiceQueryModelTest {
         assertNotEquals(serviceQueryTest.hashCode(), serviceQueryTest1.hashCode());
         assertNotEquals(serviceQueryTest1.hashCode(), serviceQueryTest2.hashCode());
 
-        serviceQueryTest1.setMyUserId(userId);
+        serviceQueryTest1.setUserId(userId);
         assertEquals(serviceQueryTest, serviceQueryTest1);
         assertNotEquals(serviceQueryTest1, serviceQueryTest2);
         assertEquals(serviceQueryTest.hashCode(), serviceQueryTest1.hashCode());
@@ -109,7 +109,7 @@ class ServiceQueryModelTest {
     @Test
     void testToString() {
         String expectedString = "ServiceQueryModel(csp=HUAWEI, category=COMPUTE, serviceName=kafka,"
-                + " serviceVersion=v1.0.0, serviceState=DEPLOY_SUCCESS, myUserId=defaultUserId)";
+                + " serviceVersion=v1.0.0, serviceState=DEPLOY_SUCCESS, userId=defaultUserId)";
         assertEquals(expectedString, serviceQueryTest.toString());
     }
 

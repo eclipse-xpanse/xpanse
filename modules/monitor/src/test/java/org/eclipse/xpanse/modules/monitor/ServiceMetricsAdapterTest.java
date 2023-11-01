@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
@@ -84,6 +85,7 @@ class ServiceMetricsAdapterTest {
         when(mockPluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(
                 getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
+        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         // Run the test
         final List<Metric> result =
                 serviceMetricsAdapterUnderTest.getMetricsByServiceId(serviceId,
@@ -160,7 +162,7 @@ class ServiceMetricsAdapterTest {
         when(mockPluginManager.getOrchestratorPlugin(Csp.HUAWEI)).thenReturn(
                 getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
-
+        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         // Run the test
         final List<Metric> result =
                 serviceMetricsAdapterUnderTest.getMetricsByResourceId(resourceId, null, null, null,

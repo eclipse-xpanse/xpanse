@@ -16,8 +16,8 @@ import jakarta.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
@@ -25,7 +25,6 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialTypeMessage;
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +134,8 @@ public class CredentialManageApi {
             @RequestParam(name = "cspName", required = false) Csp csp,
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type", required = false) CredentialType type) {
-        return credentialCenter.listCredentials(csp, type, getCurrentLoginUserId());
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        return credentialCenter.listCredentials(csp, type, userIdOptional.orElse(null));
     }
 
     /**
@@ -177,7 +177,8 @@ public class CredentialManageApi {
     @Operation(description = "Add user's credential for connecting to the cloud service provider.")
     public void addCredential(
             @Valid @RequestBody CreateCredential createCredential) {
-        createCredential.setUserId(getCurrentLoginUserId());
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        createCredential.setUserId(userIdOptional.orElse(null));
         credentialCenter.addCredential(createCredential);
     }
 
@@ -195,7 +196,8 @@ public class CredentialManageApi {
             "Update user's credential for connecting to the cloud service provider.")
     public void updateCredential(
             @Valid @RequestBody CreateCredential updateCredential) {
-        updateCredential.setUserId(getCurrentLoginUserId());
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        updateCredential.setUserId(userIdOptional.orElse(null));
         credentialCenter.updateCredential(updateCredential);
     }
 
@@ -220,19 +222,9 @@ public class CredentialManageApi {
             @RequestParam(name = "type") CredentialType type,
             @Parameter(name = "name", description = "The name of of credential.")
             @RequestParam(name = "name") String name) {
-        credentialCenter.deleteCredential(csp, type, name, getCurrentLoginUserId());
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        credentialCenter.deleteCredential(csp, type, name, userIdOptional.orElse(null));
     }
-
-    private String getCurrentLoginUserId() {
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)
-                && StringUtils.isNotBlank(currentUserInfo.getUserId())) {
-            return currentUserInfo.getUserId();
-        } else {
-            return "defaultUserId";
-        }
-    }
-
 
     private void getCredentialCapabilitiesValue(
             List<AbstractCredentialInfo> abstractCredentialInfoList) {
