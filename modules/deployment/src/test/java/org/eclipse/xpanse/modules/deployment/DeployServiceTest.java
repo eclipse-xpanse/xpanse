@@ -406,7 +406,7 @@ class DeployServiceTest {
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(null);
 
         assertThrows(ServiceNotDeployedException.class,
-                () -> deployService.getDestroyHandler(deployTask));
+                () -> deployService.getDestroyHandler(deployTask, userId));
     }
 
     @Test
@@ -415,11 +415,8 @@ class DeployServiceTest {
 
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(
                 deployServiceEntity);
-
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
-
         assertThrows(InvalidServiceStateException.class,
-                () -> deployService.getDestroyHandler(deployTask));
+                () -> deployService.getDestroyHandler(deployTask, userId));
     }
 
     @Test
@@ -444,10 +441,9 @@ class DeployServiceTest {
         deploymentBeans.put("deploymentBean", deploymentMock);
 
         when(applicationContext.getBeansOfType(Deployment.class)).thenReturn(deploymentBeans);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         deployService.deploymentMap();
 
-        Deployment result = deployService.getDestroyHandler(deployTask);
+        Deployment result = deployService.getDestroyHandler(deployTask, userId);
 
         // Verify the interactions and assertions
         verify(deployServiceStorage).findDeployServiceById(uuid);

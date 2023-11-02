@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
@@ -48,18 +47,6 @@ public class WorkFlowApi {
 
     @Resource
     private IdentityProviderManager identityProviderManager;
-
-    /**
-     * Query process status.
-     */
-    @Tag(name = "WorkFlow", description = "APIs to manage the WorkFlow")
-    @Operation(description = "Query process status by processInstanceId")
-    @GetMapping(value = "/workflow/state/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public Response queryWorkFlowById(@PathVariable("id") String processInstanceId) {
-        String workFlowState = workflowProcessUtils.getWorkFlowState(processInstanceId);
-        return Response.successResponse(List.of(workFlowState));
-    }
 
     /**
      * Query the tasks that need to be done by me.
