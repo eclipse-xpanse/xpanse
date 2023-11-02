@@ -49,6 +49,7 @@ public class MigrateDestroyProcess implements Serializable, JavaDelegate {
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
         String id = variables.get(MigrateConstants.ID).toString();
+        String userId = (String) variables.get(MigrateConstants.USER_ID);
         int destroyRetryNum = (int) variables.get(MigrateConstants.DESTROY_RETRY_NUM);
         if (destroyRetryNum > 0) {
             log.info("Process instance: {} retry destroy service : {},RetryNum:{}",
@@ -56,11 +57,11 @@ public class MigrateDestroyProcess implements Serializable, JavaDelegate {
         }
         runtimeService.setVariable(processInstanceId, MigrateConstants.DESTROY_RETRY_NUM,
                 destroyRetryNum + 1);
-        CompletableFuture<Void> future = deployService.destroyService(id);
+        CompletableFuture<Void> future = deployService.destroyService(id, userId);
         future.join();
-        boolean destroySuccess =
+        CompletableFuture<Boolean> destroySuccess =
                 deployService.isDestroySuccess(UUID.fromString(id));
         runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
-                destroySuccess);
+                destroySuccess.get());
     }
 }

@@ -52,9 +52,9 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
 
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
+        UUID id = (UUID) variables.get(MigrateConstants.ID);
         UUID newId = (UUID) variables.get(MigrateConstants.NEW_ID);
         runtimeService.updateBusinessKey(processInstanceId, newId.toString());
-
         int deployRetryNum = (int) variables.get(MigrateConstants.DEPLOY_RETRY_NUM);
 
         runtimeService.setVariable(processInstanceId, MigrateConstants.DEPLOY_RETRY_NUM,
@@ -67,14 +67,11 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
                 (MigrateRequest) variables.get(MigrateConstants.MIGRATE_REQUEST);
         DeployRequest deployRequest = new DeployRequest();
         BeanUtils.copyProperties(migrateRequest, deployRequest);
-
-        CompletableFuture<Void> future = deployService.deployService(newId, deployRequest);
+        String userId = (String) variables.get(MigrateConstants.USER_ID);
+        CompletableFuture<Void> future = deployService.deployService(newId, userId, deployRequest);
         future.join();
         boolean deploySuccess = deployService.isDeploySuccess(newId);
         if (!deploySuccess && deployRetryNum >= 1) {
-            UUID id = (UUID) variables.get(MigrateConstants.ID);
-            String userId = deployService.getDeployServiceDetails(id)
-                    .getDeployRequest().getUserId();
             runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE, userId);
         }
         runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,

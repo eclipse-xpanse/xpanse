@@ -36,6 +36,7 @@ import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -158,7 +159,9 @@ public class ServiceDeployerApi {
         log.info("Stopping managed service with id {}", id);
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.fromString(id));
-        Deployment deployment = this.deployService.getDestroyHandler(deployTask);
+        String currentLoginUserId = deployService.getCurrentLoginUserId();
+        Deployment deployment =
+                this.deployService.getDestroyHandler(deployTask, currentLoginUserId);
         this.deployService.updateServiceStatus(deployTask.getId(),
                 ServiceDeploymentState.DESTROYING);
         this.deployService.asyncDestroyService(deployment, deployTask);
@@ -181,7 +184,9 @@ public class ServiceDeployerApi {
         log.info("Purging managed service with id {}", id);
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.fromString(id));
-        Deployment deployment = this.deployService.getDestroyHandler(deployTask);
+        String currentLoginUserId = deployService.getCurrentLoginUserId();
+        Deployment deployment =
+                this.deployService.getDestroyHandler(deployTask, currentLoginUserId);
         this.deployService.purgeService(deployment, deployTask);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
@@ -199,10 +204,11 @@ public class ServiceDeployerApi {
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
         UUID newId = UUID.randomUUID();
         Map<String, Object> variable = new HashMap<>();
-        variable.put("id", migrateRequest.getId());
-        variable.put("newId", newId);
-        variable.put("migrateRequest", migrateRequest);
-        workflowProcessUtils.asyncStartProcess("migrate", variable);
+        variable.put(MigrateConstants.ID, migrateRequest.getId());
+        variable.put(MigrateConstants.NEW_ID, newId);
+        variable.put(MigrateConstants.MIGRATE_REQUEST, migrateRequest);
+        variable.put(MigrateConstants.USER_ID, deployService.getCurrentLoginUserId());
+        workflowProcessUtils.asyncStartProcess(MigrateConstants.PROCESS_KEY, variable);
         return newId;
     }
 

@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
@@ -268,7 +269,7 @@ public class DeployService {
      *
      * @param deployTask the task of deploy managed service name.
      */
-    public Deployment getDestroyHandler(DeployTask deployTask) {
+    public Deployment getDestroyHandler(DeployTask deployTask, String userId) {
         // Find the deployed service.
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(deployTask.getId());
@@ -278,9 +279,7 @@ public class DeployService {
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+        if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
                     "No permissions to destroy services belonging to other users.");
         }
@@ -548,6 +547,19 @@ public class DeployService {
         return deployment;
     }
 
+    /**
+     * Get the id of the current login user.
+     */
+    public String getCurrentLoginUserId() {
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)
+                && StringUtils.isNotBlank(currentUserInfo.getUserId())) {
+            return currentUserInfo.getUserId();
+        } else {
+            return "defaultUserId";
+        }
+    }
+
     private ServiceVo convertToServiceVo(DeployServiceEntity serviceEntity) {
         if (Objects.nonNull(serviceEntity)) {
             ServiceVo serviceVo = new ServiceVo();
@@ -578,7 +590,8 @@ public class DeployService {
      * Deployment service.
      */
     @Async("taskExecutor")
-    public CompletableFuture<Void> deployService(UUID newId, DeployRequest deployRequest) {
+    public CompletableFuture<Void> deployService(UUID newId,
+            String userId, DeployRequest deployRequest) {
         MDC.put(TASK_ID, newId.toString());
         log.info("start deploy service, service id : {}", newId);
         DeployTask deployTask = new DeployTask();
@@ -586,6 +599,7 @@ public class DeployService {
         deployTask.setId(newId);
         deployTask.setDeployRequest(deployRequest);
         Deployment deployment = getDeployHandler(deployTask);
+        deployTask.getDeployRequest().setUserId(userId);
         deploy(deployment, deployTask);
         return CompletableFuture.completedFuture(null);
     }
@@ -594,12 +608,12 @@ public class DeployService {
      * Destroy service by deployed service id.
      */
     @Async("taskExecutor")
-    public CompletableFuture<Void> destroyService(String id) {
+    public CompletableFuture<Void> destroyService(String id, String userId) {
         MDC.put(TASK_ID, id);
         log.info("start destroy service, service id : {}", id);
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.fromString(id));
-        Deployment deployment = getDestroyHandler(deployTask);
+        Deployment deployment = getDestroyHandler(deployTask, userId);
         destroy(deployment, deployTask);
         return CompletableFuture.completedFuture(null);
     }
@@ -622,16 +636,18 @@ public class DeployService {
     /**
      * Method to determine whether destroy is successful.
      */
-    public boolean isDestroySuccess(UUID id) {
+    @Async("taskExecutor")
+    public CompletableFuture<Boolean> isDestroySuccess(UUID id) {
         ServiceDeploymentState destroyState = null;
         MDC.put(TASK_ID, id.toString());
         log.info(" starting to poll for status update.. , service id : {}", id);
         while (destroyState == ServiceDeploymentState.DESTROYING || destroyState == null) {
-            destroyState = deployServiceStorage.queryRefreshDeployServiceById(id)
+            destroyState = deployServiceStorage.findDeployServiceById(id)
                     .getServiceDeploymentState();
         }
         log.info("destroy status updated,state:{}", destroyState);
-        return destroyState == ServiceDeploymentState.DESTROY_SUCCESS;
+        return CompletableFuture.completedFuture(
+                destroyState == ServiceDeploymentState.DESTROY_SUCCESS);
     }
 
     /**
