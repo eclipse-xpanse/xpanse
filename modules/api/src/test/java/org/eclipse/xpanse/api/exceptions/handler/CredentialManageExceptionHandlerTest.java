@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Optional;
 import java.util.Set;
-import org.eclipse.xpanse.api.controllers.CredentialManageApi;
+import org.eclipse.xpanse.api.controllers.UserCloudCredentialsApi;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialCapabilityNotFound;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariablesNotComplete;
@@ -34,7 +34,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {CredentialManageApi.class, CommonExceptionHandler.class,
+@ContextConfiguration(classes = {UserCloudCredentialsApi.class, CommonExceptionHandler.class,
         CredentialCenter.class, CredentialManageExceptionHandler.class,
         IdentityProviderManager.class})
 @WebMvcTest
@@ -100,5 +100,16 @@ class CredentialManageExceptionHandlerTest {
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("No Credential Definition Available"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+
+    @Test
+    void testHandleUserNoLoginException() throws Exception {
+        when(credentialCenter.listCredentials(any(), any(), anyString()))
+                .thenThrow(new NoCredentialDefinitionAvailable("test error"));
+        this.mockMvc.perform(get("/xpanse/credentials"))
+                .andExpect(status().is(401))
+                .andExpect(jsonPath("$.resultType").value("Current Login User No Found"))
+                .andExpect(jsonPath("$.details[0]").value("Unable to get current login information"));
     }
 }

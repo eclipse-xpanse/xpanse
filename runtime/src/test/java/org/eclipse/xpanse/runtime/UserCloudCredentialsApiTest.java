@@ -45,13 +45,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Test for CredentialManageApi.
+ * Test for UserCloudCredentialsApi.
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class CredentialManageApiTest {
+class UserCloudCredentialsApiTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Resource

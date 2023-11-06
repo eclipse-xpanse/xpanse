@@ -177,7 +177,7 @@ class CredentialCenterTest {
         Csp csp = Csp.OPENSTACK;
         String userId = "";
         CredentialType requestedCredentialType = CredentialType.VARIABLES;
-
+        when(mockPluginManager.getOrchestratorPlugin(csp)).thenReturn(orchestratorPlugin);
         List<AbstractCredentialInfo> result = credentialCenter.listCredentials(
                 csp, requestedCredentialType, userId);
 

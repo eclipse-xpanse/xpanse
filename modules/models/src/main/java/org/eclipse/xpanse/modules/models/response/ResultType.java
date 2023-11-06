@@ -52,7 +52,8 @@ public enum ResultType {
     POLICY_NOT_FOUND("Policy Not Found"),
     POLICY_DUPLICATE("Duplicate Policy"),
     POLICY_VALIDATION_FAILED("Policy Validation Failed"),
-    POLICY_EVALUATION_FAILED("Policy Evaluation Failed");
+    POLICY_EVALUATION_FAILED("Policy Evaluation Failed"),
+    USER_NO_LOGIN_EXCEPTION("Current Login User No Found");
 
     private final String value;
 

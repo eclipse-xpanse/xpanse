@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.credential;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +19,7 @@ import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.credential.enums.CredentialTypeMessage;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialCapabilityNotFound;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariablesNotComplete;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
@@ -117,9 +117,6 @@ public class CredentialCenter {
      */
     public List<AbstractCredentialInfo> listCredentials(Csp csp, CredentialType type,
                                                         String userId) {
-        if (StringUtils.isBlank(userId)) {
-            return Collections.emptyList();
-        }
         if (Objects.isNull(csp)) {
             List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
             for (Csp key : pluginManager.getPluginsMap().keySet()) {
@@ -389,6 +386,9 @@ public class CredentialCenter {
 
     private List<AbstractCredentialInfo> maskSensitiveValues(
             List<AbstractCredentialInfo> abstractCredentialInfos) {
+        if (CollectionUtils.isEmpty(abstractCredentialInfos)) {
+            return abstractCredentialInfos;
+        }
         List<AbstractCredentialInfo> maskedCredentialInfos = new ArrayList<>();
         for (AbstractCredentialInfo abstractCredentialInfo : abstractCredentialInfos) {
             CredentialVariables credentialVariables =
@@ -434,5 +434,26 @@ public class CredentialCenter {
             addCredentialInfoFromEnv(csp, joinCredentials);
         }
         return joinCredentials;
+    }
+
+    /**
+     * Traverse the AbstractCredentialInfo collection and set the value for CredentialVariable.
+     *
+     * @param abstractCredentialInfoList A collection of instances of any class that implements
+     *                                   AbstractCredentialInfo.
+     */
+    public void getCredentialCapabilitiesValue(
+            List<AbstractCredentialInfo> abstractCredentialInfoList) {
+
+        for (AbstractCredentialInfo abstractCredentialInfo : abstractCredentialInfoList) {
+            if (abstractCredentialInfo.getType() == CredentialType.VARIABLES) {
+                CredentialVariables credentialVariables =
+                        (CredentialVariables) abstractCredentialInfo;
+                for (CredentialVariable variable : credentialVariables.getVariables()) {
+                    variable.setValue(
+                            CredentialTypeMessage.getMessageByType(CredentialType.VARIABLES));
+                }
+            }
+        }
     }
 }
