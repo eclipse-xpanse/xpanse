@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
+import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
@@ -168,6 +169,18 @@ public class CommonExceptionHandler {
     public Response handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex) {
         return Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for UserNotLoggedInException.
+     */
+    @ExceptionHandler({UserNotLoggedInException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public Response handleUserNoLoginException(
+            UserNotLoggedInException ex) {
+        return Response.errorResponse(ResultType.USER_NO_LOGIN_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 }
