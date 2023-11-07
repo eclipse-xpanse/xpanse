@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.credential.cache;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 
@@ -19,10 +20,15 @@ public record CredentialCacheKey(Csp csp,
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof CredentialCacheKey key) {
-            return key.csp == this.csp
-                    && key.credentialType == this.credentialType
-                    && key.credentialName.equals(this.credentialName)
-                    && key.userId.equals(this.userId);
+            return StringUtils.isBlank(userId)
+                    ?
+                    key.csp == this.csp
+                            && key.credentialType == this.credentialType
+                            && key.credentialName.equals(this.credentialName)
+                    : key.csp == this.csp
+                            && key.credentialType == this.credentialType
+                            && key.credentialName.equals(this.credentialName)
+                            && key.userId.equals(this.userId);
         } else {
             return false;
         }
