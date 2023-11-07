@@ -6,5 +6,6 @@
   "flavor": "1-master-with-3-worker-nodes-normal",
   "region": "eu-west-0",
   "customerServiceName": "default-k8s",
+  "serviceHostingType": "self",
   "serviceRequestProperties": {}
 }

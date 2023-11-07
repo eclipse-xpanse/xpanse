@@ -30,7 +30,7 @@ public enum Csp {
     }
 
     /**
-     * For CSP serialize.
+     * For CSP deserialize.
      */
     @JsonCreator
     public static Csp getByValue(String name) {
@@ -44,7 +44,7 @@ public enum Csp {
     }
 
     /**
-     * For CSP deserialize.
+     * For CSP serialize.
      */
     @JsonValue
     public String toValue() {

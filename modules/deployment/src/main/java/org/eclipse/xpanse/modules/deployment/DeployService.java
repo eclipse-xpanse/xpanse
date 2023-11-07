@@ -142,6 +142,8 @@ public class DeployService {
                 StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
         serviceTemplate.setCsp(deployTask.getDeployRequest().getCsp());
         serviceTemplate.setCategory(deployTask.getDeployRequest().getCategory());
+        serviceTemplate.setServiceHostingType(
+                deployTask.getDeployRequest().getServiceHostingType());
         serviceTemplate = serviceTemplateStorage.findServiceTemplate(serviceTemplate);
         if (Objects.isNull(serviceTemplate) || Objects.isNull(serviceTemplate.getOcl())) {
             throw new ServiceTemplateNotRegistered("Service template not found.");

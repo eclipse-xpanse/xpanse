@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setVersion("version");
         serviceTemplateEntity.setCsp(Csp.HUAWEI);
         serviceTemplateEntity.setCategory(Category.AI);
+        serviceTemplateEntity.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
 
         // Run the test
         test.store(serviceTemplateEntity);
@@ -58,6 +60,7 @@ class DatabaseServiceTemplateStorageTest {
         entity.setVersion("version");
         entity.setCsp(Csp.HUAWEI);
         entity.setCategory(Category.AI);
+        entity.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         verify(mockServiceTemplateRepository).save(entity);
     }
 

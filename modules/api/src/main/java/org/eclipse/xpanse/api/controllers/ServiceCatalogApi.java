@@ -181,6 +181,8 @@ public class ServiceCatalogApi {
             userOrderableServiceVo.add(
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
                             .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
+            userOrderableServiceVo.setServiceHostingType(
+                    serviceTemplateEntity.getOcl().getServiceHostingType());
             return userOrderableServiceVo;
         }
         return null;

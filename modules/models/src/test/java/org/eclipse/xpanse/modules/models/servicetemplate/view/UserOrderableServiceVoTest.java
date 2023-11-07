@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -69,6 +70,7 @@ class UserOrderableServiceVoTest {
         userOrderableServiceVo.setVariables(variables);
         userOrderableServiceVo.setFlavors(flavorBasics);
         userOrderableServiceVo.setBilling(billing);
+        userOrderableServiceVo.setServiceHostingType(ServiceHostingType.SELF);
     }
 
     @Test
@@ -83,11 +85,11 @@ class UserOrderableServiceVoTest {
         assertEquals(icon, userOrderableServiceVo.getIcon());
         assertEquals(variables, userOrderableServiceVo.getVariables());
         assertEquals(billing, userOrderableServiceVo.getBilling());
+        assertEquals(ServiceHostingType.SELF, userOrderableServiceVo.getServiceHostingType());
     }
 
     @Test
     public void testEqualsAndHashCode() {
-        assertEquals(userOrderableServiceVo, userOrderableServiceVo);
         assertEquals(userOrderableServiceVo.hashCode(), userOrderableServiceVo.hashCode());
 
         Object obj = new Object();
@@ -166,6 +168,7 @@ class UserOrderableServiceVoTest {
 
 
         userOrderableServiceVo1.setBilling(billing);
+        userOrderableServiceVo1.setServiceHostingType(ServiceHostingType.SELF);
         assertEquals(userOrderableServiceVo, userOrderableServiceVo1);
         assertNotEquals(userOrderableServiceVo1, userOrderableServiceVo2);
         assertEquals(userOrderableServiceVo.hashCode(), userOrderableServiceVo1.hashCode());
@@ -185,7 +188,8 @@ class UserOrderableServiceVoTest {
                 "icon=" + icon + ", " +
                 "variables=" + variables + ", " +
                 "flavors=" + flavorBasics + ", " +
-                "billing=" + billing + ")";
+                "billing=" + billing + ", " +
+                "serviceHostingType=" + ServiceHostingType.SELF + ")";
         assertEquals(expectedToString, userOrderableServiceVo.toString());
     }
 

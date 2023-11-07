@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -166,6 +167,7 @@ class DeployRequestTest {
         request.setCsp(csp);
         request.setFlavor(flavor);
         request.setOcl(ocl);
+        request.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         request.setServiceRequestProperties(properties);
 
         String expectedToString = "DeployRequest(super=DeployRequestBase(" +
@@ -177,6 +179,7 @@ class DeployRequestTest {
                 ", region=" + region +
                 ", csp=" + csp +
                 ", flavor=" + flavor +
+                ", serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR +
                 ", ocl=" + ocl +
                 ", serviceRequestProperties=" + properties +
                 "), id=" + id + ")";

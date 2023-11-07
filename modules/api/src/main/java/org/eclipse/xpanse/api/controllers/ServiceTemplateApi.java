@@ -297,6 +297,8 @@ public class ServiceTemplateApi {
             serviceTemplateDetailVo.add(
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
                             .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
+            serviceTemplateDetailVo.setServiceHostingType(
+                    serviceTemplateEntity.getServiceHostingType());
             return serviceTemplateDetailVo;
         }
         return null;

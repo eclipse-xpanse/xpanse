@@ -41,7 +41,6 @@ class DeployTaskTest {
     void testEqualsAndHashCode() {
 
         test.setDeployResourceHandler(handler);
-        assertEquals(test, test);
         assertNotEquals(test.hashCode(), 0);
 
         Object object = new Object();
@@ -108,11 +107,11 @@ class DeployTaskTest {
         String exceptedString = "DeployTask(id=23cc529b-64d9-4875-a2f0-08b415705964, "
                 + "deployRequest=DeployRequest(super=DeployRequestBase(userId=null, category=null, "
                 + "serviceName=null, customerServiceName=null, version=null, region=null, "
-                + "csp=null, flavor=null, ocl=null, serviceRequestProperties=null), id=null),"
+                + "csp=null, flavor=null, serviceHostingType=null, ocl=null, serviceRequestProperties=null), id=null),"
                 + " ocl=Ocl(category=null, version=null, name=null, serviceVersion=null, "
                 + "description=null, namespace=null, icon=null, cloudServiceProvider=null, "
-                + "deployment=null, flavors=null, billing=null), deployResourceHandler=null)";
-        assertEquals(test.toString(), exceptedString);
+                + "deployment=null, flavors=null, billing=null, serviceHostingType=null), deployResourceHandler=null)";
+        assertEquals(exceptedString, test.toString());
 
     }
 }

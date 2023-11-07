@@ -31,7 +31,7 @@ public class TerraformBootManager {
     private TerraformApi terraformApi;
     @Value("${spring.profiles.active}")
     private String springProfilesActive;
-    @Value("${terraform.boot.endpoint=http://localhost:9090}")
+    @Value("${terraform.boot.endpoint:http://localhost:9090}")
     private String terraformBootBaseUrl;
 
     /**
