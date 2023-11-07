@@ -29,13 +29,6 @@ public class ServiceVo {
     private UUID id;
 
     /**
-     * The id of the user who deployed the service.
-     */
-    @NotNull
-    @Schema(description = "The id of the user who deployed the service")
-    private String userId;
-
-    /**
      * The category of the Service.
      */
     @NotNull

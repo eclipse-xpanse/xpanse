@@ -15,6 +15,7 @@ import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -56,8 +57,8 @@ public class WorkFlowApi {
     @GetMapping(value = "/workflow/task/todo", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<WorkFlowTask> queryTodoTasks() {
-        String userId = identityProviderManager.getCurrentUserInfo().getUserId();
-        return workflowProcessUtils.todoTasks(userId);
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        return workflowProcessUtils.todoTasks(userIdOptional.orElse(null));
     }
 
     /**
@@ -68,8 +69,8 @@ public class WorkFlowApi {
     @GetMapping(value = "/workflow/task/done", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<WorkFlowTask> queryDoneTasks() {
-        String userId = identityProviderManager.getCurrentUserInfo().getUserId();
-        return workflowProcessUtils.doneTasks(userId);
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        return workflowProcessUtils.doneTasks(userIdOptional.orElse(null));
     }
 
     /**

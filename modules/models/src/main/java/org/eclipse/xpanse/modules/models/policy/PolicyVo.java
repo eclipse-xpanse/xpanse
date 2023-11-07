@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.models.policy;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -30,12 +29,6 @@ public class PolicyVo {
     @NotNull
     @Schema(description = "The id of the policy.")
     private UUID id;
-
-    /**
-     * The id of user who created the policy.
-     */
-    @Hidden
-    private String userId;
 
     /**
      * The valid policy created by the user.

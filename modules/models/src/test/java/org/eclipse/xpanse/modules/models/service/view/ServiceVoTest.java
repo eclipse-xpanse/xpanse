@@ -40,7 +40,6 @@ class ServiceVoTest {
     void setUp() {
         serviceVo = new ServiceVo();
         serviceVo.setId(uuid);
-        serviceVo.setUserId(userId);
         serviceVo.setCategory(category);
         serviceVo.setName(name);
         serviceVo.setCustomerServiceName(customerServiceName);
@@ -55,7 +54,6 @@ class ServiceVoTest {
     @Test
     void testGetterAndSetter() {
         assertEquals(uuid, serviceVo.getId());
-        assertEquals(userId, serviceVo.getUserId());
         assertEquals(category, serviceVo.getCategory());
         assertEquals(name, serviceVo.getName());
         assertEquals(customerServiceName, serviceVo.getCustomerServiceName());
@@ -92,7 +90,6 @@ class ServiceVoTest {
         assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
         assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
 
-        serviceVo1.setUserId(userId);
         assertNotEquals(serviceVo, serviceVo1);
         assertNotEquals(serviceVo1, serviceVo2);
         assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
@@ -157,7 +154,6 @@ class ServiceVoTest {
     void testToString() {
         String expectedString = "ServiceVo(" +
                 "id=" + uuid +
-                ", userId=" + userId + "" +
                 ", category=" + category +
                 ", name=" + name + "" +
                 ", customerServiceName=" + customerServiceName + "" +

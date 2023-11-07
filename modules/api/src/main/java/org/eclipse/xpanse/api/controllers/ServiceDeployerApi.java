@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -36,6 +37,7 @@ import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
 import org.springframework.http.HttpStatus;
@@ -65,6 +67,9 @@ public class ServiceDeployerApi {
 
     @Resource
     private DeployService deployService;
+
+    @Resource
+    private IdentityProviderManager identityProviderManager;
 
     @Resource
     private WorkflowProcessUtils workflowProcessUtils;
@@ -159,9 +164,7 @@ public class ServiceDeployerApi {
         log.info("Stopping managed service with id {}", id);
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.fromString(id));
-        String currentLoginUserId = deployService.getCurrentLoginUserId();
-        Deployment deployment =
-                this.deployService.getDestroyHandler(deployTask, currentLoginUserId);
+        Deployment deployment = this.deployService.getDestroyHandler(deployTask);
         this.deployService.updateServiceStatus(deployTask.getId(),
                 ServiceDeploymentState.DESTROYING);
         this.deployService.asyncDestroyService(deployment, deployTask);
@@ -184,9 +187,7 @@ public class ServiceDeployerApi {
         log.info("Purging managed service with id {}", id);
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.fromString(id));
-        String currentLoginUserId = deployService.getCurrentLoginUserId();
-        Deployment deployment =
-                this.deployService.getDestroyHandler(deployTask, currentLoginUserId);
+        Deployment deployment = this.deployService.getDestroyHandler(deployTask);
         this.deployService.purgeService(deployment, deployTask);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
@@ -203,11 +204,12 @@ public class ServiceDeployerApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
         UUID newId = UUID.randomUUID();
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         Map<String, Object> variable = new HashMap<>();
         variable.put(MigrateConstants.ID, migrateRequest.getId());
         variable.put(MigrateConstants.NEW_ID, newId);
         variable.put(MigrateConstants.MIGRATE_REQUEST, migrateRequest);
-        variable.put(MigrateConstants.USER_ID, deployService.getCurrentLoginUserId());
+        variable.put(MigrateConstants.USER_ID, userIdOptional.orElse(null));
         workflowProcessUtils.asyncStartProcess(MigrateConstants.PROCESS_KEY, variable);
         return newId;
     }

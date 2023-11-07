@@ -406,17 +406,19 @@ class DeployServiceTest {
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(null);
 
         assertThrows(ServiceNotDeployedException.class,
-                () -> deployService.getDestroyHandler(deployTask, userId));
+                () -> deployService.getDestroyHandler(deployTask));
     }
 
     @Test
     void testGetDestroyHandler_ServiceStateIsDestroying_ThrowsInvalidServiceStateException() {
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
 
+        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+
         when(deployServiceStorage.findDeployServiceById(deployTask.getId())).thenReturn(
                 deployServiceEntity);
         assertThrows(InvalidServiceStateException.class,
-                () -> deployService.getDestroyHandler(deployTask, userId));
+                () -> deployService.getDestroyHandler(deployTask));
     }
 
     @Test
@@ -443,7 +445,9 @@ class DeployServiceTest {
         when(applicationContext.getBeansOfType(Deployment.class)).thenReturn(deploymentBeans);
         deployService.deploymentMap();
 
-        Deployment result = deployService.getDestroyHandler(deployTask, userId);
+        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+
+        Deployment result = deployService.getDestroyHandler(deployTask);
 
         // Verify the interactions and assertions
         verify(deployServiceStorage).findDeployServiceById(uuid);

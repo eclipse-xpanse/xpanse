@@ -38,13 +38,6 @@ class PolicyUpdateRequestTest {
     }
 
     @Test
-    void testUserIdGetterAndSetter() {
-        final String userId = "userId";
-        policyUpdateRequestUnderTest.setUserId(userId);
-        assertThat(policyUpdateRequestUnderTest.getUserId()).isEqualTo(userId);
-    }
-
-    @Test
     void testGetCsp() {
         assertThat(policyUpdateRequestUnderTest.getCsp()).isEqualTo(mockCsp);
     }
@@ -85,7 +78,7 @@ class PolicyUpdateRequestTest {
     @Test
     void testToString() {
         String result =
-                "PolicyUpdateRequest(id=null, userId=null, csp=mockCsp, policy=null, enabled=null)";
+                "PolicyUpdateRequest(id=null, csp=mockCsp, policy=null, enabled=null)";
         assertThat(policyUpdateRequestUnderTest.toString()).isEqualTo(result);
     }
 }

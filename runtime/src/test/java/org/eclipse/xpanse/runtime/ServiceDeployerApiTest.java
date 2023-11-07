@@ -339,7 +339,6 @@ class ServiceDeployerApiTest {
         Assertions.assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
                 serviceDetailVo.getName());
         Assertions.assertEquals(ocl.getServiceVersion(), serviceDetailVo.getVersion());
-        Assertions.assertEquals(userId, serviceDetailVo.getUserId());
 
         if (ServiceDeploymentState.DEPLOY_SUCCESS == serviceDetailVo.getServiceDeploymentState()) {
             Map<String, String> properties = serviceDetailVo.getDeployedServiceProperties();
