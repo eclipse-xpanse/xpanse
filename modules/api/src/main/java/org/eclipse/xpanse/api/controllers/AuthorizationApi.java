@@ -13,10 +13,12 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.IdentityProviderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,8 +43,12 @@ public class AuthorizationApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/auth/authorize")
     void authorize(HttpServletResponse response) throws IOException {
-        String authorizeUrl = identityProviderManager.getActiveIdentityProviderService()
-                .getAuthorizeUrl();
+        IdentityProviderService identityProviderService =
+                identityProviderManager.getActiveIdentityProviderService();
+        String authorizeUrl = "";
+        if (Objects.nonNull(identityProviderService)) {
+            authorizeUrl = identityProviderService.getAuthorizeUrl();
+        }
         if (StringUtils.isNotEmpty(authorizeUrl)) {
             response.sendRedirect(authorizeUrl);
         } else {
@@ -62,6 +68,11 @@ public class AuthorizationApi {
                     String code,
             @Parameter(name = "state", description = "Opaque value used to maintain state.")
                     String state) {
-        return identityProviderManager.getActiveIdentityProviderService().getAccessToken(code);
+        IdentityProviderService identityProviderService =
+                identityProviderManager.getActiveIdentityProviderService();
+        if (Objects.nonNull(identityProviderService)) {
+            return identityProviderService.getAccessToken(code);
+        }
+        return null;
     }
 }

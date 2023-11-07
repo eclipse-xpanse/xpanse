@@ -59,6 +59,7 @@ public class PolicyEntity extends CreateModifiedTime {
     /**
      * Is the policy enabled.
      */
-    private Boolean enabled = true;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean enabled;
 
 }

@@ -117,9 +117,8 @@ public class PolicyManager {
      * @return Returns created policy view object.
      */
     public PolicyVo addPolicy(PolicyCreateRequest createRequest) {
-        checkPolicyWhetherCreated(createRequest.getCsp(), createRequest.getPolicy());
         validatePolicy(createRequest.getPolicy());
-
+        checkIfPolicyIsDuplicate(createRequest.getCsp(), createRequest.getPolicy());
         PolicyEntity newPolicy = conventToPolicyEntity(createRequest);
         PolicyEntity policyEntity = policyStorage.store(newPolicy);
         return conventToPolicyVo(policyEntity);
@@ -144,30 +143,10 @@ public class PolicyManager {
             throw new AccessDeniedException(
                     "No permissions to update policy belonging to other users.");
         }
-        boolean updatePolicy = false;
-        if (StringUtils.isNotBlank(updateRequest.getPolicy())
-                && StringUtils.equals(updateRequest.getPolicy(), existingEntity.getPolicy())) {
-            existingEntity.setPolicy(updateRequest.getPolicy());
-            updatePolicy = true;
-        }
 
-        boolean updateCsp = false;
-        if (Objects.nonNull(updateRequest.getCsp())) {
-            existingEntity.setCsp(updateRequest.getCsp());
-            updateCsp = true;
-        }
-        if (Objects.nonNull(updateRequest.getEnabled())) {
-            existingEntity.setEnabled(updateRequest.getEnabled());
-        }
-        if (updatePolicy) {
-            validatePolicy(existingEntity.getPolicy());
-            checkPolicyWhetherCreated(existingEntity.getCsp(), existingEntity.getPolicy());
-        }
-        if (updateCsp) {
-            checkPolicyWhetherCreated(existingEntity.getCsp(), existingEntity.getPolicy());
-        }
+        PolicyEntity policyToUpdate = getPolicyToUpdate(updateRequest, existingEntity);
 
-        PolicyEntity updatedPolicy = policyStorage.store(existingEntity);
+        PolicyEntity updatedPolicy = policyStorage.store(policyToUpdate);
         return conventToPolicyVo(updatedPolicy);
     }
 
@@ -211,7 +190,7 @@ public class PolicyManager {
         policyStorage.deletePolicyById(id);
     }
 
-    private void checkPolicyWhetherCreated(Csp csp, String policy) {
+    private void checkIfPolicyIsDuplicate(Csp csp, String policy) {
 
         PolicyQueryRequest queryModel = new PolicyQueryRequest();
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
@@ -271,10 +250,42 @@ public class PolicyManager {
         if (!valid) {
             throw new PoliciesValidationFailedException(errorMsg);
         }
-
     }
 
-    private void evaluatePolicies(List<String> policies, String input) {
+    private PolicyEntity getPolicyToUpdate(PolicyUpdateRequest updateRequest,
+                                           PolicyEntity existingEntity) {
+        PolicyEntity policyToUpdate = new PolicyEntity();
+        BeanUtils.copyProperties(existingEntity, policyToUpdate);
+        boolean updatePolicy = StringUtils.isNotBlank(updateRequest.getPolicy())
+                && !StringUtils.equals(updateRequest.getPolicy(), existingEntity.getPolicy());
+        if (updatePolicy) {
+            validatePolicy(updateRequest.getPolicy());
+            policyToUpdate.setPolicy(updateRequest.getPolicy());
+        }
+
+        boolean updateCsp = Objects.nonNull(updateRequest.getCsp())
+                && !Objects.equals(updateRequest.getCsp(), existingEntity.getCsp());
+        if (updateCsp) {
+            policyToUpdate.setCsp(updateRequest.getCsp());
+        }
+
+        if (Objects.nonNull(updateRequest.getEnabled())) {
+            policyToUpdate.setEnabled(updateRequest.getEnabled());
+        }
+
+        if (updateCsp || updatePolicy) {
+            checkIfPolicyIsDuplicate(policyToUpdate.getCsp(), policyToUpdate.getPolicy());
+        }
+        return policyToUpdate;
+    }
+
+    /**
+     * Evaluate input by polices.
+     *
+     * @param policies list of policies.
+     * @param input    input
+     */
+    public void evaluatePolicies(List<String> policies, String input) {
         boolean valid = true;
         String errorMsg = "";
         EvalCmdList cmdList = new EvalCmdList();

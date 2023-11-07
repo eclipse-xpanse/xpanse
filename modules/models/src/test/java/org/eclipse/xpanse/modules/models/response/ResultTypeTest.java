@@ -111,4 +111,58 @@ class ResultTypeTest {
         assertNull(ResultType.getResultTypeByValue("null"));
     }
 
+    @Test
+    void testGetTypeByValue() {
+        ResultType test = ResultType.BACKEND_FAILURE;
+
+        assertEquals(ResultType.SUCCESS, test.getByValue("Success"));
+        assertEquals(ResultType.RUNTIME_ERROR,
+                test.getByValue("Runtime Error"));
+        assertEquals(ResultType.BAD_PARAMETERS,
+                test.getByValue("Parameters Invalid"));
+        assertEquals(ResultType.TERRAFORM_SCRIPT_INVALID,
+                test.getByValue("Terraform Script Invalid"));
+        assertEquals(ResultType.UNPROCESSABLE_ENTITY,
+                test.getByValue("Unprocessable Entity"));
+        assertEquals(ResultType.INVALID_RESPONSE,
+                test.getByValue("Response Not Valid"));
+        assertEquals(ResultType.BACKEND_FAILURE,
+                test.getByValue("Failure while connecting to backend"));
+        assertEquals(ResultType.CREDENTIAL_CAPABILITY_NOT_FOUND,
+                test.getByValue("Credential Capability Not Found"));
+        assertEquals(ResultType.CREDENTIALS_NOT_FOUND,
+                test.getByValue("Credentials Not Found"));
+        assertEquals(ResultType.CREDENTIALS_VARIABLES_NOT_COMPLETE,
+                test.getByValue("Credential Variables Not Complete"));
+        assertEquals(ResultType.FLAVOR_NOT_FOUND,
+                test.getByValue("Flavor Invalid"));
+        assertEquals(ResultType.TERRAFORM_EXECUTION_FAILED,
+                test.getByValue("Terraform Execution Failed"));
+        assertEquals(ResultType.PLUGIN_NOT_FOUND,
+                test.getByValue("Plugin Not Found"));
+        assertEquals(ResultType.DEPLOYER_NOT_FOUND,
+                test.getByValue("Deployer Not Found"));
+        assertEquals(ResultType.TERRAFORM_PROVIDER_NOT_FOUND,
+                test.getByValue("Terraform Provider Not Found"));
+        assertEquals(ResultType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
+                test.getByValue("No Credential Definition Available"));
+        assertEquals(ResultType.SERVICE_STATE_INVALID,
+                test.getByValue("Invalid Service State"));
+        assertEquals(ResultType.RESOURCE_TYPE_INVALID_FOR_MONITORING,
+                test.getByValue("Resource Invalid For Monitoring"));
+        assertEquals(ResultType.UNHANDLED_EXCEPTION,
+                test.getByValue("Unhandled Exception"));
+        assertEquals(ResultType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
+                test.getByValue("Service Template Already Registered"));
+        assertEquals(ResultType.ICON_PROCESSING_FAILED,
+                test.getByValue("Icon Processing Failed"));
+        assertEquals(ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
+                test.getByValue("Service Template Not Registered"));
+        assertEquals(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                test.getByValue("Service Deployment Not Found"));
+        assertEquals(ResultType.RESOURCE_NOT_FOUND,
+                test.getByValue("Resource Not Found"));
+        assertNull(test.getByValue("null"));
+    }
+
 }

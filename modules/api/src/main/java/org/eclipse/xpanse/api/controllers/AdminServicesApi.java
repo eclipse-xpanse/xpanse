@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.IdentityProviderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -127,11 +128,14 @@ public class AdminServicesApi {
         List<BackendSystemStatus> backendSystemStatuses = new ArrayList<>();
         for (BackendSystemType type : BackendSystemType.values()) {
             if (Objects.equals(BackendSystemType.IDENTITY_PROVIDER, type)) {
-                BackendSystemStatus identityProviderStatus =
-                        identityProviderManager.getActiveIdentityProviderService()
-                                .getIdentityProviderStatus();
-                if (Objects.nonNull(identityProviderStatus)) {
-                    backendSystemStatuses.add(identityProviderStatus);
+                IdentityProviderService identityProviderService =
+                        identityProviderManager.getActiveIdentityProviderService();
+                if (Objects.nonNull(identityProviderService)) {
+                    BackendSystemStatus identityProviderStatus =
+                            identityProviderService.getIdentityProviderStatus();
+                    if (Objects.nonNull(identityProviderStatus)) {
+                        backendSystemStatuses.add(identityProviderStatus);
+                    }
                 }
             }
             if (Objects.equals(BackendSystemType.DATABASE, type)) {

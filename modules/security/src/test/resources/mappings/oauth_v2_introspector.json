@@ -76,14 +76,7 @@
           "scope": "openid urn:zitadel:iam:org:project:role:admin urn:zitadel:iam:org:project:role:csp urn:zitadel:iam:org:project:role:user",
           "sub": "221647436064489729",
           "username": "xpanse-admin",
-          "token_type": "Bearer",
-          "urn:zitadel:iam:org:project:221644807007633665:roles": {
-            "admin": {
-              "221363997012656385": "osc.zitadel.cloud"
-            }
-          },
-          "urn:zitadel:iam:org:project:roles": {
-          }
+          "token_type": "Bearer"
         }
       }
     },

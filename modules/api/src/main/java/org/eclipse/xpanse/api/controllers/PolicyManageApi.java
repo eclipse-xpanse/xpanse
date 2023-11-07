@@ -87,7 +87,7 @@ public class PolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the details of the policy created by the user.")
-    public Object getPolicyDetails(@PathVariable String id) {
+    public PolicyVo getPolicyDetails(@PathVariable String id) {
         return policyManager.getPolicyDetails(UUID.fromString(id));
     }
 
