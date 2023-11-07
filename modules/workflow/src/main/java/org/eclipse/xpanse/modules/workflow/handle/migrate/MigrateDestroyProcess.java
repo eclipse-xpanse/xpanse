@@ -32,12 +32,12 @@ public class MigrateDestroyProcess implements Serializable, JavaDelegate {
 
     @Autowired
     public void setRuntimeService(RuntimeService runtimeService) {
-        this.runtimeService = runtimeService;
+        MigrateDestroyProcess.runtimeService = runtimeService;
     }
 
     @Autowired
     public void setDeployService(DeployService deployService) {
-        this.deployService = deployService;
+        MigrateDestroyProcess.deployService = deployService;
     }
 
     /**
@@ -57,7 +57,7 @@ public class MigrateDestroyProcess implements Serializable, JavaDelegate {
         }
         runtimeService.setVariable(processInstanceId, MigrateConstants.DESTROY_RETRY_NUM,
                 destroyRetryNum + 1);
-        CompletableFuture<Void> future = deployService.destroyService(id, userId);
+        CompletableFuture<Void> future = deployService.destroyService(id);
         future.join();
         CompletableFuture<Boolean> destroySuccess =
                 deployService.isDestroySuccess(UUID.fromString(id));

@@ -144,7 +144,6 @@ class PolicyManageApiTest {
         Assertions.assertEquals(policyVo.getCreateTime(), policyVo.getLastModifiedTime());
         Assertions.assertEquals(policyVo.getPolicy(), "huawei_policy");
         Assertions.assertTrue(policyVo.getEnabled());
-        Assertions.assertEquals(policyVo.getUserId(), "userId");
 
 
         final PolicyCreateRequest openStackCreateRequest = new PolicyCreateRequest();
@@ -170,7 +169,6 @@ class PolicyManageApiTest {
                 openStackPolicyVo.getLastModifiedTime());
         Assertions.assertEquals(openStackPolicyVo.getPolicy(), "openstack_policy");
         Assertions.assertTrue(openStackPolicyVo.getEnabled());
-        Assertions.assertEquals(openStackPolicyVo.getUserId(), "userId");
 
     }
 
@@ -260,7 +258,6 @@ class PolicyManageApiTest {
         mockPoliciesValidateRequest(false);
 
         final PolicyCreateRequest createRequest = new PolicyCreateRequest();
-        createRequest.setUserId("userId");
         createRequest.setCsp(Csp.HUAWEI);
         createRequest.setPolicy("policy");
         String requestBody = objectMapper.writeValueAsString(createRequest);
@@ -329,7 +326,6 @@ class PolicyManageApiTest {
         Assertions.assertNotNull(policyVo.getId());
         Assertions.assertEquals(policyVo.getPolicy(), "hw_policy_update");
         Assertions.assertFalse(policyVo.getEnabled());
-        Assertions.assertEquals(policyVo.getUserId(), "userId");
     }
 
     void testUpdatePolicy_ThrowsPolicyDuplicateException() throws Exception {

@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.models.policy;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
@@ -25,12 +24,6 @@ public class PolicyUpdateRequest {
     @NotNull
     @Schema(description = "The id of the policy.")
     private UUID id;
-
-    /**
-     * The id of user who created the policy.
-     */
-    @Hidden
-    private String userId;
 
     /**
      * The csp which the policy belongs to.

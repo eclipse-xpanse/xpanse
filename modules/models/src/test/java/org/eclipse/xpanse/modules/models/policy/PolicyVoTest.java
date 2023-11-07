@@ -41,13 +41,6 @@ class PolicyVoTest {
     }
 
     @Test
-    void testUserIdGetterAndSetter() {
-        final String userId = "userId";
-        policyVoUnderTest.setUserId(userId);
-        assertThat(policyVoUnderTest.getUserId()).isEqualTo(userId);
-    }
-
-    @Test
     void testPolicyGetterAndSetter() {
         final String policy = "policy";
         policyVoUnderTest.setPolicy(policy);
@@ -103,7 +96,7 @@ class PolicyVoTest {
 
     @Test
     void testToString() {
-        String result = "PolicyVo(id=null, userId=null, policy=null, csp=mockCsp, enabled=null," +
+        String result = "PolicyVo(id=null, policy=null, csp=mockCsp, enabled=null," +
                 " createTime=null, lastModifiedTime=null)";
         assertThat(policyVoUnderTest.toString()).isEqualTo(result);
     }

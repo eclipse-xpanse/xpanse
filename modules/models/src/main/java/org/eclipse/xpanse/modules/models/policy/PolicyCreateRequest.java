@@ -21,12 +21,6 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 public class PolicyCreateRequest {
 
     /**
-     * The id of user who created the policy.
-     */
-    @Hidden
-    private String userId;
-
-    /**
      * The csp which the policy belongs to.
      */
     @NotNull

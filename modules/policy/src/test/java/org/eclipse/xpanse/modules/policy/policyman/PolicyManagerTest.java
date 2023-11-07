@@ -126,7 +126,6 @@ class PolicyManagerTest {
 
         final PolicyVo policyVo = new PolicyVo();
         policyVo.setId(id);
-        policyVo.setUserId(userId);
         policyVo.setPolicy("policy");
         policyVo.setCsp(Csp.HUAWEI);
         policyVo.setEnabled(true);
@@ -184,13 +183,11 @@ class PolicyManagerTest {
     void testAddPolicy() {
         // Setup
         final PolicyCreateRequest createRequest = new PolicyCreateRequest();
-        createRequest.setUserId(userId);
         createRequest.setCsp(Csp.HUAWEI);
         createRequest.setPolicy("policy");
 
         final PolicyVo expectedResult = new PolicyVo();
         expectedResult.setId(id);
-        expectedResult.setUserId(userId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
@@ -236,7 +233,6 @@ class PolicyManagerTest {
     void testAddPolicy_ReturnsNull() {
         // Setup
         final PolicyCreateRequest createRequest = new PolicyCreateRequest();
-        createRequest.setUserId(userId);
         createRequest.setCsp(Csp.HUAWEI);
         createRequest.setPolicy("policy");
 
@@ -274,7 +270,6 @@ class PolicyManagerTest {
     void testAddPolicy_ThrowsPolicyDuplicateException() {
         // Setup
         final PolicyCreateRequest createRequest = new PolicyCreateRequest();
-        createRequest.setUserId(userId);
         createRequest.setCsp(Csp.HUAWEI);
         createRequest.setPolicy("policy");
         createRequest.setEnabled(true);
@@ -313,14 +308,12 @@ class PolicyManagerTest {
     void testAddPolicy_ThrowsPoliciesValidationFailedException() {
         // Setup
         final PolicyCreateRequest createRequest = new PolicyCreateRequest();
-        createRequest.setUserId(userId);
         createRequest.setCsp(Csp.HUAWEI);
         createRequest.setPolicy("policy");
         createRequest.setEnabled(true);
 
         final PolicyVo expectedResult = new PolicyVo();
         expectedResult.setId(id);
-        expectedResult.setUserId(userId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
@@ -346,7 +339,6 @@ class PolicyManagerTest {
 
         final PolicyVo expectedResult = new PolicyVo();
         expectedResult.setId(id);
-        expectedResult.setUserId(userId);
         expectedResult.setPolicy("policy_update");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(false);
@@ -403,7 +395,6 @@ class PolicyManagerTest {
 
         final PolicyVo expectedResult = new PolicyVo();
         expectedResult.setId(id);
-        expectedResult.setUserId(userId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.OPENSTACK);
         expectedResult.setEnabled(false);
@@ -447,7 +438,6 @@ class PolicyManagerTest {
         // Setup
         final PolicyUpdateRequest updateRequest = new PolicyUpdateRequest();
         updateRequest.setId(id);
-        updateRequest.setUserId(userId);
         updateRequest.setCsp(Csp.HUAWEI);
         updateRequest.setPolicy("policy");
         // Configure DatabasePolicyStorage.findPolicyById(...).
@@ -462,7 +452,6 @@ class PolicyManagerTest {
         // Setup
         final PolicyUpdateRequest updateRequest = new PolicyUpdateRequest();
         updateRequest.setId(id);
-        updateRequest.setUserId(userId);
         updateRequest.setCsp(Csp.HUAWEI);
         updateRequest.setPolicy("policy");
 
@@ -540,7 +529,6 @@ class PolicyManagerTest {
         // Setup
         final PolicyVo expectedResult = new PolicyVo();
         expectedResult.setId(id);
-        expectedResult.setUserId(userId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
@@ -568,7 +556,6 @@ class PolicyManagerTest {
         // Setup
         final PolicyVo expectedResult = new PolicyVo();
         expectedResult.setId(id);
-        expectedResult.setUserId(userId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
@@ -586,7 +573,6 @@ class PolicyManagerTest {
         // Setup
         final PolicyVo expectedResult = new PolicyVo();
         expectedResult.setId(id);
-        expectedResult.setUserId(userId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
