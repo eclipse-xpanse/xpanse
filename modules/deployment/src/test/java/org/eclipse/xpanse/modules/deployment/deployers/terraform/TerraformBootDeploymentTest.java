@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -13,9 +13,6 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
-import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
-import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
-import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -43,33 +40,8 @@ public class IdentityProviderManager {
                 applicationContext.getBeansOfType(IdentityProviderService.class)
                         .values().stream().toList();
         if (CollectionUtils.isEmpty(identityProviderServices)) {
-            log.info("Not found any identity provider service is active.");
-            activeIdentityProviderService = new IdentityProviderService() {
-                @Override
-                public IdentityProviderType getIdentityProviderType() {
-                    return null;
-                }
-
-                @Override
-                public CurrentUserInfo getCurrentUserInfo() {
-                    return null;
-                }
-
-                @Override
-                public BackendSystemStatus getIdentityProviderStatus() {
-                    return null;
-                }
-
-                @Override
-                public String getAuthorizeUrl() {
-                    return null;
-                }
-
-                @Override
-                public TokenResponse getAccessToken(String code) {
-                    return null;
-                }
-            };
+            log.error("No active identity providers found.");
+            activeIdentityProviderService = null;
         } else {
             if (identityProviderServices.size() > 1) {
                 throw new IllegalStateException(
@@ -87,7 +59,10 @@ public class IdentityProviderManager {
      * @return current login user info.
      */
     public CurrentUserInfo getCurrentUserInfo() {
-        return activeIdentityProviderService.getCurrentUserInfo();
+        if (Objects.nonNull(activeIdentityProviderService)) {
+            return activeIdentityProviderService.getCurrentUserInfo();
+        }
+        return null;
     }
 
 

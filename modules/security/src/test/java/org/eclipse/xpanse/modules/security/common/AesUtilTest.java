@@ -1,6 +1,7 @@
 package org.eclipse.xpanse.modules.security.common;
 
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -105,4 +106,39 @@ class AesUtilTest {
         Assertions.assertEquals(string, encodedStr);
     }
 
+    @Test
+    void testDecodeBackToOriginalTypeBoolean() {
+        // SetUp
+        boolean bool = true;
+        // Run the test
+        final Object decodedBoolResult = aesUtilTest.decodeBackToOriginalType(
+                DeployVariableDataType.BOOLEAN, aesUtilTest.encode(String.valueOf(bool)));
+        // Verify the results
+        Assertions.assertTrue(decodedBoolResult instanceof Boolean);
+        Assertions.assertEquals(decodedBoolResult, bool);
+    }
+
+    @Test
+    void testDecodeBackToOriginalTypeString() {
+        // SetUp
+        String string = "hello";
+        // Run the test
+        final Object decodedResult = aesUtilTest.decodeBackToOriginalType(
+                DeployVariableDataType.STRING, aesUtilTest.encode(string));
+        // Verify the results
+        Assertions.assertTrue(decodedResult instanceof String);
+        Assertions.assertEquals(decodedResult, string);
+    }
+
+    @Test
+    void testDecodeBackToOriginalTypeNumber() {
+        // SetUp
+        int number = 111;
+        // Run the test
+        final Object decodedResult = aesUtilTest.decodeBackToOriginalType(
+                DeployVariableDataType.NUMBER, aesUtilTest.encode(String.valueOf(number)));
+        // Verify the results
+        Assertions.assertTrue(decodedResult instanceof Integer);
+        Assertions.assertEquals((Integer) decodedResult, number);
+    }
 }

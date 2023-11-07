@@ -221,6 +221,12 @@ class ServiceDeployerApiTest {
         // Run the test
         final MockHttpServletResponse listResponse = mockMvc.perform(
                         get("/xpanse/services")
+                                .param("categoryName", "middleware")
+                                .param("cspName", "huawei")
+                                .param("serviceName", "kafka-cluster")
+                                .param("serviceVersion", "v3.3.2")
+                                .param("serviceState",
+                                        ServiceDeploymentState.DEPLOY_SUCCESS.toValue())
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
         // Verify the results
@@ -228,12 +234,11 @@ class ServiceDeployerApiTest {
         Assertions.assertEquals(result, listResponse.getContentAsString());
     }
 
-    void deleteDestroyedServiceRecord() {
+    void deleteDestroyedServiceRecord() throws Exception {
         taskId = null;
         serviceDetailVo = null;
         state = null;
         deployServiceRepository.deleteAll();
-        deployServiceRepository.flush();
     }
 
 

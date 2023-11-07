@@ -37,9 +37,9 @@ public enum ServiceDeploymentState {
      * For ServiceDeploymentState deserialize.
      */
     @JsonCreator
-    public ServiceDeploymentState getByValue(String state) {
+    public static ServiceDeploymentState getByValue(String state) {
         for (ServiceDeploymentState serviceState : values()) {
-            if (serviceState.state.equals(StringUtils.lowerCase(state))) {
+            if (StringUtils.equalsIgnoreCase(serviceState.state, state)) {
                 return serviceState;
             }
         }
