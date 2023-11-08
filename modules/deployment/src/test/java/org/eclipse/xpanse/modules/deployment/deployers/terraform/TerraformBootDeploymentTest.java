@@ -172,7 +172,7 @@ class TerraformBootDeploymentTest {
         deployment4.setDeployer("deployer");
         ocl4.setDeployment(deployment4);
         task3.setOcl(ocl4);
-        when(mockDeployEnvironments.getCredentialVariables(task3)).thenReturn(stringStringMap3);
+        when(mockDeployEnvironments.getCredentialVariablesByHostingType(task3)).thenReturn(stringStringMap3);
 
         // Configure DeployEnvironments.getPluginMandatoryVariables(...).
         final Map<String, String> stringStringMap4 = Map.ofEntries(Map.entry("value", "value"));
@@ -334,7 +334,7 @@ class TerraformBootDeploymentTest {
         deployment4.setDeployer("deployer");
         ocl4.setDeployment(deployment4);
         task4.setOcl(ocl4);
-        when(mockDeployEnvironments.getCredentialVariables(task4)).thenReturn(stringStringMap3);
+        when(mockDeployEnvironments.getCredentialVariablesByHostingType(task4)).thenReturn(stringStringMap3);
 
         // Configure DeployEnvironments.getPluginMandatoryVariables(...).
         final Map<String, String> stringStringMap4 = Map.ofEntries(Map.entry("value", "value"));
