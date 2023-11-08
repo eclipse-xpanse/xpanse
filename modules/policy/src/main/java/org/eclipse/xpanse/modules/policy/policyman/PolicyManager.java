@@ -222,9 +222,6 @@ public class PolicyManager {
         BeanUtils.copyProperties(policyCreateRequest, policyEntity);
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         policyEntity.setUserId(userIdOptional.orElse(null));
-        if (Objects.isNull(policyEntity.getEnabled())) {
-            policyEntity.setEnabled(true);
-        }
         return policyEntity;
     }
 
