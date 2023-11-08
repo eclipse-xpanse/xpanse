@@ -70,7 +70,7 @@ class PolicyCreateRequestTest {
 
     @Test
     void testToString() {
-        String result = "PolicyCreateRequest(csp=mockCsp, policy=null, enabled=null)";
+        String result = "PolicyCreateRequest(csp=mockCsp, policy=null, enabled=true)";
         assertThat(policyCreateRequestUnderTest.toString()).isEqualTo(result);
     }
 }

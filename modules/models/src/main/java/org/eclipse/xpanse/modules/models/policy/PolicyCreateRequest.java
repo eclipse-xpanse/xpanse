@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.models.policy;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -40,7 +39,7 @@ public class PolicyCreateRequest {
     /**
      * Is the policy enabled.
      */
-    @Hidden
-    private Boolean enabled;
+    @Schema(description = "Is the policy enabled. true:enabled;false:disabled.")
+    private Boolean enabled = true;
 
 }
