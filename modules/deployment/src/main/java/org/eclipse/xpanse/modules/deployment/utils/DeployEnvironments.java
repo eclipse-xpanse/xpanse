@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
@@ -148,18 +149,21 @@ public class DeployEnvironments {
     }
 
     /**
-     * Get credential variables.
+     * Get credential variables By ServiceHostingType.
      *
      * @param task the DeployTask.
      */
-    public Map<String, String> getCredentialVariables(DeployTask task) {
+    public Map<String, String> getCredentialVariablesByHostingType(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
         CredentialType credentialType = task.getOcl().getDeployment().getCredentialType();
         Csp csp = task.getOcl().getCloudServiceProvider().getName();
+        ServiceHostingType serviceHostingType = task.getDeployRequest().getServiceHostingType();
+        String userId =
+                serviceHostingType == ServiceHostingType.SELF ? task.getDeployRequest().getUserId()
+                        : null;
 
         AbstractCredentialInfo abstractCredentialInfo =
-                this.credentialCenter.getCredential(csp, credentialType,
-                        task.getDeployRequest().getUserId());
+                this.credentialCenter.getCredential(csp, credentialType, userId);
         if (Objects.nonNull(abstractCredentialInfo)) {
             for (CredentialVariable variable
                     : ((CredentialVariables) abstractCredentialInfo).getVariables()) {

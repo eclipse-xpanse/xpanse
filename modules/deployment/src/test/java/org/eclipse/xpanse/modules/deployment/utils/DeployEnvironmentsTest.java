@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
@@ -77,6 +78,7 @@ class DeployEnvironmentsTest {
         deployRequest.setUserId(userId);
         deployRequest.setFlavor("flavor");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
+        deployRequest.setServiceHostingType(ServiceHostingType.SELF);
 
 
         Deployment deployment = new Deployment();
@@ -177,7 +179,7 @@ class DeployEnvironmentsTest {
     }
 
     @Test
-    void testGetCredentialVariables() {
+    void testGetCredentialVariablesWithHostingType_SELF() {
         deployVariable1.setKind(DeployVariableKind.VARIABLE);
         deployVariable4.setKind(DeployVariableKind.VARIABLE);
         deployVariable2.setKind(DeployVariableKind.ENV_VARIABLE);
@@ -203,7 +205,7 @@ class DeployEnvironmentsTest {
                 .thenReturn(abstractCredentialInfo);
 
         Map<String, String> variablesActual =
-                deployEnvironmentsUnderTest.getCredentialVariables(task);
+                deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(task);
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
@@ -212,6 +214,46 @@ class DeployEnvironmentsTest {
         }
         verify(mockCredentialCenter, times(1))
                 .getCredential(csp, credentialType, userId);
+
+    }
+
+    @Test
+    void testGetCredentialVariablesWithHostingType_SERVICE_VENDOR() {
+        deployVariable1.setKind(DeployVariableKind.VARIABLE);
+        deployVariable4.setKind(DeployVariableKind.VARIABLE);
+        deployVariable2.setKind(DeployVariableKind.ENV_VARIABLE);
+        deployVariable3.setKind(DeployVariableKind.FIX_VARIABLE);
+        deployRequest.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        Csp csp = Csp.HUAWEI;
+        List<CredentialVariable> variables = new ArrayList<>();
+        variables.add(
+                new CredentialVariable(
+                        "HW_AK",
+                        "The access key.", true));
+        variables.add(
+                new CredentialVariable("HW_SK",
+                        "The security key.", true));
+
+        CredentialType credentialType = CredentialType.VARIABLES;
+
+        AbstractCredentialInfo abstractCredentialInfo =
+                new CredentialVariables(csp, credentialType, "AK_SK", "description", null,
+                        variables);
+        when(mockCredentialCenter.getCredential(csp, credentialType,
+                null))
+                .thenReturn(abstractCredentialInfo);
+
+        Map<String, String> variablesActual =
+                deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(task);
+
+        assertEquals(2, variablesActual.size());
+        for (CredentialVariable variable : variables) {
+            assertTrue(variablesActual.containsKey(variable.getName()));
+            assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
+        }
+        verify(mockCredentialCenter, times(1))
+                .getCredential(csp, credentialType, null);
+
 
     }
 

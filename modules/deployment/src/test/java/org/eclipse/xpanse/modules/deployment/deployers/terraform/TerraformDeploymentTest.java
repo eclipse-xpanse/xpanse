@@ -89,7 +89,7 @@ class TerraformDeploymentTest {
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setDeployRequest(deployRequest);
-        doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any(DeployTask.class));
+        doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariablesByHostingType(any(DeployTask.class));
         doReturn("""
             terraform {
               required_providers {

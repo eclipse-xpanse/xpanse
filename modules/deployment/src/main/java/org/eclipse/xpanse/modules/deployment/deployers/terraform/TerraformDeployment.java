@@ -261,7 +261,7 @@ public class TerraformDeployment implements Deployment {
         // load flavor variables also as input variables for terraform executor.
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(task));
         // load credential variables also as env variables for terraform executor.
-        envVariables.putAll(this.deployEnvironments.getCredentialVariables(task));
+        envVariables.putAll(this.deployEnvironments.getCredentialVariablesByHostingType(task));
         envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(task));
         return getExecutor(envVariables, inputVariables, workspace);
     }
