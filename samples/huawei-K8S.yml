@@ -27,6 +27,7 @@ billing:
   period: monthly
   # The billing currency (`euro`, `usd`, ...)
   currency: euro
+serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   - name: 1-master-with-3-worker-nodes-normal

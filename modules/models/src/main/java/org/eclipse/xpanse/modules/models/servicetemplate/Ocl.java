@@ -20,6 +20,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
  * Defines for OCLv2.
@@ -90,6 +91,12 @@ public class Ocl implements Serializable {
     @NotNull
     @Schema(description = "The billing policy of the managed service")
     private Billing billing;
+
+    @Valid
+    @NotNull
+    @Schema(description = "Defines which cloud service account is used "
+            + "for deploying cloud resources.")
+    private ServiceHostingType serviceHostingType;
 
     /**
      * an OCL object might be passed to different plugins for processing, in case any plugin want to

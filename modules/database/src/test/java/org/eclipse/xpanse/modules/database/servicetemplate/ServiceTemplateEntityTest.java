@@ -65,6 +65,7 @@ class ServiceTemplateEntityTest {
                         + "csp=" + CSP + ", "
                         + "category=" + CATEGORY + ", "
                         + "namespace=test, "
+                        + "serviceHostingType=null" + ", "
                         + "ocl=" + ocl + ", "
                         + "serviceRegistrationState=" + SERVICE_STATE + ", "
                         + "jsonObjectSchema=" + jsonObjectSchema + ")";
@@ -73,7 +74,6 @@ class ServiceTemplateEntityTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(test, test);
         assertEquals(test.hashCode(), test.hashCode());
 
         Object o = new Object();

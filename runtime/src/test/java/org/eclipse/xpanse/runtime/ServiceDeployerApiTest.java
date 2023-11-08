@@ -48,6 +48,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentS
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
@@ -261,7 +262,6 @@ class ServiceDeployerApiTest {
         // Setup
         registerServiceTemplate();
         addCredential();
-
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setUserId(userId);
         deployRequest.setServiceName(serviceTemplateDetailVo.getName());
@@ -270,6 +270,7 @@ class ServiceDeployerApiTest {
         deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
         deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().get(0).getName());
         deployRequest.setRegion(serviceTemplateDetailVo.getRegions().get(0).toString());
+        deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("secgroup_name", "secgroup_name");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
@@ -306,6 +307,8 @@ class ServiceDeployerApiTest {
         deployRequest.setCategory(Category.AI);
         deployRequest.setFlavor("flavor2");
         deployRequest.setRegion("region");
+        deployRequest.setServiceHostingType(ServiceHostingType.SELF);
+        deployRequest.setOcl(ocl);
         String requestBody = objectMapper.writeValueAsString(deployRequest);
 
         // Run the test

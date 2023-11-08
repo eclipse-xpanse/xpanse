@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
@@ -270,6 +271,7 @@ class ServiceTemplateManageTest {
         entity.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
         entity.setCsp(ocl.getCloudServiceProvider().getName());
         entity.setCategory(ocl.getCategory());
+        entity.setServiceHostingType(ServiceHostingType.SELF);
         entity.setOcl(ocl);
         entity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
 

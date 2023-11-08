@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.junit.jupiter.api.Assertions;
@@ -61,6 +62,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequest.setCategory(serviceTemplate.getCategory());
         deployRequest.setFlavor(serviceTemplate.getFlavors().get(0).toString());
         deployRequest.setRegion(serviceTemplate.getRegions().get(0).toString());
+        deployRequest.setServiceHostingType(ServiceHostingType.SELF);
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);

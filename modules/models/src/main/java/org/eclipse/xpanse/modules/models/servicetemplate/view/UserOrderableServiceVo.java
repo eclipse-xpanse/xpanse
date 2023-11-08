@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
@@ -77,5 +78,11 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
     @NotNull
     @Schema(description = "The billing policy of the orderable service.")
     private Billing billing;
+
+    @Valid
+    @NotNull
+    @Schema(description = "Defines which cloud service account is used "
+            + "for deploying cloud resources.")
+    private ServiceHostingType serviceHostingType;
 
 }

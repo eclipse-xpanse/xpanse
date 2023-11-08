@@ -16,6 +16,7 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
  * Request body for service deployment.
@@ -82,6 +83,11 @@ public class DeployRequestBase implements Serializable {
     @NotEmpty
     @Schema(description = "The flavor of the Service.")
     private String flavor;
+
+    @NotNull
+    @Schema(description = "Defines which cloud service account is used "
+            + "for deploying cloud resources.")
+    private ServiceHostingType serviceHostingType;
 
     @Hidden
     private Ocl ocl;

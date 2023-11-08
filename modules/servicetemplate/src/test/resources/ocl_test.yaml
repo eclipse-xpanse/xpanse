@@ -20,6 +20,7 @@ cloudServiceProvider:
       area: Asia China
     - name: cn-north-4
       area: Asia China
+serviceHostingType: self
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat

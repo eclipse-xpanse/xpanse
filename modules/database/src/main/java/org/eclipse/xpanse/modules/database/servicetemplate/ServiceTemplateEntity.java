@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.hibernate.annotations.Type;
@@ -33,7 +34,8 @@ import org.hibernate.annotations.Type;
  * Represents the SERVICE_TEMPLATE table in the database.
  */
 @Table(name = "SERVICE_TEMPLATE", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"NAME", "VERSION", "CSP", "CATEGORY"})
+        @UniqueConstraint(columnNames = {
+                "NAME", "VERSION", "CSP", "CATEGORY", "SERVICE_HOSTING_TYPE"})
 })
 @Entity
 @Data
@@ -61,6 +63,10 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
 
     @Column(name = "NAMESPACE")
     private String namespace;
+
+    @Column(name = "SERVICE_HOSTING_TYPE")
+    @Enumerated(EnumType.STRING)
+    private ServiceHostingType serviceHostingType;
 
     @Column(name = "OCL", columnDefinition = "json", nullable = false)
     @Type(value = JsonType.class)

@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,7 @@ class OclTest {
     private static List<Flavor> flavors;
     private static Billing billing;
     private static Ocl ocl;
+    private static final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
 
     @BeforeEach
     void setUp() {
@@ -69,6 +71,7 @@ class OclTest {
         ocl.setDeployment(deployment);
         ocl.setFlavors(flavors);
         ocl.setBilling(billing);
+        ocl.setServiceHostingType(serviceHostingType);
     }
 
     @Test
@@ -101,11 +104,11 @@ class OclTest {
 
         assertNotSame(ocl.getDeployment(), aCopy.getDeployment());
         assertEquals(ocl.getDeployment().getKind(), aCopy.getDeployment().getKind());
+        assertEquals(ocl.getServiceHostingType(), aCopy.getServiceHostingType());
     }
 
     @Test
     public void testEqualsAndHashCode() {
-        assertEquals(ocl, ocl);
         assertEquals(ocl.hashCode(), ocl.hashCode());
 
         Object obj = new Object();
@@ -183,6 +186,7 @@ class OclTest {
         assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
 
         ocl1.setBilling(billing);
+        ocl1.setServiceHostingType(ServiceHostingType.SELF);
         assertEquals(ocl, ocl1);
         assertNotEquals(ocl1, ocl2);
         assertEquals(ocl.hashCode(), ocl1.hashCode());
@@ -193,16 +197,17 @@ class OclTest {
     void testToString() {
         String expectedString = "Ocl(" +
                 "category=" + category +
-                ", version=" + version + "" +
+                ", version=" + version +
                 ", name=" + name +
-                ", serviceVersion=" + serviceVersion + "" +
-                ", description=" + description + "" +
+                ", serviceVersion=" + serviceVersion +
+                ", description=" + description +
                 ", namespace=" + namespace +
-                ", icon=" + icon + "" +
-                ", cloudServiceProvider=" + cloudServiceProvider + "" +
-                ", deployment=" + deployment + "" +
-                ", flavors=" + flavors + "" +
-                ", billing=" + billing + "" +
+                ", icon=" + icon +
+                ", cloudServiceProvider=" + cloudServiceProvider +
+                ", deployment=" + deployment +
+                ", flavors=" + flavors +
+                ", billing=" + billing +
+                ", serviceHostingType=" +  serviceHostingType +
                 ")";
 
         assertEquals(expectedString, ocl.toString());

@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -93,6 +94,12 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
     @NotNull
     @Schema(description = "The billing policy of the registered service.")
     private Billing billing;
+
+    @Valid
+    @NotNull
+    @Schema(description = "Defines which cloud service account is used "
+            + "for deploying cloud resources.")
+    private ServiceHostingType serviceHostingType;
 
     @NotNull
     @Schema(description = "createTime of the registered service.")

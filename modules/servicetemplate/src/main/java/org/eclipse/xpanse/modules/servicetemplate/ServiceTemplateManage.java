@@ -139,6 +139,7 @@ public class ServiceTemplateManage {
         entity.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
         entity.setCsp(ocl.getCloudServiceProvider().getName());
         entity.setCategory(ocl.getCategory());
+        entity.setServiceHostingType(ocl.getServiceHostingType());
         entity.setOcl(ocl);
         entity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         return entity;

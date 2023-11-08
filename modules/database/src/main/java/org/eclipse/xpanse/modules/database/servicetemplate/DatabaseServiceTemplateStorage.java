@@ -66,6 +66,8 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                             StringUtils.lowerCase(serviceTemplateEntity.getVersion())));
                     predicateList.add(criteriaBuilder.equal(root.get("category"),
                             serviceTemplateEntity.getCategory()));
+                    predicateList.add(criteriaBuilder.equal(root.get("serviceHostingType"),
+                            serviceTemplateEntity.getServiceHostingType()));
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
                 };

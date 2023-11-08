@@ -28,6 +28,7 @@ billing:
   # The billing currency (`euro`, `usd`, ...)
   currency: euro
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
+serviceHostingType: self
 flavors:
   - name: 1-zookeeper-with-3-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)

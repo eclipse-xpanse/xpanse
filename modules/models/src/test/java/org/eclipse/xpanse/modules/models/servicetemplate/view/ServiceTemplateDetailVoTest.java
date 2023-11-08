@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -83,6 +84,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setCreateTime(createTime);
         serviceTemplateDetailVo.setLastModifiedTime(lastModifiedTime);
         serviceTemplateDetailVo.setServiceRegistrationState(serviceRegistrationState);
+        serviceTemplateDetailVo.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
     }
 
     @Test
@@ -103,11 +105,11 @@ class ServiceTemplateDetailVoTest {
         assertEquals(lastModifiedTime, serviceTemplateDetailVo.getLastModifiedTime());
         assertEquals(serviceRegistrationState,
                 serviceTemplateDetailVo.getServiceRegistrationState());
+        assertEquals(ServiceHostingType.SERVICE_VENDOR, serviceTemplateDetailVo.getServiceHostingType());
     }
 
     @Test
     public void testEqualsAndHashCode() {
-        assertEquals(serviceTemplateDetailVo, serviceTemplateDetailVo);
         assertEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo.hashCode());
 
         Object obj = new Object();
@@ -215,6 +217,7 @@ class ServiceTemplateDetailVoTest {
         assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
 
         serviceTemplateDetailVo1.setServiceRegistrationState(serviceRegistrationState);
+        serviceTemplateDetailVo1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         assertEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
         assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
         assertEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
@@ -237,6 +240,7 @@ class ServiceTemplateDetailVoTest {
                 "variables=" + variables + ", " +
                 "flavors=" + flavors + ", " +
                 "billing=" + billing + ", " +
+                "serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR + ", " +
                 "createTime=" + createTime + ", " +
                 "lastModifiedTime=" + lastModifiedTime + ", " +
                 "serviceRegistrationState=" + serviceRegistrationState + ")";
