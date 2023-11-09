@@ -22,7 +22,7 @@ public class CredentialVariable {
 
     @NotNull
     @Schema(description = "The name of the CredentialVariable,"
-            + "this field is provided by the the plugin of cloud service provider.")
+            + "this field is provided by the plugin of cloud service provider.")
     private final String name;
 
     @NotNull
