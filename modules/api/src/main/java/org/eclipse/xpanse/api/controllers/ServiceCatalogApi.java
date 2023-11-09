@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
@@ -78,9 +79,12 @@ public class ServiceCatalogApi {
             @Parameter(name = "serviceName", description = "name of the service")
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
-            @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
+            @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
+            @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
+            @RequestParam(name = "serviceHostingType", required = false)
+            ServiceHostingType serviceHostingType) {
         ServiceTemplateQueryModel query = getServiceTemplatesQueryModel(
-                categoryName, cspName, serviceName, serviceVersion);
+                categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
         List<ServiceTemplateEntity> serviceEntities =
                 serviceTemplateManage.listServiceTemplates(query);
         String successMsg = String.format("Listing orderable services with query model %s "
@@ -139,9 +143,12 @@ public class ServiceCatalogApi {
         return Link.of(apiUrl, "OpenApi");
     }
 
-    private ServiceTemplateQueryModel getServiceTemplatesQueryModel(Category category, Csp csp,
-                                                                    String serviceName,
-                                                                    String serviceVersion) {
+    private ServiceTemplateQueryModel getServiceTemplatesQueryModel(
+            Category category,
+            Csp csp,
+            String serviceName,
+            String serviceVersion,
+            ServiceHostingType serviceHostingType) {
         ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
         if (Objects.nonNull(category)) {
             query.setCategory(category);
@@ -154,6 +161,9 @@ public class ServiceCatalogApi {
         }
         if (StringUtils.isNotBlank(serviceVersion)) {
             query.setServiceVersion(serviceVersion);
+        }
+        if (Objects.nonNull(serviceHostingType)) {
+            query.setServiceHostingType(serviceHostingType);
         }
         return query;
     }

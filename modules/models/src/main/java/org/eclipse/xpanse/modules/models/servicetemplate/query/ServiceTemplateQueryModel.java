@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.models.servicetemplate.query;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
  * The query model for search register services.
@@ -25,4 +26,6 @@ public class ServiceTemplateQueryModel {
     private String serviceVersion;
 
     private String namespace;
+
+    private ServiceHostingType serviceHostingType;
 }

@@ -47,7 +47,6 @@ class ServiceTemplateQueryModelTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(serviceTemplateQueryModel, serviceTemplateQueryModel);
         assertEquals(serviceTemplateQueryModel.hashCode(), serviceTemplateQueryModel.hashCode());
 
         Object obj = new Object();
@@ -110,10 +109,11 @@ class ServiceTemplateQueryModelTest {
     void testToString() {
         String expectedString = "ServiceTemplateQueryModel(" +
                 "csp=" + csp +
-                ", category=" + category + "" +
-                ", serviceName=" + serviceName + "" +
-                ", serviceVersion=" + serviceVersion + "" +
-                ", namespace=" + namespace + "" +
+                ", category=" + category +
+                ", serviceName=" + serviceName +
+                ", serviceVersion=" + serviceVersion +
+                ", namespace=" + namespace +
+                ", serviceHostingType=" + null +
                 ")";
         assertEquals(expectedString, serviceTemplateQueryModel.toString());
     }

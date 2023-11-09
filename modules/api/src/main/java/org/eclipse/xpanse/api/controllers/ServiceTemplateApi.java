@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -213,9 +214,12 @@ public class ServiceTemplateApi {
             @Parameter(name = "serviceName", description = "name of the service")
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
-            @RequestParam(name = "serviceVersion", required = false) String serviceVersion) {
-        ServiceTemplateQueryModel query =
-                getServiceTemplateQueryModel(categoryName, cspName, serviceName, serviceVersion);
+            @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
+            @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
+            @RequestParam(name = "serviceHostingType", required = false)
+            ServiceHostingType serviceHostingType) {
+        ServiceTemplateQueryModel query = getServiceTemplateQueryModel(
+                categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
         List<ServiceTemplateEntity> serviceEntities =
                 serviceTemplateManage.listServiceTemplates(query);
         String successMsg = String.format("Listing service templates with query model %s "
@@ -254,9 +258,12 @@ public class ServiceTemplateApi {
         return serviceTemplateDetailVo;
     }
 
-    private ServiceTemplateQueryModel getServiceTemplateQueryModel(Category category, Csp csp,
-                                                                   String serviceName,
-                                                                   String serviceVersion) {
+    private ServiceTemplateQueryModel getServiceTemplateQueryModel(
+            Category category,
+            Csp csp,
+            String serviceName,
+            String serviceVersion,
+            ServiceHostingType serviceHostingType) {
         ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
         if (Objects.nonNull(category)) {
             query.setCategory(category);
@@ -269,6 +276,9 @@ public class ServiceTemplateApi {
         }
         if (StringUtils.isNotBlank(serviceVersion)) {
             query.setServiceVersion(serviceVersion);
+        }
+        if (Objects.nonNull(serviceHostingType)) {
+            query.setServiceHostingType(serviceHostingType);
         }
         CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
         if (Objects.nonNull(currentUserInfo)
