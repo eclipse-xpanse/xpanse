@@ -39,6 +39,7 @@ public class PolicyCreateRequest {
     /**
      * Is the policy enabled.
      */
+    @NotNull
     @Schema(description = "Is the policy enabled. true:enabled;false:disabled.")
     private Boolean enabled = true;
 
