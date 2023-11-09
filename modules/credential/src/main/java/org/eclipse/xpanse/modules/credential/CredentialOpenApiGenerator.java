@@ -449,7 +449,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                                         "properties": {
                                             "name": {
                                                 "type": "string",
-                                                "description": "The name of the CredentialVariable,this field is provided by the the plugin of cloud service provider."
+                                                "description": "The name of the CredentialVariable,this field is provided by the plugin of cloud service provider."
                                             },
                                             "description": {
                                                 "type": "string",

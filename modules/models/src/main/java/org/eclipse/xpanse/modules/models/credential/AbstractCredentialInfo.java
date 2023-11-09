@@ -35,7 +35,7 @@ public abstract class AbstractCredentialInfo {
     @Getter
     @NotNull
     @Schema(description = "The type of the credential, "
-            + "this field is provided by the the plugin of cloud service provider.")
+            + "this field is provided by the plugin of cloud service provider.")
     CredentialType type;
 
     /**
@@ -56,7 +56,7 @@ public abstract class AbstractCredentialInfo {
     @NotNull
     @NotBlank
     @Schema(description = "The description of the credential,"
-            + "this field is provided by  he the plugin of cloud service provider.")
+            + "this field is provided by the plugin of cloud service provider.")
     String description;
 
     /**
