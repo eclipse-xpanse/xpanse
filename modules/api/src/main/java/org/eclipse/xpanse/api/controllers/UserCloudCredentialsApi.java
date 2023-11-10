@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/xpanse")
+@RequestMapping("/xpanse/user")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
 public class UserCloudCredentialsApi {

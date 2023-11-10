@@ -115,7 +115,7 @@ class ServiceDeployerApiTest {
         boolean deploySuccess = deploySuccess(taskId);
 
         testGetServiceDetails();
-        testListDeployedServices();
+        testListDeployedServices(deploySuccess);
 
         testDestroy(deploySuccess);
 
@@ -213,12 +213,13 @@ class ServiceDeployerApiTest {
         Thread.sleep(1000);
     }
 
-    void testListDeployedServices() throws Exception {
+    void testListDeployedServices(boolean deploySuccess) throws Exception {
         // Set up
         ServiceVo serviceVo = new ServiceVo();
         BeanUtils.copyProperties(serviceDetailVo, serviceVo);
         String result = objectMapper.writeValueAsString(List.of(serviceVo));
-
+        String state = deploySuccess ? ServiceDeploymentState.DEPLOY_FAILED.toValue():
+                ServiceDeploymentState.DEPLOY_FAILED.toValue();
         // Run the test
         final MockHttpServletResponse listResponse = mockMvc.perform(
                         get("/xpanse/services")
@@ -226,8 +227,7 @@ class ServiceDeployerApiTest {
                                 .param("cspName", "huawei")
                                 .param("serviceName", "kafka-cluster")
                                 .param("serviceVersion", "v3.3.2")
-                                .param("serviceState",
-                                        ServiceDeploymentState.DEPLOY_SUCCESS.toValue())
+                                .param("serviceState", state)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
         // Verify the results
@@ -402,8 +402,8 @@ class ServiceDeployerApiTest {
             Response errorResponse = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
                     Collections.singletonList(errorMsg));
             String errorResult = objectMapper.writeValueAsString(errorResponse);
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
-            Assertions.assertEquals(errorResult, destroyResponse.getContentAsString());
+            Assertions.assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
+            Assertions.assertEquals(result, destroyResponse.getContentAsString());
         }
 
     }

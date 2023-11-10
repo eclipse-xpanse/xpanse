@@ -183,7 +183,7 @@ class UserCloudCredentialsApiTest {
         String result = "[]";
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/credentials")
+                mockMvc.perform(get("/xpanse/user/credentials")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -220,13 +220,13 @@ class UserCloudCredentialsApiTest {
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
         final MockHttpServletResponse addResponse =
-                mockMvc.perform(post("/xpanse/credentials")
+                mockMvc.perform(post("/xpanse/user/credentials")
                                 .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/credentials")
+                mockMvc.perform(get("/xpanse/user/credentials")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -266,13 +266,13 @@ class UserCloudCredentialsApiTest {
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
         final MockHttpServletResponse addResponse =
-                mockMvc.perform(post("/xpanse/credentials")
+                mockMvc.perform(post("/xpanse/user/credentials")
                                 .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/credentials")
+                mockMvc.perform(get("/xpanse/user/credentials")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -294,7 +294,7 @@ class UserCloudCredentialsApiTest {
 
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/credentials")
+                mockMvc.perform(get("/xpanse/user/credentials")
                                 .param("cspName", "huawei")
                                 .param("type", "VARIABLES")
                                 .accept(MediaType.APPLICATION_JSON))
@@ -357,13 +357,13 @@ class UserCloudCredentialsApiTest {
 
         // Run the test
         final MockHttpServletResponse updateResponse =
-                mockMvc.perform(put("/xpanse/credentials")
+                mockMvc.perform(put("/xpanse/user/credentials")
                                 .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/credentials")
+                mockMvc.perform(get("/xpanse/user/credentials")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -386,7 +386,7 @@ class UserCloudCredentialsApiTest {
 
         // Run the test
         final MockHttpServletResponse deleteResponse =
-                mockMvc.perform(delete("/xpanse/credentials")
+                mockMvc.perform(delete("/xpanse/user/credentials")
                                 .param("cspName", "huawei")
                                 .param("type", "VARIABLES")
                                 .param("name", "AK_SK")
@@ -394,7 +394,7 @@ class UserCloudCredentialsApiTest {
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/credentials", Csp.HUAWEI)
+                mockMvc.perform(get("/xpanse/user/credentials", Csp.HUAWEI)
                                 .param("type", "VARIABLES")
                                 .param("name", "AK_SK")
                                 .accept(MediaType.APPLICATION_JSON))
