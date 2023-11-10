@@ -64,7 +64,7 @@ public class CredentialsConfigApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the credential types supported by the cloud service provider.")
-    public List<CredentialType> getUserCloudCredentialTypes(
+    public List<CredentialType> getCredentialTypes(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @RequestParam(name = "cspName", required = false) Csp csp) {
         if (Objects.isNull(csp)) {
@@ -88,7 +88,7 @@ public class CredentialsConfigApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description =
             "List the credential capabilities defined by the cloud service provider.")
-    public List<AbstractCredentialInfo> getUserCloudCredentialCapabilities(
+    public List<AbstractCredentialInfo> getCredentialCapabilities(
             @Parameter(name = "cspName", description = "name of the cloud service provider.")
             @RequestParam(name = "cspName") Csp csp,
             @Parameter(name = "type", description = "The type of credential.")

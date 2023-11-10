@@ -63,7 +63,7 @@ class CredentialManageExceptionHandlerTest {
         when(credentialCenter.listCredentials(any(), any(), anyString()))
                 .thenThrow(new CredentialCapabilityNotFound("test error"));
         when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
-        this.mockMvc.perform(get("/xpanse/credentials"))
+        this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Credential Capability Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -74,7 +74,7 @@ class CredentialManageExceptionHandlerTest {
         when(credentialCenter.listCredentials(any(), any(), anyString()))
                 .thenThrow(new CredentialsNotFoundException("test error"));
         when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
-        this.mockMvc.perform(get("/xpanse/credentials"))
+        this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Credentials Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -85,7 +85,7 @@ class CredentialManageExceptionHandlerTest {
         when(credentialCenter.listCredentials(any(), any(), anyString()))
                 .thenThrow(new CredentialVariablesNotComplete(Set.of("test error")));
         when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
-        this.mockMvc.perform(get("/xpanse/credentials"))
+        this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Credential Variables Not Complete"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -96,7 +96,7 @@ class CredentialManageExceptionHandlerTest {
         when(credentialCenter.listCredentials(any(), any(), anyString()))
                 .thenThrow(new NoCredentialDefinitionAvailable("test error"));
         when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
-        this.mockMvc.perform(get("/xpanse/credentials"))
+        this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("No Credential Definition Available"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -107,7 +107,7 @@ class CredentialManageExceptionHandlerTest {
     void testHandleUserNoLoginException() throws Exception {
         when(credentialCenter.listCredentials(any(), any(), anyString()))
                 .thenThrow(new NoCredentialDefinitionAvailable("test error"));
-        this.mockMvc.perform(get("/xpanse/credentials"))
+        this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(401))
                 .andExpect(jsonPath("$.resultType").value("Current Login User No Found"))
                 .andExpect(jsonPath("$.details[0]").value("Unable to get current login information"));
