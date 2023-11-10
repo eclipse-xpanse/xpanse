@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -80,4 +81,17 @@ public class IdentityProviderManager {
         }
     }
 
+    /**
+     * Get current login user namespace.
+     *
+     * @return current login user namespace.
+     */
+    public Optional<String> getUserNamespace() {
+        CurrentUserInfo currentUserInfo = getCurrentUserInfo();
+        if (Objects.isNull(currentUserInfo) || StringUtils.isBlank(
+                currentUserInfo.getNamespace())) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(currentUserInfo.getNamespace());
+    }
 }

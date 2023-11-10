@@ -23,6 +23,11 @@ public class DeployTask {
     private UUID id;
 
     /**
+     * Namespace of the user who registered service template.
+     */
+    private String namespace;
+
+    /**
      * The Ocl object of the DeployTask.
      */
     private DeployRequest deployRequest;

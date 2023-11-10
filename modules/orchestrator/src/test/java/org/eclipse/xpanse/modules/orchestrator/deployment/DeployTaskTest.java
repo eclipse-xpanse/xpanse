@@ -105,6 +105,7 @@ class DeployTaskTest {
         assertNotEquals(test.toString(), null);
 
         String exceptedString = "DeployTask(id=23cc529b-64d9-4875-a2f0-08b415705964, "
+                + "namespace=null, "
                 + "deployRequest=DeployRequest(super=DeployRequestBase(userId=null, category=null, "
                 + "serviceName=null, customerServiceName=null, version=null, region=null, "
                 + "csp=null, flavor=null, serviceHostingType=null, ocl=null, serviceRequestProperties=null), id=null),"
