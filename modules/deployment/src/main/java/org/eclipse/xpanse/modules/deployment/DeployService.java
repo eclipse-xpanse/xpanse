@@ -122,6 +122,7 @@ public class DeployService {
         entity.setUserId(deployTask.getDeployRequest().getUserId());
         entity.setDeployRequest(deployTask.getDeployRequest());
         entity.setDeployResourceList(new ArrayList<>());
+        entity.setNamespace(deployTask.getNamespace());
         return entity;
     }
 
@@ -160,6 +161,7 @@ public class DeployService {
         }
         encodeDeployVariable(serviceTemplate,
                 deployTask.getDeployRequest().getServiceRequestProperties());
+        deployTask.setNamespace(serviceTemplate.getNamespace());
         // Set Ocl and CreateRequest
         deployTask.setOcl(serviceTemplate.getOcl());
         deployTask.getDeployRequest().setOcl(serviceTemplate.getOcl());
@@ -650,5 +652,22 @@ public class DeployService {
                 deployServiceStorage.findDeployServiceById(id);
         deployServiceEntity.setServiceDeploymentState(serviceDeploymentState);
         deployServiceStorage.storeAndFlush(deployServiceEntity);
+    }
+
+    /**
+     * Use query model to list SV deployment services.
+     *
+     * @param query service query model.
+     * @return serviceVos
+     */
+    public List<ServiceVo> listDeployedServicesOfIsv(ServiceQueryModel query) {
+        Optional<String> namespace = identityProviderManager.getUserNamespace();
+        if (namespace.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return deployServiceStorage.listServices(query).stream()
+                .filter(deployServiceEntity -> namespace.get()
+                        .equals(deployServiceEntity.getNamespace()))
+                .map(this::convertToServiceVo).toList();
     }
 }

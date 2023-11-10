@@ -28,6 +28,7 @@ class DeployServiceEntityTest {
     private final String NAME = "kafka";
     private final String CUSTOMER_SERVICE_NAME = "kafka-cluster";
     private final String VERSION = "2.0";
+    private final String NAMESPACE = "defaultUserId";
     private final Csp CSP = Csp.HUAWEI;
     private final String FLAVOR = "1-zookeeper-with-3-worker-nodes-normal";
     private final ServiceDeploymentState SERVICE_STATE = ServiceDeploymentState.DEPLOYING;
@@ -49,6 +50,7 @@ class DeployServiceEntityTest {
         test.setName(NAME);
         test.setCustomerServiceName(CUSTOMER_SERVICE_NAME);
         test.setVersion(VERSION);
+        test.setNamespace(NAMESPACE);
         test.setCsp(CSP);
         test.setFlavor(FLAVOR);
         test.setServiceDeploymentState(SERVICE_STATE);
@@ -68,6 +70,7 @@ class DeployServiceEntityTest {
                         + "name=" + NAME + ", "
                         + "customerServiceName=" + CUSTOMER_SERVICE_NAME + ", "
                         + "version=" + VERSION + ", "
+                        + "namespace=" + NAMESPACE + ", "
                         + "csp=" + CSP + ", "
                         + "flavor=" + FLAVOR + ", "
                         + "serviceDeploymentState=" + SERVICE_STATE + ", "
@@ -139,6 +142,14 @@ class DeployServiceEntityTest {
         Assertions.assertNotEquals(test1, test2);
         Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
         Assertions.assertNotEquals(test1.hashCode(), test2.hashCode());
+
+        test1.setNamespace(NAMESPACE);
+        Assertions.assertNotEquals(test, test1);
+        Assertions.assertNotEquals(test, test2);
+        Assertions.assertNotEquals(test1, test2);
+        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
+        Assertions.assertNotEquals(test1.hashCode(), test2.hashCode());
+
 
         test1.setCsp(CSP);
         Assertions.assertNotEquals(test, test1);
