@@ -143,9 +143,12 @@ public class ServiceDeployerApi {
         Deployment deployment = this.deployService.getDeployHandler(deployTask);
         this.deployService.asyncDeployService(deployment, deployTask);
         String successMsg = String.format(
-                "Task for starting managed service %s-%s-%s started. UUID %s",
+                "Task for starting managed service %s-%s-%s-%s started. UUID %s",
                 deployRequest.getServiceName(),
-                deployRequest.getVersion(), deployRequest.getCsp(), deployTask.getId());
+                deployRequest.getVersion(),
+                deployRequest.getCsp().toValue(),
+                deployRequest.getServiceHostingType().toValue(),
+                deployTask.getId());
         log.info(successMsg);
         return id;
     }

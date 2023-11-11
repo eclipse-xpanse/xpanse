@@ -111,6 +111,7 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
         serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         serviceTemplateEntity.setOcl(oclRegister);
+        serviceTemplateEntity.setServiceHostingType(oclRegister.getServiceHostingType());
 
         when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(ocl);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
@@ -161,6 +162,7 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
         serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
+        serviceTemplateEntity.setServiceHostingType(oclRegister.getServiceHostingType());
         serviceTemplateEntity.setOcl(oclRegister);
 
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);

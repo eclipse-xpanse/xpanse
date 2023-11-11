@@ -80,47 +80,51 @@ public class ServiceTemplateManage {
      * @return Returns service template DB entity.
      */
     public ServiceTemplateEntity updateServiceTemplate(String id, Ocl ocl) {
-        ServiceTemplateEntity existedService = storage.getServiceTemplateById(UUID.fromString(id));
-        if (Objects.isNull(existedService)) {
+        ServiceTemplateEntity existingService = storage.getServiceTemplateById(UUID.fromString(id));
+        if (Objects.isNull(existingService)) {
             String errMsg = String.format("Service template with id %s not found.", id);
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
-        if (!StringUtils.equals(getUserNamespace(), existedService.getNamespace())) {
+        if (!StringUtils.equals(getUserNamespace(), existingService.getNamespace())) {
             throw new AccessDeniedException("No permissions to update service templates "
                     + "belonging to other namespaces.");
         }
-        iconUpdate(existedService, ocl);
-        checkParams(existedService, ocl);
+        iconUpdate(existingService, ocl);
+        checkParams(existingService, ocl);
         validateTerraformScript(ocl);
-        existedService.setOcl(ocl);
-        existedService.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
+        existingService.setOcl(ocl);
+        existingService.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
-                        existedService.getOcl().getDeployment().getVariables());
-        existedService.setJsonObjectSchema(jsonObjectSchema);
-        storage.store(existedService);
-        serviceTemplateOpenApiGenerator.updateServiceApi(existedService);
-        return existedService;
+                        existingService.getOcl().getDeployment().getVariables());
+        existingService.setJsonObjectSchema(jsonObjectSchema);
+        storage.store(existingService);
+        serviceTemplateOpenApiGenerator.updateServiceApi(existingService);
+        return existingService;
     }
 
-    private void checkParams(ServiceTemplateEntity existedService, Ocl ocl) {
+    private void checkParams(ServiceTemplateEntity existingService, Ocl ocl) {
 
-        String oldCategory = existedService.getCategory().name();
+        String oldCategory = existingService.getCategory().name();
         String newCategory = ocl.getCategory().name();
         compare(oldCategory, newCategory, "category");
 
-        String oldName = existedService.getName();
+        String oldName = existingService.getName();
         String newName = ocl.getName();
         compare(oldName, newName, "service name");
 
-        String oldVersion = existedService.getVersion();
+        String oldVersion = existingService.getVersion();
         String newVersion = ocl.getServiceVersion();
         compare(oldVersion, newVersion, "service version");
 
-        String oldCsp = existedService.getCsp().name();
+        String oldCsp = existingService.getCsp().name();
         String newCsp = ocl.getCloudServiceProvider().getName().name();
         compare(oldCsp, newCsp, "csp");
+
+        String oldServiceHostingType = existingService.getServiceHostingType().toValue();
+        String newServiceHostingType = ocl.getServiceHostingType().toValue();
+        compare(oldServiceHostingType, newServiceHostingType, "service hosting type");
     }
 
     private void compare(String oldParams, String newParams, String type) {
