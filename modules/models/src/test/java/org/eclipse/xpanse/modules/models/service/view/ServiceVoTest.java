@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,6 +50,7 @@ class ServiceVoTest {
         serviceVo.setServiceDeploymentState(serviceDeploymentState);
         serviceVo.setCreateTime(createTime);
         serviceVo.setLastModifiedTime(lastModifiedTime);
+        serviceVo.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
     }
 
     @Test
@@ -67,7 +69,6 @@ class ServiceVoTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        assertEquals(serviceVo, serviceVo);
         assertEquals(serviceVo.hashCode(), serviceVo.hashCode());
 
         Object obj = new Object();
@@ -144,6 +145,7 @@ class ServiceVoTest {
         assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
 
         serviceVo1.setLastModifiedTime(lastModifiedTime);
+        serviceVo1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         assertEquals(serviceVo, serviceVo1);
         assertNotEquals(serviceVo1, serviceVo2);
         assertEquals(serviceVo.hashCode(), serviceVo1.hashCode());
@@ -155,12 +157,13 @@ class ServiceVoTest {
         String expectedString = "ServiceVo(" +
                 "id=" + uuid +
                 ", category=" + category +
-                ", name=" + name + "" +
-                ", customerServiceName=" + customerServiceName + "" +
-                ", version=" + version + "" +
+                ", name=" + name +
+                ", customerServiceName=" + customerServiceName +
+                ", version=" + version +
                 ", csp=" + csp +
-                ", flavor=" + flavor + "" +
+                ", flavor=" + flavor +
                 ", serviceDeploymentState=" + serviceDeploymentState +
+                ", serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR +
                 ", createTime=" + createTime +
                 ", lastModifiedTime=" + lastModifiedTime +
                 ")";
