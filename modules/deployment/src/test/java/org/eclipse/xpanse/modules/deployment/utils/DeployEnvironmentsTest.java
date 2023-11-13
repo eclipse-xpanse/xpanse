@@ -9,19 +9,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
@@ -32,9 +36,15 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -255,6 +265,78 @@ class DeployEnvironmentsTest {
                 .getCredential(csp, credentialType, null);
 
 
+    }
+
+    @Test
+    void testGetPluginMandatoryVariable() throws Exception {
+
+        OclLoader oclLoader = new OclLoader();
+        Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setServiceName(ocl.getName());
+        deployRequest.setCustomerServiceName("test");
+        deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
+        deployRequest.setVersion(ocl.getServiceVersion());
+        deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
+
+        Map<String, Object> property = new HashMap<>();
+        property.put("secgroup_id", "1234567890");
+        deployRequest.setServiceRequestProperties(property);
+
+        DeployTask xpanseDeployTask = new DeployTask();
+        xpanseDeployTask.setId(UUID.randomUUID());
+        xpanseDeployTask.setOcl(ocl);
+        xpanseDeployTask.setDeployResourceHandler(null);
+        xpanseDeployTask.setDeployRequest(deployRequest);
+
+        OrchestratorPlugin plugin = new OrchestratorPlugin() {
+            @Override
+            public Csp getCsp() {
+                return Csp.OPENSTACK;
+            }
+
+            @Override
+            public List<String> requiredProperties() {
+                return List.of("OS_AUTH_URL");
+            }
+
+            @Override
+            public List<CredentialType> getAvailableCredentialTypes() {
+                return null;
+            }
+
+            @Override
+            public List<AbstractCredentialInfo> getCredentialDefinitions() {
+                return null;
+            }
+
+            @Override
+            public DeployResourceHandler getResourceHandler() {
+                return null;
+            }
+
+            @Override
+            public String getProvider(String region) {
+                return null;
+            }
+
+            @Override
+            public List<Metric> getMetricsForResource(
+                    ResourceMetricsRequest resourceMetricRequest) {
+                return null;
+            }
+
+            @Override
+            public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
+                return null;
+            }
+        };
+        when(this.pluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(plugin);
+        Map<String, String> variables =
+                deployEnvironmentsUnderTest.getPluginMandatoryVariables(xpanseDeployTask);
+
+        Assertions.assertNotNull(variables);
     }
 
 }

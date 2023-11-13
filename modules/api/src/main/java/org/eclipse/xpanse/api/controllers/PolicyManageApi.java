@@ -16,6 +16,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.policy.PolicyCreateRequest;
@@ -24,6 +25,7 @@ import org.eclipse.xpanse.modules.models.policy.PolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.policy.PolicyVo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -52,6 +54,9 @@ public class PolicyManageApi {
 
     @Resource
     private PolicyManager policyManager;
+
+    @Resource
+    private IdentityProviderManager identityProviderManager;
 
     /**
      * List the policies created by the user.
@@ -146,6 +151,8 @@ public class PolicyManageApi {
         if (Objects.nonNull(enabled)) {
             policyQueryRequest.setEnabled(enabled);
         }
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        policyQueryRequest.setUserId(userIdOptional.orElse(null));
         return policyQueryRequest;
     }
 

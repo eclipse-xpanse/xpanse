@@ -55,9 +55,8 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
      * @param deployServiceEntity the model of registered service.
      */
     @Override
-    public boolean storeAndFlush(DeployServiceEntity deployServiceEntity) {
-        this.deployServiceRepository.saveAndFlush(deployServiceEntity);
-        return true;
+    public DeployServiceEntity storeAndFlush(DeployServiceEntity deployServiceEntity) {
+        return this.deployServiceRepository.saveAndFlush(deployServiceEntity);
     }
 
     @Override

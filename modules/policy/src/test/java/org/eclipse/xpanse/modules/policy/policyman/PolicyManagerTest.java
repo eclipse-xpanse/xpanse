@@ -130,8 +130,6 @@ class PolicyManagerTest {
         policyVo.setCsp(Csp.HUAWEI);
         policyVo.setEnabled(true);
         final List<PolicyVo> expectedResult = List.of(policyVo);
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
-
         // Configure DatabasePolicyStorage.listPolicies(...).
         final PolicyEntity policyEntity = new PolicyEntity();
         policyEntity.setId(id);
@@ -157,12 +155,9 @@ class PolicyManagerTest {
     void testListPolicies_ReturnsNoItems() {
         // Setup
         final PolicyQueryRequest queryModel = new PolicyQueryRequest();
-
         queryModel.setUserId(userId);
         queryModel.setCsp(Csp.HUAWEI);
         queryModel.setPolicy("policy");
-
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
 
         // Configure DatabasePolicyStorage.listPolicies(...).
         final PolicyQueryRequest queryModel1 = new PolicyQueryRequest();

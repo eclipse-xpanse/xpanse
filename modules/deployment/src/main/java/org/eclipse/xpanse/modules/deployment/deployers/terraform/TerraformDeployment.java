@@ -143,6 +143,19 @@ public class TerraformDeployment implements Deployment {
         return result;
     }
 
+
+    @Override
+    public String getDeployPlanAsJson(DeployTask task) {
+        String workspace = getWorkspacePath(task.getId().toString());
+        // Create the workspace.
+        buildWorkspace(workspace);
+        createScriptFile(task.getDeployRequest().getCsp(), task.getDeployRequest().getRegion(),
+                workspace, task.getOcl().getDeployment().getDeployer());
+        // Execute the terraform command.
+        TerraformExecutor executor = getExecutorForDeployTask(task, workspace, true);
+        return executor.getTerraformPlanAsJson();
+    }
+
     private void flushDestroyServiceEntity(DeployResult result, UUID taskId) {
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(taskId);
@@ -169,7 +182,9 @@ public class TerraformDeployment implements Deployment {
             deployServiceEntity.setServiceDeploymentState(
                     ServiceDeploymentState.DESTROY_FAILED);
         }
-        if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
+        DeployServiceEntity storedDeployServiceEntity =
+                deployServiceStorage.storeAndFlush(deployServiceEntity);
+        if (Objects.nonNull(storedDeployServiceEntity)) {
             deleteTaskWorkspace(taskId.toString());
         }
     }
@@ -186,10 +201,16 @@ public class TerraformDeployment implements Deployment {
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
         deployServiceEntity.setProperties(deployResult.getProperties());
         deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
-        deployServiceEntity.getDeployResourceList().clear();
-        deployServiceEntity.getDeployResourceList()
-                .addAll(getDeployResourceEntityList(deployResult.getResources(),
-                        deployServiceEntity));
+
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
+            deployServiceEntity.getDeployResourceList().clear();
+        }
+        List<DeployResourceEntity> resourceEntityList =
+                getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity);
+        if (!CollectionUtils.isEmpty(resourceEntityList)) {
+            deployServiceEntity.getDeployResourceList().addAll(resourceEntityList);
+        }
+
         maskSensitiveFields(deployServiceEntity);
         deployServiceStorage.storeAndFlush(deployServiceEntity);
     }

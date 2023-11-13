@@ -24,4 +24,6 @@ public interface Deployment {
     DeployerKind getDeployerKind();
 
     DeployValidationResult validate(Ocl ocl);
+
+    String getDeployPlanAsJson(DeployTask task);
 }

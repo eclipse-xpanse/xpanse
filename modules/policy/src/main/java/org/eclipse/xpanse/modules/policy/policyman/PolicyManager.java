@@ -103,8 +103,6 @@ public class PolicyManager {
      * @return Returns all policies matched the query model.
      */
     public List<PolicyVo> listPolicies(PolicyQueryRequest queryModel) {
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        queryModel.setUserId(userIdOptional.orElse(null));
         List<PolicyEntity> policyEntities = policyStorage.listPolicies(queryModel);
         return policyEntities.stream().sorted(Comparator.comparing(PolicyEntity::getCsp))
                 .map(this::conventToPolicyVo).toList();

@@ -76,6 +76,16 @@ public class TerraformExecutor {
     }
 
     /**
+     * Executes terraform plan command and output.
+     *
+     * @return Returns result of SystemCmd executed.
+     */
+    public SystemCmdResult tfPlanWithOutput() {
+        return executeWithVariables(new StringBuilder(
+                "terraform plan -input=false -no-color --out tfplan.binary"));
+    }
+
+    /**
      * Executes terraform apply command.
      *
      * @return Returns result of SystemCmd executed.
@@ -155,7 +165,7 @@ public class TerraformExecutor {
             throw new TerraformExecutorException("TFExecutor.tfInit failed.",
                     initResult.getCommandStdError());
         }
-        SystemCmdResult planResult = tfPlan();
+        SystemCmdResult planResult = tfPlanWithOutput();
         if (!planResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfPlan failed.");
             throw new TerraformExecutorException("TFExecutor.tfPlan failed.",
@@ -212,6 +222,31 @@ public class TerraformExecutor {
             }
         }
         return fileContentMap;
+    }
+
+    /**
+     * Method to execute terraform plan and get the plan as a json string.
+     */
+    public String getTerraformPlanAsJson() {
+        SystemCmdResult initResult = tfInit();
+        if (!initResult.isCommandSuccessful()) {
+            log.error("TFExecutor.tfInit failed.");
+            throw new TerraformExecutorException("TFExecutor.tfInit failed.",
+                    initResult.getCommandStdError());
+        }
+        SystemCmdResult tfPlanResult = tfPlanWithOutput();
+        if (!tfPlanResult.isCommandSuccessful()) {
+            log.error("TFExecutor.tfPlan failed.");
+            throw new TerraformExecutorException("TFExecutor.tfPlan failed.",
+                    tfPlanResult.getCommandStdError());
+        }
+        SystemCmdResult planJsonResult = execute("terraform show -json tfplan.binary");
+        if (!planJsonResult.isCommandSuccessful()) {
+            log.error("Reading Terraform plan as JSON failed.");
+            throw new TerraformExecutorException("Reading Terraform plan as JSON failed.",
+                    planJsonResult.getCommandStdError());
+        }
+        return planJsonResult.getCommandStdOutput();
     }
 
     private boolean isExcludedFile(String fileName) {
