@@ -17,6 +17,7 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
  * Define view object for UI Client to query deployed services.
@@ -77,6 +78,11 @@ public class ServiceVo {
     @NotNull
     @Schema(description = "The state of the service")
     private ServiceDeploymentState serviceDeploymentState;
+
+    @NotNull
+    @Schema(description = "Defines which cloud service account is used "
+            + "for deploying cloud resources.")
+    private ServiceHostingType serviceHostingType;
 
     @NotNull
     @Schema(description = "Time of register service.")

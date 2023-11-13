@@ -426,6 +426,8 @@ public class DeployService {
         }
 
         ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
+        serviceDetailVo.setServiceHostingType(
+                deployServiceEntity.getDeployRequest().getServiceHostingType());
         BeanUtils.copyProperties(deployServiceEntity, serviceDetailVo);
         if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
             List<DeployResource> deployResources =
@@ -553,6 +555,8 @@ public class DeployService {
         if (Objects.nonNull(serviceEntity)) {
             ServiceVo serviceVo = new ServiceVo();
             BeanUtils.copyProperties(serviceEntity, serviceVo);
+            serviceVo.setServiceHostingType(
+                    serviceEntity.getDeployRequest().getServiceHostingType());
             return serviceVo;
         }
         return null;
