@@ -7,7 +7,7 @@ package org.eclipse.xpanse.runtime.database.mysql;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -74,7 +74,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     }
 
     private ServiceTemplateDetailVo registerService() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test_dummy.yaml"));
+        Ocl ocl =
+                oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL());
         return ServiceTemplateApi.register(ocl);
     }
 }

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
-import java.net.URL;
+import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +85,8 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
     }
 
     private Ocl getOclFromFile() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test_dummy.yaml"));
+        Ocl ocl =
+                oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL());
         ocl.setName(UUID.randomUUID().toString());
         return ocl;
     }

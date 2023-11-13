@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
@@ -40,7 +41,7 @@ public class IconProcessorUtil {
         icon = icon.trim();
         if (icon.matches(URL_REGEX)) {
             try {
-                URL url = new URL(icon);
+                URL url = URI.create(icon).toURL();
                 URLConnection connection = url.openConnection();
                 connection.setConnectTimeout(20000);
                 connection.setReadTimeout(20000);

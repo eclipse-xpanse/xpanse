@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.servicetemplate;
 
 import jakarta.annotation.Resource;
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -68,7 +68,7 @@ public class ServiceTemplateManage {
      */
     public ServiceTemplateEntity updateServiceTemplateByUrl(String id, String oclLocation)
             throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         return updateServiceTemplate(id, ocl);
     }
 
@@ -196,7 +196,7 @@ public class ServiceTemplateManage {
      * @return Returns service template DB entity.
      */
     public ServiceTemplateEntity registerServiceTemplateByUrl(String oclLocation) throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         return registerServiceTemplate(ocl);
     }
 

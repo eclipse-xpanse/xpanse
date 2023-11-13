@@ -6,7 +6,7 @@
 package org.eclipse.xpanse.runtime.modules.servicetemplate.utils;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URI;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
@@ -44,7 +44,8 @@ class ServiceTemplateOpenApiGeneratorTest {
     @Order(1)
     void createServiceApi_test() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_testOpenApi.yaml"));
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_testOpenApi.yaml").toURL());
 
         ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
                 new ServiceVariablesJsonSchemaGenerator();
@@ -75,7 +76,8 @@ class ServiceTemplateOpenApiGeneratorTest {
     @Order(2)
     void updateServiceApi_test() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_testOpenApi.yaml"));
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_testOpenApi.yaml").toURL());
         ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
                 new ServiceVariablesJsonSchemaGenerator();
         JsonObjectSchema jsonObjectSchema =

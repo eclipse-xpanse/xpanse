@@ -7,7 +7,7 @@ package org.eclipse.xpanse.plugins.openstack.monitor.keystone;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
@@ -100,7 +100,7 @@ public class KeystoneManager {
 
     private static String getIpAddressFromUrl(String url) {
         try {
-            return InetAddress.getByName(new URL(url).getHost()).getHostAddress();
+            return InetAddress.getByName(URI.create(url).toURL().getHost()).getHostAddress();
         } catch (UnknownHostException | MalformedURLException e) {
             throw new XpanseUnhandledException(e.getMessage());
         }
