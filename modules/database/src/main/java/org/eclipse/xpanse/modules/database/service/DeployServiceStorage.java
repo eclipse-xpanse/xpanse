@@ -27,7 +27,7 @@ public interface DeployServiceStorage {
      *
      * @param deployServiceEntity the model of deployed service.
      */
-    boolean storeAndFlush(DeployServiceEntity deployServiceEntity);
+    DeployServiceEntity storeAndFlush(DeployServiceEntity deployServiceEntity);
 
     /**
      * Method to get all stored database entries.

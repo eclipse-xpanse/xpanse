@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -19,6 +21,8 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.a
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDeployFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDestroyFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDeployWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlan;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlanWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig.AuthTypeEnum;
@@ -33,7 +37,6 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -53,6 +56,7 @@ public class TerraformBootDeployment implements Deployment {
     private final TerraformBootConfig terraformBootConfig;
     private final String port;
     private final TerraformApi terraformApi;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Initializes the TerraformBoot deployer.
@@ -76,6 +80,7 @@ public class TerraformBootDeployment implements Deployment {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromDirectoryRequest request = getDeployRequest(deployTask);
         terraformApi.asyncDeployWithScripts(request);
+        result.setId(deployTask.getId());
         return result;
     }
 
@@ -84,6 +89,7 @@ public class TerraformBootDeployment implements Deployment {
         DeployResult result = new DeployResult();
         TerraformAsyncDestroyFromDirectoryRequest request = getDestroyRequest(task, stateFile);
         terraformApi.asyncDestroyWithScripts(request);
+        result.setId(task.getId());
         return result;
     }
 
@@ -110,10 +116,22 @@ public class TerraformBootDeployment implements Deployment {
     public DeployValidationResult validate(Ocl ocl) {
         TerraformValidationResult validate =
                 terraformApi.validateWithScripts(getDeployWithScriptsRequest(ocl));
-        DeployValidationResult result = new DeployValidationResult();
-        BeanUtils.copyProperties(validate, result);
+        DeployValidationResult result = null;
+        try {
+            result = objectMapper.readValue(objectMapper.writeValueAsString(validate),
+                    DeployValidationResult.class);
+        } catch (JsonProcessingException e) {
+            log.error("JsonProcessingException", e);
+        }
         return result;
     }
+
+    @Override
+    public String getDeployPlanAsJson(DeployTask task) {
+        TerraformPlan terraformPlan = terraformApi.planWithScripts(getPlanWithScriptsRequest(task));
+        return terraformPlan.getPlan();
+    }
+
 
     private TerraformDeployWithScriptsRequest getDeployWithScriptsRequest(Ocl ocl) {
         TerraformDeployWithScriptsRequest request =
@@ -124,8 +142,18 @@ public class TerraformBootDeployment implements Deployment {
 
     }
 
+
+    private TerraformPlanWithScriptsRequest getPlanWithScriptsRequest(DeployTask task) {
+        TerraformPlanWithScriptsRequest request = new TerraformPlanWithScriptsRequest();
+        request.setScripts(getFiles(task));
+        request.setVariables(getInputVariables(task, true));
+        request.setEnvVariables(getEnvironmentVariables(task));
+        return request;
+    }
+
+
     private TerraformAsyncDestroyFromDirectoryRequest getDestroyRequest(DeployTask task,
-            String stateFile)
+                                                                        String stateFile)
             throws TerraformBootRequestFailedException {
         TerraformAsyncDestroyFromDirectoryRequest request =
                 new TerraformAsyncDestroyFromDirectoryRequest();

@@ -27,6 +27,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
+import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
+import org.eclipse.xpanse.modules.models.policy.PolicyVo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
@@ -50,6 +52,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.slf4j.MDC;
@@ -91,6 +94,8 @@ public class DeployService {
     private AesUtil aesUtil;
     @Resource
     private ServiceVariablesJsonSchemaValidator serviceVariablesJsonSchemaValidator;
+    @Resource
+    private PolicyManager policyManager;
 
     /**
      * Get all Deployment group by DeployerKind.
@@ -208,6 +213,7 @@ public class DeployService {
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
+            validateDeploymentWithPolicies(deployment, deployTask);
             deployment.deploy(deployTask);
         } catch (RuntimeException e) {
             log.error("asyncDeployService failed.", e);
@@ -243,13 +249,14 @@ public class DeployService {
                 deployServiceEntity.setServiceDeploymentState(
                         ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
             }
-            if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
+            DeployServiceEntity storedDeployServiceEntity =
+                    deployServiceStorage.storeAndFlush(deployServiceEntity);
+            if (Objects.nonNull(storedDeployServiceEntity)) {
                 deployment.deleteTaskWorkspace(deployTask.getId().toString());
             }
         } else {
             log.info("No resources to rollback.");
         }
-
     }
 
     private List<DeployResourceEntity> getDeployResourceEntityList(
@@ -333,7 +340,9 @@ public class DeployService {
             log.error("asyncDestroyService failed", e);
             deployServiceEntity.setResultMessage(e.getMessage());
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
-            if (deployServiceStorage.storeAndFlush(deployServiceEntity)) {
+            DeployServiceEntity storedDeployServiceEntity =
+                    deployServiceStorage.storeAndFlush(deployServiceEntity);
+            if (Objects.nonNull(storedDeployServiceEntity)) {
                 deployment.deleteTaskWorkspace(deployTask.getId().toString());
             }
         }
@@ -360,6 +369,32 @@ public class DeployService {
                     String.format("Service %s is not in the state allowed for purging.",
                             deployServiceEntity.getId()));
         }
+    }
+
+    private void validateDeploymentWithPolicies(Deployment deployment, DeployTask deployTask) {
+
+        if (Objects.isNull(deployTask.getDeployRequest())) {
+            return;
+        }
+        String userId = deployTask.getDeployRequest().getUserId();
+        Csp csp = deployTask.getDeployRequest().getCsp();
+        PolicyQueryRequest queryRequest = new PolicyQueryRequest();
+        queryRequest.setUserId(userId);
+        queryRequest.setCsp(csp);
+        queryRequest.setEnabled(true);
+        List<PolicyVo> policyVos = policyManager.listPolicies(queryRequest);
+        if (CollectionUtils.isEmpty(policyVos)) {
+            return;
+        }
+
+        String planJson = deployment.getDeployPlanAsJson(deployTask);
+        if (StringUtils.isEmpty(planJson)) {
+            return;
+        }
+
+        List<String> policies = policyVos.stream().map(PolicyVo::getPolicy)
+                .filter(StringUtils::isNotBlank).toList();
+        policyManager.evaluatePolicies(policies, planJson);
     }
 
     /**

@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
@@ -60,6 +61,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.Assertions;
@@ -114,6 +116,9 @@ class DeployServiceTest {
 
     @InjectMocks
     private DeployService deployService;
+
+    @Mock
+    private PolicyManager policyManager;
 
 
     @BeforeEach
@@ -462,9 +467,10 @@ class DeployServiceTest {
 
         deployService.asyncDeployService(deploymentMock, deployTask);
 
-        // Verify the interactions and assertions
-        verify(deployServiceStorage, times(1)).storeAndFlush(any(DeployServiceEntity.class));
-
+        PolicyQueryRequest queryRequest = new PolicyQueryRequest();
+        queryRequest.setUserId(deployRequest.getUserId());
+        queryRequest.setCsp(deployTask.getDeployRequest().getCsp());
+        queryRequest.setEnabled(true);
         // Verify the captured DeployServiceEntity
         ArgumentCaptor<DeployServiceEntity> entityCaptor =
                 ArgumentCaptor.forClass(DeployServiceEntity.class);
@@ -474,7 +480,8 @@ class DeployServiceTest {
                 capturedEntity.getServiceDeploymentState());
         assertNotEquals(deployResult.getProperties(), capturedEntity.getProperties());
         assertNotEquals(deployResult.getPrivateProperties(), capturedEntity.getPrivateProperties());
-        assertEquals("test", capturedEntity.getDeployRequest().getServiceRequestProperties().get("test"));
+        assertEquals("test",
+                capturedEntity.getDeployRequest().getServiceRequestProperties().get("test"));
     }
 
     @Test
