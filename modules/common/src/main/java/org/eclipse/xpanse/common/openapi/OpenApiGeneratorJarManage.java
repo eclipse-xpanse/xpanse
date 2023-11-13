@@ -8,6 +8,7 @@ package org.eclipse.xpanse.common.openapi;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -87,7 +88,7 @@ public class OpenApiGeneratorJarManage implements
     public boolean downloadClientJar() {
         try {
             log.info("Downloading openapi jar from maven central");
-            URL url = new URL(clientDownLoadUrl);
+            URL url = URI.create(clientDownLoadUrl).toURL();
             File cliJarFile = getCliFile();
             FileUtils.copyURLToFile(url, cliJarFile);
             log.info("Downloading openapi client:{} from URL:{} successful.",

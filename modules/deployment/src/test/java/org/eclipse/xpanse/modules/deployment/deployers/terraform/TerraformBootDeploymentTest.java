@@ -11,7 +11,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +79,7 @@ class TerraformBootDeploymentTest {
     void setUp() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setOcl(ocl);

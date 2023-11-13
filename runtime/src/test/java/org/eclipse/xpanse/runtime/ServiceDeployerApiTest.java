@@ -21,7 +21,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
-import java.net.URL;
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -197,7 +197,7 @@ class ServiceDeployerApiTest {
 
     void registerServiceTemplate() throws Exception {
         // Setup
-        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
 

@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -271,7 +271,7 @@ class DeployEnvironmentsTest {
     void testGetPluginMandatoryVariable() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        Ocl ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());

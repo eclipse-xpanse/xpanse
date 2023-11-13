@@ -13,7 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -94,13 +94,13 @@ class ServiceTemplateManageTest {
     @BeforeAll
     static void init() throws Exception {
         oclLoader = new OclLoader();
-        oclRegister = oclLoader.getOcl(new URL(oclLocation));
+        oclRegister = oclLoader.getOcl(URI.create(oclLocation).toURL());
         uuid = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
     }
 
     @Test
     void testUpdateServiceTemplateByUrl() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setVersion("2.1");
 
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
@@ -113,7 +113,7 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setOcl(oclRegister);
         serviceTemplateEntity.setServiceHostingType(oclRegister.getServiceHostingType());
 
-        when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(ocl);
+        when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(ocl);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
@@ -145,7 +145,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testUpdateServiceTemplateByUrl_OclLoaderThrowsException() throws Exception {
-        when(mockOclLoader.getOcl(new URL(oclLocation))).thenThrow(Exception.class);
+        when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenThrow(Exception.class);
         assertThatThrownBy(() -> serviceTemplateManageTest.updateServiceTemplateByUrl(
                 UUID.randomUUID().toString(), oclLocation))
                 .isInstanceOf(Exception.class);
@@ -153,7 +153,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testUpdateServiceTemplate() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setVersion("2.1");
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setName(oclRegister.getName());
@@ -196,7 +196,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testUpdateThrowsServiceTemplateUpdateNotAllowedException() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setServiceVersion("1.0");
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setName(oclRegister.getName());
@@ -214,7 +214,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testUpdateThrowsAccessDeniedException() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setNamespace("ISV-A");
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
@@ -229,7 +229,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testUpdateThrowsServiceTemplateNotRegisteredException() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setServiceVersion("1.0");
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
         Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
@@ -267,7 +267,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testRegisterThrowsServiceTemplateAlreadyRegistered() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ServiceTemplateEntity entity = new ServiceTemplateEntity();
         entity.setName(StringUtils.lowerCase(ocl.getName()));
         entity.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
@@ -288,7 +288,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testRegisterIconThrowsProcessingFailedException() throws Exception {
-        Ocl ocl = oclLoader.getOcl(new URL(oclLocation));
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setIcon(
                 "https://raw.githubusercontent.com/eclipse-xpanse/xpanse/main/static/full-logo.png");
         Assertions.assertThrows(IconProcessingFailedException.class, () ->
@@ -297,7 +297,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testRegisterServiceTemplateByUrl() throws Exception {
-        when(mockOclLoader.getOcl(new URL(oclLocation))).thenReturn(oclRegister);
+        when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(oclRegister);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null)
                         , deployServiceStorage, deployResourceStorage,
@@ -326,7 +326,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testServiceTemplateByUrl_OclLoaderThrowsException() throws Exception {
-        when(mockOclLoader.getOcl(new URL(oclLocation))).thenThrow(Exception.class);
+        when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenThrow(Exception.class);
         assertThatThrownBy(() -> serviceTemplateManageTest.registerServiceTemplateByUrl(
                 oclLocation)).isInstanceOf(Exception.class);
     }

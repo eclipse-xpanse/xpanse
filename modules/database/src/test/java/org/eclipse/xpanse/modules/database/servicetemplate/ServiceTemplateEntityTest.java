@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.database.servicetemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -38,7 +38,7 @@ class ServiceTemplateEntityTest {
     @BeforeEach
     void setUp() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
                 new ServiceVariablesJsonSchemaGenerator();
         jsonObjectSchema =

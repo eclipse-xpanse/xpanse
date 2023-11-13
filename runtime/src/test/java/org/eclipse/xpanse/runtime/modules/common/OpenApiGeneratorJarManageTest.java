@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
@@ -45,7 +46,7 @@ class OpenApiGeneratorJarManageTest {
     void testDownloadClientJar() throws IOException {
         // SetUp
         File jarFile = openApiGeneratorJarManage.getCliFile();
-        URL url = new URL(clientDownloadUrl);
+        URL url = URI.create(clientDownloadUrl).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.connect();
 

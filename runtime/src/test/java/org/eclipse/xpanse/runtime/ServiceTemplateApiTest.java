@@ -23,7 +23,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
-import java.net.URL;
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,7 +95,7 @@ class ServiceTemplateApiTest {
     @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
             claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
     void testFetchMethods() throws Exception {
-        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         testFetch();
         testFetchUpdate();
         testUnregister();
@@ -127,7 +127,7 @@ class ServiceTemplateApiTest {
 
     void testRegister() throws Exception {
         // Setup
-        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
 
@@ -156,7 +156,7 @@ class ServiceTemplateApiTest {
 
     void testRegisterThrowsMethodArgumentNotValidException() throws Exception {
         // Setup
-        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         ocl.setFlavors(null);
         String requestBody = yamlMapper.writeValueAsString(ocl);
@@ -185,7 +185,8 @@ class ServiceTemplateApiTest {
     void testRegisterThrowsTerraformExecutionException() throws Exception {
         // Setup
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test_dummy.yaml"));
+        ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL());
         ocl.getDeployment().setDeployer("error_" + ocl.getDeployment().getDeployer());
         String requestBody = yamlMapper.writeValueAsString(ocl);
         Response expectedResponse = Response.errorResponse(ResultType.TERRAFORM_EXECUTION_FAILED,
@@ -211,9 +212,10 @@ class ServiceTemplateApiTest {
 
     void testUpdate() throws Exception {
         // Setup
-        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test.yaml"));
+        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test_dummy.yaml"));
+        ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL());
         ocl.setIcon("https://avatars.githubusercontent.com/u/127229590?s=48&v=4");
         String requestBody = yamlMapper.writeValueAsString(ocl);
 
@@ -242,7 +244,8 @@ class ServiceTemplateApiTest {
     void testUpdateThrowsException() throws Exception {
         // Setup
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        ocl = new OclLoader().getOcl(new URL("file:src/test/resources/ocl_test_dummy.yaml"));
+        ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL());
         String requestBody = yamlMapper.writeValueAsString(ocl);
         String uuid = UUID.randomUUID().toString();
         Response expectedResponse = Response.errorResponse(
@@ -264,7 +267,8 @@ class ServiceTemplateApiTest {
 
     void testFetchThrowsException() throws Exception {
         // Setup
-        String fileUrl = new URL("file:src/test/resources/ocl_test_update.yaml").toString();
+        String fileUrl =
+                URI.create("file:src/test/resources/ocl_test_update.yaml").toURL().toString();
         Response expectedResponse = Response.errorResponse(ResultType.RUNTIME_ERROR,
                 Collections.singletonList("java.io.FileNotFoundException:"));
 
@@ -285,7 +289,8 @@ class ServiceTemplateApiTest {
 
     void testFetchUpdateThrowsException() throws Exception {
         // Setup
-        String fileUrl = new URL("file:src/test/resources/ocl_test_dummy.yaml").toString();
+        String fileUrl =
+                URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL().toString();
         String uuid = UUID.randomUUID().toString();
         Response expectedResponse = Response.errorResponse(
                 ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
@@ -445,7 +450,7 @@ class ServiceTemplateApiTest {
 
     void testFetch() throws Exception {
         // Setup
-        String fileUrl = new URL("file:src/test/resources/ocl_test.yaml").toString();
+        String fileUrl = URI.create("file:src/test/resources/ocl_test.yaml").toURL().toString();
 
         // Run the test
         final MockHttpServletResponse fetchResponse =
@@ -473,7 +478,7 @@ class ServiceTemplateApiTest {
 
     void testFetchUpdate() throws Exception {
         // Setup
-        String fileUrl = new URL("file:src/test/resources/ocl_test_dummy.yaml").toString();
+        String fileUrl = URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL().toString();
 
         // Run the test
         final MockHttpServletResponse fetchUpdateResponse =

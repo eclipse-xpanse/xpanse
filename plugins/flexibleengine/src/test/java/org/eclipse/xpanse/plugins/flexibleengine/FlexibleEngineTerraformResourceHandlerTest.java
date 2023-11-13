@@ -4,7 +4,7 @@ import static org.eclipse.xpanse.modules.deployment.deployers.terraform.Terrafor
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfState;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
@@ -21,7 +21,7 @@ class FlexibleEngineTerraformResourceHandlerTest {
     @Test
     void handler() throws IOException {
         TfState tfState = objectMapper.readValue(
-                new URL("file:src/test/resources/flexible-tfstate.json"), TfState.class);
+                URI.create("file:src/test/resources/flexible-tfstate.json").toURL(), TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.getPrivateProperties()
                 .put(STATE_FILE_NAME, objectMapper.writeValueAsString(tfState));
@@ -34,7 +34,8 @@ class FlexibleEngineTerraformResourceHandlerTest {
     @Test
     void handler_destroy() throws IOException {
         TfState tfState = objectMapper.readValue(
-                new URL("file:src/test/resources/flexible-tfstate-destroy.json"), TfState.class);
+                URI.create("file:src/test/resources/flexible-tfstate-destroy.json").toURL(),
+                TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.getPrivateProperties().put(STATE_FILE_NAME,
                 objectMapper.writeValueAsString(tfState));
