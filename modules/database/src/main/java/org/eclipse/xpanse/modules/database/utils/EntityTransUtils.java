@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -42,6 +44,29 @@ public class EntityTransUtils {
             }
         }
         return resources;
+    }
+
+    /**
+     * DeployServiceEntity converted to ServiceDetailVo.
+     *
+     * @param deployServiceEntity DeployServiceEntity.
+     * @return serviceDetailVo
+     */
+    public static ServiceDetailVo transDeployServiceEntityToServiceDetailVo(
+            DeployServiceEntity deployServiceEntity) {
+        ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
+        serviceDetailVo.setServiceHostingType(
+                deployServiceEntity.getDeployRequest().getServiceHostingType());
+        BeanUtils.copyProperties(deployServiceEntity, serviceDetailVo);
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
+            List<DeployResource> deployResources = transResourceEntity(
+                    deployServiceEntity.getDeployResourceList());
+            serviceDetailVo.setDeployResources(deployResources);
+        }
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
+            serviceDetailVo.setDeployedServiceProperties(deployServiceEntity.getProperties());
+        }
+        return serviceDetailVo;
     }
 
 }

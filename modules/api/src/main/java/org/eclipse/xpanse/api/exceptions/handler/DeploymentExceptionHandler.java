@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalid
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
@@ -155,6 +156,18 @@ public class DeploymentExceptionHandler {
     public Response handleVariableInvalidException(
             VariableInvalidException ex) {
         return Response.errorResponse(ResultType.VARIABLE_VALIDATION_FAILED,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceDetailsNotAccessible.
+     */
+    @ExceptionHandler({ServiceDetailsNotAccessible.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public Response handleServiceDetailsNotAccessible(
+            ServiceDetailsNotAccessible ex) {
+        return Response.errorResponse(ResultType.SERVICE_DETAILS_NOT_ACCESSIBLE,
                 Collections.singletonList(ex.getMessage()));
     }
 }
