@@ -35,6 +35,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentS
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.service.view.VendorHostedServiceDetailsVo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -89,6 +90,23 @@ public class ServiceDeployerApi {
             @PathVariable("id") String id) {
 
         return this.deployService.getDeployServiceDetails(UUID.fromString(id));
+    }
+
+
+    /**
+     * Get details of the managed vendor hosted service by id.
+     *
+     * @return VendorHostedServiceDetailsVo of the managed service.
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Get deployed service details by id.")
+    @GetMapping(value = "/isv/service/vendor_hosted/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public VendorHostedServiceDetailsVo getVendorHostedServiceDetailsById(
+            @Parameter(name = "id", description = "Task id of deployed service")
+            @PathVariable("id") String id) {
+        return this.deployService.getVendorHostedServiceDetailsByIdForEndUser(UUID.fromString(id));
     }
 
     /**
