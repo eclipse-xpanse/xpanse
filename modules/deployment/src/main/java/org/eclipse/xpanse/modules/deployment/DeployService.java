@@ -44,6 +44,7 @@ import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.service.view.VendorHostedServiceDetailsVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
@@ -436,6 +437,26 @@ public class DeployService {
     public ServiceDetailVo getDeployServiceDetails(UUID id) {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
         return EntityTransUtils.transDeployServiceEntityToServiceDetailVo(deployServiceEntity);
+    }
+
+    /**
+     * Get vendor hosted service detail by id.
+     *
+     * @param id ID of deploy service.
+     * @return VendorHostedServiceDetailsVo
+     */
+    public VendorHostedServiceDetailsVo getVendorHostedServiceDetailsByIdForEndUser(UUID id) {
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        ServiceHostingType serviceHostingType =
+                deployServiceEntity.getDeployRequest().getServiceHostingType();
+        if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
+            String errorMsg = String.format(
+                    "details of non service-vendor hosted with id %s is not accessible", id);
+            log.error(errorMsg);
+            throw new ServiceDetailsNotAccessible(errorMsg);
+        }
+        return EntityTransUtils.transServiceEntityToVendorHostedServiceDetailsVo(
+                deployServiceEntity);
     }
 
     /**

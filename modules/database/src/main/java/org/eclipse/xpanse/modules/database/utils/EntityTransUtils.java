@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
+import org.eclipse.xpanse.modules.models.service.view.VendorHostedServiceDetailsVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -67,6 +68,26 @@ public class EntityTransUtils {
             serviceDetailVo.setDeployedServiceProperties(deployServiceEntity.getProperties());
         }
         return serviceDetailVo;
+    }
+
+    /**
+     * DeployServiceEntity converted to VendorHostedServiceDetailsVo.
+     *
+     * @param deployServiceEntity DeployServiceEntity.
+     * @return serviceDetailVo
+     */
+    public static VendorHostedServiceDetailsVo transServiceEntityToVendorHostedServiceDetailsVo(
+            DeployServiceEntity deployServiceEntity) {
+        VendorHostedServiceDetailsVo vendorHostedServiceDetailsVo =
+                new VendorHostedServiceDetailsVo();
+        vendorHostedServiceDetailsVo.setServiceHostingType(
+                deployServiceEntity.getDeployRequest().getServiceHostingType());
+        BeanUtils.copyProperties(deployServiceEntity, vendorHostedServiceDetailsVo);
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
+            vendorHostedServiceDetailsVo.setDeployedServiceProperties(
+                    deployServiceEntity.getProperties());
+        }
+        return vendorHostedServiceDetailsVo;
     }
 
 }
