@@ -55,6 +55,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -182,7 +183,7 @@ class DeployServiceTest {
         resourceEntity.setProperties(Map.of("key", "value"));
         deployResourceEntities.add(resourceEntity);
         deployServiceEntity.setDeployResourceList(deployResourceEntities);
-
+        deployServiceEntity.getDeployRequest().setServiceHostingType(ServiceHostingType.SELF);
         deployResult = new DeployResult();
         deployResult.setId(uuid);
         DeployResource deployResource = new DeployResource();
@@ -387,7 +388,7 @@ class DeployServiceTest {
         when(deployServiceStorage.findDeployServiceById(uuid))
                 .thenReturn(deployServiceEntity);
         when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
-        ServiceDetailVo result = deployService.getDeployServiceDetails(uuid);
+        ServiceDetailVo result = deployService.getSelfHostedServiceDetailsByIdForEndUser(uuid);
 
         assertNotNull(result);
         assertEquals(uuid, result.getId());
@@ -403,7 +404,7 @@ class DeployServiceTest {
                 .thenReturn(null);
 
         assertThrows(ServiceNotDeployedException.class,
-                () -> deployService.getDeployServiceDetails(uuid));
+                () -> deployService.getSelfHostedServiceDetailsByIdForEndUser(uuid));
     }
 
     @Test

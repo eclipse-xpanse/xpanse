@@ -129,7 +129,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testServiceNotDeployedException() throws Exception {
-        when(deployService.getDeployServiceDetails(any(UUID.class)))
+        when(deployService.getSelfHostedServiceDetailsByIdForEndUser(any(UUID.class)))
                 .thenThrow(new ServiceNotDeployedException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services/{id}", UUID.randomUUID()))

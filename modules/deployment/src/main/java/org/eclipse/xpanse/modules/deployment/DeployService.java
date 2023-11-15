@@ -434,8 +434,16 @@ public class DeployService {
      * @param id ID of deploy service.
      * @return serviceDetailVo
      */
-    public ServiceDetailVo getDeployServiceDetails(UUID id) {
+    public ServiceDetailVo getSelfHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        ServiceHostingType serviceHostingType =
+                deployServiceEntity.getDeployRequest().getServiceHostingType();
+        if (ServiceHostingType.SELF != serviceHostingType) {
+            String errorMsg = String.format("details of non service-self hosted with id %s is not "
+                    + "accessible",  id);
+            log.error(errorMsg);
+            throw new ServiceDetailsNotAccessible(errorMsg);
+        }
         return EntityTransUtils.transDeployServiceEntityToServiceDetailVo(deployServiceEntity);
     }
 
