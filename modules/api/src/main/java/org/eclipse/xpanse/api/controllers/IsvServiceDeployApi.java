@@ -15,6 +15,7 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.DeployService;
@@ -23,6 +24,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
+import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -76,6 +79,22 @@ public class IsvServiceDeployApi {
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, serviceState);
         return this.deployService.listDeployedServicesOfIsv(query);
+    }
+
+    /**
+     * Get details of the managed service by id for ISV role.
+     *
+     * @return Details of the managed service.
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Get deployed service details by id.")
+    @GetMapping(value = "/isv/services/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ServiceDetailVo getServiceDetailsByIdForIsv(
+            @Parameter(name = "id", description = "Task id of deployed service")
+            @PathVariable("id") String id) {
+        return this.deployService.getServiceDetailsByIdForIsv(UUID.fromString(id));
     }
 
     private ServiceQueryModel getServiceQueryModel(Category category, Csp csp,

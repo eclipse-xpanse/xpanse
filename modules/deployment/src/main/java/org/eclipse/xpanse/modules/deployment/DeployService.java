@@ -38,6 +38,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
@@ -46,6 +47,7 @@ import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -281,19 +283,7 @@ public class DeployService {
      */
     public Deployment getDestroyHandler(DeployTask deployTask) {
         // Find the deployed service.
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(deployTask.getId());
-        if (Objects.isNull(deployServiceEntity)
-                || Objects.isNull(deployServiceEntity.getDeployRequest())) {
-            String errorMsg = String.format("Service with id %s not found.", deployTask.getId());
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
-            throw new AccessDeniedException(
-                    "No permissions to destroy services belonging to other users.");
-        }
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(deployTask.getId());
         // Get state of service.
         ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
         if (state.equals(ServiceDeploymentState.DEPLOYING)
@@ -324,13 +314,7 @@ public class DeployService {
 
     private void destroy(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(deployTask.getId());
-        if (Objects.isNull(deployServiceEntity)) {
-            String errorMsg = String.format("Service with id %s not found.", deployTask.getId());
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException("Service with id %s not found.");
-        }
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(deployTask.getId());
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
@@ -450,45 +434,15 @@ public class DeployService {
      * @return serviceDetailVo
      */
     public ServiceDetailVo getDeployServiceDetails(UUID id) {
-        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
-        if (Objects.isNull(deployServiceEntity)) {
-            String errorMsg = String.format("Service with id %s not found.", id);
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
-            throw new AccessDeniedException(
-                    "No permissions to view details of services belonging to other users.");
-        }
-
-        ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
-        serviceDetailVo.setServiceHostingType(
-                deployServiceEntity.getDeployRequest().getServiceHostingType());
-        BeanUtils.copyProperties(deployServiceEntity, serviceDetailVo);
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
-            List<DeployResource> deployResources =
-                    EntityTransUtils.transResourceEntity(
-                            deployServiceEntity.getDeployResourceList());
-            serviceDetailVo.setDeployResources(deployResources);
-        }
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
-            serviceDetailVo.setDeployedServiceProperties(deployServiceEntity.getProperties());
-        }
-        return serviceDetailVo;
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        return EntityTransUtils.transDeployServiceEntityToServiceDetailVo(deployServiceEntity);
     }
 
     /**
      * Callback method after deployment is complete.
      */
     public void deployCallback(String taskId, TerraformResult result) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(UUID.fromString(taskId));
-        if (Objects.isNull(deployServiceEntity)) {
-            String errorMsg = String.format("Service with id %s not found.", taskId);
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(taskId));
         DeployResult deployResult = handlerDeployResource(result);
         if (StringUtils.isNotBlank(result.getTerraformState())) {
             getResourceHandler(deployServiceEntity.getCsp()).handler(deployResult);
@@ -526,13 +480,7 @@ public class DeployService {
      * Callback method after the service is destroyed.
      */
     public void destroyCallback(String taskId, TerraformResult result) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(UUID.fromString(taskId));
-        if (Objects.isNull(deployServiceEntity)) {
-            String errorMsg = String.format("Service with id %s not found.", taskId);
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(taskId));
         if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
             deployServiceEntity.setProperties(new HashMap<>());
@@ -708,5 +656,43 @@ public class DeployService {
                 .filter(deployServiceEntity -> namespace.get()
                         .equals(deployServiceEntity.getNamespace()))
                 .map(this::convertToServiceVo).toList();
+    }
+
+    /**
+     * Get deploy service detail by id.
+     *
+     * @param id ID of deploy service.
+     * @return serviceDetailVo
+     */
+    public ServiceDetailVo getServiceDetailsByIdForIsv(UUID id) {
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        ServiceHostingType serviceHostingType =
+                deployServiceEntity.getDeployRequest().getServiceHostingType();
+        if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
+            String errorMsg = String.format("the details of Service with id %s no accessible",  id);
+            log.error(errorMsg);
+            throw new ServiceDetailsNotAccessible(errorMsg);
+        }
+        Optional<String> namespace = identityProviderManager.getUserNamespace();
+        if (namespace.isEmpty() || !namespace.get().equals(deployServiceEntity.getNamespace())) {
+            throw new AccessDeniedException(
+                    "No permissions to view details of services belonging to other users.");
+        }
+        return EntityTransUtils.transDeployServiceEntityToServiceDetailVo(deployServiceEntity);
+    }
+
+    private DeployServiceEntity getDeployServiceEntity(UUID id) {
+        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity)) {
+            String errorMsg = String.format("Service with id %s not found.", id);
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to view details of services belonging to other users.");
+        }
+        return deployServiceEntity;
     }
 }
