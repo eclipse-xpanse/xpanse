@@ -69,7 +69,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
         UUID deployUUid = serviceDeployerApi.deploy(deployRequest);
         Assertions.assertThrows(ServiceNotDeployedException.class,
-                () -> serviceDeployerApi.getServiceDetailsById(deployUUid.toString()));
+                () -> serviceDeployerApi.getSelfHostedServiceDetailsById(deployUUid.toString()));
 
     }
 

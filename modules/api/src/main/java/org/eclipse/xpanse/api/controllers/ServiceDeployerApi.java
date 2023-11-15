@@ -85,11 +85,10 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ServiceDetailVo getServiceDetailsById(
+    public ServiceDetailVo getSelfHostedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
-
-        return this.deployService.getDeployServiceDetails(UUID.fromString(id));
+        return this.deployService.getSelfHostedServiceDetailsByIdForEndUser(UUID.fromString(id));
     }
 
 
