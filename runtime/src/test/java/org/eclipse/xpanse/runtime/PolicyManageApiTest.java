@@ -279,8 +279,8 @@ class PolicyManageApiTest {
 
         // Setup
         mockPoliciesValidateRequest(true);
-        String errMsg = String.format("The same policy already created by you for the Csp: %s."
-                + " id: %s", policyVo.getCsp(), policyVo.getId());
+        String errMsg = String.format("The same policy already exists for Csp: %s."
+                + " with id: %s", policyVo.getCsp(), policyVo.getId());
         Response result = Response.errorResponse(ResultType.POLICY_DUPLICATE, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
@@ -331,8 +331,8 @@ class PolicyManageApiTest {
     void testUpdatePolicy_ThrowsPolicyDuplicateException() throws Exception {
         // Setup
         mockPoliciesValidateRequest(true);
-        String errMsg = String.format("The same policy already created by you for the Csp: %s."
-                + " id: %s", openStackPolicyVo.getCsp(), openStackPolicyVo.getId());
+        String errMsg = String.format("The same policy already exists for Csp: %s."
+                + " with id: %s", openStackPolicyVo.getCsp(), openStackPolicyVo.getId());
         Response result = Response.errorResponse(ResultType.POLICY_DUPLICATE, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
