@@ -36,19 +36,19 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Value("${terraform.provider.huaweicloud.version}")
     private String terraformHuaweiCloudVersion;
 
-    private final HuaweiTerraformResourceHandler huaweiTerraformResourceHandler;
+    private final HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler;
 
     @Resource
     private HuaweiCloudMetricsService huaweiCloudMetricsService;
 
     public HuaweiCloudOrchestratorPlugin(
-            HuaweiTerraformResourceHandler huaweiTerraformResourceHandler) {
-        this.huaweiTerraformResourceHandler = huaweiTerraformResourceHandler;
+            HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler) {
+        this.huaweiCloudTerraformResourceHandler = huaweiCloudTerraformResourceHandler;
     }
 
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return this.huaweiTerraformResourceHandler;
+        return this.huaweiCloudTerraformResourceHandler;
     }
 
     @Override

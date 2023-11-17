@@ -38,8 +38,14 @@ public class TfResourceTransUtils {
         if (Objects.isNull(instanceAttributes) || instanceAttributes.isEmpty()) {
             return;
         }
-        deployResource.setResourceId(getValue(instanceAttributes, "id"));
-        deployResource.setName(getValue(instanceAttributes, "name"));
+        String id = getValue(instanceAttributes, "id");
+        deployResource.setResourceId(id);
+        String name = getValue(instanceAttributes, "name");
+        if (StringUtils.isBlank(name)) {
+            deployResource.setName(deployResource.getKind().toValue() + "-" + id);
+        } else {
+            deployResource.setName(name);
+        }
         deployResource.setProperties(new HashMap<>());
         if (Objects.nonNull(keyProperties) && !keyProperties.isEmpty()) {
             keyProperties.forEach((k, v) ->

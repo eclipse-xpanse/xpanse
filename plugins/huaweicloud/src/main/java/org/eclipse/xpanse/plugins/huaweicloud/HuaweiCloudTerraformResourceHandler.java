@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.plugins.openstack;
+package org.eclipse.xpanse.plugins.huaweicloud;
 
 import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
 
@@ -25,20 +25,20 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResourceProperties
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.plugins.openstack.enums.OpenstackTerraformResourceProperties;
+import org.eclipse.xpanse.plugins.huaweicloud.models.HuaweiCloudTerraformResourceProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Terraform resource handler for Openstack.
+ * Terraform resource handler for HuaweiCloud.
  */
 @Component
 @Slf4j
-public class OpenstackTerraformResourceHandler implements DeployResourceHandler {
+public class HuaweiCloudTerraformResourceHandler implements DeployResourceHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Handler of Openstack for the DeployResult.
+     * Handler of HuaweiCloud for the DeployResult.
      *
      * @param deployResult the result of the deployment.
      */
@@ -61,11 +61,11 @@ public class OpenstackTerraformResourceHandler implements DeployResourceHandler 
                 }
             }
             Set<String> supportTypes =
-                    OpenstackTerraformResourceProperties.getTerraformResourceTypes();
+                    HuaweiCloudTerraformResourceProperties.getTerraformResourceTypes();
             for (TfStateResource tfStateResource : tfState.getResources()) {
                 if (supportTypes.contains(tfStateResource.getType())) {
                     DeployResourceProperties deployResourceProperties =
-                            OpenstackTerraformResourceProperties.getDeployResourceProperties(
+                            HuaweiCloudTerraformResourceProperties.getDeployResourceProperties(
                                     tfStateResource.getType());
                     if (Objects.nonNull(deployResourceProperties)) {
                         for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
@@ -81,4 +81,5 @@ public class OpenstackTerraformResourceHandler implements DeployResourceHandler 
         }
         deployResult.setResources(deployResourceList);
     }
+
 }

@@ -218,7 +218,7 @@ class ServiceDeployerApiTest {
         ServiceVo serviceVo = new ServiceVo();
         BeanUtils.copyProperties(serviceDetailVo, serviceVo);
         String result = objectMapper.writeValueAsString(List.of(serviceVo));
-        String state = deploySuccess ? ServiceDeploymentState.DEPLOY_FAILED.toValue():
+        String state = deploySuccess ? ServiceDeploymentState.DEPLOY_SUCCESS.toValue() :
                 ServiceDeploymentState.DEPLOY_FAILED.toValue();
         // Run the test
         final MockHttpServletResponse listResponse = mockMvc.perform(
@@ -235,7 +235,7 @@ class ServiceDeployerApiTest {
         Assertions.assertEquals(result, listResponse.getContentAsString());
     }
 
-    void deleteDestroyedServiceRecord() throws Exception {
+    void deleteDestroyedServiceRecord() {
         taskId = null;
         serviceDetailVo = null;
         state = null;

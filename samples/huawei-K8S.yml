@@ -203,8 +203,9 @@ deployment:
       override_special = "#%@"
     }
 
-    resource "huaweicloud_compute_keypair" "keypair" {
-      name = "keypair-k8s-${random_id.new.hex}"
+    resource "huaweicloud_kps_keypair" "keypair" {
+      name     = "keypair-k8s-${random_id.new.hex}"
+      key_file = "keypair-kafka-${random_id.new.hex}.pem"
     }
 
     data "huaweicloud_images_image" "image" {
@@ -218,7 +219,7 @@ deployment:
       flavor_id          = var.flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.image.id
-      key_pair           = huaweicloud_compute_keypair.keypair.name
+      key_pair           = huaweicloud_kps_keypair.keypair.name
       network {
         uuid = local.subnet_id
       }
@@ -236,7 +237,7 @@ deployment:
       flavor_id          = var.flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.image.id
-      key_pair           = huaweicloud_compute_keypair.keypair.name
+      key_pair           = huaweicloud_kps_keypair.keypair.name
       network {
         uuid = local.subnet_id
       }

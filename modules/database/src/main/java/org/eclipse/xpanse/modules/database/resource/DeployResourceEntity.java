@@ -73,6 +73,6 @@ public class DeployResourceEntity extends CreateModifiedTime {
     @CollectionTable(name = "DEPLOY_RESOURCE_PROPERTY",
             joinColumns = @JoinColumn(name = "deployResource_id", nullable = false))
     @MapKeyColumn(name = "p_key")
-    @Column(name = "p_value")
+    @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
     private Map<String, String> properties;
 }

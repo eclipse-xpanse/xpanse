@@ -23,11 +23,11 @@ import org.junit.jupiter.api.Test;
 class HuaweiCloudOrchestratorPluginTest {
 
     private final HuaweiCloudOrchestratorPlugin plugin = new HuaweiCloudOrchestratorPlugin(
-            new HuaweiTerraformResourceHandler());
+            new HuaweiCloudTerraformResourceHandler());
 
     @Test
     void getResourceHandler() {
-        assertTrue(plugin.getResourceHandler() instanceof HuaweiTerraformResourceHandler);
+        assertTrue(plugin.getResourceHandler() instanceof HuaweiCloudTerraformResourceHandler);
     }
 
     @Test
