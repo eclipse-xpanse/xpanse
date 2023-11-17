@@ -477,7 +477,13 @@ public class DeployService {
      * Callback method after deployment is complete.
      */
     public void deployCallback(String taskId, TerraformResult result) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(taskId));
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(UUID.fromString(taskId));
+        if (Objects.isNull(deployServiceEntity)) {
+            String errorMsg = String.format("Service with id %s not found.", taskId);
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
         DeployResult deployResult = handlerDeployResource(result);
         if (StringUtils.isNotBlank(result.getTerraformState())) {
             getResourceHandler(deployServiceEntity.getCsp()).handler(deployResult);
@@ -515,7 +521,13 @@ public class DeployService {
      * Callback method after the service is destroyed.
      */
     public void destroyCallback(String taskId, TerraformResult result) {
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(taskId));
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(UUID.fromString(taskId));
+        if (Objects.isNull(deployServiceEntity)) {
+            String errorMsg = String.format("Service with id %s not found.", taskId);
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
         if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
             deployServiceEntity.setProperties(new HashMap<>());
