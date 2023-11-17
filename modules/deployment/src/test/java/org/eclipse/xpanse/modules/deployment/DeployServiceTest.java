@@ -299,7 +299,6 @@ class DeployServiceTest {
         String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
         when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         deployService.asyncDestroyService(deploymentMock, deployTask);
 
         // Verify the expected interactions
@@ -312,7 +311,6 @@ class DeployServiceTest {
     @Test
     void testAsyncDestroyService_Exception() {
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         deployService.asyncDestroyService(deploymentMock, deployTask);
 
         doThrow(new RuntimeException()).when(deployServiceStorage)
@@ -340,7 +338,6 @@ class DeployServiceTest {
 
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
         when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         deployService.asyncDestroyService(deploymentMock, deployTask);
 
         // Verify the expected interactions
@@ -358,7 +355,6 @@ class DeployServiceTest {
 
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
         when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         deployService.asyncDestroyService(deploymentMock, deployTask);
 
         // Verify the expected interactions
@@ -519,7 +515,6 @@ class DeployServiceTest {
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
         String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
         when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         deployService.purgeService(deploymentMock, deployTask);
         // Verify the expected interactions
         verify(deployServiceStorage, times(2)).findDeployServiceById(uuid);
@@ -543,7 +538,6 @@ class DeployServiceTest {
         when(deployServiceStorage.findDeployServiceById(uuid)).thenReturn(deployServiceEntity);
         String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
         when(deploymentMock.destroy(deployTask, stateFile)).thenReturn(deployResult);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         deployService.asyncPurgeService(deploymentMock, deployTask, deployServiceEntity);
 
         // Verify the expected interactions
