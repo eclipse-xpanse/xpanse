@@ -48,6 +48,7 @@ public class PolicyEntity extends CreateModifiedTime {
     /**
      * The valid policy created by the user.
      */
+    @Column(name = "POLICY", length = Integer.MAX_VALUE)
     private String policy;
 
     /**
