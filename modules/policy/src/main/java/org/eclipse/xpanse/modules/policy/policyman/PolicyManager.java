@@ -198,8 +198,8 @@ public class PolicyManager {
         List<PolicyEntity> policyEntityList = policyStorage.listPolicies(queryModel);
         if (!CollectionUtils.isEmpty(policyEntityList)) {
             String policyKey = policyEntityList.get(0).getId().toString();
-            String errMsg = String.format("The same policy already created by you for the Csp: %s."
-                    + " id: %s", csp, policyKey);
+            String errMsg = String.format("The same policy already exists for Csp: %s."
+                    + " with id: %s", csp, policyKey);
             throw new PolicyDuplicateException(errMsg);
         }
 
