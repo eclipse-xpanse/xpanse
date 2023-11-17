@@ -19,7 +19,7 @@ public class PoliciesValidationFailedException extends RuntimeException {
     private final String errorReason;
 
     public PoliciesValidationFailedException(String errorReason) {
-        super(String.format("Policy is invalid. Error reasons: %s", errorReason));
+        super(errorReason);
         this.errorReason = errorReason;
     }
 

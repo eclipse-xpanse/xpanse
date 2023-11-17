@@ -57,8 +57,7 @@ class PolicyManageExceptionHandlerTest {
         this.mockMvc.perform(get("/xpanse/policies"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Policy Validation Failed"))
-                .andExpect(jsonPath("$.details[0]").value(
-                        "Policy is invalid. Error reasons: test error"));
+                .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
 
