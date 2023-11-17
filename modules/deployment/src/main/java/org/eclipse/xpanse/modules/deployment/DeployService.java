@@ -315,7 +315,13 @@ public class DeployService {
 
     private void destroy(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(deployTask.getId());
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(deployTask.getId());
+        if (Objects.isNull(deployServiceEntity)) {
+            String errorMsg = String.format("Service with id %s not found.", deployTask.getId());
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException("Service with id %s not found.");
+        }
         try {
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
