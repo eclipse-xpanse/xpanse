@@ -116,7 +116,7 @@ public class IsvServiceDeployApi {
             query.setServiceState(state);
         }
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!userIdOptional.isPresent()) {
+        if (userIdOptional.isEmpty()) {
             throw new UserNotLoggedInException("Unable to get current login information");
         }
         query.setUserId(userIdOptional.get());

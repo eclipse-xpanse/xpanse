@@ -142,7 +142,7 @@ public class UserCloudCredentialsApi {
 
     private String getUserId() {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!userIdOptional.isPresent()) {
+        if (userIdOptional.isEmpty()) {
             throw new UserNotLoggedInException("Unable to get current login information");
         }
         return userIdOptional.get();
