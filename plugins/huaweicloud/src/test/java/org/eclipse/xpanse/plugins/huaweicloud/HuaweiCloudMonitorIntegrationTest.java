@@ -45,7 +45,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         HuaweiCloudMetricsService.class, HuaweiCloudMonitorClient.class,
         HuaweiCloudMonitorConstants.class, HuaweiCloudDataModelConverter.class,
         CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
-        HuaweiTerraformResourceHandler.class})
+        HuaweiCloudTerraformResourceHandler.class})
 class HuaweiCloudMonitorIntegrationTest {
 
     @RegisterExtension

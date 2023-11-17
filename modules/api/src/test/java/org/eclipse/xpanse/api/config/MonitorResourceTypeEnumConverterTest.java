@@ -1,28 +1,28 @@
 package org.eclipse.xpanse.api.config;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class MonitorResourceTypeEnumConverterTest {
 
-    private MonitorResourceTypeEnumConverter monitorResourceTypeEnumConverterUnderTest;
+    private final MonitorResourceTypeEnumConverter converterTest =
+            new MonitorResourceTypeEnumConverter();
 
-    @BeforeEach
-    void setUp() {
-        monitorResourceTypeEnumConverterUnderTest = new MonitorResourceTypeEnumConverter();
-    }
 
     @Test
     void testConvert() {
-        assertThat(
-                monitorResourceTypeEnumConverterUnderTest.convert("CPU"))
-                .isEqualTo(MonitorResourceType.CPU);
-        assertThrows(UnsupportedEnumValueException.class, () ->
-                monitorResourceTypeEnumConverterUnderTest.convert("monitorResourceType"));
+
+        Assertions.assertEquals(MonitorResourceType.CPU,
+                converterTest.convert("cpu"));
+        Assertions.assertEquals(MonitorResourceType.MEM,
+                converterTest.convert("mem"));
+        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING,
+                converterTest.convert("vm_network_incoming"));
+        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING,
+                converterTest.convert("vm_network_outgoing"));
+        Assertions.assertThrows(UnsupportedEnumValueException.class,
+                () -> converterTest.convert("error_value"));
     }
 }

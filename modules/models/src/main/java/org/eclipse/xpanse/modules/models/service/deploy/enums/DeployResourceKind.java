@@ -21,6 +21,9 @@ public enum DeployResourceKind {
     VPC("vpc"),
     VOLUME("volume"),
     UNKNOWN("unknown"),
+    SECURITY_GROUP("security_group"),
+    SECURITY_GROUP_RULE("security_group_rule"),
+    KEYPAIR("keypair"),
     SUBNET("subnet");
 
     private final String kind;
@@ -35,7 +38,7 @@ public enum DeployResourceKind {
     @JsonCreator
     public DeployResourceKind getByValue(String kind) {
         for (DeployResourceKind resourceKind : values()) {
-            if (resourceKind.kind.equals(StringUtils.lowerCase(kind))) {
+            if (StringUtils.endsWithIgnoreCase(resourceKind.kind, kind)) {
                 return resourceKind;
             }
         }
