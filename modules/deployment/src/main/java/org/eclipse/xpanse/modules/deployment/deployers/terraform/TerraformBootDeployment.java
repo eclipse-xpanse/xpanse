@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 
 /**
  * Implementation of the deployment with terraform-boot.
@@ -79,18 +80,30 @@ public class TerraformBootDeployment implements Deployment {
     public DeployResult deploy(DeployTask deployTask) {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromDirectoryRequest request = getDeployRequest(deployTask);
-        terraformApi.asyncDeployWithScripts(request);
-        result.setId(deployTask.getId());
-        return result;
+        try {
+            terraformApi.asyncDeployWithScripts(request);
+            result.setId(deployTask.getId());
+            return result;
+        } catch (RestClientException e) {
+            log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
+                    deployTask.getId(), e.getMessage());
+            throw new TerraformBootRequestFailedException(e.getMessage());
+        }
     }
 
     @Override
     public DeployResult destroy(DeployTask task, String stateFile) {
         DeployResult result = new DeployResult();
         TerraformAsyncDestroyFromDirectoryRequest request = getDestroyRequest(task, stateFile);
-        terraformApi.asyncDestroyWithScripts(request);
-        result.setId(task.getId());
-        return result;
+        try {
+            terraformApi.asyncDestroyWithScripts(request);
+            result.setId(task.getId());
+            return result;
+        } catch (RestClientException e) {
+            log.error("terraform-boot destroy service failed. service id: {} , error:{} ",
+                    task.getId(), e.getMessage());
+            throw new TerraformBootRequestFailedException(e.getMessage());
+        }
     }
 
     /**

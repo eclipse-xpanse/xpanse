@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -40,7 +41,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestClientException;
 
 /**
  * Test for TerraformDeploy.
@@ -140,24 +140,24 @@ class TerraformBootDeploymentTest {
     void testDeploy_ThrowsRestClientException() {
         ocl.getDeployment().setDeployer(errorDeployer);
 
-        Mockito.doThrow(new RestClientException("IO error")).when(terraformApi)
+        Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
                 .asyncDeployWithScripts(any());
 
         ocl.getDeployment().setDeployer(invalidDeployer);
 
-        Assertions.assertThrows(RestClientException.class,
+        Assertions.assertThrows(TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.deploy(deployTask));
     }
 
     @Test
     void testDestroy_ThrowsRestClientException() {
-        Mockito.doThrow(new RestClientException("IO error")).when(terraformApi)
+        Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
                 .asyncDestroyWithScripts(any());
 
-        Assertions.assertThrows(RestClientException.class,
+        Assertions.assertThrows(TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.destroy(deployTask, ""));
 
-        Assertions.assertThrows(RestClientException.class,
+        Assertions.assertThrows(TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.destroy(deployTask, "error_tdState"));
     }
 
@@ -180,9 +180,10 @@ class TerraformBootDeploymentTest {
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
 
-        when(terraformApi.planWithScripts(any())).thenThrow(new RestClientException("IO error"));
+        when(terraformApi.planWithScripts(any())).thenThrow(
+                new TerraformBootRequestFailedException("IO error"));
 
-        Assertions.assertThrows(RestClientException.class,
+        Assertions.assertThrows(TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.getDeployPlanAsJson(deployTask));
 
     }
@@ -237,8 +238,8 @@ class TerraformBootDeploymentTest {
     void testValidate_ThrowsTerraformExecutorException() {
         ocl.getDeployment().setDeployer(errorDeployer);
         when(terraformApi.validateWithScripts(any())).thenThrow(
-                new RestClientException("IO error"));
-        Assertions.assertThrows(RestClientException.class,
+                new TerraformBootRequestFailedException("IO error"));
+        Assertions.assertThrows(TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.validate(ocl));
     }
 
