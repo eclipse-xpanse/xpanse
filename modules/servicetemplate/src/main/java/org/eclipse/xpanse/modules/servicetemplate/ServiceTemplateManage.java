@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -86,7 +86,9 @@ public class ServiceTemplateManage {
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
-        if (!StringUtils.equals(getUserNamespace(), existingService.getNamespace())) {
+        Optional<String> namespace = identityProviderManager.getUserNamespace();
+        if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
+                existingService.getNamespace())) {
             throw new AccessDeniedException("No permissions to update service templates "
                     + "belonging to other namespaces.");
         }
@@ -178,8 +180,9 @@ public class ServiceTemplateManage {
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
                         newEntity.getOcl().getDeployment().getVariables());
         validateTerraformScript(ocl);
-        if (StringUtils.isNotBlank(getUserNamespace())) {
-            newEntity.setNamespace(getUserNamespace());
+        Optional<String> namespace = identityProviderManager.getUserNamespace();
+        if (namespace.isPresent()) {
+            newEntity.setNamespace(namespace.get());
         } else {
             newEntity.setNamespace(ocl.getNamespace());
         }
@@ -215,7 +218,9 @@ public class ServiceTemplateManage {
             throw new ServiceTemplateNotRegistered(errMsg);
         }
         if (checkNamespace) {
-            if (!StringUtils.equals(getUserNamespace(), existedService.getNamespace())) {
+            Optional<String> namespace = identityProviderManager.getUserNamespace();
+            if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
+                    existedService.getNamespace())) {
                 throw new AccessDeniedException("No permissions to view details of service "
                         + "templates belonging to other namespaces.");
             }
@@ -246,7 +251,9 @@ public class ServiceTemplateManage {
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
-        if (!StringUtils.equals(getUserNamespace(), existedService.getNamespace())) {
+        Optional<String> namespace = identityProviderManager.getUserNamespace();
+        if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
+                existedService.getNamespace())) {
             throw new AccessDeniedException("No permissions to unregister service templates "
                     + "belonging to other namespaces.");
         }
@@ -287,16 +294,6 @@ public class ServiceTemplateManage {
                                 .collect(Collectors.toList()));
             }
         }
-    }
-
-    private String getUserNamespace() {
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)) {
-            return StringUtils.isBlank(currentUserInfo.getNamespace())
-                    ? currentUserInfo.getUserId()
-                    : currentUserInfo.getNamespace();
-        }
-        return null;
     }
 
 }
