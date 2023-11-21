@@ -12,41 +12,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Implementation of the deployment with terraform.
@@ -61,8 +49,6 @@ public class TerraformDeployment implements Deployment {
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
     private final DeployEnvironments deployEnvironments;
-    private final DeployServiceStorage deployServiceStorage;
-    private final DeployResourceStorage deployResourceStorage;
     private final TerraformLocalConfig terraformLocalConfig;
     private final PluginManager pluginManager;
 
@@ -72,12 +58,8 @@ public class TerraformDeployment implements Deployment {
     @Autowired
     public TerraformDeployment(
             DeployEnvironments deployEnvironments,
-            DeployServiceStorage deployServiceStorage,
-            DeployResourceStorage deployResourceStorage,
             TerraformLocalConfig terraformLocalConfig, PluginManager pluginManager) {
         this.deployEnvironments = deployEnvironments;
-        this.deployServiceStorage = deployServiceStorage;
-        this.deployResourceStorage = deployResourceStorage;
         this.terraformLocalConfig = terraformLocalConfig;
         this.pluginManager = pluginManager;
     }
@@ -96,23 +78,19 @@ public class TerraformDeployment implements Deployment {
                 workspace, task.getOcl().getDeployment().getDeployer());
         // Execute the terraform command.
         TerraformExecutor executor = getExecutorForDeployTask(task, workspace, true);
-        executor.deploy();
-        String tfState = executor.getTerraformState();
-
         DeployResult deployResult = new DeployResult();
-        if (StringUtils.isEmpty(tfState) || StringUtils.isBlank(tfState)) {
-            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
-        } else {
+        deployResult.setId(task.getId());
+        try {
+            executor.deploy();
             deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
-            deployResult.getPrivateProperties().put(STATE_FILE_NAME, tfState);
-            Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
-            deployResult.getPrivateProperties().putAll(importantFileContentMap);
+            deployResult.setMessage(TerraformExecState.DEPLOY_SUCCESS.toValue());
+        } catch (TerraformExecutorException tfEx) {
+            log.error("Execute terraform deploy script failed. {}", tfEx.getMessage());
+            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+            deployResult.setMessage(tfEx.getMessage());
         }
-
-        if (task.getDeployResourceHandler() != null) {
-            task.getDeployResourceHandler().handler(deployResult);
-        }
-        flushDeployServiceEntity(deployResult, task.getId());
+        handleTerraformExecuteResult(executor, task, deployResult,
+                TerraformExecState.DEPLOY_FAILED);
         return deployResult;
     }
 
@@ -135,14 +113,51 @@ public class TerraformDeployment implements Deployment {
         createDestroyScriptFile(task.getDeployRequest().getCsp(),
                 task.getDeployRequest().getRegion(), workspace, tfState);
         TerraformExecutor executor = getExecutorForDeployTask(task, workspace, false);
-        executor.destroy();
-        DeployResult result = new DeployResult();
-        result.setId(task.getId());
-        result.setState(TerraformExecState.DESTROY_SUCCESS);
-        flushDestroyServiceEntity(result, task.getId());
-        return result;
+        DeployResult destroyResult = new DeployResult();
+        destroyResult.setId(task.getId());
+        try {
+            executor.destroy();
+            destroyResult.setState(TerraformExecState.DESTROY_SUCCESS);
+            destroyResult.setMessage(TerraformExecState.DESTROY_SUCCESS.toValue());
+        } catch (TerraformExecutorException tfEx) {
+            log.error("Execute terraform deploy script failed. {}", tfEx.getMessage());
+            destroyResult.setState(TerraformExecState.DESTROY_FAILED);
+            destroyResult.setMessage(tfEx.getMessage());
+        }
+        handleTerraformExecuteResult(executor, task, destroyResult,
+                TerraformExecState.DESTROY_FAILED);
+        return destroyResult;
     }
 
+    private void handleTerraformExecuteResult(TerraformExecutor executor, DeployTask task,
+                                              DeployResult result,
+                                              TerraformExecState state) {
+        Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
+        if (!importantFileContentMap.isEmpty()) {
+            result.getPrivateProperties().putAll(importantFileContentMap);
+        }
+        String tfState = null;
+        try {
+            tfState = executor.getTerraformState();
+        } catch (TerraformExecutorException tfEx) {
+            log.error("Read terraform state file failed. {}", tfEx.getMessage());
+            result.setState(state);
+            result.setMessage(tfEx.getMessage());
+        }
+        if (StringUtils.isNotEmpty(tfState)) {
+            result.getPrivateProperties().put(STATE_FILE_NAME, tfState);
+        }
+
+        if (Objects.nonNull(task.getDeployResourceHandler())) {
+            try {
+                task.getDeployResourceHandler().handler(result);
+            } catch (TerraformExecutorException tfEx) {
+                log.error("Handle terraform resources failed. {}", tfEx.getMessage());
+                result.setState(TerraformExecState.DEPLOY_FAILED);
+                result.setMessage(tfEx.getMessage());
+            }
+        }
+    }
 
     @Override
     public String getDeployPlanAsJson(DeployTask task) {
@@ -154,97 +169,6 @@ public class TerraformDeployment implements Deployment {
         // Execute the terraform command.
         TerraformExecutor executor = getExecutorForDeployTask(task, workspace, true);
         return executor.getTerraformPlanAsJson();
-    }
-
-    private void flushDestroyServiceEntity(DeployResult result, UUID taskId) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(taskId);
-        if (Objects.isNull(deployServiceEntity)
-                || Objects.isNull(deployServiceEntity.getDeployRequest())) {
-            String errorMsg = String.format("Service with id %s not found.", taskId);
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
-        if (result.getState() == TerraformExecState.DESTROY_SUCCESS) {
-            deployServiceEntity.setServiceDeploymentState(
-                    ServiceDeploymentState.DESTROY_SUCCESS);
-            deployServiceEntity.setProperties(result.getProperties());
-            deployServiceEntity.setPrivateProperties(result.getPrivateProperties());
-            List<DeployResource> resources = result.getResources();
-            if (CollectionUtils.isEmpty(resources)) {
-                deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
-            } else {
-                deployServiceEntity.getDeployResourceList().clear();
-                deployServiceEntity.getDeployResourceList()
-                        .addAll(getDeployResourceEntityList(resources, deployServiceEntity));
-            }
-        } else {
-            deployServiceEntity.setServiceDeploymentState(
-                    ServiceDeploymentState.DESTROY_FAILED);
-        }
-        DeployServiceEntity storedDeployServiceEntity =
-                deployServiceStorage.storeAndFlush(deployServiceEntity);
-        if (Objects.nonNull(storedDeployServiceEntity)) {
-            deleteTaskWorkspace(taskId.toString());
-        }
-    }
-
-    private void flushDeployServiceEntity(DeployResult deployResult, UUID taskId) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(taskId);
-        if (Objects.isNull(deployServiceEntity)
-                || Objects.isNull(deployServiceEntity.getDeployRequest())) {
-            String errorMsg = String.format("Service with id %s not found.", taskId);
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
-        deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
-        deployServiceEntity.setProperties(deployResult.getProperties());
-        deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
-
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
-            deployServiceEntity.getDeployResourceList().clear();
-        }
-        List<DeployResourceEntity> resourceEntityList =
-                getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity);
-        if (!CollectionUtils.isEmpty(resourceEntityList)) {
-            deployServiceEntity.getDeployResourceList().addAll(resourceEntityList);
-        }
-
-        maskSensitiveFields(deployServiceEntity);
-        deployServiceStorage.storeAndFlush(deployServiceEntity);
-    }
-
-    private List<DeployResourceEntity> getDeployResourceEntityList(
-            List<DeployResource> deployResources, DeployServiceEntity deployServiceEntity) {
-        List<DeployResourceEntity> deployResourceEntities = new ArrayList<>();
-        if (CollectionUtils.isEmpty(deployResources)) {
-            return deployResourceEntities;
-        }
-        for (DeployResource resource : deployResources) {
-            DeployResourceEntity deployResource = new DeployResourceEntity();
-            BeanUtils.copyProperties(resource, deployResource);
-            deployResource.setDeployService(deployServiceEntity);
-            deployResourceEntities.add(deployResource);
-        }
-        return deployResourceEntities;
-    }
-
-    private void maskSensitiveFields(DeployServiceEntity deployServiceEntity) {
-        log.debug("masking sensitive input data after deployment");
-        if (Objects.nonNull(deployServiceEntity.getDeployRequest().getServiceRequestProperties())) {
-            for (DeployVariable deployVariable
-                    : deployServiceEntity.getDeployRequest().getOcl().getDeployment()
-                    .getVariables()) {
-                if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
-                        && (deployServiceEntity.getDeployRequest().getServiceRequestProperties()
-                        .containsKey(deployVariable.getName()))) {
-                    deployServiceEntity.getDeployRequest().getServiceRequestProperties()
-                            .put(deployVariable.getName(), "********");
-
-                }
-            }
-        }
     }
 
     @Override

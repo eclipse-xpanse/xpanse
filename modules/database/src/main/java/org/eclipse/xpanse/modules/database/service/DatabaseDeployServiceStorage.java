@@ -126,17 +126,4 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
     public void deleteDeployService(DeployServiceEntity deployServiceEntity) {
         this.deployServiceRepository.delete(deployServiceEntity);
     }
-
-    @Override
-    public DeployServiceEntity queryRefreshDeployServiceById(UUID id) {
-        Optional<DeployServiceEntity> optionalEntity =
-                this.deployServiceRepository.findById(id);
-        if (optionalEntity.isPresent()) {
-            DeployServiceEntity entity = optionalEntity.get();
-            entityManager.refresh(entity);
-            return entity;
-        } else {
-            return null;
-        }
-    }
 }

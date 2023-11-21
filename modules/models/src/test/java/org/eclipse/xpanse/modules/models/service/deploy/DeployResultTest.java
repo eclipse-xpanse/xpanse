@@ -56,6 +56,7 @@ class DeployResultTest {
         deployResult.setResources(resources);
         deployResult.setProperties(properties);
         deployResult.setPrivateProperties(privateProperties);
+        deployResult.setMessage(state.toValue());
     }
 
     @Test
@@ -111,6 +112,12 @@ class DeployResultTest {
         assertNotEquals(deployResult1.hashCode(), deployResult2.hashCode());
 
         deployResult1.setPrivateProperties(privateProperties);
+        assertNotEquals(deployResult, deployResult1);
+        assertNotEquals(deployResult1, deployResult2);
+        assertNotEquals(deployResult.hashCode(), deployResult1.hashCode());
+        assertNotEquals(deployResult1.hashCode(), deployResult2.hashCode());
+
+        deployResult1.setMessage(state.toValue());
         assertEquals(deployResult, deployResult1);
         assertNotEquals(deployResult1, deployResult2);
         assertEquals(deployResult.hashCode(), deployResult1.hashCode());
@@ -120,8 +127,9 @@ class DeployResultTest {
     @Test
     void testToString() {
         String expectedToString =
-                "DeployResult(id=" + id + ", state=" + state + ", resources=" + resources +
-                        ", properties=" + properties + ", privateProperties=" + privateProperties +
+                "DeployResult(id=" + id + ", state=" + state + ", message=" + state.toValue()
+                        + ", resources=" + resources + ", properties=" + properties
+                        + ", privateProperties=" + privateProperties +
                         ")";
         assertEquals(expectedToString, deployResult.toString());
     }

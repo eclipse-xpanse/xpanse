@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.workflow.handle.migrate;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.SneakyThrows;
@@ -15,9 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.MigrateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +38,12 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
 
     @Autowired
     public void setRuntimeService(RuntimeService runtimeService) {
-        this.runtimeService = runtimeService;
+        MigrateDeployProcess.runtimeService = runtimeService;
     }
 
     @Autowired
     public void setDeployService(DeployService deployService) {
-        this.deployService = deployService;
+        MigrateDeployProcess.deployService = deployService;
     }
 
     /**
@@ -52,7 +55,6 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
 
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        UUID id = (UUID) variables.get(MigrateConstants.ID);
         UUID newId = (UUID) variables.get(MigrateConstants.NEW_ID);
         runtimeService.updateBusinessKey(processInstanceId, newId.toString());
         int deployRetryNum = (int) variables.get(MigrateConstants.DEPLOY_RETRY_NUM);
@@ -68,9 +70,13 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
         DeployRequest deployRequest = new DeployRequest();
         BeanUtils.copyProperties(migrateRequest, deployRequest);
         String userId = (String) variables.get(MigrateConstants.USER_ID);
-        CompletableFuture<Void> future = deployService.deployService(newId, userId, deployRequest);
-        future.join();
-        boolean deploySuccess = deployService.isDeploySuccess(newId);
+
+        CompletableFuture<DeployServiceEntity> future =
+                deployService.deployService(newId, userId, deployRequest);
+        DeployServiceEntity result = future.get();
+
+        boolean deploySuccess = Objects.nonNull(result) &&
+                ServiceDeploymentState.DEPLOY_SUCCESS == result.getServiceDeploymentState();
         if (!deploySuccess && deployRetryNum >= 1) {
             runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE, userId);
         }

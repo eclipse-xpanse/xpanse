@@ -59,5 +59,4 @@ public interface DeployServiceStorage {
      */
     void deleteDeployService(DeployServiceEntity deployServiceEntity);
 
-    DeployServiceEntity queryRefreshDeployServiceById(UUID id);
 }

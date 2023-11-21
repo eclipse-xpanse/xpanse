@@ -35,6 +35,12 @@ public class DeployResult {
     private TerraformExecState state;
 
     /**
+     * The message of the XpanseDeployTask.
+     */
+    @Schema(description = "The message of the service.")
+    private String message;
+
+    /**
      * The resources of the server.
      */
     @NotNull

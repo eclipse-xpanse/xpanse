@@ -117,7 +117,7 @@ class ServiceTemplateManageTest {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        deployServiceStorage, deployResourceStorage, terraformLocalConfig, pluginManager);
+                        terraformLocalConfig, pluginManager);
 
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
@@ -168,7 +168,6 @@ class ServiceTemplateManageTest {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        deployServiceStorage, deployResourceStorage,
                         terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
@@ -239,8 +238,7 @@ class ServiceTemplateManageTest {
     @Test
     void testRegisterServiceTemplate() {
         TerraformDeployment deployment =
-                new TerraformDeployment(new DeployEnvironments(null, null, null, null)
-                        , deployServiceStorage, deployResourceStorage,
+                new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
@@ -299,8 +297,7 @@ class ServiceTemplateManageTest {
     void testRegisterServiceTemplateByUrl() throws Exception {
         when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(oclRegister);
         TerraformDeployment deployment =
-                new TerraformDeployment(new DeployEnvironments(null, null, null, null)
-                        , deployServiceStorage, deployResourceStorage,
+                new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
