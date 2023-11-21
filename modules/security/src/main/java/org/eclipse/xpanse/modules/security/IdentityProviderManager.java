@@ -88,10 +88,11 @@ public class IdentityProviderManager {
      */
     public Optional<String> getUserNamespace() {
         CurrentUserInfo currentUserInfo = getCurrentUserInfo();
-        if (Objects.isNull(currentUserInfo) || StringUtils.isBlank(
-                currentUserInfo.getNamespace())) {
+        if (Objects.isNull(currentUserInfo)) {
             return Optional.empty();
         }
-        return Optional.ofNullable(currentUserInfo.getNamespace());
+        return StringUtils.isBlank(currentUserInfo.getNamespace())
+                ? Optional.ofNullable(currentUserInfo.getUserId())
+                : Optional.ofNullable(currentUserInfo.getNamespace());
     }
 }
