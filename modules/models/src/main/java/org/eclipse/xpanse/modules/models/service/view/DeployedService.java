@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
  * Define view object for UI Client to query deployed services.
  */
 @Data
-public class ServiceVo {
+public class DeployedService {
 
     @NotNull
     @Schema(description = "The ID of the service")

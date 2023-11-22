@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class VendorHostedServiceDetailsVo extends ServiceVo {
+public class VendorHostedDeployedServiceDetails extends DeployedService {
 
     @NotNull
     @Schema(description = "The create request of the deployed service.")

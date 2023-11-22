@@ -25,79 +25,79 @@ class PolicyVoTest {
     @Mock
     private Csp mockCsp;
 
-    private PolicyVo policyVoUnderTest;
+    private Policy policyUnderTest;
 
     @BeforeEach
     void setUp() {
-        policyVoUnderTest = new PolicyVo();
-        policyVoUnderTest.setCsp(mockCsp);
+        policyUnderTest = new Policy();
+        policyUnderTest.setCsp(mockCsp);
     }
 
     @Test
     void testIdGetterAndSetter() {
         final UUID id = UUID.fromString("34da927b-3ce0-4aef-85fb-aa2e87d9a724");
-        policyVoUnderTest.setId(id);
-        assertThat(policyVoUnderTest.getId()).isEqualTo(id);
+        policyUnderTest.setId(id);
+        assertThat(policyUnderTest.getId()).isEqualTo(id);
     }
 
     @Test
     void testPolicyGetterAndSetter() {
         final String policy = "policy";
-        policyVoUnderTest.setPolicy(policy);
-        assertThat(policyVoUnderTest.getPolicy()).isEqualTo(policy);
+        policyUnderTest.setPolicy(policy);
+        assertThat(policyUnderTest.getPolicy()).isEqualTo(policy);
     }
 
     @Test
     void testGetCsp() {
-        assertThat(policyVoUnderTest.getCsp()).isEqualTo(mockCsp);
+        assertThat(policyUnderTest.getCsp()).isEqualTo(mockCsp);
     }
 
     @Test
     void testEnabledGetterAndSetter() {
         final Boolean enabled = false;
-        policyVoUnderTest.setEnabled(enabled);
-        assertThat(policyVoUnderTest.getEnabled()).isFalse();
+        policyUnderTest.setEnabled(enabled);
+        assertThat(policyUnderTest.getEnabled()).isFalse();
     }
 
     @Test
     void testCreateTimeGetterAndSetter() {
         final OffsetDateTime createTime =
                 OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
-        policyVoUnderTest.setCreateTime(createTime);
-        assertThat(policyVoUnderTest.getCreateTime()).isEqualTo(createTime);
+        policyUnderTest.setCreateTime(createTime);
+        assertThat(policyUnderTest.getCreateTime()).isEqualTo(createTime);
     }
 
     @Test
     void testLastModifiedTimeGetterAndSetter() {
         final OffsetDateTime lastModifiedTime =
                 OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
-        policyVoUnderTest.setLastModifiedTime(lastModifiedTime);
-        assertThat(policyVoUnderTest.getLastModifiedTime()).isEqualTo(lastModifiedTime);
+        policyUnderTest.setLastModifiedTime(lastModifiedTime);
+        assertThat(policyUnderTest.getLastModifiedTime()).isEqualTo(lastModifiedTime);
     }
 
     @Test
     void testEquals() {
-        assertThat(policyVoUnderTest.equals("o")).isFalse();
+        assertThat(policyUnderTest.equals("o")).isFalse();
     }
 
     @Test
     void testCanEqual() {
-        assertThat(policyVoUnderTest.canEqual("other")).isFalse();
+        assertThat(policyUnderTest.canEqual("other")).isFalse();
     }
 
     @Test
     void testHashCode() {
-        PolicyVo test1 = new PolicyVo();
-        assertThat(policyVoUnderTest.hashCode()).isNotEqualTo(test1.hashCode());
-        PolicyVo test2 = new PolicyVo();
+        Policy test1 = new Policy();
+        assertThat(policyUnderTest.hashCode()).isNotEqualTo(test1.hashCode());
+        Policy test2 = new Policy();
         test2.setCsp(mockCsp);
-        assertThat(policyVoUnderTest.hashCode()).isEqualTo(test2.hashCode());
+        assertThat(policyUnderTest.hashCode()).isEqualTo(test2.hashCode());
     }
 
     @Test
     void testToString() {
-        String result = "PolicyVo(id=null, policy=null, csp=mockCsp, enabled=null," +
+        String result = "Policy(id=null, policy=null, csp=mockCsp, enabled=null," +
                 " createTime=null, lastModifiedTime=null)";
-        assertThat(policyVoUnderTest.toString()).isEqualTo(result);
+        assertThat(policyUnderTest.toString()).isEqualTo(result);
     }
 }

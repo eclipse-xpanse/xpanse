@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test of ServiceVo.
+ * Test of DeployedService.
  */
 class ServiceVoTest {
 
@@ -35,126 +35,126 @@ class ServiceVoTest {
             ServiceDeploymentState.DEPLOY_SUCCESS;
     private static final OffsetDateTime createTime = OffsetDateTime.now();
     private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
-    private static ServiceVo serviceVo;
+    private static DeployedService deployedService;
 
     @BeforeEach
     void setUp() {
-        serviceVo = new ServiceVo();
-        serviceVo.setId(uuid);
-        serviceVo.setCategory(category);
-        serviceVo.setName(name);
-        serviceVo.setCustomerServiceName(customerServiceName);
-        serviceVo.setVersion(version);
-        serviceVo.setCsp(csp);
-        serviceVo.setFlavor(flavor);
-        serviceVo.setServiceDeploymentState(serviceDeploymentState);
-        serviceVo.setCreateTime(createTime);
-        serviceVo.setLastModifiedTime(lastModifiedTime);
-        serviceVo.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        deployedService = new DeployedService();
+        deployedService.setId(uuid);
+        deployedService.setCategory(category);
+        deployedService.setName(name);
+        deployedService.setCustomerServiceName(customerServiceName);
+        deployedService.setVersion(version);
+        deployedService.setCsp(csp);
+        deployedService.setFlavor(flavor);
+        deployedService.setServiceDeploymentState(serviceDeploymentState);
+        deployedService.setCreateTime(createTime);
+        deployedService.setLastModifiedTime(lastModifiedTime);
+        deployedService.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
     }
 
     @Test
     void testGetterAndSetter() {
-        assertEquals(uuid, serviceVo.getId());
-        assertEquals(category, serviceVo.getCategory());
-        assertEquals(name, serviceVo.getName());
-        assertEquals(customerServiceName, serviceVo.getCustomerServiceName());
-        assertEquals(version, serviceVo.getVersion());
-        assertEquals(csp, serviceVo.getCsp());
-        assertEquals(flavor, serviceVo.getFlavor());
-        assertEquals(serviceDeploymentState, serviceVo.getServiceDeploymentState());
-        assertEquals(createTime, serviceVo.getCreateTime());
-        assertEquals(lastModifiedTime, serviceVo.getLastModifiedTime());
+        assertEquals(uuid, deployedService.getId());
+        assertEquals(category, deployedService.getCategory());
+        assertEquals(name, deployedService.getName());
+        assertEquals(customerServiceName, deployedService.getCustomerServiceName());
+        assertEquals(version, deployedService.getVersion());
+        assertEquals(csp, deployedService.getCsp());
+        assertEquals(flavor, deployedService.getFlavor());
+        assertEquals(serviceDeploymentState, deployedService.getServiceDeploymentState());
+        assertEquals(createTime, deployedService.getCreateTime());
+        assertEquals(lastModifiedTime, deployedService.getLastModifiedTime());
     }
 
     @Test
     public void testEqualsAndHashCode() {
-        assertEquals(serviceVo.hashCode(), serviceVo.hashCode());
+        assertEquals(deployedService.hashCode(), deployedService.hashCode());
 
         Object obj = new Object();
-        assertNotEquals(serviceVo, obj);
-        assertNotEquals(serviceVo, null);
-        assertNotEquals(serviceVo.hashCode(), obj.hashCode());
+        assertNotEquals(deployedService, obj);
+        assertNotEquals(deployedService, null);
+        assertNotEquals(deployedService.hashCode(), obj.hashCode());
 
-        ServiceVo serviceVo1 = new ServiceVo();
-        ServiceVo serviceVo2 = new ServiceVo();
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo, serviceVo2);
-        assertEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo.hashCode(), serviceVo2.hashCode());
-        assertEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        DeployedService deployedService1 = new DeployedService();
+        DeployedService deployedService2 = new DeployedService();
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService, deployedService2);
+        assertEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService.hashCode(), deployedService2.hashCode());
+        assertEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setId(uuid);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setId(uuid);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setCategory(category);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setCategory(category);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setName(name);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setName(name);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setCustomerServiceName(customerServiceName);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setCustomerServiceName(customerServiceName);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setVersion(version);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setVersion(version);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setCsp(csp);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setCsp(csp);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setFlavor(flavor);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setFlavor(flavor);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setServiceDeploymentState(serviceDeploymentState);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setServiceDeploymentState(serviceDeploymentState);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setCreateTime(createTime);
-        assertNotEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertNotEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setCreateTime(createTime);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
-        serviceVo1.setLastModifiedTime(lastModifiedTime);
-        serviceVo1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
-        assertEquals(serviceVo, serviceVo1);
-        assertNotEquals(serviceVo1, serviceVo2);
-        assertEquals(serviceVo.hashCode(), serviceVo1.hashCode());
-        assertNotEquals(serviceVo1.hashCode(), serviceVo2.hashCode());
+        deployedService1.setLastModifiedTime(lastModifiedTime);
+        deployedService1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        assertEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
     }
 
     @Test
     void testToString() {
-        String expectedString = "ServiceVo(" +
+        String expectedString = "DeployedService(" +
                 "id=" + uuid +
                 ", category=" + category +
                 ", name=" + name +
@@ -167,7 +167,7 @@ class ServiceVoTest {
                 ", createTime=" + createTime +
                 ", lastModifiedTime=" + lastModifiedTime +
                 ")";
-        assertEquals(expectedString, serviceVo.toString());
+        assertEquals(expectedString, deployedService.toString());
     }
 
 }

@@ -28,9 +28,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.policy.Policy;
 import org.eclipse.xpanse.modules.models.policy.PolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.PolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.policy.PolicyVo;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
@@ -63,9 +63,9 @@ class PolicyManageApiTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static UUID policyId;
-    private static PolicyVo policyVo;
+    private static Policy policy;
     private static UUID openStackPolicyId;
-    private static PolicyVo openStackPolicyVo;
+    private static Policy openStackPolicy;
     @Resource
     private MockMvc mockMvc;
     @MockBean
@@ -134,16 +134,16 @@ class PolicyManageApiTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        policyVo = objectMapper.readValue(response.getContentAsString(), PolicyVo.class);
-        policyId = policyVo.getId();
+        policy = objectMapper.readValue(response.getContentAsString(), Policy.class);
+        policyId = policy.getId();
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
-        Assertions.assertNotNull(policyVo.getId());
-        Assertions.assertEquals(policyVo.getCsp(), Csp.HUAWEI);
-        Assertions.assertEquals(policyVo.getCreateTime(), policyVo.getLastModifiedTime());
-        Assertions.assertEquals(policyVo.getPolicy(), "huawei_policy");
-        Assertions.assertTrue(policyVo.getEnabled());
+        Assertions.assertNotNull(policy.getId());
+        Assertions.assertEquals(policy.getCsp(), Csp.HUAWEI);
+        Assertions.assertEquals(policy.getCreateTime(), policy.getLastModifiedTime());
+        Assertions.assertEquals(policy.getPolicy(), "huawei_policy");
+        Assertions.assertTrue(policy.getEnabled());
 
 
         final PolicyCreateRequest openStackCreateRequest = new PolicyCreateRequest();
@@ -157,28 +157,28 @@ class PolicyManageApiTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        openStackPolicyVo =
-                objectMapper.readValue(openStackResponse.getContentAsString(), PolicyVo.class);
-        openStackPolicyId = openStackPolicyVo.getId();
+        openStackPolicy =
+                objectMapper.readValue(openStackResponse.getContentAsString(), Policy.class);
+        openStackPolicyId = openStackPolicy.getId();
 
         // Verify the results
         Assertions.assertEquals(openStackResponse.getStatus(), HttpStatus.OK.value());
-        Assertions.assertNotNull(openStackPolicyVo.getId());
-        Assertions.assertEquals(openStackPolicyVo.getCsp(), Csp.OPENSTACK);
-        Assertions.assertEquals(openStackPolicyVo.getCreateTime(),
-                openStackPolicyVo.getLastModifiedTime());
-        Assertions.assertEquals(openStackPolicyVo.getPolicy(), "openstack_policy");
-        Assertions.assertTrue(openStackPolicyVo.getEnabled());
+        Assertions.assertNotNull(openStackPolicy.getId());
+        Assertions.assertEquals(openStackPolicy.getCsp(), Csp.OPENSTACK);
+        Assertions.assertEquals(openStackPolicy.getCreateTime(),
+                openStackPolicy.getLastModifiedTime());
+        Assertions.assertEquals(openStackPolicy.getPolicy(), "openstack_policy");
+        Assertions.assertTrue(openStackPolicy.getEnabled());
 
     }
 
     void testGetPolicyDetails() throws Exception {
         // Setup
-        String exceptedResult = objectMapper.writeValueAsString(policyVo);
+        String exceptedResult = objectMapper.writeValueAsString(policy);
 
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/policies/{id}", policyVo.getId())
+                mockMvc.perform(get("/xpanse/policies/{id}", policy.getId())
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -206,8 +206,8 @@ class PolicyManageApiTest {
 
     void testListPolicies() throws Exception {
         // Setup
-        List<PolicyVo> policyVoList = List.of(policyVo, openStackPolicyVo);
-        String exceptedResult = objectMapper.writeValueAsString(policyVoList);
+        List<Policy> policyList = List.of(policy, openStackPolicy);
+        String exceptedResult = objectMapper.writeValueAsString(policyList);
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/policies")
@@ -222,8 +222,8 @@ class PolicyManageApiTest {
 
     void testListPolicies_WithCspHuawei() throws Exception {
         // Setup
-        List<PolicyVo> policyVoList = List.of(policyVo);
-        String exceptedResult = objectMapper.writeValueAsString(policyVoList);
+        List<Policy> policyList = List.of(policy);
+        String exceptedResult = objectMapper.writeValueAsString(policyList);
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/policies")
@@ -280,7 +280,7 @@ class PolicyManageApiTest {
         // Setup
         mockPoliciesValidateRequest(true);
         String errMsg = String.format("The same policy already exists for Csp: %s."
-                + " with id: %s", policyVo.getCsp(), policyVo.getId());
+                + " with id: %s", policy.getCsp(), policy.getId());
         Response result = Response.errorResponse(ResultType.POLICY_DUPLICATE, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
@@ -305,8 +305,8 @@ class PolicyManageApiTest {
 
         // Setup
         mockPoliciesValidateRequest(true);
-        policyVo.setPolicy("hw_policy_update");
-        policyVo.setEnabled(false);
+        policy.setPolicy("hw_policy_update");
+        policy.setEnabled(false);
 
         final PolicyUpdateRequest updateRequest = new PolicyUpdateRequest();
         updateRequest.setId(policyId);
@@ -323,16 +323,16 @@ class PolicyManageApiTest {
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
-        Assertions.assertNotNull(policyVo.getId());
-        Assertions.assertEquals(policyVo.getPolicy(), "hw_policy_update");
-        Assertions.assertFalse(policyVo.getEnabled());
+        Assertions.assertNotNull(policy.getId());
+        Assertions.assertEquals(policy.getPolicy(), "hw_policy_update");
+        Assertions.assertFalse(policy.getEnabled());
     }
 
     void testUpdatePolicy_ThrowsPolicyDuplicateException() throws Exception {
         // Setup
         mockPoliciesValidateRequest(true);
         String errMsg = String.format("The same policy already exists for Csp: %s."
-                + " with id: %s", openStackPolicyVo.getCsp(), openStackPolicyVo.getId());
+                + " with id: %s", openStackPolicy.getCsp(), openStackPolicy.getId());
         Response result = Response.errorResponse(ResultType.POLICY_DUPLICATE, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
@@ -393,8 +393,8 @@ class PolicyManageApiTest {
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
         Assertions.assertEquals(response2.getStatus(), HttpStatus.NO_CONTENT.value());
-        policyVo = null;
-        openStackPolicyVo = null;
+        policy = null;
+        openStackPolicy = null;
     }
 
     void testDeletePolicy_ThrowsPolicyNotFoundException() throws Exception {

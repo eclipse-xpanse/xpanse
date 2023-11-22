@@ -24,8 +24,8 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
-import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
-import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.service.view.DeployedService;
+import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -64,7 +64,7 @@ public class IsvServiceDeployApi {
     @GetMapping(value = "/isv/services",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ServiceVo> listDeployedServicesOfIsv(
+    public List<DeployedService> listDeployedServicesOfIsv(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category category,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
@@ -91,7 +91,7 @@ public class IsvServiceDeployApi {
     @GetMapping(value = "/isv/services/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ServiceDetailVo getServiceDetailsByIdForIsv(
+    public DeployedServiceDetails getServiceDetailsByIdForIsv(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
         return this.deployService.getServiceDetailsByIdForIsv(UUID.fromString(id));

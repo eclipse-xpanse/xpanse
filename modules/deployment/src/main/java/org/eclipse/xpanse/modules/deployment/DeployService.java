@@ -27,8 +27,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
+import org.eclipse.xpanse.modules.models.policy.Policy;
 import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
-import org.eclipse.xpanse.modules.models.policy.PolicyVo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
@@ -42,9 +42,9 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetail
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
-import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
-import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
-import org.eclipse.xpanse.modules.models.service.view.VendorHostedServiceDetailsVo;
+import org.eclipse.xpanse.modules.models.service.view.DeployedService;
+import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
@@ -373,8 +373,8 @@ public class DeployService {
         queryRequest.setUserId(userId);
         queryRequest.setCsp(csp);
         queryRequest.setEnabled(true);
-        List<PolicyVo> policyVos = policyManager.listPolicies(queryRequest);
-        if (CollectionUtils.isEmpty(policyVos)) {
+        List<Policy> policies = policyManager.listPolicies(queryRequest);
+        if (CollectionUtils.isEmpty(policies)) {
             return;
         }
 
@@ -383,9 +383,9 @@ public class DeployService {
             return;
         }
 
-        List<String> policies = policyVos.stream().map(PolicyVo::getPolicy)
+        List<String> policyList = policies.stream().map(Policy::getPolicy)
                 .filter(StringUtils::isNotBlank).toList();
-        policyManager.evaluatePolicies(policies, planJson);
+        policyManager.evaluatePolicies(policyList, planJson);
     }
 
     /**
@@ -424,7 +424,7 @@ public class DeployService {
      * @param query service query model.
      * @return serviceVos
      */
-    public List<ServiceVo> listDeployedServices(ServiceQueryModel query) {
+    public List<DeployedService> listDeployedServices(ServiceQueryModel query) {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         query.setUserId(userIdOptional.orElse(null));
         List<DeployServiceEntity> deployServices =
@@ -440,7 +440,7 @@ public class DeployService {
      * @param id ID of deploy service.
      * @return serviceDetailVo
      */
-    public ServiceDetailVo getSelfHostedServiceDetailsByIdForEndUser(UUID id) {
+    public DeployedServiceDetails getSelfHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
         ServiceHostingType serviceHostingType =
                 deployServiceEntity.getDeployRequest().getServiceHostingType();
@@ -457,9 +457,9 @@ public class DeployService {
      * Get vendor hosted service detail by id.
      *
      * @param id ID of deploy service.
-     * @return VendorHostedServiceDetailsVo
+     * @return VendorHostedDeployedServiceDetails
      */
-    public VendorHostedServiceDetailsVo getVendorHostedServiceDetailsByIdForEndUser(UUID id) {
+    public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
         ServiceHostingType serviceHostingType =
                 deployServiceEntity.getDeployRequest().getServiceHostingType();
@@ -583,13 +583,13 @@ public class DeployService {
         return deployment;
     }
 
-    private ServiceVo convertToServiceVo(DeployServiceEntity serviceEntity) {
+    private DeployedService convertToServiceVo(DeployServiceEntity serviceEntity) {
         if (Objects.nonNull(serviceEntity)) {
-            ServiceVo serviceVo = new ServiceVo();
-            BeanUtils.copyProperties(serviceEntity, serviceVo);
-            serviceVo.setServiceHostingType(
+            DeployedService deployedService = new DeployedService();
+            BeanUtils.copyProperties(serviceEntity, deployedService);
+            deployedService.setServiceHostingType(
                     serviceEntity.getDeployRequest().getServiceHostingType());
-            return serviceVo;
+            return deployedService;
         }
         return null;
     }
@@ -694,7 +694,7 @@ public class DeployService {
      * @param query service query model.
      * @return serviceVos
      */
-    public List<ServiceVo> listDeployedServicesOfIsv(ServiceQueryModel query) {
+    public List<DeployedService> listDeployedServicesOfIsv(ServiceQueryModel query) {
         Optional<String> namespace = identityProviderManager.getUserNamespace();
         if (namespace.isEmpty()) {
             return new ArrayList<>();
@@ -711,7 +711,7 @@ public class DeployService {
      * @param id ID of deploy service.
      * @return serviceDetailVo
      */
-    public ServiceDetailVo getServiceDetailsByIdForIsv(UUID id) {
+    public DeployedServiceDetails getServiceDetailsByIdForIsv(UUID id) {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
         ServiceHostingType serviceHostingType =
                 deployServiceEntity.getDeployRequest().getServiceHostingType();
