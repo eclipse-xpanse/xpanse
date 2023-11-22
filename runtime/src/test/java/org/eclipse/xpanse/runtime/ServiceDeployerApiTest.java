@@ -45,8 +45,8 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
-import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.service.view.DeployedService;
+import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -78,7 +78,7 @@ class ServiceDeployerApiTest {
 
     private static final String userId = "adminId";
     private static ServiceTemplateDetailVo serviceTemplateDetailVo;
-    private static ServiceDetailVo serviceDetailVo;
+    private static DeployedServiceDetails deployedServiceDetails;
     private static Ocl ocl;
     private static UUID taskId;
     private static ServiceDeploymentState state;
@@ -215,9 +215,9 @@ class ServiceDeployerApiTest {
 
     void testListDeployedServices(boolean deploySuccess) throws Exception {
         // Set up
-        ServiceVo serviceVo = new ServiceVo();
-        BeanUtils.copyProperties(serviceDetailVo, serviceVo);
-        String result = objectMapper.writeValueAsString(List.of(serviceVo));
+        DeployedService deployedService = new DeployedService();
+        BeanUtils.copyProperties(deployedServiceDetails, deployedService);
+        String result = objectMapper.writeValueAsString(List.of(deployedService));
         String state = deploySuccess ? ServiceDeploymentState.DEPLOY_SUCCESS.toValue() :
                 ServiceDeploymentState.DEPLOY_FAILED.toValue();
         // Run the test
@@ -237,7 +237,7 @@ class ServiceDeployerApiTest {
 
     void deleteDestroyedServiceRecord() {
         taskId = null;
-        serviceDetailVo = null;
+        deployedServiceDetails = null;
         state = null;
         deployServiceRepository.deleteAll();
     }
@@ -331,27 +331,27 @@ class ServiceDeployerApiTest {
         final MockHttpServletResponse detailResponse =
                 mockMvc.perform(get("/xpanse/services/{id}", taskId))
                         .andReturn().getResponse();
-        serviceDetailVo = objectMapper.readValue(detailResponse.getContentAsString(),
-                ServiceDetailVo.class);
+        deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
+                DeployedServiceDetails.class);
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), detailResponse.getStatus());
-        Assertions.assertEquals(ocl.getCategory(), serviceDetailVo.getCategory());
+        Assertions.assertEquals(ocl.getCategory(), deployedServiceDetails.getCategory());
         Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
-                serviceDetailVo.getCsp());
+                deployedServiceDetails.getCsp());
         Assertions.assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
-                serviceDetailVo.getName());
-        Assertions.assertEquals(ocl.getServiceVersion(), serviceDetailVo.getVersion());
+                deployedServiceDetails.getName());
+        Assertions.assertEquals(ocl.getServiceVersion(), deployedServiceDetails.getVersion());
 
-        if (ServiceDeploymentState.DEPLOY_SUCCESS == serviceDetailVo.getServiceDeploymentState()) {
-            Map<String, String> properties = serviceDetailVo.getDeployedServiceProperties();
+        if (ServiceDeploymentState.DEPLOY_SUCCESS == deployedServiceDetails.getServiceDeploymentState()) {
+            Map<String, String> properties = deployedServiceDetails.getDeployedServiceProperties();
             Assertions.assertNotNull(properties);
-            Assertions.assertFalse(serviceDetailVo.getDeployedServiceProperties().isEmpty());
+            Assertions.assertFalse(deployedServiceDetails.getDeployedServiceProperties().isEmpty());
             Assertions.assertTrue(properties.containsKey("secgroup_name"));
             Assertions.assertEquals("secgroup_name", properties.get("secgroup_name"));
         }
-        if (ServiceDeploymentState.DEPLOY_FAILED == serviceDetailVo.getServiceDeploymentState()) {
-            Assertions.assertNotNull(serviceDetailVo.getResultMessage());
+        if (ServiceDeploymentState.DEPLOY_FAILED == deployedServiceDetails.getServiceDeploymentState()) {
+            Assertions.assertNotNull(deployedServiceDetails.getResultMessage());
         }
     }
 
@@ -465,9 +465,9 @@ class ServiceDeployerApiTest {
                     mockMvc.perform(get("/xpanse/services/{id}", id))
                             .andReturn().getResponse();
             if (HttpStatus.OK.value() == detailResponse.getStatus()) {
-                serviceDetailVo = objectMapper.readValue(detailResponse.getContentAsString(),
-                        ServiceDetailVo.class);
-                state = serviceDetailVo.getServiceDeploymentState();
+                deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
+                        DeployedServiceDetails.class);
+                state = deployedServiceDetails.getServiceDeploymentState();
                 if (ServiceDeploymentState.DEPLOY_SUCCESS == state) {
                     deploySuccess = true;
                 } else if (ServiceDeploymentState.DEPLOY_FAILED == state) {
@@ -491,9 +491,9 @@ class ServiceDeployerApiTest {
                     mockMvc.perform(get("/xpanse/services/{id}", id))
                             .andReturn().getResponse();
             if (HttpStatus.OK.value() == detailResponse.getStatus()) {
-                serviceDetailVo = objectMapper.readValue(detailResponse.getContentAsString(),
-                        ServiceDetailVo.class);
-                state = serviceDetailVo.getServiceDeploymentState();
+                deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
+                        DeployedServiceDetails.class);
+                state = deployedServiceDetails.getServiceDeploymentState();
                 if (ServiceDeploymentState.DESTROY_SUCCESS == state) {
                     destroySuccess = true;
                 } else if (ServiceDeploymentState.DESTROY_FAILED == state) {

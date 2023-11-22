@@ -16,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.policy.DatabasePolicyStorage;
 import org.eclipse.xpanse.modules.database.policy.PolicyEntity;
+import org.eclipse.xpanse.modules.models.policy.Policy;
 import org.eclipse.xpanse.modules.models.policy.PolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.PolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.policy.PolicyVo;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
@@ -102,7 +102,7 @@ public class PolicyManager {
      * @param queryModel The query model.
      * @return Returns all policies matched the query model.
      */
-    public List<PolicyVo> listPolicies(PolicyQueryRequest queryModel) {
+    public List<Policy> listPolicies(PolicyQueryRequest queryModel) {
         List<PolicyEntity> policyEntities = policyStorage.listPolicies(queryModel);
         return policyEntities.stream().sorted(Comparator.comparing(PolicyEntity::getCsp))
                 .map(this::conventToPolicyVo).toList();
@@ -114,7 +114,7 @@ public class PolicyManager {
      * @param createRequest create policy request.
      * @return Returns created policy view object.
      */
-    public PolicyVo addPolicy(PolicyCreateRequest createRequest) {
+    public Policy addPolicy(PolicyCreateRequest createRequest) {
         validatePolicy(createRequest.getPolicy());
         checkIfPolicyIsDuplicate(createRequest.getCsp(), createRequest.getPolicy());
         PolicyEntity newPolicy = conventToPolicyEntity(createRequest);
@@ -128,7 +128,7 @@ public class PolicyManager {
      * @param updateRequest update policy request.
      * @return Returns updated policy view object.
      */
-    public PolicyVo updatePolicy(PolicyUpdateRequest updateRequest) {
+    public Policy updatePolicy(PolicyUpdateRequest updateRequest) {
         PolicyEntity existingEntity = policyStorage.findPolicyById(updateRequest.getId());
         if (Objects.isNull(existingEntity)) {
             String errorMsg = String.format("The policy with id %s not found.",
@@ -154,7 +154,7 @@ public class PolicyManager {
      * @param id the id of the policy.
      * @return Returns the policy view object.
      */
-    public PolicyVo getPolicyDetails(UUID id) {
+    public Policy getPolicyDetails(UUID id) {
         PolicyEntity existingEntity = policyStorage.findPolicyById(id);
         if (Objects.isNull(existingEntity)) {
             String errorMsg = String.format("The policy with id %s not found.", id);
@@ -206,11 +206,11 @@ public class PolicyManager {
     }
 
 
-    private PolicyVo conventToPolicyVo(PolicyEntity policyEntity) {
+    private Policy conventToPolicyVo(PolicyEntity policyEntity) {
         if (Objects.nonNull(policyEntity)) {
-            PolicyVo policyVo = new PolicyVo();
-            BeanUtils.copyProperties(policyEntity, policyVo);
-            return policyVo;
+            Policy policy = new Policy();
+            BeanUtils.copyProperties(policyEntity, policy);
+            return policy;
         }
         return null;
     }

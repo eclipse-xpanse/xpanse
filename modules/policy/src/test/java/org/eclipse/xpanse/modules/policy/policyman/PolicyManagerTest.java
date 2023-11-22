@@ -17,10 +17,10 @@ import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.policy.DatabasePolicyStorage;
 import org.eclipse.xpanse.modules.database.policy.PolicyEntity;
+import org.eclipse.xpanse.modules.models.policy.Policy;
 import org.eclipse.xpanse.modules.models.policy.PolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.PolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.policy.PolicyVo;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
@@ -124,12 +124,12 @@ class PolicyManagerTest {
         queryModel.setCsp(Csp.HUAWEI);
         queryModel.setPolicy("policy");
 
-        final PolicyVo policyVo = new PolicyVo();
-        policyVo.setId(id);
-        policyVo.setPolicy("policy");
-        policyVo.setCsp(Csp.HUAWEI);
-        policyVo.setEnabled(true);
-        final List<PolicyVo> expectedResult = List.of(policyVo);
+        final Policy policy = new Policy();
+        policy.setId(id);
+        policy.setPolicy("policy");
+        policy.setCsp(Csp.HUAWEI);
+        policy.setEnabled(true);
+        final List<Policy> expectedResult = List.of(policy);
         // Configure DatabasePolicyStorage.listPolicies(...).
         final PolicyEntity policyEntity = new PolicyEntity();
         policyEntity.setId(id);
@@ -145,7 +145,7 @@ class PolicyManagerTest {
         when(mockPolicyStorage.listPolicies(queryModel1)).thenReturn(policyEntities);
 
         // Run the test
-        final List<PolicyVo> result = policyManagerUnderTest.listPolicies(queryModel);
+        final List<Policy> result = policyManagerUnderTest.listPolicies(queryModel);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -168,7 +168,7 @@ class PolicyManagerTest {
         when(mockPolicyStorage.listPolicies(queryModel1)).thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<PolicyVo> result = policyManagerUnderTest.listPolicies(queryModel);
+        final List<Policy> result = policyManagerUnderTest.listPolicies(queryModel);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -181,7 +181,7 @@ class PolicyManagerTest {
         createRequest.setCsp(Csp.HUAWEI);
         createRequest.setPolicy("policy");
 
-        final PolicyVo expectedResult = new PolicyVo();
+        final Policy expectedResult = new Policy();
         expectedResult.setId(id);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
@@ -217,7 +217,7 @@ class PolicyManagerTest {
         when(mockPolicyStorage.store(any(PolicyEntity.class))).thenReturn(policyEntity1);
 
         // Run the test
-        final PolicyVo result = policyManagerUnderTest.addPolicy(createRequest);
+        final Policy result = policyManagerUnderTest.addPolicy(createRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -254,7 +254,7 @@ class PolicyManagerTest {
         when(mockPolicyStorage.store(any(PolicyEntity.class))).thenReturn(null);
 
         // Run the test
-        final PolicyVo result = policyManagerUnderTest.addPolicy(createRequest);
+        final Policy result = policyManagerUnderTest.addPolicy(createRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(null);
@@ -307,7 +307,7 @@ class PolicyManagerTest {
         createRequest.setPolicy("policy");
         createRequest.setEnabled(true);
 
-        final PolicyVo expectedResult = new PolicyVo();
+        final Policy expectedResult = new Policy();
         expectedResult.setId(id);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
@@ -332,7 +332,7 @@ class PolicyManagerTest {
         updateRequest.setPolicy("policy_update");
         updateRequest.setEnabled(false);
 
-        final PolicyVo expectedResult = new PolicyVo();
+        final Policy expectedResult = new Policy();
         expectedResult.setId(id);
         expectedResult.setPolicy("policy_update");
         expectedResult.setCsp(Csp.HUAWEI);
@@ -374,7 +374,7 @@ class PolicyManagerTest {
                 .thenReturn(validateResponse);
 
         // Run the test
-        final PolicyVo result = policyManagerUnderTest.updatePolicy(updateRequest);
+        final Policy result = policyManagerUnderTest.updatePolicy(updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -388,7 +388,7 @@ class PolicyManagerTest {
         updateRequest.setCsp(Csp.OPENSTACK);
         updateRequest.setEnabled(false);
 
-        final PolicyVo expectedResult = new PolicyVo();
+        final Policy expectedResult = new Policy();
         expectedResult.setId(id);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.OPENSTACK);
@@ -422,7 +422,7 @@ class PolicyManagerTest {
         when(mockPolicyStorage.store(updatedPolicyEntity)).thenReturn(updatedPolicyEntity);
 
         // Run the test
-        final PolicyVo result = policyManagerUnderTest.updatePolicy(updateRequest);
+        final Policy result = policyManagerUnderTest.updatePolicy(updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -522,7 +522,7 @@ class PolicyManagerTest {
     @Test
     void testGetPolicyDetails() {
         // Setup
-        final PolicyVo expectedResult = new PolicyVo();
+        final Policy expectedResult = new Policy();
         expectedResult.setId(id);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
@@ -540,7 +540,7 @@ class PolicyManagerTest {
         when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
 
         // Run the test
-        final PolicyVo result = policyManagerUnderTest.getPolicyDetails(id);
+        final Policy result = policyManagerUnderTest.getPolicyDetails(id);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -549,7 +549,7 @@ class PolicyManagerTest {
     @Test
     void testGetPolicyDetails_ThrowsPolicyNotFoundException() {
         // Setup
-        final PolicyVo expectedResult = new PolicyVo();
+        final Policy expectedResult = new Policy();
         expectedResult.setId(id);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
@@ -566,7 +566,7 @@ class PolicyManagerTest {
     @Test
     void testGetPolicyDetails_ThrowsAccessDeniedException() {
         // Setup
-        final PolicyVo expectedResult = new PolicyVo();
+        final Policy expectedResult = new Policy();
         expectedResult.setId(id);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);

@@ -33,9 +33,9 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.MigrateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
-import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
-import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
-import org.eclipse.xpanse.modules.models.service.view.VendorHostedServiceDetailsVo;
+import org.eclipse.xpanse.modules.models.service.view.DeployedService;
+import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -85,7 +85,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ServiceDetailVo getSelfHostedServiceDetailsById(
+    public DeployedServiceDetails getSelfHostedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
         return this.deployService.getSelfHostedServiceDetailsByIdForEndUser(UUID.fromString(id));
@@ -95,14 +95,14 @@ public class ServiceDeployerApi {
     /**
      * Get details of the managed vendor hosted service by id.
      *
-     * @return VendorHostedServiceDetailsVo of the managed service.
+     * @return VendorHostedDeployedServiceDetails of the managed service.
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Get deployed service details by id.")
     @GetMapping(value = "/isv/service/vendor_hosted/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public VendorHostedServiceDetailsVo getVendorHostedServiceDetailsById(
+    public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
         return this.deployService.getVendorHostedServiceDetailsByIdForEndUser(UUID.fromString(id));
@@ -118,7 +118,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ServiceVo> listDeployedServices(
+    public List<DeployedService> listDeployedServices(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category category,
             @Parameter(name = "cspName", description = "name of the cloud service provider")

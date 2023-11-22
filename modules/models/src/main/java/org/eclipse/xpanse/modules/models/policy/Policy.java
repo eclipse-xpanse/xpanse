@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
  * Define view object for detail of the policy entity.
  */
 @Data
-public class PolicyVo {
+public class Policy {
 
     /**
      * The id of the entity.

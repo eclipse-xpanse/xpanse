@@ -25,9 +25,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test of ServiceDetailVo.
+ * Test of DeployedServiceDetails.
  */
-class ServiceDetailVoTest {
+class DeployedServiceDetailsTest {
     private static final String userId = "userId";
     private static final Category category = Category.COMPUTE;
     private static final String serviceName = "serviceName";
@@ -45,7 +45,7 @@ class ServiceDetailVoTest {
     private static DeployRequest deployRequest;
     private static List<@Valid DeployResource> deployResources;
     private static Map<String, String> deployedServiceProperties;
-    private static ServiceDetailVo serviceDetailVo;
+    private static DeployedServiceDetails deployedServiceDetails;
 
     @BeforeEach
     void setUp() {
@@ -74,11 +74,11 @@ class ServiceDetailVoTest {
         deployedServiceProperties.put("key1", "value1");
         deployedServiceProperties.put("key2", "value2");
 
-        serviceDetailVo = new ServiceDetailVo();
-        serviceDetailVo.setDeployRequest(deployRequest);
-        serviceDetailVo.setDeployResources(deployResources);
-        serviceDetailVo.setDeployedServiceProperties(deployedServiceProperties);
-        serviceDetailVo.setResultMessage(resultSuccessMessage);
+        deployedServiceDetails = new DeployedServiceDetails();
+        deployedServiceDetails.setDeployRequest(deployRequest);
+        deployedServiceDetails.setDeployResources(deployResources);
+        deployedServiceDetails.setDeployedServiceProperties(deployedServiceProperties);
+        deployedServiceDetails.setResultMessage(resultSuccessMessage);
     }
 
     @Test
@@ -98,63 +98,63 @@ class ServiceDetailVoTest {
         assertEquals(kind, deployResource.getKind());
         assertEquals(Collections.emptyMap(), deployResource.getProperties());
 
-        assertEquals(deployRequest, serviceDetailVo.getDeployRequest());
-        assertEquals(deployResources, serviceDetailVo.getDeployResources());
-        assertEquals(deployedServiceProperties, serviceDetailVo.getDeployedServiceProperties());
-        assertEquals(resultSuccessMessage, serviceDetailVo.getResultMessage());
+        assertEquals(deployRequest, deployedServiceDetails.getDeployRequest());
+        assertEquals(deployResources, deployedServiceDetails.getDeployResources());
+        assertEquals(deployedServiceProperties, deployedServiceDetails.getDeployedServiceProperties());
+        assertEquals(resultSuccessMessage, deployedServiceDetails.getResultMessage());
     }
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(serviceDetailVo.hashCode(), serviceDetailVo.hashCode());
+        assertEquals(deployedServiceDetails.hashCode(), deployedServiceDetails.hashCode());
 
         Object obj = new Object();
-        assertNotEquals(serviceDetailVo, obj);
-        assertNotEquals(null, serviceDetailVo);
-        assertNotEquals(serviceDetailVo.hashCode(), obj.hashCode());
+        assertNotEquals(deployedServiceDetails, obj);
+        assertNotEquals(null, deployedServiceDetails);
+        assertNotEquals(deployedServiceDetails.hashCode(), obj.hashCode());
 
-        ServiceDetailVo serviceDetailVo1 = new ServiceDetailVo();
-        ServiceDetailVo serviceDetailVo2 = new ServiceDetailVo();
-        assertNotEquals(serviceDetailVo, serviceDetailVo1);
-        assertNotEquals(serviceDetailVo, serviceDetailVo2);
-        assertEquals(serviceDetailVo1, serviceDetailVo2);
-        assertNotEquals(serviceDetailVo.hashCode(), serviceDetailVo1.hashCode());
-        assertNotEquals(serviceDetailVo.hashCode(), serviceDetailVo2.hashCode());
-        assertEquals(serviceDetailVo1.hashCode(), serviceDetailVo2.hashCode());
+        DeployedServiceDetails deployedServiceDetails1 = new DeployedServiceDetails();
+        DeployedServiceDetails deployedServiceDetails2 = new DeployedServiceDetails();
+        assertNotEquals(deployedServiceDetails, deployedServiceDetails1);
+        assertNotEquals(deployedServiceDetails, deployedServiceDetails2);
+        assertEquals(deployedServiceDetails1, deployedServiceDetails2);
+        assertNotEquals(deployedServiceDetails.hashCode(), deployedServiceDetails1.hashCode());
+        assertNotEquals(deployedServiceDetails.hashCode(), deployedServiceDetails2.hashCode());
+        assertEquals(deployedServiceDetails1.hashCode(), deployedServiceDetails2.hashCode());
 
-        serviceDetailVo1.setDeployRequest(deployRequest);
-        assertNotEquals(serviceDetailVo, serviceDetailVo1);
-        assertNotEquals(serviceDetailVo1, serviceDetailVo2);
-        assertNotEquals(serviceDetailVo.hashCode(), serviceDetailVo1.hashCode());
-        assertNotEquals(serviceDetailVo1.hashCode(), serviceDetailVo2.hashCode());
+        deployedServiceDetails1.setDeployRequest(deployRequest);
+        assertNotEquals(deployedServiceDetails, deployedServiceDetails1);
+        assertNotEquals(deployedServiceDetails1, deployedServiceDetails2);
+        assertNotEquals(deployedServiceDetails.hashCode(), deployedServiceDetails1.hashCode());
+        assertNotEquals(deployedServiceDetails1.hashCode(), deployedServiceDetails2.hashCode());
 
-        serviceDetailVo1.setDeployResources(deployResources);
-        assertNotEquals(serviceDetailVo, serviceDetailVo1);
-        assertNotEquals(serviceDetailVo1, serviceDetailVo2);
-        assertNotEquals(serviceDetailVo.hashCode(), serviceDetailVo1.hashCode());
-        assertNotEquals(serviceDetailVo1.hashCode(), serviceDetailVo2.hashCode());
+        deployedServiceDetails1.setDeployResources(deployResources);
+        assertNotEquals(deployedServiceDetails, deployedServiceDetails1);
+        assertNotEquals(deployedServiceDetails1, deployedServiceDetails2);
+        assertNotEquals(deployedServiceDetails.hashCode(), deployedServiceDetails1.hashCode());
+        assertNotEquals(deployedServiceDetails1.hashCode(), deployedServiceDetails2.hashCode());
 
-        serviceDetailVo1.setDeployedServiceProperties(deployedServiceProperties);
-        assertNotEquals(serviceDetailVo, serviceDetailVo1);
-        assertNotEquals(serviceDetailVo1, serviceDetailVo2);
-        assertNotEquals(serviceDetailVo.hashCode(), serviceDetailVo1.hashCode());
-        assertNotEquals(serviceDetailVo1.hashCode(), serviceDetailVo2.hashCode());
+        deployedServiceDetails1.setDeployedServiceProperties(deployedServiceProperties);
+        assertNotEquals(deployedServiceDetails, deployedServiceDetails1);
+        assertNotEquals(deployedServiceDetails1, deployedServiceDetails2);
+        assertNotEquals(deployedServiceDetails.hashCode(), deployedServiceDetails1.hashCode());
+        assertNotEquals(deployedServiceDetails1.hashCode(), deployedServiceDetails2.hashCode());
 
-        serviceDetailVo1.setResultMessage(resultSuccessMessage);
-        assertEquals(serviceDetailVo, serviceDetailVo1);
-        assertNotEquals(serviceDetailVo1, serviceDetailVo2);
-        assertEquals(serviceDetailVo.hashCode(), serviceDetailVo1.hashCode());
-        assertNotEquals(serviceDetailVo1.hashCode(), serviceDetailVo2.hashCode());
+        deployedServiceDetails1.setResultMessage(resultSuccessMessage);
+        assertEquals(deployedServiceDetails, deployedServiceDetails1);
+        assertNotEquals(deployedServiceDetails1, deployedServiceDetails2);
+        assertEquals(deployedServiceDetails.hashCode(), deployedServiceDetails1.hashCode());
+        assertNotEquals(deployedServiceDetails1.hashCode(), deployedServiceDetails2.hashCode());
     }
 
     @Test
     void testToString() {
-        String expectedToString = "ServiceDetailVo(deployRequest=" + deployRequest +
+        String expectedToString = "DeployedServiceDetails(deployRequest=" + deployRequest +
                 ", deployResources=" + deployResources +
                 ", deployedServiceProperties=" + deployedServiceProperties +
                 ", resultMessage=" + resultSuccessMessage + ")";
 
-        assertEquals(expectedToString, serviceDetailVo.toString());
+        assertEquals(expectedToString, deployedServiceDetails.toString());
     }
 
 }

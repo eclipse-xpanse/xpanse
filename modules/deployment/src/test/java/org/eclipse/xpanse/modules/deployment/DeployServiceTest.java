@@ -49,8 +49,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoun
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
-import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
-import org.eclipse.xpanse.modules.models.service.view.ServiceVo;
+import org.eclipse.xpanse.modules.models.service.view.DeployedService;
+import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -370,13 +370,13 @@ class DeployServiceTest {
         deployServices.add(deployServiceEntity);
 
         when(deployServiceStorage.listServices(any())).thenReturn(deployServices);
-        List<ServiceVo> result = deployService.listDeployedServices(new ServiceQueryModel());
+        List<DeployedService> result = deployService.listDeployedServices(new ServiceQueryModel());
 
         assertEquals(1, result.size());
 
-        ServiceVo serviceVo = result.get(0);
-        assertEquals(uuid, serviceVo.getId());
-        assertEquals("deployServiceEntity", serviceVo.getName());
+        DeployedService deployedService = result.get(0);
+        assertEquals(uuid, deployedService.getId());
+        assertEquals("deployServiceEntity", deployedService.getName());
     }
 
     @Test
@@ -384,7 +384,7 @@ class DeployServiceTest {
         when(deployServiceStorage.findDeployServiceById(uuid))
                 .thenReturn(deployServiceEntity);
         when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
-        ServiceDetailVo result = deployService.getSelfHostedServiceDetailsByIdForEndUser(uuid);
+        DeployedServiceDetails result = deployService.getSelfHostedServiceDetailsByIdForEndUser(uuid);
 
         assertNotNull(result);
         assertEquals(uuid, result.getId());

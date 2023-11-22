@@ -30,7 +30,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.view.ServiceDetailVo;
+import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ public class WebhookApiTest {
 
     private static final String userId = "adminId";
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static ServiceDetailVo serviceDetailVo;
+    private static DeployedServiceDetails deployedServiceDetails;
     private static String taskId = "bfdbc175-9f27-4679-8a4d-1f6b8c91386b";
     private static ServiceDeploymentState state;
     @Resource
@@ -143,9 +143,9 @@ public class WebhookApiTest {
                     mockMvc.perform(get("/xpanse/services/{id}", id))
                             .andReturn().getResponse();
             if (HttpStatus.OK.value() == detailResponse.getStatus()) {
-                serviceDetailVo = objectMapper.readValue(detailResponse.getContentAsString(),
-                        ServiceDetailVo.class);
-                state = serviceDetailVo.getServiceDeploymentState();
+                deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
+                        DeployedServiceDetails.class);
+                state = deployedServiceDetails.getServiceDeploymentState();
                 if (ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED == state) {
                     deployCallbackSuccess = true;
                 } else if (ServiceDeploymentState.DEPLOY_FAILED == state) {
@@ -241,9 +241,9 @@ public class WebhookApiTest {
                     mockMvc.perform(get("/xpanse/services/{id}", id))
                             .andReturn().getResponse();
             if (HttpStatus.OK.value() == detailResponse.getStatus()) {
-                serviceDetailVo = objectMapper.readValue(detailResponse.getContentAsString(),
-                        ServiceDetailVo.class);
-                state = serviceDetailVo.getServiceDeploymentState();
+                deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
+                        DeployedServiceDetails.class);
+                state = deployedServiceDetails.getServiceDeploymentState();
                 if (ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED == state) {
                     deployCallbackSuccess = true;
                 } else if (ServiceDeploymentState.DEPLOY_FAILED == state) {

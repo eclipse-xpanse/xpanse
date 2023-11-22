@@ -20,7 +20,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ServiceDetailVo extends ServiceVo {
+public class DeployedServiceDetails extends DeployedService {
 
     @NotNull
     @Schema(description = "The create request of the deployed service.")

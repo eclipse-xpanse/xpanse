@@ -19,10 +19,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.policy.Policy;
 import org.eclipse.xpanse.modules.models.policy.PolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.PolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.policy.PolicyVo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -71,7 +71,7 @@ public class PolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies defined by the user.")
-    public List<PolicyVo> listPolicies(
+    public List<Policy> listPolicies(
             @Parameter(name = "cspName", description = "Name of csp which the policy belongs to.")
             @RequestParam(name = "cspName", required = false) Csp csp,
             @Parameter(name = "enabled", description = "Is the policy enabled.")
@@ -92,7 +92,7 @@ public class PolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the details of the policy created by the user.")
-    public PolicyVo getPolicyDetails(@PathVariable String id) {
+    public Policy getPolicyDetails(@PathVariable String id) {
         return policyManager.getPolicyDetails(UUID.fromString(id));
     }
 
@@ -107,7 +107,7 @@ public class PolicyManageApi {
     @PostMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Add policy created by the user.")
-    public PolicyVo addPolicy(
+    public Policy addPolicy(
             @Valid @RequestBody PolicyCreateRequest policyCreateRequest) {
         return policyManager.addPolicy(policyCreateRequest);
     }
@@ -122,7 +122,7 @@ public class PolicyManageApi {
     @PutMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update the policy created by the user.")
-    public PolicyVo updatePolicy(
+    public Policy updatePolicy(
             @Valid @RequestBody PolicyUpdateRequest updateRequest) {
         return policyManager.updatePolicy(updateRequest);
     }
