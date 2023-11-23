@@ -613,10 +613,16 @@ public class DeployService {
 
     /**
      * Deployment service.
+     *
+     * @param newId         new service id.
+     * @param userId        user id.
+     * @param deployRequest deploy request.
+     * @return new deployed service entity.
      */
     @Async("taskExecutor")
-    public CompletableFuture<Void> deployService(UUID newId,
-            String userId, DeployRequest deployRequest) {
+    public CompletableFuture<DeployServiceEntity> deployService(UUID newId,
+                                                                String userId,
+                                                                DeployRequest deployRequest) {
         MDC.put(TASK_ID, newId.toString());
         log.info("start deploy service, service id : {}", newId);
         DeployTask deployTask = new DeployTask();
@@ -626,53 +632,28 @@ public class DeployService {
         Deployment deployment = getDeployHandler(deployTask);
         deployTask.getDeployRequest().setUserId(userId);
         deploy(deployment, deployTask);
-        return CompletableFuture.completedFuture(null);
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(newId);
+        return CompletableFuture.completedFuture(deployServiceEntity);
     }
 
     /**
      * Destroy service by deployed service id.
+     *
+     * @param id deployed service id.
+     * @return updated service entity.
      */
     @Async("taskExecutor")
-    public CompletableFuture<Void> destroyService(String id) {
+    public CompletableFuture<DeployServiceEntity> destroyService(String id) {
         MDC.put(TASK_ID, id);
         log.info("start destroy service, service id : {}", id);
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.fromString(id));
         Deployment deployment = getDestroyHandler(deployTask);
         destroy(deployment, deployTask);
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /**
-     * Method to determine whether deploy is successful.
-     */
-    public boolean isDeploySuccess(UUID id) {
-        MDC.put(TASK_ID, id.toString());
-        log.info(" starting to poll for status update.. , service id : {}", id);
-        ServiceDeploymentState deployState = null;
-        while (deployState == ServiceDeploymentState.DEPLOYING || deployState == null) {
-            deployState = deployServiceStorage.queryRefreshDeployServiceById(id)
-                    .getServiceDeploymentState();
-        }
-        log.info("deployment status updated,state:{}", deployState);
-        return deployState == ServiceDeploymentState.DEPLOY_SUCCESS;
-    }
-
-    /**
-     * Method to determine whether destroy is successful.
-     */
-    @Async("taskExecutor")
-    public CompletableFuture<Boolean> isDestroySuccess(UUID id) {
-        ServiceDeploymentState destroyState = null;
-        MDC.put(TASK_ID, id.toString());
-        log.info(" starting to poll for status update.. , service id : {}", id);
-        while (destroyState == ServiceDeploymentState.DESTROYING || destroyState == null) {
-            destroyState = deployServiceStorage.findDeployServiceById(id)
-                    .getServiceDeploymentState();
-        }
-        log.info("destroy status updated,state:{}", destroyState);
-        return CompletableFuture.completedFuture(
-                destroyState == ServiceDeploymentState.DESTROY_SUCCESS);
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(UUID.fromString(id));
+        return CompletableFuture.completedFuture(deployServiceEntity);
     }
 
     /**
