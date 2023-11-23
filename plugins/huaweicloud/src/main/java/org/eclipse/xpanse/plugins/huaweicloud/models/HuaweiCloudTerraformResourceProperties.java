@@ -220,7 +220,7 @@ public enum HuaweiCloudTerraformResourceProperties {
             map.put("ethertype", "ethertype");
             map.put("protocol", "protocol");
             map.put("remote_ip_prefix", "remote_ip_prefix");
-            map.put("port_range_min", "remote_ip_prefix");
+            map.put("port_range_min", "port_range_min");
             map.put("port_range_max", "port_range_max");
             return map;
         }
