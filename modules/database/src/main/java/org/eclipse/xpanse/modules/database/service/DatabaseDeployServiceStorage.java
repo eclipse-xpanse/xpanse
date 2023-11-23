@@ -39,20 +39,10 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
     }
 
     /**
-     * Store the entity to the database.
-     *
-     * @param deployServiceEntity the model of registered service.
-     */
-    @Override
-    public boolean store(DeployServiceEntity deployServiceEntity) {
-        this.deployServiceRepository.save(deployServiceEntity);
-        return true;
-    }
-
-    /**
      * Store the entity to the database and flush the data immediately.
      *
-     * @param deployServiceEntity the model of registered service.
+     * @param deployServiceEntity the entity of service.
+     * @return deployServiceEntity the entity of service.
      */
     @Override
     public DeployServiceEntity storeAndFlush(DeployServiceEntity deployServiceEntity) {
@@ -125,18 +115,5 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
     @Override
     public void deleteDeployService(DeployServiceEntity deployServiceEntity) {
         this.deployServiceRepository.delete(deployServiceEntity);
-    }
-
-    @Override
-    public DeployServiceEntity queryRefreshDeployServiceById(UUID id) {
-        Optional<DeployServiceEntity> optionalEntity =
-                this.deployServiceRepository.findById(id);
-        if (optionalEntity.isPresent()) {
-            DeployServiceEntity entity = optionalEntity.get();
-            entityManager.refresh(entity);
-            return entity;
-        } else {
-            return null;
-        }
     }
 }

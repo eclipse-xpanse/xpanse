@@ -1,7 +1,6 @@
 package org.eclipse.xpanse.modules.database.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.OptimisticLockingFailureException;
 
 @ExtendWith(MockitoExtension.class)
 class DatabaseDeployServiceStorageTest {
@@ -38,44 +36,6 @@ class DatabaseDeployServiceStorageTest {
     @BeforeEach
     void setUp() {
         databaseDeployServiceStorageUnderTest.entityManager = entityManager;
-    }
-
-    @Test
-    void testStore() {
-        final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setId(id);
-        deployServiceEntity.setUserId(userId);
-        deployServiceEntity.setCategory(Category.AI);
-        deployServiceEntity.setName("name");
-        deployServiceEntity.setCustomerServiceName("customerServiceName");
-        databaseDeployServiceStorageUnderTest.store(deployServiceEntity);
-        final DeployServiceEntity entity = new DeployServiceEntity();
-        entity.setId(id);
-        entity.setUserId(userId);
-        entity.setCategory(Category.AI);
-        entity.setName("name");
-        entity.setCustomerServiceName("customerServiceName");
-        verify(mockDeployServiceRepository).save(entity);
-    }
-
-    @Test
-    void testStore_DeployServiceRepositoryThrowsOptimisticLockingFailureException() {
-        final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setId(id);
-        deployServiceEntity.setUserId(userId);
-        deployServiceEntity.setCategory(Category.AI);
-        deployServiceEntity.setName("name");
-        deployServiceEntity.setCustomerServiceName("customerServiceName");
-        final DeployServiceEntity entity = new DeployServiceEntity();
-        entity.setId(id);
-        entity.setUserId(userId);
-        entity.setCategory(Category.AI);
-        entity.setName("name");
-        entity.setCustomerServiceName("customerServiceName");
-        when(mockDeployServiceRepository.save(entity))
-                .thenThrow(OptimisticLockingFailureException.class);
-        assertThatThrownBy(() -> databaseDeployServiceStorageUnderTest.store(
-                deployServiceEntity)).isInstanceOf(OptimisticLockingFailureException.class);
     }
 
     @Test

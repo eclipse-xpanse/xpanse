@@ -18,14 +18,8 @@ public interface DeployServiceStorage {
     /**
      * Add or update deployed service data to database.
      *
-     * @param deployServiceEntity the model of deployed service.
-     */
-    boolean store(DeployServiceEntity deployServiceEntity);
-
-    /**
-     * Add or update deployed service data to database.
-     *
-     * @param deployServiceEntity the model of deployed service.
+     * @param deployServiceEntity the entity of service.
+     * @return deployServiceEntity the entity of service.
      */
     DeployServiceEntity storeAndFlush(DeployServiceEntity deployServiceEntity);
 
@@ -59,5 +53,4 @@ public interface DeployServiceStorage {
      */
     void deleteDeployService(DeployServiceEntity deployServiceEntity);
 
-    DeployServiceEntity queryRefreshDeployServiceById(UUID id);
 }
