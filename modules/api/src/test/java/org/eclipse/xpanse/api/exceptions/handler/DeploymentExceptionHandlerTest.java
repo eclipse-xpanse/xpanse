@@ -132,7 +132,7 @@ class DeploymentExceptionHandlerTest {
         when(deployService.getSelfHostedServiceDetailsByIdForEndUser(any(UUID.class)))
                 .thenThrow(new ServiceNotDeployedException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services/{id}", UUID.randomUUID()))
+        this.mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", UUID.randomUUID()))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Deployment Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));

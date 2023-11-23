@@ -144,7 +144,7 @@ class AuthorizationApiTest {
                 Collections.singletonList(ResultType.ACCESS_DENIED.toValue()));
         String resBody = objectMapper.writeValueAsString(responseModel);
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services/deployed")
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
