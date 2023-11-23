@@ -82,7 +82,7 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Get deployed service details by id.")
-    @GetMapping(value = "/services/{id}",
+    @GetMapping(value = "/services/details/self_hosted/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public DeployedServiceDetails getSelfHostedServiceDetailsById(
@@ -99,7 +99,7 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Get deployed service details by id.")
-    @GetMapping(value = "/isv/service/vendor_hosted/{id}",
+    @GetMapping(value = "/services/details/vendor_hosted/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsById(

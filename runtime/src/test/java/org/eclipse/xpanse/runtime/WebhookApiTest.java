@@ -194,7 +194,7 @@ public class WebhookApiTest {
 
         // Run the test
         final MockHttpServletResponse detailResponse =
-                mockMvc.perform(get("/xpanse/services/{id}", uuid))
+                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", uuid))
                         .andReturn().getResponse();
 
 

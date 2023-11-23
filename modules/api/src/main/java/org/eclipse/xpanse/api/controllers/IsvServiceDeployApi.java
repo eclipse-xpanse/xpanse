@@ -61,7 +61,7 @@ public class IsvServiceDeployApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "List all deployed services by a user.")
-    @GetMapping(value = "/isv/services",
+    @GetMapping(value = "/services/isv",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<DeployedService> listDeployedServicesOfIsv(
@@ -88,7 +88,7 @@ public class IsvServiceDeployApi {
      */
     @Tag(name = "Service", description = "APIs to manage the service instances")
     @Operation(description = "Get deployed service details by id.")
-    @GetMapping(value = "/isv/services/{id}",
+    @GetMapping(value = "/services/isv/details/vendor_hosted/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public DeployedServiceDetails getServiceDetailsByIdForIsv(

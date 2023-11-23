@@ -329,7 +329,7 @@ class ServiceDeployerApiTest {
 
         // Run the test
         final MockHttpServletResponse detailResponse =
-                mockMvc.perform(get("/xpanse/services/{id}", taskId))
+                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", taskId))
                         .andReturn().getResponse();
         deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
                 DeployedServiceDetails.class);
@@ -366,7 +366,7 @@ class ServiceDeployerApiTest {
 
         // Run the test
         final MockHttpServletResponse detailResponse =
-                mockMvc.perform(get("/xpanse/services/{id}", uuid))
+                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", uuid))
                         .andReturn().getResponse();
 
 
@@ -462,7 +462,7 @@ class ServiceDeployerApiTest {
                 break;
             }
             final MockHttpServletResponse detailResponse =
-                    mockMvc.perform(get("/xpanse/services/{id}", id))
+                    mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", id))
                             .andReturn().getResponse();
             if (HttpStatus.OK.value() == detailResponse.getStatus()) {
                 deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
