@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.2.0</version>
     </parent>
     <licenses>
         <license>
@@ -34,13 +34,13 @@
     </modules>
     <properties>
         <java.version>21</java.version>
-        <spring-boot.version>3.1.5</spring-boot.version>
+        <spring-boot.version>3.2.0</spring-boot.version>
         <spring.retry.version>2.0.4</spring.retry.version>
         <junit-jupiter.version>5.10.0</junit-jupiter.version>
         <lombok.version>1.18.30</lombok.version>
         <checkstyle-maven-plugin.version>3.3.0</checkstyle-maven-plugin.version>
         <logbook.version>3.5.0</logbook.version>
-        <wiremock.version>3.2.0</wiremock.version>
+        <wiremock.version>3.3.1</wiremock.version>
         <instancio.version>3.4.0</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
         <awaitility.version>4.2.0</awaitility.version>
@@ -65,8 +65,8 @@
         <huaweicloud.sdk.version>3.1.41</huaweicloud.sdk.version>
         <maven.clean.plugin.version>3.1.0</maven.clean.plugin.version>
         <maven.compile.plugin.version>3.10.1</maven.compile.plugin.version>
-        <maven.javadoc.plugin.version>3.4.1</maven.javadoc.plugin.version>
-        <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
+        <maven.javadoc.plugin.version>3.6.2</maven.javadoc.plugin.version>
+        <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
         <maven.dependency.plugin.version>3.3.0</maven.dependency.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
@@ -198,8 +198,8 @@
             </dependency>
             <dependency>
                 <groupId>org.wiremock</groupId>
-                <artifactId>wiremock</artifactId>
-                <version>${wiremock.version}</version>
+                <artifactId>wiremock-standalone</artifactId>
+                <version>3.3.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

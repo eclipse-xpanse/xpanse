@@ -174,14 +174,14 @@ public class WebhookApiTest {
 
         // Run the test
         final MockHttpServletResponse deployCallbackResponse =
-                mockMvc.perform(post("/webhook/deploy/")
+                mockMvc.perform(post("/webhook/deploy/bfdbc175-9f27-4679-8a4d-1f6b8c91386b")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(requestBody))
                         .andReturn().getResponse();
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), deployCallbackResponse.getStatus());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), deployCallbackResponse.getStatus());
     }
 
     void testGetServiceDetailsThrowsException() throws Exception {
@@ -273,14 +273,14 @@ public class WebhookApiTest {
 
         // Run the test
         final MockHttpServletResponse destroyCallbackResponse =
-                mockMvc.perform(post("/webhook/destroy/")
+                mockMvc.perform(post("/webhook/destroy/bfdbc175-9f27-4679-8a4d-1f6b8c91386b")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(requestBody))
                         .andReturn().getResponse();
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), destroyCallbackResponse.getStatus());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), destroyCallbackResponse.getStatus());
 
     }
 }
