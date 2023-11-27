@@ -58,7 +58,7 @@ public class WebhookApiTest {
     private static final String userId = "adminId";
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static DeployedServiceDetails deployedServiceDetails;
-    private static String taskId = "bfdbc175-9f27-4679-8a4d-1f6b8c91386b";
+    private static final String taskId = "bfdbc175-9f27-4679-8a4d-1f6b8c91386b";
     private static ServiceDeploymentState state;
     @Resource
     private DeployService deployService;
@@ -140,7 +140,7 @@ public class WebhookApiTest {
                 break;
             }
             final MockHttpServletResponse detailResponse =
-                    mockMvc.perform(get("/xpanse/services/{id}", id))
+                    mockMvc.perform(get("/xpanse/services/details/vendor_hosted/{id}", id))
                             .andReturn().getResponse();
             if (HttpStatus.OK.value() == detailResponse.getStatus()) {
                 deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
@@ -238,7 +238,7 @@ public class WebhookApiTest {
                 break;
             }
             final MockHttpServletResponse detailResponse =
-                    mockMvc.perform(get("/xpanse/services/{id}", id))
+                    mockMvc.perform(get("/xpanse/services/details/vendor_hosted/{id}", id))
                             .andReturn().getResponse();
             if (HttpStatus.OK.value() == detailResponse.getStatus()) {
                 deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),

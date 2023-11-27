@@ -9,7 +9,6 @@ package org.eclipse.xpanse.modules.deployment;
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,9 +17,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -88,8 +87,6 @@ public class DeployService {
     @Resource
     private DeployServiceStorage deployServiceStorage;
     @Resource
-    private DeployResourceStorage deployResourceStorage;
-    @Resource
     private PluginManager pluginManager;
     @Resource
     private IdentityProviderManager identityProviderManager;
@@ -112,71 +109,52 @@ public class DeployService {
         return deploymentMap;
     }
 
-    /**
-     * Persist the result of the deployment.
-     *
-     * @param deployTask the task of the deployment.
-     */
-    public DeployServiceEntity getNewDeployServiceTask(DeployTask deployTask) {
-        DeployServiceEntity entity = new DeployServiceEntity();
-        entity.setId(deployTask.getId());
-        entity.setCreateTime(OffsetDateTime.now());
-        entity.setVersion(StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
-        entity.setName(StringUtils.lowerCase(deployTask.getDeployRequest().getServiceName()));
-        entity.setCsp(deployTask.getDeployRequest().getCsp());
-        entity.setCategory(deployTask.getDeployRequest().getCategory());
-        entity.setCustomerServiceName(deployTask.getDeployRequest().getCustomerServiceName());
-        entity.setFlavor(deployTask.getDeployRequest().getFlavor());
-        entity.setUserId(deployTask.getDeployRequest().getUserId());
-        entity.setDeployRequest(deployTask.getDeployRequest());
-        entity.setDeployResourceList(new ArrayList<>());
-        entity.setNamespace(deployTask.getNamespace());
-        return entity;
-    }
 
     /**
-     * Get deployment and fill deployTask for deploy service task.
+     * Create new deploy task by deploy request.
      *
-     * @param deployTask the task of deploy managed service name.
+     * @param deployRequest deploy request.
+     * @return new deploy task.
      */
-    public Deployment getDeployHandler(DeployTask deployTask) {
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        deployTask.getDeployRequest().setUserId(userIdOptional.orElse(null));
-
+    public DeployTask createNewDeployTask(DeployRequest deployRequest) {
         // Find the registered service template and fill Ocl.
         ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
-        serviceTemplate.setName(
-                StringUtils.lowerCase(deployTask.getDeployRequest().getServiceName()));
-        serviceTemplate.setVersion(
-                StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
-        serviceTemplate.setCsp(deployTask.getDeployRequest().getCsp());
-        serviceTemplate.setCategory(deployTask.getDeployRequest().getCategory());
-        serviceTemplate.setServiceHostingType(
-                deployTask.getDeployRequest().getServiceHostingType());
+        serviceTemplate.setName(StringUtils.lowerCase(deployRequest.getServiceName()));
+        serviceTemplate.setVersion(StringUtils.lowerCase(deployRequest.getVersion()));
+        serviceTemplate.setCsp(deployRequest.getCsp());
+        serviceTemplate.setCategory(deployRequest.getCategory());
+        serviceTemplate.setServiceHostingType(deployRequest.getServiceHostingType());
         serviceTemplate = serviceTemplateStorage.findServiceTemplate(serviceTemplate);
         if (Objects.isNull(serviceTemplate) || Objects.isNull(serviceTemplate.getOcl())) {
             throw new ServiceTemplateNotRegistered("Service template not found.");
         }
+
         // Check context validation
         if (Objects.nonNull(serviceTemplate.getOcl().getDeployment()) && Objects.nonNull(
-                deployTask.getDeployRequest().getServiceRequestProperties())) {
+                deployRequest.getServiceRequestProperties())) {
             List<DeployVariable> deployVariables = serviceTemplate.getOcl().getDeployment()
                     .getVariables();
 
             serviceVariablesJsonSchemaValidator.validateDeployVariables(deployVariables,
-                    deployTask.getDeployRequest().getServiceRequestProperties(),
+                    deployRequest.getServiceRequestProperties(),
                     serviceTemplate.getJsonObjectSchema());
         }
         encodeDeployVariable(serviceTemplate,
-                deployTask.getDeployRequest().getServiceRequestProperties());
+                deployRequest.getServiceRequestProperties());
+
+        if (StringUtils.isEmpty(deployRequest.getCustomerServiceName())) {
+            deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
+        }
+        // Create new deploy task by deploy request.
+        DeployTask deployTask = new DeployTask();
+        deployTask.setId(UUID.randomUUID());
+        deployRequest.setOcl(serviceTemplate.getOcl());
+        deployTask.setDeployRequest(deployRequest);
         deployTask.setNamespace(serviceTemplate.getNamespace());
-        // Set Ocl and CreateRequest
         deployTask.setOcl(serviceTemplate.getOcl());
-        deployTask.getDeployRequest().setOcl(serviceTemplate.getOcl());
         // Fill the handler
         fillHandler(deployTask);
-        // get the deployment.
-        return getDeployment(deployTask.getOcl().getDeployment().getKind());
+        return deployTask;
     }
 
     private void encodeDeployVariable(ServiceTemplateEntity serviceTemplate,
@@ -198,6 +176,45 @@ public class DeployService {
         });
     }
 
+    private String generateCustomerServiceName(DeployRequest deployRequest) {
+        if (deployRequest.getServiceName().length() > 5) {
+            return deployRequest.getServiceName().substring(0, 4) + "-"
+                    + RandomStringUtils.randomAlphanumeric(5);
+        } else {
+            return deployRequest.getServiceName() + "-"
+                    + RandomStringUtils.randomAlphanumeric(5);
+        }
+    }
+
+    private void fillHandler(DeployTask deployTask) {
+        DeployResourceHandler resourceHandler =
+                getResourceHandler(deployTask.getDeployRequest().getCsp());
+        deployTask.setDeployResourceHandler(resourceHandler);
+    }
+
+    private DeployServiceEntity storeNewDeployServiceEntity(DeployTask deployTask) {
+        DeployServiceEntity entity = new DeployServiceEntity();
+        entity.setId(deployTask.getId());
+        entity.setCreateTime(OffsetDateTime.now());
+        entity.setVersion(StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
+        entity.setName(StringUtils.lowerCase(deployTask.getDeployRequest().getServiceName()));
+        entity.setCsp(deployTask.getDeployRequest().getCsp());
+        entity.setCategory(deployTask.getDeployRequest().getCategory());
+        entity.setCustomerServiceName(deployTask.getDeployRequest().getCustomerServiceName());
+        entity.setFlavor(deployTask.getDeployRequest().getFlavor());
+        entity.setUserId(deployTask.getDeployRequest().getUserId());
+        entity.setDeployRequest(deployTask.getDeployRequest());
+        entity.setDeployResourceList(new ArrayList<>());
+        entity.setNamespace(deployTask.getNamespace());
+        entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
+        DeployServiceEntity storedEntity = deployServiceStorage.storeAndFlush(entity);
+        if (Objects.isNull(storedEntity)) {
+            log.error("Store new deploy service entity with id:{} failed.", deployTask.getId());
+            throw new RuntimeException("Store new deploy service entity failed.");
+        }
+        return storedEntity;
+    }
+
     /**
      * Async method to deploy service.
      *
@@ -211,154 +228,29 @@ public class DeployService {
 
     private void deploy(Deployment deployment, DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
-        DeployServiceEntity deployServiceEntity = getNewDeployServiceTask(deployTask);
-        DeployResult deployResult = new DeployResult();
+        DeployResult deployResult;
+        DeployServiceEntity storedEntity = null;
         try {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            storedEntity = storeNewDeployServiceEntity(deployTask);
             validateDeploymentWithPolicies(deployment, deployTask);
-            deployment.deploy(deployTask);
+            deployResult = deployment.deploy(deployTask);
         } catch (RuntimeException e) {
-            log.error("asyncDeployService failed.", e);
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
-            deployServiceEntity.setResultMessage(e.getMessage());
-            deployServiceEntity.setProperties(deployResult.getProperties());
-            deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
-            deployServiceEntity.setDeployResourceList(
-                    getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
-            maskSensitiveFields(deployServiceEntity);
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
-            rollbackOnDeploymentFailure(deployServiceEntity, deployResult, deployment, deployTask);
-        }
-    }
-
-    /**
-     * Perform rollback when deployment fails and destroy the created resources.
-     */
-    private void rollbackOnDeploymentFailure(DeployServiceEntity deployServiceEntity,
-                                             DeployResult deployResult, Deployment deployment,
-                                             DeployTask deployTask) {
-        if (!CollectionUtils.isEmpty(deployResult.getResources())) {
-            log.info("Performing rollback of already provisioned resources.");
-            String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
-            DeployResult destroyResult = deployment.destroy(deployTask, stateFile);
-            if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
-                deployServiceEntity.setProperties(destroyResult.getProperties());
-                deployServiceEntity.setPrivateProperties(destroyResult.getPrivateProperties());
-                deployServiceEntity.setDeployResourceList(
-                        getDeployResourceEntityList(destroyResult.getResources(),
-                                deployServiceEntity));
-            } else {
-                deployServiceEntity.setServiceDeploymentState(
-                        ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
-            }
-            DeployServiceEntity storedDeployServiceEntity =
-                    deployServiceStorage.storeAndFlush(deployServiceEntity);
-            if (Objects.nonNull(storedDeployServiceEntity)) {
-                deployment.deleteTaskWorkspace(deployTask.getId().toString());
-            }
-        } else {
-            log.info("No resources to rollback.");
-        }
-    }
-
-    private List<DeployResourceEntity> getDeployResourceEntityList(
-            List<DeployResource> deployResources, DeployServiceEntity deployServiceEntity) {
-        List<DeployResourceEntity> deployResourceEntities = new ArrayList<>();
-        if (CollectionUtils.isEmpty(deployResources)) {
-            return deployResourceEntities;
-        }
-        for (DeployResource resource : deployResources) {
-            DeployResourceEntity deployResource = new DeployResourceEntity();
-            BeanUtils.copyProperties(resource, deployResource);
-            deployResource.setDeployService(deployServiceEntity);
-            deployResourceEntities.add(deployResource);
-        }
-        return deployResourceEntities;
-    }
-
-    /**
-     * Get deployment and fill deployTask for destroy service task.
-     *
-     * @param deployTask the task of deploy managed service name.
-     */
-    public Deployment getDestroyHandler(DeployTask deployTask) {
-        // Find the deployed service.
-        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(deployTask.getId());
-        // Get state of service.
-        ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
-        if (state.equals(ServiceDeploymentState.DEPLOYING)
-                || state.equals(ServiceDeploymentState.DESTROYING)) {
-            throw new InvalidServiceStateException(String.format("Service with id %s is %s.",
-                    deployTask.getId(), state));
-        }
-        // Set Ocl and CreateRequest
-        deployTask.setDeployRequest(deployServiceEntity.getDeployRequest());
-        deployTask.setOcl(deployServiceEntity.getDeployRequest().getOcl());
-        // Fill the handler
-        fillHandler(deployTask);
-        // get the deployment.
-        return getDeployment(deployTask.getOcl().getDeployment().getKind());
-
-    }
-
-    /**
-     * Async method to deploy service.
-     *
-     * @param deployment deployment
-     * @param deployTask deployTask
-     */
-    @Async("taskExecutor")
-    public void asyncDestroyService(Deployment deployment, DeployTask deployTask) {
-        destroy(deployment, deployTask);
-    }
-
-    private void destroy(Deployment deployment, DeployTask deployTask) {
-        MDC.put(TASK_ID, deployTask.getId().toString());
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(deployTask.getId());
-        if (Objects.isNull(deployServiceEntity)) {
-            String errorMsg = String.format("Service with id %s not found.", deployTask.getId());
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException("Service with id %s not found.");
+            log.info("Deploy service with id:{} failed. error:{}", deployTask.getId(), e);
+            deployResult = new DeployResult();
+            deployResult.setId(deployTask.getId());
+            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+            deployResult.setMessage(e.getMessage());
         }
         try {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
-            String stateFile = deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
-            deployment.destroy(deployTask, stateFile);
-        } catch (Exception e) {
-            log.error("asyncDestroyService failed", e);
-            deployServiceEntity.setResultMessage(e.getMessage());
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
-            DeployServiceEntity storedDeployServiceEntity =
-                    deployServiceStorage.storeAndFlush(deployServiceEntity);
-            if (Objects.nonNull(storedDeployServiceEntity)) {
-                deployment.deleteTaskWorkspace(deployTask.getId().toString());
+            DeployServiceEntity updatedDeployServiceEntity =
+                    flushDeployServiceEntity(deployResult, storedEntity);
+            if (ServiceDeploymentState.DEPLOY_FAILED
+                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
+                rollbackOnDeploymentFailure(deployment, deployTask, updatedDeployServiceEntity);
             }
-        }
-
-    }
-
-    /**
-     * purge the service based on the serviceDeploymentState.
-     *
-     * @param deployment deployment
-     * @param deployTask deployTask
-     */
-    public void purgeService(Deployment deployment, DeployTask deployTask) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(deployTask.getId());
-        ServiceDeploymentState serviceDeploymentState =
-                deployServiceEntity.getServiceDeploymentState();
-        if (serviceDeploymentState == ServiceDeploymentState.DEPLOY_FAILED
-                || serviceDeploymentState == ServiceDeploymentState.DESTROY_SUCCESS
-                || serviceDeploymentState == ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED) {
-            asyncPurgeService(deployment, deployTask, deployServiceEntity);
-        } else {
-            throw new InvalidServiceStateException(
-                    String.format("Service %s is not in the state allowed for purging.",
-                            deployServiceEntity.getId()));
+        } catch (RuntimeException e) {
+            log.info("Deploy service with id:{} update database entity failed. error:{}",
+                    deployTask.getId(), e);
         }
     }
 
@@ -388,6 +280,158 @@ public class DeployService {
         policyManager.evaluatePolicies(policyList, planJson);
     }
 
+    private DeployServiceEntity flushDeployServiceEntity(DeployResult deployResult,
+                                                         DeployServiceEntity storedEntity)
+            throws RuntimeException {
+        if (Objects.nonNull(deployResult.getState()) && Objects.nonNull(storedEntity)) {
+            log.info("Deploy task update deploy service entity with id:{}", deployResult.getId());
+            DeployServiceEntity deployServiceEntityToFlush = new DeployServiceEntity();
+            BeanUtils.copyProperties(storedEntity, deployServiceEntityToFlush);
+            if (TerraformExecState.DEPLOY_SUCCESS == deployResult.getState()) {
+                deployServiceEntityToFlush.setServiceDeploymentState(
+                        ServiceDeploymentState.DEPLOY_SUCCESS);
+            } else {
+                deployServiceEntityToFlush.setServiceDeploymentState(
+                        ServiceDeploymentState.DEPLOY_FAILED);
+                deployServiceEntityToFlush.setResultMessage(deployResult.getMessage());
+            }
+            updateDeployResourceEntity(deployResult, deployServiceEntityToFlush);
+            return deployServiceStorage.storeAndFlush(deployServiceEntityToFlush);
+        } else {
+            return storedEntity;
+        }
+    }
+
+    private void updateDeployResourceEntity(DeployResult deployResult,
+                                            DeployServiceEntity deployServiceEntity) {
+
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
+            deployServiceEntity.getProperties().clear();
+        }
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getPrivateProperties())) {
+            deployServiceEntity.getPrivateProperties().clear();
+        }
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
+            deployServiceEntity.getDeployResourceList().clear();
+        }
+
+        if (!CollectionUtils.isEmpty(deployResult.getPrivateProperties())) {
+            deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
+        }
+        if (!CollectionUtils.isEmpty(deployResult.getProperties())) {
+            deployServiceEntity.setProperties(deployResult.getProperties());
+        }
+        if (!CollectionUtils.isEmpty(deployResult.getResources())) {
+            deployServiceEntity.setDeployResourceList(
+                    getDeployResourceEntityList(deployResult.getResources(),
+                            deployServiceEntity));
+        }
+        maskSensitiveFields(deployServiceEntity);
+    }
+
+    /**
+     * Convert deploy resources to deploy resource entities.
+     */
+    private List<DeployResourceEntity> getDeployResourceEntityList(
+            List<DeployResource> deployResources, DeployServiceEntity deployServiceEntity) {
+        List<DeployResourceEntity> deployResourceEntities = new ArrayList<>();
+        if (CollectionUtils.isEmpty(deployResources)) {
+            return deployResourceEntities;
+        }
+        for (DeployResource resource : deployResources) {
+            DeployResourceEntity deployResource = new DeployResourceEntity();
+            BeanUtils.copyProperties(resource, deployResource);
+            deployResource.setDeployService(deployServiceEntity);
+            deployResourceEntities.add(deployResource);
+        }
+        return deployResourceEntities;
+    }
+
+    /**
+     * Perform rollback when deployment fails and destroy the created resources.
+     */
+    private void rollbackOnDeploymentFailure(Deployment deployment,
+                                             DeployTask destroyTask,
+                                             DeployServiceEntity deployServiceEntity) {
+        log.info("Performing rollback of already provisioned resources.");
+        destroy(deployment, destroyTask, deployServiceEntity);
+    }
+
+    /**
+     * Async method to destroy service.
+     *
+     * @param deployment          deployment
+     * @param deployTask          deployTask
+     * @param deployServiceEntity deployServiceEntity
+     */
+    @Async("taskExecutor")
+    public void asyncDestroyService(Deployment deployment, DeployTask deployTask,
+                                    DeployServiceEntity deployServiceEntity) {
+        destroy(deployment, deployTask, deployServiceEntity);
+    }
+
+    private void destroy(Deployment deployment, DeployTask destroyTask,
+                         DeployServiceEntity deployServiceEntity) {
+        MDC.put(TASK_ID, destroyTask.getId().toString());
+        DeployResult destroyResult;
+        try {
+            String stateFile = getStoredStateContent(deployServiceEntity);
+            destroyResult = deployment.destroy(destroyTask, stateFile);
+        } catch (RuntimeException e) {
+            log.info("Destroy service with id:{} failed. error:{}", destroyTask.getId(), e);
+            destroyResult = new DeployResult();
+            destroyResult.setId(destroyTask.getId());
+            destroyResult.setState(TerraformExecState.DESTROY_FAILED);
+            destroyResult.setMessage(e.getMessage());
+        }
+
+        try {
+            DeployServiceEntity updatedDeployServiceEntity =
+                    flushDestroyServiceEntity(destroyResult, deployServiceEntity);
+            if (ServiceDeploymentState.DESTROY_SUCCESS
+                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
+                deployment.deleteTaskWorkspace(destroyTask.getId().toString());
+            }
+        } catch (RuntimeException e) {
+            log.info("Destroy service with id:{} update database entity failed. error:{}",
+                    destroyTask.getId(), e);
+        }
+    }
+
+    private String getStoredStateContent(DeployServiceEntity deployServiceEntity) {
+        if (Objects.isNull(deployServiceEntity)
+                || CollectionUtils.isEmpty(deployServiceEntity.getPrivateProperties())
+                || StringUtils.isEmpty(
+                deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME))) {
+            throw new ServiceNotDeployedException(
+                    "Can't find valid state context in stored deployed service.");
+        }
+        return deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
+    }
+
+    private DeployServiceEntity flushDestroyServiceEntity(DeployResult destroyResult,
+                                                          DeployServiceEntity deployServiceEntity)
+            throws RuntimeException {
+        if (Objects.nonNull(destroyResult) && Objects.nonNull(destroyResult.getState())) {
+            log.info("Update stored deploy service entity by result of destroy task with id:{}",
+                    destroyResult.getId());
+            DeployServiceEntity deployServiceEntityToFlush = new DeployServiceEntity();
+            BeanUtils.copyProperties(deployServiceEntity, deployServiceEntityToFlush);
+            if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
+                deployServiceEntityToFlush.setServiceDeploymentState(
+                        ServiceDeploymentState.DESTROY_SUCCESS);
+            } else {
+                deployServiceEntityToFlush.setServiceDeploymentState(
+                        ServiceDeploymentState.DESTROY_FAILED);
+                deployServiceEntityToFlush.setResultMessage(destroyResult.getMessage());
+            }
+            updateDeployResourceEntity(destroyResult, deployServiceEntityToFlush);
+            return deployServiceStorage.storeAndFlush(deployServiceEntityToFlush);
+        } else {
+            return deployServiceEntity;
+        }
+    }
+
     /**
      * Async method to purge deployed service.
      *
@@ -398,24 +442,37 @@ public class DeployService {
     @Async("taskExecutor")
     public void asyncPurgeService(Deployment deployment, DeployTask deployTask,
                                   DeployServiceEntity deployServiceEntity) {
+        purgeService(deployment, deployTask, deployServiceEntity);
+    }
+
+    /**
+     * purge the service based on the serviceDeploymentState.
+     *
+     * @param deployment          deployment
+     * @param deployTask          deployTask
+     * @param deployServiceEntity deployServiceEntity
+     */
+    private void purgeService(Deployment deployment, DeployTask deployTask,
+                              DeployServiceEntity deployServiceEntity) {
         MDC.put(TASK_ID, deployTask.getId().toString());
-        if (!deployServiceEntity.getDeployResourceList().isEmpty()) {
-            log.info("Purging created resources for service with ID: {}",
-                    deployServiceEntity.getId());
-            try {
-                asyncDestroyService(deployment, deployTask);
-            } catch (RuntimeException e) {
-                log.error("Error purging created resources for service with ID: {}. Ignoring.",
-                        deployServiceEntity.getId(), e);
+        try {
+            if (Objects.nonNull(deployServiceEntity.getDeployResourceList())
+                    && !deployServiceEntity.getDeployResourceList().isEmpty()) {
+                log.info("Purging created resources for service with ID: {}", deployTask.getId());
+                destroy(deployment, deployTask, deployServiceEntity);
             }
-        } else {
-            log.info("No resources to purge for service with ID: {}",
-                    deployServiceEntity.getId());
+            DeployServiceEntity updatedDeployServiceEntity =
+                    deployServiceStorage.findDeployServiceById(deployServiceEntity.getId());
+            if (Objects.nonNull(updatedDeployServiceEntity)
+                    && ServiceDeploymentState.DESTROY_SUCCESS
+                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
+                deployServiceStorage.deleteDeployService(deployServiceEntity);
+                log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
+            }
+        } catch (RuntimeException e) {
+            log.error("Error purging created resources for service with ID: {}. Ignoring.",
+                    deployTask.getId(), e);
         }
-        deployServiceStorage.deleteDeployService(deployServiceEntity);
-        log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
-
-
     }
 
     /**
@@ -430,7 +487,7 @@ public class DeployService {
         List<DeployServiceEntity> deployServices =
                 deployServiceStorage.listServices(query);
         return deployServices.stream()
-                .map(this::convertToServiceVo).toList();
+                .map(this::convertToDeployedService).toList();
 
     }
 
@@ -442,11 +499,16 @@ public class DeployService {
      */
     public DeployedServiceDetails getSelfHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to view details of services belonging to other users.");
+        }
         ServiceHostingType serviceHostingType =
                 deployServiceEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SELF != serviceHostingType) {
             String errorMsg = String.format("details of non service-self hosted with id %s is not "
-                    + "accessible",  id);
+                    + "accessible", id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
@@ -461,6 +523,11 @@ public class DeployService {
      */
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to view details of services belonging to other users.");
+        }
         ServiceHostingType serviceHostingType =
                 deployServiceEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
@@ -477,77 +544,69 @@ public class DeployService {
      * Callback method after deployment is complete.
      */
     public void deployCallback(String taskId, TerraformResult result) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(UUID.fromString(taskId));
-        if (Objects.isNull(deployServiceEntity)) {
-            String errorMsg = String.format("Service with id %s not found.", taskId);
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
-        DeployResult deployResult = handlerDeployResource(result);
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(taskId));
+        DeployResult deployResult = handlerCallbackDeployResult(result);
+        deployResult.setId(UUID.fromString(taskId));
         if (StringUtils.isNotBlank(result.getTerraformState())) {
             getResourceHandler(deployServiceEntity.getCsp()).handler(deployResult);
         }
-        deployServiceEntity.setProperties(deployResult.getProperties());
-        deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
-        deployServiceEntity.getDeployResourceList().clear();
-        deployServiceEntity.getDeployResourceList()
-                .addAll(getDeployResourceEntityList(deployResult.getResources(),
-                        deployServiceEntity));
-        maskSensitiveFields(deployServiceEntity);
-        if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
-        } else {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
-            deployServiceEntity.setResultMessage(result.getCommandStdError());
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
-            rollbackOnDeploymentFailure(deployServiceEntity, deployResult,
-                    deploymentMap.get(DeployerKind.TERRAFORM),
-                    getDeployTask(taskId, deployServiceEntity));
+        DeployServiceEntity updatedDeployServiceEntity =
+                flushDeployServiceEntity(deployResult, deployServiceEntity);
+        if (ServiceDeploymentState.DEPLOY_FAILED
+                == updatedDeployServiceEntity.getServiceDeploymentState()) {
+            DeployTask deployTask = getDeployTaskByStoredService(updatedDeployServiceEntity);
+            Deployment deployment = getDeployment(updatedDeployServiceEntity.getDeployRequest()
+                    .getOcl().getDeployment().getKind());
+            rollbackOnDeploymentFailure(deployment, deployTask, updatedDeployServiceEntity);
         }
+
     }
 
-    private DeployTask getDeployTask(String taskId, DeployServiceEntity deployServiceEntity) {
-        DeployTask task = new DeployTask();
-        task.setId(UUID.fromString(taskId));
-        task.setOcl(deployServiceEntity.getDeployRequest().getOcl());
-        task.setDeployRequest(deployServiceEntity.getDeployRequest());
-        fillHandler(task);
-        return task;
+    private DeployResult handlerCallbackDeployResult(TerraformResult result) {
+        DeployResult deployResult = new DeployResult();
+        if (result.getCommandSuccessful()) {
+            deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
+        } else {
+            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+            deployResult.setMessage(result.getCommandStdError());
+        }
+        deployResult.getPrivateProperties().put(STATE_FILE_NAME, result.getTerraformState());
+        if (Objects.nonNull(result.getImportantFileContentMap())) {
+            deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
+        }
+        return deployResult;
     }
 
     /**
      * Callback method after the service is destroyed.
      */
     public void destroyCallback(String taskId, TerraformResult result) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(UUID.fromString(taskId));
-        if (Objects.isNull(deployServiceEntity)) {
-            String errorMsg = String.format("Service with id %s not found.", taskId);
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
+        log.info("Update database entity with id:{} with destroy  callback result.", taskId);
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(taskId));
+        DeployResult destroyResult = handlerCallbackDestroyResult(result);
+        destroyResult.setId(UUID.fromString(taskId));
+        if (StringUtils.isNotBlank(result.getTerraformState())) {
+            getResourceHandler(deployServiceEntity.getCsp()).handler(destroyResult);
         }
-        if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
-            deployServiceEntity.setProperties(new HashMap<>());
-            deployServiceEntity.setPrivateProperties(new HashMap<>());
-            deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
-        } else {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
+        try {
+            flushDestroyServiceEntity(destroyResult, deployServiceEntity);
+        } catch (RuntimeException e) {
+            log.info("Update database entity with id:{} with destroy callback result failed.",
+                    taskId, e);
         }
     }
 
-    private DeployResult handlerDeployResource(TerraformResult result) {
+    private DeployResult handlerCallbackDestroyResult(TerraformResult result) {
         DeployResult deployResult = new DeployResult();
-        if (StringUtils.isBlank(result.getTerraformState())) {
-            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+        if (result.getCommandSuccessful()) {
+            deployResult.setState(TerraformExecState.DESTROY_SUCCESS);
         } else {
-            deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
-            deployResult.getPrivateProperties().put(STATE_FILE_NAME, result.getTerraformState());
-            if (Objects.nonNull(result.getImportantFileContentMap())) {
-                deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
-            }
+            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+            deployResult.setMessage(result.getCommandStdError());
+        }
+        deployResult.getPrivateProperties().put(STATE_FILE_NAME, result.getTerraformState());
+        if (Objects.nonNull(result.getImportantFileContentMap())) {
+            deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
         }
         return deployResult;
     }
@@ -557,22 +616,15 @@ public class DeployService {
                 pluginManager.getPluginsMap().get(csp);
         if (Objects.isNull(plugin) || Objects.isNull(plugin.getResourceHandler())) {
             throw new PluginNotFoundException(
-                    "Can't find suitable plugin and resource handler for the "
-                            + "Task.");
+                    "Can't find suitable plugin and resource handler for the Task.");
         }
         return plugin.getResourceHandler();
-    }
-
-    private void fillHandler(DeployTask deployTask) {
-        DeployResourceHandler resourceHandler =
-                getResourceHandler(deployTask.getDeployRequest().getCsp());
-        deployTask.setDeployResourceHandler(resourceHandler);
     }
 
     /**
      * Get Deployment bean available for the requested DeployerKind.
      *
-     * @param deployerKind Deployer for which the Deployment bean is required.
+     * @param deployerKind kind of deployer.
      * @return Deployment bean for the provided deployerKind.
      */
     public Deployment getDeployment(DeployerKind deployerKind) {
@@ -583,7 +635,7 @@ public class DeployService {
         return deployment;
     }
 
-    private DeployedService convertToServiceVo(DeployServiceEntity serviceEntity) {
+    private DeployedService convertToDeployedService(DeployServiceEntity serviceEntity) {
         if (Objects.nonNull(serviceEntity)) {
             DeployedService deployedService = new DeployedService();
             BeanUtils.copyProperties(serviceEntity, deployedService);
@@ -624,49 +676,29 @@ public class DeployService {
                                                                 String userId,
                                                                 DeployRequest deployRequest) {
         MDC.put(TASK_ID, newId.toString());
-        log.info("start deploy service, service id : {}", newId);
-        DeployTask deployTask = new DeployTask();
-        deployRequest.setId(newId);
+        log.info("Migrate workflow start deploy new service with id: {}", newId);
+        DeployTask deployTask = createNewDeployTask(deployRequest);
+        // override task id and user id.
         deployTask.setId(newId);
-        deployTask.setDeployRequest(deployRequest);
-        Deployment deployment = getDeployHandler(deployTask);
         deployTask.getDeployRequest().setUserId(userId);
+        Deployment deployment = getDeployment(deployTask.getOcl().getDeployment().getKind());
+        storeNewDeployServiceEntity(deployTask);
         deploy(deployment, deployTask);
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(newId);
+        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(newId);
         return CompletableFuture.completedFuture(deployServiceEntity);
     }
 
     /**
      * Destroy service by deployed service id.
-     *
-     * @param id deployed service id.
-     * @return updated service entity.
      */
     @Async("taskExecutor")
     public CompletableFuture<DeployServiceEntity> destroyService(String id) {
         MDC.put(TASK_ID, id);
-        log.info("start destroy service, service id : {}", id);
-        DeployTask deployTask = new DeployTask();
-        deployTask.setId(UUID.fromString(id));
-        Deployment deployment = getDestroyHandler(deployTask);
-        destroy(deployment, deployTask);
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(UUID.fromString(id));
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(id));
+        DeployTask deployTask = getDeployTaskByStoredService(deployServiceEntity);
+        Deployment deployment = getDeployment(deployTask.getOcl().getDeployment().getKind());
+        destroy(deployment, deployTask, deployServiceEntity);
         return CompletableFuture.completedFuture(deployServiceEntity);
-    }
-
-    /**
-     * Helper method to update service status in the database.
-     *
-     * @param id ID of the service
-     * @param serviceDeploymentState new status to be set for the service.
-     */
-    public void updateServiceStatus(UUID id, ServiceDeploymentState serviceDeploymentState) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(id);
-        deployServiceEntity.setServiceDeploymentState(serviceDeploymentState);
-        deployServiceStorage.storeAndFlush(deployServiceEntity);
     }
 
     /**
@@ -683,7 +715,7 @@ public class DeployService {
         return deployServiceStorage.listServices(query).stream()
                 .filter(deployServiceEntity -> namespace.get()
                         .equals(deployServiceEntity.getNamespace()))
-                .map(this::convertToServiceVo).toList();
+                .map(this::convertToDeployedService).toList();
     }
 
     /**
@@ -697,7 +729,7 @@ public class DeployService {
         ServiceHostingType serviceHostingType =
                 deployServiceEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
-            String errorMsg = String.format("the details of Service with id %s no accessible",  id);
+            String errorMsg = String.format("the details of Service with id %s no accessible", id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
@@ -709,17 +741,71 @@ public class DeployService {
         return EntityTransUtils.transDeployServiceEntityToServiceDetailVo(deployServiceEntity);
     }
 
-    private DeployServiceEntity getDeployServiceEntity(UUID id) {
+
+    /**
+     * Get destroy task by stored deploy service entity.
+     *
+     * @param deployServiceEntity deploy service entity.
+     * @return deploy task.
+     */
+    public DeployTask getDestroyTask(DeployServiceEntity deployServiceEntity) {
+
+        // Get state of service.
+        ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
+        if (state.equals(ServiceDeploymentState.DEPLOYING)
+                || state.equals(ServiceDeploymentState.DESTROYING)) {
+            throw new InvalidServiceStateException(String.format("Service with id %s is %s.",
+                    deployServiceEntity.getId(), state));
+        }
+        deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
+        DeployServiceEntity updatedDeployServiceEntity =
+                deployServiceStorage.storeAndFlush(deployServiceEntity);
+        return getDeployTaskByStoredService(updatedDeployServiceEntity);
+    }
+
+    private DeployTask getDeployTaskByStoredService(DeployServiceEntity deployServiceEntity) {
+        // Set Ocl and CreateRequest
+        DeployTask deployTask = new DeployTask();
+        deployTask.setId(deployServiceEntity.getId());
+        deployTask.setDeployRequest(deployServiceEntity.getDeployRequest());
+        deployTask.setOcl(deployServiceEntity.getDeployRequest().getOcl());
+        fillHandler(deployTask);
+        return deployTask;
+
+    }
+
+    /**
+     * Get purge task by stored deploy service entity.
+     *
+     * @param deployServiceEntity deploy service entity.
+     * @return deploy task.
+     */
+    public DeployTask getPurgeTask(DeployServiceEntity deployServiceEntity) {
+        // Get state of service.
+        ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
+        if (!(state == ServiceDeploymentState.DEPLOY_FAILED
+                || state == ServiceDeploymentState.DESTROY_SUCCESS
+                || state == ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED)) {
+            throw new InvalidServiceStateException(
+                    String.format("Service %s is not in the state allowed for purging.",
+                            deployServiceEntity.getId()));
+        }
+        return getDeployTaskByStoredService(deployServiceEntity);
+    }
+
+
+    /**
+     * Get deploy service entity by id.
+     *
+     * @param id task id.
+     * @return deploy service entity.
+     */
+    public DeployServiceEntity getDeployServiceEntity(UUID id) {
         DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
         if (Objects.isNull(deployServiceEntity)) {
             String errorMsg = String.format("Service with id %s not found.", id);
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
-        }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
-            throw new AccessDeniedException(
-                    "No permissions to view details of services belonging to other users.");
         }
         return deployServiceEntity;
     }

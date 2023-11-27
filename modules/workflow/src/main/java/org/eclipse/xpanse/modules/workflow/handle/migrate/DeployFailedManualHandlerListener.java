@@ -25,7 +25,7 @@ public class DeployFailedManualHandlerListener implements ExecutionListener {
 
     @Autowired
     public void setRuntimeService(RuntimeService runtimeService) {
-        this.runtimeService = runtimeService;
+        DeployFailedManualHandlerListener.runtimeService = runtimeService;
     }
 
     @Override

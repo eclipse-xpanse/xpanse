@@ -101,9 +101,9 @@ public class ServiceTemplateManage {
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
                         existingService.getOcl().getDeployment().getVariables());
         existingService.setJsonObjectSchema(jsonObjectSchema);
-        storage.store(existingService);
-        serviceTemplateOpenApiGenerator.updateServiceApi(existingService);
-        return existingService;
+        ServiceTemplateEntity updatedServiceTemplate = storage.storeAndFlush(existingService);
+        serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
+        return updatedServiceTemplate;
     }
 
     private void checkParams(ServiceTemplateEntity existingService, Ocl ocl) {
@@ -187,9 +187,9 @@ public class ServiceTemplateManage {
             newEntity.setNamespace(ocl.getNamespace());
         }
         newEntity.setJsonObjectSchema(jsonObjectSchema);
-        storage.store(newEntity);
-        serviceTemplateOpenApiGenerator.generateServiceApi(newEntity);
-        return newEntity;
+        ServiceTemplateEntity storedServiceTemplate = storage.storeAndFlush(newEntity);
+        serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
+        return storedServiceTemplate;
     }
 
     /**

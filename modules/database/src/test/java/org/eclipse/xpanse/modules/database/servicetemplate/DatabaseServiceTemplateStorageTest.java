@@ -39,7 +39,7 @@ class DatabaseServiceTemplateStorageTest {
     }
 
     @Test
-    void testStore() {
+    void testStoreAndFlush() {
         // Setup
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(id);
@@ -50,7 +50,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
 
         // Run the test
-        test.store(serviceTemplateEntity);
+        ServiceTemplateEntity result = test.storeAndFlush(serviceTemplateEntity);
 
         // Verify the results
         // Confirm ServiceTemplateRepository.save(...).
@@ -61,11 +61,11 @@ class DatabaseServiceTemplateStorageTest {
         entity.setCsp(Csp.HUAWEI);
         entity.setCategory(Category.AI);
         entity.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
-        verify(mockServiceTemplateRepository).save(entity);
+        verify(mockServiceTemplateRepository).saveAndFlush(entity);
     }
 
     @Test
-    void testStore_ServiceTemplateRepositoryThrowsOptimisticLockingFailureException() {
+    void testStoreAndFlush_ServiceTemplateRepositoryThrowsOptimisticLockingFailureException() {
         // Setup
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(id);
@@ -81,11 +81,11 @@ class DatabaseServiceTemplateStorageTest {
         entity.setVersion("version");
         entity.setCsp(Csp.HUAWEI);
         entity.setCategory(Category.AI);
-        when(mockServiceTemplateRepository.save(entity))
+        when(mockServiceTemplateRepository.saveAndFlush(entity))
                 .thenThrow(OptimisticLockingFailureException.class);
 
         // Run the test
-        assertThatThrownBy(() -> test.store(
+        assertThatThrownBy(() -> test.storeAndFlush(
                 serviceTemplateEntity)).isInstanceOf(OptimisticLockingFailureException.class);
     }
 

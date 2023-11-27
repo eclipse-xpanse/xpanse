@@ -33,7 +33,7 @@ public class TerraformExecutor {
     private static final String STATE_FILE_NAME = "terraform.tfstate";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final List<String> EXCLUDED_FILE_SUFFIX_LIST =
-            Arrays.asList(".tf", ".tfstate", ".hcl");
+            Arrays.asList(".tf", ".tfstate", ".binary", ".hcl");
 
     static {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -115,7 +115,7 @@ public class TerraformExecutor {
         command.append(" -var-file=");
         command.append(VARS_FILE_NAME);
         SystemCmdResult systemCmdResult = execute(command.toString());
-        // cleanUpVariablesFile();
+        cleanUpVariablesFile();
         return systemCmdResult;
     }
 
@@ -165,7 +165,7 @@ public class TerraformExecutor {
             throw new TerraformExecutorException("TFExecutor.tfInit failed.",
                     initResult.getCommandStdError());
         }
-        SystemCmdResult planResult = tfPlanWithOutput();
+        SystemCmdResult planResult = tfPlan();
         if (!planResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfPlan failed.");
             throw new TerraformExecutorException("TFExecutor.tfPlan failed.",

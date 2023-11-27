@@ -26,7 +26,7 @@ public class MigrateExportDataProcess implements Serializable, JavaDelegate {
 
     @Autowired
     public void setRuntimeService(RuntimeService runtimeService) {
-        this.runtimeService = runtimeService;
+        MigrateExportDataProcess.runtimeService = runtimeService;
     }
 
     /**

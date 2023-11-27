@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
@@ -33,14 +34,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class MigrateDeployProcess implements Serializable, JavaDelegate {
 
-    private final RuntimeService runtimeService;
-    private final DeployService deployService;
+    private static RuntimeService runtimeService;
+    private static DeployService deployService;
 
     @Autowired
-    public MigrateDeployProcess(RuntimeService runtimeService,
-                                DeployService deployService) {
-        this.runtimeService = runtimeService;
-        this.deployService = deployService;
+    public void setRuntimeService(RuntimeService runtimeService) {
+        MigrateDeployProcess.runtimeService = runtimeService;
+    }
+
+    @Autowired
+    public void setDeployService(DeployService deployService) {
+        MigrateDeployProcess.deployService = deployService;
     }
 
     /**
@@ -52,6 +56,7 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
 
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
+        UUID id = (UUID) variables.get(MigrateConstants.ID);
         UUID newId = (UUID) variables.get(MigrateConstants.NEW_ID);
         runtimeService.updateBusinessKey(processInstanceId, newId.toString());
         int deployRetryNum = (int) variables.get(MigrateConstants.DEPLOY_RETRY_NUM);
@@ -67,11 +72,16 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
         DeployRequest deployRequest = new DeployRequest();
         BeanUtils.copyProperties(migrateRequest, deployRequest);
         String userId = (String) variables.get(MigrateConstants.USER_ID);
-
+        log.info("Migration workflow start deploying new service with id:{}", newId);
         CompletableFuture<DeployServiceEntity> future =
                 deployService.deployService(newId, userId, deployRequest);
-        DeployServiceEntity result = future.get();
-
+        DeployServiceEntity result = null;
+        try {
+            result = future.get();
+        } catch (RuntimeException | InterruptedException | ExecutionException e) {
+            log.error("Migration workflow deploy new service with id:{} failed. error:{}",
+                    newId, e.getMessage());
+        }
         boolean deploySuccess = Objects.nonNull(result)
                 && ServiceDeploymentState.DEPLOY_SUCCESS == result.getServiceDeploymentState();
         if (!deploySuccess && deployRetryNum >= 1) {
@@ -79,5 +89,7 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
         }
         runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,
                 deploySuccess);
+        log.info("Migration workflow completed deploying new service with id:{}, success:{}",
+                newId, deploySuccess);
     }
 }
