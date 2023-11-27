@@ -23,8 +23,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
@@ -43,6 +43,7 @@ import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -149,15 +150,12 @@ public class ServiceDeployerApi {
         log.info("Starting managed service with name {}, version {}, csp {}",
                 deployRequest.getServiceName(),
                 deployRequest.getVersion(), deployRequest.getCsp());
-        UUID id = UUID.randomUUID();
-        if (StringUtils.isBlank(deployRequest.getCustomerServiceName())) {
-            deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
-        }
-        DeployTask deployTask = new DeployTask();
-        deployRequest.setId(id);
-        deployTask.setId(id);
-        deployTask.setDeployRequest(deployRequest);
-        Deployment deployment = this.deployService.getDeployHandler(deployTask);
+
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        deployRequest.setUserId(userIdOptional.orElse(null));
+        DeployTask deployTask = this.deployService.createNewDeployTask(deployRequest);
+        Deployment deployment =
+                this.deployService.getDeployment(deployTask.getOcl().getDeployment().getKind());
         this.deployService.asyncDeployService(deployment, deployTask);
         String successMsg = String.format(
                 "Task for starting managed service %s-%s-%s-%s started. UUID %s",
@@ -167,7 +165,7 @@ public class ServiceDeployerApi {
                 deployRequest.getServiceHostingType().toValue(),
                 deployTask.getId());
         log.info(successMsg);
-        return id;
+        return deployTask.getId();
     }
 
     /**
@@ -182,12 +180,17 @@ public class ServiceDeployerApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Response destroy(@PathVariable("id") String id) {
         log.info("Stopping managed service with id {}", id);
-        DeployTask deployTask = new DeployTask();
-        deployTask.setId(UUID.fromString(id));
-        Deployment deployment = this.deployService.getDestroyHandler(deployTask);
-        this.deployService.updateServiceStatus(deployTask.getId(),
-                ServiceDeploymentState.DESTROYING);
-        this.deployService.asyncDestroyService(deployment, deployTask);
+        DeployServiceEntity deployServiceEntity =
+                this.deployService.getDeployServiceEntity(UUID.fromString(id));
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to destroy services belonging to other users.");
+        }
+        DeployTask destroyTask = this.deployService.getDestroyTask(deployServiceEntity);
+        Deployment deployment =
+                this.deployService.getDeployment(destroyTask.getOcl().getDeployment().getKind());
+        this.deployService.asyncDestroyService(deployment, destroyTask, deployServiceEntity);
         String successMsg = String.format(
                 "Task for destroying managed service %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
@@ -205,10 +208,17 @@ public class ServiceDeployerApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Response purge(@PathVariable("id") String id) {
         log.info("Purging managed service with id {}", id);
-        DeployTask deployTask = new DeployTask();
-        deployTask.setId(UUID.fromString(id));
-        Deployment deployment = this.deployService.getDestroyHandler(deployTask);
-        this.deployService.purgeService(deployment, deployTask);
+        DeployServiceEntity deployServiceEntity =
+                this.deployService.getDeployServiceEntity(UUID.fromString(id));
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to purge services belonging to other users.");
+        }
+        DeployTask purgeTask = this.deployService.getPurgeTask(deployServiceEntity);
+        Deployment deployment =
+                this.deployService.getDeployment(purgeTask.getOcl().getDeployment().getKind());
+        this.deployService.asyncPurgeService(deployment, purgeTask, deployServiceEntity);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
     }
@@ -223,13 +233,21 @@ public class ServiceDeployerApi {
     @PostMapping(value = "/services/migration", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
-        UUID newId = UUID.randomUUID();
+
+        DeployServiceEntity deployServiceEntity =
+                this.deployService.getDeployServiceEntity(migrateRequest.getId());
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        String userId = userIdOptional.orElse(null);
+        if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to migrate services belonging to other users.");
+        }
+        UUID newId = UUID.randomUUID();
         Map<String, Object> variable = new HashMap<>();
         variable.put(MigrateConstants.ID, migrateRequest.getId());
         variable.put(MigrateConstants.NEW_ID, newId);
         variable.put(MigrateConstants.MIGRATE_REQUEST, migrateRequest);
-        variable.put(MigrateConstants.USER_ID, userIdOptional.orElse(null));
+        variable.put(MigrateConstants.USER_ID, userId);
         workflowProcessUtils.asyncStartProcess(MigrateConstants.PROCESS_KEY, variable);
         return newId;
     }
@@ -255,15 +273,5 @@ public class ServiceDeployerApi {
             query.setServiceState(state);
         }
         return query;
-    }
-
-    private String generateCustomerServiceName(DeployRequest deployRequest) {
-        if (deployRequest.getServiceName().length() > 5) {
-            return deployRequest.getServiceName().substring(0, 4) + "-"
-                    + RandomStringUtils.randomAlphanumeric(5);
-        } else {
-            return deployRequest.getServiceName() + "-"
-                    + RandomStringUtils.randomAlphanumeric(5);
-        }
     }
 }

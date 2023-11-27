@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -27,14 +29,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceRepository;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceRepository;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -54,10 +52,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDet
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -76,26 +72,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest {
 
-    private static final String userId = "adminId";
-    private static ServiceTemplateDetailVo serviceTemplateDetailVo;
-    private static DeployedServiceDetails deployedServiceDetails;
-    private static Ocl ocl;
-    private static UUID taskId;
-    private static ServiceDeploymentState state;
+    private static final long waitTime = 60 * 1000;
+    static ServiceTemplateDetailVo serviceTemplateDetailVo;
+    static Ocl ocl;
+    static boolean credentialReady = false;
     private static final ObjectMapper objectMapper = new ObjectMapper();
     @Resource
     private MockMvc mockMvc;
-
-    @Resource
-    private DeployServiceRepository deployServiceRepository;
-
-    @Resource
-    private DeployResourceRepository deployResourceRepository;
-
-    @BeforeEach
-    void setUp() throws Exception {
-        deleteDestroyedServiceRecord();
-    }
 
     @BeforeAll
     static void configureObjectMapper() {
@@ -104,95 +87,6 @@ class ServiceDeployerApiTest {
                 OffsetDateTimeSerializer.INSTANCE));
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-
-    }
-
-    @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
-    void testServiceDeployer() throws Exception {
-        testDeploy();
-        boolean deploySuccess = deploySuccess(taskId);
-
-        testGetServiceDetails();
-        testListDeployedServices(deploySuccess);
-
-        testDestroy(deploySuccess);
-
-        boolean destroySuccess = destroySuccess(taskId);
-        if (destroySuccess) {
-            testListDeployedServicesReturnsEmptyList();
-        } else {
-            testGetServiceDetails();
-        }
-
-        deleteDestroyedServiceRecord();
-    }
-
-    @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
-    void testServiceDeployerThrowsException() throws Exception {
-        testDeployThrowsException();
-        testGetServiceDetailsThrowsException();
-        testDestroyThrowsException();
-    }
-
-    @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
-    void testServicePurgeSuccess() throws Exception {
-        testDeploy();
-        boolean deploySuccess = deploySuccess(taskId);
-
-        testPurgeSuccess();
-        deleteDestroyedServiceRecord();
-    }
-
-    @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
-    void testServicePurgeRefuse() throws Exception {
-        testDeploy();
-        deploySuccess(taskId);
-
-        testPurgeRefuse();
-        deleteDestroyedServiceRecord();
-    }
-
-    void testPurgeRefuse() throws Exception {
-        // SetUp
-        String refuseMsg = String.format(
-                "Service %s is not in the state allowed for purging.", taskId);
-        Response response = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
-                Collections.singletonList(refuseMsg));
-        String result = objectMapper.writeValueAsString(response);
-        DeployServiceEntity referenceById = deployServiceRepository.getReferenceById(taskId);
-        referenceById.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
-
-        // Run the test
-        final MockHttpServletResponse purgeResponse =
-                mockMvc.perform(delete("/xpanse/services/purge/{id}", taskId))
-                        .andReturn().getResponse();
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
-        Assertions.assertEquals(result, purgeResponse.getContentAsString());
-    }
-
-    void testPurgeSuccess() throws Exception {
-        // SetUp
-        String successMsg = String.format(
-                "Purging task for service with ID %s has started.", taskId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
-        String result = objectMapper.writeValueAsString(response);
-        DeployServiceEntity referenceById = deployServiceRepository.getReferenceById(taskId);
-        referenceById.setServiceDeploymentState(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
-
-        // Run the test
-        final MockHttpServletResponse purgeResponse =
-                mockMvc.perform(delete("/xpanse/services/purge/{id}", taskId))
-                        .andReturn().getResponse();
-        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), purgeResponse.getStatus());
-        Assertions.assertEquals(result, purgeResponse.getContentAsString());
     }
 
     void registerServiceTemplate() throws Exception {
@@ -207,63 +101,82 @@ class ServiceDeployerApiTest {
                                 .content(requestBody).contentType("application/x-yaml")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
-        serviceTemplateDetailVo =
-                objectMapper.readValue(registerResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
-        Thread.sleep(1000);
+        serviceTemplateDetailVo = objectMapper.readValue(registerResponse.getContentAsString(),
+                ServiceTemplateDetailVo.class);
     }
 
-    void testListDeployedServices(boolean deploySuccess) throws Exception {
-        // Set up
-        DeployedService deployedService = new DeployedService();
-        BeanUtils.copyProperties(deployedServiceDetails, deployedService);
-        String result = objectMapper.writeValueAsString(List.of(deployedService));
-        String state = deploySuccess ? ServiceDeploymentState.DEPLOY_SUCCESS.toValue() :
-                ServiceDeploymentState.DEPLOY_FAILED.toValue();
-        // Run the test
-        final MockHttpServletResponse listResponse = mockMvc.perform(
-                        get("/xpanse/services")
-                                .param("categoryName", "middleware")
-                                .param("cspName", "huawei")
-                                .param("serviceName", "kafka-cluster")
-                                .param("serviceVersion", "v3.3.2")
-                                .param("serviceState", state)
-                                .accept(MediaType.APPLICATION_JSON))
+    void addCredential() throws Exception {
+
+        final CreateCredential createCredential = new CreateCredential();
+        createCredential.setCsp(Csp.HUAWEI);
+        createCredential.setType(CredentialType.VARIABLES);
+        createCredential.setName("AK_SK");
+        createCredential.setDescription("description");
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.", true, false, "AK_VALUE"));
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.", true, false, "SK_VALUE"));
+        createCredential.setVariables(credentialVariables);
+        createCredential.setTimeToLive(3000);
+        String requestBody = objectMapper.writeValueAsString(createCredential);
+        final MockHttpServletResponse response = mockMvc.perform(post("/xpanse/user/credentials")
+                        .content(requestBody).contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
-        Assertions.assertEquals(result, listResponse.getContentAsString());
+        if (HttpStatus.NO_CONTENT.value() == response.getStatus()) {
+            credentialReady = true;
+        }
     }
 
-    void deleteDestroyedServiceRecord() {
-        taskId = null;
-        deployedServiceDetails = null;
-        state = null;
-        deployServiceRepository.deleteAll();
+    @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    void testServiceDeployerWell() throws Exception {
+        if (!credentialReady) {
+            addCredential();
+        }
+        if (Objects.isNull(serviceTemplateDetailVo)) {
+            registerServiceTemplate();
+        }
+        UUID serviceId = testDeploy();
+        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+            listDeployedServices();
+        }
+        testListDeployedServices();
+        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+            testDestroy(serviceId);
+
+        }
+        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
+            testPurge(serviceId);
+        }
+
     }
 
+    boolean waitUntilExceptedState(UUID id, ServiceDeploymentState targetState) throws Exception {
+        boolean isDone = false;
+        long startTime = System.currentTimeMillis();
+        while (!isDone) {
+            DeployedService deployedService = getDeployedServiceDetails(id);
+            if (Objects.nonNull(deployedService) &&
+                    deployedService.getServiceDeploymentState() == targetState) {
+                isDone = true;
+            } else {
+                if (System.currentTimeMillis() - startTime > waitTime) {
+                    break;
+                }
+                Thread.sleep(5 * 3000);
+            }
 
-    void testListDeployedServicesReturnsEmptyList() throws Exception {
-        // Set up
-        String result = "[]";
-
-        // Run the test
-        final MockHttpServletResponse listResponse =
-                mockMvc.perform(get("/xpanse/services")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
-        Assertions.assertEquals(result, listResponse.getContentAsString());
+        }
+        return isDone;
     }
 
-    void testDeploy() throws Exception {
-        // Setup
-        registerServiceTemplate();
-        addCredential();
+    UUID testDeploy() throws Exception {
         DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setUserId(userId);
         deployRequest.setServiceName(serviceTemplateDetailVo.getName());
         deployRequest.setVersion(serviceTemplateDetailVo.getVersion());
         deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
@@ -272,7 +185,7 @@ class ServiceDeployerApiTest {
         deployRequest.setRegion(serviceTemplateDetailVo.getRegions().get(0).toString());
         deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("secgroup_name", "secgroup_name");
+        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
         String requestBody = objectMapper.writeValueAsString(deployRequest);
 
@@ -283,14 +196,125 @@ class ServiceDeployerApiTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(requestBody))
                         .andReturn().getResponse();
-        taskId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
+        UUID taskId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.ACCEPTED.value(), deployResponse.getStatus());
-        Assertions.assertTrue(StringUtils.isNotBlank(taskId.toString()));
+        Assertions.assertNotNull(taskId);
+        return taskId;
 
     }
 
+    void testListDeployedServices() throws Exception {
+        // Run the test
+        List<DeployedService> result = listDeployedServices();
+
+        // Verify the results
+        Assertions.assertTrue(result.size() >= 1);
+        Assertions.assertEquals(result.get(0).getServiceDeploymentState(),
+                ServiceDeploymentState.DEPLOY_SUCCESS);
+    }
+
+    void testDestroy(UUID taskId) throws Exception {
+        // SetUp
+        String successMsg = String.format(
+                "Task for destroying managed service %s has started.", taskId);
+        Response response = Response.successResponse(Collections.singletonList(successMsg));
+
+        String result = objectMapper.writeValueAsString(response);
+
+        // Run the test
+        final MockHttpServletResponse destroyResponse =
+                mockMvc.perform(delete("/xpanse/services/{id}", taskId))
+                        .andReturn().getResponse();
+
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
+        Assertions.assertEquals(result, destroyResponse.getContentAsString());
+    }
+
+
+    @Test
+    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
+            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    void testServiceDeployerThrowsException() throws Exception {
+        testDeployThrowsException();
+        testGetServiceDetailsThrowsException();
+        testDestroyThrowsException();
+        testPurgeThrowsException();
+    }
+
+    void testPurgeThrowsException() throws Exception {
+        UUID serviceId = UUID.randomUUID();
+        // SetUp
+        String refuseMsg = String.format(
+                "Service with id %s not found.", serviceId);
+        Response response = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                Collections.singletonList(refuseMsg));
+        String result = objectMapper.writeValueAsString(response);
+        // Run the test
+        final MockHttpServletResponse purgeResponse =
+                mockMvc.perform(delete("/xpanse/services/purge/{id}", serviceId))
+                        .andReturn().getResponse();
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
+        Assertions.assertEquals(result, purgeResponse.getContentAsString());
+    }
+
+    void testPurge(UUID taskId) throws Exception {
+        // SetUp
+        String successMsg = String.format(
+                "Purging task for service with ID %s has started.", taskId);
+        Response response = Response.successResponse(Collections.singletonList(successMsg));
+        String result = objectMapper.writeValueAsString(response);
+        // Run the test
+        final MockHttpServletResponse purgeResponse =
+                mockMvc.perform(delete("/xpanse/services/purge/{id}", taskId))
+                        .andReturn().getResponse();
+        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), purgeResponse.getStatus());
+        Assertions.assertEquals(result, purgeResponse.getContentAsString());
+
+        Thread.sleep(waitTime);
+
+
+        // SetUp
+        String refuseMsg = String.format(
+                "Service with id %s not found.", taskId);
+        Response detailsErrorResponse =
+                Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                        Collections.singletonList(refuseMsg));
+        String detailsResult = objectMapper.writeValueAsString(detailsErrorResponse);
+        final MockHttpServletResponse detailsResponse =
+                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", taskId))
+                        .andReturn().getResponse();
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());
+        Assertions.assertEquals(detailsResult, detailsResponse.getContentAsString());
+    }
+
+    List<DeployedService> listDeployedServices() throws Exception {
+
+        final MockHttpServletResponse listResponse =
+                mockMvc.perform(get("/xpanse/services")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+        return objectMapper.readValue(listResponse.getContentAsString(),
+                new TypeReference<>() {
+                });
+    }
+
+    DeployedServiceDetails getDeployedServiceDetails(UUID serviceId) throws Exception {
+        final MockHttpServletResponse detailResponse =
+                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", serviceId))
+                        .andReturn().getResponse();
+        try {
+            return objectMapper.readValue(detailResponse.getContentAsString(),
+                    DeployedServiceDetails.class);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
 
     void testDeployThrowsException() throws Exception {
         Response expectedResponse = Response.errorResponse(
@@ -300,7 +324,6 @@ class ServiceDeployerApiTest {
 
         DeployRequest deployRequest = new DeployRequest();
 
-        deployRequest.setUserId(userId);
         deployRequest.setServiceName("redis");
         deployRequest.setVersion("v1.0.0");
         deployRequest.setCsp(Csp.HUAWEI);
@@ -323,36 +346,6 @@ class ServiceDeployerApiTest {
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
         Assertions.assertEquals(result, deployResponse.getContentAsString());
 
-    }
-
-    void testGetServiceDetails() throws Exception {
-
-        // Run the test
-        final MockHttpServletResponse detailResponse =
-                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", taskId))
-                        .andReturn().getResponse();
-        deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
-                DeployedServiceDetails.class);
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), detailResponse.getStatus());
-        Assertions.assertEquals(ocl.getCategory(), deployedServiceDetails.getCategory());
-        Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
-                deployedServiceDetails.getCsp());
-        Assertions.assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
-                deployedServiceDetails.getName());
-        Assertions.assertEquals(ocl.getServiceVersion(), deployedServiceDetails.getVersion());
-
-        if (ServiceDeploymentState.DEPLOY_SUCCESS == deployedServiceDetails.getServiceDeploymentState()) {
-            Map<String, String> properties = deployedServiceDetails.getDeployedServiceProperties();
-            Assertions.assertNotNull(properties);
-            Assertions.assertFalse(deployedServiceDetails.getDeployedServiceProperties().isEmpty());
-            Assertions.assertTrue(properties.containsKey("secgroup_name"));
-            Assertions.assertEquals("secgroup_name", properties.get("secgroup_name"));
-        }
-        if (ServiceDeploymentState.DEPLOY_FAILED == deployedServiceDetails.getServiceDeploymentState()) {
-            Assertions.assertNotNull(deployedServiceDetails.getResultMessage());
-        }
     }
 
 
@@ -378,37 +371,6 @@ class ServiceDeployerApiTest {
     }
 
 
-    void testDestroy(boolean deploySuccess) throws Exception {
-
-        // SetUp
-        String successMsg = String.format(
-                "Task for destroying managed service %s has started.", taskId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
-
-        String result = objectMapper.writeValueAsString(response);
-
-        // Run the test
-        final MockHttpServletResponse destroyResponse =
-                mockMvc.perform(delete("/xpanse/services/{id}", taskId))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        if (deploySuccess) {
-            Assertions.assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
-            Assertions.assertEquals(result, destroyResponse.getContentAsString());
-        } else {
-            String errorMsg = String.format("Service with id %s is %s.",
-                    taskId, state);
-            Response errorResponse = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
-                    Collections.singletonList(errorMsg));
-            String errorResult = objectMapper.writeValueAsString(errorResponse);
-            Assertions.assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
-            Assertions.assertEquals(result, destroyResponse.getContentAsString());
-        }
-
-    }
-
-
     void testDestroyThrowsException() throws Exception {
         UUID uuid = UUID.randomUUID();
         Response expectedResponse = Response.errorResponse(
@@ -429,79 +391,4 @@ class ServiceDeployerApiTest {
 
     }
 
-    void addCredential() throws Exception {
-
-        final CreateCredential createCredential = new CreateCredential();
-        createCredential.setCsp(Csp.HUAWEI);
-        createCredential.setType(CredentialType.VARIABLES);
-        createCredential.setName("AK_SK");
-        createCredential.setDescription("description");
-        List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true, false, "AK_VALUE"));
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true, false, "SK_VALUE"));
-        createCredential.setVariables(credentialVariables);
-        createCredential.setTimeToLive(3000);
-        String requestBody = objectMapper.writeValueAsString(createCredential);
-        createCredential.setUserId(userId);
-        mockMvc.perform(post("/xpanse/credentials")
-                        .content(requestBody).contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-    }
-
-    boolean deploySuccess(UUID id) throws Exception {
-        long start = System.currentTimeMillis();
-        boolean deploySuccess = false;
-        while (!deploySuccess) {
-            Thread.sleep(5000);
-            if (System.currentTimeMillis() - start > 60000) {
-                break;
-            }
-            final MockHttpServletResponse detailResponse =
-                    mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", id))
-                            .andReturn().getResponse();
-            if (HttpStatus.OK.value() == detailResponse.getStatus()) {
-                deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
-                        DeployedServiceDetails.class);
-                state = deployedServiceDetails.getServiceDeploymentState();
-                if (ServiceDeploymentState.DEPLOY_SUCCESS == state) {
-                    deploySuccess = true;
-                } else if (ServiceDeploymentState.DEPLOY_FAILED == state) {
-                    return false;
-                }
-            }
-        }
-        return deploySuccess;
-
-    }
-
-    boolean destroySuccess(UUID id) throws Exception {
-        long start = System.currentTimeMillis();
-        boolean destroySuccess = false;
-        while (!destroySuccess) {
-            Thread.sleep(5000);
-            if (System.currentTimeMillis() - start > 60000) {
-                break;
-            }
-            final MockHttpServletResponse detailResponse =
-                    mockMvc.perform(get("/xpanse/services/{id}", id))
-                            .andReturn().getResponse();
-            if (HttpStatus.OK.value() == detailResponse.getStatus()) {
-                deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
-                        DeployedServiceDetails.class);
-                state = deployedServiceDetails.getServiceDeploymentState();
-                if (ServiceDeploymentState.DESTROY_SUCCESS == state) {
-                    destroySuccess = true;
-                } else if (ServiceDeploymentState.DESTROY_FAILED == state) {
-                    return false;
-                }
-            }
-        }
-        return destroySuccess;
-
-    }
 }

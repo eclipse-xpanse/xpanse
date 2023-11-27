@@ -20,7 +20,7 @@ public interface ServiceTemplateStorage {
      *
      * @param serviceTemplateEntity the model of registered service.
      */
-    void store(ServiceTemplateEntity serviceTemplateEntity);
+    ServiceTemplateEntity storeAndFlush(ServiceTemplateEntity serviceTemplateEntity);
 
     /**
      * Method to list database entry based ServiceTemplateEntity.

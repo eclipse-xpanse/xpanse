@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
@@ -29,14 +30,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class MigrateDestroyProcess implements Serializable, JavaDelegate {
 
-    private final RuntimeService runtimeService;
-    private final DeployService deployService;
+    private static RuntimeService runtimeService;
+    private static DeployService deployService;
 
     @Autowired
-    public MigrateDestroyProcess(RuntimeService runtimeService,
-                                 DeployService deployService) {
-        this.runtimeService = runtimeService;
-        this.deployService = deployService;
+    public void setRuntimeService(RuntimeService runtimeService) {
+        MigrateDestroyProcess.runtimeService = runtimeService;
+    }
+
+    @Autowired
+    public void setDeployService(DeployService deployService) {
+        MigrateDestroyProcess.deployService = deployService;
     }
 
     /**
@@ -55,13 +59,21 @@ public class MigrateDestroyProcess implements Serializable, JavaDelegate {
         }
         runtimeService.setVariable(processInstanceId, MigrateConstants.DESTROY_RETRY_NUM,
                 destroyRetryNum + 1);
+        log.info("Migration workflow start destroying old service with service id:{}", id);
         CompletableFuture<DeployServiceEntity> future = deployService.destroyService(id);
-        DeployServiceEntity deployServiceEntity = future.get();
-
-        boolean destroySuccess = Objects.nonNull(deployServiceEntity)
+        DeployServiceEntity result = null;
+        try {
+            result = future.get();
+        } catch (RuntimeException | InterruptedException | ExecutionException e) {
+            log.error("Migration workflow destroy old service with id:{} failed. error:{}",
+                    id, e.getMessage());
+        }
+        boolean destroySuccess = Objects.nonNull(result)
                 && ServiceDeploymentState.DEPLOY_SUCCESS
-                == deployServiceEntity.getServiceDeploymentState();
+                == result.getServiceDeploymentState();
         runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
+                destroySuccess);
+        log.info("Migration workflow completed destroying old service with id:{}, success:{}", id,
                 destroySuccess);
     }
 }

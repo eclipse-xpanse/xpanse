@@ -21,16 +21,12 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
@@ -79,12 +75,7 @@ class ServiceTemplateManageTest {
     private DeployService mockDeployService;
     @Mock
     private IdentityProviderManager identityProviderManager;
-    @Mock
-    private OpenApiUrlManage openApiUrlManage;
-    @Mock
-    DeployServiceStorage deployServiceStorage;
-    @Mock
-    DeployResourceStorage deployResourceStorage;
+
     @Mock
     TerraformLocalConfig terraformLocalConfig;
     @Mock
@@ -99,11 +90,7 @@ class ServiceTemplateManageTest {
         uuid = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
     }
 
-    @Test
-    void testUpdateServiceTemplateByUrl() throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ocl.setVersion("2.1");
-
+    ServiceTemplateEntity getServiceTemplateEntity() {
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setName(oclRegister.getName());
         serviceTemplateEntity.setId(UUID.randomUUID());
@@ -111,31 +98,40 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
         serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
         serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
-        serviceTemplateEntity.setOcl(oclRegister);
         serviceTemplateEntity.setServiceHostingType(oclRegister.getServiceHostingType());
+        serviceTemplateEntity.setOcl(oclRegister);
         serviceTemplateEntity.setNamespace("ISV-A");
+        return serviceTemplateEntity;
+    }
 
+    @Test
+    void testUpdateServiceTemplateByUrl() throws Exception {
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
+        ocl.setVersion("2.1");
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(ocl);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+        when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        deployServiceStorage, deployResourceStorage, terraformLocalConfig, pluginManager);
+                        terraformLocalConfig, pluginManager);
 
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
-            terraform {
-              required_providers {
-                huaweicloud = {
-                  source = "huaweicloud/huaweicloud"
-                  version = "~> 1.51.0"
+                terraform {
+                  required_providers {
+                    huaweicloud = {
+                      source = "huaweicloud/huaweicloud"
+                      version = "~> 1.51.0"
+                    }
+                  }
                 }
-              }
-            }
-                        
-            provider "huaweicloud" {
-              region = "test"
-            }
-            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
+                            
+                provider "huaweicloud" {
+                  region = "test"
+                }
+                """).when(this.pluginManager)
+                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         ServiceTemplateEntity ServiceTemplateEntityByUrl =
                 serviceTemplateManageTest.updateServiceTemplateByUrl(uuid.toString(),
@@ -158,21 +154,11 @@ class ServiceTemplateManageTest {
     void testUpdateServiceTemplate() throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setVersion("2.1");
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setName(oclRegister.getName());
-        serviceTemplateEntity.setId(UUID.randomUUID());
-        serviceTemplateEntity.setCategory(oclRegister.getCategory());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
-        serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
-        serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
-        serviceTemplateEntity.setServiceHostingType(oclRegister.getServiceHostingType());
-        serviceTemplateEntity.setOcl(oclRegister);
-        serviceTemplateEntity.setNamespace("ISV-A");
-
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+        when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        deployServiceStorage, deployResourceStorage,
                         terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
@@ -193,7 +179,6 @@ class ServiceTemplateManageTest {
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         ServiceTemplateEntity updateServiceTemplateEntity =
                 serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl);
-        log.error(updateServiceTemplateEntity.toString());
         Assertions.assertEquals(ServiceRegistrationState.UPDATED,
                 updateServiceTemplateEntity.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).updateServiceApi(serviceTemplateEntity);
@@ -203,15 +188,7 @@ class ServiceTemplateManageTest {
     void testUpdateThrowsServiceTemplateUpdateNotAllowedException() throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setServiceVersion("1.0");
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setName(oclRegister.getName());
-        serviceTemplateEntity.setId(UUID.randomUUID());
-        serviceTemplateEntity.setCategory(oclRegister.getCategory());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
-        serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
-        serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
-        serviceTemplateEntity.setOcl(oclRegister);
-        serviceTemplateEntity.setNamespace("ISV-A");
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         Assertions.assertThrows(ServiceTemplateUpdateNotAllowed.class, () ->
@@ -243,8 +220,7 @@ class ServiceTemplateManageTest {
     @Test
     void testRegisterServiceTemplate() {
         TerraformDeployment deployment =
-                new TerraformDeployment(new DeployEnvironments(null, null, null, null)
-                        , deployServiceStorage, deployResourceStorage,
+                new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
@@ -262,11 +238,14 @@ class ServiceTemplateManageTest {
                     }
                     """).when(this.pluginManager)
                 .getTerraformProviderForRegionByCsp(any(Csp.class), any());
-        ServiceTemplateEntity serviceTemplateEntity =
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
+        when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
+
+        ServiceTemplateEntity savedServiceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplate(oclRegister);
         Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
-                serviceTemplateEntity.getServiceRegistrationState());
-        verify(serviceTemplateOpenApiGenerator).generateServiceApi(serviceTemplateEntity);
+                savedServiceTemplateEntity.getServiceRegistrationState());
+        verify(serviceTemplateOpenApiGenerator).generateServiceApi(savedServiceTemplateEntity);
     }
 
     @Test
@@ -281,7 +260,7 @@ class ServiceTemplateManageTest {
         entity.setOcl(ocl);
         entity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
 
-        ServiceTemplateEntity existedServiceTemplateEntity = new ServiceTemplateEntity();
+        ServiceTemplateEntity existedServiceTemplateEntity = getServiceTemplateEntity();
 
         when(mockStorage.findServiceTemplate(entity)).thenReturn(existedServiceTemplateEntity);
 
@@ -303,29 +282,33 @@ class ServiceTemplateManageTest {
     void testRegisterServiceTemplateByUrl() throws Exception {
         when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(oclRegister);
         TerraformDeployment deployment =
-                new TerraformDeployment(new DeployEnvironments(null, null, null, null)
-                        , deployServiceStorage, deployResourceStorage,
+                new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
-            terraform {
-              required_providers {
-                huaweicloud = {
-                  source = "huaweicloud/huaweicloud"
-                  version = "~> 1.51.0"
-                }
-              }
-            }
-                        
-            provider "huaweicloud" {
-              region = "test"
-            }
-            """).when(this.pluginManager).getTerraformProviderForRegionByCsp(any(Csp.class), any());
-        ServiceTemplateEntity serviceTemplateEntity =
+                terraform {
+                  required_providers {
+                    huaweicloud = {
+                          source = "huaweicloud/huaweicloud"
+                          version = "~> 1.51.0"
+                        }
+                      }
+                    }
+                                
+                    provider "huaweicloud" {
+                      region = "test"
+                    }
+                    """).when(this.pluginManager)
+                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
+
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
+        when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
+
+        ServiceTemplateEntity savedServiceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplateByUrl(oclLocation);
         Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
-                serviceTemplateEntity.getServiceRegistrationState());
-        verify(serviceTemplateOpenApiGenerator).generateServiceApi(serviceTemplateEntity);
+                savedServiceTemplateEntity.getServiceRegistrationState());
+        verify(serviceTemplateOpenApiGenerator).generateServiceApi(savedServiceTemplateEntity);
     }
 
     @Test
@@ -337,14 +320,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testGetServiceTemplate() {
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setName(oclRegister.getName());
-        serviceTemplateEntity.setId(UUID.randomUUID());
-        serviceTemplateEntity.setCategory(oclRegister.getCategory());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
-        serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
-        serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
-        serviceTemplateEntity.setOcl(oclRegister);
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
 
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         ServiceTemplateEntity ServiceTemplate =
@@ -363,14 +339,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testListServiceTemplates() {
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setName(oclRegister.getName());
-        serviceTemplateEntity.setId(UUID.randomUUID());
-        serviceTemplateEntity.setCategory(oclRegister.getCategory());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
-        serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
-        serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
-        serviceTemplateEntity.setOcl(oclRegister);
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         List<ServiceTemplateEntity> ServiceTemplateEntities = new ArrayList<>();
         ServiceTemplateEntities.add(serviceTemplateEntity);
         when(mockStorage.listServiceTemplates(new ServiceTemplateQueryModel())).thenReturn(
@@ -403,15 +372,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testUnregisterServiceTemplate() {
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setName(oclRegister.getName());
-        serviceTemplateEntity.setId(UUID.randomUUID());
-        serviceTemplateEntity.setCategory(oclRegister.getCategory());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
-        serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
-        serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
-        serviceTemplateEntity.setOcl(oclRegister);
-        serviceTemplateEntity.setNamespace("ISV-A");
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         serviceTemplateManageTest.unregisterServiceTemplate(uuid.toString());
@@ -430,15 +391,7 @@ class ServiceTemplateManageTest {
 
     @Test
     void testGetOpenApiUrl() {
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setName(oclRegister.getName());
-        serviceTemplateEntity.setId(UUID.randomUUID());
-        serviceTemplateEntity.setCategory(oclRegister.getCategory());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
-        serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
-        serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
-        serviceTemplateEntity.setOcl(oclRegister);
-
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid))
                 .thenReturn(serviceTemplateEntity);
         when(serviceTemplateOpenApiGenerator.getOpenApi(serviceTemplateEntity)).thenReturn(

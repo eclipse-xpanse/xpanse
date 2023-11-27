@@ -42,8 +42,8 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
      * @param serviceTemplateEntity the model of registered service.
      */
     @Override
-    public void store(ServiceTemplateEntity serviceTemplateEntity) {
-        repository.save(serviceTemplateEntity);
+    public ServiceTemplateEntity storeAndFlush(ServiceTemplateEntity serviceTemplateEntity) {
+        return repository.saveAndFlush(serviceTemplateEntity);
     }
 
     /**

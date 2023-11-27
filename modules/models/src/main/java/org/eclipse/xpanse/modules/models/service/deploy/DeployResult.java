@@ -22,17 +22,23 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState
 public class DeployResult {
 
     /**
-     * The id of the XpanseDeployTask.
+     * The id of the deployment task.
      */
     @NotNull
     @Schema(description = "The id of the service task.")
     private UUID id;
     /**
-     * The state of the XpanseDeployTask.
+     * The state of the deployment task.
      */
     @NotNull
     @Schema(description = "The state of the service.")
     private TerraformExecState state;
+
+    /**
+     * The message of the deployment task.
+     */
+    @Schema(description = "The message of the service.")
+    private String message;
 
     /**
      * The resources of the server.
