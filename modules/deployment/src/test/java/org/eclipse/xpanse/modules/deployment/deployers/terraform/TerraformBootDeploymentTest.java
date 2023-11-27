@@ -141,7 +141,7 @@ class TerraformBootDeploymentTest {
         ocl.getDeployment().setDeployer(errorDeployer);
 
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
-                .asyncDeployWithScripts(any());
+                .asyncDeployWithScripts(any(), any());
 
         ocl.getDeployment().setDeployer(invalidDeployer);
 
@@ -152,7 +152,7 @@ class TerraformBootDeploymentTest {
     @Test
     void testDestroy_ThrowsRestClientException() {
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
-                .asyncDestroyWithScripts(any());
+                .asyncDestroyWithScripts(any(), any());
 
         Assertions.assertThrows(TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.destroy(deployTask, ""));
@@ -171,7 +171,7 @@ class TerraformBootDeploymentTest {
     void testGetDeployPlanAsJson() {
         TerraformPlan terraformPlan = new TerraformPlan();
         terraformPlan.setPlan("plan");
-        when(terraformApi.planWithScripts(any())).thenReturn(terraformPlan);
+        when(terraformApi.planWithScripts(any(), any())).thenReturn(terraformPlan);
         String deployPlanJson = terraformBootDeployment.getDeployPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
 
@@ -180,7 +180,7 @@ class TerraformBootDeploymentTest {
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
 
-        when(terraformApi.planWithScripts(any())).thenThrow(
+        when(terraformApi.planWithScripts(any(), any())).thenThrow(
                 new TerraformBootRequestFailedException("IO error"));
 
         Assertions.assertThrows(TerraformBootRequestFailedException.class,

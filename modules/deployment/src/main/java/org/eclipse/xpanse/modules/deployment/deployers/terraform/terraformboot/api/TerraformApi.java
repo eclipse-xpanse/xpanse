@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.m
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlanWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
+import java.util.UUID;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,31 +63,33 @@ public class TerraformApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDeployWithScripts(TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest) throws RestClientException {
-        asyncDeployWithScriptsWithHttpInfo(terraformAsyncDeployFromDirectoryRequest);
+    public void asyncDeployWithScripts(TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        asyncDeployWithScriptsWithHttpInfo(terraformAsyncDeployFromDirectoryRequest, xCustomRequestId);
     }
 
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDeployWithScriptsWithHttpInfo(TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest) throws RestClientException {
+    public ResponseEntity<Void> asyncDeployWithScriptsWithHttpInfo(TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
         Object localVarPostBody = terraformAsyncDeployFromDirectoryRequest;
         
         // verify the required parameter 'terraformAsyncDeployFromDirectoryRequest' is set
@@ -99,6 +102,9 @@ public class TerraformApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*"
@@ -117,31 +123,33 @@ public class TerraformApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDestroyWithScripts(TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest) throws RestClientException {
-        asyncDestroyWithScriptsWithHttpInfo(terraformAsyncDestroyFromDirectoryRequest);
+    public void asyncDestroyWithScripts(TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        asyncDestroyWithScriptsWithHttpInfo(terraformAsyncDestroyFromDirectoryRequest, xCustomRequestId);
     }
 
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDestroyWithScriptsWithHttpInfo(TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest) throws RestClientException {
+    public ResponseEntity<Void> asyncDestroyWithScriptsWithHttpInfo(TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
         Object localVarPostBody = terraformAsyncDestroyFromDirectoryRequest;
         
         // verify the required parameter 'terraformAsyncDestroyFromDirectoryRequest' is set
@@ -154,6 +162,9 @@ public class TerraformApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*"
@@ -172,10 +183,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDeployFromDirectoryRequest  (required)
@@ -189,10 +200,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDeployFromDirectoryRequest  (required)
@@ -238,32 +249,34 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult deployWithScripts(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest) throws RestClientException {
-        return deployWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest).getBody();
+    public TerraformResult deployWithScripts(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+        return deployWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest, xCustomRequestId).getBody();
     }
 
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> deployWithScriptsWithHttpInfo(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest) throws RestClientException {
+    public ResponseEntity<TerraformResult> deployWithScriptsWithHttpInfo(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
         Object localVarPostBody = terraformDeployWithScriptsRequest;
         
         // verify the required parameter 'terraformDeployWithScriptsRequest' is set
@@ -276,6 +289,9 @@ public class TerraformApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*", "application/json"
@@ -294,10 +310,10 @@ public class TerraformApi {
     /**
      * 
      * Destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDestroyFromDirectoryRequest  (required)
@@ -311,10 +327,10 @@ public class TerraformApi {
     /**
      * 
      * Destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDestroyFromDirectoryRequest  (required)
@@ -360,32 +376,34 @@ public class TerraformApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult destroyWithScripts(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest) throws RestClientException {
-        return destroyWithScriptsWithHttpInfo(terraformDestroyWithScriptsRequest).getBody();
+    public TerraformResult destroyWithScripts(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+        return destroyWithScriptsWithHttpInfo(terraformDestroyWithScriptsRequest, xCustomRequestId).getBody();
     }
 
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> destroyWithScriptsWithHttpInfo(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest) throws RestClientException {
+    public ResponseEntity<TerraformResult> destroyWithScriptsWithHttpInfo(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
         Object localVarPostBody = terraformDestroyWithScriptsRequest;
         
         // verify the required parameter 'terraformDestroyWithScriptsRequest' is set
@@ -398,6 +416,9 @@ public class TerraformApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*", "application/json"
@@ -416,10 +437,10 @@ public class TerraformApi {
     /**
      * 
      * Check health of Terraform API service
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @return TerraformBootSystemStatus
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -431,10 +452,10 @@ public class TerraformApi {
     /**
      * 
      * Check health of Terraform API service
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @return ResponseEntity&lt;TerraformBootSystemStatus&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -463,10 +484,10 @@ public class TerraformApi {
     /**
      * 
      * Get Terraform Plan as JSON string from a directory
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformPlanFromDirectoryRequest  (required)
@@ -480,10 +501,10 @@ public class TerraformApi {
     /**
      * 
      * Get Terraform Plan as JSON string from a directory
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformPlanFromDirectoryRequest  (required)
@@ -529,32 +550,34 @@ public class TerraformApi {
     /**
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformPlanWithScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @return TerraformPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformPlan planWithScripts(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest) throws RestClientException {
-        return planWithScriptsWithHttpInfo(terraformPlanWithScriptsRequest).getBody();
+    public TerraformPlan planWithScripts(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+        return planWithScriptsWithHttpInfo(terraformPlanWithScriptsRequest, xCustomRequestId).getBody();
     }
 
     /**
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformPlanWithScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformPlan&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformPlan> planWithScriptsWithHttpInfo(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest) throws RestClientException {
+    public ResponseEntity<TerraformPlan> planWithScriptsWithHttpInfo(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
         Object localVarPostBody = terraformPlanWithScriptsRequest;
         
         // verify the required parameter 'terraformPlanWithScriptsRequest' is set
@@ -567,6 +590,9 @@ public class TerraformApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*", "application/json"
@@ -585,10 +611,10 @@ public class TerraformApi {
     /**
      * 
      * Validate the Terraform modules
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @return TerraformValidationResult
@@ -601,10 +627,10 @@ public class TerraformApi {
     /**
      * 
      * Validate the Terraform modules
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
@@ -642,10 +668,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @return TerraformValidationResult
@@ -658,10 +684,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
      * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
      * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;

@@ -81,7 +81,7 @@ public class TerraformBootDeployment implements Deployment {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromDirectoryRequest request = getDeployRequest(deployTask);
         try {
-            terraformApi.asyncDeployWithScripts(request);
+            terraformApi.asyncDeployWithScripts(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -96,7 +96,7 @@ public class TerraformBootDeployment implements Deployment {
         DeployResult result = new DeployResult();
         TerraformAsyncDestroyFromDirectoryRequest request = getDestroyRequest(task, stateFile);
         try {
-            terraformApi.asyncDestroyWithScripts(request);
+            terraformApi.asyncDestroyWithScripts(request, task.getId());
             result.setId(task.getId());
             return result;
         } catch (RestClientException e) {
@@ -141,7 +141,8 @@ public class TerraformBootDeployment implements Deployment {
 
     @Override
     public String getDeployPlanAsJson(DeployTask task) {
-        TerraformPlan terraformPlan = terraformApi.planWithScripts(getPlanWithScriptsRequest(task));
+        TerraformPlan terraformPlan =
+                terraformApi.planWithScripts(getPlanWithScriptsRequest(task), task.getId());
         return terraformPlan.getPlan();
     }
 
