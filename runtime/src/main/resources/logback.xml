@@ -15,6 +15,16 @@
       </Pattern>
     </encoder>
   </appender>
+  <springProfile name="opentelemetry">
+    <appender name="OpenTelemetry" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+    </appender>
+    <logger additivity="false" level="info" name="org.eclipse.xpanse">
+      <appender-ref ref="OpenTelemetry"/>
+    </logger>
+    <root level="error">
+      <appender-ref ref="OpenTelemetry"/>
+    </root>
+  </springProfile>
 
   <logger additivity="false" level="info" name="org.eclipse.xpanse">
     <appender-ref ref="Console"/>
