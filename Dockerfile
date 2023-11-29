@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 ENV TERRAFORM_VERSION=1.4.4
 ENV XPANSE_USER=xpanse
