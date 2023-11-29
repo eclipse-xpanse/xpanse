@@ -33,6 +33,7 @@
         <module>common</module>
         <module>policy</module>
         <module>workflow</module>
+        <module>observability</module>
     </modules>
 
 </project>
