@@ -75,7 +75,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
                 Assertions.assertNotNull(newServiceDetails);
                 Assertions.assertEquals(ServiceDeploymentState.DEPLOY_SUCCESS,
                         newServiceDetails.getServiceDeploymentState());
-                Assertions.assertTrue(newServiceDetails.getDeployedServiceProperties().size() >= 1);
+                Assertions.assertFalse(newServiceDetails.getDeployedServiceProperties().isEmpty());
 
                 testDestroyAndGetDetails(newServiceId);
             } else {
@@ -95,6 +95,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
                 if (serviceIsTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {
                     testPurgeAndGetDetails(serviceId);
                 }
+
             }
         } else {
             if (serviceIsTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {

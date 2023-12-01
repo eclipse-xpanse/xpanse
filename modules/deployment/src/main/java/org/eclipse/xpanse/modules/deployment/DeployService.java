@@ -466,14 +466,8 @@ public class DeployService {
                         deployTask.getId());
                 destroy(deployment, deployTask, deployServiceEntity);
             }
-            DeployServiceEntity updatedDeployServiceEntity =
-                    deployServiceStorage.findDeployServiceById(deployServiceEntity.getId());
-            if (Objects.nonNull(updatedDeployServiceEntity)
-                    && ServiceDeploymentState.DESTROY_SUCCESS
-                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
-                deployServiceStorage.deleteDeployService(deployServiceEntity);
-                log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
-            }
+            deployServiceStorage.deleteDeployService(deployServiceEntity);
+            log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
         } catch (RuntimeException e) {
             log.error("Error purging created resources for service with ID: {}. Ignoring.",
                     deployTask.getId(), e);
