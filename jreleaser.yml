@@ -18,6 +18,12 @@ release:
     overwrite: true
     changelog:
       skipMergeCommits: true
+      formatted: ALWAYS
+      excludeLabels:
+        - 'botCommits'
+      labelers:
+        - label: 'botCommits'
+          title: 'regex:.*GitHub Action.*'
 signing:
   active: ALWAYS
   armored: true
