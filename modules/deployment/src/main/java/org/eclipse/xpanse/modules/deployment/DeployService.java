@@ -235,7 +235,7 @@ public class DeployService {
             validateDeploymentWithPolicies(deployment, deployTask);
             deployResult = deployment.deploy(deployTask);
         } catch (RuntimeException e) {
-            log.info("Deploy service with id:{} failed. error:{}", deployTask.getId(), e);
+            log.info("Deploy service with id:{} failed.", deployTask.getId(), e);
             deployResult = new DeployResult();
             deployResult.setId(deployTask.getId());
             deployResult.setState(TerraformExecState.DEPLOY_FAILED);
@@ -249,7 +249,7 @@ public class DeployService {
                 rollbackOnDeploymentFailure(deployment, deployTask, updatedDeployServiceEntity);
             }
         } catch (RuntimeException e) {
-            log.info("Deploy service with id:{} update database entity failed. error:{}",
+            log.info("Deploy service with id:{} update database entity failed.",
                     deployTask.getId(), e);
         }
     }
@@ -351,10 +351,14 @@ public class DeployService {
      * Perform rollback when deployment fails and destroy the created resources.
      */
     private void rollbackOnDeploymentFailure(Deployment deployment,
-                                             DeployTask destroyTask,
+                                             DeployTask deployTask,
                                              DeployServiceEntity deployServiceEntity) {
         log.info("Performing rollback of already provisioned resources.");
-        destroy(deployment, destroyTask, deployServiceEntity);
+        if (Objects.nonNull(deployServiceEntity.getDeployResourceList())
+                && !deployServiceEntity.getDeployResourceList().isEmpty()) {
+            log.info("destroying created resources for service with ID: {}", deployTask.getId());
+            destroy(deployment, deployTask, deployServiceEntity);
+        }
     }
 
     /**
@@ -378,7 +382,7 @@ public class DeployService {
             String stateFile = getStoredStateContent(deployServiceEntity);
             destroyResult = deployment.destroy(destroyTask, stateFile);
         } catch (RuntimeException e) {
-            log.info("Destroy service with id:{} failed. error:{}", destroyTask.getId(), e);
+            log.info("Destroy service with id:{} failed.", destroyTask.getId(), e);
             destroyResult = new DeployResult();
             destroyResult.setId(destroyTask.getId());
             destroyResult.setState(TerraformExecState.DESTROY_FAILED);
@@ -393,7 +397,7 @@ public class DeployService {
                 deployment.deleteTaskWorkspace(destroyTask.getId().toString());
             }
         } catch (RuntimeException e) {
-            log.info("Destroy service with id:{} update database entity failed. error:{}",
+            log.info("Destroy service with id:{} update database entity failed.",
                     destroyTask.getId(), e);
         }
     }
@@ -458,17 +462,12 @@ public class DeployService {
         try {
             if (Objects.nonNull(deployServiceEntity.getDeployResourceList())
                     && !deployServiceEntity.getDeployResourceList().isEmpty()) {
-                log.info("Purging created resources for service with ID: {}", deployTask.getId());
+                log.info("destroying created resources for service with ID: {}",
+                        deployTask.getId());
                 destroy(deployment, deployTask, deployServiceEntity);
             }
-            DeployServiceEntity updatedDeployServiceEntity =
-                    deployServiceStorage.findDeployServiceById(deployServiceEntity.getId());
-            if (Objects.nonNull(updatedDeployServiceEntity)
-                    && ServiceDeploymentState.DESTROY_SUCCESS
-                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
-                deployServiceStorage.deleteDeployService(deployServiceEntity);
-                log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
-            }
+            deployServiceStorage.deleteDeployService(deployServiceEntity);
+            log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
         } catch (RuntimeException e) {
             log.error("Error purging created resources for service with ID: {}. Ignoring.",
                     deployTask.getId(), e);
