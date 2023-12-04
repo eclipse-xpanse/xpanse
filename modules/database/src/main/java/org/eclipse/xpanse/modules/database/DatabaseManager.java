@@ -5,8 +5,6 @@
 
 package org.eclipse.xpanse.modules.database;
 
-import java.util.Arrays;
-import java.util.List;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
@@ -20,6 +18,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseManager {
 
+    @Value("${spring.datasource.name:h2}")
+    private String dataSourceName;
+
     @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
     private String dataSourceUrl;
 
@@ -29,23 +30,12 @@ public class DatabaseManager {
      * @return system status of database.
      */
     public BackendSystemStatus getDatabaseStatus() {
-        List<String> databaseUrlSplitList = Arrays.asList(dataSourceUrl.split(":"));
-        if (databaseUrlSplitList.contains(DatabaseType.H2DB.toValue())) {
-            BackendSystemStatus databaseStatus = new BackendSystemStatus();
-            databaseStatus.setBackendSystemType(BackendSystemType.DATABASE);
-            databaseStatus.setName(DatabaseType.H2DB.toValue());
-            databaseStatus.setHealthStatus(HealthStatus.OK);
-            databaseStatus.setEndpoint(dataSourceUrl);
-            return databaseStatus;
-        }
-        if (databaseUrlSplitList.contains(DatabaseType.MYSQL.toValue())) {
-            BackendSystemStatus databaseStatus = new BackendSystemStatus();
-            databaseStatus.setBackendSystemType(BackendSystemType.DATABASE);
-            databaseStatus.setName(DatabaseType.MYSQL.toValue());
-            databaseStatus.setHealthStatus(HealthStatus.OK);
-            databaseStatus.setEndpoint(dataSourceUrl);
-            return databaseStatus;
-        }
-        return null;
+        DatabaseType databaseType = DatabaseType.getByValue(dataSourceName);
+        BackendSystemStatus databaseStatus = new BackendSystemStatus();
+        databaseStatus.setBackendSystemType(BackendSystemType.DATABASE);
+        databaseStatus.setName(databaseType.toValue());
+        databaseStatus.setHealthStatus(HealthStatus.OK);
+        databaseStatus.setEndpoint(dataSourceUrl);
+        return databaseStatus;
     }
 }

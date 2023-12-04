@@ -44,7 +44,6 @@ class OpenApiGeneratorJarManageTest {
     }
 
     @Test
-    @Disabled
     void testDownloadClientJar() throws IOException {
         // SetUp
         File jarFile = openApiGeneratorJarManage.getCliFile();

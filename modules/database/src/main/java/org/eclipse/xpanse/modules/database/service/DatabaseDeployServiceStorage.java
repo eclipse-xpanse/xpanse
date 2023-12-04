@@ -6,8 +6,6 @@
 
 package org.eclipse.xpanse.modules.database.service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 public class DatabaseDeployServiceStorage implements DeployServiceStorage {
-
-    @PersistenceContext
-    public EntityManager entityManager;
 
     private final DeployServiceRepository deployServiceRepository;
 
