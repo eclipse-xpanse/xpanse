@@ -18,6 +18,7 @@ class CurrentUserInfoTest {
         test.setRoles(List.of("admin"));
         test.setMetadata(Map.of("namespace", "test"));
         test.setNamespace("test");
+        test.setToken("token");
     }
 
     @Test
@@ -102,7 +103,7 @@ class CurrentUserInfoTest {
     @Test
     void testToString() {
         String exceptedString = "CurrentUserInfo(userId=userId, userName=userName, roles=[admin],"
-                + " metadata={namespace=test}, namespace=test)";
+                + " metadata={namespace=test}, namespace=test, token=token)";
         Assertions.assertEquals(test.toString(), exceptedString);
         Assertions.assertNotEquals(test.toString(), null);
     }

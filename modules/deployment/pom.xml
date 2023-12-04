@@ -106,7 +106,7 @@
                             <library>resttemplate</library>
                             <skip>${skipTerraformBootClientGeneration}</skip>
                             <supportingFilesToGenerate>
-                                ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java
+                                ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,OAuth.java
                             </supportingFilesToGenerate>
                             <configOptions>
                                 <generateClientAsBean>true</generateClientAsBean>
