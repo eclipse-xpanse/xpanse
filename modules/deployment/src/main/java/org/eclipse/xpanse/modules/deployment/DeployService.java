@@ -357,7 +357,7 @@ public class DeployService {
         if (Objects.nonNull(deployServiceEntity.getDeployResourceList())
                 && !deployServiceEntity.getDeployResourceList().isEmpty()) {
             log.info("destroying created resources for service with ID: {}", deployTask.getId());
-            destroy(deployment, deployTask, deployServiceEntity);
+            destroy(deployment, deployTask, deployServiceEntity, true);
         }
     }
 
@@ -371,11 +371,11 @@ public class DeployService {
     @Async("taskExecutor")
     public void asyncDestroyService(Deployment deployment, DeployTask deployTask,
                                     DeployServiceEntity deployServiceEntity) {
-        destroy(deployment, deployTask, deployServiceEntity);
+        destroy(deployment, deployTask, deployServiceEntity, false);
     }
 
     private void destroy(Deployment deployment, DeployTask destroyTask,
-                         DeployServiceEntity deployServiceEntity) {
+                         DeployServiceEntity deployServiceEntity, boolean isCalledWhenRollback) {
         MDC.put(TASK_ID, destroyTask.getId().toString());
         DeployResult destroyResult;
         try {
@@ -386,13 +386,17 @@ public class DeployService {
             destroyResult = new DeployResult();
             destroyResult.setId(destroyTask.getId());
             destroyResult.setState(TerraformExecState.DESTROY_FAILED);
+            destroyResult.setState(TerraformExecState.DESTROY_FAILED);
             destroyResult.setMessage(e.getMessage());
         }
 
         try {
             DeployServiceEntity updatedDeployServiceEntity =
-                    flushDestroyServiceEntity(destroyResult, deployServiceEntity);
+                    flushDestroyServiceEntity(destroyResult, deployServiceEntity,
+                            isCalledWhenRollback);
             if (ServiceDeploymentState.DESTROY_SUCCESS
+                    == updatedDeployServiceEntity.getServiceDeploymentState()
+                    || ServiceDeploymentState.DEPLOY_FAILED
                     == updatedDeployServiceEntity.getServiceDeploymentState()) {
                 deployment.deleteTaskWorkspace(destroyTask.getId().toString());
             }
@@ -414,20 +418,31 @@ public class DeployService {
     }
 
     private DeployServiceEntity flushDestroyServiceEntity(DeployResult destroyResult,
-                                                          DeployServiceEntity deployServiceEntity)
+                                                          DeployServiceEntity deployServiceEntity,
+                                                          boolean isCalledWhenRollback)
             throws RuntimeException {
         if (Objects.nonNull(destroyResult) && Objects.nonNull(destroyResult.getState())) {
             log.info("Update stored deploy service entity by result of destroy task with id:{}",
                     destroyResult.getId());
             DeployServiceEntity deployServiceEntityToFlush = new DeployServiceEntity();
             BeanUtils.copyProperties(deployServiceEntity, deployServiceEntityToFlush);
-            if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
-                deployServiceEntityToFlush.setServiceDeploymentState(
-                        ServiceDeploymentState.DESTROY_SUCCESS);
+            if (isCalledWhenRollback) {
+                if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
+                    deployServiceEntityToFlush.setServiceDeploymentState(
+                            ServiceDeploymentState.DEPLOY_FAILED);
+                } else {
+                    deployServiceEntityToFlush.setServiceDeploymentState(
+                            ServiceDeploymentState.ROLLBACK_FAILED);
+                }
             } else {
-                deployServiceEntityToFlush.setServiceDeploymentState(
-                        ServiceDeploymentState.DESTROY_FAILED);
-                deployServiceEntityToFlush.setResultMessage(destroyResult.getMessage());
+                if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
+                    deployServiceEntityToFlush.setServiceDeploymentState(
+                            ServiceDeploymentState.DESTROY_SUCCESS);
+                } else {
+                    deployServiceEntityToFlush.setServiceDeploymentState(
+                            ServiceDeploymentState.DESTROY_FAILED);
+                    deployServiceEntityToFlush.setResultMessage(destroyResult.getMessage());
+                }
             }
             updateDeployResourceEntity(destroyResult, deployServiceEntityToFlush);
             return deployServiceStorage.storeAndFlush(deployServiceEntityToFlush);
@@ -464,7 +479,7 @@ public class DeployService {
                     && !deployServiceEntity.getDeployResourceList().isEmpty()) {
                 log.info("destroying created resources for service with ID: {}",
                         deployTask.getId());
-                destroy(deployment, deployTask, deployServiceEntity);
+                destroy(deployment, deployTask, deployServiceEntity, false);
             }
             deployServiceStorage.deleteDeployService(deployServiceEntity);
             log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
@@ -588,7 +603,7 @@ public class DeployService {
             getResourceHandler(deployServiceEntity.getCsp()).handler(destroyResult);
         }
         try {
-            flushDestroyServiceEntity(destroyResult, deployServiceEntity);
+            flushDestroyServiceEntity(destroyResult, deployServiceEntity, false);
         } catch (RuntimeException e) {
             log.info("Update database entity with id:{} with destroy callback result failed.",
                     taskId, e);
@@ -696,7 +711,7 @@ public class DeployService {
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(id));
         DeployTask deployTask = getDeployTaskByStoredService(deployServiceEntity);
         Deployment deployment = getDeployment(deployTask.getOcl().getDeployment().getKind());
-        destroy(deployment, deployTask, deployServiceEntity);
+        destroy(deployment, deployTask, deployServiceEntity, false);
         return CompletableFuture.completedFuture(deployServiceEntity);
     }
 
