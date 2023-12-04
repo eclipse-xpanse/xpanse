@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
+import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthCheck;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -67,6 +68,9 @@ public class AdminServicesApi {
 
     @Resource
     private PolicyManager policyManager;
+
+    @Resource
+    private OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
 
 
     /**
@@ -127,7 +131,7 @@ public class AdminServicesApi {
     private List<BackendSystemStatus> checkHealthOfAllBackendSystems() {
         List<BackendSystemStatus> backendSystemStatuses = new ArrayList<>();
         for (BackendSystemType type : BackendSystemType.values()) {
-            if (Objects.equals(BackendSystemType.IDENTITY_PROVIDER, type)) {
+            if (type == BackendSystemType.IDENTITY_PROVIDER) {
                 IdentityProviderService identityProviderService =
                         identityProviderManager.getActiveIdentityProviderService();
                 if (Objects.nonNull(identityProviderService)) {
@@ -138,24 +142,32 @@ public class AdminServicesApi {
                     }
                 }
             }
-            if (Objects.equals(BackendSystemType.DATABASE, type)) {
+            if (type == BackendSystemType.DATABASE) {
                 BackendSystemStatus databaseStatus = databaseManager.getDatabaseStatus();
                 if (Objects.nonNull(databaseStatus)) {
                     backendSystemStatuses.add(databaseStatus);
                 }
             }
-            if (Objects.equals(BackendSystemType.TERRAFORM_BOOT, type)) {
+            if (type == BackendSystemType.TERRAFORM_BOOT) {
                 BackendSystemStatus terraformBootStatus =
                         terraformBootManager.getTerraformBootStatus();
                 if (Objects.nonNull(terraformBootStatus)) {
                     backendSystemStatuses.add(terraformBootStatus);
                 }
             }
-            if (Objects.equals(BackendSystemType.POLICY_MAN, type)) {
-                BackendSystemStatus terraformBootStatus =
+            if (type == BackendSystemType.POLICY_MAN) {
+                BackendSystemStatus policyManStatus =
                         policyManager.getPolicyManStatus();
-                if (Objects.nonNull(terraformBootStatus)) {
-                    backendSystemStatuses.add(terraformBootStatus);
+                if (Objects.nonNull(policyManStatus)) {
+                    backendSystemStatuses.add(policyManStatus);
+                }
+            }
+            if (type == BackendSystemType.OPEN_TELEMETRY_COLLECTOR) {
+
+                BackendSystemStatus otelExporterStatus =
+                        openTelemetryHealthCheck.getOpenTelemetryHealthStatus();
+                if (Objects.nonNull(otelExporterStatus)) {
+                    backendSystemStatuses.add(otelExporterStatus);
                 }
             }
         }

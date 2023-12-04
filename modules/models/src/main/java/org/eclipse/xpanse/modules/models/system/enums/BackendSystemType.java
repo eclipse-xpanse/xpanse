@@ -18,7 +18,8 @@ public enum BackendSystemType {
     IDENTITY_PROVIDER("IdentityProvider"),
     DATABASE("Database"),
     TERRAFORM_BOOT("Terraform Boot"),
-    POLICY_MAN("PolicyMan");
+    POLICY_MAN("PolicyMan"),
+    OPEN_TELEMETRY_COLLECTOR("OpenTelemetry Collector");
 
     private final String code;
 

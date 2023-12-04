@@ -96,7 +96,11 @@
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>policy</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>observability</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
