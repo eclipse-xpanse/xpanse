@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.m
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig.AuthTypeEnum;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfoHolder;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
@@ -41,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 
 /**
@@ -52,12 +54,16 @@ import org.springframework.web.client.RestClientException;
 public class TerraformBootDeployment implements Deployment {
 
     public static final String STATE_FILE_NAME = "terraform.tfstate";
+    private static final String ZITADEL_PROFILE_NAME = "zitadel";
     private final DeployEnvironments deployEnvironments;
     private final PluginManager pluginManager;
     private final TerraformBootConfig terraformBootConfig;
     private final String port;
     private final TerraformApi terraformApi;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${spring.profiles.active}")
+    private String profiles;
 
     /**
      * Initializes the TerraformBoot deployer.
@@ -81,6 +87,7 @@ public class TerraformBootDeployment implements Deployment {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromDirectoryRequest request = getDeployRequest(deployTask);
         try {
+            setHeaderTokenByProfiles();
             terraformApi.asyncDeployWithScripts(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;
@@ -96,6 +103,7 @@ public class TerraformBootDeployment implements Deployment {
         DeployResult result = new DeployResult();
         TerraformAsyncDestroyFromDirectoryRequest request = getDestroyRequest(task, stateFile);
         try {
+            setHeaderTokenByProfiles();
             terraformApi.asyncDestroyWithScripts(request, task.getId());
             result.setId(task.getId());
             return result;
@@ -127,6 +135,7 @@ public class TerraformBootDeployment implements Deployment {
      */
     @Override
     public DeployValidationResult validate(Ocl ocl) {
+        setHeaderTokenByProfiles();
         TerraformValidationResult validate =
                 terraformApi.validateWithScripts(getDeployWithScriptsRequest(ocl));
         DeployValidationResult result = null;
@@ -141,6 +150,7 @@ public class TerraformBootDeployment implements Deployment {
 
     @Override
     public String getDeployPlanAsJson(DeployTask task) {
+        setHeaderTokenByProfiles();
         TerraformPlan terraformPlan =
                 terraformApi.planWithScripts(getPlanWithScriptsRequest(task), task.getId());
         return terraformPlan.getPlan();
@@ -245,5 +255,15 @@ public class TerraformBootDeployment implements Deployment {
                 this.deployEnvironments.getCredentialVariablesByHostingType(deployTask));
         envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(deployTask));
         return envVariables;
+    }
+
+    private void setHeaderTokenByProfiles() {
+        if (StringUtils.isBlank(profiles)) {
+            return;
+        }
+        List<String> profileList = Arrays.asList(profiles.split(","));
+        if (!CollectionUtils.isEmpty(profileList) && profileList.contains(ZITADEL_PROFILE_NAME)) {
+            terraformApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
+        }
     }
 }

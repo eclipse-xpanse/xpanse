@@ -54,6 +54,7 @@ import java.util.function.Supplier;
 import java.time.OffsetDateTime;
 
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.auth.Authentication;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.auth.OAuth;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient")
@@ -109,6 +110,7 @@ public class ApiClient extends JavaTimeFormatter {
 
         // Setup authentications (key: authentication name, value: authentication).
         authentications = new HashMap<String, Authentication>();
+        authentications.put("OAuth2Flow", new OAuth());
         // Prevent the authentications from being modified.
         authentications = Collections.unmodifiableMap(authentications);
     }
@@ -154,6 +156,21 @@ public class ApiClient extends JavaTimeFormatter {
 
 
 
+
+    /**
+     * Helper method to set access token for the first OAuth2 authentication.
+     *
+     * @param accessToken Access token
+     */
+    public void setAccessToken(String accessToken) {
+        for (Authentication auth : authentications.values()) {
+            if (auth instanceof OAuth) {
+                ((OAuth) auth).setAccessToken(accessToken);
+                return;
+            }
+        }
+        throw new RuntimeException("No OAuth2 authentication configured!");
+    }
 
 
     /**

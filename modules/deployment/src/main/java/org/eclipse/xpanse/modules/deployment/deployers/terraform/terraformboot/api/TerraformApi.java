@@ -63,10 +63,10 @@ public class TerraformApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -79,10 +79,10 @@ public class TerraformApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -115,7 +115,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
         return apiClient.invokeAPI("/terraform-boot/deploy/scripts/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -123,10 +123,10 @@ public class TerraformApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -139,10 +139,10 @@ public class TerraformApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -175,7 +175,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
         return apiClient.invokeAPI("/terraform-boot/destroy/scripts/async", HttpMethod.DELETE, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -183,10 +183,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDeployFromDirectoryRequest  (required)
@@ -200,10 +200,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDeployFromDirectoryRequest  (required)
@@ -241,7 +241,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
         return apiClient.invokeAPI("/terraform-boot/deploy/{module_directory}", HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -249,10 +249,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -266,10 +266,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -302,7 +302,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
         return apiClient.invokeAPI("/terraform-boot/deploy/scripts", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -310,10 +310,10 @@ public class TerraformApi {
     /**
      * 
      * Destroy the Terraform modules
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDestroyFromDirectoryRequest  (required)
@@ -327,10 +327,10 @@ public class TerraformApi {
     /**
      * 
      * Destroy the Terraform modules
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDestroyFromDirectoryRequest  (required)
@@ -368,7 +368,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
         return apiClient.invokeAPI("/terraform-boot/destroy/{module_directory}", HttpMethod.DELETE, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -376,10 +376,10 @@ public class TerraformApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -393,10 +393,10 @@ public class TerraformApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -429,7 +429,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
         return apiClient.invokeAPI("/terraform-boot/destroy/scripts", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -437,10 +437,10 @@ public class TerraformApi {
     /**
      * 
      * Check health of Terraform API service
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @return TerraformBootSystemStatus
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -452,10 +452,10 @@ public class TerraformApi {
     /**
      * 
      * Check health of Terraform API service
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @return ResponseEntity&lt;TerraformBootSystemStatus&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -476,7 +476,7 @@ public class TerraformApi {
         final String[] localVarContentTypes = {  };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformBootSystemStatus> localReturnType = new ParameterizedTypeReference<TerraformBootSystemStatus>() {};
         return apiClient.invokeAPI("/terraform-boot/health", HttpMethod.GET, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -484,10 +484,10 @@ public class TerraformApi {
     /**
      * 
      * Get Terraform Plan as JSON string from a directory
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformPlanFromDirectoryRequest  (required)
@@ -501,10 +501,10 @@ public class TerraformApi {
     /**
      * 
      * Get Terraform Plan as JSON string from a directory
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformPlanFromDirectoryRequest  (required)
@@ -542,7 +542,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformPlan> localReturnType = new ParameterizedTypeReference<TerraformPlan>() {};
         return apiClient.invokeAPI("/terraform-boot/plan/{module_directory}", HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -550,10 +550,10 @@ public class TerraformApi {
     /**
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param terraformPlanWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -567,10 +567,10 @@ public class TerraformApi {
     /**
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param terraformPlanWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -603,7 +603,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformPlan> localReturnType = new ParameterizedTypeReference<TerraformPlan>() {};
         return apiClient.invokeAPI("/terraform-boot/plan", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -611,10 +611,10 @@ public class TerraformApi {
     /**
      * 
      * Validate the Terraform modules
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @return TerraformValidationResult
@@ -627,10 +627,10 @@ public class TerraformApi {
     /**
      * 
      * Validate the Terraform modules
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
@@ -660,7 +660,7 @@ public class TerraformApi {
         final String[] localVarContentTypes = {  };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformValidationResult> localReturnType = new ParameterizedTypeReference<TerraformValidationResult>() {};
         return apiClient.invokeAPI("/terraform-boot/validate/{module_directory}", HttpMethod.GET, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
@@ -668,10 +668,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @return TerraformValidationResult
@@ -684,10 +684,10 @@ public class TerraformApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
@@ -716,7 +716,7 @@ public class TerraformApi {
          };
         final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformValidationResult> localReturnType = new ParameterizedTypeReference<TerraformValidationResult>() {};
         return apiClient.invokeAPI("/terraform-boot/validate/scripts", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);

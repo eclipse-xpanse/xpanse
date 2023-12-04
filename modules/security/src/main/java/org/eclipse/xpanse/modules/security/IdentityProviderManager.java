@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfoHolder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -61,7 +62,9 @@ public class IdentityProviderManager {
      */
     public CurrentUserInfo getCurrentUserInfo() {
         if (Objects.nonNull(activeIdentityProviderService)) {
-            return activeIdentityProviderService.getCurrentUserInfo();
+            CurrentUserInfo currentUserInfo = activeIdentityProviderService.getCurrentUserInfo();
+            CurrentUserInfoHolder.setCurrentUserInfo(currentUserInfo);
+            return currentUserInfo;
         }
         return null;
     }

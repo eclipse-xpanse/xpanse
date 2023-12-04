@@ -44,6 +44,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.OAuth2Token;
+import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -172,6 +174,7 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                     }
                 }
             }
+            setUserInfoToken(authentication, currentUserInfo);
             return currentUserInfo;
         }
         return null;
@@ -217,5 +220,11 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
         return null;
     }
 
-
+    private void setUserInfoToken(Authentication authentication, CurrentUserInfo currentUserInfo) {
+        OAuth2Token token =
+                ((AbstractOAuth2TokenAuthenticationToken<?>) authentication).getToken();
+        if (Objects.nonNull(token)) {
+            currentUserInfo.setToken(token.getTokenValue());
+        }
+    }
 }

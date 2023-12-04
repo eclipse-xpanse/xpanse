@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
+import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfoHolder;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -26,6 +27,7 @@ import org.springframework.web.client.RestClientException;
 public class TerraformBootManager {
 
     private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
+    private static final String ZITADEL_PROFILE_NAME = "zitadel";
 
     @Resource
     private TerraformApi terraformApi;
@@ -48,6 +50,10 @@ public class TerraformBootManager {
             terraformBootStatus.setEndpoint(terraformBootBaseUrl);
 
             try {
+                List<String> profileList = Arrays.asList(springProfilesActive.split(","));
+                if (profileList.contains(ZITADEL_PROFILE_NAME)) {
+                    terraformApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
+                }
                 TerraformBootSystemStatus terraformBootSystemStatus = terraformApi.healthCheck();
                 terraformBootStatus.setHealthStatus(HealthStatus.valueOf(
                         terraformBootSystemStatus.getHealthStatus().getValue()));
