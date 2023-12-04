@@ -22,9 +22,10 @@ public enum ServiceDeploymentState {
     DESTROY_SUCCESS("destroy successful"),
     DESTROY_FAILED("destroy failed"),
     MIGRATING("migrating"),
-    MIGRATION_SUCCESS("migration_success"),
-    MIGRATION_FAILED("migration_failed"),
-    MANUAL_CLEANUP_REQUIRED("manual cleanup required");
+    MIGRATION_SUCCESS("migration successful"),
+    MIGRATION_FAILED("migration failed"),
+    MANUAL_CLEANUP_REQUIRED("manual cleanup required"),
+    ROLLBACK_FAILED("rollback failed");
 
 
     private final String state;

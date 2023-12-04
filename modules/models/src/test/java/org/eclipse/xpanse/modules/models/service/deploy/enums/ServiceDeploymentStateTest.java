@@ -20,19 +20,29 @@ class ServiceDeploymentStateTest {
     @Test
     void testGetByValue() {
         assertEquals(ServiceDeploymentState.DEPLOYING,
-                ServiceDeploymentState.DEPLOYING.getByValue("deploying"));
+                ServiceDeploymentState.getByValue("deploying"));
         assertEquals(ServiceDeploymentState.DEPLOY_SUCCESS,
-                ServiceDeploymentState.DEPLOY_SUCCESS.getByValue("deployment successful"));
+                ServiceDeploymentState.getByValue("deployment successful"));
         assertEquals(ServiceDeploymentState.DEPLOY_FAILED,
-                ServiceDeploymentState.DEPLOY_FAILED.getByValue("deployment failed"));
+                ServiceDeploymentState.getByValue("deployment failed"));
         assertEquals(ServiceDeploymentState.DESTROYING,
-                ServiceDeploymentState.DESTROYING.getByValue("destroying"));
+                ServiceDeploymentState.getByValue("destroying"));
         assertEquals(ServiceDeploymentState.DESTROY_SUCCESS,
-                ServiceDeploymentState.DESTROY_SUCCESS.getByValue("destroy successful"));
+                ServiceDeploymentState.getByValue("destroy successful"));
         assertEquals(ServiceDeploymentState.DESTROY_FAILED,
-                ServiceDeploymentState.DESTROY_FAILED.getByValue("destroy failed"));
+                ServiceDeploymentState.getByValue("destroy failed"));
+        assertEquals(ServiceDeploymentState.MIGRATING,
+                ServiceDeploymentState.getByValue("migrating"));
+        assertEquals(ServiceDeploymentState.MIGRATION_SUCCESS,
+                ServiceDeploymentState.getByValue("migration successful"));
+        assertEquals(ServiceDeploymentState.MIGRATION_FAILED,
+                ServiceDeploymentState.getByValue("migration failed"));
+        assertEquals(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED,
+                ServiceDeploymentState.getByValue("manual cleanup required"));
+        assertEquals(ServiceDeploymentState.ROLLBACK_FAILED,
+                ServiceDeploymentState.getByValue("rollback failed"));
         assertThrows(UnsupportedEnumValueException.class,
-                () -> ServiceDeploymentState.DESTROY_FAILED.getByValue("unavailable"));
+                () -> ServiceDeploymentState.getByValue("unavailable"));
     }
 
     @Test
@@ -43,6 +53,12 @@ class ServiceDeploymentStateTest {
         assertEquals("destroying", ServiceDeploymentState.DESTROYING.toValue());
         assertEquals("destroy successful", ServiceDeploymentState.DESTROY_SUCCESS.toValue());
         assertEquals("destroy failed", ServiceDeploymentState.DESTROY_FAILED.toValue());
+        assertEquals("migrating", ServiceDeploymentState.MIGRATING.toValue());
+        assertEquals("migration successful", ServiceDeploymentState.MIGRATION_SUCCESS.toValue());
+        assertEquals("migration failed", ServiceDeploymentState.MIGRATION_FAILED.toValue());
+        assertEquals("manual cleanup required",
+                ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED.toValue());
+        assertEquals("rollback failed", ServiceDeploymentState.ROLLBACK_FAILED.toValue());
     }
 
 }
