@@ -94,6 +94,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
      * The state of the Service.
      */
     @Enumerated(EnumType.STRING)
+    @Column(name = "SERVICE_DEPLOYMENT_STATE")
     private ServiceDeploymentState serviceDeploymentState;
 
     /**

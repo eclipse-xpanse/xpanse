@@ -6,13 +6,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.persistence.EntityManager;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,16 +25,8 @@ class DatabaseDeployServiceStorageTest {
     @Mock
     private DeployServiceRepository mockDeployServiceRepository;
 
-    @Mock
-    private EntityManager entityManager;
-
     @InjectMocks
     private DatabaseDeployServiceStorage databaseDeployServiceStorageUnderTest;
-
-    @BeforeEach
-    void setUp() {
-        databaseDeployServiceStorageUnderTest.entityManager = entityManager;
-    }
 
     @Test
     void testStoreAndFlush() {
