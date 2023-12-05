@@ -23,6 +23,16 @@
             <artifactId>opentelemetry-spring-boot-starter</artifactId>
             <version>${opentelemetry.version}-alpha</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>models</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>
