@@ -17,6 +17,7 @@ release:
   github:
     overwrite: true
     changelog:
+      format: '- {{commitShortHash}} {{commitTitle}}'
       skipMergeCommits: true
       formatted: ALWAYS
       excludeLabels:
@@ -24,6 +25,12 @@ release:
       labelers:
         - label: 'botCommits'
           title: 'regex:.*GitHub Action.*'
+      hide:
+        contributors:
+          - eclipse-xpanse-bot
+          - dependabot[bot]
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
 signing:
   active: ALWAYS
   armored: true
