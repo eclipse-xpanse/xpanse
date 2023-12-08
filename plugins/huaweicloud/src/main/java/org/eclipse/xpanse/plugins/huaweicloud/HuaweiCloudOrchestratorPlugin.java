@@ -19,8 +19,10 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
+import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudMetricsService;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +42,9 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Resource
     private HuaweiCloudMetricsService huaweiCloudMetricsService;
+
+    @Resource
+    private HuaweiCloudVmStateManager huaweiCloudVmStateManager;
 
     public HuaweiCloudOrchestratorPlugin(
             HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler) {
@@ -132,5 +137,20 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
               region = "%s"
             }
             """, terraformHuaweiCloudVersion, region);
+    }
+
+    @Override
+    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
+        return huaweiCloudVmStateManager.startService(serviceManagerRequest);
+    }
+
+    @Override
+    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
+        return huaweiCloudVmStateManager.stopService(serviceManagerRequest);
+    }
+
+    @Override
+    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
+        return huaweiCloudVmStateManager.restartService(serviceManagerRequest);
     }
 }

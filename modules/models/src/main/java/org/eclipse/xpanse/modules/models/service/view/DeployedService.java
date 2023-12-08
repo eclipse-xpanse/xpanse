@@ -17,6 +17,7 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.manager.ServiceState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
@@ -76,8 +77,12 @@ public class DeployedService {
      * The state of the Service.
      */
     @NotNull
-    @Schema(description = "The state of the service")
+    @Schema(description = "The deployment state of the service")
     private ServiceDeploymentState serviceDeploymentState;
+
+    @NotNull
+    @Schema(description = "The run state of the service")
+    private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
     @NotNull
     @Schema(description = "Defines which cloud service account is used "

@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDep
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
+import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -203,6 +204,21 @@ class ServiceMetricsAdapterTest {
 
     private OrchestratorPlugin getOrchestratorPlugin(Csp csp, List<Metric> metrics) {
         return new OrchestratorPlugin() {
+            @Override
+            public boolean startService(ServiceManagerRequest serviceManagerRequest) {
+                return true;
+            }
+
+            @Override
+            public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
+                return true;
+            }
+
+            @Override
+            public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
+                return true;
+            }
+
             @Override
             public String getProvider(String region) {
                 return null;

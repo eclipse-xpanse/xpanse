@@ -13,6 +13,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
+import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.springframework.stereotype.Component;
@@ -71,5 +72,20 @@ public class DummyOpenstackPluginImpl implements OrchestratorPlugin {
     @Override
     public String getProvider(String region) {
         return null;
+    }
+
+    @Override
+    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
+        return true;
+    }
+
+    @Override
+    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
+        return true;
+    }
+
+    @Override
+    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
+        return true;
     }
 }

@@ -27,6 +27,9 @@ import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudManagerClient;
+import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudServerManageRequestConverter;
+import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudDataModelConverter;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudMetricsService;
@@ -42,6 +45,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class,
+        HuaweiCloudVmStateManager.class, HuaweiCloudServerManageRequestConverter.class,
         HuaweiCloudMetricsService.class, HuaweiCloudMonitorClient.class,
         HuaweiCloudMonitorConstants.class, HuaweiCloudDataModelConverter.class,
         CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
@@ -62,6 +66,8 @@ class HuaweiCloudMonitorIntegrationTest {
     @MockBean
     HuaweiCloudMonitorClient huaweiCloudMonitorClient;
     @MockBean
+    HuaweiCloudManagerClient huaweiCloudManagerClient;
+    @MockBean
     CredentialCenter credentialCenter;
 
     ResourceMetricsRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
@@ -80,7 +86,7 @@ class HuaweiCloudMonitorIntegrationTest {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
         when(this.huaweiCloudMonitorClient.getCesClient(any(), any())).thenReturn(getCesClient());
-        when(this.huaweiCloudMonitorClient.getCredentialForClient(any())).thenReturn(
+        when(this.huaweiCloudMonitorClient.getCredential(any())).thenReturn(
                 getCredential());
     }
 
