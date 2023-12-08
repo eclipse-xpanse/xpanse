@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.manager.ServiceState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test of DeployedService.
  */
-class ServiceVoTest {
+class DeployedServiceTest {
 
     private static final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
     private static final String userId = "userId";
@@ -33,6 +34,7 @@ class ServiceVoTest {
     private static final String flavor = "basic";
     private static final ServiceDeploymentState serviceDeploymentState =
             ServiceDeploymentState.DEPLOY_SUCCESS;
+    private static final ServiceState SERVICE_STATE = ServiceState.NOT_RUNNING;
     private static final OffsetDateTime createTime = OffsetDateTime.now();
     private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private static DeployedService deployedService;
@@ -48,6 +50,7 @@ class ServiceVoTest {
         deployedService.setCsp(csp);
         deployedService.setFlavor(flavor);
         deployedService.setServiceDeploymentState(serviceDeploymentState);
+        deployedService.setServiceState(SERVICE_STATE);
         deployedService.setCreateTime(createTime);
         deployedService.setLastModifiedTime(lastModifiedTime);
         deployedService.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
@@ -163,6 +166,7 @@ class ServiceVoTest {
                 ", csp=" + csp +
                 ", flavor=" + flavor +
                 ", serviceDeploymentState=" + serviceDeploymentState +
+                ", serviceState=" + SERVICE_STATE +
                 ", serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR +
                 ", createTime=" + createTime +
                 ", lastModifiedTime=" + lastModifiedTime +

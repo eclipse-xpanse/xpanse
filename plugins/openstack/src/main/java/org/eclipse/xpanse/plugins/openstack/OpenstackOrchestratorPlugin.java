@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
+import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
@@ -161,4 +162,18 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
                 """, terraformOpenStackVersion, region);
     }
 
+    @Override
+    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
+        return true;
+    }
+
+    @Override
+    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
+        return true;
+    }
+
+    @Override
+    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
+        return true;
+    }
 }

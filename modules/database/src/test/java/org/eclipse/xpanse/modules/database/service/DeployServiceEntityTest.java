@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.manager.ServiceState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ class DeployServiceEntityTest {
     private final Csp CSP = Csp.HUAWEI;
     private final String FLAVOR = "1-zookeeper-with-3-worker-nodes-normal";
     private final ServiceDeploymentState SERVICE_STATE = ServiceDeploymentState.DEPLOYING;
+    private final ServiceState SERVICE_RUN_STATE = ServiceState.NOT_RUNNING;
     private final DeployRequest CREATE_REQUEST = new DeployRequest();
     private final List<DeployResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
     private final Map<String, String> PROPERTIES = new HashMap<>();
@@ -54,6 +56,7 @@ class DeployServiceEntityTest {
         test.setCsp(CSP);
         test.setFlavor(FLAVOR);
         test.setServiceDeploymentState(SERVICE_STATE);
+        test.setServiceState(SERVICE_RUN_STATE);
         test.setDeployRequest(CREATE_REQUEST);
         test.setDeployResourceList(DEPLOY_RESOURCE_LIST);
         test.setProperties(PROPERTIES);
@@ -74,6 +77,7 @@ class DeployServiceEntityTest {
                         + "csp=" + CSP + ", "
                         + "flavor=" + FLAVOR + ", "
                         + "serviceDeploymentState=" + SERVICE_STATE + ", "
+                        + "serviceState=" + SERVICE_RUN_STATE + ", "
                         + "deployRequest=" + CREATE_REQUEST + ", "
                         //+ "deployResourceList=" + DEPLOY_RESOURCE_LIST+ ", "
                         + "properties=" + PROPERTIES + ", "

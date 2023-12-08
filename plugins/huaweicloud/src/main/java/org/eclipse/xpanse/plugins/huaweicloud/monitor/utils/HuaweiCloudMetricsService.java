@@ -82,7 +82,7 @@ public class HuaweiCloudMetricsService {
                 Csp.HUAWEI,
                 CredentialType.VARIABLES, resourceMetricRequest.getUserId());
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
-        ICredential icredential = huaweiCloudMonitorClient.getCredentialForClient(credential);
+        ICredential icredential = huaweiCloudMonitorClient.getCredential(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
                 deployResource.getProperties().get("region"));
         Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
@@ -128,7 +128,7 @@ public class HuaweiCloudMetricsService {
         AbstractCredentialInfo credential = credentialCenter.getCredential(
                 Csp.HUAWEI, CredentialType.VARIABLES, serviceMetricRequest.getUserId());
         MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
-        ICredential icredential = huaweiCloudMonitorClient.getCredentialForClient(credential);
+        ICredential icredential = huaweiCloudMonitorClient.getCredential(credential);
         CesClient client = huaweiCloudMonitorClient.getCesClient(icredential,
                 deployResources.get(0).getProperties().get("region"));
         Map<String, List<MetricInfoList>> deployResourceMetricInfoMap = new HashMap<>();

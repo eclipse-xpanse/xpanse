@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.manager.ServiceState;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
@@ -91,11 +92,17 @@ public class DeployServiceEntity extends CreateModifiedTime {
     private String flavor;
 
     /**
-     * The state of the Service.
+     * The deployment state of the Service.
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "SERVICE_DEPLOYMENT_STATE")
     private ServiceDeploymentState serviceDeploymentState;
+
+    /**
+     * The run state of the Service.
+     */
+    @Enumerated(EnumType.STRING)
+    private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
     /**
      * The Ocl object of the XpanseDeployTask.

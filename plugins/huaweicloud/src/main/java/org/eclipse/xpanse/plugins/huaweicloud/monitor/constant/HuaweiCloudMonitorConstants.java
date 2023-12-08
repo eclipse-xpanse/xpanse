@@ -6,15 +6,12 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.monitor.constant;
 
+import org.eclipse.xpanse.plugins.huaweicloud.models.constant.HuaweiCloudConstants;
+
 /**
  * Huawei Monitor Constant.
  */
-public class HuaweiCloudMonitorConstants {
-
-    public static final String IAM = "AK_SK";
-    public static final String HW_ACCESS_KEY = "HW_ACCESS_KEY";
-    public static final String HW_SECRET_KEY = "HW_SECRET_KEY";
-
+public class HuaweiCloudMonitorConstants extends HuaweiCloudConstants {
 
     /**
      * Aggregation method of indicator monitoring data: average.

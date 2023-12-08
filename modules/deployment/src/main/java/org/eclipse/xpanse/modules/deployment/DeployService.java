@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +33,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
@@ -39,6 +41,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServic
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.manager.ServiceState;
 import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -54,6 +57,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
@@ -290,9 +294,11 @@ public class DeployService {
             if (TerraformExecState.DEPLOY_SUCCESS == deployResult.getState()) {
                 deployServiceEntityToFlush.setServiceDeploymentState(
                         ServiceDeploymentState.DEPLOY_SUCCESS);
+                deployServiceEntityToFlush.setServiceState(ServiceState.RUNNING);
             } else {
                 deployServiceEntityToFlush.setServiceDeploymentState(
                         ServiceDeploymentState.DEPLOY_FAILED);
+                deployServiceEntityToFlush.setServiceState(ServiceState.NOT_RUNNING);
                 deployServiceEntityToFlush.setResultMessage(deployResult.getMessage());
             }
             updateDeployResourceEntity(deployResult, deployServiceEntityToFlush);
@@ -430,17 +436,21 @@ public class DeployService {
                 if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
                     deployServiceEntityToFlush.setServiceDeploymentState(
                             ServiceDeploymentState.DEPLOY_FAILED);
+                    deployServiceEntityToFlush.setServiceState(ServiceState.NOT_RUNNING);
                 } else {
                     deployServiceEntityToFlush.setServiceDeploymentState(
                             ServiceDeploymentState.ROLLBACK_FAILED);
+                    deployServiceEntityToFlush.setServiceState(ServiceState.RUNNING);
                 }
             } else {
                 if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
                     deployServiceEntityToFlush.setServiceDeploymentState(
                             ServiceDeploymentState.DESTROY_SUCCESS);
+                    deployServiceEntityToFlush.setServiceState(ServiceState.NOT_RUNNING);
                 } else {
                     deployServiceEntityToFlush.setServiceDeploymentState(
                             ServiceDeploymentState.DESTROY_FAILED);
+                    deployServiceEntityToFlush.setServiceState(ServiceState.RUNNING);
                     deployServiceEntityToFlush.setResultMessage(destroyResult.getMessage());
                 }
             }
@@ -822,5 +832,202 @@ public class DeployService {
             throw new ServiceNotDeployedException(errorMsg);
         }
         return deployServiceEntity;
+    }
+
+    /**
+     * Start the service by the deployed service id.
+     *
+     * @param id service id.
+     * @return deployedService.
+     */
+    public DeployedService startService(UUID id) {
+        MDC.put(TASK_ID, id.toString());
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        try {
+            validateStartDeployServiceEntity(deployServiceEntity);
+            deployServiceEntity.setServiceState(ServiceState.STARTING);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            if (start(deployServiceEntity)) {
+                deployServiceEntity.setServiceState(ServiceState.RUNNING);
+            } else {
+                deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
+            }
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+        } catch (RuntimeException e) {
+            log.info("start service by service id:{} failed.", id);
+            deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+        }
+        DeployedService deployedService = new DeployedService();
+        BeanUtils.copyProperties(deployServiceEntity, deployedService);
+        deployedService.setServiceHostingType(deployServiceEntity.getDeployRequest()
+                .getServiceHostingType());
+        return deployedService;
+    }
+
+    /**
+     * Stop the service by the deployed service id.
+     *
+     * @param id service id.
+     * @return deployedService.
+     */
+    public DeployedService stopService(UUID id) {
+        MDC.put(TASK_ID, id.toString());
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        try {
+            validateStopDeployServiceEntity(deployServiceEntity);
+            deployServiceEntity.setServiceState(ServiceState.STOPPING);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            if (stop(deployServiceEntity)) {
+                deployServiceEntity.setServiceState(ServiceState.STOPPED);
+            } else {
+                deployServiceEntity.setServiceState(ServiceState.STOPPING_FAILED);
+            }
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+        } catch (RuntimeException e) {
+            log.info("stop service by service id:{} failed.", id);
+            deployServiceEntity.setServiceState(ServiceState.STOPPING_FAILED);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+        }
+        DeployedService deployedService = new DeployedService();
+        BeanUtils.copyProperties(deployServiceEntity, deployedService);
+        deployedService.setServiceHostingType(deployServiceEntity.getDeployRequest()
+                .getServiceHostingType());
+        return deployedService;
+    }
+
+    /**
+     * Restart the service by the deployed service id.
+     *
+     * @param id service id.
+     * @return deployedService.
+     */
+    public DeployedService restartService(UUID id) {
+        MDC.put(TASK_ID, id.toString());
+        DeployServiceEntity deployServiceEntity = getDeployServiceEntity(id);
+        try {
+            validateDeployServiceEntity(deployServiceEntity);
+            deployServiceEntity.setServiceState(ServiceState.STARTING);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            if (restart(deployServiceEntity)) {
+                deployServiceEntity.setServiceState(ServiceState.RUNNING);
+            } else {
+                deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
+            }
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+        } catch (RuntimeException e) {
+            log.info("stop service by service id:{} failed.", id);
+            deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+        }
+        DeployedService deployedService = new DeployedService();
+        BeanUtils.copyProperties(deployServiceEntity, deployedService);
+        deployedService.setServiceHostingType(deployServiceEntity.getDeployRequest()
+                .getServiceHostingType());
+        return deployedService;
+    }
+
+    private boolean start(DeployServiceEntity deployServiceEntity) {
+        OrchestratorPlugin plugin =
+                pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
+        List<DeployResourceEntity> deployResourceList =
+                getVmDeployResourceEntities(deployServiceEntity);
+        ServiceManagerRequest serviceManagerRequest =
+                getServiceManagerRequest(deployResourceList,
+                        deployServiceEntity.getDeployRequest().getServiceHostingType(),
+                        deployServiceEntity.getUserId());
+        return plugin.startService(serviceManagerRequest);
+    }
+
+    private boolean stop(DeployServiceEntity deployServiceEntity) {
+        OrchestratorPlugin plugin =
+                pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
+        List<DeployResourceEntity> deployResourceList =
+                getVmDeployResourceEntities(deployServiceEntity);
+        ServiceManagerRequest serviceManagerRequest =
+                getServiceManagerRequest(deployResourceList,
+                        deployServiceEntity.getDeployRequest().getServiceHostingType(),
+                        deployServiceEntity.getUserId());
+        return plugin.stopService(serviceManagerRequest);
+    }
+
+    private boolean restart(DeployServiceEntity deployServiceEntity) {
+        OrchestratorPlugin plugin =
+                pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
+        List<DeployResourceEntity> deployResourceList =
+                getVmDeployResourceEntities(deployServiceEntity);
+        ServiceManagerRequest serviceManagerRequest =
+                getServiceManagerRequest(deployResourceList,
+                        deployServiceEntity.getDeployRequest().getServiceHostingType(),
+                        deployServiceEntity.getUserId());
+        return plugin.restartService(serviceManagerRequest);
+    }
+
+    private void validateStartDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
+        validateDeployServiceEntity(deployServiceEntity);
+        if (deployServiceEntity.getServiceState() == ServiceState.RUNNING
+                || deployServiceEntity.getServiceState() == ServiceState.STOPPING_FAILED) {
+            return;
+        }
+        if (!(deployServiceEntity.getServiceState() == ServiceState.STOPPED
+                || deployServiceEntity.getServiceState() == ServiceState.STARTING_FAILED)) {
+            throw new InvalidServiceStateException(
+                    String.format("Service %s is not allowed to start. serviceState: %s",
+                            deployServiceEntity.getId(), deployServiceEntity.getServiceState()));
+        }
+    }
+
+    private void validateStopDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
+        validateDeployServiceEntity(deployServiceEntity);
+        if (deployServiceEntity.getServiceState() == ServiceState.STOPPED
+                || deployServiceEntity.getServiceState() == ServiceState.STARTING_FAILED) {
+            return;
+        }
+        if (!(deployServiceEntity.getServiceState() == ServiceState.RUNNING
+                || deployServiceEntity.getServiceState() == ServiceState.STOPPING_FAILED)) {
+            throw new InvalidServiceStateException(
+                    String.format("Service %s is not allowed to stop. serviceState: %s",
+                            deployServiceEntity.getId(), deployServiceEntity.getServiceState()));
+        }
+    }
+
+    private void validateDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
+        ServiceDeploymentState serviceDeploymentState =
+                deployServiceEntity.getServiceDeploymentState();
+        if (!(serviceDeploymentState == ServiceDeploymentState.DEPLOY_SUCCESS
+                || serviceDeploymentState == ServiceDeploymentState.DESTROY_FAILED)) {
+            throw new InvalidServiceStateException(String.format("Service with id %s is %s.",
+                    deployServiceEntity.getId(), serviceDeploymentState));
+        }
+        if (deployServiceEntity.getDeployRequest().getServiceHostingType()
+                == ServiceHostingType.SERVICE_VENDOR) {
+            return;
+        }
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to start service by service id.");
+        }
+    }
+
+    private List<DeployResourceEntity> getVmDeployResourceEntities(
+            DeployServiceEntity deployServiceEntity) {
+        return deployServiceEntity.getDeployResourceList().stream()
+                .filter(deployResourceEntity -> deployResourceEntity.getKind()
+                        .equals(DeployResourceKind.VM)).collect(Collectors.toList());
+    }
+
+
+    private ServiceManagerRequest getServiceManagerRequest(
+            List<DeployResourceEntity> deployResourceList, ServiceHostingType serviceHostingType,
+            String userId) {
+        ServiceManagerRequest serviceManagerRequest = new ServiceManagerRequest();
+        serviceManagerRequest.setDeployResourceEntityList(deployResourceList);
+        if (serviceHostingType == ServiceHostingType.SELF) {
+            serviceManagerRequest.setUserId(userId);
+        }
+        serviceManagerRequest.setRegionName(
+                deployResourceList.get(0).getProperties().get("region"));
+        return serviceManagerRequest;
     }
 }

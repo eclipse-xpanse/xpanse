@@ -32,7 +32,7 @@ class HuaweiCloudMonitorClientTest {
 
         // Run the test
         final ICredential result =
-                testClient.getCredentialForClient(credential);
+                testClient.getCredential(credential);
         // Verify the results
         Assertions.assertFalse(Objects.isNull(result));
     }
@@ -44,7 +44,7 @@ class HuaweiCloudMonitorClientTest {
         final AbstractCredentialInfo credential = getCredentialDefinition("", "");
         // Verify the run
         Assertions.assertThrows(CredentialsNotFoundException.class,
-                () -> testClient.getCredentialForClient(credential));
+                () -> testClient.getCredential(credential));
     }
 
 
@@ -52,7 +52,7 @@ class HuaweiCloudMonitorClientTest {
     void testGetCesClient() {
         // Setup
         ICredential iCredential =
-                testClient.getCredentialForClient(getCredentialDefinition("ak", "sk"));
+                testClient.getCredential(getCredentialDefinition("ak", "sk"));
 
         // Verify the results
         Assertions.assertThrows(SdkException.class,
