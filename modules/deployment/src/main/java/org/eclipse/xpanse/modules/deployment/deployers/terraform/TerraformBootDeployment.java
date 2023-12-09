@@ -136,14 +136,19 @@ public class TerraformBootDeployment implements Deployment {
     @Override
     public DeployValidationResult validate(Ocl ocl) {
         setHeaderTokenByProfiles();
-        TerraformValidationResult validate =
-                terraformApi.validateWithScripts(getDeployWithScriptsRequest(ocl));
         DeployValidationResult result = null;
         try {
-            result = objectMapper.readValue(objectMapper.writeValueAsString(validate),
-                    DeployValidationResult.class);
-        } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException", e);
+            TerraformValidationResult validate =
+                    terraformApi.validateWithScripts(getDeployWithScriptsRequest(ocl));
+            try {
+                result = objectMapper.readValue(objectMapper.writeValueAsString(validate),
+                        DeployValidationResult.class);
+            } catch (JsonProcessingException e) {
+                log.error("JsonProcessingException", e);
+            }
+        } catch (RestClientException restClientException) {
+            log.error("Request to terraform-boot API failed", restClientException);
+            throw new TerraformBootRequestFailedException(restClientException.getMessage());
         }
         return result;
     }
