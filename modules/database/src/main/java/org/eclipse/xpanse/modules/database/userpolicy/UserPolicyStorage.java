@@ -4,31 +4,31 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.policy;
+package org.eclipse.xpanse.modules.database.userpolicy;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 
 /**
- * Interface for persist of PoliciesManageService.
+ * Interface for persist of UserPolicyManager.
  */
-public interface PolicyStorage {
+public interface UserPolicyStorage {
 
     /**
      * Add or update valid data to database.
      *
-     * @param policyEntity the model of deployed service.
+     * @param userPolicyEntity the model of deployed service.
      * @return Returns stored entity.
      */
-    PolicyEntity store(PolicyEntity policyEntity);
+    UserPolicyEntity store(UserPolicyEntity userPolicyEntity);
 
     /**
      * Method to get all stored database entries.
      *
      * @return Returns all rows from the database table.
      */
-    List<PolicyEntity> policies();
+    List<UserPolicyEntity> policies();
 
     /**
      * Method to get stored database entries by query model.
@@ -36,7 +36,7 @@ public interface PolicyStorage {
      * @param query query model.
      * @return Returns all rows matched the query info from the database table.
      */
-    List<PolicyEntity> listPolicies(PolicyQueryRequest query);
+    List<UserPolicyEntity> listPolicies(UserPolicyQueryRequest query);
 
     /**
      * Get policy using ID.
@@ -44,14 +44,14 @@ public interface PolicyStorage {
      * @param id the id of the policy.
      * @return policyEntity.
      */
-    PolicyEntity findPolicyById(UUID id);
+    UserPolicyEntity findPolicyById(UUID id);
 
     /**
      * Delete stored policy entities using policy entity.
      *
-     * @param policyEntity the entity of policy.
+     * @param userPolicyEntity the entity of policy.
      */
-    void deletePolicies(PolicyEntity policyEntity);
+    void deletePolicies(UserPolicyEntity userPolicyEntity);
 
     /**
      * Delete stored policy entity using the id of policy.

@@ -13,37 +13,37 @@ import org.junit.jupiter.api.Test;
 
 class PolicyDuplicateExceptionTest {
 
-    private PolicyDuplicateException policyDuplicateExceptionUnderTest;
+    private PolicyDuplicateException test;
 
     @BeforeEach
     void setUp() {
-        policyDuplicateExceptionUnderTest = new PolicyDuplicateException("errorReason");
+        test = new PolicyDuplicateException("errorReason");
     }
 
     @Test
     void testGetErrorReason() {
-        assertThat(policyDuplicateExceptionUnderTest.getErrorReason()).isEqualTo("errorReason");
+        assertThat(test.getErrorReason()).isEqualTo("errorReason");
     }
 
     @Test
     void testToString() {
         String result = "PolicyDuplicateException(errorReason=errorReason)";
-        assertThat(policyDuplicateExceptionUnderTest.toString()).isEqualTo(result);
+        assertThat(test.toString()).isEqualTo(result);
     }
 
     @Test
     void testEquals() {
-        assertThat(policyDuplicateExceptionUnderTest.equals("o")).isFalse();
+        assertThat(test.equals(new Object())).isFalse();
     }
 
     @Test
     void testCanEqual() {
-        assertThat(policyDuplicateExceptionUnderTest.canEqual("other")).isFalse();
+        assertThat(test.canEqual("other")).isFalse();
     }
 
     @Test
     void testHashCode() {
-        PolicyDuplicateException test = new PolicyDuplicateException("error");
-        assertThat(policyDuplicateExceptionUnderTest.hashCode()).isNotEqualTo(test.hashCode());
+        PolicyDuplicateException test1 = new PolicyDuplicateException("error");
+        assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
     }
 }

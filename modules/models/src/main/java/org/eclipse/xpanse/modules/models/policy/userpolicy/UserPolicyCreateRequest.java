@@ -4,7 +4,7 @@
  */
 
 
-package org.eclipse.xpanse.modules.models.policy;
+package org.eclipse.xpanse.modules.models.policy.userpolicy;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
  * The model for creating the policy.
  */
 @Data
-public class PolicyCreateRequest {
+public class UserPolicyCreateRequest {
 
     /**
      * The csp which the policy belongs to.

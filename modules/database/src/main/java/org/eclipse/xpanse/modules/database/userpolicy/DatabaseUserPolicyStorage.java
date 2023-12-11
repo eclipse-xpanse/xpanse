@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.policy;
+package org.eclipse.xpanse.modules.database.userpolicy;
 
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -12,39 +12,39 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of the PoliciesStorage.
+ * Implementation of the UserPolicyStorage.
  */
 @Component
 @Transactional
-public class DatabasePolicyStorage implements PolicyStorage {
+public class DatabaseUserPolicyStorage implements UserPolicyStorage {
 
-    private final PolicyRepository policyRepository;
+    private final UserPolicyRepository userPolicyRepository;
 
     @Autowired
-    public DatabasePolicyStorage(PolicyRepository policyRepository) {
-        this.policyRepository = policyRepository;
+    public DatabaseUserPolicyStorage(UserPolicyRepository userPolicyRepository) {
+        this.userPolicyRepository = userPolicyRepository;
     }
 
     @Override
-    public PolicyEntity store(PolicyEntity policyEntity) {
-        return policyRepository.save(policyEntity);
+    public UserPolicyEntity store(UserPolicyEntity userPolicyEntity) {
+        return userPolicyRepository.save(userPolicyEntity);
     }
 
     @Override
-    public List<PolicyEntity> policies() {
-        return policyRepository.findAll();
+    public List<UserPolicyEntity> policies() {
+        return userPolicyRepository.findAll();
     }
 
     @Override
-    public List<PolicyEntity> listPolicies(PolicyQueryRequest queryModel) {
-        Specification<PolicyEntity> specification =
+    public List<UserPolicyEntity> listPolicies(UserPolicyQueryRequest queryModel) {
+        Specification<UserPolicyEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(queryModel.getCsp())) {
@@ -68,22 +68,22 @@ public class DatabasePolicyStorage implements PolicyStorage {
                             .getRestriction();
                 };
 
-        return policyRepository.findAll(specification);
+        return userPolicyRepository.findAll(specification);
     }
 
     @Override
-    public PolicyEntity findPolicyById(UUID id) {
-        Optional<PolicyEntity> optional = policyRepository.findById(id);
+    public UserPolicyEntity findPolicyById(UUID id) {
+        Optional<UserPolicyEntity> optional = userPolicyRepository.findById(id);
         return optional.orElse(null);
     }
 
     @Override
-    public void deletePolicies(PolicyEntity policyEntity) {
-        policyRepository.delete(policyEntity);
+    public void deletePolicies(UserPolicyEntity userPolicyEntity) {
+        userPolicyRepository.delete(userPolicyEntity);
     }
 
     @Override
     public void deletePolicyById(UUID id) {
-        policyRepository.deleteById(id);
+        userPolicyRepository.deleteById(id);
     }
 }

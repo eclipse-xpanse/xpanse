@@ -4,7 +4,7 @@
  */
 
 
-package org.eclipse.xpanse.modules.models.policy;
+package org.eclipse.xpanse.modules.models.policy.userpolicy;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
  * The model for updating the policy.
  */
 @Data
-public class PolicyUpdateRequest {
+public class UserPolicyUpdateRequest {
 
     /**
      * The id of the policy.

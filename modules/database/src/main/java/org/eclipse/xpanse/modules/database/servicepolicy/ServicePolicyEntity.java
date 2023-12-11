@@ -4,33 +4,34 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.policy;
+package org.eclipse.xpanse.modules.database.servicepolicy;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 
 /**
- * PoliciesEntity for persistence.
+ * Represents the SERVICE_POLICY table in the database.
  */
 @Data
-@Table(name = "POLICIES", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"USERID", "POLICY", "CSP"})
+@Table(name = "SERVICE_POLICY", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"SERVICE_TEMPLATE_ID", "POLICY"})
 })
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class PolicyEntity extends CreateModifiedTime {
+public class ServicePolicyEntity extends CreateModifiedTime {
 
     /**
      * The id of the entity.
@@ -41,21 +42,18 @@ public class PolicyEntity extends CreateModifiedTime {
     private UUID id;
 
     /**
-     * The id of user who created the policy.
-     */
-    private String userId;
-
-    /**
      * The valid policy created by the user.
      */
     @Column(name = "POLICY", length = Integer.MAX_VALUE)
     private String policy;
 
     /**
-     * The csp which the policy belongs to.
+     * The registered service template we belonged to.
      */
-    @Enumerated(EnumType.STRING)
-    private Csp csp;
+    @ManyToOne
+    @JoinColumn(name = "SERVICE_TEMPLATE_ID")
+    @JsonIgnoreProperties({"servicePolicyEntity"})
+    private ServiceTemplateEntity serviceTemplate;
 
     /**
      * Is the policy enabled.
