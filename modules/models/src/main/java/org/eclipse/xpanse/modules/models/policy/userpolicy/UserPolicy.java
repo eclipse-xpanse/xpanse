@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.policy;
+package org.eclipse.xpanse.modules.models.policy.userpolicy;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
  * Define view object for detail of the policy entity.
  */
 @Data
-public class Policy {
+public class UserPolicy {
 
     /**
      * The id of the entity.

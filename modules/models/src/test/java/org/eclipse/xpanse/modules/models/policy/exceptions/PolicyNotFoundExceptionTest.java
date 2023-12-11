@@ -13,37 +13,37 @@ import org.junit.jupiter.api.Test;
 
 class PolicyNotFoundExceptionTest {
 
-    private PolicyNotFoundException policyNotFoundExceptionUnderTest;
+    private PolicyNotFoundException test;
 
     @BeforeEach
     void setUp() {
-        policyNotFoundExceptionUnderTest = new PolicyNotFoundException("errorReason");
+        test = new PolicyNotFoundException("errorReason");
     }
 
     @Test
     void testGetErrorReason() {
-        assertThat(policyNotFoundExceptionUnderTest.getErrorReason()).isEqualTo("errorReason");
+        assertThat(test.getErrorReason()).isEqualTo("errorReason");
     }
 
     @Test
     void testToString() {
         String result = "PolicyNotFoundException(errorReason=errorReason)";
-        assertThat(policyNotFoundExceptionUnderTest.toString()).isEqualTo(result);
+        assertThat(test.toString()).isEqualTo(result);
     }
 
     @Test
     void testEquals() {
-        assertThat(policyNotFoundExceptionUnderTest.equals("o")).isFalse();
+        assertThat(test.equals(new Object())).isFalse();
     }
 
     @Test
     void testCanEqual() {
-        assertThat(policyNotFoundExceptionUnderTest.canEqual("other")).isFalse();
+        assertThat(test.canEqual("other")).isFalse();
     }
 
     @Test
     void testHashCode() {
-        PolicyNotFoundException test = new PolicyNotFoundException("error");
-        assertThat(policyNotFoundExceptionUnderTest.hashCode()).isNotEqualTo(test.hashCode());
+        PolicyNotFoundException test1 = new PolicyNotFoundException("error");
+        assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
     }
 }

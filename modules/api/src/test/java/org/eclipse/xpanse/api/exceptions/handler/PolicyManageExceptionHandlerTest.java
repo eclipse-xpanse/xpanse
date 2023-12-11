@@ -5,20 +5,18 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.eclipse.xpanse.api.controllers.PolicyManageApi;
-import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
+import java.util.UUID;
+import org.eclipse.xpanse.api.controllers.UserPolicyManageApi;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
-import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.policy.policyman.UserPolicyManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,17 +30,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PolicyManageApi.class, PolicyManager.class,
-        PolicyManageExceptionHandler.class, IdentityProviderManager.class})
+@ContextConfiguration(classes = {UserPolicyManageApi.class, PolicyManageExceptionHandler.class})
 @WebMvcTest
 class PolicyManageExceptionHandlerTest {
 
     @Autowired
     private WebApplicationContext context;
-    @MockBean
-    private PolicyManager policyManager;
-
+    private final UUID id = UUID.randomUUID();
     private MockMvc mockMvc;
+    @MockBean
+    private UserPolicyManager userPolicyManager;
 
     @BeforeEach
     public void setup() {
@@ -51,10 +48,10 @@ class PolicyManageExceptionHandlerTest {
 
     @Test
     void testPoliciesValidationFailedExceptionHandler() throws Exception {
-        when(policyManager.listPolicies(any(PolicyQueryRequest.class)))
+        when(userPolicyManager.getUserPolicyDetails(id))
                 .thenThrow(new PoliciesValidationFailedException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/policies"))
+        this.mockMvc.perform(get("/xpanse/policies/{id}", id))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Policy Validation Failed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -63,10 +60,10 @@ class PolicyManageExceptionHandlerTest {
 
     @Test
     void testPolicyNotFoundExceptionHandler() throws Exception {
-        when(policyManager.listPolicies(any(PolicyQueryRequest.class)))
+        when(userPolicyManager.getUserPolicyDetails(id))
                 .thenThrow(new PolicyNotFoundException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/policies"))
+        this.mockMvc.perform(get("/xpanse/policies/{id}", id))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Policy Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -75,10 +72,10 @@ class PolicyManageExceptionHandlerTest {
 
     @Test
     void testPolicyDuplicatesExceptionHandler() throws Exception {
-        when(policyManager.listPolicies(any(PolicyQueryRequest.class)))
+        when(userPolicyManager.getUserPolicyDetails(id))
                 .thenThrow(new PolicyDuplicateException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/policies"))
+        this.mockMvc.perform(get("/xpanse/policies/{id}", id))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Duplicate Policy"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -86,10 +83,10 @@ class PolicyManageExceptionHandlerTest {
 
     @Test
     void testPoliciesEvaluationFailedExceptionHandler() throws Exception {
-        when(policyManager.listPolicies(any(PolicyQueryRequest.class)))
+        when(userPolicyManager.getUserPolicyDetails(id))
                 .thenThrow(new PoliciesEvaluationFailedException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/policies"))
+        this.mockMvc.perform(get("/xpanse/policies/{id}", id))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Policy Evaluation Failed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));

@@ -1,0 +1,222 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
+package org.eclipse.xpanse.modules.policy.policyman;
+
+import jakarta.annotation.Resource;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
+import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
+import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
+import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
+import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+/**
+ * The service for managing policies created by the end user.
+ */
+@Slf4j
+@Component
+public class UserPolicyManager {
+
+    @Resource
+    private PolicyManager policyManager;
+    @Resource
+    private IdentityProviderManager identityProviderManager;
+    @Resource
+    private DatabaseUserPolicyStorage userPolicyStorage;
+
+    /**
+     * Get the query model for listing policies.
+     *
+     * @param csp     The csp.
+     * @param enabled The enabled.
+     * @return Returns the query model.
+     */
+    public UserPolicyQueryRequest getUserPolicyQueryModel(Csp csp, Boolean enabled) {
+        UserPolicyQueryRequest userPolicyQueryRequest = new UserPolicyQueryRequest();
+        if (Objects.nonNull(csp)) {
+            userPolicyQueryRequest.setCsp(csp);
+        }
+        if (Objects.nonNull(enabled)) {
+            userPolicyQueryRequest.setEnabled(enabled);
+        }
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        userPolicyQueryRequest.setUserId(userIdOptional.orElse(null));
+        return userPolicyQueryRequest;
+    }
+
+
+    /**
+     * List policies by the query model.
+     *
+     * @param queryModel The query model.
+     * @return Returns all policies matched the query model.
+     */
+    public List<UserPolicy> listUserPolicies(UserPolicyQueryRequest queryModel) {
+        List<UserPolicyEntity> policyEntities = userPolicyStorage.listPolicies(queryModel);
+        return policyEntities.stream().sorted(Comparator.comparing(UserPolicyEntity::getCsp))
+                .map(this::conventToUserPolicy).toList();
+    }
+
+    /**
+     * Create new policy by user.
+     *
+     * @param createRequest create policy request.
+     * @return Returns created policy view object.
+     */
+    public UserPolicy addUserPolicy(UserPolicyCreateRequest createRequest) {
+        policyManager.validatePolicy(createRequest.getPolicy());
+        checkIfUserPolicyIsDuplicate(createRequest.getCsp(), createRequest.getPolicy());
+        UserPolicyEntity newPolicy = conventToUserPolicyEntity(createRequest);
+        UserPolicyEntity userPolicyEntity = userPolicyStorage.store(newPolicy);
+        return conventToUserPolicy(userPolicyEntity);
+    }
+
+    /**
+     * Update policy.
+     *
+     * @param updateRequest update policy request.
+     * @return Returns updated policy view object.
+     */
+    public UserPolicy updateUserPolicy(UserPolicyUpdateRequest updateRequest) {
+        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(updateRequest.getId());
+        if (Objects.isNull(existingEntity)) {
+            String errorMsg = String.format("The policy with id %s not found.",
+                    updateRequest.getId());
+            throw new PolicyNotFoundException(errorMsg);
+        }
+
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to update policy belonging to other users.");
+        }
+
+        UserPolicyEntity policyToUpdate = getUserPolicyToUpdate(updateRequest, existingEntity);
+
+        UserPolicyEntity updatedPolicy = userPolicyStorage.store(policyToUpdate);
+        return conventToUserPolicy(updatedPolicy);
+    }
+
+    /**
+     * Get details of the policy.
+     *
+     * @param id the id of the policy.
+     * @return Returns the policy view object.
+     */
+    public UserPolicy getUserPolicyDetails(UUID id) {
+        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(id);
+        if (Objects.isNull(existingEntity)) {
+            String errorMsg = String.format("The policy with id %s not found.", id);
+            throw new PolicyNotFoundException(errorMsg);
+        }
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to view policy belonging to other users.");
+        }
+        return conventToUserPolicy(existingEntity);
+    }
+
+
+    /**
+     * Delete the policy by user.
+     *
+     * @param id the id of policy.
+     */
+    public void deleteUserPolicy(UUID id) {
+        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(id);
+        if (Objects.isNull(existingEntity)) {
+            String errorMsg = String.format("The policy with id %s not found.", id);
+            throw new PolicyNotFoundException(errorMsg);
+        }
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to delete policy belonging to other users.");
+        }
+        userPolicyStorage.deletePolicyById(id);
+    }
+
+    private void checkIfUserPolicyIsDuplicate(Csp csp, String policy) {
+
+        UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        queryModel.setUserId(userIdOptional.orElse(null));
+        queryModel.setCsp(csp);
+        queryModel.setPolicy(policy);
+        List<UserPolicyEntity> userPolicyEntityList = userPolicyStorage.listPolicies(queryModel);
+        if (!CollectionUtils.isEmpty(userPolicyEntityList)) {
+            String policyKey = userPolicyEntityList.get(0).getId().toString();
+            String errMsg = String.format("The same policy already exists for Csp: %s."
+                    + " with id: %s", csp, policyKey);
+            throw new PolicyDuplicateException(errMsg);
+        }
+
+    }
+
+
+    private UserPolicy conventToUserPolicy(UserPolicyEntity userPolicyEntity) {
+        if (Objects.nonNull(userPolicyEntity)) {
+            UserPolicy userPolicy = new UserPolicy();
+            BeanUtils.copyProperties(userPolicyEntity, userPolicy);
+            return userPolicy;
+        }
+        return null;
+    }
+
+    private UserPolicyEntity conventToUserPolicyEntity(
+            UserPolicyCreateRequest userPolicyCreateRequest) {
+        UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
+        BeanUtils.copyProperties(userPolicyCreateRequest, userPolicyEntity);
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        userPolicyEntity.setUserId(userIdOptional.orElse(null));
+        return userPolicyEntity;
+    }
+
+    private UserPolicyEntity getUserPolicyToUpdate(UserPolicyUpdateRequest updateRequest,
+                                                   UserPolicyEntity existingEntity) {
+        UserPolicyEntity policyToUpdate = new UserPolicyEntity();
+        BeanUtils.copyProperties(existingEntity, policyToUpdate);
+        boolean updatePolicy = StringUtils.isNotBlank(updateRequest.getPolicy())
+                && !StringUtils.equals(updateRequest.getPolicy(), existingEntity.getPolicy());
+        if (updatePolicy) {
+            policyManager.validatePolicy(updateRequest.getPolicy());
+            policyToUpdate.setPolicy(updateRequest.getPolicy());
+        }
+
+        boolean updateCsp = Objects.nonNull(updateRequest.getCsp())
+                && !Objects.equals(updateRequest.getCsp(), existingEntity.getCsp());
+        if (updateCsp) {
+            policyToUpdate.setCsp(updateRequest.getCsp());
+        }
+
+        if (Objects.nonNull(updateRequest.getEnabled())) {
+            policyToUpdate.setEnabled(updateRequest.getEnabled());
+        }
+
+        if (updateCsp || updatePolicy) {
+            checkIfUserPolicyIsDuplicate(policyToUpdate.getCsp(), policyToUpdate.getPolicy());
+        }
+        return policyToUpdate;
+    }
+
+}

@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.policy;
+package org.eclipse.xpanse.modules.database.userpolicy;
 
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
  * Interface to access default JPA methods.
  */
 @Repository
-public interface PolicyRepository extends JpaRepository<PolicyEntity, UUID>,
-        JpaSpecificationExecutor<PolicyEntity> {
+public interface UserPolicyRepository extends JpaRepository<UserPolicyEntity, UUID>,
+        JpaSpecificationExecutor<UserPolicyEntity> {
 
 }

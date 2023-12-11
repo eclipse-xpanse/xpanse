@@ -15,17 +15,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.policy.Policy;
-import org.eclipse.xpanse.modules.models.policy.PolicyCreateRequest;
-import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
-import org.eclipse.xpanse.modules.models.policy.PolicyUpdateRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.policy.policyman.UserPolicyManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -50,13 +47,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
-public class PolicyManageApi {
+public class UserPolicyManageApi {
 
     @Resource
-    private PolicyManager policyManager;
-
-    @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserPolicyManager userPolicyManager;
 
     /**
      * List the policies created by the user.
@@ -65,18 +59,19 @@ public class PolicyManageApi {
      * @param enabled Is the policy enabled.
      * @return Returns list of the policies created by the user.
      */
-    @Tag(name = "Policies Management",
+    @Tag(name = "User Policies Management",
             description = "APIs for managing user's infra policies.")
     @GetMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies defined by the user.")
-    public List<Policy> listPolicies(
+    public List<UserPolicy> listUserPolicies(
             @Parameter(name = "cspName", description = "Name of csp which the policy belongs to.")
             @RequestParam(name = "cspName", required = false) Csp csp,
             @Parameter(name = "enabled", description = "Is the policy enabled.")
             @RequestParam(name = "enabled", required = false) Boolean enabled) {
-        return policyManager.listPolicies(getPolicyQueryModel(csp, enabled));
+        UserPolicyQueryRequest queryModel = userPolicyManager.getUserPolicyQueryModel(csp, enabled);
+        return userPolicyManager.listUserPolicies(queryModel);
     }
 
 
@@ -86,30 +81,30 @@ public class PolicyManageApi {
      * @param id The id of the policy.
      * @return Returns list of the policies defined by the user.
      */
-    @Tag(name = "Policies Management",
+    @Tag(name = "User Policies Management",
             description = "APIs for managing user's infra policies.")
     @GetMapping(value = "/policies/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the details of the policy created by the user.")
-    public Policy getPolicyDetails(@PathVariable String id) {
-        return policyManager.getPolicyDetails(UUID.fromString(id));
+    public UserPolicy getPolicyDetails(@PathVariable String id) {
+        return userPolicyManager.getUserPolicyDetails(UUID.fromString(id));
     }
 
 
     /**
      * Add policy created by the user.
      *
-     * @param policyCreateRequest The policy to be created.
+     * @param userPolicyCreateRequest The policy to be created.
      */
-    @Tag(name = "Policies Management",
+    @Tag(name = "User Policies Management",
             description = "APIs for managing user's infra policies.")
     @PostMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Add policy created by the user.")
-    public Policy addPolicy(
-            @Valid @RequestBody PolicyCreateRequest policyCreateRequest) {
-        return policyManager.addPolicy(policyCreateRequest);
+    public UserPolicy addUserPolicy(
+            @Valid @RequestBody UserPolicyCreateRequest userPolicyCreateRequest) {
+        return userPolicyManager.addUserPolicy(userPolicyCreateRequest);
     }
 
     /**
@@ -117,14 +112,14 @@ public class PolicyManageApi {
      *
      * @param updateRequest The policy to be updated.
      */
-    @Tag(name = "Policies Management",
+    @Tag(name = "User Policies Management",
             description = "APIs for managing user's infra policies.")
     @PutMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update the policy created by the user.")
-    public Policy updatePolicy(
-            @Valid @RequestBody PolicyUpdateRequest updateRequest) {
-        return policyManager.updatePolicy(updateRequest);
+    public UserPolicy updateUserPolicy(
+            @Valid @RequestBody UserPolicyUpdateRequest updateRequest) {
+        return userPolicyManager.updateUserPolicy(updateRequest);
     }
 
     /**
@@ -132,29 +127,14 @@ public class PolicyManageApi {
      *
      * @param id The id of policy.
      */
-    @Tag(name = "Policies Management",
+    @Tag(name = "User Policies Management",
             description = "APIs for managing user's infra policies.")
     @DeleteMapping(value = "/policies/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete the policy created by the user.")
-    public void deletePolicy(@PathVariable("id") String id) {
-        policyManager.deletePolicy(UUID.fromString(id));
+    public void deleteUserPolicy(@PathVariable("id") String id) {
+        userPolicyManager.deleteUserPolicy(UUID.fromString(id));
     }
-
-
-    private PolicyQueryRequest getPolicyQueryModel(Csp csp, Boolean enabled) {
-        PolicyQueryRequest policyQueryRequest = new PolicyQueryRequest();
-        if (Objects.nonNull(csp)) {
-            policyQueryRequest.setCsp(csp);
-        }
-        if (Objects.nonNull(enabled)) {
-            policyQueryRequest.setEnabled(enabled);
-        }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        policyQueryRequest.setUserId(userIdOptional.orElse(null));
-        return policyQueryRequest;
-    }
-
 
 }

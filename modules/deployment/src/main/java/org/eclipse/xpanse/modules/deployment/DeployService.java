@@ -27,8 +27,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
-import org.eclipse.xpanse.modules.models.policy.Policy;
-import org.eclipse.xpanse.modules.models.policy.PolicyQueryRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
@@ -59,6 +59,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
+import org.eclipse.xpanse.modules.policy.policyman.UserPolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.slf4j.MDC;
@@ -100,6 +101,8 @@ public class DeployService {
     private ServiceVariablesJsonSchemaValidator serviceVariablesJsonSchemaValidator;
     @Resource
     private PolicyManager policyManager;
+    @Resource
+    private UserPolicyManager userPolicyManager;
 
     /**
      * Get all Deployment group by DeployerKind.
@@ -265,11 +268,11 @@ public class DeployService {
         }
         String userId = deployTask.getDeployRequest().getUserId();
         Csp csp = deployTask.getDeployRequest().getCsp();
-        PolicyQueryRequest queryRequest = new PolicyQueryRequest();
+        UserPolicyQueryRequest queryRequest = new UserPolicyQueryRequest();
         queryRequest.setUserId(userId);
         queryRequest.setCsp(csp);
         queryRequest.setEnabled(true);
-        List<Policy> policies = policyManager.listPolicies(queryRequest);
+        List<UserPolicy> policies = userPolicyManager.listUserPolicies(queryRequest);
         if (CollectionUtils.isEmpty(policies)) {
             return;
         }
@@ -279,7 +282,7 @@ public class DeployService {
             return;
         }
 
-        List<String> policyList = policies.stream().map(Policy::getPolicy)
+        List<String> policyList = policies.stream().map(UserPolicy::getPolicy)
                 .filter(StringUtils::isNotBlank).toList();
         policyManager.evaluatePolicies(policyList, planJson);
     }
