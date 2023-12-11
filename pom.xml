@@ -67,7 +67,7 @@
         <maven.compile.plugin.version>3.10.1</maven.compile.plugin.version>
         <maven.javadoc.plugin.version>3.6.2</maven.javadoc.plugin.version>
         <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
-        <maven.dependency.plugin.version>3.3.0</maven.dependency.plugin.version>
+        <maven.dependency.plugin.version>3.6.1</maven.dependency.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
         <openapi.generator.plugin.version>7.0.1</openapi.generator.plugin.version>
