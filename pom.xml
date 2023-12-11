@@ -53,7 +53,7 @@
         <testcontainers.version>1.19.1</testcontainers.version>
         <apache.commons.io.version>2.14.0</apache.commons.io.version>
         <apache.commons.collections.version>4.4</apache.commons.collections.version>
-        <apache.commons.validator.version>1.7</apache.commons.validator.version>
+        <apache.commons.validator.version>1.8.0</apache.commons.validator.version>
         <mysql.version>8.1.0</mysql.version>
         <system.stubs.version>2.0.2</system.stubs.version>
         <junit4.version>4.13.2</junit4.version>
