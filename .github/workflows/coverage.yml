@@ -33,7 +33,7 @@ jobs:
           echo "COVERAGE_PERCENTAGE=$coverage" >> $GITHUB_ENV
 
       - name: Create Coverage Badge
-        uses: schneegans/dynamic-badges-action@v1.6.0
+        uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_TOKEN }}
           gistID: 3d9c022b98734fbf615c21136abe4add
