@@ -9,7 +9,6 @@ package org.eclipse.xpanse.modules.policy.policyman;
 import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
@@ -104,30 +103,19 @@ public class PolicyManager {
      * @param policies list of policies.
      * @param input    input
      */
-    public void evaluatePolicies(List<String> policies, String input) {
-        boolean valid = true;
-        String errorMsg = "";
-        EvalCmdList cmdList = new EvalCmdList();
-        cmdList.setPolicyList(policies);
-        cmdList.setInput(input);
+    public EvalResult evaluatePolicies(List<String> policies, String input) {
         try {
+            EvalCmdList cmdList = new EvalCmdList();
+            cmdList.setPolicyList(policies);
+            cmdList.setInput(input);
             EvalResult evalResult = policiesEvaluationApi.evaluatePoliciesPost(cmdList);
-            log.info("Evaluate policies response:{}", evalResult.toString());
-            if (!evalResult.getIsSuccessful()) {
-                valid = false;
-                errorMsg = String.format("Evaluate policies failed. policies: %s, input: %s",
-                        evalResult.getPolicy(), evalResult.getInput());
-            }
+            log.info("Evaluate input with policies response:{}", evalResult.toString());
+            return evalResult;
         } catch (RestClientException e) {
-            log.error("Evaluate policies error:{}", e.getMessage());
-            valid = false;
-            errorMsg = e.getMessage();
+            String errorMsg = "Evaluate input with policies failed.\nError:" + e.getMessage();
+            log.error(errorMsg);
+            throw new RestClientException(errorMsg);
         }
-        if (!valid) {
-            throw new PoliciesEvaluationFailedException(errorMsg);
-        }
-
     }
-
 
 }
