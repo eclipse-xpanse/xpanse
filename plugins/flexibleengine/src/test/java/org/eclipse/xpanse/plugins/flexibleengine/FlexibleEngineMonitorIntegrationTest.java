@@ -28,12 +28,12 @@ import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.util.FlexibleEngineManageConverter;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.util.FlexibleEngineVmStateManagerService;
+import org.eclipse.xpanse.plugins.flexibleengine.models.constant.FlexibleEngineConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineRestTemplateConfig;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,8 +45,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {FlexibleEngineOrchestratorPlugin.class,
-        FlexibleEngineMetricsService.class,
-        FlexibleEngineMonitorClient.class, RetryTemplateService.class,
+        FlexibleEngineMetricsService.class, FlexibleEngineVmStateManagerService.class,
+        FlexibleEngineManageConverter.class,
+        FlexibleEngineClient.class, RetryTemplateService.class,
         FlexibleEngineMetricsConverter.class, CredentialCenter.class,
         ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
         FlexibleEngineRestTemplateConfig.class, RestTemplateLoggingInterceptor.class,
@@ -71,7 +72,7 @@ class FlexibleEngineMonitorIntegrationTest {
     CredentialCenter credentialCenter;
 
     @MockBean
-    FlexibleEngineMonitorClient client;
+    FlexibleEngineClient client;
 
     ResourceMetricsRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
                                                       Long from, Long to,
@@ -380,11 +381,11 @@ class FlexibleEngineMonitorIntegrationTest {
         CredentialVariables credentialVariables =
                 (CredentialVariables) this.plugin.getCredentialDefinitions().get(0);
         for (CredentialVariable credentialVariable : credentialVariables.getVariables()) {
-            if (credentialVariable.getName().equals(FlexibleEngineMonitorConstants.OS_ACCESS_KEY)) {
-                credentialVariable.setValue(FlexibleEngineMonitorConstants.OS_ACCESS_KEY);
+            if (credentialVariable.getName().equals(FlexibleEngineConstants.OS_ACCESS_KEY)) {
+                credentialVariable.setValue(FlexibleEngineConstants.OS_ACCESS_KEY);
             }
-            if (credentialVariable.getName().equals(FlexibleEngineMonitorConstants.OS_SECRET_KEY)) {
-                credentialVariable.setValue(FlexibleEngineMonitorConstants.OS_SECRET_KEY);
+            if (credentialVariable.getName().equals(FlexibleEngineConstants.OS_SECRET_KEY)) {
+                credentialVariable.setValue(FlexibleEngineConstants.OS_SECRET_KEY);
             }
         }
         return credentialVariables;

@@ -34,7 +34,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
+import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineClient;
+import org.eclipse.xpanse.plugins.flexibleengine.RetryTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -51,7 +52,7 @@ public class FlexibleEngineMetricsService {
 
     private final FlexibleEngineMetricsConverter flexibleEngineMetricsConverter;
 
-    private final FlexibleEngineMonitorClient flexibleEngineMonitorClient;
+    private final FlexibleEngineClient flexibleEngineClient;
 
     private final ServiceMetricsStore serviceMetricsStore;
 
@@ -62,7 +63,7 @@ public class FlexibleEngineMetricsService {
     /**
      * Constructor for the MetricsService class.
      *
-     * @param flexibleEngineMonitorClient    instance of FlexibleEngineMonitorClient
+     * @param flexibleEngineClient    instance of FlexibleEngineClient
      * @param flexibleEngineMetricsConverter instance of FlexibleEngineMonitorConverter
      * @param serviceMetricsStore            instance of MetricItemsStore
      * @param retryTemplateService           instance of retryTemplateService
@@ -70,13 +71,13 @@ public class FlexibleEngineMetricsService {
      */
     @Autowired
     public FlexibleEngineMetricsService(
-            FlexibleEngineMonitorClient flexibleEngineMonitorClient,
+            FlexibleEngineClient flexibleEngineClient,
             FlexibleEngineMetricsConverter flexibleEngineMetricsConverter,
             ServiceMetricsStore serviceMetricsStore,
             RetryTemplateService retryTemplateService,
             CredentialCenter credentialCenter) {
         this.flexibleEngineMetricsConverter = flexibleEngineMetricsConverter;
-        this.flexibleEngineMonitorClient = flexibleEngineMonitorClient;
+        this.flexibleEngineClient = flexibleEngineClient;
         this.serviceMetricsStore = serviceMetricsStore;
         this.retryTemplateService = retryTemplateService;
         this.credentialCenter = credentialCenter;
@@ -86,7 +87,7 @@ public class FlexibleEngineMetricsService {
     private Project queryProjectInfo(AbstractCredentialInfo credential, String url) {
         try {
             HttpRequestBase requestBase =
-                    flexibleEngineMonitorClient.buildGetRequest(credential, url);
+                    flexibleEngineClient.buildGetRequest(credential, url);
             KeystoneListProjectsResponse projectsResponse =
                     retryTemplateService.queryProjectInfo(requestBase);
             if (Objects.nonNull(projectsResponse)
@@ -106,7 +107,7 @@ public class FlexibleEngineMetricsService {
     private ShowMetricDataResponse queryMetricData(AbstractCredentialInfo credential, String url) {
         try {
             HttpRequestBase requestBase =
-                    flexibleEngineMonitorClient.buildGetRequest(credential, url);
+                    flexibleEngineClient.buildGetRequest(credential, url);
             return retryTemplateService.queryMetricData(requestBase);
         } catch (Exception e) {
             String errorMsg = String.format("Query metric data by FlexibleEngine Client error. %s",
@@ -119,7 +120,7 @@ public class FlexibleEngineMetricsService {
     private ListMetricsResponse queryMetricItemList(AbstractCredentialInfo credential, String url) {
         try {
             HttpRequestBase requestBase =
-                    flexibleEngineMonitorClient.buildGetRequest(credential, url);
+                    flexibleEngineClient.buildGetRequest(credential, url);
             return retryTemplateService.queryMetricItemList(requestBase);
         } catch (Exception e) {
             String errorMsg =
@@ -136,7 +137,7 @@ public class FlexibleEngineMetricsService {
         try {
             String requestBody = OBJECT_MAPPER.writeValueAsString(request.getBody());
             HttpRequestBase requestBase =
-                    flexibleEngineMonitorClient.buildPostRequest(credential, url, requestBody);
+                    flexibleEngineClient.buildPostRequest(credential, url, requestBody);
             return retryTemplateService.batchQueryMetricData(requestBase, requestBody);
         } catch (Exception e) {
             String errorMsg =

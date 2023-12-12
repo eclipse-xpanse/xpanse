@@ -39,6 +39,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.monitor.MetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineConverter;
+import org.eclipse.xpanse.plugins.flexibleengine.models.constant.FlexibleEngineConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorMetrics;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineNameSpaceKind;
@@ -46,11 +48,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Resource conversion.
+ * FlexibleEngine Metrics Resource conversion.
  */
 @Slf4j
 @Component
-public class FlexibleEngineMetricsConverter {
+public class FlexibleEngineMetricsConverter extends FlexibleEngineConverter {
 
     private final Map<String, MonitorResourceType> metricNameToResourceTypeMap = new HashMap<>();
 
@@ -92,10 +94,10 @@ public class FlexibleEngineMetricsConverter {
      * @param projectId projectId.
      */
     public static StringBuilder getBatchQueryMetricBasicUrl(String region, String projectId) {
-        return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
+        return new StringBuilder(FlexibleEngineConstants.PROTOCOL_HTTPS)
                 .append(FlexibleEngineMonitorConstants.CES_ENDPOINT_PREFIX)
                 .append(region)
-                .append(FlexibleEngineMonitorConstants.ENDPOINT_SUFFIX).append("/")
+                .append(FlexibleEngineConstants.ENDPOINT_SUFFIX).append("/")
                 .append(FlexibleEngineMonitorConstants.CES_API_VERSION).append("/")
                 .append(projectId).append("/")
                 .append(FlexibleEngineMonitorConstants.BATCH_METRIC_PATH);
@@ -194,10 +196,10 @@ public class FlexibleEngineMetricsConverter {
 
     private StringBuilder getQueryListMetricsBasicUrl(String region, String projectId,
                                                       String resourceId) {
-        return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
+        return new StringBuilder(FlexibleEngineConstants.PROTOCOL_HTTPS)
                 .append(FlexibleEngineMonitorConstants.CES_ENDPOINT_PREFIX)
                 .append(region)
-                .append(FlexibleEngineMonitorConstants.ENDPOINT_SUFFIX).append("/")
+                .append(FlexibleEngineConstants.ENDPOINT_SUFFIX).append("/")
                 .append(FlexibleEngineMonitorConstants.CES_API_VERSION).append("/")
                 .append(projectId).append("/")
                 .append(FlexibleEngineMonitorConstants.LIST_METRICS_PATH).append("?")
@@ -353,30 +355,14 @@ public class FlexibleEngineMetricsConverter {
     }
 
     private StringBuilder getQueryMetricBasicUrl(String region, String projectId) {
-        return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
+        return new StringBuilder(FlexibleEngineConstants.PROTOCOL_HTTPS)
                 .append(FlexibleEngineMonitorConstants.CES_ENDPOINT_PREFIX)
                 .append(region)
-                .append(FlexibleEngineMonitorConstants.ENDPOINT_SUFFIX).append("/")
+                .append(FlexibleEngineConstants.ENDPOINT_SUFFIX).append("/")
                 .append(FlexibleEngineMonitorConstants.CES_API_VERSION).append("/")
                 .append(projectId).append("/")
                 .append(FlexibleEngineMonitorConstants.METRIC_PATH).append("?");
 
-    }
-
-    /**
-     * Get url to query project info.
-     *
-     * @param region The region of resource.
-     * @return Returns query url.
-     */
-    public StringBuilder buildProjectQueryUrl(String region) {
-        return new StringBuilder(FlexibleEngineMonitorConstants.PROTOCOL_HTTPS)
-                .append(FlexibleEngineMonitorConstants.IAM_ENDPOINT_PREFIX)
-                .append(region)
-                .append(FlexibleEngineMonitorConstants.ENDPOINT_SUFFIX).append("/")
-                .append(FlexibleEngineMonitorConstants.IAM_API_VERSION).append("/")
-                .append(FlexibleEngineMonitorConstants.PROJECTS_PATH).append("?")
-                .append("name=").append(region);
     }
 
     private Map<String, String> getFlexibleEngineMonitorParams(

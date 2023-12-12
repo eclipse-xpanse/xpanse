@@ -21,7 +21,8 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.util.FlexibleEngineVmStateManagerService;
+import org.eclipse.xpanse.plugins.flexibleengine.models.constant.FlexibleEngineConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,16 +37,22 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     private final FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler;
     private final FlexibleEngineMetricsService flexibleEngineMetricsService;
+    private final FlexibleEngineVmStateManagerService flexibleEngineVmStateManagerService;
 
     @Value("${terraform.provider.flexibleengine.version}")
     private String terraformFlexibleEngineVersion;
 
+    /**
+     * Building OrchestratorPlugin for FlexibleEngine.
+     */
     @Autowired
     public FlexibleEngineOrchestratorPlugin(
             FlexibleEngineMetricsService flexibleEngineMetricsService,
-            FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler) {
+            FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler,
+            FlexibleEngineVmStateManagerService flexibleEngineVmStateManagerService) {
         this.flexibleEngineMetricsService = flexibleEngineMetricsService;
         this.flexibleEngineTerraformResourceHandler = flexibleEngineTerraformResourceHandler;
+        this.flexibleEngineVmStateManagerService = flexibleEngineVmStateManagerService;
     }
 
     @Override
@@ -77,10 +84,10 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
                 getCsp(), CredentialType.VARIABLES, "AK_SK", "The access key and security key.",
                 null, credentialVariables);
         credentialVariables.add(
-                new CredentialVariable(FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
+                new CredentialVariable(FlexibleEngineConstants.OS_ACCESS_KEY,
                         "The access key.", true));
         credentialVariables.add(
-                new CredentialVariable(FlexibleEngineMonitorConstants.OS_SECRET_KEY,
+                new CredentialVariable(FlexibleEngineConstants.OS_SECRET_KEY,
                         "The security key.", true));
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(accessKey);
@@ -117,6 +124,21 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
+        return flexibleEngineVmStateManagerService.startService(serviceManagerRequest);
+    }
+
+    @Override
+    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
+        return flexibleEngineVmStateManagerService.stopService(serviceManagerRequest);
+    }
+
+    @Override
+    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
+        return flexibleEngineVmStateManagerService.restartService(serviceManagerRequest);
+    }
+
+    @Override
     public String getProvider(String region) {
         return String.format("""         
             terraform {
@@ -132,20 +154,5 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
               region = "%s"
             }
             """, terraformFlexibleEngineVersion, region);
-    }
-
-    @Override
-    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
-    }
-
-    @Override
-    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
-    }
-
-    @Override
-    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
     }
 }

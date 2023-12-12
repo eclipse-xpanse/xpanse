@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.plugins.flexibleengine.monitor.models;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,18 +18,19 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineClient;
+import org.eclipse.xpanse.plugins.flexibleengine.models.constant.FlexibleEngineConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class FlexibleEngineMonitorClientTest {
+class FlexibleEngineClientTest {
 
-    private FlexibleEngineMonitorClient flexibleEngineMonitorClientUnderTest;
+    private FlexibleEngineClient flexibleEngineClientUnderTest;
 
     @BeforeEach
     void setUp() {
-        flexibleEngineMonitorClientUnderTest = new FlexibleEngineMonitorClient();
+        flexibleEngineClientUnderTest = new FlexibleEngineClient();
     }
 
     @Test
@@ -33,7 +40,7 @@ class FlexibleEngineMonitorClientTest {
 
         // Run the test
         final HttpRequestBase result =
-                flexibleEngineMonitorClientUnderTest.buildGetRequest(credential, "url");
+                flexibleEngineClientUnderTest.buildGetRequest(credential, "url");
 
         // Verify the results
         Assertions.assertFalse(Objects.isNull(result));
@@ -47,7 +54,7 @@ class FlexibleEngineMonitorClientTest {
         // Setup
         final AbstractCredentialInfo credential = null;
         // Run the test
-        assertThatThrownBy(() -> flexibleEngineMonitorClientUnderTest.buildGetRequest(credential,
+        assertThatThrownBy(() -> flexibleEngineClientUnderTest.buildGetRequest(credential,
                 "url")).isInstanceOf(Exception.class);
     }
 
@@ -58,7 +65,7 @@ class FlexibleEngineMonitorClientTest {
 
         // Run the test
         final HttpRequestBase result =
-                flexibleEngineMonitorClientUnderTest.buildPostRequest(credential, "url",
+                flexibleEngineClientUnderTest.buildPostRequest(credential, "url",
                         "postBody");
 
         // Verify the results
@@ -74,7 +81,7 @@ class FlexibleEngineMonitorClientTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> flexibleEngineMonitorClientUnderTest.buildPostRequest(credential, "url",
+                () -> flexibleEngineClientUnderTest.buildPostRequest(credential, "url",
                         "postBody")).isInstanceOf(Exception.class);
     }
 
@@ -87,17 +94,17 @@ class FlexibleEngineMonitorClientTest {
                 "The access key and security key.",
                 null, definedCredentialVariables);
         definedCredentialVariables.add(
-                new CredentialVariable(FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
+                new CredentialVariable(FlexibleEngineConstants.OS_ACCESS_KEY,
                         "The access key.", true));
         definedCredentialVariables.add(
-                new CredentialVariable(FlexibleEngineMonitorConstants.OS_SECRET_KEY,
+                new CredentialVariable(FlexibleEngineConstants.OS_SECRET_KEY,
                         "The security key.", true));
         for (CredentialVariable credentialVariable : credentialVariables.getVariables()) {
-            if (credentialVariable.getName().equals(FlexibleEngineMonitorConstants.OS_ACCESS_KEY)) {
-                credentialVariable.setValue(FlexibleEngineMonitorConstants.OS_ACCESS_KEY);
+            if (credentialVariable.getName().equals(FlexibleEngineConstants.OS_ACCESS_KEY)) {
+                credentialVariable.setValue(FlexibleEngineConstants.OS_ACCESS_KEY);
             }
-            if (credentialVariable.getName().equals(FlexibleEngineMonitorConstants.OS_SECRET_KEY)) {
-                credentialVariable.setValue(FlexibleEngineMonitorConstants.OS_SECRET_KEY);
+            if (credentialVariable.getName().equals(FlexibleEngineConstants.OS_SECRET_KEY)) {
+                credentialVariable.setValue(FlexibleEngineConstants.OS_SECRET_KEY);
             }
         }
         return credentialVariables;
