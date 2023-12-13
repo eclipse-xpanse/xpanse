@@ -292,12 +292,16 @@ class ServiceDeployerApiTest {
         Assertions.assertEquals(detailsResult, detailsResponse.getContentAsString());
     }
 
+
     List<DeployedService> listDeployedServices() throws Exception {
 
         final MockHttpServletResponse listResponse =
                 mockMvc.perform(get("/xpanse/services")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("page", "0")
+                        )
+
                         .andReturn().getResponse();
         return objectMapper.readValue(listResponse.getContentAsString(),
                 new TypeReference<>() {

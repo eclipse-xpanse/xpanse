@@ -1,10 +1,10 @@
 package org.eclipse.xpanse.modules.policy.policyman;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -85,41 +85,46 @@ class PolicyManagerTest {
     @Test
     void testEvaluatePolicies() {
         // Setup
-        // Configure PoliciesEvaluationApi.evaluatePoliciesPost(...).
         final EvalResult evalResult = new EvalResult();
         evalResult.setIsSuccessful(true);
+        // Configure PoliciesEvaluationApi.evaluatePoliciesPost(...).
         final EvalCmdList cmdList = new EvalCmdList();
         cmdList.setInput("input");
         cmdList.setPolicyList(List.of("policy"));
         when(mockPoliciesEvaluationApi.evaluatePoliciesPost(cmdList)).thenReturn(evalResult);
-
         // Run the test
-        policyManagerUnderTest.evaluatePolicies(cmdList.getPolicyList(), cmdList.getInput());
+        EvalResult result = policyManagerUnderTest.evaluatePolicies(cmdList.getPolicyList(),
+                cmdList.getInput());
+        verify(mockPoliciesEvaluationApi).evaluatePoliciesPost(cmdList);
+        Assertions.assertEquals(evalResult, result);
 
     }
 
     @Test
     void testEvaluatePolicies_PoliciesEvaluationFailed() {
         // Setup
-        final EvalResult evalResult = new EvalResult();
-        evalResult.setIsSuccessful(false);
-        evalResult.setPolicy("policy");
-        evalResult.setInput("input");
+        final EvalResult exceptionResult = new EvalResult();
+        exceptionResult.setIsSuccessful(false);
+        exceptionResult.setPolicy("policy");
+        exceptionResult.setInput("input");
 
         // Configure PoliciesEvaluationApi.evaluatePoliciesPost(...).
         final EvalCmdList cmdList = new EvalCmdList();
         cmdList.setInput("input");
         cmdList.setPolicyList(List.of("value"));
-        when(mockPoliciesEvaluationApi.evaluatePoliciesPost(cmdList))
-                .thenReturn(evalResult);
+        when(mockPoliciesEvaluationApi.evaluatePoliciesPost(cmdList)).thenReturn(exceptionResult);
 
         // Run the test
-        Assertions.assertThrows(PoliciesEvaluationFailedException.class,
-                () -> policyManagerUnderTest.evaluatePolicies(List.of("value"), "input"));
+        EvalResult evalResult = policyManagerUnderTest.evaluatePolicies(cmdList.getPolicyList(),
+                cmdList.getInput());
+
+        verify(mockPoliciesEvaluationApi).evaluatePoliciesPost(cmdList);
+
+        Assertions.assertEquals(exceptionResult, evalResult);
     }
 
     @Test
-    void testEvaluatePolicies_PoliciesEvaluationApiThrowsRestClientException() {
+    void testEvaluatePolicies_ThrowsRestClientException() {
         // Setup
         // Configure PoliciesEvaluationApi.evaluatePoliciesPost(...).
         final EvalCmdList cmdList = new EvalCmdList();
@@ -129,7 +134,7 @@ class PolicyManagerTest {
                 .thenThrow(new RestClientException("error"));
 
         // Run the test
-        Assertions.assertThrows(PoliciesEvaluationFailedException.class,
+        Assertions.assertThrows(RestClientException.class,
                 () -> policyManagerUnderTest.evaluatePolicies(List.of("value"), "input"));
     }
 }

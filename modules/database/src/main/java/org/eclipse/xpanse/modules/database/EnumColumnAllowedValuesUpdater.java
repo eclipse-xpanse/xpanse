@@ -104,7 +104,7 @@ public class EnumColumnAllowedValuesUpdater implements
                                 .dropOldConstraintForH2TableEnumColumn(tableName, constraintName);
                         enumColumnConstraintManage.addNewConstraintForH2TableEnumColumn(tableName,
                                 columnName, constraintName, enumValuesStr);
-                        log.info("Update MySql table:{} enum column:{} to values:[{}] completed.",
+                        log.info("Update H2 table:{} enum column:{} to values:[{}] completed.",
                                 tableName, columnName, enumValuesStr);
                     }
                 }

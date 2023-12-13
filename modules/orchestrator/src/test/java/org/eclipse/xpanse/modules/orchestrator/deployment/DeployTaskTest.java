@@ -111,7 +111,7 @@ class DeployTaskTest {
                 + "csp=null, flavor=null, serviceHostingType=null, ocl=null, serviceRequestProperties=null), id=null),"
                 + " ocl=Ocl(category=null, version=null, name=null, serviceVersion=null, "
                 + "description=null, namespace=null, icon=null, cloudServiceProvider=null, "
-                + "deployment=null, flavors=null, billing=null, serviceHostingType=null), deployResourceHandler=null)";
+                + "deployment=null, flavors=null, billing=null, serviceHostingType=null), deployResourceHandler=null, servicePolicies=null)";
         assertEquals(exceptedString, test.toString());
 
     }

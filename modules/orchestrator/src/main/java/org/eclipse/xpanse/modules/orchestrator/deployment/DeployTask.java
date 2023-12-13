@@ -6,8 +6,10 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
+import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 
@@ -18,7 +20,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 public class DeployTask {
 
     /**
-     * The id of the DeployTask.
+     * The id of the deployment task.
      */
     private UUID id;
 
@@ -28,12 +30,12 @@ public class DeployTask {
     private String namespace;
 
     /**
-     * The Ocl object of the DeployTask.
+     * The Ocl object of the deployment task.
      */
     private DeployRequest deployRequest;
 
     /**
-     * The Ocl object of the DeployTask.
+     * The Ocl object of the deployment task.
      */
     private Ocl ocl;
 
@@ -41,5 +43,10 @@ public class DeployTask {
      * The specific xpanse resource handler for the csp.
      */
     private DeployResourceHandler deployResourceHandler;
+
+    /**
+     * The service policies belongs to the registered service template.
+     */
+    private List<ServicePolicy> servicePolicies;
 
 }

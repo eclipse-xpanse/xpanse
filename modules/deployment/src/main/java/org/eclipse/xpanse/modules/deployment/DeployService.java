@@ -27,6 +27,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
+import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
+import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -60,6 +62,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.policy.policyman.UserPolicyManager;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.slf4j.MDC;
@@ -161,7 +164,117 @@ public class DeployService {
         deployTask.setOcl(serviceTemplate.getOcl());
         // Fill the handler
         fillHandler(deployTask);
+        // Fill the service policies
+        fillServicePolicies(deployTask, serviceTemplate);
         return deployTask;
+    }
+
+    private void fillServicePolicies(DeployTask deployTask, ServiceTemplateEntity serviceTemplate) {
+        if (Objects.nonNull(serviceTemplate)
+                && !CollectionUtils.isEmpty(serviceTemplate.getServicePolicyList())) {
+            List<ServicePolicy> servicePolicies = serviceTemplate.getServicePolicyList().stream()
+                    .filter(servicePolicyEntity -> servicePolicyEntity.getEnabled()
+                            && StringUtils.isNotBlank(servicePolicyEntity.getPolicy()))
+                    .map(servicePolicyEntity -> {
+                        ServicePolicy servicePolicy = new ServicePolicy();
+                        BeanUtils.copyProperties(servicePolicyEntity, servicePolicy);
+                        servicePolicy.setServiceTemplateId(
+                                servicePolicyEntity.getServiceTemplate().getId());
+                        return servicePolicy;
+                    }).toList();
+            deployTask.setServicePolicies(servicePolicies);
+        }
+    }
+
+    private List<UserPolicy> getUserPolicies(DeployTask deployTask) {
+        if (Objects.nonNull(deployTask.getDeployRequest())) {
+            String userId = deployTask.getDeployRequest().getUserId();
+            Csp csp = deployTask.getDeployRequest().getCsp();
+            UserPolicyQueryRequest queryRequest = new UserPolicyQueryRequest();
+            queryRequest.setUserId(userId);
+            queryRequest.setCsp(csp);
+            queryRequest.setEnabled(true);
+            return userPolicyManager.listUserPolicies(queryRequest);
+        }
+        return null;
+    }
+
+
+    /**
+     * Validate deployment with policies.
+     *
+     * @param deployment deployment.
+     * @param deployTask deploy task.
+     */
+    public void validateDeploymentWithPolicies(Deployment deployment, DeployTask deployTask) {
+        String planJson = deployment.getDeployPlanAsJson(deployTask);
+        if (StringUtils.isEmpty(planJson)) {
+            return;
+        }
+
+        evaluateDeploymentPlanWithServicePolicies(deployTask, planJson);
+
+        evaluateDeploymentPlanWithUserPolicies(deployTask, planJson);
+    }
+
+    private void evaluateDeploymentPlanWithServicePolicies(DeployTask deployTask, String planJson) {
+        List<ServicePolicy> servicePolicies = deployTask.getServicePolicies();
+        if (!CollectionUtils.isEmpty(servicePolicies)) {
+            List<String> servicePolicyList = deployTask.getServicePolicies().stream()
+                    .map(ServicePolicy::getPolicy).toList();
+            String errMsg = "Evaluate deployment plan with service policies failed.";
+            EvalResult evalResult = policyManager.evaluatePolicies(servicePolicyList, planJson);
+            if (!evalResult.getIsSuccessful()) {
+                ServicePolicy failedServicePolicy = servicePolicies.stream()
+                        .filter(servicePolicy -> servicePolicy.getPolicy()
+                                .equals(evalResult.getPolicy()))
+                        .findFirst().orElse(null);
+                if (Objects.nonNull(failedServicePolicy)) {
+                    errMsg = String.format(errMsg + "\n Failed by the policy with id: %s."
+                                    + "\n Deployment plan: %s",
+                            failedServicePolicy.getId(), planJson);
+                } else {
+                    errMsg = String.format(errMsg + "\n Failed by the policy with context: %s."
+                                    + "\nDeployment plan: %s",
+                            evalResult.getPolicy(), planJson);
+                }
+                log.error(errMsg);
+                throw new PoliciesEvaluationFailedException(errMsg);
+            } else {
+                log.info("Evaluate deployment plan with service policies successful.");
+            }
+        }
+    }
+
+
+    private void evaluateDeploymentPlanWithUserPolicies(DeployTask deployTask, String planJson) {
+
+        List<UserPolicy> userPolicies = getUserPolicies(deployTask);
+        if (!CollectionUtils.isEmpty(userPolicies)) {
+            String errMsg = "Evaluate deployment plan with user policies failed.";
+            List<String> userPolicyList = userPolicies.stream()
+                    .map(UserPolicy::getPolicy).toList();
+            EvalResult evalResult = policyManager.evaluatePolicies(userPolicyList, planJson);
+            if (!evalResult.getIsSuccessful()) {
+                UserPolicy failedUserPolicy = userPolicies.stream()
+                        .filter(userPolicy -> userPolicy.getPolicy()
+                                .equals(evalResult.getPolicy()))
+                        .findFirst().orElse(null);
+                if (Objects.nonNull(failedUserPolicy)) {
+                    errMsg = String.format(errMsg + "\n Failed by the policy with id: %s."
+                                    + "\n Deployment plan: %s",
+                            failedUserPolicy.getId(), planJson);
+                } else {
+                    errMsg = String.format(errMsg + "\n Failed by the policy with context: %s."
+                                    + "\nDeployment plan: %s",
+                            evalResult.getPolicy(), planJson);
+                }
+                log.error(errMsg);
+                throw new PoliciesEvaluationFailedException(errMsg);
+            } else {
+                log.info("Evaluate deployment plan with user policies successful.");
+            }
+        }
     }
 
     private void encodeDeployVariable(ServiceTemplateEntity serviceTemplate,
@@ -261,31 +374,8 @@ public class DeployService {
         }
     }
 
-    private void validateDeploymentWithPolicies(Deployment deployment, DeployTask deployTask) {
 
-        if (Objects.isNull(deployTask.getDeployRequest())) {
-            return;
-        }
-        String userId = deployTask.getDeployRequest().getUserId();
-        Csp csp = deployTask.getDeployRequest().getCsp();
-        UserPolicyQueryRequest queryRequest = new UserPolicyQueryRequest();
-        queryRequest.setUserId(userId);
-        queryRequest.setCsp(csp);
-        queryRequest.setEnabled(true);
-        List<UserPolicy> policies = userPolicyManager.listUserPolicies(queryRequest);
-        if (CollectionUtils.isEmpty(policies)) {
-            return;
-        }
 
-        String planJson = deployment.getDeployPlanAsJson(deployTask);
-        if (StringUtils.isEmpty(planJson)) {
-            return;
-        }
-
-        List<String> policyList = policies.stream().map(UserPolicy::getPolicy)
-                .filter(StringUtils::isNotBlank).toList();
-        policyManager.evaluatePolicies(policyList, planJson);
-    }
 
     private DeployServiceEntity flushDeployServiceEntity(DeployResult deployResult,
                                                          DeployServiceEntity storedEntity)
