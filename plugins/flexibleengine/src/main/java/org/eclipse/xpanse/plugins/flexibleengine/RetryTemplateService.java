@@ -4,12 +4,16 @@
  *
  */
 
-package org.eclipse.xpanse.plugins.flexibleengine.monitor.utils;
+package org.eclipse.xpanse.plugins.flexibleengine;
 
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
 import com.huaweicloud.sdk.ces.v1.model.ListMetricsResponse;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.internal.model.KeystoneListProjectsResponse;
+import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersResponse;
+import com.huaweicloud.sdk.ecs.v2.model.BatchStartServersResponse;
+import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersResponse;
+import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse;
 import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.Map;
@@ -128,7 +132,7 @@ public class RetryTemplateService {
             listeners = "restTemplateRetryListener",
             backoff = @Backoff(delay = DELAY_MILLISECONDS, multiplier = DELAY_MULTIPLIER))
     public BatchListMetricDataResponse batchQueryMetricData(HttpRequestBase httpRequestBase,
-                                                            String requestBody) {
+            String requestBody) {
         HttpEntity<String> httpEntity = new HttpEntity<>(requestBody,
                 getHttpHeaders(httpRequestBase));
         ResponseEntity<BatchListMetricDataResponse> responseEntity =
@@ -140,6 +144,77 @@ public class RetryTemplateService {
         throw new RestClientException("batch query metric data failed.");
     }
 
+    /**
+     * Start service.
+     *
+     * @param httpRequestBase httpRequestBase
+     * @param requestBody     requestBody
+     * @return BatchStartServersResponse
+     */
+    @Retryable(retryFor = RestClientException.class, maxAttempts = RETRY_TIMES,
+            listeners = "restTemplateRetryListener",
+            backoff = @Backoff(delay = DELAY_MILLISECONDS, multiplier = DELAY_MULTIPLIER))
+    public ResponseEntity<BatchStartServersResponse> startService(HttpRequestBase httpRequestBase,
+            String requestBody) {
+        HttpEntity<String> httpEntity = new HttpEntity<>(requestBody,
+                getHttpHeaders(httpRequestBase));
+        return restTemplate.exchange(httpRequestBase.getURI(), HttpMethod.POST, httpEntity,
+                BatchStartServersResponse.class);
+    }
+
+    /**
+     * Stop service.
+     *
+     * @param httpRequestBase httpRequestBase
+     * @param requestBody     requestBody
+     * @return BatchStopServersResponse
+     */
+    @Retryable(retryFor = RestClientException.class, maxAttempts = RETRY_TIMES,
+            listeners = "restTemplateRetryListener",
+            backoff = @Backoff(delay = DELAY_MILLISECONDS, multiplier = DELAY_MULTIPLIER))
+    public ResponseEntity<BatchStopServersResponse> stopService(HttpRequestBase httpRequestBase,
+            String requestBody) {
+        HttpEntity<String> httpEntity = new HttpEntity<>(requestBody,
+                getHttpHeaders(httpRequestBase));
+        return restTemplate.exchange(httpRequestBase.getURI(), HttpMethod.POST, httpEntity,
+                BatchStopServersResponse.class);
+    }
+
+    /**
+     * Restart service.
+     *
+     * @param httpRequestBase httpRequestBase
+     * @param requestBody     requestBody
+     * @return BatchRebootServersResponse
+     */
+    @Retryable(retryFor = RestClientException.class, maxAttempts = RETRY_TIMES,
+            listeners = "restTemplateRetryListener",
+            backoff = @Backoff(delay = DELAY_MILLISECONDS, multiplier = DELAY_MULTIPLIER))
+    public ResponseEntity<BatchRebootServersResponse> restartService(
+            HttpRequestBase httpRequestBase,
+            String requestBody) {
+        HttpEntity<String> httpEntity = new HttpEntity<>(requestBody,
+                getHttpHeaders(httpRequestBase));
+        return restTemplate.exchange(httpRequestBase.getURI(), HttpMethod.POST, httpEntity,
+                BatchRebootServersResponse.class);
+    }
+
+    /**
+     * Query JOB execution status.
+     *
+     * @param httpRequestBase httpRequestBase
+     * @return ShowJobResponse
+     */
+    @Retryable(retryFor = RestClientException.class, maxAttempts = RETRY_TIMES,
+            listeners = "restTemplateRetryListener",
+            backoff = @Backoff(delay = DELAY_MILLISECONDS, multiplier = DELAY_MULTIPLIER))
+    public ResponseEntity<ShowJobResponse> checkEcsExecResultByJobId(
+            HttpRequestBase httpRequestBase) {
+        HttpEntity<String> httpEntity =
+                new HttpEntity<>("parameters", getHttpHeaders(httpRequestBase));
+        return restTemplate.exchange(httpRequestBase.getURI(), HttpMethod.GET, httpEntity,
+                ShowJobResponse.class);
+    }
 
     private HttpHeaders getHttpHeaders(HttpRequestBase httpRequestBase) {
         HttpHeaders headers = new HttpHeaders();
@@ -172,7 +247,7 @@ public class RetryTemplateService {
      */
     @Recover
     public Object recoverPostRequest(RestClientException e, HttpRequestBase httpRequestBase,
-                                     String requestBody) {
+            String requestBody) {
         log.error("RestTemplate post request[Url:{},Body:{}] still failed after retried {} times.",
                 httpRequestBase.getURI(), RETRY_TIMES, requestBody, e);
         return null;
@@ -186,22 +261,22 @@ public class RetryTemplateService {
         return new RetryListener() {
             @Override
             public <T, E extends Throwable> boolean open(RetryContext context,
-                                                         RetryCallback<T, E> callback) {
+                    RetryCallback<T, E> callback) {
                 log.error("Retry open context:{}", context);
                 return true;
             }
 
             @Override
             public <T, E extends Throwable> void close(RetryContext context,
-                                                       RetryCallback<T, E> callback,
-                                                       Throwable throwable) {
+                    RetryCallback<T, E> callback,
+                    Throwable throwable) {
                 log.error("Retry close context:{}", context);
             }
 
             @Override
             public <T, E extends Throwable> void onError(RetryContext context,
-                                                         RetryCallback<T, E> callback,
-                                                         Throwable throwable) {
+                    RetryCallback<T, E> callback,
+                    Throwable throwable) {
                 log.error("Retry onError context:{}, error:{}.", context, throwable.getMessage());
             }
         };

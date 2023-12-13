@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.plugins.flexibleengine.monitor.utils;
+package org.eclipse.xpanse.plugins.flexibleengine;
 
 import jakarta.annotation.Resource;
 import java.util.Collections;

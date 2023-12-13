@@ -19,20 +19,22 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.models.FlexibleEngineMonitorClient;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.util.FlexibleEngineManageConverter;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.util.FlexibleEngineVmStateManagerService;
+import org.eclipse.xpanse.plugins.flexibleengine.models.constant.FlexibleEngineConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.RetryTemplateService;
 import org.junit.jupiter.api.Test;
 
 class FlexibleEngineOrchestratorPluginTest {
 
     private final FlexibleEngineOrchestratorPlugin plugin = new FlexibleEngineOrchestratorPlugin(
-            new FlexibleEngineMetricsService(new FlexibleEngineMonitorClient(),
+            new FlexibleEngineMetricsService(new FlexibleEngineClient(),
                     new FlexibleEngineMetricsConverter(),
                     new ServiceMetricsStore(new ServiceMetricsCacheManager()),
-                    new RetryTemplateService(), null), new FlexibleEngineTerraformResourceHandler());
+                    new RetryTemplateService(), null), new FlexibleEngineTerraformResourceHandler(),
+            new FlexibleEngineVmStateManagerService(new RetryTemplateService(), null,
+                    new FlexibleEngineClient(), new FlexibleEngineManageConverter()));
 
     @Test
     void getResourceHandler() {
@@ -71,7 +73,7 @@ class FlexibleEngineOrchestratorPluginTest {
 
         //Verify the attribute value of the first CredentialVariable
         CredentialVariable accessKey = variables.get(0);
-        assertEquals(FlexibleEngineMonitorConstants.OS_ACCESS_KEY, accessKey.getName());
+        assertEquals(FlexibleEngineConstants.OS_ACCESS_KEY, accessKey.getName());
         assertEquals("The access key.", accessKey.getDescription());
         assertTrue(accessKey.getIsMandatory());
         assertTrue(accessKey.getIsSensitive());

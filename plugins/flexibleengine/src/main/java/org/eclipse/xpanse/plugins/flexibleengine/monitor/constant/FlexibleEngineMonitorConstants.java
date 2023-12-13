@@ -7,22 +7,15 @@
 package org.eclipse.xpanse.plugins.flexibleengine.monitor.constant;
 
 /**
- * FlexibleEngine Constants.
+ * Flexible Engine Monitor Constants Class.
  */
 public class FlexibleEngineMonitorConstants {
 
-    public static final String PROTOCOL_HTTPS = "https://";
     public static final String CES_ENDPOINT_PREFIX = "ces.";
-    public static final String IAM_ENDPOINT_PREFIX = "iam.";
-    public static final String ENDPOINT_SUFFIX = ".prod-cloud-ocb.orange-business.com";
-    public static final String OS_ACCESS_KEY = "OS_ACCESS_KEY";
-    public static final String OS_SECRET_KEY = "OS_SECRET_KEY";
-    public static final String IAM_API_VERSION = "v3";
     public static final String CES_API_VERSION = "V1.0";
     public static final String DIM0_PREFIX = "instance_id,";
     public static final String METRIC_PATH = "metric-data";
     public static final String BATCH_METRIC_PATH = "batch-query-metric-data";
-    public static final String PROJECTS_PATH = "projects";
     public static final String LIST_METRICS_PATH = "metrics";
 
     /**

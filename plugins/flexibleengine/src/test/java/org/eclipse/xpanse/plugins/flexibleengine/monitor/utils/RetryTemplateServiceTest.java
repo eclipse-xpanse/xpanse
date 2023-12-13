@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.Objects;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.eclipse.xpanse.modules.logging.RestTemplateLoggingInterceptor;
+import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineRestTemplateConfig;
+import org.eclipse.xpanse.plugins.flexibleengine.RetryTemplateService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
