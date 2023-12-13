@@ -35,11 +35,11 @@ Details can be found on the project website [here](https://eclipse-xpanse.github
 
 ## Generate terraform-boot client code
 
-1. Run the terraform-boot project with spring-profile 'oauth' with methods mentioned here. 
-   This is necessary even if the terraform-boot will be actually used without oauth enabled in production. 
+1. Run the terraform-boot project with spring-profile 'oauth' with methods mentioned here.
+   This is necessary even if the terraform-boot will be actually used without oauth enabled in production.
    This will make the client to handle both with and without authentication usecases automatically.
 2. Access “http://localhost:9090/v3/api-docs” to get the openapi json.
-3. Copy the JSON content and place in [this folder](modules/deployment/src/main/resources/) and 
+3. Copy the JSON content and place in [this folder](modules/deployment/src/main/resources/) and
    name the file as 'terraformbootApi.json'.
 4. Run the below maven command to generate the REST API client and data models for terraform-boot. The command can be
    executed directly inside the `deployment` module.
@@ -51,7 +51,8 @@ Details can be found on the project website [here](https://eclipse-xpanse.github
 ## Generate policy-man client code
 
 1. Run the policy-man project and access “http://localhost:8090/swagger/doc.json” to get the openapi json.
-2. Copy the JSON content and place in [this folder](modules/policy/src/main/resources/) and name the file as 'policy-man-openapi.json'.
+2. Copy the JSON content and place in [this folder](modules/policy/src/main/resources/) and name the file as '
+   policy-man-openapi.json'.
 3. Run the below maven command to generate the REST API client and data models for policy-man. The command can be
    executed directly inside the `policy` module.
 
@@ -97,3 +98,7 @@ Encryption key 256 field to the aes_sec file.
 If no AES private key file aes_sec is found in the intended location or if the file is empty, then
 no encryption of the sensitive variables will take place. All data will stored in plain text within
 the JVM.
+
+## Dependencies File
+
+All third-party related content is listed in the [DEPENDENCIES](DEPENDENCIES) file.
