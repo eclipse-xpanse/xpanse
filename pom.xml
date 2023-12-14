@@ -74,7 +74,7 @@
         <nimbusds.oidc.sdk.version>11.7.1</nimbusds.oidc.sdk.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <json-schema-validator.version>1.0.87</json-schema-validator.version>
-        <archunit.version>1.1.0</archunit.version>
+        <archunit.version>1.2.1</archunit.version>
         <activiti.version>7.1.0.M6</activiti.version>
         <maven.enforcer.plugin.version>3.4.1</maven.enforcer.plugin.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
