@@ -100,4 +100,14 @@ public class DeployedService {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime lastModifiedTime;
+
+    @Schema(description = "Time of start service.")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
+    private OffsetDateTime lastStartedAt;
+
+    @Schema(description = "Time of stop service.")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
+    private OffsetDateTime lastStoppedAt;
 }
