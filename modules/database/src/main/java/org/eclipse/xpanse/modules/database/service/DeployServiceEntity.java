@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.database.service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -19,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,6 +38,7 @@ import org.eclipse.xpanse.modules.models.service.manager.ServiceState;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * DeployServiceEntity for persistence.
@@ -140,4 +143,15 @@ public class DeployServiceEntity extends CreateModifiedTime {
 
     @Column(name = "RESULT_MESSAGE", length = Integer.MAX_VALUE)
     private String resultMessage;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @Column(name = "LAST_STARTED_AT")
+    private OffsetDateTime lastStartedAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
+    @Column(name = "LAST_STOPPED_AT")
+    private OffsetDateTime lastStoppedAt;
+
 }

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.database.service;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,8 @@ class DeployServiceEntityTest {
     private final Map<String, String> PROPERTIES = new HashMap<>();
     private final Map<String, String> PRIVATE_PROPERTIES = new HashMap<>();
     private final String RESULT_MESSAGE = "RESULT_MESSAGE";
+    private static final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
+    private static final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
 
 
     private DeployServiceEntity test;
@@ -62,6 +65,8 @@ class DeployServiceEntityTest {
         test.setProperties(PROPERTIES);
         test.setPrivateProperties(PRIVATE_PROPERTIES);
         test.setResultMessage(RESULT_MESSAGE);
+        test.setLastStartedAt(LAST_STARTED_AT);
+        test.setLastStoppedAt(LAST_STOPPED_AT);
     }
 
     @Test
@@ -82,7 +87,9 @@ class DeployServiceEntityTest {
                         //+ "deployResourceList=" + DEPLOY_RESOURCE_LIST+ ", "
                         + "properties=" + PROPERTIES + ", "
                         + "privateProperties=" + PRIVATE_PROPERTIES + ", "
-                        + "resultMessage=" + RESULT_MESSAGE + ")";
+                        + "resultMessage=" + RESULT_MESSAGE + ", "
+                        + "lastStartedAt=" + LAST_STARTED_AT + ", "
+                        + "lastStoppedAt=" + LAST_STOPPED_AT + ")";
         Assertions.assertEquals(expectedToString, test.toString());
     }
 
@@ -205,6 +212,20 @@ class DeployServiceEntityTest {
         Assertions.assertNotEquals(test1.hashCode(), test2.hashCode());
 
         test1.setResultMessage(RESULT_MESSAGE);
+        Assertions.assertNotEquals(test, test1);
+        Assertions.assertNotEquals(test, test2);
+        Assertions.assertNotEquals(test1, test2);
+        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
+        Assertions.assertNotEquals(test1.hashCode(), test2.hashCode());
+
+        test1.setLastStartedAt(LAST_STARTED_AT);
+        Assertions.assertNotEquals(test, test1);
+        Assertions.assertNotEquals(test, test2);
+        Assertions.assertNotEquals(test1, test2);
+        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
+        Assertions.assertNotEquals(test1.hashCode(), test2.hashCode());
+
+        test1.setLastStoppedAt(LAST_STOPPED_AT);
         Assertions.assertEquals(test, test1);
         Assertions.assertNotEquals(test, test2);
         Assertions.assertNotEquals(test1, test2);

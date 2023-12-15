@@ -941,6 +941,7 @@ public class DeployService {
             deployServiceEntity.setServiceState(ServiceState.STARTING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             if (start(deployServiceEntity)) {
+                deployServiceEntity.setLastStartedAt(OffsetDateTime.now());
                 deployServiceEntity.setServiceState(ServiceState.RUNNING);
             } else {
                 deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
@@ -972,6 +973,7 @@ public class DeployService {
             deployServiceEntity.setServiceState(ServiceState.STOPPING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             if (stop(deployServiceEntity)) {
+                deployServiceEntity.setLastStoppedAt(OffsetDateTime.now());
                 deployServiceEntity.setServiceState(ServiceState.STOPPED);
             } else {
                 deployServiceEntity.setServiceState(ServiceState.STOPPING_FAILED);

@@ -38,6 +38,8 @@ class DeployedServiceTest {
     private static final OffsetDateTime createTime = OffsetDateTime.now();
     private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private static DeployedService deployedService;
+    private static final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
+    private static final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
 
     @BeforeEach
     void setUp() {
@@ -54,6 +56,8 @@ class DeployedServiceTest {
         deployedService.setCreateTime(createTime);
         deployedService.setLastModifiedTime(lastModifiedTime);
         deployedService.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        deployedService.setLastStartedAt(LAST_STARTED_AT);
+        deployedService.setLastStoppedAt(LAST_STOPPED_AT);
     }
 
     @Test
@@ -68,6 +72,8 @@ class DeployedServiceTest {
         assertEquals(serviceDeploymentState, deployedService.getServiceDeploymentState());
         assertEquals(createTime, deployedService.getCreateTime());
         assertEquals(lastModifiedTime, deployedService.getLastModifiedTime());
+        assertEquals(LAST_STARTED_AT, deployedService.getLastStartedAt());
+        assertEquals(LAST_STOPPED_AT, deployedService.getLastStoppedAt());
     }
 
     @Test
@@ -149,6 +155,20 @@ class DeployedServiceTest {
 
         deployedService1.setLastModifiedTime(lastModifiedTime);
         deployedService1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
+
+        deployedService1.setLastStartedAt(LAST_STARTED_AT);
+        deployedService1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
+
+        deployedService1.setLastStoppedAt(LAST_STOPPED_AT);
+        deployedService1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         assertEquals(deployedService, deployedService1);
         assertNotEquals(deployedService1, deployedService2);
         assertEquals(deployedService.hashCode(), deployedService1.hashCode());
@@ -170,6 +190,8 @@ class DeployedServiceTest {
                 ", serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR +
                 ", createTime=" + createTime +
                 ", lastModifiedTime=" + lastModifiedTime +
+                ", lastStartedAt=" + LAST_STARTED_AT +
+                ", lastStoppedAt=" + LAST_STOPPED_AT +
                 ")";
         assertEquals(expectedString, deployedService.toString());
     }
