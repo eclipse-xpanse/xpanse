@@ -48,7 +48,7 @@
         <springdoc.version>2.3.0</springdoc.version>
         <slf4j-api.version>2.0.9</slf4j-api.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
-        <hypersistence-utils-hibernate.version>3.6.1</hypersistence-utils-hibernate.version>
+        <hypersistence-utils-hibernate.version>3.7.0</hypersistence-utils-hibernate.version>
         <mockito.version>5.8.0</mockito.version>
         <testcontainers.version>1.19.3</testcontainers.version>
         <apache.commons.io.version>2.15.1</apache.commons.io.version>
