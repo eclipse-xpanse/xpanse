@@ -144,17 +144,19 @@ public class TerraformDeployment implements Deployment {
             result.setState(failedState);
             result.setMessage(tfEx.getMessage());
         }
-        if (StringUtils.isNotEmpty(tfState)) {
-            result.getPrivateProperties().put(STATE_FILE_NAME, tfState);
-        }
+        if (Objects.nonNull(tfState)) {
+            if (StringUtils.isNotEmpty(tfState)) {
+                result.getPrivateProperties().put(STATE_FILE_NAME, tfState);
+            }
 
-        if (Objects.nonNull(task.getDeployResourceHandler())) {
-            try {
-                task.getDeployResourceHandler().handler(result);
-            } catch (TerraformExecutorException tfEx) {
-                log.error("Handle terraform resources failed. {}", tfEx.getMessage());
-                result.setState(TerraformExecState.DEPLOY_FAILED);
-                result.setMessage(tfEx.getMessage());
+            if (Objects.nonNull(task.getDeployResourceHandler())) {
+                try {
+                    task.getDeployResourceHandler().handler(result);
+                } catch (TerraformExecutorException tfEx) {
+                    log.error("Handle terraform resources failed. {}", tfEx.getMessage());
+                    result.setState(TerraformExecState.DEPLOY_FAILED);
+                    result.setMessage(tfEx.getMessage());
+                }
             }
         }
     }
