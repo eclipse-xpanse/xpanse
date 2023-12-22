@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.plugins.huaweicloud.manage;
+package org.eclipse.xpanse.plugins.flexibleengine.manage;
 
 import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersRequest;
 import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersRequestBody;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class HuaweiCloudServerManageRequestConverter {
+public class FlexibleEngineServerManageRequestConverter {
 
     /**
      * Build BatchStartServersRequest Object.

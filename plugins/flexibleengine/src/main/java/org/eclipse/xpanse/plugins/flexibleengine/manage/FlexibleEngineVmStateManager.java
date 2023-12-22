@@ -4,12 +4,13 @@
  *
  */
 
-package org.eclipse.xpanse.plugins.huaweicloud.manage;
+package org.eclipse.xpanse.plugins.flexibleengine.manage;
 
-import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS;
-import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.DEFAULT_RETRY_TIMES;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_DELAY_MILLIS;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_RETRY_TIMES;
 
 import com.huaweicloud.sdk.core.auth.ICredential;
+import com.huaweicloud.sdk.core.retry.backoff.SdkBackoffStrategy;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersRequest;
 import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersResponse;
@@ -27,8 +28,8 @@ import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
-import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
-import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
+import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
+import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,20 +38,24 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class HuaweiCloudVmStateManager {
+public class FlexibleEngineVmStateManager {
+
+    private static final int BASE_DELAY = 1000;
+    private static final int MAX_BACK_OFF_IN_MILLISECONDS = 30000;
+    private static final int RETRY_TIMES = 10;
     private final CredentialCenter credentialCenter;
-    private final HuaweiCloudClient huaweiCloudClient;
-    private final HuaweiCloudServerManageRequestConverter converter;
+    private final FlexibleEngineClient flexibleEngineClient;
+    private final FlexibleEngineServerManageRequestConverter converter;
 
     /**
      * Constructs a HuaweiCloudVmStateManager with the necessary dependencies.
      */
     @Autowired
-    public HuaweiCloudVmStateManager(CredentialCenter credentialCenter,
-                                     HuaweiCloudClient huaweiCloudClient,
-                                     HuaweiCloudServerManageRequestConverter converter) {
+    public FlexibleEngineVmStateManager(CredentialCenter credentialCenter,
+                                        FlexibleEngineClient flexibleEngineClient,
+                                        FlexibleEngineServerManageRequestConverter converter) {
         this.credentialCenter = credentialCenter;
-        this.huaweiCloudClient = huaweiCloudClient;
+        this.flexibleEngineClient = flexibleEngineClient;
         this.converter = converter;
     }
 
@@ -62,11 +67,11 @@ public class HuaweiCloudVmStateManager {
         BatchStartServersRequest request =
                 converter.buildBatchStartServersRequest(
                         serviceManagerRequest.getDeployResourceEntityList());
-        BatchStartServersResponse response = ecsClient.batchStartServersInvoker(request)
-                .retryTimes(DEFAULT_RETRY_TIMES)
-                .retryCondition(huaweiCloudClient::matchRetryCondition)
-                .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
-                .invoke();
+        BatchStartServersResponse response =
+                ecsClient.batchStartServersInvoker(request).retryTimes(DEFAULT_RETRY_TIMES)
+                        .retryCondition(flexibleEngineClient::matchRetryCondition)
+                        .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                        .invoke();
         return checkEcsExecResultByJobId(ecsClient, response.getJobId());
     }
 
@@ -81,8 +86,8 @@ public class HuaweiCloudVmStateManager {
         BatchStopServersResponse response =
                 ecsClient.batchStopServersInvoker(batchStopServersRequest)
                         .retryTimes(DEFAULT_RETRY_TIMES)
-                        .retryCondition(huaweiCloudClient::matchRetryCondition)
-                        .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                        .retryCondition(flexibleEngineClient::matchRetryCondition)
+                        .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
                         .invoke();
         return checkEcsExecResultByJobId(ecsClient, response.getJobId());
     }
@@ -95,28 +100,29 @@ public class HuaweiCloudVmStateManager {
         BatchRebootServersRequest request =
                 converter.buildBatchRebootServersRequest(
                         serviceManagerRequest.getDeployResourceEntityList());
-        BatchRebootServersResponse response = ecsClient.batchRebootServersInvoker(request)
-                .retryTimes(DEFAULT_RETRY_TIMES)
-                .retryCondition(huaweiCloudClient::matchRetryCondition)
-                .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
-                .invoke();
+        BatchRebootServersResponse response =
+                ecsClient.batchRebootServersInvoker(request).retryTimes(DEFAULT_RETRY_TIMES)
+                        .retryCondition(flexibleEngineClient::matchRetryCondition)
+                        .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                        .invoke();
         return checkEcsExecResultByJobId(ecsClient, response.getJobId());
     }
 
     private EcsClient getEcsClient(ServiceManagerRequest serviceManagerRequest) {
         AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.HUAWEI, CredentialType.VARIABLES,
+                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
                         serviceManagerRequest.getUserId());
-        ICredential icredential = huaweiCloudClient.getCredential(credential);
-        return huaweiCloudClient.getEcsClient(icredential, serviceManagerRequest.getRegionName());
+        ICredential icredential = flexibleEngineClient.getCredential(credential);
+        return flexibleEngineClient.getEcsClient(icredential,
+                serviceManagerRequest.getRegionName());
     }
 
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {
         ShowJobResponse response = ecsClient.showJobInvoker(new ShowJobRequest().withJobId(jobId))
-                .retryTimes(DEFAULT_RETRY_TIMES)
-                .retryCondition((resp, ex) -> Objects.nonNull(ex)
-                        && !resp.getStatus().equals(ShowJobResponse.StatusEnum.SUCCESS))
-                .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                .retryTimes(RETRY_TIMES).retryCondition(
+                        (resp, ex) -> Objects.nonNull(resp) && !resp.getStatus()
+                                .equals(StatusEnum.SUCCESS))
+                .backoffStrategy(new SdkBackoffStrategy(BASE_DELAY, MAX_BACK_OFF_IN_MILLISECONDS))
                 .invoke();
         if (response.getStatus().equals(StatusEnum.FAIL)) {
             log.error("manage vm operation failed. JobId: {} reason: {} message: {}", jobId,

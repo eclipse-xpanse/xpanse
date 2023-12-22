@@ -6,13 +6,13 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine.monitor.constant;
 
+import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
+
 /**
  * Flexible Engine Monitor Constants Class.
  */
-public class FlexibleEngineMonitorConstants {
+public class FlexibleEngineMonitorConstants extends FlexibleEngineConstants {
 
-    public static final String CES_ENDPOINT_PREFIX = "ces.";
-    public static final String CES_API_VERSION = "V1.0";
     public static final String DIM0_PREFIX = "instance_id,";
     public static final String METRIC_PATH = "metric-data";
     public static final String BATCH_METRIC_PATH = "batch-query-metric-data";

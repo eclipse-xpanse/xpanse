@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,10 +22,10 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.plugins.flexibleengine.manage.util.FlexibleEngineVmStateManagerService;
-import org.eclipse.xpanse.plugins.flexibleengine.models.constant.FlexibleEngineConstants;
-import org.eclipse.xpanse.plugins.flexibleengine.monitor.utils.FlexibleEngineMetricsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
+import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
+import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -34,30 +35,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
-
-    private final FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler;
-    private final FlexibleEngineMetricsService flexibleEngineMetricsService;
-    private final FlexibleEngineVmStateManagerService flexibleEngineVmStateManagerService;
+    @Resource
+    private FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler;
+    @Resource
+    private FlexibleEngineMetricsService flexibleEngineMetricsService;
+    @Resource
+    private FlexibleEngineVmStateManager flexibleEngineVmStateManagerService;
 
     @Value("${terraform.provider.flexibleengine.version}")
     private String terraformFlexibleEngineVersion;
 
-    /**
-     * Building OrchestratorPlugin for FlexibleEngine.
-     */
-    @Autowired
-    public FlexibleEngineOrchestratorPlugin(
-            FlexibleEngineMetricsService flexibleEngineMetricsService,
-            FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler,
-            FlexibleEngineVmStateManagerService flexibleEngineVmStateManagerService) {
-        this.flexibleEngineMetricsService = flexibleEngineMetricsService;
-        this.flexibleEngineTerraformResourceHandler = flexibleEngineTerraformResourceHandler;
-        this.flexibleEngineVmStateManagerService = flexibleEngineVmStateManagerService;
-    }
-
     @Override
     public DeployResourceHandler getResourceHandler() {
-        return this.flexibleEngineTerraformResourceHandler;
+        return flexibleEngineTerraformResourceHandler;
     }
 
     @Override
@@ -109,7 +99,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest) {
-        return flexibleEngineMetricsService.getMetricsForResource(resourceMetricRequest);
+        return flexibleEngineMetricsService.getMetricsByResource(resourceMetricRequest);
     }
 
     /**
@@ -120,7 +110,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
-        return flexibleEngineMetricsService.getMetricsForService(serviceMetricRequest);
+        return flexibleEngineMetricsService.getMetricsByService(serviceMetricRequest);
     }
 
     @Override
@@ -141,18 +131,18 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public String getProvider(String region) {
         return String.format("""         
-            terraform {
-              required_providers {
-                flexibleengine = {
-                  source  = "FlexibleEngineCloud/flexibleengine"
-                  version = "%s"
+                terraform {
+                  required_providers {
+                    flexibleengine = {
+                      source  = "FlexibleEngineCloud/flexibleengine"
+                      version = "%s"
+                    }
+                  }
                 }
-              }
-            }
-                        
-            provider "flexibleengine" {
-              region = "%s"
-            }
-            """, terraformFlexibleEngineVersion, region);
+                            
+                provider "flexibleengine" {
+                  region = "%s"
+                }
+                """, terraformFlexibleEngineVersion, region);
     }
 }
