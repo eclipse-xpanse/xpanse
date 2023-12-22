@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.monitor.constant;
 
-import org.eclipse.xpanse.plugins.huaweicloud.models.constant.HuaweiCloudConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
 
 /**
  * Huawei Monitor Constant.

@@ -23,8 +23,9 @@ import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
+import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
-import org.eclipse.xpanse.plugins.huaweicloud.monitor.utils.HuaweiCloudMetricsService;
+import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -38,18 +39,14 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Value("${terraform.provider.huaweicloud.version}")
     private String terraformHuaweiCloudVersion;
 
-    private final HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler;
+    @Resource
+    private HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler;
 
     @Resource
     private HuaweiCloudMetricsService huaweiCloudMetricsService;
 
     @Resource
     private HuaweiCloudVmStateManager huaweiCloudVmStateManager;
-
-    public HuaweiCloudOrchestratorPlugin(
-            HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler) {
-        this.huaweiCloudTerraformResourceHandler = huaweiCloudTerraformResourceHandler;
-    }
 
     @Override
     public DeployResourceHandler getResourceHandler() {
@@ -124,19 +121,19 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public String getProvider(String region) {
         return String.format("""
-            terraform {
-              required_providers {
-                huaweicloud = {
-                  source = "huaweicloud/huaweicloud"
-                  version = "%s"
+                terraform {
+                  required_providers {
+                    huaweicloud = {
+                      source = "huaweicloud/huaweicloud"
+                      version = "%s"
+                    }
+                  }
                 }
-              }
-            }
-                        
-            provider "huaweicloud" {
-              region = "%s"
-            }
-            """, terraformHuaweiCloudVersion, region);
+                            
+                provider "huaweicloud" {
+                  region = "%s"
+                }
+                """, terraformHuaweiCloudVersion, region);
     }
 
     @Override
