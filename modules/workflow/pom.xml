@@ -17,6 +17,12 @@
   </parent>
   <groupId>org.eclipse.xpanse.modules</groupId>
   <artifactId>workflow</artifactId>
+  <repositories>
+    <repository>
+      <id>Alfresco Maven Repository</id>
+      <url>https://maven.alfresco.com/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.activiti</groupId>
@@ -26,6 +32,10 @@
         <exclusion>
           <groupId>org.springframework.security</groupId>
           <artifactId>spring-security-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.activiti</groupId>
+          <artifactId>activiti-spring-identity</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
