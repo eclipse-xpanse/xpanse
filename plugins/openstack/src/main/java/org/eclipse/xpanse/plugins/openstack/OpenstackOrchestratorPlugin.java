@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.plugins.openstack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -67,7 +68,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> requiredProperties() {
-        return List.of(OpenstackEnvironmentConstants.AUTH_URL);
+        return Collections.emptyList();
     }
 
     @Override
