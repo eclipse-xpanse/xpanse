@@ -113,11 +113,11 @@ public class WorkflowProcessUtils {
     }
 
     private List<WorkFlowTask> transTaskToWorkFlowTask(List<Task> list) {
-        return list.stream().map(task -> getWorkFlow(task)).collect(Collectors.toList());
+        return list.stream().map(this::getWorkFlow).collect(Collectors.toList());
     }
 
     private List<WorkFlowTask> transHistoricTaskInstanceToWorkFlowTask(
             List<HistoricTaskInstance> list) {
-        return list.stream().map(task -> getWorkFlow(task)).collect(Collectors.toList());
+        return list.stream().map(this::getWorkFlow).collect(Collectors.toList());
     }
 }

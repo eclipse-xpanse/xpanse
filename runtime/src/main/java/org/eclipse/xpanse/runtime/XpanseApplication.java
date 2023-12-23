@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.runtime;
 
+import org.activiti.spring.boot.ActivitiMethodSecurityAutoConfiguration;
+import org.activiti.spring.boot.ProcessEngineAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -23,7 +25,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EntityScan(basePackages = "org.eclipse.xpanse")
 @ComponentScan(basePackages = "org.eclipse.xpanse")
 @EnableJpaAuditing(dateTimeProviderRef = "auditDateTimeProviderConfig")
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class,
+        ProcessEngineAutoConfiguration.class, ActivitiMethodSecurityAutoConfiguration.class})
 public class XpanseApplication {
 
     public static void main(String[] args) {
