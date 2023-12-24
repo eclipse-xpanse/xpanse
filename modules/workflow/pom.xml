@@ -40,11 +40,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-image-generator</artifactId>
-      <version>${activiti.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.xpanse.modules</groupId>
       <artifactId>deployment</artifactId>
       <version>${project.version}</version>
