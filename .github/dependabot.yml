@@ -10,6 +10,10 @@ updates:
     directory: /
     schedule:
       interval: daily
+    ignore:
+      - dependency-name: "org.activiti:activiti-spring-boot-starter"
+        versions:
+          - 8.1.0 # until the bug https://github.com/Activiti/Activiti/issues/4491 is fixed.
   - package-ecosystem: docker
     directory: /
     schedule:
