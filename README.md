@@ -23,15 +23,15 @@ It also avoids tight coupling of your service to other cloud service provider se
 ## Configuration Language
 
 Details can be found on the project
-website [here](https://eclipse-xpanse.github.io/xpanse-website/docs/configuration-language).
+website [here](https://eclipse.dev/xpanse/docs/configuration-language).
 
 ## Runtime
 
-Details can be found on the project website [here](https://eclipse-xpanse.github.io/xpanse-website/docs/runtime).
+Details can be found on the project website [here](https://eclipse.dev/xpanse/docs/runtime).
 
 ## Database
 
-Details can be found on the project website [here](https://eclipse-xpanse.github.io/xpanse-website/docs/database).
+Details can be found on the project website [here](https://eclipse.dev/xpanse/docs/database).
 
 ## Generate terraform-boot client code
 
