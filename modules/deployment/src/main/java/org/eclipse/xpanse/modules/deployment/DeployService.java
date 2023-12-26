@@ -82,10 +82,8 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class DeployService {
 
-    private static final String TASK_ID = "TASK_ID";
-
     public static final String STATE_FILE_NAME = "terraform.tfstate";
-
+    private static final String TASK_ID = "TASK_ID";
     private final Map<DeployerKind, Deployment> deploymentMap = new ConcurrentHashMap<>();
 
     @Resource
@@ -207,20 +205,27 @@ public class DeployService {
      * @param deployTask deploy task.
      */
     public void validateDeploymentWithPolicies(Deployment deployment, DeployTask deployTask) {
+
+        List<ServicePolicy> servicePolicies = deployTask.getServicePolicies();
+        List<UserPolicy> userPolicies = getUserPolicies(deployTask);
+        if (CollectionUtils.isEmpty(userPolicies) && CollectionUtils.isEmpty(servicePolicies)) {
+            return;
+        }
+
         String planJson = deployment.getDeployPlanAsJson(deployTask);
         if (StringUtils.isEmpty(planJson)) {
             return;
         }
 
-        evaluateDeploymentPlanWithServicePolicies(deployTask, planJson);
+        evaluateDeploymentPlanWithServicePolicies(servicePolicies, planJson);
 
-        evaluateDeploymentPlanWithUserPolicies(deployTask, planJson);
+        evaluateDeploymentPlanWithUserPolicies(userPolicies, planJson);
     }
 
-    private void evaluateDeploymentPlanWithServicePolicies(DeployTask deployTask, String planJson) {
-        List<ServicePolicy> servicePolicies = deployTask.getServicePolicies();
+    private void evaluateDeploymentPlanWithServicePolicies(List<ServicePolicy> servicePolicies,
+                                                           String planJson) {
         if (!CollectionUtils.isEmpty(servicePolicies)) {
-            List<String> servicePolicyList = deployTask.getServicePolicies().stream()
+            List<String> servicePolicyList = servicePolicies.stream()
                     .map(ServicePolicy::getPolicy).toList();
             String errMsg = "Evaluate deployment plan with service policies failed.";
             EvalResult evalResult = policyManager.evaluatePolicies(servicePolicyList, planJson);
@@ -247,9 +252,8 @@ public class DeployService {
     }
 
 
-    private void evaluateDeploymentPlanWithUserPolicies(DeployTask deployTask, String planJson) {
-
-        List<UserPolicy> userPolicies = getUserPolicies(deployTask);
+    private void evaluateDeploymentPlanWithUserPolicies(List<UserPolicy> userPolicies,
+                                                        String planJson) {
         if (!CollectionUtils.isEmpty(userPolicies)) {
             String errMsg = "Evaluate deployment plan with user policies failed.";
             List<String> userPolicyList = userPolicies.stream()
@@ -373,8 +377,6 @@ public class DeployService {
                     deployTask.getId(), e);
         }
     }
-
-
 
 
     private DeployServiceEntity flushDeployServiceEntity(DeployResult deployResult,
