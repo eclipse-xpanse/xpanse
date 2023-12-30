@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
+import org.eclipse.xpanse.runtime.AbstractJwtTestConfiguration;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,7 +20,7 @@ import org.testcontainers.utility.DockerImageName;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "mysql")
-public abstract class AbstractMysqlIntegrationTest {
+public abstract class AbstractMysqlIntegrationTest extends AbstractJwtTestConfiguration {
 
     private static final MySQLContainer<?> mysqlContainer;
 

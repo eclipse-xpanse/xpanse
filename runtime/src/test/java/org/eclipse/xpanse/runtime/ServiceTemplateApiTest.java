@@ -7,13 +7,13 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -33,7 +33,6 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -48,6 +47,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -59,7 +59,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class ServiceTemplateApiTest {
+class ServiceTemplateApiTest extends AbstractJwtTestConfiguration {
 
     private static String id;
     private static ServiceTemplateDetailVo serviceTemplateDetailVo;
@@ -80,9 +80,9 @@ class ServiceTemplateApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
-            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testManageServiceTemplate() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ISV));
         testRegister();
         Thread.sleep(1000);
         testDetail();
@@ -92,9 +92,9 @@ class ServiceTemplateApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
-            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testFetchMethods() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ISV));
         ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         testFetch();
         testFetchUpdate();
@@ -102,9 +102,9 @@ class ServiceTemplateApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
-            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testRegisterServiceThrowsException() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ISV));
         testRegisterThrowsMethodArgumentNotValidException();
         testRegisterThrowsTerraformExecutionException();
         testDetailThrowsException();
@@ -115,9 +115,9 @@ class ServiceTemplateApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
-            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testFetchMethodsThrowsException() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ISV));
         testFetchThrowsException();
         testDetailThrowsException();
         testFetchUpdateThrowsException();

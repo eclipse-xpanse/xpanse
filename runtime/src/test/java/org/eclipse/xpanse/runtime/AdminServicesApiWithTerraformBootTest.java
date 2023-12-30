@@ -6,12 +6,12 @@
 
 package org.eclipse.xpanse.runtime;
 
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -47,7 +48,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed,terraform-boot"})
 @AutoConfigureMockMvc
-class AdminServicesApiWithTerraformBootTest {
+class AdminServicesApiWithTerraformBootTest extends AbstractJwtTestConfiguration {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Resource
@@ -82,10 +83,10 @@ class AdminServicesApiWithTerraformBootTest {
 
 
     @Test
-    @WithMockJwtAuth(authorities = {"admin"},
-            claims = @OpenIdClaims(sub = "admin-id", preferredUsername = "xpanse-admin"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testHealthCheckWithRoleAdmin() throws Exception {
         // SetUp
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ADMIN));
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
         systemStatus.setBackendSystemStatuses(setUpBackendSystemStatusList(true));
@@ -105,10 +106,10 @@ class AdminServicesApiWithTerraformBootTest {
 
 
     @Test
-    @WithMockJwtAuth(authorities = {"user", "csp"},
-            claims = @OpenIdClaims(sub = "user-id", preferredUsername = "xpanse-user"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testHealthCheckWithRoleNotAdmin() throws Exception {
         // SetUp
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList("user"));
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
         systemStatus.setBackendSystemStatuses(setUpBackendSystemStatusList(false));

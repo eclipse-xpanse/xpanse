@@ -6,12 +6,12 @@
 
 package org.eclipse.xpanse.runtime;
 
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -29,7 +29,6 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -46,6 +45,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -57,7 +57,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class ServiceCatalogApiTest {
+class ServiceCatalogApiTest extends AbstractJwtTestConfiguration {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private static String id;
@@ -77,9 +77,9 @@ class ServiceCatalogApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testOrderableServices() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ADMIN));
         registerService();
         Thread.sleep(3000);
         testOpenApi();
@@ -89,9 +89,9 @@ class ServiceCatalogApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testOrderableServicesThrowsException() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ADMIN));
         testOrderableServiceDetailsThrowsException();
         testListOrderableServicesThrowsException();
         testOpenApiThrowsException();
