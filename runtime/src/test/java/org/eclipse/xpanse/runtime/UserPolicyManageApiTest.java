@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -14,8 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -25,6 +25,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,6 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateReque
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolicyList;
@@ -48,6 +48,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -59,7 +60,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class UserPolicyManageApiTest {
+class UserPolicyManageApiTest extends AbstractJwtTestConfiguration {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static UUID policyId;
@@ -88,9 +89,9 @@ class UserPolicyManageApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testPoliciesManage() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_USER));
         testListPolicies_ReturnsEmptyList();
         testAddPolicy();
         testListPolicies();
@@ -103,9 +104,9 @@ class UserPolicyManageApiTest {
 
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testPoliciesManage_ThrowsExceptions() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_USER));
         testListPolicies_ReturnsEmptyList();
         testAddPolicy_ThrowsPoliciesValidationFailed();
         testAddPolicy();

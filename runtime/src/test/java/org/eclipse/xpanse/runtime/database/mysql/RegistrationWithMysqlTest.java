@@ -5,16 +5,16 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
-import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Slf4j
@@ -40,9 +41,9 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
     private OclLoader oclLoader;
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
-            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testRegisterNewService() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ISV));
         ServiceTemplateDetailVo serviceTemplateDetailVo =
                 serviceTemplateApi.register(getOclFromFile());
         Assertions.assertTrue(Objects.nonNull(serviceTemplateDetailVo));
@@ -56,9 +57,9 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testRegisterUniqueValidation() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ISV));
         Ocl ocl = getOclFromFile();
         serviceTemplateApi.register(ocl);
         assertThrows(ServiceTemplateAlreadyRegistered.class,
@@ -66,9 +67,9 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ISV,
-            claims = @OpenIdClaims(sub = "isvUserId", preferredUsername = "isvUserName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testServiceRegistrationUpdate() throws Exception {
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ISV));
         Ocl ocl = getOclFromFile();
         ServiceTemplateDetailVo serviceTemplateDetailVo =
                 serviceTemplateApi.register(ocl);

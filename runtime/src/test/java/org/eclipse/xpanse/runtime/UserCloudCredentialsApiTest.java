@@ -6,13 +6,13 @@
 
 package org.eclipse.xpanse.runtime;
 
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,6 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
@@ -40,6 +39,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,17 +51,17 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserCloudCredentialsApiTest {
+class UserCloudCredentialsApiTest extends AbstractJwtTestConfiguration {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Resource
     private MockMvc mockMvc;
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testListCredentialTypes() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         List<CredentialType> types = Arrays.asList(CredentialType.values());
         String result = objectMapper.writeValueAsString(types);
 
@@ -77,10 +77,10 @@ class UserCloudCredentialsApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testListCredentialTypes_WithCsp() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         List<CredentialType> types = List.of(CredentialType.VARIABLES);
         String result = objectMapper.writeValueAsString(types);
 
@@ -97,10 +97,10 @@ class UserCloudCredentialsApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testListCredentialTypes_PluginNotFoundException() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         Response responseModel = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList("Can't find suitable plugin for the Csp AWS"));
         String result = objectMapper.writeValueAsString(responseModel);
@@ -118,10 +118,10 @@ class UserCloudCredentialsApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testListCredentialCapabilities() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
@@ -154,10 +154,10 @@ class UserCloudCredentialsApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testListCredentialCapabilities_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         String result = "[]";
 
         // Run the test
@@ -176,10 +176,10 @@ class UserCloudCredentialsApiTest {
 
     @Test
     @Order(1)
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testListCredentials_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
+        super.updateJwtInSecurityContextWithSpecificUser(Collections.emptyMap(), List.of(ROLE_USER), "dummyEmpty");
         String result = "[]";
         // Run the test
         final MockHttpServletResponse response =
@@ -194,10 +194,10 @@ class UserCloudCredentialsApiTest {
 
     @Test
     @Order(2)
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testAddCredentialWithSensitiveIsFalse() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.HUAWEI);
         createCredential.setType(CredentialType.VARIABLES);
@@ -240,10 +240,10 @@ class UserCloudCredentialsApiTest {
 
     @Test
     @Order(3)
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testAddCredentialWithSensitiveIsTrue() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.HUAWEI);
         createCredential.setType(CredentialType.VARIABLES);
@@ -286,10 +286,10 @@ class UserCloudCredentialsApiTest {
 
     @Test
     @Order(4)
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId2", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testGetCredentials_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
+        super.updateJwtInSecurityContextWithSpecificUser(Collections.emptyMap(), List.of(ROLE_USER), "test");
         String result = "[]";
 
         // Run the test
@@ -306,10 +306,10 @@ class UserCloudCredentialsApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testGetCredentialOpenApi() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         Link link = Link.of("http://localhost/openapi/huawei_variables_credentialApi.html",
                 "OpenApi");
         String result = objectMapper.writeValueAsString(link);
@@ -329,10 +329,10 @@ class UserCloudCredentialsApiTest {
 
     @Test
     @Order(5)
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testUpdateCredential() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         final CreateCredential updateCredential = new CreateCredential();
         updateCredential.setCsp(Csp.HUAWEI);
         updateCredential.setType(CredentialType.VARIABLES);
@@ -377,10 +377,10 @@ class UserCloudCredentialsApiTest {
 
     @Test
     @Order(6)
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_USER,
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testDeleteCredential() throws Exception {
         // Setup
+        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_USER));
         String deleteResult = "";
         String queryResult = "[]";
 

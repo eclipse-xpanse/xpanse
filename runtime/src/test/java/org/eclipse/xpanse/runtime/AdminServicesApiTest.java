@@ -6,23 +6,23 @@
 
 package org.eclipse.xpanse.runtime;
 
+import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformBootManager;
-import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
@@ -38,6 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.CollectionUtils;
@@ -49,7 +50,7 @@ import org.springframework.util.CollectionUtils;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class AdminServicesApiTest {
+class AdminServicesApiTest extends AbstractJwtTestConfiguration {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -67,10 +68,10 @@ class AdminServicesApiTest {
     private PolicyManager policyManager;
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testHealthCheck() throws Exception {
         // SetUp
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ADMIN));
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
         List<BackendSystemStatus> backendSystemStatuses = setUpBackendSystemStatusList(true);
@@ -93,10 +94,10 @@ class AdminServicesApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = {"isv", "user"},
-            claims = @OpenIdClaims(sub = "userId", preferredUsername = "userName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testHealthCheckWithRoleNotAdmin() throws Exception {
         // SetUp
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList("user"));
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
         List<BackendSystemStatus> backendSystemStatuses = setUpBackendSystemStatusList(false);
@@ -119,10 +120,10 @@ class AdminServicesApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testGetCsps() throws Exception {
         // SetUp
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ADMIN));
         List<Csp> cspList = Arrays.asList(Csp.values());
         String resultBody = objectMapper.writeValueAsString(cspList);
 
@@ -139,10 +140,10 @@ class AdminServicesApiTest {
     }
 
     @Test
-    @WithMockJwtAuth(authorities = RoleConstants.ROLE_ADMIN,
-            claims = @OpenIdClaims(sub = "adminId", preferredUsername = "adminName"))
+    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
     void testGetCspsWithActive() throws Exception {
         // SetUp
+        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ADMIN));
         List<Csp> cspList = pluginManager.getPluginsMap().keySet().stream().sorted().toList();
         String resultBody = objectMapper.writeValueAsString(cspList);
 
