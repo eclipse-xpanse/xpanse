@@ -214,7 +214,7 @@ class ServiceDeployerApiTest extends AbstractJwtTestConfiguration {
         // Verify the results
         Assertions.assertTrue(result.size() >= 1);
         Assertions.assertEquals(result.get(0).getServiceDeploymentState(),
-                ServiceDeploymentState.DEPLOY_SUCCESS);
+                ServiceDeploymentState.DEPLOYING);
     }
 
     void testDestroy(UUID taskId) throws Exception {

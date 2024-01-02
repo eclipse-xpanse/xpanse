@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -79,6 +80,8 @@ class ServiceTemplateManageTest {
     @Mock
     TerraformLocalConfig terraformLocalConfig;
     @Mock
+    Executor taskExecutor;
+    @Mock
     ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @InjectMocks
     private ServiceTemplateManage serviceTemplateManageTest;
@@ -114,7 +117,7 @@ class ServiceTemplateManageTest {
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, pluginManager);
+                        terraformLocalConfig, pluginManager, mockDeployService, taskExecutor);
 
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
@@ -159,7 +162,7 @@ class ServiceTemplateManageTest {
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, pluginManager);
+                        terraformLocalConfig, pluginManager, mockDeployService, taskExecutor);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
                 terraform {
@@ -221,7 +224,7 @@ class ServiceTemplateManageTest {
     void testRegisterServiceTemplate() {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, pluginManager);
+                        terraformLocalConfig, pluginManager, mockDeployService, taskExecutor);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
                     terraform {
@@ -283,7 +286,7 @@ class ServiceTemplateManageTest {
         when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(oclRegister);
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, pluginManager);
+                        terraformLocalConfig, pluginManager, mockDeployService, taskExecutor);
         doReturn(deployment).when(mockDeployService).getDeployment(any());
         doReturn("""
                 terraform {
