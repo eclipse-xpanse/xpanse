@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collections;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -85,6 +86,6 @@ class OpenstackOrchestratorPluginTest {
 
     @Test
     void testRequiredProperties() {
-        assertThat(plugin.requiredProperties()).isEqualTo(List.of(OpenstackEnvironmentConstants.AUTH_URL));
+        assertThat(plugin.requiredProperties()).isEqualTo(Collections.emptyList());
     }
 }
