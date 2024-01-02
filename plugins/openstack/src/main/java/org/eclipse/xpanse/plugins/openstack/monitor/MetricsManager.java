@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.openstack.monitor.utils;
+package org.eclipse.xpanse.plugins.openstack.monitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
+import org.eclipse.xpanse.plugins.openstack.common.keystone.KeystoneManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.ResourcesService;
@@ -26,7 +27,7 @@ import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.filter.Metric
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.metrics.CeilometerMetricType;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.resources.InstanceNetworkResource;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.resources.InstanceResource;
-import org.eclipse.xpanse.plugins.openstack.monitor.keystone.KeystoneManager;
+import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils.GnocchiToXpanseModelConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -84,24 +85,23 @@ public class MetricsManager {
      */
     public List<Metric> getMetrics(ResourceMetricsRequest resourceMetricRequest) {
 
-        keystoneManager.authenticate(credentialCenter.getCredential(
-                Csp.OPENSTACK, CredentialType.VARIABLES,
-                resourceMetricRequest.getUserId()));
+        keystoneManager.authenticate(
+                credentialCenter.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES,
+                        resourceMetricRequest.getUserId()));
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
-        InstanceResource instanceResource =
-                this.resourcesService.getInstanceResourceInfoById(
-                        resourceMetricRequest.getDeployResource().getResourceId());
+        InstanceResource instanceResource = this.resourcesService.getInstanceResourceInfoById(
+                resourceMetricRequest.getDeployResource().getResourceId());
         List<Metric> metrics = new ArrayList<>();
         if (Objects.nonNull(instanceResource)) {
             for (Map.Entry<String, String> entry : instanceResource.getMetrics().entrySet()) {
-                if (monitorResourceType == MonitorResourceType.CPU
-                        || Objects.isNull(monitorResourceType)) {
+                if (monitorResourceType == MonitorResourceType.CPU || Objects.isNull(
+                        monitorResourceType)) {
                     if (entry.getKey().equals(CeilometerMetricType.CPU.toValue())) {
                         metrics.add(getCpuUsage(resourceMetricRequest, entry.getValue()));
                     }
                 }
-                if (monitorResourceType == MonitorResourceType.MEM
-                        || Objects.isNull(monitorResourceType)) {
+                if (monitorResourceType == MonitorResourceType.MEM || Objects.isNull(
+                        monitorResourceType)) {
                     if (entry.getKey().equals(CeilometerMetricType.MEMORY_USAGE.toValue())) {
                         metrics.add(getMemoryUsage(resourceMetricRequest, entry.getValue()));
                     }
@@ -140,16 +140,13 @@ public class MetricsManager {
 
     private Metric getCpuUsage(ResourceMetricsRequest resourceMetricRequest, String metricId) {
         AggregationRequest aggregationRequest = this.gnocchiToXpanseModelConverter
-                .buildAggregationRequestToGetCpuMeasureAsPercentage(
-                        metricId);
+                .buildAggregationRequestToGetCpuMeasureAsPercentage(metricId);
         MetricsFilter metricsFilter =
                 this.gnocchiToXpanseModelConverter.buildMetricsFilter(resourceMetricRequest);
         Metric metric = this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
-                resourceMetricRequest.getDeployResource(),
-                MonitorResourceType.CPU,
-                this.aggregationService.getAggregatedMeasuresByOperation(
-                        aggregationRequest, metricsFilter).getMeasures().getAggregated(),
-                MetricUnit.PERCENTAGE,
+                resourceMetricRequest.getDeployResource(), MonitorResourceType.CPU,
+                this.aggregationService.getAggregatedMeasuresByOperation(aggregationRequest,
+                        metricsFilter).getMeasures().getAggregated(), MetricUnit.PERCENTAGE,
                 resourceMetricRequest.isOnlyLastKnownMetric());
         doCacheActionForResourceMetrics(resourceMetricRequest, MonitorResourceType.CPU, metric);
         return metric;
@@ -159,28 +156,24 @@ public class MetricsManager {
         MetricsFilter metricsFilter =
                 this.gnocchiToXpanseModelConverter.buildMetricsFilter(resourceMetricRequest);
         Metric metric = this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
-                resourceMetricRequest.getDeployResource(),
-                MonitorResourceType.MEM,
+                resourceMetricRequest.getDeployResource(), MonitorResourceType.MEM,
                 this.measuresService.getMeasurementsForResourceByMetricId(metricId, metricsFilter),
-                MetricUnit.MB,
-                resourceMetricRequest.isOnlyLastKnownMetric());
+                MetricUnit.MB, resourceMetricRequest.isOnlyLastKnownMetric());
         doCacheActionForResourceMetrics(resourceMetricRequest, MonitorResourceType.MEM, metric);
         return metric;
     }
 
     private Metric getNetworkUsage(ResourceMetricsRequest resourceMetricRequest, String metricId,
                                    MonitorResourceType monitorResourceType) {
-        AggregationRequest aggregationRequest = this.gnocchiToXpanseModelConverter
-                .buildAggregationRequestToGetNetworkRate(
+        AggregationRequest aggregationRequest =
+                this.gnocchiToXpanseModelConverter.buildAggregationRequestToGetNetworkRate(
                         metricId);
         MetricsFilter metricsFilter =
                 this.gnocchiToXpanseModelConverter.buildMetricsFilter(resourceMetricRequest);
         Metric metric = this.gnocchiToXpanseModelConverter.convertGnocchiMeasuresToMetric(
-                resourceMetricRequest.getDeployResource(),
-                monitorResourceType,
-                this.aggregationService.getAggregatedMeasuresByOperation(
-                        aggregationRequest, metricsFilter).getMeasures().getAggregated(),
-                MetricUnit.BYTES_PER_SECOND,
+                resourceMetricRequest.getDeployResource(), monitorResourceType,
+                this.aggregationService.getAggregatedMeasuresByOperation(aggregationRequest,
+                        metricsFilter).getMeasures().getAggregated(), MetricUnit.BYTES_PER_SECOND,
                 resourceMetricRequest.isOnlyLastKnownMetric());
         doCacheActionForResourceMetrics(resourceMetricRequest, monitorResourceType, metric);
         return metric;
@@ -193,14 +186,14 @@ public class MetricsManager {
         if (resourceMetricRequest.isOnlyLastKnownMetric()) {
             String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
             if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                serviceMetricsStore.storeMonitorMetric(Csp.OPENSTACK,
-                        resourceId, monitorResourceType, metric);
+                serviceMetricsStore.storeMonitorMetric(Csp.OPENSTACK, resourceId,
+                        monitorResourceType, metric);
 
             } else {
                 Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
                         monitorResourceType);
-                if (Objects.nonNull(cacheMetric)
-                        && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
+                if (Objects.nonNull(cacheMetric) && !CollectionUtils.isEmpty(
+                        cacheMetric.getMetrics())) {
                     metric = cacheMetric;
                 }
             }

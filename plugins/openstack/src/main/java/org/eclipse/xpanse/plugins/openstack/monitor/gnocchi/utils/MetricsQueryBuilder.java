@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.utils;
+package org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils;
 
 import java.util.Objects;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.filter.MetricsFilter;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class MetricsQueryBuilder {
 
     /**
-     *  Creates URI query parameters string based on MetricsFilter object.
+     * Creates URI query parameters string based on MetricsFilter object.
      *
      * @param metricsFilter MetricsFilter bean.
      * @return returns URI with query parameters.

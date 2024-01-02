@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.openstack;
+package org.eclipse.xpanse.plugins.openstack.monitor;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -30,14 +30,16 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
+import org.eclipse.xpanse.plugins.openstack.OpenstackOrchestratorPlugin;
+import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
+import org.eclipse.xpanse.plugins.openstack.common.keystone.KeystoneManager;
+import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.ResourcesService;
-import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.utils.MetricsQueryBuilder;
-import org.eclipse.xpanse.plugins.openstack.monitor.keystone.KeystoneManager;
-import org.eclipse.xpanse.plugins.openstack.monitor.utils.GnocchiToXpanseModelConverter;
-import org.eclipse.xpanse.plugins.openstack.monitor.utils.MetricsManager;
+import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils.GnocchiToXpanseModelConverter;
+import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils.MetricsQueryBuilder;
+import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
 import org.instancio.Instancio;
 import org.instancio.Select;
 import org.junit.jupiter.api.Assertions;
@@ -63,9 +65,10 @@ class OpenstackMonitoringIntegrationTest {
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
                     .dynamicPort()
-                    .extensions(new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
-                            false, new ClasspathFileSource("src/test/resources/mappings"),
-                            Collections.emptyList())))
+                    .extensions(
+                            new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
+                                    false, new ClasspathFileSource("src/test/resources/mappings"),
+                                    Collections.emptyList())))
             .build();
     @Autowired
     OpenstackOrchestratorPlugin plugin;
@@ -73,6 +76,8 @@ class OpenstackMonitoringIntegrationTest {
     CredentialCenter credentialCenter;
     @MockBean
     ServiceMetricsStore serviceMetricsStore;
+    @MockBean
+    ServersManager serversManager;
 
     @BeforeAll
     void setEnvVar() {
@@ -193,7 +198,8 @@ class OpenstackMonitoringIntegrationTest {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 this.plugin.getCredentialDefinitions().get(0));
         Assertions.assertThrows(CredentialsNotFoundException.class,
-                () -> this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, true)));
+                () -> this.plugin.getMetricsForResource(
+                        setupResourceRequest(null, null, 150, true)));
     }
 
 

@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.plugins.openstack;
+package org.eclipse.xpanse.plugins.openstack.resourcehandler;
 
 import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
 
@@ -25,7 +25,6 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResourceProperties
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.plugins.openstack.enums.OpenstackTerraformResourceProperties;
 import org.springframework.stereotype.Component;
 
 /**

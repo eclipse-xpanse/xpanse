@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.openstack.constants;
+package org.eclipse.xpanse.plugins.openstack.common.constants;
 
 /**
  * Defines all the environment variables that must be set for the Openstack plugin to function

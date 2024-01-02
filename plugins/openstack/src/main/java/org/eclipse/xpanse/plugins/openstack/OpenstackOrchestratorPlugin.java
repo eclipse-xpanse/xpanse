@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.plugins.openstack;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,9 +23,10 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
-import org.eclipse.xpanse.plugins.openstack.monitor.utils.MetricsManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
+import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
+import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
+import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -35,20 +37,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final OpenstackTerraformResourceHandler openstackTerraformResourceHandler;
+    @Resource
+    private OpenstackTerraformResourceHandler openstackTerraformResourceHandler;
+    @Resource
+    private MetricsManager metricsManager;
+    @Resource
+    private ServersManager serversManager;
 
     @Value("${terraform.provider.openstack.version}")
     private String terraformOpenStackVersion;
-
-    private final MetricsManager metricsManager;
-
-    @Autowired
-    public OpenstackOrchestratorPlugin(
-            OpenstackTerraformResourceHandler openstackTerraformResourceHandler,
-            MetricsManager metricsManager) {
-        this.openstackTerraformResourceHandler = openstackTerraformResourceHandler;
-        this.metricsManager = metricsManager;
-    }
 
     /**
      * Get the resource handler for OpenStack.
@@ -81,22 +78,18 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.PROJECT,
-                        "The Name of the Tenant or Project to use.", true, false));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.USERNAME,
-                        "The Username to login with.", true, false));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.PASSWORD,
-                        "The Password to login with.", true, true));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN,
-                        "The domain of the openstack installation to be used.", true, false));
-        CredentialVariables httpAuth = new CredentialVariables(
-                getCsp(), CredentialType.VARIABLES, "Variables",
-                "Authenticate at the specified URL using an account and password.",
-                null, credentialVariables);
+        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.PROJECT,
+                "The Name of the Tenant or Project to use.", true, false));
+        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.USERNAME,
+                "The Username to login with.", true, false));
+        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.PASSWORD,
+                "The Password to login with.", true, true));
+        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.DOMAIN,
+                "The domain of the openstack installation to be used.", true, false));
+        CredentialVariables httpAuth =
+                new CredentialVariables(getCsp(), CredentialType.VARIABLES, "Variables",
+                        "Authenticate at the specified URL using an account and password.", null,
+                        credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(httpAuth);
 
@@ -131,15 +124,13 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
         List<Metric> metrics = new ArrayList<>();
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
-            ResourceMetricsRequest resourceMetricRequest = new ResourceMetricsRequest(
-                    deployResource,
-                    serviceMetricRequest.getMonitorResourceType(),
-                    serviceMetricRequest.getFrom(),
-                    serviceMetricRequest.getTo(),
-                    serviceMetricRequest.getGranularity(),
-                    serviceMetricRequest.isOnlyLastKnownMetric(),
-                    serviceMetricRequest.getUserId()
-            );
+            ResourceMetricsRequest resourceMetricRequest =
+                    new ResourceMetricsRequest(deployResource,
+                            serviceMetricRequest.getMonitorResourceType(),
+                            serviceMetricRequest.getFrom(), serviceMetricRequest.getTo(),
+                            serviceMetricRequest.getGranularity(),
+                            serviceMetricRequest.isOnlyLastKnownMetric(),
+                            serviceMetricRequest.getUserId());
             metrics.addAll(this.metricsManager.getMetrics(resourceMetricRequest));
         }
         return metrics;
@@ -165,16 +156,16 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public boolean startService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
+        return serversManager.startService(serviceManagerRequest);
     }
 
     @Override
     public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
+        return serversManager.stopService(serviceManagerRequest);
     }
 
     @Override
     public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
+        return serversManager.restartService(serviceManagerRequest);
     }
 }

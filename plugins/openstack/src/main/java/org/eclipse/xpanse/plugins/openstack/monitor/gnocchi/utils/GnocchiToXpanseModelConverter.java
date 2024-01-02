@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.openstack.monitor.utils;
+package org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils;
 
 import java.time.Instant;
 import java.util.ArrayList;

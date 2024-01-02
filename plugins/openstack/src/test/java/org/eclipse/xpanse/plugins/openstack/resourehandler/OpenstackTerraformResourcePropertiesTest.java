@@ -1,10 +1,11 @@
-package org.eclipse.xpanse.plugins.openstack.enums;
+package org.eclipse.xpanse.plugins.openstack.resourehandler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResourceProperties;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

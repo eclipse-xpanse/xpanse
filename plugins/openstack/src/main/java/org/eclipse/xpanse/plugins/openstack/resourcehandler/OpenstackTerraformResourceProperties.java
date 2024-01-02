@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.plugins.openstack.enums;
+package org.eclipse.xpanse.plugins.openstack.resourcehandler;
 
 import java.util.HashMap;
 import java.util.HashSet;
