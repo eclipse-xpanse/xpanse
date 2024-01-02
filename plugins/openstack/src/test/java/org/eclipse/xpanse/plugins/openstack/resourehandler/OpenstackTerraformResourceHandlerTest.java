@@ -1,4 +1,4 @@
-package org.eclipse.xpanse.plugins.openstack;
+package org.eclipse.xpanse.plugins.openstack.resourehandler;
 
 import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
 
@@ -8,6 +8,7 @@ import java.net.URI;
 import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfState;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

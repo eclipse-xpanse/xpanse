@@ -6,9 +6,9 @@
 package org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api;
 
 import java.util.List;
-import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.utils.MetricsQueryBuilder;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.filter.MetricsFilter;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.measures.Measure;
+import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils.MetricsQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

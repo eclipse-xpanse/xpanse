@@ -683,7 +683,7 @@ public class DeployService {
 
     private DeployResult handlerCallbackDeployResult(TerraformResult result) {
         DeployResult deployResult = new DeployResult();
-        if (result.getCommandSuccessful()) {
+        if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
             deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
         } else {
             deployResult.setState(TerraformExecState.DEPLOY_FAILED);
@@ -717,7 +717,7 @@ public class DeployService {
 
     private DeployResult handlerCallbackDestroyResult(TerraformResult result) {
         DeployResult deployResult = new DeployResult();
-        if (result.getCommandSuccessful()) {
+        if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
             deployResult.setState(TerraformExecState.DESTROY_SUCCESS);
         } else {
             deployResult.setState(TerraformExecState.DEPLOY_FAILED);
@@ -828,13 +828,10 @@ public class DeployService {
      */
     public List<DeployedService> listDeployedServicesOfIsv(ServiceQueryModel query) {
         Optional<String> namespace = identityProviderManager.getUserNamespace();
-        if (namespace.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return deployServiceStorage.listServices(query).stream()
-                .filter(deployServiceEntity -> namespace.get()
+        return namespace.map(s -> deployServiceStorage.listServices(query).stream()
+                .filter(deployServiceEntity -> s
                         .equals(deployServiceEntity.getNamespace()))
-                .map(this::convertToDeployedService).toList();
+                .map(this::convertToDeployedService).toList()).orElseGet(ArrayList::new);
     }
 
     /**

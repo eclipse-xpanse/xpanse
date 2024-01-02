@@ -1,4 +1,4 @@
-package org.eclipse.xpanse.plugins.openstack.monitor.keystone;
+package org.eclipse.xpanse.plugins.openstack.common.keystone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

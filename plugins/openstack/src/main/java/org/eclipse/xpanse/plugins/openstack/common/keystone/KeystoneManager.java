@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.openstack.monitor.keystone;
+package org.eclipse.xpanse.plugins.openstack.common.keystone;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -17,7 +17,8 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
-import org.eclipse.xpanse.plugins.openstack.constants.OpenstackEnvironmentConstants;
+import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
+import org.openstack4j.api.OSClient;
 import org.openstack4j.core.transport.Config;
 import org.openstack4j.core.transport.ProxyHost;
 import org.openstack4j.model.common.Identifier;
@@ -39,6 +40,14 @@ public class KeystoneManager {
         this.environment = environment;
     }
 
+    private static String getIpAddressFromUrl(String url) {
+        try {
+            return InetAddress.getByName(URI.create(url).toURL().getHost()).getHostAddress();
+        } catch (UnknownHostException | MalformedURLException e) {
+            throw new XpanseUnhandledException(e.getMessage());
+        }
+    }
+
     /**
      * Authenticates and sets the authentication details in the thread context which can be
      * used for the further calls to Openstack API.
@@ -46,6 +55,15 @@ public class KeystoneManager {
      * @param credential Credential information available for Openstack in the runtime.
      */
     public void authenticate(AbstractCredentialInfo credential) {
+        getAuthenticatedClient(credential);
+    }
+
+    /**
+     * Get the Openstack API client based on the credential information.
+     *
+     * @param credential Credential information available for Openstack in the runtime.
+     */
+    public OSClient.OSClientV3 getAuthenticatedClient(AbstractCredentialInfo credential) {
         String userName = null;
         String password = null;
         String tenant = null;
@@ -87,7 +105,7 @@ public class KeystoneManager {
         String proxyPort = this.environment.getProperty(OpenstackEnvironmentConstants.PROXY_PORT);
         String sslDisabled = this.environment.getProperty(
                 OpenstackEnvironmentConstants.SSL_VERIFICATION_DISABLED);
-        OSFactory
+        return OSFactory
                 .builderV3()
                 .withConfig(buildClientConfig(url, proxyHost, proxyPort, sslDisabled))
                 .credentials(userName, password, Identifier.byName(domain))
@@ -96,14 +114,6 @@ public class KeystoneManager {
                         Identifier.byName(domain))
                 .endpoint(url)
                 .authenticate();
-    }
-
-    private static String getIpAddressFromUrl(String url) {
-        try {
-            return InetAddress.getByName(URI.create(url).toURL().getHost()).getHostAddress();
-        } catch (UnknownHostException | MalformedURLException e) {
-            throw new XpanseUnhandledException(e.getMessage());
-        }
     }
 
     private Config buildClientConfig(String url, String proxyHost, String proxyPort,

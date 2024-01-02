@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.openstack.monitor.keystone;
+package org.eclipse.xpanse.plugins.openstack.common.keystone;
 
 import com.google.common.collect.SortedSetMultimap;
 import java.net.URI;
