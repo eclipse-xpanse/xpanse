@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -53,7 +54,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class,
-        PluginManager.class, TerraformLocalConfig.class, DeployService.class, Executor.class})
+        PluginManager.class, TerraformLocalConfig.class, DeployService.class, TaskConfiguration.class})
 class TerraformDeploymentTest {
 
     private final UUID id = UUID.randomUUID();

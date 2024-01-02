@@ -58,7 +58,7 @@ public class WorkflowProcessUtils {
         return runtimeService.startProcessInstanceByKey(processKey, variable);
     }
 
-    @Async("taskExecutor")
+    @Async("xpanseAsyncTaskExecutor")
     public void asyncStartProcess(String processKey, Map<String, Object> variable) {
         startProcess(processKey, variable);
     }

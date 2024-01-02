@@ -89,7 +89,7 @@ public class ServiceTemplateOpenApiGenerator {
      *
      * @param registerService Registered services.
      */
-    @Async("taskExecutor")
+    @Async("xpanseAsyncTaskExecutor")
     public void generateServiceApi(ServiceTemplateEntity registerService) {
         createServiceApi(registerService);
     }
@@ -99,7 +99,7 @@ public class ServiceTemplateOpenApiGenerator {
      *
      * @param registerService Registered services.
      */
-    @Async("taskExecutor")
+    @Async("xpanseAsyncTaskExecutor")
     public void updateServiceApi(ServiceTemplateEntity registerService) {
         File file =
                 new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
@@ -115,7 +115,7 @@ public class ServiceTemplateOpenApiGenerator {
      *
      * @param id ID of registered service.
      */
-    @Async("taskExecutor")
+    @Async("xpanseAsyncTaskExecutor")
     public void deleteServiceApi(String id) {
         File file = new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
                 id + OPENAPI_FILE_EXTENSION);

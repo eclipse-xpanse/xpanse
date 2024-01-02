@@ -561,7 +561,7 @@ public class DeployService {
      * @param deployTask          deployTask
      * @param deployServiceEntity deployServiceEntity
      */
-    @Async("taskExecutor")
+    @Async("xpanseAsyncTaskExecutor")
     public void asyncPurgeService(Deployment deployment, DeployTask deployTask,
                                   DeployServiceEntity deployServiceEntity) {
         purgeService(deployment, deployTask, deployServiceEntity);
@@ -788,7 +788,7 @@ public class DeployService {
      * @param deployRequest deploy request.
      * @return new deployed service entity.
      */
-    @Async("taskExecutor")
+    @Async("xpanseAsyncTaskExecutor")
     public CompletableFuture<DeployServiceEntity> deployServiceById(UUID newId,
                                                                 String userId,
                                                                 DeployRequest deployRequest) {
@@ -808,7 +808,7 @@ public class DeployService {
     /**
      * Destroy service by deployed service id.
      */
-    @Async("taskExecutor")
+    @Async("xpanseAsyncTaskExecutor")
     public CompletableFuture<DeployServiceEntity> destroyServiceById(String id) {
         MDC.put(TASK_ID, id);
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(id));
