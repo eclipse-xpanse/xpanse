@@ -74,7 +74,7 @@ public class MigrateDeployProcess implements Serializable, JavaDelegate {
         String userId = (String) variables.get(MigrateConstants.USER_ID);
         log.info("Migration workflow start deploying new service with id:{}", newId);
         CompletableFuture<DeployServiceEntity> future =
-                deployService.deployService(newId, userId, deployRequest);
+                deployService.deployServiceById(newId, userId, deployRequest);
         DeployServiceEntity result = null;
         try {
             result = future.get();

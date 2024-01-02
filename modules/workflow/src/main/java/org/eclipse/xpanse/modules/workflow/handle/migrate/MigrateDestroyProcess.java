@@ -60,7 +60,7 @@ public class MigrateDestroyProcess implements Serializable, JavaDelegate {
         runtimeService.setVariable(processInstanceId, MigrateConstants.DESTROY_RETRY_NUM,
                 destroyRetryNum + 1);
         log.info("Migration workflow start destroying old service with service id:{}", id);
-        CompletableFuture<DeployServiceEntity> future = deployService.destroyService(id);
+        CompletableFuture<DeployServiceEntity> future = deployService.destroyServiceById(id);
         DeployServiceEntity result = null;
         try {
             result = future.get();

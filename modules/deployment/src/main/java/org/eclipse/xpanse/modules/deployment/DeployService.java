@@ -341,8 +341,7 @@ public class DeployService {
      * @param deployment deployment
      * @param deployTask deployTask
      */
-    @Async("taskExecutor")
-    public void asyncDeployService(Deployment deployment, DeployTask deployTask) {
+    public void deployService(Deployment deployment, DeployTask deployTask) {
         deploy(deployment, deployTask);
     }
 
@@ -467,8 +466,7 @@ public class DeployService {
      * @param deployTask          deployTask
      * @param deployServiceEntity deployServiceEntity
      */
-    @Async("taskExecutor")
-    public void asyncDestroyService(Deployment deployment, DeployTask deployTask,
+    public void destroyService(Deployment deployment, DeployTask deployTask,
                                     DeployServiceEntity deployServiceEntity) {
         destroy(deployment, deployTask, deployServiceEntity, false);
     }
@@ -789,7 +787,7 @@ public class DeployService {
      * @return new deployed service entity.
      */
     @Async("taskExecutor")
-    public CompletableFuture<DeployServiceEntity> deployService(UUID newId,
+    public CompletableFuture<DeployServiceEntity> deployServiceById(UUID newId,
                                                                 String userId,
                                                                 DeployRequest deployRequest) {
         MDC.put(TASK_ID, newId.toString());
@@ -809,7 +807,7 @@ public class DeployService {
      * Destroy service by deployed service id.
      */
     @Async("taskExecutor")
-    public CompletableFuture<DeployServiceEntity> destroyService(String id) {
+    public CompletableFuture<DeployServiceEntity> destroyServiceById(String id) {
         MDC.put(TASK_ID, id);
         DeployServiceEntity deployServiceEntity = getDeployServiceEntity(UUID.fromString(id));
         DeployTask deployTask = getDeployTaskByStoredService(deployServiceEntity);
