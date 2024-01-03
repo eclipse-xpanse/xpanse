@@ -58,8 +58,8 @@ public class CredentialsConfigApi {
      * @param csp The cloud service provider.
      * @return Returns list the available credential types of the cloud service provider.
      */
-    @Tag(name = "Credentials Management",
-            description = "APIs for managing user's cloud provider credentials")
+    @Tag(name = "Credentials Configuration",
+            description = "APIs Viewing Cloud Credentials Configuration")
     @GetMapping(value = "/credential_types",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -81,8 +81,8 @@ public class CredentialsConfigApi {
      * @param type The type of credential.
      * @return Returns list of credential capabilities defined by the cloud service provider.
      */
-    @Tag(name = "Credentials Management",
-            description = "APIs for managing user's cloud provider credentials")
+    @Tag(name = "Credentials Configuration",
+            description = "APIs Viewing Cloud Credentials Configuration")
     @GetMapping(value = "/credentials/capabilities",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -108,8 +108,8 @@ public class CredentialsConfigApi {
      * @param type The type of credential.
      * @return Link of credential openApi url.
      */
-    @Tag(name = "Credentials Management",
-            description = "APIs for managing user's cloud provider credentials")
+    @Tag(name = "Credentials Configuration",
+            description = "APIs Viewing Cloud Credentials Configuration")
     @GetMapping(value = "/credentials/openapi/{csp}/{type}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)

@@ -137,6 +137,23 @@ jobs:
             out/jreleaser/trace.log
             out/jreleaser/output.properties
 
+  upload-to-swagger-hub:
+    runs-on: ubuntu-latest
+    if: github.repository == 'eclipse-xpanse/xpanse'
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: v${{ needs.release.outputs.next-version }}
+
+      - name: Generate API doc
+        run: mvn verify -DskipTests -Pgenerate-openapi-doc
+
+      - name: Upload API to SwaggerHub
+        run: mvn io.swagger:swaggerhub-maven-plugin:upload -Dversion=${{ needs.release.outputs.next-version }} -Duser=${{ secrets.SWAGGERHUB_USER }} -Dtoken=${{ secrets.SWAGGERHUB_API_KEY }}
+
   prepare-for-next-development-cycle:
     runs-on: ubuntu-latest
     if: github.repository == 'eclipse-xpanse/xpanse'

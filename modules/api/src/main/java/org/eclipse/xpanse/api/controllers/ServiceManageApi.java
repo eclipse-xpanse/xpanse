@@ -45,7 +45,7 @@ public class ServiceManageApi {
     @Resource
     private DeployService deployService;
 
-    @Tag(name = "Service Resource", description = "APIs to manage the service instances")
+    @Tag(name = "Service Status Management", description = "APIs to manage the service instances")
     @Operation(description = "Start the service by the service id.")
     @PutMapping(value = "/services/start/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -60,7 +60,7 @@ public class ServiceManageApi {
      * @param id service id.
      * @return deployedService.
      */
-    @Tag(name = "Service Resource", description = "APIs to manage the service instances")
+    @Tag(name = "Service Status Management", description = "APIs to manage the service instances")
     @Operation(description = "Start a task to deploy service using registered service template.")
     @PutMapping(value = "/services/stop/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -74,7 +74,7 @@ public class ServiceManageApi {
      * @param id service id.
      * @return deployedService.
      */
-    @Tag(name = "Service Resource", description = "APIs to manage the service instances")
+    @Tag(name = "Service Status Management", description = "APIs to manage the service instances")
     @Operation(description = "Start a task to deploy service using registered service template.")
     @PutMapping(value = "/services/restart/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)

@@ -25,3 +25,9 @@ jobs:
           distribution: 'temurin'
       - name: Build
         run: mvn --batch-mode --update-snapshots --no-transfer-progress verify
+      - name: Generate API doc
+        run: mvn verify -DskipTests -Pgenerate-openapi-doc
+      - name: Validate OpenAPI definition
+        uses: char0n/swagger-editor-validate@v1
+        with:
+          definition-file: runtime/target/openapi.json

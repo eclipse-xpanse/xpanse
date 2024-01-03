@@ -66,7 +66,7 @@ public class UserCloudCredentialsApi {
      * @param type The type of credential.
      * @return Returns credentials of the cloud service provider and the user.
      */
-    @Tag(name = "Credentials Management",
+    @Tag(name = "User Cloud Credentials Management",
             description = "APIs for managing user's cloud provider credentials")
     @GetMapping(value = "/credentials",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,7 +86,7 @@ public class UserCloudCredentialsApi {
      *
      * @param createCredential The credential to be created.
      */
-    @Tag(name = "Credentials Management",
+    @Tag(name = "User Cloud Credentials Management",
             description = "APIs for managing user's cloud provider credentials")
     @PostMapping(value = "/credentials",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -103,7 +103,7 @@ public class UserCloudCredentialsApi {
      *
      * @param updateCredential The credential to be updated.
      */
-    @Tag(name = "Credentials Management",
+    @Tag(name = "User Cloud Credentials Management",
             description = "APIs for managing user's cloud provider credentials")
     @PutMapping(value = "/credentials",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -123,7 +123,7 @@ public class UserCloudCredentialsApi {
      * @param type The type of credential.
      * @param name The name of credential.
      */
-    @Tag(name = "Credentials Management",
+    @Tag(name = "User Cloud Credentials Management",
             description = "APIs for managing user's cloud provider credentials")
     @DeleteMapping(value = "/credentials",
             produces = MediaType.APPLICATION_JSON_VALUE)
