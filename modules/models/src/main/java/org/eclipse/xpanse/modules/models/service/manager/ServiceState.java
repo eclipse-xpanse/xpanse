@@ -16,15 +16,15 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  */
 public enum ServiceState {
 
-    NOT_RUNNING("notRunning"),
+    NOT_RUNNING("not running"),
 
     RUNNING("running"),
     STARTING("starting"),
-    STARTING_FAILED("startingFailed"),
+    STARTING_FAILED("starting failed"),
 
     STOPPING("stopping"),
     STOPPED("stopped"),
-    STOPPING_FAILED("stoppingFailed");
+    STOPPING_FAILED("stopping failed");
 
     private final String state;
 
