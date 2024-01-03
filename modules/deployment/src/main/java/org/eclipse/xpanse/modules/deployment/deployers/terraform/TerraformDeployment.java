@@ -36,6 +36,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -63,8 +64,10 @@ public class TerraformDeployment implements Deployment {
     @Autowired
     public TerraformDeployment(
             DeployEnvironments deployEnvironments,
-            TerraformLocalConfig terraformLocalConfig, PluginManager pluginManager,
-            DeployService deployService, Executor taskExecutor) {
+            TerraformLocalConfig terraformLocalConfig,
+            PluginManager pluginManager,
+            DeployService deployService,
+            @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor) {
         this.deployEnvironments = deployEnvironments;
         this.terraformLocalConfig = terraformLocalConfig;
         this.pluginManager = pluginManager;

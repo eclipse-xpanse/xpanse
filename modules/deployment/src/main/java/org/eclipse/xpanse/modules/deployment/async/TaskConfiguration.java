@@ -25,7 +25,7 @@ public class TaskConfiguration {
      *
      * @return executor
      */
-    @Bean("taskExecutor")
+    @Bean("xpanseAsyncTaskExecutor")
     public Executor taskExecutor() {
         ServiceThreadPoolTaskExecutor executor = new ServiceThreadPoolTaskExecutor();
         executor.setCorePoolSize(CPU_COUNT * 2);
