@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: Huawei Inc.
 #
 ---
-name: xpanse-cd
+name: xpanse-release
 
 on:
   workflow_dispatch:
@@ -152,7 +152,7 @@ jobs:
         run: mvn verify -DskipTests -Pgenerate-openapi-doc
 
       - name: Upload API to SwaggerHub
-        run: mvn io.swagger:swaggerhub-maven-plugin:upload -Dversion=${{ needs.release.outputs.next-version }} -Duser=${{ secrets.SWAGGERHUB_USER }} -Dtoken=${{ secrets.SWAGGERHUB_API_KEY }}
+        run: mvn io.swagger:swaggerhub-maven-plugin:upload -Dswaggerhub.user=${{ secrets.SWAGGERHUB_USER }} -Dswaggerhub.token=${{ secrets.SWAGGERHUB_API_KEY }}
 
   prepare-for-next-development-cycle:
     runs-on: ubuntu-latest

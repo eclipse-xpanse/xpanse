@@ -80,6 +80,9 @@
         <opentelemetry.version>1.32.0</opentelemetry.version>
         <eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
         <swagger.hub.upload.plugin>1.0.10</swagger.hub.upload.plugin>
+        <api.version>${project.version}</api.version>
+        <swaggerhub.user>SWAGGERHUB_UPLOAD_USER</swaggerhub.user>
+        <swaggerhub.token>SWAGGERHUB_UPLOAD_TOKEN</swaggerhub.token>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
@@ -302,6 +305,9 @@
                         <uploadType>inputFile</uploadType>
                         <inputFile>runtime/target/openapi.json</inputFile>
                         <api>XpanseRuntimeApi</api>
+                        <owner>${swaggerhub.user}</owner>
+                        <token>${swaggerhub.token}</token>
+                        <version>${api.version}</version>
                     </configuration>
                 </plugin>
             </plugins>

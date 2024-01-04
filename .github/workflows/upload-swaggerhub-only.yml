@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: Huawei Inc.
 #
 ---
-name: xpanse-cd-docker-only
+name: upload-to-swagger-hub-only
 # This job generates the API doc for the version requested and uploads it to SwaggerHub.
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  release:
+  upload-to-swagger-hub:
     runs-on: ubuntu-latest
     if: github.repository == 'eclipse-xpanse/xpanse'
     permissions:
@@ -28,7 +28,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: v${{github.event.inputs.VersionToBeUploaded}}
 
       - name: Set Up JDK 21
         uses: actions/setup-java@v4
@@ -40,4 +39,4 @@ jobs:
         run: mvn verify -DskipTests -Pgenerate-openapi-doc
 
       - name: Upload API to SwaggerHub
-        run: mvn io.swagger:swaggerhub-maven-plugin:upload -Dversion=${{github.event.inputs.VersionToBeUploaded}} -Duser=${{ secrets.SWAGGERHUB_USER }} -Dtoken=${{ secrets.SWAGGERHUB_API_KEY }}
+        run: mvn io.swagger:swaggerhub-maven-plugin:upload -Dswaggerhub.user=${{ secrets.SWAGGERHUB_USER }} -Dswaggerhub.token=${{ secrets.SWAGGERHUB_API_KEY }}
