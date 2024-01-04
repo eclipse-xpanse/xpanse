@@ -10,6 +10,7 @@ import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.
 import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.HashMap;
@@ -50,10 +51,10 @@ public class WorkFlowApi {
     private IdentityProviderManager identityProviderManager;
 
     /**
-     * Query the tasks that need to be done by me.
+     * Query the tasks that need to be handled by the user.
      */
-    @Tag(name = "WorkFlow", description = "APIs to manage the WorkFlow")
-    @Operation(description = "Query the tasks that need to be done by me")
+    @Tag(name = "Workflow", description = "APIs to manage the Workflow")
+    @Operation(description = "Query the tasks that need to be handled by the user")
     @GetMapping(value = "/workflow/task/todo", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<WorkFlowTask> queryTodoTasks() {
@@ -62,10 +63,10 @@ public class WorkFlowApi {
     }
 
     /**
-     * Query the tasks I have completed.
+     * Query the tasks the given has completed.
      */
-    @Tag(name = "WorkFlow", description = "APIs to manage the WorkFlow")
-    @Operation(description = "Query the tasks I have completed")
+    @Tag(name = "Workflow", description = "APIs to manage the Workflow")
+    @Operation(description = "Query the tasks the given user has completed")
     @GetMapping(value = "/workflow/task/done", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<WorkFlowTask> queryDoneTasks() {
@@ -76,24 +77,32 @@ public class WorkFlowApi {
     /**
      * Complete tasks based on task ID and set global process variables.
      */
-    @Tag(name = "WorkFlow", description = "APIs to manage the WorkFlow")
+    @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Complete tasks by task ID and set global process variables .")
     @PutMapping(value = "/workflow/task/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void completeTask(@PathVariable("id") String taskId, @RequestBody Map<String,
-            Object> variables) {
+    public void completeTask(
+            @Parameter(name = "id",
+                    description = "ID of the workflow task that needs to be handled")
+            @PathVariable("id") String taskId,
+            @RequestBody Map<String, Object> variables) {
         workflowProcessUtils.completeTask(taskId, variables);
     }
 
     /**
-     * Manage failed task orders.
+     * Manage failed workflow tasks.
      */
-    @Tag(name = "WorkFlow", description = "APIs to manage the WorkFlow")
+    @Tag(name = "WorkFlow", description = "APIs to manage the Workflow")
     @Operation(description = "Manage failed task orders.")
     @PutMapping(value = "/workflow/task/{id}/{retryOrder}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void manageFailedOrder(@PathVariable("id") String taskId,
+    public void manageFailedOrder(
+            @Parameter(name = "id",
+                    description = "ID of the workflow task that needs to be handled")
+            @PathVariable("id") String taskId,
+            @Parameter(name = "retryOrder",
+                    description = "Controls if the order must be retried again or simply closed.")
             @PathVariable boolean retryOrder) {
         Map<String, Object> variables = new HashMap<>();
         variables.put(MigrateConstants.IS_RETRY_TASK, retryOrder);

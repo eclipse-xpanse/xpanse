@@ -33,11 +33,11 @@ import org.springframework.context.annotation.Profile;
                 description = "RESTful Services to interact with Xpanse runtime",
                 version = "${app.version}"
         ),
-        security = @SecurityRequirement(name = "OAuth2 Flow",
+        security = @SecurityRequirement(name = "OAuth2Flow",
                 scopes = {OPENID_SCOPE, PROFILE_SCOPE, GRANTED_ROLES_SCOPE, METADATA_SCOPE})
 )
 @SecurityScheme(
-        name = "OAuth2 Flow",
+        name = "OAuth2Flow",
         type = SecuritySchemeType.OAUTH2,
         flows = @OAuthFlows(authorizationCode =
         @OAuthFlow(

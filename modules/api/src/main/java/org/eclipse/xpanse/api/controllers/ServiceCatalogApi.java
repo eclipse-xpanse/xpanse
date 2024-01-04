@@ -65,7 +65,7 @@ public class ServiceCatalogApi {
      * @return response
      */
     @Tag(name = "Service Catalog", description =
-            "APIs to query service templates which are available for the user to order.")
+            "APIs to query the services which are available for the user to order.")
     @Operation(description =
             "List of all registered services which are available for user to order.")
     @GetMapping(value = "/catalog/services",
