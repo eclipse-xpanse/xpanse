@@ -10,7 +10,7 @@ on:
     inputs:
       VersionToBeUploaded:
         type: string
-        description: Enter the version of the API that must be uploaded
+        description: Enter the version of the API that must be uploaded.Eg., 1.0.1
 
 env:
   BOT_USER_NAME: eclipse-xpanse-bot
@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: v${{github.event.inputs.VersionToBeUploaded}}
 
       - name: Set Up JDK 21
         uses: actions/setup-java@v4

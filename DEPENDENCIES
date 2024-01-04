@@ -19,7 +19,7 @@ maven/mavencentral/com.github.fge/jackson-coreutils/1.6, Apache-2.0 or LGPL-3.0-
 maven/mavencentral/com.github.fge/json-patch/1.9, Apache-2.0 or LGPL-3.0-only, approved, #2569
 maven/mavencentral/com.github.fge/msg-simple/1.1, Apache-2.0 OR LGPL-3.0-or-later, approved, #2574
 maven/mavencentral/com.github.openstack4j.core.connectors/openstack4j-resteasy/3.11, None, restricted, #11910
-maven/mavencentral/com.github.openstack4j.core/openstack4j-core/3.11, Apache-2.0 AND LicenseRef-scancode-proprietary-license, restricted, #11880
+maven/mavencentral/com.github.openstack4j.core/openstack4j-core/3.11, Apache-2.0, approved, #11880
 maven/mavencentral/com.github.openstack4j.core/openstack4j/3.11, Apache-2.0 AND LicenseRef-scancode-proprietary-license, restricted, #11933
 maven/mavencentral/com.github.stephenc.jcip/jcip-annotations/1.0-1, Apache-2.0, approved, CQ21949
 maven/mavencentral/com.google.code.findbugs/jsr305/2.0.0, BSD-3-Clause AND CC-BY-2.5 AND LGPL-2.1+, approved, CQ13390
@@ -137,24 +137,24 @@ maven/mavencentral/org.bouncycastle/bcprov-jdk18on/1.75, MIT AND CC0-1.0, approv
 maven/mavencentral/org.checkerframework/checker-compat-qual/2.0.0, CC-BY-2.5, approved, #804
 maven/mavencentral/org.checkerframework/checker-qual/3.37.0, MIT, approved, clearlydefined
 maven/mavencentral/org.codehaus.mojo/animal-sniffer-annotations/1.14, Apache-2.0 AND MIT, approved, CQ19603
-maven/mavencentral/org.eclipse.xpanse.modules/api/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/common/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/credential/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/database/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/deployment/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/logging/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/models/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/monitor/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/observability/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/orchestrator/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/policy/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/security/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/servicetemplate/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/workflow/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.plugins/flexibleengine/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.plugins/huaweicloud/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.plugins/openstack/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.plugins/scs/1.0.6-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/api/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/common/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/credential/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/database/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/deployment/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/logging/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/models/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/monitor/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/observability/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/orchestrator/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/policy/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/security/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/servicetemplate/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/workflow/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.plugins/flexibleengine/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.plugins/huaweicloud/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.plugins/openstack/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.plugins/scs/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
 maven/mavencentral/org.hibernate.orm/hibernate-core/6.4.1.Final, LGPL-2.1-only AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND (LGPL-2.1-only AND LicenseRef-scancode-proprietary-license) AND (Apache-2.0 AND LGPL-2.1-only) AND MIT AND (CC-PDDC AND LGPL-2.1-only) AND (EPL-2.0 OR BSD-3-Clause) AND (LGPL-2.1-only AND LicenseRef-scancode-generic-exception), restricted, #12490
 maven/mavencentral/org.hibernate.validator/hibernate-validator/8.0.1.Final, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.jboss.logging/jboss-logging/3.5.3.Final, Apache-2.0, approved, #9471
