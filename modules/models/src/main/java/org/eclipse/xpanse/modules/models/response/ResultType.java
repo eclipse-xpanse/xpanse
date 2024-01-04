@@ -54,7 +54,8 @@ public enum ResultType {
     POLICY_VALIDATION_FAILED("Policy Validation Failed"),
     POLICY_EVALUATION_FAILED("Policy Evaluation Failed"),
     USER_NO_LOGIN_EXCEPTION("Current Login User No Found"),
-    SERVICE_DETAILS_NOT_ACCESSIBLE("Service Details No Accessible");
+    SERVICE_DETAILS_NOT_ACCESSIBLE("Service Details No Accessible"),
+    ACTIVITI_TASK_NOT_FOUND("Migrating activiti Task Not Found");
 
     private final String value;
 

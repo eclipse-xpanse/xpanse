@@ -9,6 +9,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ActivitiTaskNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
@@ -168,6 +169,18 @@ public class DeploymentExceptionHandler {
     public Response handleServiceDetailsNotAccessible(
             ServiceDetailsNotAccessible ex) {
         return Response.errorResponse(ResultType.SERVICE_DETAILS_NOT_ACCESSIBLE,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ActivitiTaskNotFoundException.
+     */
+    @ExceptionHandler({ActivitiTaskNotFoundException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleActivitiTaskNotFoundException(
+            ActivitiTaskNotFoundException ex) {
+        return Response.errorResponse(ResultType.ACTIVITI_TASK_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 }

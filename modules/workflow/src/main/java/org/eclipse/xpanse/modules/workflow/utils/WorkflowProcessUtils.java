@@ -18,6 +18,7 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -93,6 +94,7 @@ public class WorkflowProcessUtils {
      * @param variables global process variables.
      */
     public void completeTask(String taskId, Map<String, Object> variables) {
+        vaildateTaskId(taskId);
         taskService.complete(taskId, variables);
     }
 
@@ -119,5 +121,13 @@ public class WorkflowProcessUtils {
     private List<WorkFlowTask> transHistoricTaskInstanceToWorkFlowTask(
             List<HistoricTaskInstance> list) {
         return list.stream().map(this::getWorkFlow).collect(Collectors.toList());
+    }
+
+    private void vaildateTaskId(String taskId) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new ServiceNotDeployedException("The migrated activiti task was not found, "
+                    + "taskId: " + taskId);
+        }
     }
 }
