@@ -16,6 +16,7 @@ import com.huaweicloud.sdk.core.http.HttpConfig;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -76,7 +77,7 @@ class FlexibleEngineMonitorIntegrationTest {
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
-        return new ResourceMetricsRequest(deployResource, monitorResourceType, from, to, null,
+        return new ResourceMetricsRequest(UUID.randomUUID(), deployResource, monitorResourceType, from, to, null,
                 onlyLastKnownMetric, "userId");
 
     }
@@ -97,7 +98,7 @@ class FlexibleEngineMonitorIntegrationTest {
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
-        return new ServiceMetricsRequest(List.of(deployResource), monitorResourceType, from, to,
+        return new ServiceMetricsRequest(UUID.randomUUID(), List.of(deployResource), monitorResourceType, from, to,
                 null, onlyLastKnownMetric, "userId");
     }
 

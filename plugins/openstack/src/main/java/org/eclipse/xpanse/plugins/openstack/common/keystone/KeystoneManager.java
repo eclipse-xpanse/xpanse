@@ -10,7 +10,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -34,10 +39,22 @@ import org.springframework.stereotype.Component;
 public class KeystoneManager {
 
     private final Environment environment;
+    private final DeployEnvironments deployEnvironments;
+    private final DeployServiceStorage deployServiceStorage;
 
+    /**
+     * Constructor for KeystoneManager.
+     *
+     * @param environment          Environment Bean
+     * @param deployEnvironments   DeployEnvironments Bean
+     * @param deployServiceStorage DeployServiceStorage JPA
+     */
     @Autowired
-    public KeystoneManager(Environment environment) {
+    public KeystoneManager(Environment environment, DeployEnvironments deployEnvironments,
+                           DeployServiceStorage deployServiceStorage) {
         this.environment = environment;
+        this.deployEnvironments = deployEnvironments;
+        this.deployServiceStorage = deployServiceStorage;
     }
 
     private static String getIpAddressFromUrl(String url) {
@@ -54,8 +71,8 @@ public class KeystoneManager {
      *
      * @param credential Credential information available for Openstack in the runtime.
      */
-    public void authenticate(AbstractCredentialInfo credential) {
-        getAuthenticatedClient(credential);
+    public void authenticate(UUID serviceId, AbstractCredentialInfo credential) {
+        getAuthenticatedClient(serviceId, credential);
     }
 
     /**
@@ -63,7 +80,9 @@ public class KeystoneManager {
      *
      * @param credential Credential information available for Openstack in the runtime.
      */
-    public OSClient.OSClientV3 getAuthenticatedClient(AbstractCredentialInfo credential) {
+    public OSClient.OSClientV3 getAuthenticatedClient(UUID serviceId,
+                                                      AbstractCredentialInfo credential) {
+
         String userName = null;
         String password = null;
         String tenant = null;
@@ -98,7 +117,7 @@ public class KeystoneManager {
         OSFactory.enableHttpLoggingFilter(true);
         // there is no need to return the authenticated client because the below method already sets
         // the authentication details in the thread context.
-        String url = this.environment.getRequiredProperty(OpenstackEnvironmentConstants.AUTH_URL);
+        String url = getUrlFromDeploymentVariables(serviceId);
         String serviceTenant =
                 this.environment.getProperty(OpenstackEnvironmentConstants.SERVICE_PROJECT);
         String proxyHost = this.environment.getProperty(OpenstackEnvironmentConstants.PROXY_HOST);
@@ -128,5 +147,19 @@ public class KeystoneManager {
             config.withSSLVerificationDisabled();
         }
         return config;
+    }
+
+    private String getUrlFromDeploymentVariables(UUID serviceId) {
+        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(
+                serviceId);
+        Map<String, Object> serviceRequestVariables =
+                this.deployEnvironments.getAllDeploymentVariablesForService(
+                        deployServiceEntity.getDeployRequest().getServiceRequestProperties(),
+                        deployServiceEntity.getDeployRequest().getOcl().getDeployment()
+                                .getVariables(),
+                        deployServiceEntity.getFlavor(),
+                        deployServiceEntity.getDeployRequest().getOcl()
+                );
+        return (String) serviceRequestVariables.get(OpenstackEnvironmentConstants.AUTH_URL);
     }
 }

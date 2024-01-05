@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.UUID;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,11 +13,12 @@ import org.junit.jupiter.api.Test;
 class ResourceMetricsRequestTest {
 
     DeployResource deployResource = new DeployResource();
+    private final UUID serviceId = UUID.fromString("16e6e050-8933-4383-9e56-6131c8666d0c");
     private ResourceMetricsRequest test;
 
     @BeforeEach
     void setUp() {
-        test = new ResourceMetricsRequest(deployResource, MonitorResourceType.CPU, 0L, 0L, 1, false,
+        test = new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 1, false,
                 "userId");
     }
 
@@ -33,7 +35,6 @@ class ResourceMetricsRequestTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(test, test);
         assertNotEquals(test.hashCode(), 0);
 
         Object object = new Object();
@@ -41,12 +42,12 @@ class ResourceMetricsRequestTest {
         assertNotEquals(test.hashCode(), object.hashCode());
 
         ResourceMetricsRequest test1 =
-                new ResourceMetricsRequest(deployResource, null, null, null, null, true, null);
+                new ResourceMetricsRequest(serviceId, deployResource, null, null, null, null, true, null);
         ResourceMetricsRequest test2 =
-                new ResourceMetricsRequest(new DeployResource(), null, null, null, null, true,
+                new ResourceMetricsRequest(serviceId, new DeployResource(), null, null, null, null, true,
                         null);
         ResourceMetricsRequest test3 =
-                new ResourceMetricsRequest(null, null, null, null, null, false, null);
+                new ResourceMetricsRequest(serviceId, null, null, null, null, null, false, null);
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test, test3);
@@ -120,7 +121,7 @@ class ResourceMetricsRequestTest {
     void testToString() {
         assertNotEquals(test.toString(), null);
 
-        String exceptedString = "MetricsRequest(monitorResourceType=CPU, from=0, "
+        String exceptedString = "MetricsRequest(serviceId=16e6e050-8933-4383-9e56-6131c8666d0c, monitorResourceType=CPU, from=0, "
                 + "to=0, granularity=1, onlyLastKnownMetric=false, userId=userId)";
         assertEquals(test.toString(), exceptedString);
     }

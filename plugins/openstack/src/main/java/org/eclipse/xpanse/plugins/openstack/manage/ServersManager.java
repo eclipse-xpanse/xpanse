@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.plugins.openstack.manage;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
@@ -50,7 +51,8 @@ public class ServersManager {
      * Start the OpenStack Ecs server.
      */
     public boolean startService(ServiceManagerRequest serviceManagerRequest) {
-        OSClient.OSClientV3 osClient = getOsClient(serviceManagerRequest.getUserId());
+        OSClient.OSClientV3 osClient = getOsClient(
+                serviceManagerRequest.getUserId(), serviceManagerRequest.getServiceId());
         int failedCount = 0;
         for (DeployResourceEntity resource : serviceManagerRequest.getDeployResourceEntityList()) {
             Server serverBeforeStart = osClient.compute().servers().get(resource.getResourceId());
@@ -76,7 +78,8 @@ public class ServersManager {
      * Stop the OpenStack Ecs server.
      */
     public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
-        OSClient.OSClientV3 osClient = getOsClient(serviceManagerRequest.getUserId());
+        OSClient.OSClientV3 osClient = getOsClient(
+                serviceManagerRequest.getUserId(), serviceManagerRequest.getServiceId());
         int failureCount = 0;
         for (DeployResourceEntity resource : serviceManagerRequest.getDeployResourceEntityList()) {
             Server serverBeforeStop = osClient.compute().servers().get(resource.getResourceId());
@@ -101,7 +104,8 @@ public class ServersManager {
      * Restart the OpenStack Ecs server.
      */
     public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
-        OSClient.OSClientV3 osClient = getOsClient(serviceManagerRequest.getUserId());
+        OSClient.OSClientV3 osClient = getOsClient(
+                serviceManagerRequest.getUserId(), serviceManagerRequest.getServiceId());
         int failureCount = 0;
         for (DeployResourceEntity resource : serviceManagerRequest.getDeployResourceEntityList()) {
             Server serverBeforeRestart = osClient.compute().servers().get(resource.getResourceId());
@@ -123,10 +127,10 @@ public class ServersManager {
         return failureCount == 0;
     }
 
-    private OSClient.OSClientV3 getOsClient(String userId) {
+    private OSClient.OSClientV3 getOsClient(String userId, UUID serviceId) {
         AbstractCredentialInfo credentialInfo =
                 credentialCenter.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, userId);
-        return keystoneManager.getAuthenticatedClient(credentialInfo);
+        return keystoneManager.getAuthenticatedClient(serviceId, credentialInfo);
     }
 }
 

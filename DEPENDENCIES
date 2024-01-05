@@ -18,9 +18,9 @@ maven/mavencentral/com.github.fge/btf/1.2, Apache-2.0 OR LGPL-2.0-or-later, appr
 maven/mavencentral/com.github.fge/jackson-coreutils/1.6, Apache-2.0 or LGPL-3.0-only, approved, #2572
 maven/mavencentral/com.github.fge/json-patch/1.9, Apache-2.0 or LGPL-3.0-only, approved, #2569
 maven/mavencentral/com.github.fge/msg-simple/1.1, Apache-2.0 OR LGPL-3.0-or-later, approved, #2574
-maven/mavencentral/com.github.openstack4j.core.connectors/openstack4j-resteasy/3.11, None, restricted, #11910
+maven/mavencentral/com.github.openstack4j.core.connectors/openstack4j-resteasy/3.11, MIT, approved, #11910
 maven/mavencentral/com.github.openstack4j.core/openstack4j-core/3.11, Apache-2.0, approved, #11880
-maven/mavencentral/com.github.openstack4j.core/openstack4j/3.11, Apache-2.0 AND LicenseRef-scancode-proprietary-license, restricted, #11933
+maven/mavencentral/com.github.openstack4j.core/openstack4j/3.11, Apache-2.0, approved, #11933
 maven/mavencentral/com.github.stephenc.jcip/jcip-annotations/1.0-1, Apache-2.0, approved, CQ21949
 maven/mavencentral/com.google.code.findbugs/jsr305/2.0.0, BSD-3-Clause AND CC-BY-2.5 AND LGPL-2.1+, approved, CQ13390
 maven/mavencentral/com.google.code.findbugs/jsr305/3.0.2, Apache-2.0, approved, #20
@@ -58,7 +58,7 @@ maven/mavencentral/io.micrometer/micrometer-observation/1.12.1, Apache-2.0, appr
 maven/mavencentral/io.opentelemetry.instrumentation/opentelemetry-instrumentation-annotations/1.32.0, Apache-2.0, approved, #11684
 maven/mavencentral/io.opentelemetry.instrumentation/opentelemetry-instrumentation-api-semconv/1.32.0-alpha, Apache-2.0, approved, #11885
 maven/mavencentral/io.opentelemetry.instrumentation/opentelemetry-instrumentation-api/1.32.0, Apache-2.0, approved, clearlydefined
-maven/mavencentral/io.opentelemetry.instrumentation/opentelemetry-spring-boot-starter/1.32.0-alpha, None, restricted, #11906
+maven/mavencentral/io.opentelemetry.instrumentation/opentelemetry-spring-boot-starter/1.32.0-alpha, Apache-2.0, approved, #11906
 maven/mavencentral/io.opentelemetry.instrumentation/opentelemetry-spring-boot/1.32.0-alpha, Apache-2.0, approved, #11886
 maven/mavencentral/io.opentelemetry.semconv/opentelemetry-semconv/1.21.0-alpha, Apache-2.0, approved, clearlydefined
 maven/mavencentral/io.opentelemetry/opentelemetry-api/1.32.0, Apache-2.0, approved, #11682
@@ -170,9 +170,9 @@ maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib/1.9.21, Apache-2.0, approv
 maven/mavencentral/org.jetbrains/annotations/13.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.jetbrains/annotations/17.0.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.mybatis/mybatis/3.5.10, Apache-2.0, approved, #1572
-maven/mavencentral/org.openeuler/bgmprovider/1.0.7, GPL-2.0-only WITH Classpath-exception-2.0, restricted, #11881
-maven/mavencentral/org.openeuler/jca/1.0.7, GPL-2.0-only WITH Classpath-exception-2.0, restricted, #11900
-maven/mavencentral/org.openeuler/jsse/1.0.7, GPL-2.0-only WITH Classpath-exception-2.0, restricted, #11884
+maven/mavencentral/org.openeuler/bgmprovider/1.0.7, GPL-2.0-only WITH Classpath-exception-2.0, approved, #11881
+maven/mavencentral/org.openeuler/jca/1.0.7, GPL-2.0-only WITH Classpath-exception-2.0, approved, #11900
+maven/mavencentral/org.openeuler/jsse/1.0.7, GPL-2.0-only WITH Classpath-exception-2.0, approved, #11884
 maven/mavencentral/org.ow2.asm/asm/9.6, BSD-3-Clause, approved, #10776
 maven/mavencentral/org.projectlombok/lombok/1.18.30, MIT AND LicenseRef-Public-Domain, approved, CQ23907
 maven/mavencentral/org.reactivestreams/reactive-streams/1.0.4, CC0-1.0, approved, CQ16332

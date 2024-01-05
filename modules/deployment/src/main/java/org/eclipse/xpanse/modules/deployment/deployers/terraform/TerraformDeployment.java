@@ -109,15 +109,15 @@ public class TerraformDeployment implements Deployment {
     }
 
     private void asyncExecDeploy(DeployTask task, DeployResult deployResult) {
+        String workspace = getWorkspacePath(task.getId().toString());
+        // Create the workspace.
+        buildWorkspace(workspace);
+        createScriptFile(task.getDeployRequest().getCsp(),
+                task.getDeployRequest().getRegion(),
+                workspace, task.getOcl().getDeployment().getDeployer());
+        TerraformExecutor executor = getExecutorForDeployTask(task, workspace, true);
+        // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
-            String workspace = getWorkspacePath(task.getId().toString());
-            // Create the workspace.
-            buildWorkspace(workspace);
-            createScriptFile(task.getDeployRequest().getCsp(), task.getDeployRequest().getRegion(),
-                    workspace, task.getOcl().getDeployment().getDeployer());
-            // Execute the terraform command.
-            TerraformExecutor executor = getExecutorForDeployTask(task, workspace, true);
-
             try {
                 executor.deploy();
                 deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
@@ -135,12 +135,13 @@ public class TerraformDeployment implements Deployment {
     }
 
     private void asyncExecDestroy(DeployTask task, DeployResult destroyResult, String tfState) {
+        String taskId = task.getId().toString();
+        String workspace = getWorkspacePath(taskId);
+        createDestroyScriptFile(task.getDeployRequest().getCsp(),
+                task.getDeployRequest().getRegion(), workspace, tfState);
+        TerraformExecutor executor = getExecutorForDeployTask(task, workspace, false);
+        // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
-            String taskId = task.getId().toString();
-            String workspace = getWorkspacePath(taskId);
-            createDestroyScriptFile(task.getDeployRequest().getCsp(),
-                    task.getDeployRequest().getRegion(), workspace, tfState);
-            TerraformExecutor executor = getExecutorForDeployTask(task, workspace, false);
             try {
                 executor.destroy();
                 destroyResult.setState(TerraformExecState.DESTROY_SUCCESS);
@@ -158,7 +159,8 @@ public class TerraformDeployment implements Deployment {
     }
 
     private TerraformResult getTerraformResult(TerraformExecutor executor,
-            DeployResult deployResult, TerraformExecState state) {
+                                               DeployResult deployResult,
+                                               TerraformExecState state) {
         TerraformResult terraformResult = new TerraformResult();
         terraformResult.setTerraformState(executor.getTerraformState());
         if (deployResult.getState() == state) {
@@ -245,14 +247,19 @@ public class TerraformDeployment implements Deployment {
     private TerraformExecutor getExecutorForDeployTask(DeployTask task,
                                                        String workspace,
                                                        boolean isDeployTask) {
-        Map<String, String> envVariables = this.deployEnvironments.getEnv(task);
-        Map<String, Object> inputVariables = this.deployEnvironments.getVariables(
+        Map<String, String> envVariables = this.deployEnvironments.getEnvFromDeployTask(task);
+        Map<String, Object> inputVariables = this.deployEnvironments.getVariablesFromDeployTask(
                 task, isDeployTask);
         // load flavor variables also as input variables for terraform executor.
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(task));
         // load credential variables also as env variables for terraform executor.
-        envVariables.putAll(this.deployEnvironments.getCredentialVariablesByHostingType(task));
-        envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(task));
+        envVariables.putAll(this.deployEnvironments.getCredentialVariablesByHostingType(
+                task.getDeployRequest().getServiceHostingType(),
+                task.getOcl().getDeployment().getCredentialType(),
+                task.getDeployRequest().getCsp(),
+                task.getDeployRequest().getUserId()));
+        envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(
+                task.getDeployRequest().getCsp()));
         return getExecutor(envVariables, inputVariables, workspace);
     }
 

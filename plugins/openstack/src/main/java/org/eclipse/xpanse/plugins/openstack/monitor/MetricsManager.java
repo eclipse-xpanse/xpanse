@@ -84,8 +84,7 @@ public class MetricsManager {
      * @return returns list of Metrics.
      */
     public List<Metric> getMetrics(ResourceMetricsRequest resourceMetricRequest) {
-
-        keystoneManager.authenticate(
+        keystoneManager.authenticate(resourceMetricRequest.getServiceId(),
                 credentialCenter.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES,
                         resourceMetricRequest.getUserId()));
         MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
@@ -189,16 +188,7 @@ public class MetricsManager {
                 serviceMetricsStore.storeMonitorMetric(Csp.OPENSTACK, resourceId,
                         monitorResourceType, metric);
 
-            } else {
-                Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.OPENSTACK, resourceId,
-                        monitorResourceType);
-                if (Objects.nonNull(cacheMetric) && !CollectionUtils.isEmpty(
-                        cacheMetric.getMetrics())) {
-                    metric = cacheMetric;
-                }
             }
         }
     }
-
-
 }
