@@ -139,6 +139,9 @@ jobs:
 
   upload-to-swagger-hub:
     runs-on: ubuntu-latest
+    env:
+      SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+      SWAGGERHUB_USER: ${{ secrets.SWAGGERHUB_USER }}
     if: github.repository == 'eclipse-xpanse/xpanse'
     needs: release
     steps:
@@ -157,8 +160,13 @@ jobs:
       - name: Generate API doc
         run: mvn verify -DskipTests -Pgenerate-openapi-doc
 
-      - name: Upload API to SwaggerHub
-        run: mvn io.swagger:swaggerhub-maven-plugin:upload -Dswaggerhub.user=${{ secrets.SWAGGERHUB_USER }} -Dswaggerhub.token=${{ secrets.SWAGGERHUB_API_KEY }}
+      - name: Install SwaggerHub CLI
+        run: npm i -g swaggerhub-cli
+
+      - name: Create API
+        # takes the version automatically from the generated API doc.
+        run: |
+          swaggerhub api:create ${{ env.SWAGGERHUB_USER }}/XpanseRuntimeApi --file runtime/target/openapi.json --visibility=public --published=publish --setdefault
 
   prepare-for-next-development-cycle:
     runs-on: ubuntu-latest

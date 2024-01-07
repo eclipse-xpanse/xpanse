@@ -11,6 +11,10 @@ on:
       VersionToBeUploaded:
         type: string
         description: Enter the version of the API that must be uploaded.Eg., 1.0.1
+      IsDefaultVersion:
+        type: boolean
+        default: false
+        description: Is the version the new default version.
 
 env:
   BOT_USER_NAME: eclipse-xpanse-bot
@@ -20,6 +24,9 @@ env:
 jobs:
   upload-to-swagger-hub:
     runs-on: ubuntu-latest
+    env:
+      SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+      SWAGGERHUB_USER: ${{ secrets.SWAGGERHUB_USER }}
     if: github.repository == 'eclipse-xpanse/xpanse'
     permissions:
       packages: write
@@ -39,5 +46,13 @@ jobs:
       - name: Generate API doc
         run: mvn verify -DskipTests -Pgenerate-openapi-doc
 
-      - name: Upload API to SwaggerHub
-        run: mvn io.swagger:swaggerhub-maven-plugin:upload -Dswaggerhub.user=${{ secrets.SWAGGERHUB_USER }} -Dswaggerhub.token=${{ secrets.SWAGGERHUB_API_KEY }}
+      - name: Install SwaggerHub CLI
+        run: npm i -g swaggerhub-cli
+
+      - name: Create API with the version as default
+        if: ${{ github.event.inputs.IsDefaultVersion == 'true' }}
+        run: swaggerhub api:create ${{ env.SWAGGERHUB_USER }}/XpanseRuntimeApi --file runtime/target/openapi.json --visibility=public --published=publish --setdefault
+
+      - name: Create API as Non-default
+        if: ${{ github.event.inputs.IsDefaultVersion== 'false' }}
+        run: swaggerhub api:create ${{ env.SWAGGERHUB_USER }}/XpanseRuntimeApi --file runtime/target/openapi.json --visibility=public --published=publish
