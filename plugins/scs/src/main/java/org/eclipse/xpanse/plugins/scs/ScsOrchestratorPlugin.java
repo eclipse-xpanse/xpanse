@@ -21,7 +21,8 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.plugins.scs.constants.ScsEnvironmentConstants;
+import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
+import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,13 +35,16 @@ import org.springframework.stereotype.Component;
 public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
     private final ScsTerraformResourceHandler scsTerraformResourceHandler;
+    private final ScsServersManager scsServersManager;
 
     @Value("${terraform.provider.scs.version}")
     private String terraformScsVersion;
 
     @Autowired
-    public ScsOrchestratorPlugin(ScsTerraformResourceHandler scsTerraformResourceHandler) {
+    public ScsOrchestratorPlugin(ScsTerraformResourceHandler scsTerraformResourceHandler,
+                                 ScsServersManager scsServersManager) {
         this.scsTerraformResourceHandler = scsTerraformResourceHandler;
+        this.scsServersManager = scsServersManager;
     }
 
 
@@ -146,16 +150,16 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public boolean startService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
+        return scsServersManager.startService(serviceManagerRequest);
     }
 
     @Override
     public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
+        return scsServersManager.stopService(serviceManagerRequest);
     }
 
     @Override
     public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
-        return true;
+        return scsServersManager.restartService(serviceManagerRequest);
     }
 }

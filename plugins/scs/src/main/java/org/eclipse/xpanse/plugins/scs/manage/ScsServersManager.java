@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.plugins.openstack.manage;
+package org.eclipse.xpanse.plugins.scs.manage;
 
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
-import org.eclipse.xpanse.plugins.openstack.common.keystone.KeystoneManager;
+import org.eclipse.xpanse.plugins.scs.common.keystone.ScsKeystoneManager;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.common.ActionResponse;
 import org.openstack4j.model.compute.Action;
@@ -23,13 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Class to manage state of VMs for Openstack plugin.
+ * Class to manage state of VMs for SCS plugin.
  */
 @Slf4j
 @Component
-public class ServersManager {
+public class ScsServersManager {
 
-    private final KeystoneManager keystoneManager;
+    private final ScsKeystoneManager scsKeystoneManager;
 
     private final CredentialCenter credentialCenter;
 
@@ -37,18 +37,19 @@ public class ServersManager {
     /**
      * Constructor for the MetricsManager bean.
      *
-     * @param keystoneManager  KeystoneManager bean.
+     * @param scsKeystoneManager  KeystoneManager bean.
      * @param credentialCenter credentialCenter bean.
      */
     @Autowired
-    public ServersManager(KeystoneManager keystoneManager, CredentialCenter credentialCenter) {
-        this.keystoneManager = keystoneManager;
+    public ScsServersManager(ScsKeystoneManager scsKeystoneManager,
+                             CredentialCenter credentialCenter) {
+        this.scsKeystoneManager = scsKeystoneManager;
         this.credentialCenter = credentialCenter;
     }
 
 
     /**
-     * Start the OpenStack Nova VM.
+     * Start the SCS VM.
      */
     public boolean startService(ServiceManagerRequest serviceManagerRequest) {
         OSClient.OSClientV3 osClient = getOsClient(
@@ -75,7 +76,7 @@ public class ServersManager {
 
 
     /**
-     * Stop the OpenStack Nova VM.
+     * Stop the SCS VM.
      */
     public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
         OSClient.OSClientV3 osClient = getOsClient(
@@ -101,7 +102,7 @@ public class ServersManager {
     }
 
     /**
-     * Restart the OpenStack Nova VM.
+     * Restart the SCS VM.
      */
     public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
         OSClient.OSClientV3 osClient = getOsClient(
@@ -129,8 +130,8 @@ public class ServersManager {
 
     private OSClient.OSClientV3 getOsClient(String userId, UUID serviceId) {
         AbstractCredentialInfo credentialInfo =
-                credentialCenter.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES, userId);
-        return keystoneManager.getAuthenticatedClient(serviceId, credentialInfo);
+                credentialCenter.getCredential(Csp.SCS, CredentialType.VARIABLES, userId);
+        return scsKeystoneManager.getAuthenticatedClient(serviceId, credentialInfo);
     }
 }
 
