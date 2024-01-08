@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.orchestrator.monitor;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
@@ -18,6 +19,8 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 @SuppressWarnings("UnnecessarilyFullyQualified")
 public class MetricsRequest {
 
+    private UUID serviceId;
+
     private MonitorResourceType monitorResourceType;
 
     private Long from;
@@ -29,4 +32,6 @@ public class MetricsRequest {
     private boolean onlyLastKnownMetric;
 
     private String userId;
+
+
 }

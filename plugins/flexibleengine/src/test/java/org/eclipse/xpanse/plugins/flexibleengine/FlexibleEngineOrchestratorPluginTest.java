@@ -88,13 +88,14 @@ class FlexibleEngineOrchestratorPluginTest {
     @Test
     void testGetMetricsForResource() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -118,7 +119,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByResource(
                 resourceMetricRequest1)).thenReturn(metrics);
@@ -134,13 +135,14 @@ class FlexibleEngineOrchestratorPluginTest {
     @Test
     void testGetMetricsForResource_FlexibleEngineMetricsServiceReturnsNoItems() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
 
         // Configure FlexibleEngineMetricsService.getMetricsByResource(...).
@@ -150,7 +152,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByResource(
                 resourceMetricRequest1)).thenReturn(Collections.emptyList());
@@ -166,13 +168,14 @@ class FlexibleEngineOrchestratorPluginTest {
     @Test
     void testGetMetricsForService() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -196,7 +199,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByService(
                 serviceMetricRequest1)).thenReturn(metrics);
@@ -212,13 +215,14 @@ class FlexibleEngineOrchestratorPluginTest {
     @Test
     void testGetMetricsForService_FlexibleEngineMetricsServiceReturnsNoItems() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
 
         // Configure FlexibleEngineMetricsService.getMetricsByService(...).
@@ -228,7 +232,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByService(
                 serviceMetricRequest1)).thenReturn(Collections.emptyList());

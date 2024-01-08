@@ -109,7 +109,7 @@ class TerraformDeploymentTest {
         deployRequest.setServiceRequestProperties(Map.ofEntries(Map.entry("key", "value")));
 
         doReturn(new HashMap<>()).when(this.deployEnvironments)
-                .getCredentialVariablesByHostingType(any(DeployTask.class));
+                .getCredentialVariablesByHostingType(any(), any(), any(), any());
 
         doReturn("""
                 terraform {
@@ -181,7 +181,7 @@ class TerraformDeploymentTest {
         deployTask.setDeployResourceHandler(null);
         deployTask.setDeployRequest(deployRequest);
         DeployResult deployResult = this.terraformDeployment.deploy(deployTask);
-        Assertions.assertEquals(null, deployResult.getState());
+        Assertions.assertNull(deployResult.getState());
         Assertions.assertNotEquals(TerraformExecState.DEPLOY_SUCCESS.toValue(),
                 deployResult.getMessage());
 
@@ -197,7 +197,7 @@ class TerraformDeploymentTest {
         deployTask.setDeployRequest(deployRequest);
         DeployResult deployResult = this.terraformDeployment.destroy(deployTask, "error_tfState");
         Assertions.assertTrue(deployResult.getProperties().isEmpty());
-        Assertions.assertEquals(null, deployResult.getState());
+        Assertions.assertNull(deployResult.getState());
         Assertions.assertNotEquals(TerraformExecState.DESTROY_FAILED.toValue(),
                 deployResult.getMessage());
     }

@@ -18,7 +18,12 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
+import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
@@ -28,8 +33,10 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.eclipse.xpanse.plugins.openstack.OpenstackOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.common.keystone.KeystoneManager;
@@ -57,7 +64,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {OpenstackOrchestratorPlugin.class, MetricsManager.class,
         KeystoneManager.class, ResourcesService.class, GnocchiToXpanseModelConverter.class,
         AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class,
-        CredentialCenter.class, ServiceMetricsStore.class, OpenstackTerraformResourceHandler.class})
+        CredentialCenter.class, ServiceMetricsStore.class, OpenstackTerraformResourceHandler.class,
+        DeployEnvironments.class, AesUtil.class, PluginManager.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpenstackMonitoringIntegrationTest {
 
@@ -78,6 +86,10 @@ class OpenstackMonitoringIntegrationTest {
     ServiceMetricsStore serviceMetricsStore;
     @MockBean
     ServersManager serversManager;
+    @MockBean
+    private DatabaseDeployServiceStorage databaseDeployServiceStorage;
+    @MockBean
+    private DeployEnvironments deployEnvironments;
 
     @BeforeAll
     void setEnvVar() {
@@ -87,7 +99,7 @@ class OpenstackMonitoringIntegrationTest {
 
     public ResourceMetricsRequest setupResourceRequest(Long from, Long to, Integer period,
                                                        boolean onlyLastKnownMetric) {
-        return new ResourceMetricsRequest(
+        return new ResourceMetricsRequest(UUID.randomUUID(),
                 Instancio.of(DeployResource.class).set(Select.field(DeployResource::getKind),
                         DeployResourceKind.VM).set(Select.field(DeployResource::getResourceId),
                         "7b5b6ee6-cab4-4e72-be6e-854a67c6d381").create(),
@@ -96,7 +108,7 @@ class OpenstackMonitoringIntegrationTest {
 
     public ServiceMetricsRequest setupServiceRequest(Long from, Long to, Integer period,
                                                      boolean onlyLastKnownMetric) {
-        return new ServiceMetricsRequest(
+        return new ServiceMetricsRequest(UUID.randomUUID(),
                 List.of(Instancio.of(DeployResource.class)
                         .set(Select.field(DeployResource::getKind),
                                 DeployResourceKind.VM)
@@ -109,6 +121,10 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsHappyCase() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                Instancio.create(DeployServiceEntity.class));
+        when(this.deployEnvironments.getAllDeploymentVariablesForService(
+                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, null, false));
         Assertions.assertFalse(metrics.isEmpty());
@@ -128,6 +144,10 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsWithFromAndTo() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                Instancio.create(DeployServiceEntity.class));
+        when(this.deployEnvironments.getAllDeploymentVariablesForService(
+                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         Long currentTime = Instant.now().getEpochSecond();
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(
@@ -149,6 +169,10 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsWithGranularity() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                Instancio.create(DeployServiceEntity.class));
+        when(this.deployEnvironments.getAllDeploymentVariablesForService(
+                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, false));
         Assertions.assertFalse(metrics.isEmpty());
@@ -164,6 +188,10 @@ class OpenstackMonitoringIntegrationTest {
     void testGetOnlyLastKnownMetric() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                Instancio.create(DeployServiceEntity.class));
+        when(this.deployEnvironments.getAllDeploymentVariablesForService(
+                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());
@@ -181,6 +209,10 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsForServiceOnlyLastKnownMetric() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                Instancio.create(DeployServiceEntity.class));
+        when(this.deployEnvironments.getAllDeploymentVariablesForService(
+                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
                 this.plugin.getMetricsForService(setupServiceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());

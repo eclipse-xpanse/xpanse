@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -51,6 +52,7 @@ public class ServiceMetricsAdapter {
     /**
      * The constructor of Monitor.
      */
+    @Autowired
     public ServiceMetricsAdapter(DeployServiceStorage deployServiceStorage,
                                  DeployResourceStorage deployResourceStorage,
                                  PluginManager pluginManager,
@@ -93,7 +95,7 @@ public class ServiceMetricsAdapter {
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
 
         ServiceMetricsRequest serviceMetricRequest =
-                getServiceMetricRequest(vmResources, monitorType, from,
+                getServiceMetricRequest(UUID.fromString(id), vmResources, monitorType, from,
                         to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
 
         return orchestratorPlugin.getMetricsForService(serviceMetricRequest);
@@ -135,8 +137,15 @@ public class ServiceMetricsAdapter {
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
         ResourceMetricsRequest resourceMetricRequest =
-                getResourceMetricRequest(deployResource, monitorType, from,
-                        to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
+                getResourceMetricRequest(
+                        resourceEntity.getDeployService().getId(),
+                        deployResource,
+                        monitorType,
+                        from,
+                        to,
+                        granularity,
+                        onlyLastKnownMetric,
+                        serviceEntity.getUserId());
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
     }
 
@@ -150,7 +159,8 @@ public class ServiceMetricsAdapter {
         return serviceEntity;
     }
 
-    private ResourceMetricsRequest getResourceMetricRequest(DeployResource deployResource,
+    private ResourceMetricsRequest getResourceMetricRequest(UUID serviceId,
+                                                            DeployResource deployResource,
                                                             MonitorResourceType monitorType,
                                                             Long from,
                                                             Long to,
@@ -169,11 +179,12 @@ public class ServiceMetricsAdapter {
             }
         }
 
-        return new ResourceMetricsRequest(deployResource, monitorType, from, to,
+        return new ResourceMetricsRequest(serviceId, deployResource, monitorType, from, to,
                 granularity, onlyLastKnownMetric, userId);
     }
 
-    private ServiceMetricsRequest getServiceMetricRequest(List<DeployResource> deployResources,
+    private ServiceMetricsRequest getServiceMetricRequest(UUID serviceId,
+                                                          List<DeployResource> deployResources,
                                                           MonitorResourceType monitorType,
                                                           Long from,
                                                           Long to,
@@ -191,7 +202,7 @@ public class ServiceMetricsAdapter {
                 to = System.currentTimeMillis();
             }
         }
-        return new ServiceMetricsRequest(deployResources, monitorType, from, to,
+        return new ServiceMetricsRequest(serviceId, deployResources, monitorType, from, to,
                 granularity, onlyLastKnownMetric, userId);
     }
 

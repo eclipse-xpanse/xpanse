@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,12 +14,13 @@ import org.junit.jupiter.api.Test;
 class ServiceMetricsRequestTest {
 
     DeployResource deployResource = new DeployResource();
+    private final UUID serviceId = UUID.fromString("16e6e050-8933-4383-9e56-6131c8666d0c");
     private ServiceMetricsRequest test;
 
     @BeforeEach
     void setUp() {
 
-        test = new ServiceMetricsRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+        test = new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
                 1,
                 false,
                 "userId");
@@ -37,7 +39,6 @@ class ServiceMetricsRequestTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(test, test);
         assertNotEquals(test.hashCode(), 0);
 
         Object object = new Object();
@@ -45,13 +46,13 @@ class ServiceMetricsRequestTest {
         assertNotEquals(test.hashCode(), object.hashCode());
 
         ServiceMetricsRequest test1 =
-                new ServiceMetricsRequest(List.of(deployResource), null, null, null, null, true,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource), null, null, null, null, true,
                         null);
         ServiceMetricsRequest test2 =
-                new ServiceMetricsRequest(List.of(new DeployResource()), null, null, null, null,
+                new ServiceMetricsRequest(serviceId, List.of(new DeployResource()), null, null, null, null,
                         true, null);
         ServiceMetricsRequest test3 =
-                new ServiceMetricsRequest(null, null, null, null, null, false, null);
+                new ServiceMetricsRequest(null, null, null, null, null, null, false, null);
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test, test3);
@@ -125,8 +126,8 @@ class ServiceMetricsRequestTest {
     void testToString() {
         assertNotEquals(test.toString(), null);
 
-        String exceptedString = "MetricsRequest(monitorResourceType=CPU, from=0, "
+        String exceptedString = "MetricsRequest(serviceId=16e6e050-8933-4383-9e56-6131c8666d0c, monitorResourceType=CPU, from=0, "
                 + "to=0, granularity=1, onlyLastKnownMetric=false, userId=userId)";
-        assertEquals(test.toString(), exceptedString);
+        assertEquals(exceptedString, test.toString());
     }
 }

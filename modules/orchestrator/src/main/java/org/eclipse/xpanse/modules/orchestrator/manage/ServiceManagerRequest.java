@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.orchestrator.manage;
 
 import java.util.List;
+import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 
@@ -19,5 +20,6 @@ public class ServiceManagerRequest {
     private String userId;
     private String regionName;
     private List<DeployResourceEntity> deployResourceEntityList;
+    private UUID serviceId;
 
 }

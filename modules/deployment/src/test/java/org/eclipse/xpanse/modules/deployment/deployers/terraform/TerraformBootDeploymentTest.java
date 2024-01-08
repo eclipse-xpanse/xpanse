@@ -102,7 +102,7 @@ class TerraformBootDeploymentTest {
     @Test
     void testDeploy() {
         doReturn(new HashMap<>()).when(this.deployEnvironments)
-                .getCredentialVariablesByHostingType(any(DeployTask.class));
+                .getCredentialVariablesByHostingType(any(), any(), any(), any());
 
         doReturn("""
                 terraform {

@@ -86,13 +86,14 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testGetMetricsForResource() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -116,7 +117,7 @@ class OpenstackOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         when(mockMetricsManager.getMetrics(resourceMetricRequest1)).thenReturn(metrics);
 
@@ -131,13 +132,14 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testGetMetricsForResource_MetricsManagerReturnsNoItems() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
 
         // Configure MetricsManager.getMetrics(...).
@@ -147,7 +149,7 @@ class OpenstackOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         when(mockMetricsManager.getMetrics(resourceMetricRequest1))
                 .thenReturn(Collections.emptyList());
@@ -163,13 +165,14 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testGetMetricsForService() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -193,7 +196,7 @@ class OpenstackOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         when(mockMetricsManager.getMetrics(resourceMetricRequest)).thenReturn(metrics);
 
@@ -208,13 +211,14 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testGetMetricsForService_MetricsManagerReturnsNoItems() {
         // Setup
+        UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
 
         // Configure MetricsManager.getMetrics(...).
@@ -224,7 +228,7 @@ class OpenstackOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         when(mockMetricsManager.getMetrics(resourceMetricRequest))
                 .thenReturn(Collections.emptyList());

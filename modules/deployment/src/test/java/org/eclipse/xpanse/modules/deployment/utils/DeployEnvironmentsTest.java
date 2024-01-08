@@ -90,7 +90,7 @@ class DeployEnvironmentsTest {
         deployRequest.setFlavor("flavor");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
-
+        deployRequest.setCsp(Csp.HUAWEI);
 
         Deployment deployment = new Deployment();
         deployVariable1 = new DeployVariable();
@@ -145,7 +145,7 @@ class DeployEnvironmentsTest {
         expectedResult.put("key1", null);
         expectedResult.put("key2", "value2");
 
-        Map<String, String> result = deployEnvironmentsUnderTest.getEnv(task);
+        Map<String, String> result = deployEnvironmentsUnderTest.getEnvFromDeployTask(task);
 
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -183,7 +183,7 @@ class DeployEnvironmentsTest {
         expectedResult.put("key2", "value2");
         expectedResult.put("example", null);
 
-        final Map<String, Object> result = deployEnvironmentsUnderTest.getVariables(task, true);
+        final Map<String, Object> result = deployEnvironmentsUnderTest.getVariablesFromDeployTask(task, true);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -216,7 +216,11 @@ class DeployEnvironmentsTest {
                 .thenReturn(abstractCredentialInfo);
 
         Map<String, String> variablesActual =
-                deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(task);
+                deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(
+                        task.getDeployRequest().getServiceHostingType(),
+                        task.getOcl().getDeployment().getCredentialType(),
+                        task.getDeployRequest().getCsp(),
+                        task.getDeployRequest().getUserId());
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
@@ -255,7 +259,11 @@ class DeployEnvironmentsTest {
                 .thenReturn(abstractCredentialInfo);
 
         Map<String, String> variablesActual =
-                deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(task);
+                deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(
+                        task.getDeployRequest().getServiceHostingType(),
+                        task.getOcl().getDeployment().getCredentialType(),
+                        task.getDeployRequest().getCsp(),
+                        task.getDeployRequest().getUserId());
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
@@ -350,7 +358,7 @@ class DeployEnvironmentsTest {
         };
         when(this.pluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(plugin);
         Map<String, String> variables =
-                deployEnvironmentsUnderTest.getPluginMandatoryVariables(xpanseDeployTask);
+                deployEnvironmentsUnderTest.getPluginMandatoryVariables(xpanseDeployTask.getDeployRequest().getCsp());
 
         Assertions.assertNotNull(variables);
     }

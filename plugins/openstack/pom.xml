@@ -96,5 +96,15 @@
             <version>${instancio.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>deployment</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>database</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

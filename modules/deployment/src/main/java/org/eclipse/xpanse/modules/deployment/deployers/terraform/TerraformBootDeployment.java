@@ -248,17 +248,23 @@ public class TerraformBootDeployment implements Deployment {
 
     private Map<String, Object> getInputVariables(DeployTask deployTask, boolean isDeployRequest) {
         Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.putAll(this.deployEnvironments.getVariables(deployTask, isDeployRequest));
+        inputVariables.putAll(this.deployEnvironments.getVariablesFromDeployTask(
+                deployTask, isDeployRequest));
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(deployTask));
         return inputVariables;
     }
 
     private Map<String, String> getEnvironmentVariables(DeployTask deployTask) {
         Map<String, String> envVariables = new HashMap<>();
-        envVariables.putAll(this.deployEnvironments.getEnv(deployTask));
+        envVariables.putAll(this.deployEnvironments.getEnvFromDeployTask(deployTask));
         envVariables.putAll(
-                this.deployEnvironments.getCredentialVariablesByHostingType(deployTask));
-        envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(deployTask));
+                this.deployEnvironments.getCredentialVariablesByHostingType(
+                        deployTask.getDeployRequest().getServiceHostingType(),
+                        deployTask.getOcl().getDeployment().getCredentialType(),
+                        deployTask.getDeployRequest().getCsp(),
+                        deployTask.getDeployRequest().getUserId()));
+        envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(
+                deployTask.getDeployRequest().getCsp()));
         return envVariables;
     }
 

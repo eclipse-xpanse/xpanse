@@ -87,13 +87,14 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testGetMetricsForResource() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -117,7 +118,7 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByResource(resourceMetricRequest1))
                 .thenReturn(metrics);
@@ -133,13 +134,14 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testGetMetricsForResource_HuaweiCloudMetricsServiceReturnsNoItems() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
 
         // Configure HuaweiCloudMetricsService.getMetricsByResource(...).
@@ -149,7 +151,7 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
                         false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByResource(resourceMetricRequest1))
                 .thenReturn(Collections.emptyList());
@@ -165,13 +167,14 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testGetMetricsForService() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -195,7 +198,7 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByService(serviceMetricRequest1))
                 .thenReturn(metrics);
@@ -211,13 +214,14 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testGetMetricsForService_HuaweiCloudMetricsServiceReturnsNoItems() {
         // Setup
+        final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
 
         // Configure HuaweiCloudMetricsService.getMetricsByService(...).
@@ -227,7 +231,7 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByService(serviceMetricRequest1))
                 .thenReturn(Collections.emptyList());
