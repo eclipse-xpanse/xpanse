@@ -46,7 +46,7 @@
         <awaitility.version>4.2.0</awaitility.version>
         <jacoco.version>0.8.11</jacoco.version>
         <springdoc.version>2.3.0</springdoc.version>
-        <slf4j-api.version>2.0.10</slf4j-api.version>
+        <slf4j-api.version>2.0.11</slf4j-api.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hypersistence-utils-hibernate.version>3.7.0</hypersistence-utils-hibernate.version>
         <mockito.version>5.8.0</mockito.version>
