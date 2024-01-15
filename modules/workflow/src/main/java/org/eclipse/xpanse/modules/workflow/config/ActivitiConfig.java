@@ -18,6 +18,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -47,6 +48,7 @@ public class ActivitiConfig {
     public ProcessEngineConfiguration processEngineConfiguration() throws IOException {
         SpringProcessEngineConfiguration processEngineConfiguration =
                 new SpringProcessEngineConfiguration();
+        processEngineConfiguration.setIdGenerator(strongUuidGenerator());
         processEngineConfiguration.setDataSource(dataSource);
         processEngineConfiguration.setTransactionManager(
                 (PlatformTransactionManager) transactionManager);
@@ -59,6 +61,10 @@ public class ActivitiConfig {
         return processEngineConfiguration;
     }
 
+    @Bean
+    public StrongUuidGenerator strongUuidGenerator() {
+        return new StrongUuidGenerator();
+    }
 
     @Bean
     public ProcessEngine processEngine() throws IOException {
