@@ -1,0 +1,11 @@
+{
+  "preferred_username": "xpanse-user",
+  "email": "test@xpanse.de",
+  "aud": "https://localhost:7082",
+  "scope": "openid user isv admin",
+  "roles": ["user", "isv", "admin"],
+  "urn:zitadel:iam:org:project:roles": {
+    "user": "user"
+  },
+  "sub": "1234566dffd"
+}

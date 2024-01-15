@@ -1,7 +1,6 @@
 package org.eclipse.xpanse.runtime;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,7 +9,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
@@ -36,7 +35,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
@@ -44,7 +42,7 @@ import org.springframework.web.client.RestTemplate;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class AuthorizationApiTest extends AbstractJwtTestConfiguration {
+class AuthorizationApiTest {
 
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
@@ -136,10 +134,9 @@ class AuthorizationApiTest extends AbstractJwtTestConfiguration {
     }
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+   @WithJwt(file = "jwt_isv.json")
     void testCallApiAccessDenied() throws Exception {
         // SetUp
-        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.emptyList());
         Response responseModel = Response.errorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList(ResultType.ACCESS_DENIED.toValue()));
         String resBody = objectMapper.writeValueAsString(responseModel);
@@ -155,10 +152,8 @@ class AuthorizationApiTest extends AbstractJwtTestConfiguration {
     }
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+   @WithJwt(file = "jwt_user.json")
     void testCallApiWell() throws Exception {
-        // SetUp
-        super.updateJwtInSecurityContextWithSpecificUser(Collections.emptyMap(), Collections.singletonList(ROLE_USER), "dummy");
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services")
                         .accept(MediaType.APPLICATION_JSON))

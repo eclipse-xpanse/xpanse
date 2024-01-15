@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.zitadel.config;
+package org.eclipse.xpanse.modules.security.zitadel.config.openapi;
 
 import io.swagger.v3.oas.models.Operation;
 import java.util.Objects;

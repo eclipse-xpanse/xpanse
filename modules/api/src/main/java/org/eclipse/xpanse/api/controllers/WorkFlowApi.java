@@ -92,7 +92,7 @@ public class WorkFlowApi {
     /**
      * Manage failed workflow tasks.
      */
-    @Tag(name = "WorkFlow", description = "APIs to manage the Workflow")
+    @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Manage failed task orders.")
     @PutMapping(value = "/workflow/task/{id}/{retryOrder}", produces =
             MediaType.APPLICATION_JSON_VALUE)

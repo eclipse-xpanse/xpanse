@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.xpanse.modules.models.security.constant.RoleConstants;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
 import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
+import org.eclipse.xpanse.modules.security.common.XpanseAuthentication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,8 +27,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,8 +37,6 @@ class ZitadelIdentityProviderServiceTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "authTokenType",
-                "JWT");
         ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "iamServerEndpoint",
                 "http://localhost:8081");
         ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "clientId",
@@ -68,25 +65,22 @@ class ZitadelIdentityProviderServiceTest {
 
     void mockBearerTokenAuthentication(Map<String, Object> attributes,
                                        Collection<GrantedAuthority> authorities) {
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "authTokenType",
-                "OpaqueToken");
-        BearerTokenAuthentication authentication = Mockito.mock(BearerTokenAuthentication.class);
+        XpanseAuthentication authentication = Mockito.mock(XpanseAuthentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-
+        Mockito.when(authentication.getClaims()).thenReturn(attributes);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        Mockito.when(authentication.getTokenAttributes()).thenReturn(attributes);
         Mockito.when(authentication.getAuthorities()).thenReturn(authorities);
         SecurityContextHolder.setContext(securityContext);
     }
 
     void mockJwtTokenAuthentication(Map<String, Object> attributes,
                                     Collection<GrantedAuthority> authorities) {
-        JwtAuthenticationToken authentication = Mockito.mock(JwtAuthenticationToken.class);
+        XpanseAuthentication authentication = Mockito.mock(XpanseAuthentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        Mockito.when(authentication.getTokenAttributes()).thenReturn(attributes);
         Mockito.when(authentication.getAuthorities()).thenReturn(authorities);
+        Mockito.when(authentication.getClaims()).thenReturn(attributes);
         SecurityContextHolder.setContext(securityContext);
     }
 

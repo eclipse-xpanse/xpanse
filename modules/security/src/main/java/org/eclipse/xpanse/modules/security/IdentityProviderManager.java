@@ -42,7 +42,7 @@ public class IdentityProviderManager {
                 applicationContext.getBeansOfType(IdentityProviderService.class)
                         .values().stream().toList();
         if (CollectionUtils.isEmpty(identityProviderServices)) {
-            log.error("No active identity providers found.");
+            log.info("No active identity providers found.");
             activeIdentityProviderService = null;
         } else {
             if (identityProviderServices.size() > 1) {
@@ -50,7 +50,7 @@ public class IdentityProviderManager {
                         "More than one identity provider service is active.");
             }
             activeIdentityProviderService = identityProviderServices.get(0);
-            log.error("Identity provider service with type:{} is active.",
+            log.info("Identity provider service with type:{} is active.",
                     activeIdentityProviderService.getIdentityProviderType());
         }
     }
