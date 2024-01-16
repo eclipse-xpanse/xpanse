@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -53,11 +53,11 @@ public class ServiceTemplateManage {
     @Resource
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
     @Resource
-    private DeployService deployService;
-    @Resource
     private IdentityProviderManager identityProviderManager;
     @Resource
     private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
+    @Resource
+    private DeployerKindManager deployerKindManager;
 
     /**
      * Update service template using id and the ocl file url.
@@ -285,7 +285,7 @@ public class ServiceTemplateManage {
     private void validateTerraformScript(Ocl ocl) {
         if (ocl.getDeployment().getKind() == DeployerKind.TERRAFORM) {
             DeployValidationResult tfValidationResult =
-                    this.deployService.getDeployment(ocl.getDeployment().getKind())
+                    this.deployerKindManager.getDeployment(ocl.getDeployment().getKind())
                             .validate(ocl);
             if (!tfValidationResult.isValid()) {
                 throw new TerraformScriptFormatInvalidException(

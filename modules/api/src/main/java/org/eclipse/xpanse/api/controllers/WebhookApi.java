@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.DeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebhookApi {
 
     @Resource
-    private DeployService deployService;
+    private DeploymentResultCallbackManager deploymentResultCallbackManager;
 
     /**
      * Webhook methods to receive terraform execution result.
@@ -46,10 +46,10 @@ public class WebhookApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void deployCallback(
-            @Parameter(name = "task_id", description = "task id") @PathVariable("task_id")
-                    String taskId, @Valid @RequestBody TerraformResult result) {
+            @Parameter(name = "task_id", description = "task id")
+            @PathVariable("task_id") String taskId, @Valid @RequestBody TerraformResult result) {
 
-        deployService.deployCallback(taskId, result);
+        deploymentResultCallbackManager.deployCallback(taskId, result);
     }
 
     /**
@@ -64,7 +64,7 @@ public class WebhookApi {
     public void destroyCallback(
             @Parameter(name = "task_id", description = "task id") @PathVariable("task_id")
                     String taskId, @Valid @RequestBody TerraformResult result) {
-        deployService.destroyCallback(taskId, result);
+        deploymentResultCallbackManager.destroyCallback(taskId, result);
     }
 
 }

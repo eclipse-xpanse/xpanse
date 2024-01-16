@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -49,7 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class IsvServiceDeployApi {
 
     @Resource
-    private DeployService deployService;
+    private ServiceDetailsViewManager serviceDetailsViewManager;
 
     @Resource
     private IdentityProviderManager identityProviderManager;
@@ -78,7 +78,7 @@ public class IsvServiceDeployApi {
                     ServiceDeploymentState serviceState) {
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, serviceState);
-        return this.deployService.listDeployedServicesOfIsv(query);
+        return this.serviceDetailsViewManager.listDeployedServicesOfIsv(query);
     }
 
     /**
@@ -94,7 +94,7 @@ public class IsvServiceDeployApi {
     public DeployedServiceDetails getServiceDetailsByIdForIsv(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
-        return this.deployService.getServiceDetailsByIdForIsv(UUID.fromString(id));
+        return this.serviceDetailsViewManager.getServiceDetailsByIdForIsv(UUID.fromString(id));
     }
 
     private ServiceQueryModel getServiceQueryModel(Category category, Csp csp,

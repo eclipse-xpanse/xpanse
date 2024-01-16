@@ -26,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
+import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -76,6 +79,15 @@ public class ServiceDeployerApi {
     @Resource
     private WorkflowProcessUtils workflowProcessUtils;
 
+    @Resource
+    private ServiceDetailsViewManager serviceDetailsViewManager;
+
+    @Resource
+    private DeployerKindManager deployerKindManager;
+
+    @Resource
+    private DeployServiceEntityHandler deployServiceEntityHandler;
+
     /**
      * Get details of the managed service by id.
      *
@@ -89,7 +101,8 @@ public class ServiceDeployerApi {
     public DeployedServiceDetails getSelfHostedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
-        return this.deployService.getSelfHostedServiceDetailsByIdForEndUser(UUID.fromString(id));
+        return this.serviceDetailsViewManager.getSelfHostedServiceDetailsByIdForEndUser(
+                UUID.fromString(id));
     }
 
 
@@ -106,7 +119,8 @@ public class ServiceDeployerApi {
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
-        return this.deployService.getVendorHostedServiceDetailsByIdForEndUser(UUID.fromString(id));
+        return this.serviceDetailsViewManager.getVendorHostedServiceDetailsByIdForEndUser(
+                UUID.fromString(id));
     }
 
     /**
@@ -133,7 +147,7 @@ public class ServiceDeployerApi {
                     ServiceDeploymentState serviceState) {
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, serviceState);
-        return this.deployService.listDeployedServices(query);
+        return this.serviceDetailsViewManager.listDeployedServices(query);
     }
 
     /**
@@ -155,7 +169,8 @@ public class ServiceDeployerApi {
         deployRequest.setUserId(userIdOptional.orElse(null));
         DeployTask deployTask = this.deployService.createNewDeployTask(deployRequest);
         Deployment deployment =
-                this.deployService.getDeployment(deployTask.getOcl().getDeployment().getKind());
+                this.deployerKindManager.getDeployment(
+                        deployTask.getOcl().getDeployment().getKind());
         this.deployService.deployService(deployment, deployTask);
         String successMsg = String.format(
                 "Task for starting managed service %s-%s-%s-%s started. UUID %s",
@@ -181,7 +196,7 @@ public class ServiceDeployerApi {
     public Response destroy(@PathVariable("id") String id) {
         log.info("Stopping managed service with id {}", id);
         DeployServiceEntity deployServiceEntity =
-                this.deployService.getDeployServiceEntity(UUID.fromString(id));
+                this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
@@ -189,7 +204,8 @@ public class ServiceDeployerApi {
         }
         DeployTask destroyTask = this.deployService.getDestroyTask(deployServiceEntity);
         Deployment deployment =
-                this.deployService.getDeployment(destroyTask.getOcl().getDeployment().getKind());
+                this.deployerKindManager.getDeployment(
+                        destroyTask.getOcl().getDeployment().getKind());
         this.deployService.destroyService(deployment, destroyTask, deployServiceEntity);
         String successMsg = String.format(
                 "Task for destroying managed service %s has started.", id);
@@ -209,7 +225,7 @@ public class ServiceDeployerApi {
     public Response purge(@PathVariable("id") String id) {
         log.info("Purging managed service with id {}", id);
         DeployServiceEntity deployServiceEntity =
-                this.deployService.getDeployServiceEntity(UUID.fromString(id));
+                this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
@@ -217,7 +233,8 @@ public class ServiceDeployerApi {
         }
         DeployTask purgeTask = this.deployService.getPurgeTask(deployServiceEntity);
         Deployment deployment =
-                this.deployService.getDeployment(purgeTask.getOcl().getDeployment().getKind());
+                this.deployerKindManager.getDeployment(
+                        purgeTask.getOcl().getDeployment().getKind());
         this.deployService.asyncPurgeService(deployment, purgeTask, deployServiceEntity);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
@@ -235,7 +252,7 @@ public class ServiceDeployerApi {
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
 
         DeployServiceEntity deployServiceEntity =
-                this.deployService.getDeployServiceEntity(migrateRequest.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(migrateRequest.getId());
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         String userId = userIdOptional.orElse(null);
         if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {

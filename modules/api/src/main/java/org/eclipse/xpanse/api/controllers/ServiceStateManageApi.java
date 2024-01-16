@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.ServiceStateManager;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServiceStateManageApi {
 
     @Resource
-    private DeployService deployService;
+    private ServiceStateManager serviceStateManager;
 
     /**
      * Start the service by the deployed service id.
@@ -51,7 +51,7 @@ public class ServiceStateManageApi {
     @ResponseStatus(HttpStatus.OK)
     public DeployedService startService(@PathVariable("id") String id) {
         log.info("Start the service by service id : {}", id);
-        return deployService.startService(UUID.fromString(id));
+        return serviceStateManager.startService(UUID.fromString(id));
     }
 
     /**
@@ -65,7 +65,7 @@ public class ServiceStateManageApi {
     @PutMapping(value = "/services/stop/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public DeployedService stopService(@PathVariable("id") String id) {
-        return deployService.stopService(UUID.fromString(id));
+        return serviceStateManager.stopService(UUID.fromString(id));
     }
 
     /**
@@ -79,6 +79,6 @@ public class ServiceStateManageApi {
     @PutMapping(value = "/services/restart/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public DeployedService restartService(@PathVariable("id") String id) {
-        return deployService.restartService(UUID.fromString(id));
+        return serviceStateManager.restartService(UUID.fromString(id));
     }
 }
