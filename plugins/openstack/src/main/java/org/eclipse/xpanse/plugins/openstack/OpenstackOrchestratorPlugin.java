@@ -20,9 +20,9 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
@@ -156,17 +156,17 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
-        return serversManager.startService(serviceManagerRequest);
+    public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
+        return serversManager.startService(serviceStateManageRequest);
     }
 
     @Override
-    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
-        return serversManager.stopService(serviceManagerRequest);
+    public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
+        return serversManager.stopService(serviceStateManageRequest);
     }
 
     @Override
-    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
-        return serversManager.restartService(serviceManagerRequest);
+    public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
+        return serversManager.restartService(serviceStateManageRequest);
     }
 }

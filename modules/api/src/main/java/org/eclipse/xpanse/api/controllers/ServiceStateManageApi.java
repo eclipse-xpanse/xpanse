@@ -34,7 +34,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
-public class ServiceManageApi {
+public class ServiceStateManageApi {
+
+    @Resource
+    private DeployService deployService;
 
     /**
      * Start the service by the deployed service id.
@@ -42,9 +45,6 @@ public class ServiceManageApi {
      * @param id service id.
      * @return deployedService.
      */
-    @Resource
-    private DeployService deployService;
-
     @Tag(name = "Service Status Management", description = "APIs to manage the service instances")
     @Operation(description = "Start the service by the service id.")
     @PutMapping(value = "/services/start/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

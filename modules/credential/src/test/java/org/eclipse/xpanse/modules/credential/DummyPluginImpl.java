@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.springframework.stereotype.Component;
@@ -94,17 +94,17 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     }
 
     @Override
-    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
+    public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
         return true;
     }
 
     @Override
-    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
+    public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
         return true;
     }
 
     @Override
-    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
+    public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         return true;
     }
 }

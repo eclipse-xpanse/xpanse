@@ -59,7 +59,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
-import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.policy.policyman.UserPolicyManager;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
@@ -1024,11 +1024,11 @@ public class DeployService {
                 pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
         List<DeployResourceEntity> deployResourceList =
                 getVmDeployResourceEntities(deployServiceEntity);
-        ServiceManagerRequest serviceManagerRequest =
-                getServiceManagerRequest(deployResourceList,
+        ServiceStateManageRequest serviceStateManageRequest =
+                getServiceStateManageRequest(deployResourceList,
                         deployServiceEntity.getDeployRequest().getServiceHostingType(),
                         deployServiceEntity.getUserId());
-        return plugin.startService(serviceManagerRequest);
+        return plugin.startService(serviceStateManageRequest);
     }
 
     private boolean stop(DeployServiceEntity deployServiceEntity) {
@@ -1036,11 +1036,11 @@ public class DeployService {
                 pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
         List<DeployResourceEntity> deployResourceList =
                 getVmDeployResourceEntities(deployServiceEntity);
-        ServiceManagerRequest serviceManagerRequest =
-                getServiceManagerRequest(deployResourceList,
+        ServiceStateManageRequest serviceStateManageRequest =
+                getServiceStateManageRequest(deployResourceList,
                         deployServiceEntity.getDeployRequest().getServiceHostingType(),
                         deployServiceEntity.getUserId());
-        return plugin.stopService(serviceManagerRequest);
+        return plugin.stopService(serviceStateManageRequest);
     }
 
     private boolean restart(DeployServiceEntity deployServiceEntity) {
@@ -1048,11 +1048,11 @@ public class DeployService {
                 pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
         List<DeployResourceEntity> deployResourceList =
                 getVmDeployResourceEntities(deployServiceEntity);
-        ServiceManagerRequest serviceManagerRequest =
-                getServiceManagerRequest(deployResourceList,
+        ServiceStateManageRequest serviceStateManageRequest =
+                getServiceStateManageRequest(deployResourceList,
                         deployServiceEntity.getDeployRequest().getServiceHostingType(),
                         deployServiceEntity.getUserId());
-        return plugin.restartService(serviceManagerRequest);
+        return plugin.restartService(serviceStateManageRequest);
     }
 
     private void validateStartDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
@@ -1110,16 +1110,16 @@ public class DeployService {
     }
 
 
-    private ServiceManagerRequest getServiceManagerRequest(
+    private ServiceStateManageRequest getServiceStateManageRequest(
             List<DeployResourceEntity> deployResourceList, ServiceHostingType serviceHostingType,
             String userId) {
-        ServiceManagerRequest serviceManagerRequest = new ServiceManagerRequest();
-        serviceManagerRequest.setDeployResourceEntityList(deployResourceList);
+        ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setDeployResourceEntityList(deployResourceList);
         if (serviceHostingType == ServiceHostingType.SELF) {
-            serviceManagerRequest.setUserId(userId);
+            serviceStateManageRequest.setUserId(userId);
         }
-        serviceManagerRequest.setRegionName(
+        serviceStateManageRequest.setRegionName(
                 deployResourceList.get(0).getProperties().get("region"));
-        return serviceManagerRequest;
+        return serviceStateManageRequest;
     }
 }

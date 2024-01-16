@@ -19,9 +19,9 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
@@ -114,18 +114,18 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
-        return flexibleEngineVmStateManagerService.startService(serviceManagerRequest);
+    public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
+        return flexibleEngineVmStateManagerService.startService(serviceStateManageRequest);
     }
 
     @Override
-    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
-        return flexibleEngineVmStateManagerService.stopService(serviceManagerRequest);
+    public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
+        return flexibleEngineVmStateManagerService.stopService(serviceStateManageRequest);
     }
 
     @Override
-    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
-        return flexibleEngineVmStateManagerService.restartService(serviceManagerRequest);
+    public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
+        return flexibleEngineVmStateManagerService.restartService(serviceStateManageRequest);
     }
 
     @Override

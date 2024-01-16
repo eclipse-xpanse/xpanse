@@ -12,7 +12,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.scs.common.keystone.ScsKeystoneManager;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.common.ActionResponse;
@@ -51,11 +51,12 @@ public class ScsServersManager {
     /**
      * Start the SCS VM.
      */
-    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
+    public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
         OSClient.OSClientV3 osClient = getOsClient(
-                serviceManagerRequest.getUserId(), serviceManagerRequest.getServiceId());
+                serviceStateManageRequest.getUserId(), serviceStateManageRequest.getServiceId());
         int failedCount = 0;
-        for (DeployResourceEntity resource : serviceManagerRequest.getDeployResourceEntityList()) {
+        for (DeployResourceEntity resource
+                : serviceStateManageRequest.getDeployResourceEntityList()) {
             Server serverBeforeStart = osClient.compute().servers().get(resource.getResourceId());
             if (serverBeforeStart.getStatus().equals(Server.Status.ACTIVE)) {
                 log.info("Server with id {} is already started.", resource.getResourceId());
@@ -78,11 +79,12 @@ public class ScsServersManager {
     /**
      * Stop the SCS VM.
      */
-    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
+    public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
         OSClient.OSClientV3 osClient = getOsClient(
-                serviceManagerRequest.getUserId(), serviceManagerRequest.getServiceId());
+                serviceStateManageRequest.getUserId(), serviceStateManageRequest.getServiceId());
         int failureCount = 0;
-        for (DeployResourceEntity resource : serviceManagerRequest.getDeployResourceEntityList()) {
+        for (DeployResourceEntity resource
+                : serviceStateManageRequest.getDeployResourceEntityList()) {
             Server serverBeforeStop = osClient.compute().servers().get(resource.getResourceId());
             if (serverBeforeStop.getStatus().equals(Server.Status.SHUTOFF)) {
                 log.info("Server with id {} is already stopped.", resource.getResourceId());
@@ -104,11 +106,12 @@ public class ScsServersManager {
     /**
      * Restart the SCS VM.
      */
-    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
+    public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         OSClient.OSClientV3 osClient = getOsClient(
-                serviceManagerRequest.getUserId(), serviceManagerRequest.getServiceId());
+                serviceStateManageRequest.getUserId(), serviceStateManageRequest.getServiceId());
         int failureCount = 0;
-        for (DeployResourceEntity resource : serviceManagerRequest.getDeployResourceEntityList()) {
+        for (DeployResourceEntity resource
+                : serviceStateManageRequest.getDeployResourceEntityList()) {
             Server serverBeforeRestart = osClient.compute().servers().get(resource.getResourceId());
             if (!serverBeforeRestart.getStatus().equals(Server.Status.ACTIVE)) {
                 log.error("Server with id {} could not be restarted when it is inactive.",
