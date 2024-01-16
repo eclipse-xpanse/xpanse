@@ -1,4 +1,4 @@
-package org.eclipse.xpanse.modules.models.service.deploy;
+package org.eclipse.xpanse.modules.models.workflow.migrate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
