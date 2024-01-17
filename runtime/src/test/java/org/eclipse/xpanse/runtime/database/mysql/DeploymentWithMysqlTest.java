@@ -5,14 +5,10 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
-
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,7 +34,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -61,9 +56,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     OclLoader oclLoader;
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+    @WithJwt(file = "jwt_all_roles.json")
     void testDeployer() throws Exception {
-        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_ISV, ROLE_USER));
         if (Objects.isNull(serviceTemplate)) {
             registerServiceTemplate();
         }

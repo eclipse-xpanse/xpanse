@@ -6,14 +6,11 @@
 
 package org.eclipse.xpanse.runtime;
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_CSP;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -60,7 +57,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -72,7 +68,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class ServiceDeployerApiTest extends AbstractJwtTestConfiguration {
+class ServiceDeployerApiTest {
 
     private static final long waitTime = 60 * 1000;
     static ServiceTemplateDetailVo serviceTemplateDetailVo;
@@ -134,9 +130,8 @@ class ServiceDeployerApiTest extends AbstractJwtTestConfiguration {
     }
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+    @WithJwt(file = "jwt_all_roles.json")
     void testServiceDeployerWell() throws Exception {
-        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_ADMIN, ROLE_USER, ROLE_CSP));
         if (!credentialReady) {
             addCredential();
         }
@@ -212,7 +207,7 @@ class ServiceDeployerApiTest extends AbstractJwtTestConfiguration {
         List<DeployedService> result = listDeployedServices();
 
         // Verify the results
-        Assertions.assertTrue(result.size() >= 1);
+        Assertions.assertFalse(result.isEmpty());
         Assertions.assertEquals(result.get(0).getServiceDeploymentState(),
                 ServiceDeploymentState.DEPLOYING);
     }
@@ -238,9 +233,8 @@ class ServiceDeployerApiTest extends AbstractJwtTestConfiguration {
 
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+    @WithJwt(file = "jwt_all_roles.json")
     void testServiceDeployerThrowsException() throws Exception {
-        super.updateJwtInSecurityContext(Collections.emptyMap(), Collections.singletonList(ROLE_ADMIN));
         testDeployThrowsException();
         testGetServiceDetailsThrowsException();
         testDestroyThrowsException();

@@ -6,11 +6,10 @@
 
 package org.eclipse.xpanse.runtime;
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockAuthentication;
+import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -21,7 +20,6 @@ import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +38,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -54,7 +51,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @CrossOrigin
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed,terraform-boot"})
 @AutoConfigureMockMvc
-public class WebhookApiTest extends AbstractJwtTestConfiguration {
+public class WebhookApiTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static DeployedServiceDetails deployedServiceDetails;
@@ -77,33 +74,29 @@ public class WebhookApiTest extends AbstractJwtTestConfiguration {
     }
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+    @WithJwt(file = "jwt_admin.json")
     void testDeployCallbackSuccess() throws Exception {
-        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_ADMIN));
         testDeployCallback();
         deployCallbackSuccess(UUID.fromString(taskId));
     }
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+    @WithJwt(file = "jwt_admin.json")
     void testDeployCallbackSuccessThrowsException() throws Exception {
-        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_ADMIN));
         deployCallbackThrowsException();
         testGetServiceDetailsThrowsException();
     }
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+    @WithJwt(file = "jwt_all_roles.json")
     void testDestroyCallbackSuccess() throws Exception {
-        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_ADMIN, "user", "csp"));
         testDestroyCallback();
         destroyCallbackSuccess(UUID.fromString(taskId));
     }
 
     @Test
-    @WithMockAuthentication(authType = JwtAuthenticationToken.class)
+    @WithJwt(file = "jwt_all_roles.json")
     void testDestroyCallbackSuccessThrowsException() throws Exception {
-        super.updateJwtInSecurityContext(Collections.emptyMap(), List.of(ROLE_ADMIN, "user", "csp"));
         destroyCallbackThrowsException();
         testGetServiceDetailsThrowsException();
     }

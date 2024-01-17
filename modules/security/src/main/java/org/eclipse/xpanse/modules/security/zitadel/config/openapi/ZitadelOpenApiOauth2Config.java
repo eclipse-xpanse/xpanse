@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.zitadel.config;
+package org.eclipse.xpanse.modules.security.zitadel.config.openapi;
 
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.GRANTED_ROLES_SCOPE;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.METADATA_SCOPE;

@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.security.zitadel;
 
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.AUTH_TYPE_JWT;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.METADATA_KEY;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.NAMESPACE_KEY;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.REQUIRED_SCOPES;
@@ -33,6 +32,7 @@ import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
 import org.eclipse.xpanse.modules.security.IdentityProviderService;
+import org.eclipse.xpanse.modules.security.common.XpanseAuthentication;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -41,13 +41,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.OAuth2Token;
-import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -69,8 +64,6 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     @Qualifier("zitadelRestTemplate")
     @Resource
     private RestTemplate restTemplate;
-    @Value("${authorization.token.type:JWT}")
-    private String authTokenType;
     @Value("${authorization.server.endpoint}")
     private String iamServerEndpoint;
     @Value("${authorization.swagger.ui.client.id}")
@@ -94,7 +87,7 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
         } catch (NoSuchAlgorithmException e) {
             log.error("initCodeChallengeMap error.", e);
         }
-        log.info("CODE_CHALLENGE_MAP:{}", map);
+        log.debug("CODE_CHALLENGE_MAP:{}", map);
         return map;
 
     }
@@ -129,16 +122,12 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
 
     @Override
     public CurrentUserInfo getCurrentUserInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        XpanseAuthentication authentication =
+                (XpanseAuthentication) SecurityContextHolder.getContext().getAuthentication();
         if (Objects.isNull(authentication)) {
             return null;
         }
-        Map<String, Object> claimsMap;
-        if (StringUtils.endsWithIgnoreCase(AUTH_TYPE_JWT, authTokenType)) {
-            claimsMap = ((JwtAuthenticationToken) authentication).getTokenAttributes();
-        } else {
-            claimsMap = ((BearerTokenAuthentication) authentication).getTokenAttributes();
-        }
+        Map<String, Object> claimsMap = authentication.getClaims();
 
         if (Objects.nonNull(claimsMap) && !claimsMap.isEmpty()) {
             CurrentUserInfo currentUserInfo = new CurrentUserInfo();
@@ -174,7 +163,7 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                     }
                 }
             }
-            setUserInfoToken(authentication, currentUserInfo);
+            currentUserInfo.setToken(authentication.getToken());
             return currentUserInfo;
         }
         return null;
@@ -218,13 +207,5 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
             log.error("Get access token by code:{} form the IAM error.", code, e);
         }
         return null;
-    }
-
-    private void setUserInfoToken(Authentication authentication, CurrentUserInfo currentUserInfo) {
-        OAuth2Token token =
-                ((AbstractOAuth2TokenAuthenticationToken<?>) authentication).getToken();
-        if (Objects.nonNull(token)) {
-            currentUserInfo.setToken(token.getTokenValue());
-        }
     }
 }

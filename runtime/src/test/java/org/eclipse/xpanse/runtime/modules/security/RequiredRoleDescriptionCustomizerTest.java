@@ -6,7 +6,7 @@ import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.Operation;
 import java.util.List;
 import org.eclipse.xpanse.api.controllers.AdminServicesApi;
-import org.eclipse.xpanse.modules.security.zitadel.config.RequiredRoleDescriptionCustomizer;
+import org.eclipse.xpanse.modules.security.zitadel.config.openapi.RequiredRoleDescriptionCustomizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
