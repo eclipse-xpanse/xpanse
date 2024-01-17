@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,11 +57,11 @@ public class HuaweiCloudVmStateManager {
     /**
      * Start the Huawei Cloud Ecs server.
      */
-    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
-        EcsClient ecsClient = getEcsClient(serviceManagerRequest);
+    public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
+        EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
         BatchStartServersRequest request =
                 converter.buildBatchStartServersRequest(
-                        serviceManagerRequest.getDeployResourceEntityList());
+                        serviceStateManageRequest.getDeployResourceEntityList());
         BatchStartServersResponse response = ecsClient.batchStartServersInvoker(request)
                 .retryTimes(DEFAULT_RETRY_TIMES)
                 .retryCondition(huaweiCloudClient::matchRetryCondition)
@@ -73,11 +73,11 @@ public class HuaweiCloudVmStateManager {
     /**
      * Stop the Huawei Cloud Ecs server.
      */
-    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
-        EcsClient ecsClient = getEcsClient(serviceManagerRequest);
+    public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
+        EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
         BatchStopServersRequest batchStopServersRequest =
                 converter.buildBatchStopServersRequest(
-                        serviceManagerRequest.getDeployResourceEntityList());
+                        serviceStateManageRequest.getDeployResourceEntityList());
         BatchStopServersResponse response =
                 ecsClient.batchStopServersInvoker(batchStopServersRequest)
                         .retryTimes(DEFAULT_RETRY_TIMES)
@@ -90,11 +90,11 @@ public class HuaweiCloudVmStateManager {
     /**
      * Restart the Huawei Cloud Ecs server.
      */
-    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
-        EcsClient ecsClient = getEcsClient(serviceManagerRequest);
+    public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
+        EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
         BatchRebootServersRequest request =
                 converter.buildBatchRebootServersRequest(
-                        serviceManagerRequest.getDeployResourceEntityList());
+                        serviceStateManageRequest.getDeployResourceEntityList());
         BatchRebootServersResponse response = ecsClient.batchRebootServersInvoker(request)
                 .retryTimes(DEFAULT_RETRY_TIMES)
                 .retryCondition(huaweiCloudClient::matchRetryCondition)
@@ -103,12 +103,13 @@ public class HuaweiCloudVmStateManager {
         return checkEcsExecResultByJobId(ecsClient, response.getJobId());
     }
 
-    private EcsClient getEcsClient(ServiceManagerRequest serviceManagerRequest) {
+    private EcsClient getEcsClient(ServiceStateManageRequest serviceStateManageRequest) {
         AbstractCredentialInfo credential =
                 credentialCenter.getCredential(Csp.HUAWEI, CredentialType.VARIABLES,
-                        serviceManagerRequest.getUserId());
+                        serviceStateManageRequest.getUserId());
         ICredential icredential = huaweiCloudClient.getCredential(credential);
-        return huaweiCloudClient.getEcsClient(icredential, serviceManagerRequest.getRegionName());
+        return huaweiCloudClient.getEcsClient(
+                icredential, serviceStateManageRequest.getRegionName());
     }
 
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {

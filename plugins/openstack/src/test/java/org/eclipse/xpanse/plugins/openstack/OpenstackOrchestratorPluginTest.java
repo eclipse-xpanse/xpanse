@@ -1,6 +1,7 @@
 package org.eclipse.xpanse.plugins.openstack;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -17,7 +18,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
@@ -81,6 +82,7 @@ class OpenstackOrchestratorPluginTest {
                 openstackOrchestratorPluginUnderTest.getCredentialDefinitions();
 
         // Verify the results
+        assertFalse(result.isEmpty());
     }
 
     @Test
@@ -264,27 +266,27 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testStartService() {
         // Setup
-        final ServiceManagerRequest serviceManagerRequest = new ServiceManagerRequest();
-        serviceManagerRequest.setUserId("userId");
-        serviceManagerRequest.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity.setResourceId("resourceId");
-        serviceManagerRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.startService(...).
-        final ServiceManagerRequest serviceManagerRequest1 = new ServiceManagerRequest();
-        serviceManagerRequest1.setUserId("userId");
-        serviceManagerRequest1.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
-        serviceManagerRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.startService(serviceManagerRequest1)).thenReturn(false);
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockServersManager.startService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.startService(serviceManagerRequest);
+                openstackOrchestratorPluginUnderTest.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -293,27 +295,27 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testStartService_ServersManagerReturnsTrue() {
         // Setup
-        final ServiceManagerRequest serviceManagerRequest = new ServiceManagerRequest();
-        serviceManagerRequest.setUserId("userId");
-        serviceManagerRequest.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity.setResourceId("resourceId");
-        serviceManagerRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.startService(...).
-        final ServiceManagerRequest serviceManagerRequest1 = new ServiceManagerRequest();
-        serviceManagerRequest1.setUserId("userId");
-        serviceManagerRequest1.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
-        serviceManagerRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.startService(serviceManagerRequest1)).thenReturn(true);
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockServersManager.startService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.startService(serviceManagerRequest);
+                openstackOrchestratorPluginUnderTest.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -322,27 +324,27 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testStopService() {
         // Setup
-        final ServiceManagerRequest serviceManagerRequest = new ServiceManagerRequest();
-        serviceManagerRequest.setUserId("userId");
-        serviceManagerRequest.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity.setResourceId("resourceId");
-        serviceManagerRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.stopService(...).
-        final ServiceManagerRequest serviceManagerRequest1 = new ServiceManagerRequest();
-        serviceManagerRequest1.setUserId("userId");
-        serviceManagerRequest1.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
-        serviceManagerRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.stopService(serviceManagerRequest1)).thenReturn(false);
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockServersManager.stopService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.stopService(serviceManagerRequest);
+                openstackOrchestratorPluginUnderTest.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -351,27 +353,27 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testStopService_ServersManagerReturnsTrue() {
         // Setup
-        final ServiceManagerRequest serviceManagerRequest = new ServiceManagerRequest();
-        serviceManagerRequest.setUserId("userId");
-        serviceManagerRequest.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity.setResourceId("resourceId");
-        serviceManagerRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.stopService(...).
-        final ServiceManagerRequest serviceManagerRequest1 = new ServiceManagerRequest();
-        serviceManagerRequest1.setUserId("userId");
-        serviceManagerRequest1.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
-        serviceManagerRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.stopService(serviceManagerRequest1)).thenReturn(true);
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockServersManager.stopService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.stopService(serviceManagerRequest);
+                openstackOrchestratorPluginUnderTest.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -380,27 +382,27 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testRestartService() {
         // Setup
-        final ServiceManagerRequest serviceManagerRequest = new ServiceManagerRequest();
-        serviceManagerRequest.setUserId("userId");
-        serviceManagerRequest.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity.setResourceId("resourceId");
-        serviceManagerRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.restartService(...).
-        final ServiceManagerRequest serviceManagerRequest1 = new ServiceManagerRequest();
-        serviceManagerRequest1.setUserId("userId");
-        serviceManagerRequest1.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
-        serviceManagerRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.restartService(serviceManagerRequest1)).thenReturn(false);
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockServersManager.restartService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.restartService(serviceManagerRequest);
+                openstackOrchestratorPluginUnderTest.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -409,27 +411,27 @@ class OpenstackOrchestratorPluginTest {
     @Test
     void testRestartService_ServersManagerReturnsTrue() {
         // Setup
-        final ServiceManagerRequest serviceManagerRequest = new ServiceManagerRequest();
-        serviceManagerRequest.setUserId("userId");
-        serviceManagerRequest.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity.setResourceId("resourceId");
-        serviceManagerRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.restartService(...).
-        final ServiceManagerRequest serviceManagerRequest1 = new ServiceManagerRequest();
-        serviceManagerRequest1.setUserId("userId");
-        serviceManagerRequest1.setRegionName("regionName");
+        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
-        serviceManagerRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.restartService(serviceManagerRequest1)).thenReturn(true);
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockServersManager.restartService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.restartService(serviceManagerRequest);
+                openstackOrchestratorPluginUnderTest.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();

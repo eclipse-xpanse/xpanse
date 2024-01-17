@@ -19,9 +19,9 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
-import org.eclipse.xpanse.modules.orchestrator.manage.ServiceManagerRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
@@ -137,17 +137,17 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public boolean startService(ServiceManagerRequest serviceManagerRequest) {
-        return huaweiCloudVmStateManager.startService(serviceManagerRequest);
+    public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
+        return huaweiCloudVmStateManager.startService(serviceStateManageRequest);
     }
 
     @Override
-    public boolean stopService(ServiceManagerRequest serviceManagerRequest) {
-        return huaweiCloudVmStateManager.stopService(serviceManagerRequest);
+    public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
+        return huaweiCloudVmStateManager.stopService(serviceStateManageRequest);
     }
 
     @Override
-    public boolean restartService(ServiceManagerRequest serviceManagerRequest) {
-        return huaweiCloudVmStateManager.restartService(serviceManagerRequest);
+    public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
+        return huaweiCloudVmStateManager.restartService(serviceStateManageRequest);
     }
 }
