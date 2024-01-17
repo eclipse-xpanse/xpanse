@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDeployFromDirectoryRequest;
@@ -26,6 +28,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.m
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig.AuthTypeEnum;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfoHolder;
@@ -61,6 +64,7 @@ public class TerraformBootDeployment implements Deployment {
     private final String port;
     private final TerraformApi terraformApi;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final DeployServiceEntityHandler deployServiceEntityHandler;
 
     @Value("${spring.profiles.active}")
     private String profiles;
@@ -74,12 +78,14 @@ public class TerraformBootDeployment implements Deployment {
             PluginManager pluginManager,
             TerraformBootConfig terraformBootConfig,
             TerraformApi terraformApi,
-            @Value("${server.port}") String port) {
+            @Value("${server.port}") String port,
+            DeployServiceEntityHandler deployServiceEntityHandler) {
         this.deployEnvironments = deployEnvironments;
         this.pluginManager = pluginManager;
         this.terraformBootConfig = terraformBootConfig;
         this.terraformApi = terraformApi;
         this.port = port;
+        this.deployServiceEntityHandler = deployServiceEntityHandler;
     }
 
     @Override
@@ -99,9 +105,12 @@ public class TerraformBootDeployment implements Deployment {
     }
 
     @Override
-    public DeployResult destroy(DeployTask task, String stateFile) {
+    public DeployResult destroy(DeployTask task) {
         DeployResult result = new DeployResult();
-        TerraformAsyncDestroyFromDirectoryRequest request = getDestroyRequest(task, stateFile);
+        DeployServiceEntity deployServiceEntity =
+                this.deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+        String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
+        TerraformAsyncDestroyFromDirectoryRequest request = getDestroyRequest(task, resourceState);
         try {
             setHeaderTokenByProfiles();
             terraformApi.asyncDestroyWithScripts(request, task.getId());

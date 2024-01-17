@@ -16,11 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlan;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidateDiagnostics;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
@@ -39,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -68,6 +71,8 @@ class TerraformBootDeploymentTest {
     TerraformApi terraformApi;
     @Mock
     TerraformBootConfig terraformBootConfig;
+    @Mock
+    DeployServiceEntityHandler deployServiceEntityHandler;
 
     @InjectMocks
     private TerraformBootDeployment terraformBootDeployment;
@@ -128,11 +133,14 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testDestroy() {
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+                    .thenReturn("Test");
+            DeployResult destroyResult = this.terraformBootDeployment.destroy(deployTask);
 
-        DeployResult destroyResult = this.terraformBootDeployment.destroy(deployTask, "tfstate");
-
-        Assertions.assertNotNull(destroyResult);
-        Assertions.assertEquals(id, destroyResult.getId());
+            Assertions.assertNotNull(destroyResult);
+            Assertions.assertEquals(id, destroyResult.getId());
+        }
     }
 
 
@@ -153,12 +161,15 @@ class TerraformBootDeploymentTest {
     void testDestroy_ThrowsRestClientException() {
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
                 .asyncDestroyWithScripts(any(), any());
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any())).thenReturn("Test");
 
-        Assertions.assertThrows(TerraformBootRequestFailedException.class,
-                () -> this.terraformBootDeployment.destroy(deployTask, ""));
+            Assertions.assertThrows(TerraformBootRequestFailedException.class,
+                    () -> this.terraformBootDeployment.destroy(deployTask));
 
-        Assertions.assertThrows(TerraformBootRequestFailedException.class,
-                () -> this.terraformBootDeployment.destroy(deployTask, "error_tdState"));
+            Assertions.assertThrows(TerraformBootRequestFailedException.class,
+                    () -> this.terraformBootDeployment.destroy(deployTask));
+        }
     }
 
     @Test

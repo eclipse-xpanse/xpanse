@@ -11,9 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
- * Deployment state.
+ * Deployment state. This is the internal state of every task invoked by the deployer.
+ * This state is not exposed to the end user.
  */
-public enum TerraformExecState {
+public enum DeployerTaskStatus {
     INIT("initial"),
     DEPLOY_SUCCESS("success"),
     DEPLOY_FAILED("failed"),
@@ -22,26 +23,26 @@ public enum TerraformExecState {
 
     private final String status;
 
-    TerraformExecState(String status) {
+    DeployerTaskStatus(String status) {
         this.status = status;
     }
 
     /**
-     * For XpanseDeployStatus serialize.
+     * For DeployerTaskStatus deserialize.
      */
     @JsonCreator
-    public TerraformExecState getByValue(String period) {
-        for (TerraformExecState xpanseDeployStatus : values()) {
+    public DeployerTaskStatus getByValue(String period) {
+        for (DeployerTaskStatus xpanseDeployStatus : values()) {
             if (xpanseDeployStatus.status.equals(StringUtils.lowerCase(period))) {
                 return xpanseDeployStatus;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("TerraformExecState value %s is not supported.", period));
+                String.format("DeployerTaskStatus value %s is not supported.", period));
     }
 
     /**
-     * For XpanseDeployStatus deserialize.
+     * For DeployerTaskStatus serialize.
      */
     @JsonValue
     public String toValue() {

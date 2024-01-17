@@ -17,7 +17,13 @@ public interface Deployment {
 
     DeployResult deploy(DeployTask task);
 
-    DeployResult destroy(DeployTask task, String tfState);
+    /**
+     * Method to delete the service. Will destroy all cloud resources used by the service.
+     *
+     * @param task task to be executed.
+     * @return result of the destroy task.
+     */
+    DeployResult destroy(DeployTask task);
 
     void deleteTaskWorkspace(String taskId);
 

@@ -26,7 +26,6 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -37,8 +36,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ServiceStateManager {
-
-    private static final String TASK_ID = "TASK_ID";
 
     @Resource
     private DeployServiceEntityHandler deployServiceEntityHandler;
@@ -54,7 +51,6 @@ public class ServiceStateManager {
      * @return deployedService.
      */
     public DeployedService startService(UUID id) {
-        MDC.put(TASK_ID, id.toString());
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
         try {
@@ -87,7 +83,6 @@ public class ServiceStateManager {
      * @return deployedService.
      */
     public DeployedService stopService(UUID id) {
-        MDC.put(TASK_ID, id.toString());
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
         try {
@@ -120,7 +115,6 @@ public class ServiceStateManager {
      * @return deployedService.
      */
     public DeployedService restartService(UUID id) {
-        MDC.put(TASK_ID, id.toString());
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
         try {

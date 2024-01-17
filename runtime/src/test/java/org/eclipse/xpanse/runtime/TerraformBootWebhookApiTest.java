@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @CrossOrigin
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed,terraform-boot"})
 @AutoConfigureMockMvc
-public class WebhookApiTest {
+public class TerraformBootWebhookApiTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static DeployedServiceDetails deployedServiceDetails;
@@ -154,8 +154,6 @@ public class WebhookApiTest {
         Response expectedResponse = Response.errorResponse(
                 ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
                 Collections.singletonList("Service template not found."));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-
         TerraformResult createRequest = new TerraformResult();
         createRequest.setCommandStdOutput("commandStdOutput");
         createRequest.setCommandSuccessful(true);
@@ -252,9 +250,6 @@ public class WebhookApiTest {
         Response expectedResponse = Response.errorResponse(
                 ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList("Service template not found."));
-
-        String result = objectMapper.writeValueAsString(expectedResponse);
-
         TerraformResult createRequest = new TerraformResult();
         createRequest.setCommandStdOutput("commandStdOutput");
         createRequest.setCommandSuccessful(true);

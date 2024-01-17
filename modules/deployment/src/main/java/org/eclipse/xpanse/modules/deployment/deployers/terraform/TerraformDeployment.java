@@ -20,13 +20,15 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.deployment.DeploymentResultCallbackManager;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -56,7 +58,8 @@ public class TerraformDeployment implements Deployment {
     private final TerraformLocalConfig terraformLocalConfig;
     private final PluginManager pluginManager;
     private final Executor taskExecutor;
-    private final DeploymentResultCallbackManager deploymentResultCallbackManager;
+    private final TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+    private final DeployServiceEntityHandler deployServiceEntityHandler;
 
     /**
      * Initializes the Terraform deployer.
@@ -67,12 +70,14 @@ public class TerraformDeployment implements Deployment {
             TerraformLocalConfig terraformLocalConfig,
             PluginManager pluginManager,
             @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
-            DeploymentResultCallbackManager deploymentResultCallbackManager) {
+            TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager,
+            DeployServiceEntityHandler deployServiceEntityHandler) {
         this.deployEnvironments = deployEnvironments;
         this.terraformLocalConfig = terraformLocalConfig;
         this.pluginManager = pluginManager;
         this.taskExecutor = taskExecutor;
-        this.deploymentResultCallbackManager = deploymentResultCallbackManager;
+        this.terraformDeploymentResultCallbackManager = terraformDeploymentResultCallbackManager;
+        this.deployServiceEntityHandler = deployServiceEntityHandler;
     }
 
     /**
@@ -95,8 +100,11 @@ public class TerraformDeployment implements Deployment {
      * @param task the task for the deployment.
      */
     @Override
-    public DeployResult destroy(DeployTask task, String tfState) {
-        if (StringUtils.isBlank(tfState)) {
+    public DeployResult destroy(DeployTask task) {
+        DeployServiceEntity deployServiceEntity =
+                this.deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+        String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
+        if (StringUtils.isBlank(resourceState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
                     task.getId());
             log.error(errorMsg);
@@ -104,7 +112,7 @@ public class TerraformDeployment implements Deployment {
         }
         DeployResult destroyResult = new DeployResult();
         destroyResult.setId(task.getId());
-        asyncExecDestroy(task, destroyResult, tfState);
+        asyncExecDestroy(task, destroyResult, resourceState);
         return destroyResult;
     }
 
@@ -120,18 +128,18 @@ public class TerraformDeployment implements Deployment {
         taskExecutor.execute(() -> {
             try {
                 executor.deploy();
-                deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
-                deployResult.setMessage(TerraformExecState.DEPLOY_SUCCESS.toValue());
+                deployResult.setState(DeployerTaskStatus.DEPLOY_SUCCESS);
+                deployResult.setMessage(DeployerTaskStatus.DEPLOY_SUCCESS.toValue());
             } catch (TerraformExecutorException tfEx) {
                 log.error("Execute terraform deploy script failed. {}", tfEx.getMessage());
-                deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+                deployResult.setState(DeployerTaskStatus.DEPLOY_FAILED);
                 deployResult.setMessage(tfEx.getMessage());
             }
             handleTerraformExecuteResult(executor, task, deployResult,
-                    TerraformExecState.DEPLOY_FAILED);
-            deploymentResultCallbackManager.deployCallback(
+                    DeployerTaskStatus.DEPLOY_FAILED);
+            terraformDeploymentResultCallbackManager.deployCallback(
                     task.getId().toString(),
-                    getTerraformResult(executor, deployResult, TerraformExecState.DEPLOY_SUCCESS));
+                    getTerraformResult(executor, deployResult, DeployerTaskStatus.DEPLOY_SUCCESS));
         });
     }
 
@@ -145,25 +153,25 @@ public class TerraformDeployment implements Deployment {
         taskExecutor.execute(() -> {
             try {
                 executor.destroy();
-                destroyResult.setState(TerraformExecState.DESTROY_SUCCESS);
-                destroyResult.setMessage(TerraformExecState.DESTROY_SUCCESS.toValue());
+                destroyResult.setState(DeployerTaskStatus.DESTROY_SUCCESS);
+                destroyResult.setMessage(DeployerTaskStatus.DESTROY_SUCCESS.toValue());
             } catch (TerraformExecutorException tfEx) {
                 log.error("Execute terraform deploy script failed. {}", tfEx.getMessage());
-                destroyResult.setState(TerraformExecState.DESTROY_FAILED);
+                destroyResult.setState(DeployerTaskStatus.DESTROY_FAILED);
                 destroyResult.setMessage(tfEx.getMessage());
             }
             handleTerraformExecuteResult(executor, task, destroyResult,
-                    TerraformExecState.DESTROY_FAILED);
-            deploymentResultCallbackManager.destroyCallback(
+                    DeployerTaskStatus.DESTROY_FAILED);
+            terraformDeploymentResultCallbackManager.destroyCallback(
                     task.getId().toString(),
                     getTerraformResult(
-                            executor, destroyResult, TerraformExecState.DESTROY_SUCCESS));
+                            executor, destroyResult, DeployerTaskStatus.DESTROY_SUCCESS));
         });
     }
 
     private TerraformResult getTerraformResult(TerraformExecutor executor,
                                                DeployResult deployResult,
-                                               TerraformExecState state) {
+                                               DeployerTaskStatus state) {
         TerraformResult terraformResult = new TerraformResult();
         terraformResult.setTerraformState(executor.getTerraformState());
         if (deployResult.getState() == state) {
@@ -179,7 +187,7 @@ public class TerraformDeployment implements Deployment {
 
     private void handleTerraformExecuteResult(TerraformExecutor executor, DeployTask task,
                                               DeployResult result,
-                                              TerraformExecState failedState) {
+                                              DeployerTaskStatus failedState) {
         Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
         if (!importantFileContentMap.isEmpty()) {
             result.getPrivateProperties().putAll(importantFileContentMap);
@@ -202,7 +210,7 @@ public class TerraformDeployment implements Deployment {
                     task.getDeployResourceHandler().handler(result);
                 } catch (TerraformExecutorException tfEx) {
                     log.error("Handle terraform resources failed. {}", tfEx.getMessage());
-                    result.setState(TerraformExecState.DEPLOY_FAILED);
+                    result.setState(DeployerTaskStatus.DEPLOY_FAILED);
                     result.setMessage(tfEx.getMessage());
                 }
             }

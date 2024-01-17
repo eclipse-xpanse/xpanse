@@ -24,13 +24,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
-import org.eclipse.xpanse.modules.deployment.DeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -45,6 +45,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -95,7 +97,7 @@ class TerraformDeploymentTest {
     Executor taskExecutor;
 
     @MockBean
-    DeploymentResultCallbackManager deploymentResultCallbackManager;
+    TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
 
     @MockBean
     DeployServiceEntityHandler deployServiceEntityHandler;
@@ -167,8 +169,7 @@ class TerraformDeploymentTest {
         when(this.deployEnvironments.getFlavorVariables(any(DeployTask.class))).thenReturn(
                 new HashMap<>());
         Assertions.assertThrows(ServiceNotDeployedException.class,
-                () -> terraformDeployment.destroy(deployTask,
-                        deployResult.getPrivateProperties().get(STATE_FILE_NAME)));
+                () -> terraformDeployment.destroy(deployTask));
     }
 
     @Test
@@ -190,24 +191,28 @@ class TerraformDeploymentTest {
         deployTask.setDeployRequest(deployRequest);
         DeployResult deployResult = this.terraformDeployment.deploy(deployTask);
         Assertions.assertNull(deployResult.getState());
-        Assertions.assertNotEquals(TerraformExecState.DEPLOY_SUCCESS.toValue(),
+        Assertions.assertNotEquals(DeployerTaskStatus.DEPLOY_SUCCESS.toValue(),
                 deployResult.getMessage());
 
     }
 
     @Test
     void testDestroy_FailedCausedByTerraformExecutorException() {
-        ocl.getDeployment().setDeployer(errorDeployer);
-        DeployTask deployTask = new DeployTask();
-        deployTask.setId(id);
-        deployTask.setOcl(ocl);
-        deployTask.setDeployResourceHandler(null);
-        deployTask.setDeployRequest(deployRequest);
-        DeployResult deployResult = this.terraformDeployment.destroy(deployTask, "error_tfState");
-        Assertions.assertTrue(deployResult.getProperties().isEmpty());
-        Assertions.assertNull(deployResult.getState());
-        Assertions.assertNotEquals(TerraformExecState.DESTROY_FAILED.toValue(),
-                deployResult.getMessage());
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+                    .thenReturn("Test");
+            ocl.getDeployment().setDeployer(errorDeployer);
+            DeployTask deployTask = new DeployTask();
+            deployTask.setId(id);
+            deployTask.setOcl(ocl);
+            deployTask.setDeployResourceHandler(null);
+            deployTask.setDeployRequest(deployRequest);
+            DeployResult deployResult = this.terraformDeployment.destroy(deployTask);
+            Assertions.assertTrue(deployResult.getProperties().isEmpty());
+            Assertions.assertNull(deployResult.getState());
+            Assertions.assertNotEquals(DeployerTaskStatus.DESTROY_FAILED.toValue(),
+                    deployResult.getMessage());
+        }
     }
 
     @Test

@@ -11,14 +11,19 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResourceInstance;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Utils Define methods to transform TfResource into DeployResource.
  */
 @Slf4j
 public class TfResourceTransUtils {
+
+    public static final String STATE_FILE_NAME = "terraform.tfstate";
 
     private TfResourceTransUtils() {
         // private constructor to block instantiation.
@@ -61,4 +66,22 @@ public class TfResourceTransUtils {
         return instanceAttributes.getOrDefault(key, StringUtils.EMPTY).toString();
     }
 
+    /**
+     * Method to extract stored service resource state from DB entity. In case of terraform, it is
+     * the tfstate file contents which we store after the service is successfully deployed.
+     *
+     * @param deployServiceEntity DeployServiceEntity of the deployed service.
+     * @return returns the resource state stored in the database.
+     */
+
+    public static String getStoredStateContent(DeployServiceEntity deployServiceEntity) {
+        if (Objects.isNull(deployServiceEntity)
+                || CollectionUtils.isEmpty(deployServiceEntity.getPrivateProperties())
+                || StringUtils.isEmpty(
+                deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME))) {
+            throw new ServiceNotDeployedException(
+                    "Can't find valid state context in stored deployed service.");
+        }
+        return deployServiceEntity.getPrivateProperties().get(STATE_FILE_NAME);
+    }
 }
