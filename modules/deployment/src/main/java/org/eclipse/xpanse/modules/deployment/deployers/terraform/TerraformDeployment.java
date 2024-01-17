@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.DeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -55,8 +55,8 @@ public class TerraformDeployment implements Deployment {
     private final DeployEnvironments deployEnvironments;
     private final TerraformLocalConfig terraformLocalConfig;
     private final PluginManager pluginManager;
-    private final DeployService deployService;
     private final Executor taskExecutor;
+    private final DeploymentResultCallbackManager deploymentResultCallbackManager;
 
     /**
      * Initializes the Terraform deployer.
@@ -66,13 +66,13 @@ public class TerraformDeployment implements Deployment {
             DeployEnvironments deployEnvironments,
             TerraformLocalConfig terraformLocalConfig,
             PluginManager pluginManager,
-            DeployService deployService,
-            @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor) {
+            @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
+            DeploymentResultCallbackManager deploymentResultCallbackManager) {
         this.deployEnvironments = deployEnvironments;
         this.terraformLocalConfig = terraformLocalConfig;
         this.pluginManager = pluginManager;
-        this.deployService = deployService;
         this.taskExecutor = taskExecutor;
+        this.deploymentResultCallbackManager = deploymentResultCallbackManager;
     }
 
     /**
@@ -129,8 +129,9 @@ public class TerraformDeployment implements Deployment {
             }
             handleTerraformExecuteResult(executor, task, deployResult,
                     TerraformExecState.DEPLOY_FAILED);
-            deployService.deployCallback(task.getId().toString(), getTerraformResult(executor,
-                    deployResult, TerraformExecState.DEPLOY_SUCCESS));
+            deploymentResultCallbackManager.deployCallback(
+                    task.getId().toString(),
+                    getTerraformResult(executor, deployResult, TerraformExecState.DEPLOY_SUCCESS));
         });
     }
 
@@ -153,8 +154,10 @@ public class TerraformDeployment implements Deployment {
             }
             handleTerraformExecuteResult(executor, task, destroyResult,
                     TerraformExecState.DESTROY_FAILED);
-            deployService.destroyCallback(task.getId().toString(), getTerraformResult(executor,
-                    destroyResult, TerraformExecState.DESTROY_SUCCESS));
+            deploymentResultCallbackManager.destroyCallback(
+                    task.getId().toString(),
+                    getTerraformResult(
+                            executor, destroyResult, TerraformExecState.DESTROY_SUCCESS));
         });
     }
 

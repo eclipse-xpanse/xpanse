@@ -6,10 +6,8 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
-import java.util.List;
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 
@@ -44,9 +42,6 @@ public class DeployTask {
      */
     private DeployResourceHandler deployResourceHandler;
 
-    /**
-     * The service policies belongs to the registered service template.
-     */
-    private List<ServicePolicy> servicePolicies;
+    private UUID serviceTemplateId;
 
 }

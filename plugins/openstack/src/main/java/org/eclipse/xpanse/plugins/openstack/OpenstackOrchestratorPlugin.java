@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
+public class    OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Resource
     private OpenstackTerraformResourceHandler openstackTerraformResourceHandler;

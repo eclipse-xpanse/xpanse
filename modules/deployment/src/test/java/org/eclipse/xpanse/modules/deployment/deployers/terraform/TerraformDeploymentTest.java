@@ -22,6 +22,8 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.DeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -91,6 +93,12 @@ class TerraformDeploymentTest {
 
     @MockBean
     Executor taskExecutor;
+
+    @MockBean
+    DeploymentResultCallbackManager deploymentResultCallbackManager;
+
+    @MockBean
+    DeployServiceEntityHandler deployServiceEntityHandler;
 
     @BeforeEach
     void setUp() throws Exception {
