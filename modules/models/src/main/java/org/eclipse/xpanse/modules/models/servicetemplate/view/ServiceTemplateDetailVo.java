@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.springframework.hateoas.RepresentationModel;
@@ -116,5 +117,9 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
     @NotNull
     @Schema(description = "State of registered service.")
     private ServiceRegistrationState serviceRegistrationState;
+
+    @NotNull
+    @Schema(description = "The contact details of the service provider.")
+    private ServiceProviderContactDetails serviceProviderContactDetails;
 
 }

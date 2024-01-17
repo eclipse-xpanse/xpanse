@@ -217,7 +217,7 @@ public class ServiceTemplateApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
             @RequestParam(name = "serviceHostingType", required = false)
-            ServiceHostingType serviceHostingType) {
+                    ServiceHostingType serviceHostingType) {
         ServiceTemplateQueryModel query = getServiceTemplateQueryModel(
                 categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
         List<ServiceTemplateEntity> serviceEntities =
@@ -309,6 +309,8 @@ public class ServiceTemplateApi {
                             .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
             serviceTemplateDetailVo.setServiceHostingType(
                     serviceTemplateEntity.getServiceHostingType());
+            serviceTemplateDetailVo.setServiceProviderContactDetails(
+                    serviceTemplateDetailVo.getServiceProviderContactDetails());
             return serviceTemplateDetailVo;
         }
         return null;

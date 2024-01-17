@@ -148,6 +148,7 @@ public class ServiceTemplateManage {
         entity.setServiceHostingType(ocl.getServiceHostingType());
         entity.setOcl(ocl);
         entity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+        entity.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
         return entity;
     }
 

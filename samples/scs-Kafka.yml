@@ -62,6 +62,9 @@ flavors:
       worker_nodes_count: 5
       flavor_name: SCS-4V:8:20
       image_name: Ubuntu 20.04
+# The contact details of the service.
+serviceProviderContactDetails:
+  email: ["test@test.com"]
 deployment:
   # kind, Supported values are terraform, pulumi, crossplane.
   kind: terraform
