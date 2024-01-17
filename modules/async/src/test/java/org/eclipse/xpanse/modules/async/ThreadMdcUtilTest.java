@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.deployment.async;
+package org.eclipse.xpanse.modules.async;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,9 +28,7 @@ class ThreadMdcUtilTest {
 
     @Test
     public void testWrapCallableWithNullContext() throws Exception {
-        Callable<String> callable = () -> {
-            return MDC.get("key");
-        };
+        Callable<String> callable = () -> MDC.get("key");
         Callable<String> wrappedCallable = ThreadMdcUtil.wrap(callable, null);
         MDC.put("key", "value");
         String result = wrappedCallable.call();
@@ -40,9 +38,7 @@ class ThreadMdcUtilTest {
 
     @Test
     public void testWrapCallableWithNonNullContext() throws Exception {
-        Callable<String> callable = () -> {
-            return MDC.get("key");
-        };
+        Callable<String> callable = () -> MDC.get("key");
         Map<String, String> context = new HashMap<>();
         context.put("key", "value");
         Callable<String> wrappedCallable = ThreadMdcUtil.wrap(callable, context);
@@ -54,7 +50,6 @@ class ThreadMdcUtilTest {
     @Test
     public void testWrapRunnableWithNullContext() {
         Runnable runnable = () -> {
-            String value = MDC.get("key");
             MDC.put("key", "modified");
         };
         Runnable wrappedRunnable = ThreadMdcUtil.wrap(runnable, null);
@@ -67,7 +62,6 @@ class ThreadMdcUtilTest {
     @Test
     public void testWrapRunnableWithNonNullContext() {
         Runnable runnable = () -> {
-            String value = MDC.get("key");
             MDC.put("key", "modified");
         };
         Map<String, String> context = new HashMap<>();
