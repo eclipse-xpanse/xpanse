@@ -98,6 +98,11 @@ public class Ocl implements Serializable {
             + "for deploying cloud resources.")
     private ServiceHostingType serviceHostingType;
 
+    @Valid
+    @NotNull
+    @Schema(description = "The contact details of the service provider.")
+    private ServiceProviderContactDetails serviceProviderContactDetails;
+
     /**
      * an OCL object might be passed to different plugins for processing, in case any plugin want to
      * change the property of Ocl, we should not change the original Object, we should change a deep

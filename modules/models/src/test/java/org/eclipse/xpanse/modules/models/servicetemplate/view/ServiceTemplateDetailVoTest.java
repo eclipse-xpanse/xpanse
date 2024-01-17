@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,7 @@ class ServiceTemplateDetailVoTest {
     private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private static final ServiceRegistrationState serviceRegistrationState =
             ServiceRegistrationState.REGISTERED;
+    private static ServiceProviderContactDetails serviceProviderContactDetails;
     private static List<@Valid Region> regions;
     private static List<@Valid DeployVariable> variables;
     private static List<@Valid Flavor> flavors;
@@ -85,6 +87,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setLastModifiedTime(lastModifiedTime);
         serviceTemplateDetailVo.setServiceRegistrationState(serviceRegistrationState);
         serviceTemplateDetailVo.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
     }
 
     @Test
@@ -105,7 +108,10 @@ class ServiceTemplateDetailVoTest {
         assertEquals(lastModifiedTime, serviceTemplateDetailVo.getLastModifiedTime());
         assertEquals(serviceRegistrationState,
                 serviceTemplateDetailVo.getServiceRegistrationState());
-        assertEquals(ServiceHostingType.SERVICE_VENDOR, serviceTemplateDetailVo.getServiceHostingType());
+        assertEquals(ServiceHostingType.SERVICE_VENDOR,
+                serviceTemplateDetailVo.getServiceHostingType());
+        assertEquals(serviceProviderContactDetails,
+                serviceTemplateDetailVo.getServiceProviderContactDetails());
     }
 
     @Test
@@ -218,6 +224,7 @@ class ServiceTemplateDetailVoTest {
 
         serviceTemplateDetailVo1.setServiceRegistrationState(serviceRegistrationState);
         serviceTemplateDetailVo1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        serviceTemplateDetailVo1.setServiceProviderContactDetails(serviceProviderContactDetails);
         assertEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
         assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
         assertEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
@@ -243,7 +250,8 @@ class ServiceTemplateDetailVoTest {
                 "serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR + ", " +
                 "createTime=" + createTime + ", " +
                 "lastModifiedTime=" + lastModifiedTime + ", " +
-                "serviceRegistrationState=" + serviceRegistrationState + ")";
+                "serviceRegistrationState=" + serviceRegistrationState + ", " +
+                "serviceProviderContactDetails=" + serviceProviderContactDetails + ")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());
     }

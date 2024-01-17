@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
@@ -82,6 +83,11 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Column(name = "SERVICE_REGISTRATION_STATE")
     @Enumerated(EnumType.STRING)
     private ServiceRegistrationState serviceRegistrationState;
+
+    @Column(name = "SERVICE_PROVIDER_CONTACT_DETAILS", columnDefinition = "json", nullable = false)
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private ServiceProviderContactDetails serviceProviderContactDetails;
 
     @Column(name = "SERVICE_VARIABLES_JSON_SCHEMA", columnDefinition = "json", nullable = false)
     @Type(value = JsonType.class)

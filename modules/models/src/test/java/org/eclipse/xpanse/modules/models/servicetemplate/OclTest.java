@@ -36,6 +36,7 @@ class OclTest {
     private static List<Flavor> flavors;
     private static Billing billing;
     private static Ocl ocl;
+    private static  ServiceProviderContactDetails serviceProviderContactDetails;
     private static final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
 
     @BeforeEach
@@ -72,6 +73,7 @@ class OclTest {
         ocl.setFlavors(flavors);
         ocl.setBilling(billing);
         ocl.setServiceHostingType(serviceHostingType);
+        ocl.setServiceProviderContactDetails(serviceProviderContactDetails);
     }
 
     @Test
@@ -105,6 +107,7 @@ class OclTest {
         assertNotSame(ocl.getDeployment(), aCopy.getDeployment());
         assertEquals(ocl.getDeployment().getKind(), aCopy.getDeployment().getKind());
         assertEquals(ocl.getServiceHostingType(), aCopy.getServiceHostingType());
+        assertEquals(ocl.getServiceProviderContactDetails(), aCopy.getServiceProviderContactDetails());
     }
 
     @Test
@@ -187,6 +190,7 @@ class OclTest {
 
         ocl1.setBilling(billing);
         ocl1.setServiceHostingType(ServiceHostingType.SELF);
+        ocl1.setServiceProviderContactDetails(serviceProviderContactDetails);
         assertEquals(ocl, ocl1);
         assertNotEquals(ocl1, ocl2);
         assertEquals(ocl.hashCode(), ocl1.hashCode());
@@ -207,7 +211,8 @@ class OclTest {
                 ", deployment=" + deployment +
                 ", flavors=" + flavors +
                 ", billing=" + billing +
-                ", serviceHostingType=" +  serviceHostingType +
+                ", serviceHostingType=" + serviceHostingType +
+                ", serviceProviderContactDetails=" +  serviceProviderContactDetails +
                 ")";
 
         assertEquals(expectedString, ocl.toString());

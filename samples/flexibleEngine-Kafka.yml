@@ -58,6 +58,9 @@ flavors:
     properties:
       worker_nodes_count: 5
       flavor_id: s6.xlarge.4
+# The contact details of the service.
+serviceProviderContactDetails:
+  email: ["test@test.com"]
 deployment:
   # kind, Supported values are terraform, pulumi, crossplane.
   kind: terraform

@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,12 +19,15 @@ class DeployTaskTest {
     DeployResourceHandler handler = deployResult -> {
     };
     Ocl ocl = new Ocl();
+    ServiceProviderContactDetails serviceProviderContactDetails =
+            new ServiceProviderContactDetails();
     DeployRequest deployRequest = new DeployRequest();
     private DeployTask test;
 
     @BeforeEach
     void setUp() {
         test = new DeployTask();
+        ocl.setServiceProviderContactDetails(null);
         test.setId(id);
         test.setOcl(ocl);
         test.setDeployRequest(deployRequest);
@@ -108,10 +112,12 @@ class DeployTaskTest {
                 + "namespace=null, "
                 + "deployRequest=DeployRequest(super=DeployRequestBase(userId=null, category=null, "
                 + "serviceName=null, customerServiceName=null, version=null, region=null, "
-                + "csp=null, flavor=null, serviceHostingType=null, ocl=null, serviceRequestProperties=null), id=null),"
-                + " ocl=Ocl(category=null, version=null, name=null, serviceVersion=null, "
-                + "description=null, namespace=null, icon=null, cloudServiceProvider=null, "
-                + "deployment=null, flavors=null, billing=null, serviceHostingType=null), deployResourceHandler=null, serviceTemplateId=null)";
+                + "csp=null, flavor=null, serviceHostingType=null, ocl=null, "
+                + "serviceRequestProperties=null), id=null), ocl=Ocl(category=null, version=null, "
+                + "name=null, serviceVersion=null, description=null, namespace=null, icon=null, "
+                + "cloudServiceProvider=null, deployment=null, flavors=null, billing=null, "
+                + "serviceHostingType=null, serviceProviderContactDetails=null), "
+                + "deployResourceHandler=null, serviceTemplateId=null)";
         assertEquals(exceptedString, test.toString());
 
     }

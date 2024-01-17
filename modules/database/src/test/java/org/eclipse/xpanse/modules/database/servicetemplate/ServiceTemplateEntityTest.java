@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.models.service.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -32,6 +33,7 @@ class ServiceTemplateEntityTest {
             ServiceRegistrationState.REGISTERED;
     private Ocl ocl;
     private JsonObjectSchema jsonObjectSchema;
+    private ServiceProviderContactDetails serviceProviderContactDetails;
 
     private ServiceTemplateEntity test;
 
@@ -54,6 +56,7 @@ class ServiceTemplateEntityTest {
         test.setOcl(ocl);
         test.setServiceRegistrationState(SERVICE_STATE);
         test.setJsonObjectSchema(jsonObjectSchema);
+        test.setServiceProviderContactDetails(serviceProviderContactDetails);
     }
 
     @Test
@@ -68,6 +71,7 @@ class ServiceTemplateEntityTest {
                         + "serviceHostingType=null" + ", "
                         + "ocl=" + ocl + ", "
                         + "serviceRegistrationState=" + SERVICE_STATE + ", "
+                        + "serviceProviderContactDetails=" + serviceProviderContactDetails + ", "
                         + "jsonObjectSchema=" + jsonObjectSchema + ")";
         assertEquals(expectedToString, test.toString());
     }
@@ -139,6 +143,13 @@ class ServiceTemplateEntityTest {
         assertNotEquals(test1.hashCode(), test2.hashCode());
 
         test1.setServiceRegistrationState(SERVICE_STATE);
+        assertNotEquals(test, test1);
+        assertNotEquals(test, test2);
+        assertNotEquals(test1, test2);
+        assertNotEquals(test.hashCode(), test1.hashCode());
+        assertNotEquals(test1.hashCode(), test2.hashCode());
+
+        test1.setServiceProviderContactDetails(serviceProviderContactDetails);
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test1, test2);
