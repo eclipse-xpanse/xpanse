@@ -15,8 +15,8 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.models.service.manager.ServiceState;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -50,7 +50,7 @@ public class DeployResultManager {
             log.info("Deploy task update deploy service entity with id:{}", deployResult.getId());
             DeployServiceEntity deployServiceEntityToFlush = new DeployServiceEntity();
             BeanUtils.copyProperties(storedEntity, deployServiceEntityToFlush);
-            if (TerraformExecState.DEPLOY_SUCCESS == deployResult.getState()) {
+            if (DeployerTaskStatus.DEPLOY_SUCCESS == deployResult.getState()) {
                 deployServiceEntityToFlush.setServiceDeploymentState(
                         ServiceDeploymentState.DEPLOY_SUCCESS);
                 deployServiceEntityToFlush.setServiceState(ServiceState.RUNNING);
@@ -132,7 +132,7 @@ public class DeployResultManager {
             DeployServiceEntity deployServiceEntityToFlush = new DeployServiceEntity();
             BeanUtils.copyProperties(deployServiceEntity, deployServiceEntityToFlush);
             if (isCalledWhenRollback) {
-                if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
+                if (destroyResult.getState() == DeployerTaskStatus.DESTROY_SUCCESS) {
                     deployServiceEntityToFlush.setServiceDeploymentState(
                             ServiceDeploymentState.DEPLOY_FAILED);
                     deployServiceEntityToFlush.setServiceState(ServiceState.NOT_RUNNING);
@@ -142,7 +142,7 @@ public class DeployResultManager {
                     deployServiceEntityToFlush.setServiceState(ServiceState.RUNNING);
                 }
             } else {
-                if (destroyResult.getState() == TerraformExecState.DESTROY_SUCCESS) {
+                if (destroyResult.getState() == DeployerTaskStatus.DESTROY_SUCCESS) {
                     deployServiceEntityToFlush.setServiceDeploymentState(
                             ServiceDeploymentState.DESTROY_SUCCESS);
                     deployServiceEntityToFlush.setServiceState(ServiceState.NOT_RUNNING);

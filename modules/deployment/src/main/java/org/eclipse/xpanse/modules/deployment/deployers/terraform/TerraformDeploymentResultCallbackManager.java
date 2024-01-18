@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.deployment;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
 import jakarta.annotation.Resource;
 import java.util.Objects;
@@ -12,12 +12,17 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.deployment.DeployResultManager;
+import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityToDeployTaskConverter;
+import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,9 +30,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class DeploymentResultCallbackManager {
-
-    public static final String STATE_FILE_NAME = "terraform.tfstate";
+public class TerraformDeploymentResultCallbackManager {
 
     @Resource
     DeployServiceEntityHandler deployServiceEntityHandler;
@@ -37,9 +40,6 @@ public class DeploymentResultCallbackManager {
 
     @Resource
     DeployResultManager deployResultManager;
-
-    @Resource
-    private DeployerKindManager deployerKindManager;
 
     @Resource
     private DeployServiceEntityToDeployTaskConverter deployServiceEntityToDeployTaskConverter;
@@ -67,15 +67,7 @@ public class DeploymentResultCallbackManager {
             DeployTask deployTask =
                     deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
                             updatedDeployServiceEntity);
-            Deployment deployment =
-                    deployerKindManager.getDeployment(
-                            updatedDeployServiceEntity
-                                    .getDeployRequest()
-                                    .getOcl()
-                                    .getDeployment()
-                                    .getKind());
-            deployService.rollbackOnDeploymentFailure(
-                    deployment, deployTask, updatedDeployServiceEntity);
+            deployService.rollbackOnDeploymentFailure(deployTask, updatedDeployServiceEntity);
         }
 
     }
@@ -83,12 +75,13 @@ public class DeploymentResultCallbackManager {
     private DeployResult handlerCallbackDeployResult(TerraformResult result) {
         DeployResult deployResult = new DeployResult();
         if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
-            deployResult.setState(TerraformExecState.DEPLOY_SUCCESS);
+            deployResult.setState(DeployerTaskStatus.DEPLOY_SUCCESS);
         } else {
-            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+            deployResult.setState(DeployerTaskStatus.DEPLOY_FAILED);
             deployResult.setMessage(result.getCommandStdError());
         }
-        deployResult.getPrivateProperties().put(STATE_FILE_NAME, result.getTerraformState());
+        deployResult.getPrivateProperties().put(
+                TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
         if (Objects.nonNull(result.getImportantFileContentMap())) {
             deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
         }
@@ -120,12 +113,13 @@ public class DeploymentResultCallbackManager {
     private DeployResult handlerCallbackDestroyResult(TerraformResult result) {
         DeployResult deployResult = new DeployResult();
         if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
-            deployResult.setState(TerraformExecState.DESTROY_SUCCESS);
+            deployResult.setState(DeployerTaskStatus.DESTROY_SUCCESS);
         } else {
-            deployResult.setState(TerraformExecState.DEPLOY_FAILED);
+            deployResult.setState(DeployerTaskStatus.DEPLOY_FAILED);
             deployResult.setMessage(result.getCommandStdError());
         }
-        deployResult.getPrivateProperties().put(STATE_FILE_NAME, result.getTerraformState());
+        deployResult.getPrivateProperties().put(
+                TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
         if (Objects.nonNull(result.getImportantFileContentMap())) {
             deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
         }

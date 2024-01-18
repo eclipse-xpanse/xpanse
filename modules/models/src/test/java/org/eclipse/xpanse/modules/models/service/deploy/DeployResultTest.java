@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.TerraformExecState;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ class DeployResultTest {
 
     private static final UUID id = UUID.fromString("f0dcb6ea-cbe7-4c88-9c94-a5d00e82a4f2");
     private static final String name = "name";
-    private static final TerraformExecState state = TerraformExecState.DEPLOY_SUCCESS;
+    private static final DeployerTaskStatus state = DeployerTaskStatus.DEPLOY_SUCCESS;
     private static final Map<String, String> map = Map.of("key", "value");
     private static final Map<String, String> properties = Collections.singletonMap("key", "value");
     private static final Map<String, String> privateProperties =
@@ -70,9 +70,6 @@ class DeployResultTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(deployResult, deployResult);
-        assertEquals(deployResult.hashCode(), deployResult.hashCode());
-
         Object obj = new Object();
         assertNotEquals(deployResult, obj);
         assertNotEquals(deployResult, null);

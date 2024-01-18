@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
-import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
@@ -40,7 +39,6 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
@@ -81,9 +79,6 @@ public class ServiceDeployerApi {
 
     @Resource
     private ServiceDetailsViewManager serviceDetailsViewManager;
-
-    @Resource
-    private DeployerKindManager deployerKindManager;
 
     @Resource
     private DeployServiceEntityHandler deployServiceEntityHandler;
@@ -168,10 +163,7 @@ public class ServiceDeployerApi {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         deployRequest.setUserId(userIdOptional.orElse(null));
         DeployTask deployTask = this.deployService.createNewDeployTask(deployRequest);
-        Deployment deployment =
-                this.deployerKindManager.getDeployment(
-                        deployTask.getOcl().getDeployment().getKind());
-        this.deployService.deployService(deployment, deployTask);
+        this.deployService.deployService(deployTask);
         String successMsg = String.format(
                 "Task for starting managed service %s-%s-%s-%s started. UUID %s",
                 deployRequest.getServiceName(),
@@ -203,10 +195,7 @@ public class ServiceDeployerApi {
                     "No permissions to destroy services belonging to other users.");
         }
         DeployTask destroyTask = this.deployService.getDestroyTask(deployServiceEntity);
-        Deployment deployment =
-                this.deployerKindManager.getDeployment(
-                        destroyTask.getOcl().getDeployment().getKind());
-        this.deployService.destroyService(deployment, destroyTask, deployServiceEntity);
+        this.deployService.destroyService(destroyTask, deployServiceEntity);
         String successMsg = String.format(
                 "Task for destroying managed service %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
@@ -232,10 +221,7 @@ public class ServiceDeployerApi {
                     "No permissions to purge services belonging to other users.");
         }
         DeployTask purgeTask = this.deployService.getPurgeTask(deployServiceEntity);
-        Deployment deployment =
-                this.deployerKindManager.getDeployment(
-                        purgeTask.getOcl().getDeployment().getKind());
-        this.deployService.asyncPurgeService(deployment, purgeTask, deployServiceEntity);
+        this.deployService.asyncPurgeService(purgeTask, deployServiceEntity);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
     }

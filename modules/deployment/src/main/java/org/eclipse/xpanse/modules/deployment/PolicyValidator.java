@@ -21,7 +21,6 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
 import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
 import org.eclipse.xpanse.modules.policy.policyman.UserPolicyManager;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
@@ -42,6 +41,8 @@ public class PolicyValidator {
     private UserPolicyManager userPolicyManager;
     @Resource
     private DatabaseServiceTemplateStorage serviceTemplateStorage;
+    @Resource
+    private DeployerKindManager deployerKindManager;
 
     private List<ServicePolicy> getServicePolicies(UUID serviceTemplateId) {
         ServiceTemplateEntity existedServiceTemplate =
@@ -78,17 +79,17 @@ public class PolicyValidator {
     /**
      * Validate deployment with policies.
      *
-     * @param deployment deployment.
      * @param deployTask deploy task.
      */
-    public void validateDeploymentWithPolicies(Deployment deployment, DeployTask deployTask) {
+    public void validateDeploymentWithPolicies(DeployTask deployTask) {
 
         List<ServicePolicy> servicePolicies = getServicePolicies(deployTask.getServiceTemplateId());
         List<UserPolicy> userPolicies = getUserPolicies(deployTask);
         if (CollectionUtils.isEmpty(userPolicies) && CollectionUtils.isEmpty(servicePolicies)) {
             return;
         }
-        String planJson = deployment.getDeployPlanAsJson(deployTask);
+        String planJson = deployerKindManager.getDeployment(
+                deployTask.getOcl().getDeployment().getKind()).getDeployPlanAsJson(deployTask);
         if (StringUtils.isEmpty(planJson)) {
             return;
         }

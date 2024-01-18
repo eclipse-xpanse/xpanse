@@ -131,7 +131,8 @@ public class DeployServiceEntity extends CreateModifiedTime {
     private Map<String, String> properties;
 
     /**
-     * The properties of the deployed service.
+     * The private properties of the deployed service. This is not returned to the customer.
+     * This can be used by the deployer for storing any internal data.
      */
     @ElementCollection
     @CollectionTable(name = "DEPLOY_RESULT_PROPERTY",
