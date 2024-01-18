@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
+import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
@@ -91,6 +92,8 @@ class ServiceTemplateManageTest {
     ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @InjectMocks
     private ServiceTemplateManage serviceTemplateManageTest;
+    @Mock
+    private ResourceHandlerManager resourceHandlerManager;
 
     @BeforeAll
     static void init() throws Exception {
@@ -124,7 +127,8 @@ class ServiceTemplateManageTest {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler);
+                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
+                        resourceHandlerManager);
 
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         doReturn("""
@@ -170,7 +174,8 @@ class ServiceTemplateManageTest {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler);
+                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
+                        resourceHandlerManager);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         doReturn("""
                 terraform {
@@ -233,7 +238,8 @@ class ServiceTemplateManageTest {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler);
+                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
+                        resourceHandlerManager);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         doReturn("""
                     terraform {
@@ -296,7 +302,8 @@ class ServiceTemplateManageTest {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler);
+                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
+                        resourceHandlerManager);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         doReturn("""
                 terraform {

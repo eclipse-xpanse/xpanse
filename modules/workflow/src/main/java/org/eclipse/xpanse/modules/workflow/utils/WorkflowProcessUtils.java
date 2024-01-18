@@ -94,7 +94,7 @@ public class WorkflowProcessUtils {
      * @param variables global process variables.
      */
     public void completeTask(String taskId, Map<String, Object> variables) {
-        vaildateTaskId(taskId);
+        validateTaskId(taskId);
         taskService.complete(taskId, variables);
     }
 
@@ -123,7 +123,7 @@ public class WorkflowProcessUtils {
         return list.stream().map(this::getWorkFlow).collect(Collectors.toList());
     }
 
-    private void vaildateTaskId(String taskId) {
+    private void validateTaskId(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new ServiceNotDeployedException("The migrated activiti task was not found, "

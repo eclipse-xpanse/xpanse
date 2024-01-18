@@ -7,11 +7,13 @@
 package org.eclipse.xpanse.modules.orchestrator;
 
 import java.util.List;
+import java.util.Map;
 import lombok.extern.java.Log;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Component;
 public class DummyOpenstackPluginImpl implements OrchestratorPlugin {
 
     @Override
-    public DeployResourceHandler getResourceHandler() {
+    public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         return null;
     }
 

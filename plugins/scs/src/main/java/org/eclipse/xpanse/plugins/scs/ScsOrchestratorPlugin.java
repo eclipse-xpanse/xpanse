@@ -8,7 +8,9 @@ package org.eclipse.xpanse.plugins.scs;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -16,6 +18,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -49,11 +52,12 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
 
     /**
-     * Get the resource handler for SCS.
+     * Get the resource handlers for SCS.
      */
-    @Override
-    public DeployResourceHandler getResourceHandler() {
-        return scsTerraformResourceHandler;
+    public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
+        Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
+        resourceHandlers.put(DeployerKind.TERRAFORM, scsTerraformResourceHandler);
+        return resourceHandlers;
     }
 
     /**

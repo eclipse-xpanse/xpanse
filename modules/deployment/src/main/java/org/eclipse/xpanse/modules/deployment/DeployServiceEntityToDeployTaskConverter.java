@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.stereotype.Component;
@@ -17,9 +16,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DeployServiceEntityToDeployTaskConverter {
-
-    @Resource
-    ResourceHandlerManager resourceHandlerManager;
 
     /**
      * Method to create a DeployTask from DeployServiceEntity.
@@ -33,7 +29,6 @@ public class DeployServiceEntityToDeployTaskConverter {
         deployTask.setId(deployServiceEntity.getId());
         deployTask.setDeployRequest(deployServiceEntity.getDeployRequest());
         deployTask.setOcl(deployServiceEntity.getDeployRequest().getOcl());
-        resourceHandlerManager.fillHandler(deployTask);
         return deployTask;
 
     }

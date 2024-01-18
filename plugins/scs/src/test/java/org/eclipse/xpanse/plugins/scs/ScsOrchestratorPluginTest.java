@@ -11,6 +11,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class ScsOrchestratorPluginTest {
 
     @Test
     void getResourceHandler() {
-        assertTrue(plugin.getResourceHandler() instanceof ScsTerraformResourceHandler);
+        assertTrue(plugin.resourceHandlers().get(DeployerKind.TERRAFORM) instanceof ScsTerraformResourceHandler);
     }
 
     @Test

@@ -35,6 +35,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
@@ -296,7 +297,6 @@ class DeployEnvironmentsTest {
         DeployTask xpanseDeployTask = new DeployTask();
         xpanseDeployTask.setId(UUID.randomUUID());
         xpanseDeployTask.setOcl(ocl);
-        xpanseDeployTask.setDeployResourceHandler(null);
         xpanseDeployTask.setDeployRequest(deployRequest);
 
         OrchestratorPlugin plugin = new OrchestratorPlugin() {
@@ -336,7 +336,7 @@ class DeployEnvironmentsTest {
             }
 
             @Override
-            public DeployResourceHandler getResourceHandler() {
+            public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
                 return null;
             }
 

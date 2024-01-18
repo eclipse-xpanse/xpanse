@@ -40,7 +40,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
-import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -54,9 +54,8 @@ import org.springframework.web.client.RestClientException;
 @Slf4j
 @Profile("terraform-boot")
 @Component
-public class TerraformBootDeployment implements Deployment {
+public class TerraformBootDeployment implements Deployer {
 
-    public static final String STATE_FILE_NAME = "terraform.tfstate";
     private static final String ZITADEL_PROFILE_NAME = "zitadel";
     private final DeployEnvironments deployEnvironments;
     private final PluginManager pluginManager;
@@ -163,7 +162,7 @@ public class TerraformBootDeployment implements Deployment {
     }
 
     @Override
-    public String getDeployPlanAsJson(DeployTask task) {
+    public String getDeploymentPlanAsJson(DeployTask task) {
         setHeaderTokenByProfiles();
         TerraformPlan terraformPlan =
                 terraformApi.planWithScripts(getPlanWithScriptsRequest(task), task.getId());

@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupported
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -245,7 +246,7 @@ class ServiceMetricsAdapterTest {
             }
 
             @Override
-            public DeployResourceHandler getResourceHandler() {
+            public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
                 return null;
             }
 

@@ -14,19 +14,17 @@ import org.springframework.context.annotation.Profile;
 /**
  * Configuration class of terraform-boot env.
  */
+@Getter
 @Configuration
 @Profile("terraform-boot")
 public class TerraformBootConfig {
 
-    @Getter
     @Value("${terraform.webhook.endpoint}")
     private String clientBaseUri;
 
-    @Getter
     @Value("${webhook.deployCallbackUri}")
     private String deployCallbackUri;
 
-    @Getter
     @Value("${webhook.destroyCallbackUri}")
     private String destroyCallbackUri;
 

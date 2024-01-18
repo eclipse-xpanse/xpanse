@@ -56,7 +56,10 @@ public class TerraformDeploymentResultCallbackManager {
         DeployResult deployResult = handlerCallbackDeployResult(result);
         deployResult.setId(UUID.fromString(taskId));
         if (StringUtils.isNotBlank(result.getTerraformState())) {
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp())
+            resourceHandlerManager.getResourceHandler(
+                    deployServiceEntity.getCsp(),
+                            deployServiceEntity.getDeployRequest().getOcl().getDeployment()
+                                    .getKind())
                     .handler(deployResult);
         }
         DeployServiceEntity updatedDeployServiceEntity =
@@ -99,7 +102,9 @@ public class TerraformDeploymentResultCallbackManager {
         destroyResult.setId(UUID.fromString(taskId));
         if (StringUtils.isNotBlank(result.getTerraformState())) {
             resourceHandlerManager.getResourceHandler(
-                    deployServiceEntity.getCsp()).handler(destroyResult);
+                    deployServiceEntity.getCsp(),
+                    deployServiceEntity.getDeployRequest().getOcl().getDeployment()
+                            .getKind()).handler(destroyResult);
         }
         try {
             deployResultManager.updateDeployServiceEntityWithDestroyResult(

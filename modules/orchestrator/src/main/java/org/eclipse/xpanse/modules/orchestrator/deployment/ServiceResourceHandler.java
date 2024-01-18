@@ -6,9 +6,12 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
+import java.util.Map;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+
 /**
- * This interface describes orchestrator plugin in charge of interacting with backend fundamental
- * APIs.
+ * This interface describes the DeployResourceHandler used to extract the resources
+ * used by the service.
  */
 public interface ServiceResourceHandler {
 
@@ -18,5 +21,5 @@ public interface ServiceResourceHandler {
      *
      * @return the resource handler of the plugin.
      */
-    DeployResourceHandler getResourceHandler();
+    Map<DeployerKind, DeployResourceHandler> resourceHandlers();
 }

@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
@@ -53,7 +54,7 @@ class OpenstackOrchestratorPluginTest {
 
     @Test
     void testGetResourceHandler() {
-        assertThat(openstackOrchestratorPluginUnderTest.getResourceHandler())
+        assertThat(openstackOrchestratorPluginUnderTest.resourceHandlers().get(DeployerKind.TERRAFORM))
                 .isEqualTo(mockOpenstackTerraformResourceHandler);
     }
 
