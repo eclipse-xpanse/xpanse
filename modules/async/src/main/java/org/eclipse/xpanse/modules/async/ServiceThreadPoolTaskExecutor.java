@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.deployment.async;
+package org.eclipse.xpanse.modules.async;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;

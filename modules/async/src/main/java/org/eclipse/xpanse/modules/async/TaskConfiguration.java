@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.deployment.async;
+package org.eclipse.xpanse.modules.async;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TaskConfiguration {
 
+    public static final String ASYNC_EXECUTOR_NAME = "xpanseAsyncTaskExecutor";
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
 
     /**
@@ -25,7 +26,7 @@ public class TaskConfiguration {
      *
      * @return executor
      */
-    @Bean("xpanseAsyncTaskExecutor")
+    @Bean(ASYNC_EXECUTOR_NAME)
     public Executor taskExecutor() {
         ServiceThreadPoolTaskExecutor executor = new ServiceThreadPoolTaskExecutor();
         executor.setCorePoolSize(CPU_COUNT * 2);

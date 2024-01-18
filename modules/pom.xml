@@ -34,6 +34,7 @@
         <module>policy</module>
         <module>workflow</module>
         <module>observability</module>
+        <module>async</module>
     </modules>
 
 </project>

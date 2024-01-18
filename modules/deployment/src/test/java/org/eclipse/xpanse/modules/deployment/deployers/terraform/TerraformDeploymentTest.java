@@ -21,10 +21,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeploymentResultCallbackManager;
-import org.eclipse.xpanse.modules.deployment.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
@@ -149,7 +149,7 @@ class TerraformDeploymentTest {
         Assertions.assertNotNull(deployResult.getPrivateProperties());
         tfState = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
         Assertions.assertNull(tfState);
-        Assertions.assertEquals(null, deployResult.getState());
+        Assertions.assertNull(deployResult.getState());
 
     }
 

@@ -75,6 +75,11 @@
             <artifactId>policy</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>async</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

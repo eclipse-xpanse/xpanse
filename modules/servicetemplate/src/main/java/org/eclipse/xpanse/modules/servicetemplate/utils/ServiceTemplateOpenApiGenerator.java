@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
+import org.eclipse.xpanse.modules.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.common.enums.Category;
@@ -89,7 +90,7 @@ public class ServiceTemplateOpenApiGenerator {
      *
      * @param registerService Registered services.
      */
-    @Async("xpanseAsyncTaskExecutor")
+    @Async(TaskConfiguration.ASYNC_EXECUTOR_NAME)
     public void generateServiceApi(ServiceTemplateEntity registerService) {
         createServiceApi(registerService);
     }
@@ -99,7 +100,7 @@ public class ServiceTemplateOpenApiGenerator {
      *
      * @param registerService Registered services.
      */
-    @Async("xpanseAsyncTaskExecutor")
+    @Async(TaskConfiguration.ASYNC_EXECUTOR_NAME)
     public void updateServiceApi(ServiceTemplateEntity registerService) {
         File file =
                 new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
@@ -115,7 +116,7 @@ public class ServiceTemplateOpenApiGenerator {
      *
      * @param id ID of registered service.
      */
-    @Async("xpanseAsyncTaskExecutor")
+    @Async(TaskConfiguration.ASYNC_EXECUTOR_NAME)
     public void deleteServiceApi(String id) {
         File file = new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
                 id + OPENAPI_FILE_EXTENSION);
@@ -151,7 +152,7 @@ public class ServiceTemplateOpenApiGenerator {
             if (yamlFile.exists() && jarPath.exists()) {
                 String comm = String.format("java -jar %s generate -g html2 "
                         + "-i %s -o %s", jarPath.getPath(), yamlFile.getPath(), openApiDir);
-                Process exec = Runtime.getRuntime().exec(comm);
+                Process exec = Runtime.getRuntime().exec(comm.split("\\s+"));
                 StringBuilder stdErrOut = new StringBuilder();
                 BufferedReader outputReader =
                         new BufferedReader(new InputStreamReader(exec.getErrorStream()));
