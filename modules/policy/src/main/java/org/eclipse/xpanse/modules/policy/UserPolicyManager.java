@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.policy.policyman;
+package org.eclipse.xpanse.modules.policy;
 
 import jakarta.annotation.Resource;
 import java.util.Comparator;
