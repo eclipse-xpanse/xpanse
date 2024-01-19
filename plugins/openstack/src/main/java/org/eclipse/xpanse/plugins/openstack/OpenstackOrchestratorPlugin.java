@@ -9,7 +9,9 @@ package org.eclipse.xpanse.plugins.openstack;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -18,6 +20,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -48,11 +51,13 @@ public class    OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     private String terraformOpenStackVersion;
 
     /**
-     * Get the resource handler for OpenStack.
+     * Get the resource handlers for OpenStack.
      */
     @Override
-    public DeployResourceHandler getResourceHandler() {
-        return this.openstackTerraformResourceHandler;
+    public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
+        Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
+        resourceHandlers.put(DeployerKind.TERRAFORM, openstackTerraformResourceHandler);
+        return resourceHandlers;
     }
 
     /**

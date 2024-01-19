@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -58,7 +59,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class,
-        PluginManager.class, TerraformLocalConfig.class, DeployService.class, TaskConfiguration.class})
+        PluginManager.class, TerraformLocalConfig.class, DeployService.class, TaskConfiguration.class,
+ResourceHandlerManager.class})
 class TerraformDeploymentTest {
 
     private final UUID id = UUID.randomUUID();
@@ -144,7 +146,6 @@ class TerraformDeploymentTest {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(id);
         deployTask.setOcl(ocl);
-        deployTask.setDeployResourceHandler(null);
         deployTask.setDeployRequest(deployRequest);
         deployResult = terraformDeployment.deploy(deployTask);
         Assertions.assertNotNull(deployResult);
@@ -161,7 +162,6 @@ class TerraformDeploymentTest {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(id);
         deployTask.setOcl(ocl);
-        deployTask.setDeployResourceHandler(null);
         deployTask.setDeployRequest(deployRequest);
         if (StringUtils.isBlank(tfState)) {
             testDeploy();
@@ -187,7 +187,6 @@ class TerraformDeploymentTest {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.randomUUID());
         deployTask.setOcl(ocl);
-        deployTask.setDeployResourceHandler(null);
         deployTask.setDeployRequest(deployRequest);
         DeployResult deployResult = this.terraformDeployment.deploy(deployTask);
         Assertions.assertNull(deployResult.getState());
@@ -205,7 +204,6 @@ class TerraformDeploymentTest {
             DeployTask deployTask = new DeployTask();
             deployTask.setId(id);
             deployTask.setOcl(ocl);
-            deployTask.setDeployResourceHandler(null);
             deployTask.setDeployRequest(deployRequest);
             DeployResult deployResult = this.terraformDeployment.destroy(deployTask);
             Assertions.assertTrue(deployResult.getProperties().isEmpty());
@@ -238,10 +236,9 @@ class TerraformDeploymentTest {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(id);
         deployTask.setOcl(ocl);
-        deployTask.setDeployResourceHandler(null);
         deployTask.setDeployRequest(deployRequest);
 
-        String deployPlanJson = terraformDeployment.getDeployPlanAsJson(deployTask);
+        String deployPlanJson = terraformDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
 
     }
@@ -253,12 +250,11 @@ class TerraformDeploymentTest {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.randomUUID());
         deployTask.setOcl(ocl);
-        deployTask.setDeployResourceHandler(null);
         deployTask.setDeployRequest(deployRequest);
         deployResult = this.terraformDeployment.deploy(deployTask);
 
         Assertions.assertThrows(TerraformExecutorException.class,
-                () -> this.terraformDeployment.getDeployPlanAsJson(deployTask));
+                () -> this.terraformDeployment.getDeploymentPlanAsJson(deployTask));
 
     }
 

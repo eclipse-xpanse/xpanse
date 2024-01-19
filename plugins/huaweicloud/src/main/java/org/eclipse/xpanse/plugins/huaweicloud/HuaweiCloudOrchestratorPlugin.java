@@ -9,7 +9,9 @@ package org.eclipse.xpanse.plugins.huaweicloud;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -17,6 +19,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -49,8 +52,10 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     private HuaweiCloudVmStateManager huaweiCloudVmStateManager;
 
     @Override
-    public DeployResourceHandler getResourceHandler() {
-        return this.huaweiCloudTerraformResourceHandler;
+    public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
+        Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
+        resourceHandlers.put(DeployerKind.TERRAFORM, huaweiCloudTerraformResourceHandler);
+        return resourceHandlers;
     }
 
     @Override

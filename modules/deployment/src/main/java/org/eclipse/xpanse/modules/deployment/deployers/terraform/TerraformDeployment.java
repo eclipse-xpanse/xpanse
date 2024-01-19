@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
@@ -36,7 +37,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
-import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -48,7 +49,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @ConditionalOnMissingBean(TerraformBootDeployment.class)
-public class TerraformDeployment implements Deployment {
+public class TerraformDeployment implements Deployer {
 
     public static final String VERSION_FILE_NAME = "version.tf";
     public static final String SCRIPT_FILE_NAME = "resources.tf";
@@ -59,6 +60,7 @@ public class TerraformDeployment implements Deployment {
     private final PluginManager pluginManager;
     private final Executor taskExecutor;
     private final TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+    private final ResourceHandlerManager resourceHandlerManager;
     private final DeployServiceEntityHandler deployServiceEntityHandler;
 
     /**
@@ -71,12 +73,14 @@ public class TerraformDeployment implements Deployment {
             PluginManager pluginManager,
             @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
             TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager,
-            DeployServiceEntityHandler deployServiceEntityHandler) {
+            DeployServiceEntityHandler deployServiceEntityHandler,
+            ResourceHandlerManager resourceHandlerManager) {
         this.deployEnvironments = deployEnvironments;
         this.terraformLocalConfig = terraformLocalConfig;
         this.pluginManager = pluginManager;
         this.taskExecutor = taskExecutor;
         this.terraformDeploymentResultCallbackManager = terraformDeploymentResultCallbackManager;
+        this.resourceHandlerManager = resourceHandlerManager;
         this.deployServiceEntityHandler = deployServiceEntityHandler;
     }
 
@@ -204,21 +208,21 @@ public class TerraformDeployment implements Deployment {
             if (StringUtils.isNotEmpty(tfState)) {
                 result.getPrivateProperties().put(STATE_FILE_NAME, tfState);
             }
-
-            if (Objects.nonNull(task.getDeployResourceHandler())) {
-                try {
-                    task.getDeployResourceHandler().handler(result);
-                } catch (TerraformExecutorException tfEx) {
-                    log.error("Handle terraform resources failed. {}", tfEx.getMessage());
-                    result.setState(DeployerTaskStatus.DEPLOY_FAILED);
-                    result.setMessage(tfEx.getMessage());
-                }
+            try {
+                resourceHandlerManager.getResourceHandler(
+                        task.getDeployRequest().getCsp(),
+                        task.getOcl().getDeployment().getKind()
+                ).handler(result);
+            } catch (TerraformExecutorException tfEx) {
+                log.error("Handle terraform resources failed. {}", tfEx.getMessage());
+                result.setState(DeployerTaskStatus.DEPLOY_FAILED);
+                result.setMessage(tfEx.getMessage());
             }
         }
     }
 
     @Override
-    public String getDeployPlanAsJson(DeployTask task) {
+    public String getDeploymentPlanAsJson(DeployTask task) {
         String workspace = getWorkspacePath(task.getId().toString());
         // Create the workspace.
         buildWorkspace(workspace);
@@ -322,7 +326,7 @@ public class TerraformDeployment implements Deployment {
         String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + STATE_FILE_NAME;
         try (FileWriter verWriter = new FileWriter(verScriptPath);
-                FileWriter scriptWriter = new FileWriter(scriptPath)) {
+                 FileWriter scriptWriter = new FileWriter(scriptPath)) {
             verWriter.write(pluginManager.getTerraformProviderForRegionByCsp(csp, region));
             scriptWriter.write(tfState);
             log.info("create terraform destroy workspace and script success.");

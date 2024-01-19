@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchem
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.Deployment;
+import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -58,8 +58,7 @@ public class DeployService {
     private DeployServiceEntityHandler deployServiceEntityHandler;
     @Resource
     private DeployResultManager deployResultManager;
-    @Resource
-    private ResourceHandlerManager resourceHandlerManager;
+
     @Resource
     private DeployerKindManager deployerKindManager;
     @Resource
@@ -108,8 +107,6 @@ public class DeployService {
         deployTask.setNamespace(serviceTemplate.getNamespace());
         deployTask.setOcl(serviceTemplate.getOcl());
         deployTask.setServiceTemplateId(serviceTemplate.getId());
-        // Fill the handler
-        resourceHandlerManager.fillHandler(deployTask);
         return deployTask;
     }
 
@@ -163,12 +160,12 @@ public class DeployService {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployResult deployResult;
         DeployServiceEntity storedEntity = null;
-        Deployment deployment = deployerKindManager.getDeployment(
+        Deployer deployer = deployerKindManager.getDeployment(
                 deployTask.getOcl().getDeployment().getKind());
         try {
             storedEntity = storeNewDeployServiceEntity(deployTask);
             policyValidator.validateDeploymentWithPolicies(deployTask);
-            deployResult = deployment.deploy(deployTask);
+            deployResult = deployer.deploy(deployTask);
         } catch (RuntimeException e) {
             log.info("Deploy service with id:{} failed.", deployTask.getId(), e);
             deployResult = new DeployResult();
@@ -220,10 +217,10 @@ public class DeployService {
                          boolean isCalledWhenRollback) {
         MDC.put(TASK_ID, destroyTask.getId().toString());
         DeployResult destroyResult;
-        Deployment deployment = deployerKindManager.getDeployment(
+        Deployer deployer = deployerKindManager.getDeployment(
                 destroyTask.getOcl().getDeployment().getKind());
         try {
-            destroyResult = deployment.destroy(destroyTask);
+            destroyResult = deployer.destroy(destroyTask);
         } catch (RuntimeException e) {
             log.info("Destroy service with id:{} failed.", destroyTask.getId(), e);
             destroyResult = new DeployResult();
@@ -241,7 +238,7 @@ public class DeployService {
                     == updatedDeployServiceEntity.getServiceDeploymentState()
                     || ServiceDeploymentState.DEPLOY_FAILED
                     == updatedDeployServiceEntity.getServiceDeploymentState()) {
-                deployment.deleteTaskWorkspace(destroyTask.getId().toString());
+                deployer.deleteTaskWorkspace(destroyTask.getId().toString());
             }
         } catch (RuntimeException e) {
             log.info("Destroy service with id:{} update database entity failed.",
@@ -325,7 +322,6 @@ public class DeployService {
      * Get destroy task by stored deploy service entity.
      *
      * @param deployServiceEntity deploy service entity.
-     * @return deploy task.
      */
     public DeployTask getDestroyTask(DeployServiceEntity deployServiceEntity) {
 

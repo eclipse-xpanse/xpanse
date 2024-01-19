@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 /**
  * Interface to produce a service.
  */
-public interface Deployment {
+public interface Deployer {
 
     DeployResult deploy(DeployTask task);
 
@@ -31,5 +31,15 @@ public interface Deployment {
 
     DeployValidationResult validate(Ocl ocl);
 
-    String getDeployPlanAsJson(DeployTask task);
+    /**
+     * Method to get the changes the infrastructure changes the service deployment would do for a
+     * given service. This can be the terraform plan as JSON or pulumi's preview as JSON.
+     * The JSON string must be something that will be used for creating rego policy files.
+     * This is generally a feature provided by the underlying infrastructure deployment tool.
+     *
+     * @param task DeployTask of the service deployment.
+     * @return JSON representation of infrastructure changes that would be created by the
+     * service deployment.
+     */
+    String getDeploymentPlanAsJson(DeployTask task);
 }

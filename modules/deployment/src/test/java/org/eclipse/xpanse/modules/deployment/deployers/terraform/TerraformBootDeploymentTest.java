@@ -100,7 +100,6 @@ class TerraformBootDeploymentTest {
         deployTask = new DeployTask();
         deployTask.setId(id);
         deployTask.setOcl(ocl);
-        deployTask.setDeployResourceHandler(null);
         deployTask.setDeployRequest(deployRequest);
     }
 
@@ -183,7 +182,7 @@ class TerraformBootDeploymentTest {
         TerraformPlan terraformPlan = new TerraformPlan();
         terraformPlan.setPlan("plan");
         when(terraformApi.planWithScripts(any(), any())).thenReturn(terraformPlan);
-        String deployPlanJson = terraformBootDeployment.getDeployPlanAsJson(deployTask);
+        String deployPlanJson = terraformBootDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
 
     }
@@ -195,7 +194,7 @@ class TerraformBootDeploymentTest {
                 new TerraformBootRequestFailedException("IO error"));
 
         Assertions.assertThrows(TerraformBootRequestFailedException.class,
-                () -> this.terraformBootDeployment.getDeployPlanAsJson(deployTask));
+                () -> this.terraformBootDeployment.getDeploymentPlanAsJson(deployTask));
 
     }
 

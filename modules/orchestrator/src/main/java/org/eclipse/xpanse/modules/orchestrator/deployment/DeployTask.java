@@ -37,11 +37,6 @@ public class DeployTask {
      */
     private Ocl ocl;
 
-    /**
-     * The specific xpanse resource handler for the csp.
-     */
-    private DeployResourceHandler deployResourceHandler;
-
     private UUID serviceTemplateId;
 
 }

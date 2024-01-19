@@ -89,7 +89,7 @@ public class PolicyValidator {
             return;
         }
         String planJson = deployerKindManager.getDeployment(
-                deployTask.getOcl().getDeployment().getKind()).getDeployPlanAsJson(deployTask);
+                deployTask.getOcl().getDeployment().getKind()).getDeploymentPlanAsJson(deployTask);
         if (StringUtils.isEmpty(planJson)) {
             return;
         }
