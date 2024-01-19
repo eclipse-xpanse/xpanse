@@ -22,7 +22,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateReque
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.policy.policyman.UserPolicyManager;
+import org.eclipse.xpanse.modules.policy.UserPolicyManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;

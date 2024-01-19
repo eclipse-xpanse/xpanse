@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFai
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
-import org.eclipse.xpanse.modules.policy.policyman.UserPolicyManager;
+import org.eclipse.xpanse.modules.policy.UserPolicyManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

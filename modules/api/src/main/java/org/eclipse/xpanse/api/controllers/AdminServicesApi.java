@@ -30,7 +30,7 @@ import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthCheck;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.policy.policyman.PolicyManager;
+import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderService;
 import org.springframework.http.HttpStatus;

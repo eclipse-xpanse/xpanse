@@ -24,6 +24,8 @@ import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.policy.PolicyManager;
+import org.eclipse.xpanse.modules.policy.ServicePolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
