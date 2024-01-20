@@ -15,12 +15,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +58,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testRuntimeException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new RuntimeException("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -70,7 +69,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testHttpMessageConversionException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new HttpMessageConversionException("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -81,7 +80,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testIllegalArgumentException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new IllegalArgumentException("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -105,7 +104,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testResponseInvalidException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new ResponseInvalidException(List.of("test error")));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -116,7 +115,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testXpanseUnhandledException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new XpanseUnhandledException("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -128,7 +127,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testHandleAccessDeniedException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new AccessDeniedException("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -139,7 +138,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testSensitiveFieldEncryptionOrDecryptionFailedException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new SensitiveFieldEncryptionOrDecryptionFailedException("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -151,7 +150,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testUnsupportedEnumValueException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new UnsupportedEnumValueException("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -162,7 +161,7 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testMethodArgumentTypeMismatchException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new MethodArgumentTypeMismatchException(
                         "errorValue", Csp.class, null, null, null));
 
@@ -171,7 +170,7 @@ class CommonExceptionHandlerTest {
                 .andExpect(jsonPath("$.resultType").value("Unprocessable Entity"))
                 .andExpect(jsonPath("$.details[0]").value("Failed to convert value of type "
                         + "'java.lang.String' to required type "
-                        + "'org.eclipse.xpanse.modules.models.service.common.enums.Csp'"));
+                        + "'org.eclipse.xpanse.modules.models.common.enums.Csp'"));
     }
 
 }

@@ -6,9 +6,9 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,8 +22,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformBootManager;
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
@@ -33,6 +32,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderService;
+import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;

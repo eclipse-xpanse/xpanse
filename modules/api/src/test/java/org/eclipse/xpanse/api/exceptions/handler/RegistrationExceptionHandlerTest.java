@@ -19,7 +19,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
-import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +53,8 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testTerraformScriptFormatInvalidException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(
+                any(), any(), any(), any(), any()))
                 .thenThrow(new TerraformScriptFormatInvalidException(List.of("test error")));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -65,7 +65,7 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testServiceTemplateAlreadyRegistered() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new ServiceTemplateAlreadyRegistered("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -76,7 +76,7 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testIconProcessingFailedException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new IconProcessingFailedException("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -87,7 +87,7 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testServiceTemplateNotRegistered() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new ServiceTemplateNotRegistered("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -98,7 +98,7 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testServiceTemplateUpdateNotAllowed() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new ServiceTemplateUpdateNotAllowed("test error"));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))
@@ -109,7 +109,7 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testInvalidValueSchemaException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(ServiceTemplateQueryModel.class)))
+        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
                 .thenThrow(new InvalidValueSchemaException(List.of("test error")));
 
         this.mockMvc.perform(get("/xpanse/service_templates"))

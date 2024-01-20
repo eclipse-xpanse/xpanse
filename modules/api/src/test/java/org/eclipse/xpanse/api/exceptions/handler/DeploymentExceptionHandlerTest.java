@@ -14,10 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateRepository;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
@@ -31,14 +27,11 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDep
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
-import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -81,7 +74,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testFlavorInvalidException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(ServiceQueryModel.class)))
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
                 .thenThrow(new FlavorInvalidException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services"))
@@ -92,7 +85,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testTerraformExecutorException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(ServiceQueryModel.class)))
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
                 .thenThrow(new TerraformExecutorException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services"))
@@ -103,7 +96,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testPluginNotFoundException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(ServiceQueryModel.class)))
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
                 .thenThrow(new PluginNotFoundException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services"))
@@ -114,7 +107,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testDeployerNotFoundException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(ServiceQueryModel.class)))
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
                 .thenThrow(new DeployerNotFoundException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services"))
@@ -125,7 +118,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testTerraformProviderNotFoundException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(ServiceQueryModel.class)))
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
                 .thenThrow(new TerraformProviderNotFoundException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services"))
@@ -136,7 +129,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testInvalidServiceStateException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(ServiceQueryModel.class)))
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
                 .thenThrow(new InvalidServiceStateException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services"))
@@ -158,7 +151,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testInvalidDeploymentVariableException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(ServiceQueryModel.class)))
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
                 .thenThrow(new InvalidDeploymentVariableException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services"))
@@ -169,7 +162,7 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testVariableInvalidException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(ServiceQueryModel.class)))
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
                 .thenThrow(new VariableInvalidException(List.of("test error")));
 
         this.mockMvc.perform(get("/xpanse/services"))

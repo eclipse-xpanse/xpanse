@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.security.model;
+package org.eclipse.xpanse.modules.models.security;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

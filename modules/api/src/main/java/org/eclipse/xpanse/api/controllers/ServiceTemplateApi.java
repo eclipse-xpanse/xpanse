@@ -7,8 +7,8 @@
 package org.eclipse.xpanse.api.controllers;
 
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,17 +20,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -63,9 +59,6 @@ public class ServiceTemplateApi {
 
     @Resource
     private ServiceTemplateManage serviceTemplateManage;
-
-    @Resource
-    private IdentityProviderManager identityProviderManager;
 
     /**
      * Register new service template using ocl model.
@@ -218,12 +211,9 @@ public class ServiceTemplateApi {
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
             @RequestParam(name = "serviceHostingType", required = false)
                     ServiceHostingType serviceHostingType) {
-        ServiceTemplateQueryModel query = getServiceTemplateQueryModel(
-                categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
         List<ServiceTemplateEntity> serviceEntities =
-                serviceTemplateManage.listServiceTemplates(query);
-        String successMsg = String.format("Listing service templates with query model %s "
-                + "successful.", query);
+                serviceTemplateManage.listServiceTemplates(
+                        categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos =
                 serviceEntities.stream().map(this::convertToServiceTemplateDetailVo).sorted(
                                 Comparator.comparingInt(o -> {
@@ -231,7 +221,7 @@ public class ServiceTemplateApi {
                                     return o.getCsp().ordinal();
                                 }))
                         .toList();
-        log.info(successMsg);
+        log.info(serviceEntities.size() + " service templates found.");
         return serviceTemplateDetailVos;
     }
 
@@ -256,36 +246,6 @@ public class ServiceTemplateApi {
                 "Get detail of service template with id %s success.", id);
         log.info(successMsg);
         return serviceTemplateDetailVo;
-    }
-
-    private ServiceTemplateQueryModel getServiceTemplateQueryModel(
-            Category category,
-            Csp csp,
-            String serviceName,
-            String serviceVersion,
-            ServiceHostingType serviceHostingType) {
-        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
-        if (Objects.nonNull(category)) {
-            query.setCategory(category);
-        }
-        if (Objects.nonNull(csp)) {
-            query.setCsp(csp);
-        }
-        if (StringUtils.isNotBlank(serviceName)) {
-            query.setServiceName(serviceName);
-        }
-        if (StringUtils.isNotBlank(serviceVersion)) {
-            query.setServiceVersion(serviceVersion);
-        }
-        if (Objects.nonNull(serviceHostingType)) {
-            query.setServiceHostingType(serviceHostingType);
-        }
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)
-                && StringUtils.isNotEmpty(currentUserInfo.getNamespace())) {
-            query.setNamespace(currentUserInfo.getNamespace());
-        }
-        return query;
     }
 
     private ServiceTemplateDetailVo convertToServiceTemplateDetailVo(

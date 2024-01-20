@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.database.servicetemplate;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 
 /**
  * Interface for persist of ServiceTemplate.

@@ -5,9 +5,9 @@
 
 package org.eclipse.xpanse.modules.monitor;
 
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheKey;
 import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.security.model;
+package org.eclipse.xpanse.modules.security.common;
 
 import java.util.Objects;
 

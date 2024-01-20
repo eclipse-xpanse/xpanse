@@ -6,27 +6,21 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
-import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -51,9 +45,6 @@ public class IsvServiceDeployApi {
     @Resource
     private ServiceDetailsViewManager serviceDetailsViewManager;
 
-    @Resource
-    private IdentityProviderManager identityProviderManager;
-
     /**
      * List all deployed services by a user of ISV.
      *
@@ -76,9 +67,8 @@ public class IsvServiceDeployApi {
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
                     ServiceDeploymentState serviceState) {
-        ServiceQueryModel query =
-                getServiceQueryModel(category, csp, serviceName, serviceVersion, serviceState);
-        return this.serviceDetailsViewManager.listDeployedServicesOfIsv(query);
+        return this.serviceDetailsViewManager.listDeployedServicesOfIsv(
+                category, csp, serviceName, serviceVersion, serviceState);
     }
 
     /**
@@ -95,31 +85,5 @@ public class IsvServiceDeployApi {
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
         return this.serviceDetailsViewManager.getServiceDetailsByIdForIsv(UUID.fromString(id));
-    }
-
-    private ServiceQueryModel getServiceQueryModel(Category category, Csp csp,
-            String serviceName, String serviceVersion, ServiceDeploymentState state) {
-        ServiceQueryModel query = new ServiceQueryModel();
-        if (Objects.nonNull(category)) {
-            query.setCategory(category);
-        }
-        if (Objects.nonNull(csp)) {
-            query.setCsp(csp);
-        }
-        if (StringUtils.isNotBlank(serviceName)) {
-            query.setServiceName(serviceName);
-        }
-        if (StringUtils.isNotBlank(serviceVersion)) {
-            query.setServiceVersion(serviceVersion);
-        }
-        if (Objects.nonNull(state)) {
-            query.setServiceState(state);
-        }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (userIdOptional.isEmpty()) {
-            throw new UserNotLoggedInException("Unable to get current login information");
-        }
-        query.setUserId(userIdOptional.get());
-        return query;
     }
 }

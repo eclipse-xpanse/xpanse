@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.orchestrator;
 
 import java.util.List;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.orchestrator.credential.AuthenticationCapabilities;
 import org.eclipse.xpanse.modules.orchestrator.deployment.ServiceResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.TerraformProvider;

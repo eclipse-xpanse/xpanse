@@ -6,9 +6,9 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ISV;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,13 +19,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.beans.BeanUtils;
@@ -83,12 +81,9 @@ public class ServiceCatalogApi {
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
             @RequestParam(name = "serviceHostingType", required = false)
             ServiceHostingType serviceHostingType) {
-        ServiceTemplateQueryModel query = getServiceTemplatesQueryModel(
-                categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
         List<ServiceTemplateEntity> serviceEntities =
-                serviceTemplateManage.listServiceTemplates(query);
-        String successMsg = String.format("Listing orderable services with query model %s "
-                + "successful.", query);
+                serviceTemplateManage.listServiceTemplates(
+                        categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
         List<UserOrderableServiceVo> userOrderableServiceVos =
                 serviceEntities.stream().map(this::convertToUserOrderableServiceVo).sorted(
                                 Comparator.comparingInt(o -> {
@@ -96,7 +91,7 @@ public class ServiceCatalogApi {
                                     return o.getCsp().ordinal();
                                 }))
                         .collect(Collectors.toList());
-        log.info(successMsg);
+        log.info(serviceEntities.size() + " orderable services found.");
         return userOrderableServiceVos;
     }
 
@@ -141,31 +136,6 @@ public class ServiceCatalogApi {
                 "Get API document of the orderable service successful with Url %s.", apiUrl);
         log.info(successMsg);
         return Link.of(apiUrl, "OpenApi");
-    }
-
-    private ServiceTemplateQueryModel getServiceTemplatesQueryModel(
-            Category category,
-            Csp csp,
-            String serviceName,
-            String serviceVersion,
-            ServiceHostingType serviceHostingType) {
-        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
-        if (Objects.nonNull(category)) {
-            query.setCategory(category);
-        }
-        if (Objects.nonNull(csp)) {
-            query.setCsp(csp);
-        }
-        if (StringUtils.isNotBlank(serviceName)) {
-            query.setServiceName(serviceName);
-        }
-        if (StringUtils.isNotBlank(serviceVersion)) {
-            query.setServiceVersion(serviceVersion);
-        }
-        if (Objects.nonNull(serviceHostingType)) {
-            query.setServiceHostingType(serviceHostingType);
-        }
-        return query;
     }
 
     private UserOrderableServiceVo convertToUserOrderableServiceVo(

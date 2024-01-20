@@ -6,8 +6,8 @@
 package org.eclipse.xpanse.modules.monitor.cache;
 
 
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 
 /**
  * Defines resource metrics cache key.

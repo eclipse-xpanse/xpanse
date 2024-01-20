@@ -6,8 +6,8 @@
 package org.eclipse.xpanse.modules.credential.cache;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 
 /**
  * Defines credential cache key.

@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.models.policy.userpolicy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.servicetemplate;
 
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import java.net.URI;
 import java.util.List;
@@ -17,23 +18,27 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
-import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.springframework.security.access.AccessDeniedException;
@@ -232,10 +237,21 @@ public class ServiceTemplateManage {
     /**
      * Search service template by query model.
      *
-     * @param query the query model for search service template.
+     * @param category the category of the service template.
+     * @param csp the CSP of the service template.
+     * @param serviceName the serviceName of the service template.
+     * @param serviceVersion the serviceVersion of the service template.
+     * @param serviceHostingType the serviceHostingType of the service template.
      * @return Returns list of service template entity.
      */
-    public List<ServiceTemplateEntity> listServiceTemplates(ServiceTemplateQueryModel query) {
+    public List<ServiceTemplateEntity> listServiceTemplates(Category category,
+                                                            Csp csp,
+                                                            String serviceName,
+                                                            String serviceVersion,
+                                                            ServiceHostingType serviceHostingType) {
+        ServiceTemplateQueryModel query = getServiceTemplateQueryModel(
+                category, csp, serviceName, serviceVersion, serviceHostingType
+        );
         return storage.listServiceTemplates(query);
     }
 
@@ -245,20 +261,8 @@ public class ServiceTemplateManage {
      * @param id ID of service template.
      */
     public void unregisterServiceTemplate(String id) {
-        UUID uuid = UUID.fromString(id);
-        ServiceTemplateEntity existedService = storage.getServiceTemplateById(uuid);
-        if (Objects.isNull(existedService)) {
-            String errMsg = String.format("Service template with id %s not found.", id);
-            log.error(errMsg);
-            throw new ServiceTemplateNotRegistered(errMsg);
-        }
-        Optional<String> namespace = identityProviderManager.getUserNamespace();
-        if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
-                existedService.getNamespace())) {
-            throw new AccessDeniedException("No permissions to unregister service templates "
-                    + "belonging to other namespaces.");
-        }
-        storage.removeById(uuid);
+        ServiceTemplateEntity existedService = getServiceTemplateDetails(id, true);
+        storage.removeById(existedService.getId());
         serviceTemplateOpenApiGenerator.deleteServiceApi(id);
     }
 
@@ -296,5 +300,36 @@ public class ServiceTemplateManage {
             }
         }
     }
+
+    private ServiceTemplateQueryModel getServiceTemplateQueryModel(
+            @Nullable Category category,
+            @Nullable Csp csp,
+            @Nullable String serviceName,
+            @Nullable String serviceVersion,
+            @Nullable ServiceHostingType serviceHostingType) {
+        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
+        if (Objects.nonNull(category)) {
+            query.setCategory(category);
+        }
+        if (Objects.nonNull(csp)) {
+            query.setCsp(csp);
+        }
+        if (StringUtils.isNotBlank(serviceName)) {
+            query.setServiceName(serviceName);
+        }
+        if (StringUtils.isNotBlank(serviceVersion)) {
+            query.setServiceVersion(serviceVersion);
+        }
+        if (Objects.nonNull(serviceHostingType)) {
+            query.setServiceHostingType(serviceHostingType);
+        }
+        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo)
+                && StringUtils.isNotEmpty(currentUserInfo.getNamespace())) {
+            query.setNamespace(currentUserInfo.getNamespace());
+        }
+        return query;
+    }
+
 
 }

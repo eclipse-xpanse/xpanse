@@ -1,8 +1,8 @@
 package org.eclipse.xpanse.plugins.flexibleengine.reourcehandler;
 
 import java.util.Set;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResourceProperties;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

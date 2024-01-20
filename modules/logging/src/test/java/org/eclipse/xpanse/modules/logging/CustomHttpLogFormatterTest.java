@@ -1,15 +1,19 @@
 package org.eclipse.xpanse.modules.logging;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.zalando.logbook.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.zalando.logbook.Correlation;
+import org.zalando.logbook.HttpHeaders;
+import org.zalando.logbook.HttpRequest;
+import org.zalando.logbook.HttpResponse;
+import org.zalando.logbook.Origin;
+import org.zalando.logbook.Precorrelation;
 
 class CustomHttpLogFormatterTest {
 
