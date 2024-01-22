@@ -5,7 +5,7 @@
 
 package org.eclipse.xpanse.modules.orchestrator;
 
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

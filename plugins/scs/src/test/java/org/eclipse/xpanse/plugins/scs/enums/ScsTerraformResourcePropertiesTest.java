@@ -3,8 +3,8 @@ package org.eclipse.xpanse.plugins.scs.enums;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResourceProperties;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

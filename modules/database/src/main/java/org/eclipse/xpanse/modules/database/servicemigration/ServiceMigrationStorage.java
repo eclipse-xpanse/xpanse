@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.database.servicemigration;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.workflow.migrate.ServiceMigrationQueryModel;
 
 /**
  * Interface for persist of ServiceMigrationEntity.

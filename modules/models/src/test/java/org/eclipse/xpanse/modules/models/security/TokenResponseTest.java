@@ -1,4 +1,4 @@
-package org.eclipse.xpanse.modules.models.security.model;
+package org.eclipse.xpanse.modules.models.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

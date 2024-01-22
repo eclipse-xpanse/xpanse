@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.net.URI;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;

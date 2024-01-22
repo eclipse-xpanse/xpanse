@@ -6,10 +6,10 @@
 
 package org.eclipse.xpanse.modules.security;
 
-import org.eclipse.xpanse.modules.models.security.model.CurrentUserInfo;
-import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
+import org.eclipse.xpanse.modules.models.security.TokenResponse;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
+import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 
 /**
  * This interface describes identity provider service.

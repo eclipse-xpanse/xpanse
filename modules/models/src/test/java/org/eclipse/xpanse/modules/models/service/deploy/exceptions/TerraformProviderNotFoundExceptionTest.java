@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.models.service.deploy.exceptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

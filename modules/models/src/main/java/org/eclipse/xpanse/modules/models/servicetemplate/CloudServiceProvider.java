@@ -13,7 +13,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 
 /**
  * Defines for the Cloud Service Provider.

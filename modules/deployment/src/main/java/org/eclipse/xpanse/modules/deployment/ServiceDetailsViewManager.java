@@ -16,9 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
-import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
@@ -71,10 +75,20 @@ public class ServiceDetailsViewManager {
     /**
      * List deploy services with query model.
      *
-     * @param query service query model.
+     * @param category of the services to be filtered.
+     * @param csp of the services to be filtered.
+     * @param serviceName of the services to be filtered.
+     * @param serviceVersion of the services to be filtered.
+     * @param state of the services to be filtered.
      * @return serviceVos
      */
-    public List<DeployedService> listDeployedServices(ServiceQueryModel query) {
+    public List<DeployedService> listDeployedServices(Category category,
+                                                      Csp csp,
+                                                      String serviceName,
+                                                      String serviceVersion,
+                                                      ServiceDeploymentState state) {
+        ServiceQueryModel query = getServiceQueryModel(
+                category, csp, serviceName, serviceVersion, state);
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         query.setUserId(userIdOptional.orElse(null));
         List<DeployServiceEntity> deployServices =
@@ -149,15 +163,54 @@ public class ServiceDetailsViewManager {
     /**
      * Use query model to list SV deployment services.
      *
-     * @param query service query model.
+     * @param category of the services to be filtered.
+     * @param csp of the services to be filtered.
+     * @param serviceName of the services to be filtered.
+     * @param serviceVersion of the services to be filtered.
+     * @param state of the services to be filtered.
      * @return serviceVos
      */
-    public List<DeployedService> listDeployedServicesOfIsv(ServiceQueryModel query) {
+    public List<DeployedService> listDeployedServicesOfIsv(Category category,
+                                                           Csp csp,
+                                                           String serviceName,
+                                                           String serviceVersion,
+                                                           ServiceDeploymentState state) {
+        ServiceQueryModel query = getServiceQueryModel(
+                category, csp, serviceName, serviceVersion, state);
         Optional<String> namespace = identityProviderManager.getUserNamespace();
         return namespace.map(s -> deployServiceStorage.listServices(query).stream()
                 .filter(deployServiceEntity -> s
                         .equals(deployServiceEntity.getNamespace()))
                 .map(this::convertToDeployedService).toList()).orElseGet(ArrayList::new);
+    }
+
+    private ServiceQueryModel getServiceQueryModel(Category category,
+                                                   Csp csp,
+                                                   String serviceName,
+                                                   String serviceVersion,
+                                                   ServiceDeploymentState state) {
+        ServiceQueryModel query = new ServiceQueryModel();
+        if (Objects.nonNull(category)) {
+            query.setCategory(category);
+        }
+        if (Objects.nonNull(csp)) {
+            query.setCsp(csp);
+        }
+        if (StringUtils.isNotBlank(serviceName)) {
+            query.setServiceName(serviceName);
+        }
+        if (StringUtils.isNotBlank(serviceVersion)) {
+            query.setServiceVersion(serviceVersion);
+        }
+        if (Objects.nonNull(state)) {
+            query.setServiceState(state);
+        }
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (userIdOptional.isEmpty()) {
+            throw new UserNotLoggedInException("Unable to get current login information");
+        }
+        query.setUserId(userIdOptional.get());
+        return query;
     }
 
 

@@ -23,16 +23,18 @@ import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -41,7 +43,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
-import org.eclipse.xpanse.modules.models.servicetemplate.query.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -362,11 +363,12 @@ class ServiceTemplateManageTest {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         List<ServiceTemplateEntity> ServiceTemplateEntities = new ArrayList<>();
         ServiceTemplateEntities.add(serviceTemplateEntity);
-        when(mockStorage.listServiceTemplates(new ServiceTemplateQueryModel())).thenReturn(
+        when(mockStorage.listServiceTemplates(any())).thenReturn(
                 ServiceTemplateEntities);
 
         List<ServiceTemplateEntity> ServiceTemplateEntities1 =
-                serviceTemplateManageTest.listServiceTemplates(new ServiceTemplateQueryModel());
+                serviceTemplateManageTest.listServiceTemplates(
+                        Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1", null);
         Assertions.assertEquals(ServiceTemplateEntities, ServiceTemplateEntities1);
     }
 
@@ -386,18 +388,19 @@ class ServiceTemplateManageTest {
         when(mockStorage.listServiceTemplates(query1)).thenReturn(Collections.emptyList());
 
         List<ServiceTemplateEntity> result =
-                serviceTemplateManageTest.listServiceTemplates(query);
+                serviceTemplateManageTest.listServiceTemplates(
+                        Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1", null);
         assertThat(result).isEqualTo(Collections.emptyList());
     }
 
     @Test
     void testUnregisterServiceTemplate() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+        when(mockStorage.getServiceTemplateById(serviceTemplateEntity.getId())).thenReturn(serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
-        serviceTemplateManageTest.unregisterServiceTemplate(uuid.toString());
-        verify(mockStorage).removeById(uuid);
-        verify(serviceTemplateOpenApiGenerator).deleteServiceApi(uuid.toString());
+        serviceTemplateManageTest.unregisterServiceTemplate(serviceTemplateEntity.getId().toString());
+        verify(mockStorage).removeById(serviceTemplateEntity.getId());
+        verify(serviceTemplateOpenApiGenerator).deleteServiceApi(serviceTemplateEntity.getId().toString());
     }
 
     @Test

@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.security.constant;
+package org.eclipse.xpanse.modules.security.common;
 
 /**
  * Role Constants.

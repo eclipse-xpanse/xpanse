@@ -6,8 +6,8 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,11 +17,11 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.policy.UserPolicyManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

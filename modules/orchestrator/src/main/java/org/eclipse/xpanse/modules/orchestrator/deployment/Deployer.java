@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 

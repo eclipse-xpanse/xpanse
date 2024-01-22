@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.service.deploy;
+package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 import java.util.HashMap;
 import java.util.Map;

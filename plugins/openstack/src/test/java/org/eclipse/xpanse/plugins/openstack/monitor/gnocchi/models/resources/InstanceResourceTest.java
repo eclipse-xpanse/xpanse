@@ -1,10 +1,10 @@
 package org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 
 class InstanceResourceTest {
 

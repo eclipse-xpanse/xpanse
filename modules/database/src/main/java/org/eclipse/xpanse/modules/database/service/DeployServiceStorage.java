@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.database.service;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 
 /**
  * Interface for persist of DeployService.

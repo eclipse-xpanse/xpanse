@@ -21,10 +21,10 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStat
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResourceInstance;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResourceProperties;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.plugins.scs.enums.ScsTerraformResourceProperties;
 import org.springframework.stereotype.Component;
 

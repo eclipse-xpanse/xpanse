@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.models.policy.userpolicy;
 
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 
 /**
  * The query model for search policies.

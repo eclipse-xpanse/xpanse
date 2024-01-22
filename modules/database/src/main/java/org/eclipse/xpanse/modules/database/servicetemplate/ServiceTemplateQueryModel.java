@@ -4,11 +4,11 @@
  */
 
 
-package org.eclipse.xpanse.modules.models.servicetemplate.query;
+package org.eclipse.xpanse.modules.database.servicetemplate;
 
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**

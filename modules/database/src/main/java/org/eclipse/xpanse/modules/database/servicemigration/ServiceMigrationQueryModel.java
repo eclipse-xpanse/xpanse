@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.workflow.migrate;
+package org.eclipse.xpanse.modules.database.servicemigration;
 
 import java.util.UUID;
 import lombok.Data;

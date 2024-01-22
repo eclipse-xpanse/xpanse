@@ -7,8 +7,8 @@
 package org.eclipse.xpanse.api.controllers;
 
 
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.models.security.constant.RoleConstants.ROLE_USER;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +27,11 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
-import org.eclipse.xpanse.modules.models.service.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.query.ServiceQueryModel;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
@@ -140,9 +138,8 @@ public class ServiceDeployerApi {
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
                     ServiceDeploymentState serviceState) {
-        ServiceQueryModel query =
-                getServiceQueryModel(category, csp, serviceName, serviceVersion, serviceState);
-        return this.serviceDetailsViewManager.listDeployedServices(query);
+        return this.serviceDetailsViewManager.listDeployedServices(
+                category, csp, serviceName, serviceVersion, serviceState);
     }
 
     /**
@@ -253,28 +250,5 @@ public class ServiceDeployerApi {
         variable.put(MigrateConstants.USER_ID, userId);
         workflowProcessUtils.asyncStartProcess(MigrateConstants.PROCESS_KEY, variable);
         return newId;
-    }
-
-    private ServiceQueryModel getServiceQueryModel(Category category, Csp csp,
-                                                   String serviceName,
-                                                   String serviceVersion,
-                                                   ServiceDeploymentState state) {
-        ServiceQueryModel query = new ServiceQueryModel();
-        if (Objects.nonNull(category)) {
-            query.setCategory(category);
-        }
-        if (Objects.nonNull(csp)) {
-            query.setCsp(csp);
-        }
-        if (StringUtils.isNotBlank(serviceName)) {
-            query.setServiceName(serviceName);
-        }
-        if (StringUtils.isNotBlank(serviceVersion)) {
-            query.setServiceVersion(serviceVersion);
-        }
-        if (Objects.nonNull(state)) {
-            query.setServiceState(state);
-        }
-        return query;
     }
 }

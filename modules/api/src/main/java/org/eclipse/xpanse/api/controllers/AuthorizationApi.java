@@ -16,7 +16,7 @@ import java.io.PrintWriter;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.models.security.model.TokenResponse;
+import org.eclipse.xpanse.modules.models.security.TokenResponse;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderService;
 import org.springframework.http.HttpStatus;

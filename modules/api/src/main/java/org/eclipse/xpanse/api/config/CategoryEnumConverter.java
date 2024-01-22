@@ -5,7 +5,7 @@
 
 package org.eclipse.xpanse.api.config;
 
-import org.eclipse.xpanse.modules.models.service.common.enums.Category;
+import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
