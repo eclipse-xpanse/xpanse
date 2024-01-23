@@ -45,6 +45,11 @@ public class ServicePolicy {
     @Schema(description = "The id of registered service template which the policy belongs to.")
     private UUID serviceTemplateId;
 
+    @Schema(description =
+            "The flavor name which the policy belongs to. If a flavor is not provided, then the "
+                    + "policy will be executed for during service deployment of all flavors.")
+    private String flavorName;
+
     /**
      * Is the policy enabled.
      */
