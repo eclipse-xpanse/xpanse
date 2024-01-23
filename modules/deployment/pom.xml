@@ -80,6 +80,11 @@
             <artifactId>async</artifactId>
             <version>${project.version}</version>
         </dependency>
+      <dependency>
+        <groupId>org.eclipse.xpanse.modules</groupId>
+        <artifactId>workflow</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
 
     <build>

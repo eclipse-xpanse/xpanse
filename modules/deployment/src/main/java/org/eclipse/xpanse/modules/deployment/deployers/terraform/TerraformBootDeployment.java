@@ -57,6 +57,7 @@ import org.springframework.web.client.RestClientException;
 public class TerraformBootDeployment implements Deployer {
 
     private static final String ZITADEL_PROFILE_NAME = "zitadel";
+    private static final String SPLIT = "/";
     private final DeployEnvironments deployEnvironments;
     private final PluginManager pluginManager;
     private final TerraformBootConfig terraformBootConfig;
@@ -201,7 +202,7 @@ public class TerraformBootDeployment implements Deployer {
         WebhookConfig hookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port)
                 + terraformBootConfig.getDestroyCallbackUri();
-        hookConfig.setUrl(callbackUrl + task.getId());
+        hookConfig.setUrl(callbackUrl + SPLIT + task.getId());
         hookConfig.setAuthType(AuthTypeEnum.NONE);
         request.setWebhookConfig(hookConfig);
         return request;
@@ -217,7 +218,7 @@ public class TerraformBootDeployment implements Deployer {
         WebhookConfig hookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port)
                 + terraformBootConfig.getDeployCallbackUri();
-        hookConfig.setUrl(callbackUrl + task.getId());
+        hookConfig.setUrl(callbackUrl + SPLIT + task.getId());
         hookConfig.setAuthType(AuthTypeEnum.NONE);
         request.setWebhookConfig(hookConfig);
         return request;

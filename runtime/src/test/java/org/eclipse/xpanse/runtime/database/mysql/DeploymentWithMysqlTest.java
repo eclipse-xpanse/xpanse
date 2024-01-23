@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
+import org.eclipse.xpanse.api.controllers.ServiceMigrationApi;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -54,6 +55,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @Autowired
     OclLoader oclLoader;
+    @Autowired
+    ServiceMigrationApi serviceMigrationApi;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -168,11 +171,10 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         migrateRequest.setServiceRequestProperties(serviceRequestProperties);
 
 
-        UUID newServiceId = serviceDeployerApi.migrate(migrateRequest);
+        UUID migrateId = serviceMigrationApi.migrate(migrateRequest);
         // Verify the results
-        Assertions.assertNotNull(newServiceId);
-        Assertions.assertNotEquals(taskId, newServiceId);
-        return newServiceId;
+        Assertions.assertNotNull(migrateId);
+        return migrateId;
 
     }
 

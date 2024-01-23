@@ -141,8 +141,7 @@ public class TerraformDeployment implements Deployer {
             }
             handleTerraformExecuteResult(executor, task, deployResult,
                     DeployerTaskStatus.DEPLOY_FAILED);
-            terraformDeploymentResultCallbackManager.deployCallback(
-                    task.getId().toString(),
+            terraformDeploymentResultCallbackManager.deployCallback(task.getId().toString(),
                     getTerraformResult(executor, deployResult, DeployerTaskStatus.DEPLOY_SUCCESS));
         });
     }
@@ -166,10 +165,9 @@ public class TerraformDeployment implements Deployer {
             }
             handleTerraformExecuteResult(executor, task, destroyResult,
                     DeployerTaskStatus.DESTROY_FAILED);
-            terraformDeploymentResultCallbackManager.destroyCallback(
-                    task.getId().toString(),
-                    getTerraformResult(
-                            executor, destroyResult, DeployerTaskStatus.DESTROY_SUCCESS));
+            terraformDeploymentResultCallbackManager.destroyCallback(task.getId().toString(),
+                    getTerraformResult(executor, destroyResult,
+                            DeployerTaskStatus.DESTROY_SUCCESS));
         });
     }
 

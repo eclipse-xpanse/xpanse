@@ -9,25 +9,27 @@ package org.eclipse.xpanse.modules.workflow.utils;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
  * Process tool class.
  */
 @Component
-public class WorkflowProcessUtils {
+public class WorkflowUtils {
 
     @Resource
     private RuntimeService runtimeService;
@@ -57,11 +59,6 @@ public class WorkflowProcessUtils {
      */
     public ProcessInstance startProcess(String processKey, Map<String, Object> variable) {
         return runtimeService.startProcessInstanceByKey(processKey, variable);
-    }
-
-    @Async("xpanseAsyncTaskExecutor")
-    public void asyncStartProcess(String processKey, Map<String, Object> variable) {
-        startProcess(processKey, variable);
     }
 
     /**
@@ -96,6 +93,26 @@ public class WorkflowProcessUtils {
     public void completeTask(String taskId, Map<String, Object> variables) {
         validateTaskId(taskId);
         taskService.complete(taskId, variables);
+    }
+
+    /**
+     * Complete ReceiveTask by processInstanceId and activityId.
+     */
+    public void completeReceiveTask(String processInstanceId, String activityId) {
+        if (StringUtils.isNotBlank(processInstanceId)) {
+            ProcessInstance instance =
+                    runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId)
+                            .singleResult();
+
+            if (Objects.nonNull(instance)) {
+                Execution execution = runtimeService.createExecutionQuery()
+                        .processInstanceId(processInstanceId)
+                        .activityId(activityId)
+                        .singleResult();
+                runtimeService.trigger(execution.getId());
+
+            }
+        }
     }
 
     private WorkFlowTask getWorkFlow(TaskInfo task) {

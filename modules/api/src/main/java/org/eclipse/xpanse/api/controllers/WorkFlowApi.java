@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
-import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
+import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkFlowApi {
 
     @Resource
-    private WorkflowProcessUtils workflowProcessUtils;
+    private WorkflowUtils workflowUtils;
 
     @Resource
     private IdentityProviderManager identityProviderManager;
@@ -59,7 +59,7 @@ public class WorkFlowApi {
     @ResponseStatus(HttpStatus.OK)
     public List<WorkFlowTask> queryTodoTasks() {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        return workflowProcessUtils.todoTasks(userIdOptional.orElse(null));
+        return workflowUtils.todoTasks(userIdOptional.orElse(null));
     }
 
     /**
@@ -71,7 +71,7 @@ public class WorkFlowApi {
     @ResponseStatus(HttpStatus.OK)
     public List<WorkFlowTask> queryDoneTasks() {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        return workflowProcessUtils.doneTasks(userIdOptional.orElse(null));
+        return workflowUtils.doneTasks(userIdOptional.orElse(null));
     }
 
     /**
@@ -86,7 +86,7 @@ public class WorkFlowApi {
                     description = "ID of the workflow task that needs to be handled")
             @PathVariable("id") String taskId,
             @RequestBody Map<String, Object> variables) {
-        workflowProcessUtils.completeTask(taskId, variables);
+        workflowUtils.completeTask(taskId, variables);
     }
 
     /**
@@ -106,7 +106,7 @@ public class WorkFlowApi {
             @PathVariable boolean retryOrder) {
         Map<String, Object> variables = new HashMap<>();
         variables.put(MigrateConstants.IS_RETRY_TASK, retryOrder);
-        workflowProcessUtils.completeTask(taskId, variables);
+        workflowUtils.completeTask(taskId, variables);
     }
 
 }

@@ -40,11 +40,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.xpanse.modules</groupId>
-      <artifactId>deployment</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
@@ -63,6 +58,11 @@
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
       <version>${java.uuid.generator.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.xpanse.modules</groupId>
+      <artifactId>models</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
   </dependencies>
