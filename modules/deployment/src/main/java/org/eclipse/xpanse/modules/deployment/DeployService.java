@@ -30,7 +30,6 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.slf4j.MDC;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -246,23 +245,12 @@ public class DeployService {
     }
 
     /**
-     * Async method to purge deployed service.
-     *
-     * @param deployTask          deployTask
-     * @param deployServiceEntity deployServiceEntity
-     */
-    @Async("xpanseAsyncTaskExecutor")
-    public void asyncPurgeService(DeployTask deployTask, DeployServiceEntity deployServiceEntity) {
-        purgeService(deployTask, deployServiceEntity);
-    }
-
-    /**
      * purge the service based on the serviceDeploymentState.
      *
      * @param deployTask          deployTask
      * @param deployServiceEntity deployServiceEntity
      */
-    private void purgeService(DeployTask deployTask, DeployServiceEntity deployServiceEntity) {
+    public void purgeService(DeployTask deployTask, DeployServiceEntity deployServiceEntity) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         try {
             if (Objects.nonNull(deployServiceEntity.getDeployResourceList())

@@ -210,7 +210,7 @@ public class ServiceDeployerApi {
                     "No permissions to purge services belonging to other users.");
         }
         DeployTask purgeTask = this.deployService.getPurgeTask(deployServiceEntity);
-        this.deployService.asyncPurgeService(purgeTask, deployServiceEntity);
+        this.deployService.purgeService(purgeTask, deployServiceEntity);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
     }
