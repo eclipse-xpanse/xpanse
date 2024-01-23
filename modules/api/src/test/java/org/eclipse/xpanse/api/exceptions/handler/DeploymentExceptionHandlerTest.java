@@ -28,7 +28,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExec
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
+import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +43,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceDeployerApi.class, DeployService.class,
-        WorkflowProcessUtils.class, DeploymentExceptionHandler.class, IdentityProviderManager.class})
+        WorkflowUtils.class, DeploymentExceptionHandler.class, IdentityProviderManager.class})
 @WebMvcTest
 class DeploymentExceptionHandlerTest {
 
@@ -54,7 +54,7 @@ class DeploymentExceptionHandlerTest {
     private DeployService deployService;
 
     @MockBean
-    private WorkflowProcessUtils workflowProcessUtils;
+    private WorkflowUtils workflowUtils;
 
     @MockBean
     private DeployerKindManager deployerKindManager;

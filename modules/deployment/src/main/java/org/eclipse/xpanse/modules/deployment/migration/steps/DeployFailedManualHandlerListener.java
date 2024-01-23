@@ -4,13 +4,13 @@
  *
  */
 
-package org.eclipse.xpanse.modules.workflow.handle.migrate;
+package org.eclipse.xpanse.modules.deployment.migration.steps;
 
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
-import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

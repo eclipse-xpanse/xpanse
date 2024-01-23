@@ -50,7 +50,8 @@ public class TerraformBootWebhookApi {
     @ResponseStatus(HttpStatus.OK)
     public void deployCallback(
             @Parameter(name = "task_id", description = "task id")
-            @PathVariable("task_id") String taskId, @Valid @RequestBody TerraformResult result) {
+            @PathVariable("task_id") String taskId,
+            @Valid @RequestBody TerraformResult result) {
 
         terraformDeploymentResultCallbackManager.deployCallback(taskId, result);
     }
@@ -65,8 +66,10 @@ public class TerraformBootWebhookApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void destroyCallback(
-            @Parameter(name = "task_id", description = "task id") @PathVariable("task_id")
-                    String taskId, @Valid @RequestBody TerraformResult result) {
+            @Parameter(name = "task_id", description = "task id")
+            @PathVariable("task_id") String taskId,
+            @Valid @RequestBody TerraformResult result) {
+
         terraformDeploymentResultCallbackManager.destroyCallback(taskId, result);
     }
 

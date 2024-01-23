@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.workflow.consts;
+package org.eclipse.xpanse.modules.deployment.migration.consts;
 
 /**
  * Migrate constant classes.
@@ -23,4 +23,7 @@ public class MigrateConstants {
     public static final String USER_ID = "userId";
 
     public static final String ASSIGNEE = "assignee";
+
+    public static final String MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID = "deployCallBack";
+    public static final String MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID = "destroyCallBack";
 }

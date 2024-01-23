@@ -15,11 +15,14 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the ServiceMigrationStorage.
  */
+@Component
+@Transactional
 public class DatabaseServiceMigrationStorage implements ServiceMigrationStorage {
 
     private final ServiceMigrationRepository serviceMigrationRepository;

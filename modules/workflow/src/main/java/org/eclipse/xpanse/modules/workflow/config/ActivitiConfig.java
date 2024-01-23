@@ -55,7 +55,7 @@ public class ActivitiConfig {
         processEngineConfiguration.setDatabaseSchemaUpdate("true");
         processEngineConfiguration.setDeploymentMode("single-resource");
         Resource[] resources = new PathMatchingResourcePatternResolver().getResources(
-                ResourceLoader.CLASSPATH_URL_PREFIX + "processes/**.bpmn");
+                ResourceLoader.CLASSPATH_URL_PREFIX + "processes/**.bpmn20.xml");
         processEngineConfiguration.setDeploymentResources(resources);
         processEngineConfiguration.setHistoryLevel(HistoryLevel.NONE);
         return processEngineConfiguration;

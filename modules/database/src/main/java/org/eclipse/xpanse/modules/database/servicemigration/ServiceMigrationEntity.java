@@ -8,6 +8,8 @@ package org.eclipse.xpanse.modules.database.servicemigration;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
@@ -35,6 +37,7 @@ public class ServiceMigrationEntity extends CreateModifiedTime {
     @Column(name = "NEW_SERVICE_ID", nullable = false)
     private UUID newServiceId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "MIGRATION_STATUS")
     private MigrationStatus migrationStatus;
 

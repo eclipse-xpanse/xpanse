@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -283,39 +282,30 @@ public class DeployService {
     /**
      * Deployment service.
      *
-     * @param newId         new service id.
-     * @param userId        user id.
-     * @param deployRequest deploy request.
-     * @return new deployed service entity.
+     * @param newId             new service id.
+     * @param userId            user id.
+     * @param deployRequest     deploy request.
      */
-    @Async("xpanseAsyncTaskExecutor")
-    public CompletableFuture<DeployServiceEntity> deployServiceById(UUID newId,
-                                                                String userId,
-                                                                DeployRequest deployRequest) {
+    public void deployServiceById(UUID newId, String userId, DeployRequest deployRequest) {
         MDC.put(TASK_ID, newId.toString());
         log.info("Migrate workflow start deploy new service with id: {}", newId);
         DeployTask deployTask = createNewDeployTask(deployRequest);
         // override task id and user id.
         deployTask.setId(newId);
         deployTask.getDeployRequest().setUserId(userId);
-        storeNewDeployServiceEntity(deployTask);
         deploy(deployTask);
-        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(newId);
-        return CompletableFuture.completedFuture(deployServiceEntity);
     }
 
     /**
      * Destroy service by deployed service id.
      */
-    @Async("xpanseAsyncTaskExecutor")
-    public CompletableFuture<DeployServiceEntity> destroyServiceById(String id) {
+    public void destroyServiceById(String id) {
         MDC.put(TASK_ID, id);
         DeployServiceEntity deployServiceEntity = deployServiceEntityHandler
                 .getDeployServiceEntity(UUID.fromString(id));
         DeployTask deployTask = deployServiceEntityToDeployTaskConverter
                 .getDeployTaskByStoredService(deployServiceEntity);
         destroy(deployTask, deployServiceEntity, false);
-        return CompletableFuture.completedFuture(deployServiceEntity);
     }
 
     /**

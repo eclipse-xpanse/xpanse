@@ -16,9 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +33,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentS
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
-import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.eclipse.xpanse.modules.workflow.consts.MigrateConstants;
-import org.eclipse.xpanse.modules.workflow.utils.WorkflowProcessUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -71,9 +66,6 @@ public class ServiceDeployerApi {
 
     @Resource
     private IdentityProviderManager identityProviderManager;
-
-    @Resource
-    private WorkflowProcessUtils workflowProcessUtils;
 
     @Resource
     private ServiceDetailsViewManager serviceDetailsViewManager;
@@ -223,32 +215,4 @@ public class ServiceDeployerApi {
         return Response.successResponse(Collections.singletonList(successMsg));
     }
 
-    /**
-     * Create a job to migrate the deployed service.
-     *
-     * @return response
-     */
-    @Tag(name = "Service", description = "APIs to manage the service instances")
-    @Operation(description = "Create a job to migrate the deployed service.")
-    @PostMapping(value = "/services/migration", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
-
-        DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(migrateRequest.getId());
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        String userId = userIdOptional.orElse(null);
-        if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
-            throw new AccessDeniedException(
-                    "No permissions to migrate services belonging to other users.");
-        }
-        UUID newId = UUID.randomUUID();
-        Map<String, Object> variable = new HashMap<>();
-        variable.put(MigrateConstants.ID, migrateRequest.getId());
-        variable.put(MigrateConstants.NEW_ID, newId);
-        variable.put(MigrateConstants.MIGRATE_REQUEST, migrateRequest);
-        variable.put(MigrateConstants.USER_ID, userId);
-        workflowProcessUtils.asyncStartProcess(MigrateConstants.PROCESS_KEY, variable);
-        return newId;
-    }
 }
