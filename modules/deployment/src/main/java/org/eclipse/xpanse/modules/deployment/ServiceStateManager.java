@@ -65,7 +65,7 @@ public class ServiceStateManager {
             }
             deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
         } catch (RuntimeException e) {
-            log.info("start service by service id:{} failed.", id);
+            log.info("start service by service id:{} failed.", id, e);
             deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
             deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
         }
@@ -97,7 +97,7 @@ public class ServiceStateManager {
             }
             deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
         } catch (RuntimeException e) {
-            log.info("stop service by service id:{} failed.", id);
+            log.info("stop service by service id:{} failed.", id, e);
             deployServiceEntity.setServiceState(ServiceState.STOPPING_FAILED);
             deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
         }
