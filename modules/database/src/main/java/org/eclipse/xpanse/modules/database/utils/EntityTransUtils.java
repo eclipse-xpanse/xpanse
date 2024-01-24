@@ -12,9 +12,11 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -92,4 +94,16 @@ public class EntityTransUtils {
         return vendorHostedDeployedServiceDetails;
     }
 
+    /**
+     * ServiceMigrationEntity converted to ServiceMigrationDetails.
+     *
+     * @param serviceMigrationEntity ServiceMigrationEntity.
+     * @return ServiceMigrationDetails
+     */
+    public static ServiceMigrationDetails transServiceMigrationDetails(
+            ServiceMigrationEntity serviceMigrationEntity) {
+        ServiceMigrationDetails details = new ServiceMigrationDetails();
+        BeanUtils.copyProperties(serviceMigrationEntity, details);
+        return details;
+    }
 }
