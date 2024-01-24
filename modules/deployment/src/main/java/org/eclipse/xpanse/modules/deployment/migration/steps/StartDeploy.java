@@ -35,23 +35,19 @@ import org.springframework.stereotype.Component;
 public class StartDeploy implements Serializable, JavaDelegate {
 
 
-    private static DeployService deployService;
-    private static RuntimeService runtimeService;
-    private static MigrationService migrationService;
+    private final DeployService deployService;
+    private final RuntimeService runtimeService;
+    private final MigrationService migrationService;
 
+    /**
+     * Constructor for StartDeploy bean.
+     */
     @Autowired
-    public void setDeployService(DeployService deployService) {
-        StartDeploy.deployService = deployService;
-    }
-
-    @Autowired
-    public void setRuntimeService(RuntimeService runtimeService) {
-        StartDeploy.runtimeService = runtimeService;
-    }
-
-    @Autowired
-    public void setMigrationService(MigrationService migrationService) {
-        StartDeploy.migrationService = migrationService;
+    public StartDeploy(DeployService deployService, RuntimeService runtimeService,
+                        MigrationService migrationService) {
+        this.deployService = deployService;
+        this.runtimeService = runtimeService;
+        this.migrationService = migrationService;
     }
 
     /**

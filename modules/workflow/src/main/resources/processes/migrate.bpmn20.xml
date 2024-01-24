@@ -3,14 +3,14 @@
   <process id="migrate" name="migrate" isExecutable="true">
     <documentation>Service Migrate Process</documentation>
     <startEvent id="sid-448fe061-da08-4592-b466-33ba353d38f0"/>
-    <serviceTask id="sid-59d46b05-df91-4a02-b735-d21e025fdeff" activiti:exclusive="true" name="ExportData" activiti:class="org.eclipse.xpanse.modules.deployment.migration.steps.ExportData"/>
-    <serviceTask id="sid-05accf33-d319-4221-bf3a-db7c6036f8fb" name="StartDeploy" activiti:exclusive="true" activiti:class="org.eclipse.xpanse.modules.deployment.migration.steps.StartDeploy"/>
+    <serviceTask id="sid-59d46b05-df91-4a02-b735-d21e025fdeff" activiti:exclusive="true" name="ExportData" activiti:delegateExpression="${exportData}"/>
+    <serviceTask id="sid-05accf33-d319-4221-bf3a-db7c6036f8fb" name="StartDeploy" activiti:exclusive="true" activiti:delegateExpression="${startDeploy}"/>
     <receiveTask id="deployCallBack" name="DeployCallBack"/>
-    <serviceTask id="sid-c77e385d-b219-4458-9252-762cd6a7c0d3" name="CheckDeployStatus" activiti:exclusive="true" activiti:class="org.eclipse.xpanse.modules.deployment.migration.steps.ProcessDeploymentResult"/>
-    <serviceTask id="sid-4f68e370-4cea-4d2c-93c6-31fdeb84de4d" name="ImportData" activiti:exclusive="true" activiti:class="org.eclipse.xpanse.modules.deployment.migration.steps.ImportData"/>
-    <serviceTask id="sid-11c2db56-435c-4bb3-a9d8-9654c2da209b" name="StartDestroy" activiti:exclusive="true" activiti:class="org.eclipse.xpanse.modules.deployment.migration.steps.StartDestroy"/>
+    <serviceTask id="sid-c77e385d-b219-4458-9252-762cd6a7c0d3" name="CheckDeployStatus" activiti:exclusive="true" activiti:delegateExpression="${processDeploymentResult}"/>
+    <serviceTask id="sid-4f68e370-4cea-4d2c-93c6-31fdeb84de4d" name="ImportData" activiti:exclusive="true" activiti:delegateExpression="${importData}"/>
+    <serviceTask id="sid-11c2db56-435c-4bb3-a9d8-9654c2da209b" name="StartDestroy" activiti:exclusive="true" activiti:delegateExpression="${startDestroy}"/>
     <receiveTask id="destroyCallBack" name="DestroyCallBack"/>
-    <serviceTask id="sid-2a96b83b-8931-4f14-9f4b-bac2409ee5c6" name="CheckDestroyStatus" activiti:exclusive="true" activiti:class="org.eclipse.xpanse.modules.deployment.migration.steps.ProcessDestroytResult"/>
+    <serviceTask id="sid-2a96b83b-8931-4f14-9f4b-bac2409ee5c6" name="CheckDestroyStatus" activiti:exclusive="true" activiti:delegateExpression="${processDestroyResult}"/>
     <exclusiveGateway id="sid-ccf32734-7f92-4c34-a306-8a832ecdcd44"/>
     <exclusiveGateway id="sid-742f022b-f936-459f-ad66-f58d2c8eb217"/>
     <endEvent id="sid-f520a0a3-9f94-41fd-bd1d-c55500e8fd35"/>

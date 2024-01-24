@@ -21,11 +21,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeployFailedManualHandlerListener implements ExecutionListener {
 
-    private static RuntimeService runtimeService;
+    private final RuntimeService runtimeService;
 
     @Autowired
-    public void setRuntimeService(RuntimeService runtimeService) {
-        DeployFailedManualHandlerListener.runtimeService = runtimeService;
+    public DeployFailedManualHandlerListener(RuntimeService runtimeService) {
+        this.runtimeService = runtimeService;
     }
 
     @Override
