@@ -90,7 +90,6 @@ class CredentialCacheTests {
         CredentialCacheKey key8 =
                 new CredentialCacheKey(Csp.FLEXIBLE_ENGINE, CredentialType.API_KEY, "", null);
 
-        assertEquals(key1, key1);
         assertEquals(key1, key2);
         assertEquals(key2, key1);
 
