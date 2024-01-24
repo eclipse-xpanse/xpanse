@@ -115,8 +115,7 @@ public class HuaweiCloudVmStateManager {
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {
         ShowJobResponse response = ecsClient.showJobInvoker(new ShowJobRequest().withJobId(jobId))
                 .retryTimes(DEFAULT_RETRY_TIMES)
-                .retryCondition((resp, ex) -> Objects.nonNull(ex)
-                        && !resp.getStatus().equals(ShowJobResponse.StatusEnum.SUCCESS))
+                .retryCondition(this::matchRetryCondition)
                 .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
                 .invoke();
         if (response.getStatus().equals(StatusEnum.FAIL)) {
@@ -124,6 +123,13 @@ public class HuaweiCloudVmStateManager {
                     response.getFailReason(), response.getMessage());
         }
         return response.getStatus().equals(StatusEnum.SUCCESS);
+    }
+
+    private boolean matchRetryCondition(ShowJobResponse response, Exception ex) {
+        if (Objects.nonNull(ex)) {
+            return false;
+        }
+        return response.getStatus() != StatusEnum.SUCCESS;
     }
 
 }
