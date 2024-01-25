@@ -25,6 +25,12 @@ public class ServicePolicyUpdateRequest {
     private UUID id;
 
     /**
+     * The flavor name of the policy.
+     */
+    @Schema(description = "The flavor name of the policy.")
+    private String flavorName;
+
+    /**
      * The policy.
      */
     @Schema(description = "The policy.")
