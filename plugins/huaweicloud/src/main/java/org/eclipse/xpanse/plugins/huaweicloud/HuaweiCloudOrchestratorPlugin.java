@@ -55,6 +55,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
         resourceHandlers.put(DeployerKind.TERRAFORM, huaweiCloudTerraformResourceHandler);
+        resourceHandlers.put(DeployerKind.OPEN_TOFU, huaweiCloudTerraformResourceHandler);
         return resourceHandlers;
     }
 
@@ -80,13 +81,12 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true));
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true));
-        CredentialVariables accessKey = new CredentialVariables(
-                getCsp(), CredentialType.VARIABLES, HuaweiCloudMonitorConstants.IAM,
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY, "The access key.",
+                        true));
+        credentialVariables.add(new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                "The security key.", true));
+        CredentialVariables accessKey = new CredentialVariables(getCsp(), CredentialType.VARIABLES,
+                HuaweiCloudMonitorConstants.IAM,
                 "Using The access key and security key authentication.", null, credentialVariables);
 
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
@@ -124,21 +124,24 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public String getProvider(String region) {
-        return String.format("""
-                terraform {
-                  required_providers {
-                    huaweicloud = {
-                      source = "huaweicloud/huaweicloud"
-                      version = "%s"
+    public String getProvider(DeployerKind deployerKind, String region) {
+        return switch (deployerKind) {
+            case DeployerKind.OPEN_TOFU, DeployerKind.TERRAFORM -> String.format("""
+                    terraform {
+                      required_providers {
+                        huaweicloud = {
+                          source = "huaweicloud/huaweicloud"
+                          version = "%s"
+                        }
+                      }
                     }
-                  }
-                }
-                            
-                provider "huaweicloud" {
-                  region = "%s"
-                }
-                """, terraformHuaweiCloudVersion, region);
+                                
+                    provider "huaweicloud" {
+                      region = "%s"
+                    }
+                    """, terraformHuaweiCloudVersion, region);
+            default -> "";
+        };
     }
 
     @Override

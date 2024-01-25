@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class    OpenstackOrchestratorPlugin implements OrchestratorPlugin {
+public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Resource
     private OpenstackTerraformResourceHandler openstackTerraformResourceHandler;
@@ -57,6 +57,7 @@ public class    OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
         resourceHandlers.put(DeployerKind.TERRAFORM, openstackTerraformResourceHandler);
+        resourceHandlers.put(DeployerKind.OPEN_TOFU, openstackTerraformResourceHandler);
         return resourceHandlers;
     }
 
@@ -143,21 +144,24 @@ public class    OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public String getProvider(String region) {
-        return String.format("""
-                terraform {
-                  required_providers {
-                    openstack = {
-                          source  = "terraform-provider-openstack/openstack"
-                          version = "%s"
-                        }
-                  }
-                }
-                            
-                provider "openstack" {
-                  region = "%s"
-                }
-                """, terraformOpenStackVersion, region);
+    public String getProvider(DeployerKind deployerKind, String region) {
+        return switch (deployerKind) {
+            case DeployerKind.OPEN_TOFU, DeployerKind.TERRAFORM -> String.format("""
+                    terraform {
+                      required_providers {
+                        openstack = {
+                              source  = "terraform-provider-openstack/openstack"
+                              version = "%s"
+                            }
+                      }
+                    }
+                                
+                    provider "openstack" {
+                      region = "%s"
+                    }
+                    """, terraformOpenStackVersion, region);
+            default -> "";
+        };
     }
 
     @Override

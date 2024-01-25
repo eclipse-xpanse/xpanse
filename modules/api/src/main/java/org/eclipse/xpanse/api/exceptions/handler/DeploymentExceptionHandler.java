@@ -7,6 +7,9 @@ package org.eclipse.xpanse.api.exceptions.handler;
 
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformProviderNotFoundException;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ActivitiTaskNotFoundException;
@@ -17,9 +20,6 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServic
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformProviderNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

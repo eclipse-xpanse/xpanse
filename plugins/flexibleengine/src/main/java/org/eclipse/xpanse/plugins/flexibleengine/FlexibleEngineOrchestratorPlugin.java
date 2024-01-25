@@ -52,6 +52,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
         resourceHandlers.put(DeployerKind.TERRAFORM, flexibleEngineTerraformResourceHandler);
+        resourceHandlers.put(DeployerKind.OPEN_TOFU, flexibleEngineTerraformResourceHandler);
         return resourceHandlers;
     }
 
@@ -75,15 +76,15 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
-        CredentialVariables accessKey = new CredentialVariables(
-                getCsp(), CredentialType.VARIABLES, "AK_SK", "The access key and security key.",
-                null, credentialVariables);
+        CredentialVariables accessKey =
+                new CredentialVariables(getCsp(), CredentialType.VARIABLES, "AK_SK",
+                        "The access key and security key.", null, credentialVariables);
         credentialVariables.add(
-                new CredentialVariable(FlexibleEngineConstants.OS_ACCESS_KEY,
-                        "The access key.", true));
+                new CredentialVariable(FlexibleEngineConstants.OS_ACCESS_KEY, "The access key.",
+                        true));
         credentialVariables.add(
-                new CredentialVariable(FlexibleEngineConstants.OS_SECRET_KEY,
-                        "The security key.", true));
+                new CredentialVariable(FlexibleEngineConstants.OS_SECRET_KEY, "The security key.",
+                        true));
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(accessKey);
         /* In the credential definition object CredentialVariables. The value of fields joined like
@@ -134,20 +135,23 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public String getProvider(String region) {
-        return String.format("""         
-                terraform {
-                  required_providers {
-                    flexibleengine = {
-                      source  = "FlexibleEngineCloud/flexibleengine"
-                      version = "%s"
+    public String getProvider(DeployerKind deployerKind, String region) {
+        return switch (deployerKind) {
+            case DeployerKind.OPEN_TOFU, DeployerKind.TERRAFORM -> String.format("""
+                    terraform {
+                      required_providers {
+                        flexibleengine = {
+                          source  = "FlexibleEngineCloud/flexibleengine"
+                          version = "%s"
+                        }
+                      }
                     }
-                  }
-                }
-                            
-                provider "flexibleengine" {
-                  region = "%s"
-                }
-                """, terraformFlexibleEngineVersion, region);
+                                
+                    provider "flexibleengine" {
+                      region = "%s"
+                    }
+                    """, terraformFlexibleEngineVersion, region);
+            default -> "";
+        };
     }
 }

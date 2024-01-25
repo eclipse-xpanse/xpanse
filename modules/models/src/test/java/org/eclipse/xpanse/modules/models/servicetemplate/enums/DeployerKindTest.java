@@ -19,14 +19,15 @@ class DeployerKindTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(DeployerKind.TERRAFORM, DeployerKind.TERRAFORM.getByValue("terraform"));
-        assertThrows(UnsupportedEnumValueException.class,
-                () -> DeployerKind.TERRAFORM.getByValue("null"));
+        assertEquals(DeployerKind.TERRAFORM, DeployerKind.getByValue("terraform"));
+        assertEquals(DeployerKind.OPEN_TOFU, DeployerKind.getByValue("opentofu"));
+        assertThrows(UnsupportedEnumValueException.class, () -> DeployerKind.getByValue("null"));
     }
 
     @Test
     void testToValue() {
         assertEquals("terraform", DeployerKind.TERRAFORM.toValue());
+        assertEquals("opentofu", DeployerKind.OPEN_TOFU.toValue());
     }
 
 }

@@ -19,7 +19,6 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
@@ -56,7 +55,8 @@ class HuaweiCloudOrchestratorPluginTest {
 
     @Test
     void testGetResourceHandler() {
-        assertThat(huaweiCloudOrchestratorPluginUnderTest.resourceHandlers().get(DeployerKind.TERRAFORM))
+        assertThat(huaweiCloudOrchestratorPluginUnderTest.resourceHandlers()
+                .get(DeployerKind.TERRAFORM))
                 .isEqualTo(mockHuaweiCloudTerraformResourceHandler);
     }
 
@@ -98,7 +98,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -122,7 +123,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByResource(resourceMetricRequest1))
                 .thenReturn(metrics);
@@ -145,7 +147,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
 
         // Configure HuaweiCloudMetricsService.getMetricsByResource(...).
@@ -155,7 +158,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByResource(resourceMetricRequest1))
                 .thenReturn(Collections.emptyList());
@@ -178,7 +182,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                        MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -202,7 +207,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource1),
+                        MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByService(serviceMetricRequest1))
                 .thenReturn(metrics);
@@ -225,7 +231,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                        MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
 
         // Configure HuaweiCloudMetricsService.getMetricsByService(...).
@@ -235,7 +242,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource1),
+                        MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByService(serviceMetricRequest1))
                 .thenReturn(Collections.emptyList());
@@ -265,7 +273,8 @@ class HuaweiCloudOrchestratorPluginTest {
                   region = "%s"
                 }
                 """, terraformHuaweiCloudVersion, regionName);
-        assertThat(huaweiCloudOrchestratorPluginUnderTest.getProvider(regionName))
+        assertThat(huaweiCloudOrchestratorPluginUnderTest.getProvider(DeployerKind.TERRAFORM,
+                regionName))
                 .isEqualTo(result);
     }
 
@@ -281,14 +290,16 @@ class HuaweiCloudOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.startService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockHuaweiCloudVmStateManager.startService(serviceStateManageRequest1)).thenReturn(false);
+        when(mockHuaweiCloudVmStateManager.startService(serviceStateManageRequest1)).thenReturn(
+                false);
 
         // Run the test
         final boolean result =
@@ -310,14 +321,16 @@ class HuaweiCloudOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.startService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockHuaweiCloudVmStateManager.startService(serviceStateManageRequest1)).thenReturn(true);
+        when(mockHuaweiCloudVmStateManager.startService(serviceStateManageRequest1)).thenReturn(
+                true);
 
         // Run the test
         final boolean result =
@@ -339,14 +352,16 @@ class HuaweiCloudOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.stopService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockHuaweiCloudVmStateManager.stopService(serviceStateManageRequest1)).thenReturn(false);
+        when(mockHuaweiCloudVmStateManager.stopService(serviceStateManageRequest1)).thenReturn(
+                false);
 
         // Run the test
         final boolean result =
@@ -368,14 +383,16 @@ class HuaweiCloudOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.stopService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockHuaweiCloudVmStateManager.stopService(serviceStateManageRequest1)).thenReturn(true);
+        when(mockHuaweiCloudVmStateManager.stopService(serviceStateManageRequest1)).thenReturn(
+                true);
 
         // Run the test
         final boolean result =
@@ -397,7 +414,8 @@ class HuaweiCloudOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.restartService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -427,14 +445,16 @@ class HuaweiCloudOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.restartService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockHuaweiCloudVmStateManager.restartService(serviceStateManageRequest1)).thenReturn(true);
+        when(mockHuaweiCloudVmStateManager.restartService(serviceStateManageRequest1)).thenReturn(
+                true);
 
         // Run the test
         final boolean result =

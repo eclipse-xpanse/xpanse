@@ -1,6 +1,7 @@
 FROM eclipse-temurin:21-jre-alpine
 
-ENV TERRAFORM_VERSION=1.4.4
+ENV TERRAFORM_VERSION=1.6.0
+ENV OPENTOFU_VERSION=1.6.0
 ENV XPANSE_USER=xpanse
 ENV XPANSE_HOME_DIR=/home/xpanse
 
@@ -12,6 +13,11 @@ RUN apk update && \
 RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 RUN unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 RUN mv terraform /usr/bin/terraform
+
+# Install OpenTofu
+RUN wget https://github.com/opentofu/opentofu/releases/download/v${OPENTOFU_VERSION}/tofu_${OPENTOFU_VERSION}_linux_amd64.zip
+RUN unzip tofu_${OPENTOFU_VERSION}_linux_amd64.zip
+RUN mv tofu /usr/bin/tofu
 
 # Copy the script for starting xpanse with private key
 COPY start-xpanse-with-private_key.sh /start-xpanse-with-private_key.sh

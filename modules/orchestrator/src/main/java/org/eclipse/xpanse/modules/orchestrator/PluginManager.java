@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.exceptions.DuplicateCredentialDefinition;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -73,8 +74,9 @@ public class PluginManager {
         return plugin;
     }
 
-    public String getTerraformProviderForRegionByCsp(Csp csp, String region) {
-        return getOrchestratorPlugin(csp).getProvider(region);
+    public String getDeployerProvider(Csp csp, DeployerKind deployerKind, String region) {
+        OrchestratorPlugin plugin = getOrchestratorPlugin(csp);
+        return plugin.getProvider(deployerKind, region);
     }
 
     private boolean isPluginUsable(List<String> requiredProperties, Csp csp) {

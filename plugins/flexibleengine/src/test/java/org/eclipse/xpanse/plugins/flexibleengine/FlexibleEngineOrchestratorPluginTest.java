@@ -19,7 +19,6 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
@@ -446,7 +445,8 @@ class FlexibleEngineOrchestratorPluginTest {
                   region = "%s"
                 }
                 """, terraformFlexibleEngineVersion, regionName);
-        assertThat(flexibleEngineOrchestratorPluginUnderTest.getProvider(regionName)).isEqualTo(
+        assertThat(flexibleEngineOrchestratorPluginUnderTest.getProvider(DeployerKind.TERRAFORM,
+                regionName)).isEqualTo(
                 result);
     }
 }

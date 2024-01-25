@@ -91,11 +91,6 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     }
 
     @Override
-    public String getProvider(String region) {
-        return null;
-    }
-
-    @Override
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
         return true;
     }
@@ -108,6 +103,11 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     @Override
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         return true;
+    }
+
+    @Override
+    public String getProvider(DeployerKind deployerKind, String region) {
+        return null;
     }
 }
 

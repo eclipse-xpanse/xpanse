@@ -1,0 +1,290 @@
+# The version of the Xpanse description language
+version: 1.0
+# The category of the service.
+category: middleware
+# The Service provided by the ISV, the name will be shown on the console as a service.
+name: Kafka-cluster
+# The version of the service, the end-user can select the version they want to deploy.
+serviceVersion: v1.0.1
+# For the users may have more than one service, the @namespace can be used to separate the clusters.
+description: This is an ehanced Kafka cluster services by ISV-A.
+namespace: ISV-A
+# Icon for the service.
+icon: |
+  data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACRAQMAAAAPc4+9AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+/v7Hh8gVD0A0wAAAcVJREFUeJzNlc1twzAMhSX44KNH0CgaTd6gK3kUd4McDVTwq/hjiUyaIkV7qNA2/QCFIh+ppxB+svLNEqqBGTC0ANugBOwmCGDCFOAwIWGDOoqoODtN2BdL6wxD9NMTO9tXPa1PqL5M30W5p8lm5vNcF0t7ahSrVguqNqmMokRW4YQucVjBCBWH1Z2g3WDlW2skoYU+2x8JOtGedBF3k2iXMO0j16iUiI6gxzPdQhnU/s2G9pCO57QY2r6hvjPbKJHq7DRTRXT60avtuTRdbrFJI3mSZhNOqYjVbd99YyK1QKWzEqSWrE0k07U60uPaelflMzaaeu1KBuurHSsn572I1KWy2joX5ZBfWbS/VEt50H5P6aL4JxTuyJ/+QCNPX4PWF3Q8Xe1eF9FsLdD2VaOnaP2hWvs+zI58/7i3vH3nRFtDZpyTUNaZkON5XnBNsp8lrmDMrpvBr+b6pUl+4XbkQdndqnzYGzfuJm1JmIWimIbe6dndd/bk7gVce/cJdo3uIeLJl7+I2xTnPek67mjtDeppE7b03Ov+kSfDe3JweW53njxeGfXkaz28VeYd86+af/H8a7hgJKaebILaFzakLfxyfQLTxVB6K1K9KQAAAABJRU5ErkJggg==
+# Reserved for CSP, aws,azure,ali,huawei and ...
+cloudServiceProvider:
+  name: huawei
+  regions:
+    - name: cn-southwest-2
+      area: Asia China
+    - name: cn-north-4
+      area: Asia China
+billing:
+  # The business model(`flat`, `exponential`, ...)
+  model: flat
+  # The rental period (`daily`, `weekly`, `monthly`, `yearly`)
+  period: monthly
+  # The billing currency (`euro`, `usd`, ...)
+  currency: euro
+serviceHostingType: self
+# The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
+flavors:
+  - name: 1-zookeeper-with-3-worker-nodes-normal
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 40
+    # Properties for the service, which can be used by the deployment.
+    properties:
+      worker_nodes_count: 3
+      flavor_id: c7.large.4
+  - name: 1-zookeeper-with-3-worker-nodes-performance
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 60
+    # Properties for the service, which can be used by the deployment.
+    properties:
+      worker_nodes_count: 3
+      flavor_id: c7.xlarge.4
+  - name: 1-zookeeper-with-5-worker-nodes-normal
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 60
+    # Properties for the service, which can be used by the deployment.
+    properties:
+      worker_nodes_count: 5
+      flavor_id: c7.large.4
+  - name: 1-zookeeper-with-5-worker-nodes-performance
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 80
+    # Properties for the service, which can be used by the deployment.
+    properties:
+      worker_nodes_count: 5
+      flavor_id: c7.xlarge.4
+# The contact details of the service.
+serviceProviderContactDetails:
+  email: [ "test@test.com" ]
+deployment:
+  # kind, Supported values are terraform, opentofu.
+  kind: opentofu
+  # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
+  # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
+  # - fix_variable: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as usual variables. This variable is not visible to the end user.
+  # - env: Value for a variable of this type can be provided by end user. If marked as mandatory then end user must provide value to this variable. If marked as optional and if end user does not provided it, then the fallback value to this variable is read by runtime (it can read from other sources, e.g., OS env variables). This variable is injected as a environment variable to the deployer.
+  # - variable: Value for a variable of this type can be provided by end user. . If marked as mandatory then end user must provide value to this variable. If marked as optional and if end user does not provided it, then the fallback value to this variable is read by runtime (it can read from other sources, e.g., OS env variables). This variable is injected as a regular variable to the deployer.
+  # - env_env: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a environment variable to the deployer. End user cannot see or change this variable.
+  # - env_variable: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a regular variable to the deployer. End user cannot see or change this variable.
+  # The parameters will be used to generate the API of the managed service.
+  variables:
+    - name: admin_passwd
+      description: The admin password of all nodes in the Kafka cluster. If the value is empty, will create a random password.
+      kind: variable
+      dataType: string
+      mandatory: false
+      valueSchema:
+        minLength: 8
+        maxLength: 16
+        pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+    - name: vpc_name
+      description: The vpc name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create VPC.
+      kind: variable
+      dataType: string
+      example: "kafka-vpc-default"
+      mandatory: false
+      value: "kafka-vpc-default"
+    - name: subnet_name
+      description: The sub network name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create subnet.
+      kind: variable
+      dataType: string
+      example: "kafka-subnet-default"
+      mandatory: false
+      value: "kafka-subnet-default"
+    - name: secgroup_name
+      description: The security group name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create security group.
+      kind: variable
+      dataType: string
+      example: "kafka-secgroup-default"
+      mandatory: false
+      value: "kafka-secgroup-default"
+  deployer: |
+    variable "flavor_id" {
+      type        = string
+      default     = "c7.large.2"
+      description = "The flavor_id of all nodes in the Kafka cluster."
+    }
+
+    variable "worker_nodes_count" {
+      type        = string
+      default     = 3
+      description = "The worker nodes count in the Kafka cluster."
+    }
+
+    variable "admin_passwd" {
+      type        = string
+      default     = ""
+      description = "The root password of all nodes in the Kafka cluster."
+    }
+
+    variable "vpc_name" {
+      type        = string
+      default     = "kafka-vpc-default"
+      description = "The vpc name of all nodes in the Kafka cluster."
+    }
+
+    variable "subnet_name" {
+      type        = string
+      default     = "kafka-subnet-default"
+      description = "The subnet name of all nodes in the Kafka cluster."
+    }
+
+    variable "secgroup_name" {
+      type        = string
+      default     = "kafka-secgroup-default"
+      description = "The security group name of all nodes in the Kafka cluster."
+    }
+
+    data "huaweicloud_vpcs" "existing" {
+      name = var.vpc_name
+    }
+
+    data "huaweicloud_vpc_subnets" "existing" {
+      name = var.subnet_name
+    }
+
+    data "huaweicloud_networking_secgroups" "existing" {
+      name = var.secgroup_name
+    }
+
+    locals {
+      admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
+      vpc_id       = length(data.huaweicloud_vpcs.existing.vpcs) > 0 ? data.huaweicloud_vpcs.existing.vpcs[0].id : huaweicloud_vpc.new[0].id
+      subnet_id    = length(data.huaweicloud_vpc_subnets.existing.subnets)> 0 ? data.huaweicloud_vpc_subnets.existing.subnets[0].id : huaweicloud_vpc_subnet.new[0].id
+      secgroup_id  = length(data.huaweicloud_networking_secgroups.existing.security_groups) > 0 ? data.huaweicloud_networking_secgroups.existing.security_groups[0].id : huaweicloud_networking_secgroup.new[0].id
+    }
+
+    resource "huaweicloud_vpc" "new" {
+      count = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
+      name  = var.vpc_name
+      cidr  = "192.168.0.0/16"
+    }
+
+    resource "huaweicloud_vpc_subnet" "new" {
+      count      = length(data.huaweicloud_vpcs.existing.vpcs) == 0 ? 1 : 0
+      vpc_id     = local.vpc_id
+      name       = var.subnet_name
+      cidr       = "192.168.10.0/24"
+      gateway_ip = "192.168.10.1"
+    }
+
+    resource "huaweicloud_networking_secgroup" "new" {
+      count       = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+      name        = var.secgroup_name
+      description = "Kafka cluster security group"
+    }
+
+    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_0" {
+      count             = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+      direction         = "ingress"
+      ethertype         = "IPv4"
+      protocol          = "tcp"
+      port_range_min    = 22
+      port_range_max    = 22
+      remote_ip_prefix  = "121.37.117.211/32"
+      security_group_id = local.secgroup_id
+    }
+
+    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_1" {
+      count             = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+      direction         = "ingress"
+      ethertype         = "IPv4"
+      protocol          = "tcp"
+      port_range_min    = 2181
+      port_range_max    = 2181
+      remote_ip_prefix  = "121.37.117.211/32"
+      security_group_id = local.secgroup_id
+    }
+
+    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_2" {
+      count             = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
+      direction         = "ingress"
+      ethertype         = "IPv4"
+      protocol          = "tcp"
+      port_range_min    = 9092
+      port_range_max    = 9093
+      remote_ip_prefix  = "121.37.117.211/32"
+      security_group_id = local.secgroup_id
+    }
+
+    data "huaweicloud_availability_zones" "osc-az" {}
+
+    resource "random_id" "new" {
+      byte_length = 4
+    }
+
+    resource "random_password" "password" {
+      length           = 12
+      upper            = true
+      lower            = true
+      numeric          = true
+      special          = true
+      min_special      = 1
+      override_special = "#%@"
+    }
+
+    resource "huaweicloud_kps_keypair" "keypair" {
+      name     = "keypair-kafka-${random_id.new.hex}"
+      key_file = "keypair-kafka-${random_id.new.hex}.pem"
+    }
+
+    data "huaweicloud_images_image" "image" {
+      name        = "Kafka-v3.3.2_Ubuntu-20.04"
+      most_recent = true
+    }
+
+    resource "huaweicloud_compute_instance" "zookeeper" {
+      availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
+      name               = "kafka-zookeeper-${random_id.new.hex}"
+      flavor_id          = var.flavor_id
+      security_group_ids = [ local.secgroup_id ]
+      image_id           = data.huaweicloud_images_image.image.id
+      key_pair           = huaweicloud_kps_keypair.keypair.name
+      network {
+        uuid = local.subnet_id
+      }
+      user_data = <<EOF
+        #!bin/bash
+        echo root:${local.admin_passwd} | sudo chpasswd
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        sudo docker run -d --name zookeeper-server --privileged=true -p 2181:2181 -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:3.8.1
+      EOF
+    }
+
+    resource "huaweicloud_compute_instance" "kafka-broker" {
+      count              = var.worker_nodes_count
+      availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
+      name               = "kafka-broker-${random_id.new.hex}-${count.index}"
+      flavor_id          = var.flavor_id
+      security_group_ids = [ local.secgroup_id ]
+      image_id           = data.huaweicloud_images_image.image.id
+      key_pair           = huaweicloud_kps_keypair.keypair.name
+      network {
+        uuid = local.subnet_id
+      }
+      user_data = <<EOF
+        #!bin/bash
+        echo root:${local.admin_passwd} | sudo chpasswd
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        private_ip=$(ifconfig | grep -A1 "eth0" | grep 'inet' | awk -F ' ' ' {print $2}'|awk ' {print $1}')
+        sudo docker run -d --name kafka-server --restart always -p 9092:9092 -p 9093:9093  -e KAFKA_BROKER_ID=${count.index}  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://$private_ip:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=${huaweicloud_compute_instance.zookeeper.access_ip_v4}:2181 bitnami/kafka:3.3.2
+      EOF
+      depends_on = [
+        huaweicloud_compute_instance.zookeeper
+      ]
+    }
+
+    output "zookeeper_server" {
+      value = "${huaweicloud_compute_instance.zookeeper.access_ip_v4}:2181"
+    }
+
+    output "admin_passwd" {
+      value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
+    }

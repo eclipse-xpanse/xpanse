@@ -28,7 +28,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
@@ -37,6 +36,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
@@ -67,7 +67,12 @@ class ServiceTemplateManageTest {
     private static OclLoader oclLoader;
     private static Ocl oclRegister;
     private static UUID uuid;
-
+    @Mock
+    TerraformLocalConfig terraformLocalConfig;
+    @Mock
+    Executor taskExecutor;
+    @Mock
+    ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @Mock
     private PluginManager pluginManager;
     @Mock
@@ -84,13 +89,6 @@ class ServiceTemplateManageTest {
     private TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
     @Mock
     private DeployServiceEntityHandler deployServiceEntityHandler;
-
-    @Mock
-    TerraformLocalConfig terraformLocalConfig;
-    @Mock
-    Executor taskExecutor;
-    @Mock
-    ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @InjectMocks
     private ServiceTemplateManage serviceTemplateManageTest;
     @Mock
@@ -146,7 +144,7 @@ class ServiceTemplateManageTest {
                   region = "test"
                 }
                 """).when(this.pluginManager)
-                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
+                .getDeployerProvider(any(Csp.class), any(DeployerKind.class), any());
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         ServiceTemplateEntity ServiceTemplateEntityByUrl =
                 serviceTemplateManageTest.updateServiceTemplateByUrl(uuid.toString(),
@@ -192,7 +190,7 @@ class ServiceTemplateManageTest {
                       region = "test"
                         }
                         """).when(this.pluginManager)
-                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
+                .getDeployerProvider(any(Csp.class), any(DeployerKind.class), any());
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         ServiceTemplateEntity updateServiceTemplateEntity =
                 serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl);
@@ -256,7 +254,7 @@ class ServiceTemplateManageTest {
                       region = "test"
                     }
                     """).when(this.pluginManager)
-                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
+                .getDeployerProvider(any(Csp.class), any(DeployerKind.class), any());
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
 
@@ -320,7 +318,7 @@ class ServiceTemplateManageTest {
                       region = "test"
                     }
                     """).when(this.pluginManager)
-                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
+                .getDeployerProvider(any(Csp.class), any(DeployerKind.class), any());
 
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
@@ -396,11 +394,14 @@ class ServiceTemplateManageTest {
     @Test
     void testUnregisterServiceTemplate() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        when(mockStorage.getServiceTemplateById(serviceTemplateEntity.getId())).thenReturn(serviceTemplateEntity);
+        when(mockStorage.getServiceTemplateById(serviceTemplateEntity.getId())).thenReturn(
+                serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
-        serviceTemplateManageTest.unregisterServiceTemplate(serviceTemplateEntity.getId().toString());
+        serviceTemplateManageTest.unregisterServiceTemplate(
+                serviceTemplateEntity.getId().toString());
         verify(mockStorage).removeById(serviceTemplateEntity.getId());
-        verify(serviceTemplateOpenApiGenerator).deleteServiceApi(serviceTemplateEntity.getId().toString());
+        verify(serviceTemplateOpenApiGenerator).deleteServiceApi(
+                serviceTemplateEntity.getId().toString());
     }
 
     @Test
