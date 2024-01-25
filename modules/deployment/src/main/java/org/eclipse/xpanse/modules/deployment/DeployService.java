@@ -218,6 +218,8 @@ public class DeployService {
         Deployer deployer = deployerKindManager.getDeployment(
                 destroyTask.getOcl().getDeployment().getKind());
         try {
+            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
             destroyResult = deployer.destroy(destroyTask);
         } catch (RuntimeException e) {
             log.info("Destroy service with id:{} failed.", destroyTask.getId(), e);
