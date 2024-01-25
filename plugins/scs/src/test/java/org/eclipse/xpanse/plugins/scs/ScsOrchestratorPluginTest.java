@@ -9,43 +9,57 @@ package org.eclipse.xpanse.plugins.scs;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import org.assertj.core.api.Assertions;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
+import org.eclipse.xpanse.plugins.scs.resourcehandler.ScsTerraformResourceHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = {ScsOrchestratorPlugin.class})
 class ScsOrchestratorPluginTest {
+    private final String terraformScsVersion = "1.52.0";
 
-    @Autowired
+    @InjectMocks
     private ScsOrchestratorPlugin plugin;
+    @Mock
+    private ScsTerraformResourceHandler mockScsTerraformResourceHandler;
+    @Mock
+    private ScsServersManager mockScsServersManager;
 
-    @MockBean
-    private ScsTerraformResourceHandler handler;
-
-    @MockBean
-    private ScsServersManager scsServersManager;
-
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(plugin,
+                "terraformScsVersion", terraformScsVersion);
+    }
     @Test
     void getResourceHandler() {
-        assertTrue(plugin.resourceHandlers().get(DeployerKind.TERRAFORM) instanceof ScsTerraformResourceHandler);
+        assertInstanceOf(ScsTerraformResourceHandler.class,
+                plugin.resourceHandlers().get(DeployerKind.TERRAFORM));
     }
 
     @Test
@@ -89,5 +103,206 @@ class ScsOrchestratorPluginTest {
     @Test
     void testRequiredProperties() {
         assertThat(plugin.requiredProperties()).isEqualTo(Collections.emptyList());
+    }
+
+    @Test
+    void testGetProvider() {
+        String region = "region";
+        String result = String.format("""
+                terraform {
+                  required_providers {
+                    openstack = {
+                          source  = "terraform-provider-openstack/openstack"
+                          version = "%s"
+                        }
+                  }
+                }
+                            
+                provider "openstack" {
+                  region = "%s"
+                }
+                """, terraformScsVersion, region);
+        Assertions.assertThat(plugin.getProvider(DeployerKind.TERRAFORM,
+                "region")).isEqualTo(result);
+    }
+
+    @Test
+    void testStartService() {
+        // Setup
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+
+        // Configure ServersManager.startService(...).
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
+        deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockScsServersManager.startService(serviceStateManageRequest1)).thenReturn(false);
+
+        // Run the test
+        final boolean result =
+                plugin.startService(serviceStateManageRequest);
+
+        // Verify the results
+        Assertions.assertThat(result).isFalse();
+    }
+
+    @Test
+    void testStartService_ServersManagerReturnsTrue() {
+        // Setup
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+
+        // Configure ServersManager.startService(...).
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
+        deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockScsServersManager.startService(serviceStateManageRequest1)).thenReturn(true);
+
+        // Run the test
+        final boolean result =
+                plugin.startService(serviceStateManageRequest);
+
+        // Verify the results
+        Assertions.assertThat(result).isTrue();
+    }
+
+    @Test
+    void testStopService() {
+        // Setup
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+
+        // Configure ServersManager.stopService(...).
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
+        deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockScsServersManager.stopService(serviceStateManageRequest1)).thenReturn(false);
+
+        // Run the test
+        final boolean result =
+                plugin.stopService(serviceStateManageRequest);
+
+        // Verify the results
+        Assertions.assertThat(result).isFalse();
+    }
+
+    @Test
+    void testStopService_ServersManagerReturnsTrue() {
+        // Setup
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+
+        // Configure ServersManager.stopService(...).
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
+        deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockScsServersManager.stopService(serviceStateManageRequest1)).thenReturn(true);
+
+        // Run the test
+        final boolean result =
+                plugin.stopService(serviceStateManageRequest);
+
+        // Verify the results
+        Assertions.assertThat(result).isTrue();
+    }
+
+    @Test
+    void testRestartService() {
+        // Setup
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+
+        // Configure ServersManager.restartService(...).
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
+        deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockScsServersManager.restartService(serviceStateManageRequest1)).thenReturn(false);
+
+        // Run the test
+        final boolean result =
+                plugin.restartService(serviceStateManageRequest);
+
+        // Verify the results
+        Assertions.assertThat(result).isFalse();
+    }
+
+    @Test
+    void testRestartService_ServersManagerReturnsTrue() {
+        // Setup
+        final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
+        serviceStateManageRequest.setUserId("userId");
+        serviceStateManageRequest.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
+        deployResourceEntity.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+
+        // Configure ServersManager.restartService(...).
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
+        serviceStateManageRequest1.setUserId("userId");
+        serviceStateManageRequest1.setRegionName("regionName");
+        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
+        deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
+        deployResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        when(mockScsServersManager.restartService(serviceStateManageRequest1)).thenReturn(true);
+
+        // Run the test
+        final boolean result =
+                plugin.restartService(serviceStateManageRequest);
+
+        // Verify the results
+        Assertions.assertThat(result).isTrue();
     }
 }

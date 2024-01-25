@@ -206,6 +206,11 @@ class ServiceMetricsAdapterTest {
     private OrchestratorPlugin getOrchestratorPlugin(Csp csp, List<Metric> metrics) {
         return new OrchestratorPlugin() {
             @Override
+            public String getProvider(DeployerKind deployerKind, String region) {
+                return null;
+            }
+
+            @Override
             public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
                 return true;
             }
@@ -219,12 +224,6 @@ class ServiceMetricsAdapterTest {
             public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
                 return true;
             }
-
-            @Override
-            public String getProvider(String region) {
-                return null;
-            }
-
             @Override
             public Csp getCsp() {
                 return csp;

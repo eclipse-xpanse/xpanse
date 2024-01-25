@@ -61,6 +61,8 @@ public class TerraformDeploymentResultCallbackManager {
      * Callback method after deployment is complete.
      */
     public void deployCallback(String taskId, TerraformResult result) {
+        log.info("Update database entity with id:{} with terraform deploy callback result.",
+                taskId);
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(taskId));
         DeployResult deployResult = handlerCallbackDeployResult(result);
@@ -68,13 +70,12 @@ public class TerraformDeploymentResultCallbackManager {
         if (StringUtils.isNotBlank(result.getTerraformState())) {
             resourceHandlerManager.getResourceHandler(
                     deployServiceEntity.getCsp(),
-                            deployServiceEntity.getDeployRequest().getOcl().getDeployment()
-                                    .getKind())
-                    .handler(deployResult);
+                    deployServiceEntity.getDeployRequest().getOcl().getDeployment()
+                            .getKind()).handler(deployResult);
         }
         DeployServiceEntity updatedDeployServiceEntity =
-                deployResultManager.updateDeployServiceEntityWithDeployResult(
-                        deployResult, deployServiceEntity);
+                deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
+                        deployServiceEntity);
         if (ServiceDeploymentState.DEPLOY_FAILED
                 == updatedDeployServiceEntity.getServiceDeploymentState()) {
             DeployTask deployTask =
@@ -95,7 +96,8 @@ public class TerraformDeploymentResultCallbackManager {
      * Callback method after the service is destroyed.
      */
     public void destroyCallback(String taskId, TerraformResult result) {
-        log.info("Update database entity with id:{} with destroy  callback result.", taskId);
+        log.info("Update database entity with id:{} with terraform destroy callback result.",
+                taskId);
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(taskId));
         DeployResult destroyResult = handlerCallbackDestroyResult(result);
@@ -107,11 +109,11 @@ public class TerraformDeploymentResultCallbackManager {
                             .getKind()).handler(destroyResult);
         }
         try {
-            deployResultManager.updateDeployServiceEntityWithDestroyResult(
-                    destroyResult, deployServiceEntity, false);
+            deployResultManager.updateDeployServiceEntityWithDestroyResult(destroyResult,
+                    deployServiceEntity, false);
         } catch (RuntimeException e) {
-            log.info("Update database entity with id:{} with destroy callback result failed.",
-                    taskId, e);
+            log.error("Update database entity with id:{} with terraform destroy callback result "
+                    + "failed.", taskId, e);
         }
 
         ServiceMigrationEntity serviceMigrationEntity =
@@ -130,8 +132,8 @@ public class TerraformDeploymentResultCallbackManager {
             deployResult.setState(DeployerTaskStatus.DEPLOY_FAILED);
             deployResult.setMessage(result.getCommandStdError());
         }
-        deployResult.getPrivateProperties().put(
-                TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
+        deployResult.getPrivateProperties()
+                .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
         if (Objects.nonNull(result.getImportantFileContentMap())) {
             deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
         }
@@ -146,8 +148,8 @@ public class TerraformDeploymentResultCallbackManager {
             deployResult.setState(DeployerTaskStatus.DEPLOY_FAILED);
             deployResult.setMessage(result.getCommandStdError());
         }
-        deployResult.getPrivateProperties().put(
-                TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
+        deployResult.getPrivateProperties()
+                .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
         if (Objects.nonNull(result.getImportantFileContentMap())) {
             deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
         }

@@ -19,7 +19,6 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
@@ -55,7 +54,8 @@ class OpenstackOrchestratorPluginTest {
 
     @Test
     void testGetResourceHandler() {
-        assertThat(openstackOrchestratorPluginUnderTest.resourceHandlers().get(DeployerKind.TERRAFORM))
+        assertThat(
+                openstackOrchestratorPluginUnderTest.resourceHandlers().get(DeployerKind.TERRAFORM))
                 .isEqualTo(mockOpenstackTerraformResourceHandler);
     }
 
@@ -97,7 +97,8 @@ class OpenstackOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -121,7 +122,8 @@ class OpenstackOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
         when(mockMetricsManager.getMetrics(resourceMetricRequest1)).thenReturn(metrics);
 
@@ -143,7 +145,8 @@ class OpenstackOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
 
         // Configure MetricsManager.getMetrics(...).
@@ -153,7 +156,8 @@ class OpenstackOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
         when(mockMetricsManager.getMetrics(resourceMetricRequest1))
                 .thenReturn(Collections.emptyList());
@@ -176,7 +180,8 @@ class OpenstackOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                        MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -200,7 +205,8 @@ class OpenstackOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
         when(mockMetricsManager.getMetrics(resourceMetricRequest)).thenReturn(metrics);
 
@@ -222,7 +228,8 @@ class OpenstackOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
+                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                        MonitorResourceType.CPU, 0L, 0L,
                         0, false, "userId");
 
         // Configure MetricsManager.getMetrics(...).
@@ -232,7 +239,8 @@ class OpenstackOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                        0L, 0,
                         false, "userId");
         when(mockMetricsManager.getMetrics(resourceMetricRequest))
                 .thenReturn(Collections.emptyList());
@@ -262,7 +270,8 @@ class OpenstackOrchestratorPluginTest {
                   region = "%s"
                 }
                 """, terraformOpenStackVersion, region);
-        assertThat(openstackOrchestratorPluginUnderTest.getProvider("region")).isEqualTo(result);
+        assertThat(openstackOrchestratorPluginUnderTest.getProvider(DeployerKind.TERRAFORM,
+                "region")).isEqualTo(result);
     }
 
     @Test
@@ -277,7 +286,8 @@ class OpenstackOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.startService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -306,7 +316,8 @@ class OpenstackOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.startService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -335,7 +346,8 @@ class OpenstackOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.stopService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -364,7 +376,8 @@ class OpenstackOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.stopService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -393,7 +406,8 @@ class OpenstackOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.restartService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -422,7 +436,8 @@ class OpenstackOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure ServersManager.restartService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();

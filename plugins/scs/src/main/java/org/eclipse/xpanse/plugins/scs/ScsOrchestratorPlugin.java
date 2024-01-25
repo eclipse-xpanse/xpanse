@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
+import org.eclipse.xpanse.plugins.scs.resourcehandler.ScsTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -57,6 +58,7 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
         resourceHandlers.put(DeployerKind.TERRAFORM, scsTerraformResourceHandler);
+        resourceHandlers.put(DeployerKind.OPEN_TOFU, scsTerraformResourceHandler);
         return resourceHandlers;
     }
 
@@ -135,21 +137,24 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public String getProvider(String region) {
-        return String.format("""
-            terraform {
-              required_providers {
-                openstack = {
-                      source  = "terraform-provider-openstack/openstack"
-                      version = "%s"
+    public String getProvider(DeployerKind deployerKind, String region) {
+        return switch (deployerKind) {
+            case DeployerKind.OPEN_TOFU, DeployerKind.TERRAFORM -> String.format("""
+                    terraform {
+                      required_providers {
+                        openstack = {
+                              source  = "terraform-provider-openstack/openstack"
+                              version = "%s"
+                            }
+                      }
                     }
-              }
-            }
-                        
-            provider "openstack" {
-              region = "%s"
-            }
-            """, terraformScsVersion, region);
+                                
+                    provider "openstack" {
+                      region = "%s"
+                    }
+                    """, terraformScsVersion, region);
+            default -> "";
+        };
     }
 
     @Override

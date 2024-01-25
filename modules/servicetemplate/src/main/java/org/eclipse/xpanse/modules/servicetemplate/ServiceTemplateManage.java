@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
@@ -237,10 +238,10 @@ public class ServiceTemplateManage {
     /**
      * Search service template by query model.
      *
-     * @param category the category of the service template.
-     * @param csp the CSP of the service template.
-     * @param serviceName the serviceName of the service template.
-     * @param serviceVersion the serviceVersion of the service template.
+     * @param category           the category of the service template.
+     * @param csp                the CSP of the service template.
+     * @param serviceName        the serviceName of the service template.
+     * @param serviceVersion     the serviceVersion of the service template.
      * @param serviceHostingType the serviceHostingType of the service template.
      * @return Returns list of service template entity.
      */
@@ -294,6 +295,18 @@ public class ServiceTemplateManage {
                             .validate(ocl);
             if (!tfValidationResult.isValid()) {
                 throw new TerraformScriptFormatInvalidException(
+                        tfValidationResult.getDiagnostics().stream()
+                                .map(DeployValidateDiagnostics::getDetail)
+                                .collect(Collectors.toList()));
+            }
+        }
+
+        if (ocl.getDeployment().getKind() == DeployerKind.OPEN_TOFU) {
+            DeployValidationResult tfValidationResult =
+                    this.deployerKindManager.getDeployment(ocl.getDeployment().getKind())
+                            .validate(ocl);
+            if (!tfValidationResult.isValid()) {
+                throw new OpenTofuScriptFormatInvalidException(
                         tfValidationResult.getDiagnostics().stream()
                                 .map(DeployValidateDiagnostics::getDetail)
                                 .collect(Collectors.toList()));

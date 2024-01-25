@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmd;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.SystemCmdResult;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.common.systemcmd.SystemCmd;
+import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 
 /**

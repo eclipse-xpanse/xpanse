@@ -23,6 +23,10 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
+      - name: Set up OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.6.0
       - name: Build
         run: mvn --batch-mode --update-snapshots --no-transfer-progress verify
       - name: Generate API doc

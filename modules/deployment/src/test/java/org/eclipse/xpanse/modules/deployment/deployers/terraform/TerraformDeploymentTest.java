@@ -26,13 +26,13 @@ import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformLocalConfig;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -59,8 +59,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {TerraformDeployment.class, DeployEnvironments.class,
-        PluginManager.class, TerraformLocalConfig.class, DeployService.class, TaskConfiguration.class,
-ResourceHandlerManager.class})
+        PluginManager.class, TerraformLocalConfig.class, DeployService.class,
+        TaskConfiguration.class,
+        ResourceHandlerManager.class})
 class TerraformDeploymentTest {
 
     private final UUID id = UUID.randomUUID();
@@ -74,47 +75,38 @@ class TerraformDeploymentTest {
               value = resource.random_id_2.new.id
             }
             """;
+    @Autowired
+    TerraformDeployment terraformDeployment;
+    @MockBean
+    DeployEnvironments deployEnvironments;
+    @MockBean
+    TerraformLocalConfig terraformLocalConfig;
+    @MockBean
+    PluginManager pluginManager;
+    @MockBean
+    DeployService deployService;
+    @MockBean
+    Executor taskExecutor;
+    @MockBean
+    TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+    @MockBean
+    DeployServiceEntityHandler deployServiceEntityHandler;
     private DeployRequest deployRequest;
     private DeployResult deployResult;
     private Ocl ocl;
     private String tfState;
 
-    @Autowired
-    TerraformDeployment terraformDeployment;
-
-    @MockBean
-    DeployEnvironments deployEnvironments;
-
-
-    @MockBean
-    TerraformLocalConfig terraformLocalConfig;
-
-    @MockBean
-    PluginManager pluginManager;
-
-    @MockBean
-    DeployService deployService;
-
-    @MockBean
-    Executor taskExecutor;
-
-    @MockBean
-    TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
-
-    @MockBean
-    DeployServiceEntityHandler deployServiceEntityHandler;
-
     @BeforeEach
     void setUp() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
+        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
 
         deployRequest = new DeployRequest();
         deployRequest.setOcl(ocl);
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
-        deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
-        deployRequest.setRegion(ocl.getCloudServiceProvider().getRegions().get(0).getName());
+        deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
+        deployRequest.setRegion(ocl.getCloudServiceProvider().getRegions().getFirst().getName());
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
         deployRequest.setCategory(ocl.getCategory());
         deployRequest.setCustomerServiceName("test_deploy");
@@ -124,20 +116,20 @@ class TerraformDeploymentTest {
                 .getCredentialVariablesByHostingType(any(), any(), any(), any());
 
         doReturn("""
-                terraform {
-                  required_providers {
-                openstack = {
-                          source  = "terraform-provider-openstack/openstack"
-                          version = ">= 1.48.0"
+                    terraform {
+                      required_providers {
+                        huaweicloud = {
+                          source = "huaweicloud/huaweicloud"
+                          version = "~>1.51.0"
                         }
-                  }
-                }
-                            
-                provider "openstack" {
-                  region = "test"
-                }
+                      }
+                    }
+                                
+                    provider "huaweicloud" {
+                      region = "test"
+                    }
                 """).when(this.pluginManager)
-                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
+                .getDeployerProvider(any(Csp.class), any(DeployerKind.class), any());
     }
 
     @Test
@@ -197,7 +189,8 @@ class TerraformDeploymentTest {
 
     @Test
     void testDestroy_FailedCausedByTerraformExecutorException() {
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(TfResourceTransUtils.class)) {
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
+                TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             ocl.getDeployment().setDeployer(errorDeployer);
@@ -226,8 +219,8 @@ class TerraformDeploymentTest {
         deployRequest.setOcl(ocl);
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
-        deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
-        deployRequest.setRegion(ocl.getCloudServiceProvider().getRegions().get(0).getName());
+        deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
+        deployRequest.setRegion(ocl.getCloudServiceProvider().getRegions().getFirst().getName());
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
         deployRequest.setCategory(ocl.getCategory());
         deployRequest.setCustomerServiceName("test_deploy");

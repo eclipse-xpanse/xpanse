@@ -14,7 +14,8 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  * Deployer kinds.
  */
 public enum DeployerKind {
-    TERRAFORM("terraform");
+    TERRAFORM("terraform"),
+    OPEN_TOFU("opentofu");
 
     private final String type;
 
@@ -26,10 +27,10 @@ public enum DeployerKind {
      * For DeployerType serialize.
      */
     @JsonCreator
-    public DeployerKind getByValue(String type) {
-        for (DeployerKind csp : values()) {
-            if (csp.type.equals(StringUtils.lowerCase(type))) {
-                return csp;
+    public static DeployerKind getByValue(String type) {
+        for (DeployerKind kind : values()) {
+            if (StringUtils.equalsIgnoreCase(kind.type, type)) {
+                return kind;
             }
         }
         throw new UnsupportedEnumValueException(

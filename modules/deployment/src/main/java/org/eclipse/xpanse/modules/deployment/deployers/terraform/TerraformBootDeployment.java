@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformBootConfig;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformProviderNotFoundException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDeployFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDestroyFromDirectoryRequest;
@@ -32,7 +34,6 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourc
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -242,17 +243,26 @@ public class TerraformBootDeployment implements Deployer {
     private List<String> getFiles(DeployTask task) {
         Csp csp = task.getDeployRequest().getCsp();
         String region = task.getDeployRequest().getRegion();
-        String provider = this.pluginManager.getTerraformProviderForRegionByCsp(csp, region);
+        String provider = getProvider(csp, region);
         String deployer = task.getOcl().getDeployment().getDeployer();
         return Arrays.asList(provider, deployer);
     }
 
     private List<String> getFilesByOcl(Ocl ocl) {
         Csp csp = ocl.getCloudServiceProvider().getName();
-        String region = ocl.getCloudServiceProvider().getRegions().get(0).getName();
-        String provider = this.pluginManager.getTerraformProviderForRegionByCsp(csp, region);
+        String region = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
+        String provider = getProvider(csp, region);
         String deployer = ocl.getDeployment().getDeployer();
         return Arrays.asList(provider, deployer);
+    }
+
+    private String getProvider(Csp csp, String region) {
+        String provider = pluginManager.getDeployerProvider(csp, DeployerKind.TERRAFORM, region);
+        if (StringUtils.isBlank(provider)) {
+            String errMsg = String.format("Terraform provider for Csp %s not found.", csp);
+            throw new TerraformProviderNotFoundException(errMsg);
+        }
+        return provider;
     }
 
     private Map<String, Object> getInputVariables(DeployTask deployTask, boolean isDeployRequest) {
@@ -286,4 +296,5 @@ public class TerraformBootDeployment implements Deployer {
             terraformApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
         }
     }
+
 }

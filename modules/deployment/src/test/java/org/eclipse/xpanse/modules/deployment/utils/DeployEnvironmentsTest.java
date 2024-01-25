@@ -63,7 +63,6 @@ class DeployEnvironmentsTest {
     private static final String userId = "userId";
     private static DeployTask task;
     private static DeployRequest deployRequest;
-    private static Ocl ocl;
     private static Flavor flavor;
     private static DeployVariable deployVariable1;
     private static DeployVariable deployVariable2;
@@ -125,7 +124,7 @@ class DeployEnvironmentsTest {
         CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
         cloudServiceProvider.setName(Csp.HUAWEI);
 
-        ocl = new Ocl();
+        Ocl ocl = new Ocl();
         ocl.setDeployment(deployment);
         ocl.setFlavors(List.of(flavor));
         ocl.setCloudServiceProvider(cloudServiceProvider);
@@ -281,14 +280,15 @@ class DeployEnvironmentsTest {
     void testGetPluginMandatoryVariable() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
+        Ocl ocl =
+                oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setCustomerServiceName("test");
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
         deployRequest.setVersion(ocl.getServiceVersion());
-        deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
+        deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
 
         Map<String, Object> property = new HashMap<>();
         property.put("secgroup_id", "1234567890");
@@ -300,6 +300,11 @@ class DeployEnvironmentsTest {
         xpanseDeployTask.setDeployRequest(deployRequest);
 
         OrchestratorPlugin plugin = new OrchestratorPlugin() {
+            @Override
+            public String getProvider(DeployerKind deployerKind, String region) {
+                return null;
+            }
+
             @Override
             public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
                 return true;
@@ -337,11 +342,6 @@ class DeployEnvironmentsTest {
 
             @Override
             public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
-                return null;
-            }
-
-            @Override
-            public String getProvider(String region) {
                 return null;
             }
 

@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformBootConfig;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlan;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidateDiagnostics;
@@ -26,7 +27,6 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourc
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -84,14 +84,14 @@ class TerraformBootDeploymentTest {
     void setUp() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
+        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setOcl(ocl);
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
-        deployRequest.setFlavor(ocl.getFlavors().get(0).getName());
-        deployRequest.setRegion(ocl.getCloudServiceProvider().getRegions().get(0).getName());
+        deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
+        deployRequest.setRegion(ocl.getCloudServiceProvider().getRegions().getFirst().getName());
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
         deployRequest.setCategory(ocl.getCategory());
         deployRequest.setCustomerServiceName("test_deploy");
@@ -103,27 +103,30 @@ class TerraformBootDeploymentTest {
         deployTask.setDeployRequest(deployRequest);
     }
 
+    void mockGetProvider() {
+        doReturn("""
+                    terraform {
+                      required_providers {
+                        huaweicloud = {
+                          source = "huaweicloud/huaweicloud"
+                          version = "~>1.51.0"
+                        }
+                      }
+                    }
+                                
+                    provider "huaweicloud" {
+                      region = "test"
+                    }
+                """).when(this.pluginManager)
+                .getDeployerProvider(any(Csp.class), any(DeployerKind.class), any());
+    }
+
     @Test
     void testDeploy() {
         doReturn(new HashMap<>()).when(this.deployEnvironments)
                 .getCredentialVariablesByHostingType(any(), any(), any(), any());
 
-        doReturn("""
-                terraform {
-                  required_providers {
-                openstack = {
-                          source  = "terraform-provider-openstack/openstack"
-                          version = ">= 1.48.0"
-                        }
-                  }
-                }
-                            
-                provider "openstack" {
-                  region = "test"
-                }
-                """).when(this.pluginManager)
-                .getTerraformProviderForRegionByCsp(any(Csp.class), any());
-
+        mockGetProvider();
         DeployResult deployResult = terraformBootDeployment.deploy(deployTask);
 
         Assertions.assertNotNull(deployResult);
@@ -132,7 +135,9 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testDestroy() {
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(TfResourceTransUtils.class)) {
+        mockGetProvider();
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
+                TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             DeployResult destroyResult = this.terraformBootDeployment.destroy(deployTask);
@@ -146,7 +151,7 @@ class TerraformBootDeploymentTest {
     @Test
     void testDeploy_ThrowsRestClientException() {
         ocl.getDeployment().setDeployer(errorDeployer);
-
+        mockGetProvider();
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
                 .asyncDeployWithScripts(any(), any());
 
@@ -160,8 +165,11 @@ class TerraformBootDeploymentTest {
     void testDestroy_ThrowsRestClientException() {
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
                 .asyncDestroyWithScripts(any(), any());
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(TfResourceTransUtils.class)) {
-            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any())).thenReturn("Test");
+        mockGetProvider();
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
+                TfResourceTransUtils.class)) {
+            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+                    .thenReturn("Test");
 
             Assertions.assertThrows(TerraformBootRequestFailedException.class,
                     () -> this.terraformBootDeployment.destroy(deployTask));
@@ -182,6 +190,7 @@ class TerraformBootDeploymentTest {
         TerraformPlan terraformPlan = new TerraformPlan();
         terraformPlan.setPlan("plan");
         when(terraformApi.planWithScripts(any(), any())).thenReturn(terraformPlan);
+        mockGetProvider();
         String deployPlanJson = terraformBootDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
 
@@ -192,7 +201,7 @@ class TerraformBootDeploymentTest {
 
         when(terraformApi.planWithScripts(any(), any())).thenThrow(
                 new TerraformBootRequestFailedException("IO error"));
-
+        mockGetProvider();
         Assertions.assertThrows(TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.getDeploymentPlanAsJson(deployTask));
 
@@ -200,6 +209,7 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testValidate() {
+
         DeployValidationResult expectedResult = new DeployValidationResult();
         expectedResult.setValid(true);
 
@@ -207,6 +217,8 @@ class TerraformBootDeploymentTest {
         validate.setValid(true);
 
         when(terraformApi.validateWithScripts(any())).thenReturn(validate);
+
+        mockGetProvider();
 
         // Run the test
         final DeployValidationResult result = terraformBootDeployment.validate(ocl);
@@ -237,6 +249,8 @@ class TerraformBootDeploymentTest {
 
         when(terraformApi.validateWithScripts(any())).thenReturn(validate);
 
+        mockGetProvider();
+
         // Run the test
         final DeployValidationResult result = terraformBootDeployment.validate(ocl);
 
@@ -246,6 +260,7 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testValidate_ThrowsTerraformExecutorException() {
+        mockGetProvider();
         ocl.getDeployment().setDeployer(errorDeployer);
         when(terraformApi.validateWithScripts(any())).thenThrow(
                 new TerraformBootRequestFailedException("IO error"));
