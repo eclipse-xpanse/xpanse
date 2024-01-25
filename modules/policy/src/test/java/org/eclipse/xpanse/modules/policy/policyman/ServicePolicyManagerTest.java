@@ -23,6 +23,9 @@ import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundExcepti
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.policy.ServicePolicyManager;
@@ -172,6 +175,98 @@ class ServicePolicyManagerTest {
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testAddServicePolicyWithFlavorName() {
+        final String newPolicy = "newPolicy";
+        final String flavorName = "flavor";
+        UUID newPolicyId = UUID.randomUUID();
+        // Setup
+        final ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
+        createRequest.setServiceTemplateId(serviceTemplateId);
+        createRequest.setFlavorName(flavorName);
+        createRequest.setPolicy(newPolicy);
+        createRequest.setEnabled(false);
+
+        final ServicePolicy expectedResult = new ServicePolicy();
+        expectedResult.setId(newPolicyId);
+        expectedResult.setPolicy(newPolicy);
+        expectedResult.setFlavorName(flavorName);
+        expectedResult.setServiceTemplateId(serviceTemplateId);
+        expectedResult.setEnabled(false);
+        expectedResult.setCreateTime(createTime);
+
+        // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
+        final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        serviceTemplateEntity.setId(serviceTemplateId);
+        serviceTemplateEntity.setNamespace(namespace);
+        Flavor flavor = new Flavor();
+        flavor.setName(flavorName);
+        final Ocl ocl = new Ocl();
+        ocl.setFlavors(List.of(flavor));
+        serviceTemplateEntity.setOcl(ocl);
+        final ServicePolicyEntity existingPolicy = new ServicePolicyEntity();
+        existingPolicy.setId(policyId);
+        existingPolicy.setPolicy("policy");
+        existingPolicy.setEnabled(false);
+        existingPolicy.setServiceTemplate(serviceTemplateEntity);
+        serviceTemplateEntity.setServicePolicyList(List.of(existingPolicy));
+        when(mockServiceTemplateStorage.getServiceTemplateById(
+                serviceTemplateId))
+                .thenReturn(serviceTemplateEntity);
+
+        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+
+        // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
+        final ServicePolicyEntity newServicePolicy = new ServicePolicyEntity();
+        newServicePolicy.setId(newPolicyId);
+        newServicePolicy.setFlavorName(flavorName);
+        newServicePolicy.setPolicy(newPolicy);
+        newServicePolicy.setEnabled(false);
+        newServicePolicy.setCreateTime(createTime);
+        newServicePolicy.setServiceTemplate(serviceTemplateEntity);
+
+        when(mockServicePolicyStorage.storeAndFlush(any()))
+                .thenReturn(newServicePolicy);
+
+        // Run the test
+        final ServicePolicy result = servicePolicyManagerUnderTest.addServicePolicy(createRequest);
+
+        // Verify the results
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testAddServicePolicyWithFlavorName_ThrowsFlavorInvalidException() {
+        final String newPolicy = "newPolicy";
+        final String flavorName = "error_flavor";
+        // Setup
+        final ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
+        createRequest.setServiceTemplateId(serviceTemplateId);
+        createRequest.setFlavorName(flavorName);
+        createRequest.setPolicy(newPolicy);
+        createRequest.setEnabled(false);
+
+        // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
+        final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        serviceTemplateEntity.setId(serviceTemplateId);
+        serviceTemplateEntity.setNamespace(namespace);
+        Flavor flavor = new Flavor();
+        flavor.setName("flavor");
+        final Ocl ocl = new Ocl();
+        ocl.setFlavors(List.of(flavor));
+        serviceTemplateEntity.setOcl(ocl);
+
+        when(mockServiceTemplateStorage.getServiceTemplateById(
+                serviceTemplateId))
+                .thenReturn(serviceTemplateEntity);
+
+        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+
+        assertThatThrownBy(
+                () -> servicePolicyManagerUnderTest.addServicePolicy(createRequest))
+                .isInstanceOf(FlavorInvalidException.class);
     }
 
     @Test
@@ -326,6 +421,114 @@ class ServicePolicyManagerTest {
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testUpdateServicePolicyWithFlavorName() {
+        final String updatePolicy = "updatePolicy";
+        final String flavorName = "updateFlavor";
+        // Setup
+        final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
+        updateRequest.setId(policyId);
+        updateRequest.setFlavorName(flavorName);
+        updateRequest.setPolicy(updatePolicy);
+        updateRequest.setEnabled(true);
+
+        final ServicePolicy expectedResult = new ServicePolicy();
+        expectedResult.setId(policyId);
+        expectedResult.setFlavorName(flavorName);
+        expectedResult.setPolicy(updatePolicy);
+        expectedResult.setServiceTemplateId(serviceTemplateId);
+        expectedResult.setEnabled(true);
+
+        // Configure DatabaseServicePolicyStorage.findPolicyById(...).
+        final ServicePolicyEntity existingPolicy = new ServicePolicyEntity();
+        existingPolicy.setId(policyId);
+        existingPolicy.setFlavorName("flavor");
+        existingPolicy.setPolicy("policy");
+        existingPolicy.setEnabled(false);
+        final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
+        existingTemplate.setId(serviceTemplateId);
+        existingTemplate.setNamespace(namespace);
+        Flavor flavor = new Flavor();
+        flavor.setName(flavorName);
+        Flavor flavor1 = new Flavor();
+        flavor1.setName("flavor");
+        final Ocl ocl = new Ocl();
+        ocl.setFlavors(List.of(flavor, flavor1));
+        existingTemplate.setOcl(ocl);
+        existingTemplate.setServicePolicyList(List.of(existingPolicy));
+        existingPolicy.setServiceTemplate(existingTemplate);
+
+        when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
+        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+
+        // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
+        final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
+        servicePolicyEntity.setId(policyId);
+        servicePolicyEntity.setFlavorName(flavorName);
+        servicePolicyEntity.setPolicy(updatePolicy);
+        servicePolicyEntity.setEnabled(true);
+        final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
+        serviceTemplate.setId(serviceTemplateId);
+        serviceTemplate.setNamespace(namespace);
+        serviceTemplate.setOcl(ocl);
+        serviceTemplate.setServicePolicyList(List.of(servicePolicyEntity));
+        servicePolicyEntity.setServiceTemplate(serviceTemplate);
+
+        when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
+
+        // Run the test
+        final ServicePolicy result =
+                servicePolicyManagerUnderTest.updateServicePolicy(updateRequest);
+
+        // Verify the results
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+
+    @Test
+    void testUpdateServicePolicyWithFlavorName_ThrowsFlavorInvalidException() {
+        final String updatePolicy = "updatePolicy";
+        final String flavorName = "updateFlavor";
+        // Setup
+        final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
+        updateRequest.setId(policyId);
+        updateRequest.setFlavorName(flavorName);
+        updateRequest.setPolicy(updatePolicy);
+        updateRequest.setEnabled(true);
+
+        final ServicePolicy expectedResult = new ServicePolicy();
+        expectedResult.setId(policyId);
+        expectedResult.setFlavorName(flavorName);
+        expectedResult.setPolicy(updatePolicy);
+        expectedResult.setServiceTemplateId(serviceTemplateId);
+        expectedResult.setEnabled(true);
+
+        // Configure DatabaseServicePolicyStorage.findPolicyById(...).
+        final ServicePolicyEntity existingPolicy = new ServicePolicyEntity();
+        existingPolicy.setId(policyId);
+        existingPolicy.setFlavorName("flavor");
+        existingPolicy.setPolicy("policy");
+        existingPolicy.setEnabled(false);
+        final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
+        existingTemplate.setId(serviceTemplateId);
+        existingTemplate.setNamespace(namespace);
+        Flavor flavor = new Flavor();
+        flavor.setName("flavor");
+        final Ocl ocl = new Ocl();
+        ocl.setFlavors(List.of(flavor));
+        existingTemplate.setOcl(ocl);
+        existingTemplate.setServicePolicyList(List.of(existingPolicy));
+        existingPolicy.setServiceTemplate(existingTemplate);
+
+        when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
+        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+
+
+        assertThatThrownBy(
+                () -> servicePolicyManagerUnderTest.updateServicePolicy(updateRequest))
+                .isInstanceOf(FlavorInvalidException.class);
     }
 
     @Test
