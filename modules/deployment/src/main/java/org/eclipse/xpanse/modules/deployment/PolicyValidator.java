@@ -23,9 +23,9 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
+import org.eclipse.xpanse.modules.policy.ServicePolicyManager;
 import org.eclipse.xpanse.modules.policy.UserPolicyManager;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -41,6 +41,8 @@ public class PolicyValidator {
     @Resource
     private UserPolicyManager userPolicyManager;
     @Resource
+    private ServicePolicyManager servicePolicyManager;
+    @Resource
     private DatabaseServiceTemplateStorage serviceTemplateStorage;
     @Resource
     private DeployerKindManager deployerKindManager;
@@ -53,13 +55,9 @@ public class PolicyValidator {
             return existedServiceTemplate.getServicePolicyList().stream()
                     .filter(servicePolicyEntity -> servicePolicyEntity.getEnabled()
                             && StringUtils.isNotBlank(servicePolicyEntity.getPolicy()))
-                    .map(servicePolicyEntity -> {
-                        ServicePolicy servicePolicy = new ServicePolicy();
-                        BeanUtils.copyProperties(servicePolicyEntity, servicePolicy);
-                        servicePolicy.setServiceTemplateId(
-                                servicePolicyEntity.getServiceTemplate().getId());
-                        return servicePolicy;
-                    }).toList();
+                    .map(servicePolicyEntity ->
+                            servicePolicyManager.conventToServicePolicy(servicePolicyEntity))
+                    .toList();
         }
         return Collections.emptyList();
     }
@@ -105,9 +103,9 @@ public class PolicyValidator {
         if (!CollectionUtils.isEmpty(servicePolicies)) {
             List<String> policyList = new ArrayList<>();
             for (ServicePolicy servicePolicy : servicePolicies) {
-                if (StringUtils.isBlank(servicePolicy.getFlavorName())) {
+                if (CollectionUtils.isEmpty(servicePolicy.getFlavorNameList())) {
                     policyList.add(servicePolicy.getPolicy());
-                } else if (StringUtils.equals(flavorName, servicePolicy.getFlavorName())) {
+                } else if (servicePolicy.getFlavorNameList().contains(flavorName)) {
                     policyList.add(servicePolicy.getPolicy());
                 }
             }

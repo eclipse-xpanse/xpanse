@@ -13,6 +13,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
@@ -178,21 +179,21 @@ class ServicePolicyManagerTest {
     }
 
     @Test
-    void testAddServicePolicyWithFlavorName() {
+    void testAddServicePolicyWithFlavorNameList() {
         final String newPolicy = "newPolicy";
-        final String flavorName = "flavor";
+        final List<String> flavorNameList = List.of("flavor1", "flavor2");
         UUID newPolicyId = UUID.randomUUID();
         // Setup
         final ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
         createRequest.setServiceTemplateId(serviceTemplateId);
-        createRequest.setFlavorName(flavorName);
+        createRequest.setFlavorNameList(flavorNameList);
         createRequest.setPolicy(newPolicy);
         createRequest.setEnabled(false);
 
         final ServicePolicy expectedResult = new ServicePolicy();
         expectedResult.setId(newPolicyId);
         expectedResult.setPolicy(newPolicy);
-        expectedResult.setFlavorName(flavorName);
+        expectedResult.setFlavorNameList(flavorNameList);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
         expectedResult.setCreateTime(createTime);
@@ -201,10 +202,12 @@ class ServicePolicyManagerTest {
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
         serviceTemplateEntity.setNamespace(namespace);
-        Flavor flavor = new Flavor();
-        flavor.setName(flavorName);
+        Flavor flavor1 = new Flavor();
+        flavor1.setName("flavor1");
+        Flavor flavor2 = new Flavor();
+        flavor2.setName("flavor2");
         final Ocl ocl = new Ocl();
-        ocl.setFlavors(List.of(flavor));
+        ocl.setFlavors(List.of(flavor1, flavor2));
         serviceTemplateEntity.setOcl(ocl);
         final ServicePolicyEntity existingPolicy = new ServicePolicyEntity();
         existingPolicy.setId(policyId);
@@ -221,7 +224,7 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity newServicePolicy = new ServicePolicyEntity();
         newServicePolicy.setId(newPolicyId);
-        newServicePolicy.setFlavorName(flavorName);
+        newServicePolicy.setFlavorNames(StringUtils.join(flavorNameList, ","));
         newServicePolicy.setPolicy(newPolicy);
         newServicePolicy.setEnabled(false);
         newServicePolicy.setCreateTime(createTime);
@@ -238,13 +241,13 @@ class ServicePolicyManagerTest {
     }
 
     @Test
-    void testAddServicePolicyWithFlavorName_ThrowsFlavorInvalidException() {
+    void testAddServicePolicyWithFlavorNameList_ThrowsFlavorInvalidException() {
         final String newPolicy = "newPolicy";
-        final String flavorName = "error_flavor";
+        final List<String> flavorNameList = List.of("flavor1", "invalid_flavor");
         // Setup
         final ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
         createRequest.setServiceTemplateId(serviceTemplateId);
-        createRequest.setFlavorName(flavorName);
+        createRequest.setFlavorNameList(flavorNameList);
         createRequest.setPolicy(newPolicy);
         createRequest.setEnabled(false);
 
@@ -424,19 +427,19 @@ class ServicePolicyManagerTest {
     }
 
     @Test
-    void testUpdateServicePolicyWithFlavorName() {
+    void testUpdateServicePolicyWithFlavorNameList() {
         final String updatePolicy = "updatePolicy";
-        final String flavorName = "updateFlavor";
+        final List<String> flavorNameList = List.of("flavor1", "flavor2");
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
         updateRequest.setId(policyId);
-        updateRequest.setFlavorName(flavorName);
+        updateRequest.setFlavorNameList(flavorNameList);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
 
         final ServicePolicy expectedResult = new ServicePolicy();
         expectedResult.setId(policyId);
-        expectedResult.setFlavorName(flavorName);
+        expectedResult.setFlavorNameList(flavorNameList);
         expectedResult.setPolicy(updatePolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(true);
@@ -444,18 +447,18 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServicePolicyStorage.findPolicyById(...).
         final ServicePolicyEntity existingPolicy = new ServicePolicyEntity();
         existingPolicy.setId(policyId);
-        existingPolicy.setFlavorName("flavor");
+        existingPolicy.setFlavorNames("flavor");
         existingPolicy.setPolicy("policy");
         existingPolicy.setEnabled(false);
         final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
         existingTemplate.setId(serviceTemplateId);
         existingTemplate.setNamespace(namespace);
-        Flavor flavor = new Flavor();
-        flavor.setName(flavorName);
         Flavor flavor1 = new Flavor();
-        flavor1.setName("flavor");
+        flavor1.setName("flavor1");
+        Flavor flavor2 = new Flavor();
+        flavor2.setName("flavor2");
         final Ocl ocl = new Ocl();
-        ocl.setFlavors(List.of(flavor, flavor1));
+        ocl.setFlavors(List.of(flavor1, flavor2));
         existingTemplate.setOcl(ocl);
         existingTemplate.setServicePolicyList(List.of(existingPolicy));
         existingPolicy.setServiceTemplate(existingTemplate);
@@ -466,7 +469,7 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
         servicePolicyEntity.setId(policyId);
-        servicePolicyEntity.setFlavorName(flavorName);
+        servicePolicyEntity.setFlavorNames(StringUtils.join(flavorNameList, ","));
         servicePolicyEntity.setPolicy(updatePolicy);
         servicePolicyEntity.setEnabled(true);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
@@ -490,17 +493,17 @@ class ServicePolicyManagerTest {
     @Test
     void testUpdateServicePolicyWithFlavorName_ThrowsFlavorInvalidException() {
         final String updatePolicy = "updatePolicy";
-        final String flavorName = "updateFlavor";
+        final List<String> flavorNameList = List.of("flavor1", "invalid_flavor");
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
         updateRequest.setId(policyId);
-        updateRequest.setFlavorName(flavorName);
+        updateRequest.setFlavorNameList(flavorNameList);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
 
         final ServicePolicy expectedResult = new ServicePolicy();
         expectedResult.setId(policyId);
-        expectedResult.setFlavorName(flavorName);
+        expectedResult.setFlavorNameList(flavorNameList);
         expectedResult.setPolicy(updatePolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(true);
@@ -508,16 +511,18 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServicePolicyStorage.findPolicyById(...).
         final ServicePolicyEntity existingPolicy = new ServicePolicyEntity();
         existingPolicy.setId(policyId);
-        existingPolicy.setFlavorName("flavor");
+        existingPolicy.setFlavorNames("flavor");
         existingPolicy.setPolicy("policy");
         existingPolicy.setEnabled(false);
         final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
         existingTemplate.setId(serviceTemplateId);
         existingTemplate.setNamespace(namespace);
-        Flavor flavor = new Flavor();
-        flavor.setName("flavor");
+        Flavor flavor1 = new Flavor();
+        flavor1.setName("flavor1");
+        Flavor flavor2 = new Flavor();
+        flavor2.setName("flavor1");
         final Ocl ocl = new Ocl();
-        ocl.setFlavors(List.of(flavor));
+        ocl.setFlavors(List.of(flavor1, flavor2));
         existingTemplate.setOcl(ocl);
         existingTemplate.setServicePolicyList(List.of(existingPolicy));
         existingPolicy.setServiceTemplate(existingTemplate);
