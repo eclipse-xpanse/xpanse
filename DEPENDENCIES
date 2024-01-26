@@ -28,12 +28,12 @@ maven/mavencentral/com.google.errorprone/error_prone_annotations/2.1.3, Apache-2
 maven/mavencentral/com.google.errorprone/error_prone_annotations/2.21.1, Apache-2.0, approved, #9834
 maven/mavencentral/com.google.guava/guava/24.1.1-jre, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.google.j2objc/j2objc-annotations/1.1, Apache-2.0, approved, CQ18765
-maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-ces/3.1.78, Apache-2.0, approved, #12601
-maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-core/3.1.78, Apache-2.0, approved, #11922
-maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-ecs/3.1.78, Apache-2.0, approved, #12599
-maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-iam/3.1.78, Apache-2.0, approved, #12598
+maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-ces/3.1.79, Apache-2.0, approved, #12601
+maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-core/3.1.79, Apache-2.0, approved, #11922
+maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-ecs/3.1.79, Apache-2.0, approved, #12599
+maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-iam/3.1.79, Apache-2.0, approved, #12598
 maven/mavencentral/com.jayway.jsonpath/json-path/2.8.0, Apache-2.0, approved, clearlydefined
-maven/mavencentral/com.networknt/json-schema-validator/1.2.0, Apache-2.0 AND LicenseRef-scancode-unicode, restricted, #12849
+maven/mavencentral/com.networknt/json-schema-validator/1.2.0, Apache-2.0 AND Unicode-TOU, approved, #12849
 maven/mavencentral/com.nimbusds/content-type/2.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/lang-tag/1.7, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/nimbus-jose-jwt/9.37.3, Apache-2.0, approved, #11701
@@ -52,7 +52,7 @@ maven/mavencentral/commons-io/commons-io/2.15.1, Apache-2.0, approved, #11244
 maven/mavencentral/commons-net/commons-net/3.10.0, Apache-2.0, approved, #10928
 maven/mavencentral/commons-validator/commons-validator/1.8.0, Apache-2.0, approved, #11891
 maven/mavencentral/io.hypersistence/hypersistence-tsid/2.1.1, MIT, approved, #11907
-maven/mavencentral/io.hypersistence/hypersistence-utils-hibernate-60/3.7.0, None, restricted, #12852
+maven/mavencentral/io.hypersistence/hypersistence-utils-hibernate-60/3.7.0, Apache-2.0, approved, #12852
 maven/mavencentral/io.micrometer/micrometer-commons/1.12.2, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #11679
 maven/mavencentral/io.micrometer/micrometer-observation/1.12.2, Apache-2.0, approved, #11680
 maven/mavencentral/io.opentelemetry.instrumentation/opentelemetry-instrumentation-annotations/1.32.0, Apache-2.0, approved, #11684
@@ -123,6 +123,7 @@ maven/mavencentral/org.activiti/activiti-spring/8.0.0, Apache-2.0, approved, #12
 maven/mavencentral/org.antlr/antlr4-runtime/4.13.0, BSD-3-Clause, approved, #10767
 maven/mavencentral/org.apache.commons/commons-email/1.5, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.apache.commons/commons-lang3/3.13.0, Apache-2.0, approved, #9820
+maven/mavencentral/org.apache.commons/commons-lang3/3.14.0, Apache-2.0, approved, #11677
 maven/mavencentral/org.apache.httpcomponents/httpclient/4.5.3, Apache-2.0, approved, CQ11713
 maven/mavencentral/org.apache.httpcomponents/httpcore/4.4.16, Apache-2.0, approved, CQ23528
 maven/mavencentral/org.apache.logging.log4j/log4j-api/2.21.1, Apache-2.0 AND (Apache-2.0 AND LGPL-2.0-or-later), approved, #11079
@@ -137,25 +138,25 @@ maven/mavencentral/org.bouncycastle/bcprov-jdk18on/1.75, MIT AND CC0-1.0, approv
 maven/mavencentral/org.checkerframework/checker-compat-qual/2.0.0, CC-BY-2.5, approved, #804
 maven/mavencentral/org.checkerframework/checker-qual/3.37.0, MIT, approved, clearlydefined
 maven/mavencentral/org.codehaus.mojo/animal-sniffer-annotations/1.14, Apache-2.0 AND MIT, approved, CQ19603
-maven/mavencentral/org.eclipse.xpanse.modules/api/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/async/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/common/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/credential/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/database/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/deployment/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/logging/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/models/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/monitor/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/observability/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/orchestrator/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/policy/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/security/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/servicetemplate/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.modules/workflow/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.plugins/flexibleengine/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.plugins/huaweicloud/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.plugins/openstack/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
-maven/mavencentral/org.eclipse.xpanse.plugins/scs/1.0.7-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/api/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/async/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/common/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/credential/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/database/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/deployment/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/logging/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/models/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/monitor/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/observability/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/orchestrator/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/policy/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/security/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/servicetemplate/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.modules/workflow/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.plugins/flexibleengine/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.plugins/huaweicloud/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.plugins/openstack/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
+maven/mavencentral/org.eclipse.xpanse.plugins/scs/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
 maven/mavencentral/org.hibernate.orm/hibernate-core/6.4.1.Final, LGPL-2.1-or-later AND (EPL-2.0 OR BSD-3-Clause) AND MIT, approved, #12490
 maven/mavencentral/org.hibernate.validator/hibernate-validator/8.0.1.Final, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.jboss.logging/jboss-logging/3.5.3.Final, Apache-2.0, approved, #9471
