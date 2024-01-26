@@ -59,11 +59,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
-            <artifactId>credential</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>orchestrator</artifactId>
             <version>${project.version}</version>
         </dependency>
