@@ -2,6 +2,7 @@ package org.eclipse.xpanse.modules.models.policy.servicepolicy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ import org.springframework.beans.BeanUtils;
 class ServicePolicyUpdateRequestTest {
 
     final UUID id = UUID.fromString("0ebfecbc-3907-45c7-b9c6-36d42ec0efa1");
-    final String flavorName = "flavorName";
+    final List<String> flavorNameList = List.of("flavor1","flavor2");
     final String policy = "policy";
     final Boolean enabled = false;
     private ServicePolicyUpdateRequest test;
@@ -19,7 +20,7 @@ class ServicePolicyUpdateRequestTest {
     void setUp() {
         test = new ServicePolicyUpdateRequest();
         test.setEnabled(enabled);
-        test.setFlavorName(flavorName);
+        test.setFlavorNameList(flavorNameList);
         test.setPolicy(policy);
         test.setId(id);
     }
@@ -27,7 +28,7 @@ class ServicePolicyUpdateRequestTest {
     @Test
     void testGetters() {
         assertThat(test.getId()).isEqualTo(id);
-        assertThat(test.getFlavorName()).isEqualTo(flavorName);
+        assertThat(test.getFlavorNameList()).isEqualTo(flavorNameList);
         assertThat(test.getPolicy()).isEqualTo(policy);
         assertThat(test.getEnabled()).isEqualTo(enabled);
     }
@@ -55,9 +56,9 @@ class ServicePolicyUpdateRequestTest {
 
     @Test
     void testToString() {
-        String result = String.format("ServicePolicyUpdateRequest(id=%s, flavorName=%s, "
+        String result = String.format("ServicePolicyUpdateRequest(id=%s, flavorNameList=%s, "
                         + "policy=%s, enabled=%s)",
-                id, flavorName, policy, enabled);
+                id, flavorNameList, policy, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

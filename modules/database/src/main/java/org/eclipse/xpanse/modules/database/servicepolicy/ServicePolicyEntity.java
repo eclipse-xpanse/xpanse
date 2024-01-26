@@ -27,7 +27,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
  */
 @Data
 @Table(name = "SERVICE_POLICY", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"SERVICE_TEMPLATE_ID", "FLAVOR_NAME", "POLICY"})
+        @UniqueConstraint(columnNames = {"SERVICE_TEMPLATE_ID", "POLICY"})
 })
 @Entity
 @EqualsAndHashCode(callSuper = true)
@@ -55,8 +55,8 @@ public class ServicePolicyEntity extends CreateModifiedTime {
     @JsonIgnoreProperties({"servicePolicyEntity"})
     private ServiceTemplateEntity serviceTemplate;
 
-    @Column(name = "FLAVOR_NAME")
-    private String flavorName;
+    @Column(name = "FLAVOR_NAMES")
+    private String flavorNames;
 
     /**
      * Is the policy enabled.

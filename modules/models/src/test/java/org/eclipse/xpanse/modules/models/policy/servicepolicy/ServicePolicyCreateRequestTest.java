@@ -2,6 +2,7 @@ package org.eclipse.xpanse.modules.models.policy.servicepolicy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ import org.springframework.beans.BeanUtils;
 class ServicePolicyCreateRequestTest {
 
     final UUID serviceTemplateId = UUID.fromString("3a74cadd-d55b-4504-8fdf-56f1b6aae79c");
-    final String flavorName = "flavorName";
+    final List<String> flavorNameList = List.of("flavor1", "flavor2");
     final String policy = "policy";
     final Boolean enabled = false;
     private ServicePolicyCreateRequest test;
@@ -19,7 +20,7 @@ class ServicePolicyCreateRequestTest {
     void setUp() {
         test = new ServicePolicyCreateRequest();
         test.setServiceTemplateId(serviceTemplateId);
-        test.setFlavorName(flavorName);
+        test.setFlavorNameList(flavorNameList);
         test.setEnabled(enabled);
         test.setPolicy(policy);
     }
@@ -28,7 +29,7 @@ class ServicePolicyCreateRequestTest {
     void testGetters() {
         assertThat(test.getPolicy()).isEqualTo(policy);
         assertThat(test.getServiceTemplateId()).isEqualTo(serviceTemplateId);
-        assertThat(test.getFlavorName()).isEqualTo(flavorName);
+        assertThat(test.getFlavorNameList()).isEqualTo(flavorNameList);
         assertThat(test.getEnabled()).isEqualTo(enabled);
     }
 
@@ -56,8 +57,8 @@ class ServicePolicyCreateRequestTest {
     @Test
     void testToString() {
         String result = String.format(
-                "ServicePolicyCreateRequest(serviceTemplateId=%s, flavorName=%s, policy=%s, "
-                        + "enabled=%s)", serviceTemplateId, flavorName, policy, enabled);
+                "ServicePolicyCreateRequest(serviceTemplateId=%s, flavorNameList=%s, policy=%s, "
+                        + "enabled=%s)", serviceTemplateId, flavorNameList, policy, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

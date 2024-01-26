@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.modules.policy;
 
 import jakarta.annotation.Resource;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,6 +38,7 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 @Component
 public class ServicePolicyManager {
+    private static final String SEPARATOR = ",";
 
     @Resource
     private PolicyManager policyManager;
@@ -72,13 +75,10 @@ public class ServicePolicyManager {
     public ServicePolicy addServicePolicy(ServicePolicyCreateRequest createRequest) {
         ServiceTemplateEntity existingServiceTemplate =
                 getServiceTemplateEntity(createRequest.getServiceTemplateId());
-        if (StringUtils.isNotBlank(createRequest.getFlavorName())) {
-            validFlavorName(createRequest.getFlavorName(), existingServiceTemplate);
-        }
-        policyManager.validatePolicy(createRequest.getPolicy());
-        ServicePolicyEntity newPolicy = conventToServicePolicyEntity(createRequest);
-        newPolicy.setServiceTemplate(existingServiceTemplate);
-        checkIfServicePolicyIsDuplicate(newPolicy, existingServiceTemplate);
+
+        ServicePolicyEntity newPolicy =
+                getServicePolicyToCreate(createRequest, existingServiceTemplate);
+
         ServicePolicyEntity storedPolicy = servicePolicyStorage.storeAndFlush(newPolicy);
         return conventToServicePolicy(storedPolicy);
     }
@@ -118,14 +118,17 @@ public class ServicePolicyManager {
     }
 
 
-    private void validFlavorName(String flavorName, ServiceTemplateEntity existingServiceTemplate) {
-        boolean flavorExists = existingServiceTemplate.getOcl().getFlavors().stream()
-                .anyMatch(flavor -> flavor.getName().equals(flavorName));
-        if (!flavorExists) {
-            String errMsg = String.format(
-                    "Flavor name %s is not valid for service template" + " with id %s.", flavorName,
-                    existingServiceTemplate.getId());
-            throw new FlavorInvalidException(errMsg);
+    private void validFlavorNames(List<String> flavorNameList,
+                                  ServiceTemplateEntity existingServiceTemplate) {
+        for (String flavorName : flavorNameList) {
+            boolean flavorExists = existingServiceTemplate.getOcl().getFlavors().stream()
+                    .anyMatch(flavor -> flavor.getName().equals(flavorName));
+            if (!flavorExists) {
+                String errMsg = String.format(
+                        "Flavor name %s is not valid for service template with id %s.", flavorName,
+                        existingServiceTemplate.getId());
+                throw new FlavorInvalidException(errMsg);
+            }
         }
     }
 
@@ -167,26 +170,15 @@ public class ServicePolicyManager {
     }
 
     private void checkIfServicePolicyIsDuplicate(ServicePolicyEntity newPolicy,
-                                                 ServiceTemplateEntity existingServiceTemplate) {
-        if (!CollectionUtils.isEmpty(existingServiceTemplate.getServicePolicyList())) {
+                                                 ServiceTemplateEntity existingService) {
+        if (!CollectionUtils.isEmpty(existingService.getServicePolicyList())) {
             String newPolicyUniqueKey = getPolicyUniqueKey(newPolicy);
-            for (ServicePolicyEntity servicePolicyEntity
-                    : existingServiceTemplate.getServicePolicyList()) {
+            for (ServicePolicyEntity servicePolicyEntity : existingService.getServicePolicyList()) {
                 if (StringUtils.equals(newPolicyUniqueKey,
                         getPolicyUniqueKey(servicePolicyEntity))) {
-                    String errMsg;
-                    if (StringUtils.isEmpty(newPolicy.getFlavorName())) {
-                        errMsg = String.format("The same policy already exists with id: %s for "
-                                        + "the registered service template with id: %s.",
-                                servicePolicyEntity.getId(), existingServiceTemplate.getId());
-
-                    } else {
-                        errMsg = String.format("The same policy already exists with id: %s for "
-                                        + "the registered service template with id: %s "
-                                        + "and flavor name: %s.", servicePolicyEntity.getId(),
-                                existingServiceTemplate.getId(),
-                                servicePolicyEntity.getFlavorName());
-                    }
+                    String errMsg = String.format("The same policy already exists with id: %s for "
+                                    + "the registered service template with id: %s.",
+                            servicePolicyEntity.getId(), existingService.getId());
                     throw new PolicyDuplicateException(errMsg);
                 }
             }
@@ -194,44 +186,69 @@ public class ServicePolicyManager {
     }
 
     private String getPolicyUniqueKey(ServicePolicyEntity servicePolicyEntity) {
-        return servicePolicyEntity.getServiceTemplate().getId()
-                + servicePolicyEntity.getFlavorName() + servicePolicyEntity.getPolicy();
+        return servicePolicyEntity.getServiceTemplate().getId() + servicePolicyEntity.getPolicy();
     }
 
-    private ServicePolicy conventToServicePolicy(ServicePolicyEntity servicePolicyEntity) {
+    /**
+     * Convert service policy entity to service policy view object.
+     *
+     * @param servicePolicyEntity service policy entity.
+     * @return Returns service policy view object.
+     */
+    public ServicePolicy conventToServicePolicy(ServicePolicyEntity servicePolicyEntity) {
         if (Objects.nonNull(servicePolicyEntity) && Objects.nonNull(
                 servicePolicyEntity.getServiceTemplate())) {
             ServicePolicy servicePolicy = new ServicePolicy();
             BeanUtils.copyProperties(servicePolicyEntity, servicePolicy);
+            if (StringUtils.isNotBlank(servicePolicyEntity.getFlavorNames())) {
+                List<String> flavorNames = Arrays.asList(
+                        StringUtils.split(servicePolicyEntity.getFlavorNames(), SEPARATOR));
+                servicePolicy.setFlavorNameList(flavorNames);
+            }
             servicePolicy.setServiceTemplateId(servicePolicyEntity.getServiceTemplate().getId());
             return servicePolicy;
         }
         return null;
     }
 
-    private ServicePolicyEntity conventToServicePolicyEntity(
-            ServicePolicyCreateRequest servicePolicyCreateRequest) {
-        ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
-        BeanUtils.copyProperties(servicePolicyCreateRequest, servicePolicyEntity);
-        return servicePolicyEntity;
+    private ServicePolicyEntity getServicePolicyToCreate(ServicePolicyCreateRequest createRequest,
+                                                         ServiceTemplateEntity existingService) {
+        ServicePolicyEntity policyToCreate = new ServicePolicyEntity();
+        BeanUtils.copyProperties(createRequest, policyToCreate);
+        policyToCreate.setServiceTemplate(existingService);
+
+        if (!CollectionUtils.isEmpty(createRequest.getFlavorNameList())) {
+            validFlavorNames(createRequest.getFlavorNameList(), existingService);
+            String flavorNames =
+                    StringUtils.join(new HashSet<>(createRequest.getFlavorNameList()), SEPARATOR);
+            policyToCreate.setFlavorNames(flavorNames);
+        }
+
+        policyManager.validatePolicy(createRequest.getPolicy());
+        checkIfServicePolicyIsDuplicate(policyToCreate, existingService);
+        return policyToCreate;
     }
 
     private ServicePolicyEntity getServicePolicyToUpdate(ServicePolicyUpdateRequest updateRequest,
                                                          ServicePolicyEntity existingPolicy) {
         ServicePolicyEntity policyToUpdate = new ServicePolicyEntity();
         BeanUtils.copyProperties(existingPolicy, policyToUpdate);
-        boolean updateFlavorName =
-                !StringUtils.equals(updateRequest.getFlavorName(), existingPolicy.getFlavorName());
-        if (updateFlavorName) {
-            if (StringUtils.isNotBlank(updateRequest.getFlavorName())) {
-                validFlavorName(updateRequest.getFlavorName(), existingPolicy.getServiceTemplate());
+        if (Objects.nonNull(updateRequest.getFlavorNameList())) {
+            if (CollectionUtils.isEmpty(updateRequest.getFlavorNameList())) {
+                policyToUpdate.setFlavorNames(null);
+            } else {
+                validFlavorNames(updateRequest.getFlavorNameList(),
+                        existingPolicy.getServiceTemplate());
+                String flavorNames = StringUtils.join(
+                        new HashSet<>(updateRequest.getFlavorNameList()), SEPARATOR);
+                policyToUpdate.setFlavorNames(flavorNames);
             }
         }
 
         boolean updatePolicy =
                 StringUtils.isNotBlank(updateRequest.getPolicy()) && !StringUtils.equals(
                         updateRequest.getPolicy(), existingPolicy.getPolicy());
-        if (updateFlavorName || updatePolicy) {
+        if (updatePolicy) {
             policyManager.validatePolicy(updateRequest.getPolicy());
             policyToUpdate.setPolicy(updateRequest.getPolicy());
             checkIfServicePolicyIsDuplicate(policyToUpdate, existingPolicy.getServiceTemplate());

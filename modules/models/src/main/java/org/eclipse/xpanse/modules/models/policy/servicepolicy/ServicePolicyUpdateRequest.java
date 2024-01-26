@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.policy.servicepolicy;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 
@@ -25,10 +26,12 @@ public class ServicePolicyUpdateRequest {
     private UUID id;
 
     /**
-     * The flavor name of the policy.
+     * The flavor name list which the policy belongs to.
      */
-    @Schema(description = "The flavor name of the policy.")
-    private String flavorName;
+    @Schema(description =
+            "The flavor name list which the policy belongs to. If the list is empty, then the "
+                    + "policy will be executed for during service deployment of all flavors.")
+    private List<String> flavorNameList;
 
     /**
      * The policy.

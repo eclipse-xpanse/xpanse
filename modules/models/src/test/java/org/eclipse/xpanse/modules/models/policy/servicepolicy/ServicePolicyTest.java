@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ class ServicePolicyTest {
 
     final UUID id = UUID.fromString("0ebfecbc-3907-45c7-b9c6-36d42ec0efa1");
     final UUID serviceTemplateId = UUID.fromString("3a74cadd-d55b-4504-8fdf-56f1b6aae79c");
-    final String flavorName = "flavorName";
+    final List<String> flavorNameList = List.of("flavor1", "flavor2");
     final String policy = "policy";
     final Boolean enabled = false;
     private ServicePolicy test;
@@ -23,7 +24,7 @@ class ServicePolicyTest {
     void setUp() {
         test = new ServicePolicy();
         test.setServiceTemplateId(serviceTemplateId);
-        test.setFlavorName(flavorName);
+        test.setFlavorNameList(flavorNameList);
         test.setEnabled(enabled);
         test.setPolicy(policy);
         test.setId(id);
@@ -33,7 +34,7 @@ class ServicePolicyTest {
     void testGetters() {
         assertThat(test.getId()).isEqualTo(id);
         assertThat(test.getPolicy()).isEqualTo(policy);
-        assertThat(test.getFlavorName()).isEqualTo(flavorName);
+        assertThat(test.getFlavorNameList()).isEqualTo(flavorNameList);
         assertThat(test.getServiceTemplateId()).isEqualTo(serviceTemplateId);
         assertThat(test.getEnabled()).isEqualTo(enabled);
     }
@@ -78,9 +79,9 @@ class ServicePolicyTest {
     @Test
     void testToString() {
         String result = String.format(
-                "ServicePolicy(id=%s, policy=%s, serviceTemplateId=%s, flavorName=%s, enabled=%s, "
-                        + "createTime=%s, lastModifiedTime=%s)", id, policy, serviceTemplateId,
-                flavorName, enabled, null, null);
+                "ServicePolicy(id=%s, policy=%s, serviceTemplateId=%s, flavorNameList=%s, "
+                        + "enabled=%s, createTime=%s, lastModifiedTime=%s)",
+                id, policy, serviceTemplateId, flavorNameList, enabled, null, null);
 
         assertThat(test.toString()).isEqualTo(result);
     }

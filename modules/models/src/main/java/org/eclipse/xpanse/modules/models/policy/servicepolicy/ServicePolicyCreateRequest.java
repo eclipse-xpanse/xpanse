@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 
@@ -26,11 +27,13 @@ public class ServicePolicyCreateRequest {
     @Schema(description = "The id of registered service template which the policy belongs to.")
     private UUID serviceTemplateId;
 
-
+    /**
+     * The flavor name list which the policy belongs to.
+     */
     @Schema(description =
-            "The flavor name which the policy belongs to. If a flavor is not provided, then the "
+            "The flavor name list which the policy belongs to. If the list is empty, then the "
                     + "policy will be executed for during service deployment of all flavors.")
-    private String flavorName;
+    private List<String> flavorNameList;
 
     /**
      * The policy.

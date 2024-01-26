@@ -18,7 +18,7 @@ import org.springframework.beans.BeanUtils;
 class ServicePolicyEntityTest {
 
     final UUID id = UUID.fromString("0ebfecbc-3907-45c7-b9c6-36d42ec0efa1");
-    final String flavorName = "flavorName";
+    final String flavorNames = "flavor1,flavor2";
     final String policy = "policy";
     final Boolean enabled = false;
     @Mock
@@ -29,7 +29,7 @@ class ServicePolicyEntityTest {
     void setUp() {
         test = new ServicePolicyEntity();
         test.setServiceTemplate(mockServiceTemplate);
-        test.setFlavorName(flavorName);
+        test.setFlavorNames(flavorNames);
         test.setEnabled(enabled);
         test.setPolicy(policy);
         test.setId(id);
@@ -40,7 +40,7 @@ class ServicePolicyEntityTest {
         assertThat(test.getId()).isEqualTo(id);
         assertThat(test.getPolicy()).isEqualTo(policy);
         assertThat(test.getServiceTemplate()).isEqualTo(mockServiceTemplate);
-        assertThat(test.getFlavorName()).isEqualTo(flavorName);
+        assertThat(test.getFlavorNames()).isEqualTo(flavorNames);
         assertThat(test.getEnabled()).isEqualTo(enabled);
     }
 
@@ -84,8 +84,9 @@ class ServicePolicyEntityTest {
     @Test
     void testToString() {
         String result = String.format(
-                "ServicePolicyEntity(id=%s, policy=%s, serviceTemplate=%s, flavorName=%s, enabled=%s)",
-                id, policy, mockServiceTemplate, flavorName, enabled);
+                "ServicePolicyEntity(id=%s, policy=%s, serviceTemplate=%s, flavorNames=%s, "
+                        + "enabled=%s)",
+                id, policy, mockServiceTemplate, flavorNames, enabled);
 
         assertThat(test.toString()).isEqualTo(result);
     }
