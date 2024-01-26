@@ -31,23 +31,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class StartDestroy implements Serializable, JavaDelegate {
 
-    private static DeployService deployService;
-    private static RuntimeService runtimeService;
-    private static MigrationService migrationService;
+    private final DeployService deployService;
+    private final RuntimeService runtimeService;
+    private final MigrationService migrationService;
 
+    /**
+     * Constructor for StartDestroy bean.
+     */
     @Autowired
-    public void setDeployService(DeployService deployService) {
-        StartDestroy.deployService = deployService;
-    }
-
-    @Autowired
-    public void setRuntimeService(RuntimeService runtimeService) {
-        StartDestroy.runtimeService = runtimeService;
-    }
-
-    @Autowired
-    public void setMigrationService(MigrationService migrationService) {
-        StartDestroy.migrationService = migrationService;
+    public StartDestroy(DeployService deployService, RuntimeService runtimeService,
+                        MigrationService migrationService) {
+        this.deployService = deployService;
+        this.runtimeService = runtimeService;
+        this.migrationService = migrationService;
     }
 
     /**

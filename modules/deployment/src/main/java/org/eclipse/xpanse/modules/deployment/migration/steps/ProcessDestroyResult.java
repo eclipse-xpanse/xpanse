@@ -30,26 +30,22 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class ProcessDestroytResult implements Serializable, JavaDelegate {
+public class ProcessDestroyResult implements Serializable, JavaDelegate {
 
-    private static RuntimeService runtimeService;
-    private static DeployServiceEntityHandler deployServiceEntityHandler;
-    private static MigrationService migrationService;
+    private final RuntimeService runtimeService;
+    private final DeployServiceEntityHandler deployServiceEntityHandler;
+    private final MigrationService migrationService;
 
+    /**
+     * Constructor for ProcessDestroyResult bean.
+     */
     @Autowired
-    public void setRuntimeService(RuntimeService runtimeService) {
-        ProcessDestroytResult.runtimeService = runtimeService;
-    }
-
-    @Autowired
-    public void setDeployServiceEntityHandler(
-            DeployServiceEntityHandler deployServiceEntityHandler) {
-        ProcessDestroytResult.deployServiceEntityHandler = deployServiceEntityHandler;
-    }
-
-    @Autowired
-    public void setMigrationService(MigrationService migrationService) {
-        ProcessDestroytResult.migrationService = migrationService;
+    public ProcessDestroyResult(RuntimeService runtimeService,
+                                DeployServiceEntityHandler deployServiceEntityHandler,
+                                MigrationService migrationService) {
+        this.runtimeService = runtimeService;
+        this.deployServiceEntityHandler = deployServiceEntityHandler;
+        this.migrationService = migrationService;
     }
 
     @Override
@@ -74,6 +70,7 @@ public class ProcessDestroytResult implements Serializable, JavaDelegate {
                     UUID.fromString(oldServiceId));
             runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
                     true);
+            log.info("destroy step completed for migration order {}", processInstanceId);
         } else {
             migrationService.updateServiceMigrationStatus(serviceMigrationEntity,
                     MigrationStatus.DESTROY_FAILED, OffsetDateTime.now());

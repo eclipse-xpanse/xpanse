@@ -96,7 +96,8 @@ public class WorkflowUtils {
     }
 
     /**
-     * Complete ReceiveTask by processInstanceId and activityId.
+     * Complete ReceiveTask for the given processInstanceId and activityId.
+     * The method closes the waiting task and pushes the workflow to the next step.
      */
     public void completeReceiveTask(String processInstanceId, String activityId) {
         if (StringUtils.isNotBlank(processInstanceId)) {

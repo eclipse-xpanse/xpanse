@@ -32,24 +32,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessDeploymentResult implements Serializable, JavaDelegate {
 
-    private static RuntimeService runtimeService;
-    private static MigrationService migrationService;
-    private static DeployServiceEntityHandler deployServiceEntityHandler;
+    private final RuntimeService runtimeService;
+    private final MigrationService migrationService;
+    private final DeployServiceEntityHandler deployServiceEntityHandler;
 
+    /**
+     * Constructor for ProcessDeploymentResult bean.
+     */
     @Autowired
-    public void setRuntimeService(RuntimeService runtimeService) {
-        ProcessDeploymentResult.runtimeService = runtimeService;
-    }
-
-    @Autowired
-    public void setMigrationService(MigrationService migrationService) {
-        ProcessDeploymentResult.migrationService = migrationService;
-    }
-
-    @Autowired
-    public void setDeployServiceEntityHandler(
-            DeployServiceEntityHandler deployServiceEntityHandler) {
-        ProcessDeploymentResult.deployServiceEntityHandler = deployServiceEntityHandler;
+    public ProcessDeploymentResult(RuntimeService runtimeService, MigrationService migrationService,
+                                   DeployServiceEntityHandler deployServiceEntityHandler) {
+        this.runtimeService = runtimeService;
+        this.migrationService = migrationService;
+        this.deployServiceEntityHandler = deployServiceEntityHandler;
     }
 
     @Override
@@ -69,6 +64,7 @@ public class ProcessDeploymentResult implements Serializable, JavaDelegate {
                     MigrationStatus.DEPLOY_COMPLETED, OffsetDateTime.now());
             runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,
                     true);
+            log.info("deployment step completed for migration order {}", processInstanceId);
         } else {
             migrationService.updateServiceMigrationStatus(serviceMigrationEntity,
                     MigrationStatus.DEPLOY_FAILED, OffsetDateTime.now());
@@ -86,7 +82,7 @@ public class ProcessDeploymentResult implements Serializable, JavaDelegate {
     private int updateDeployRetryNum(String processInstanceId, Map<String, Object> variables) {
         int deployRetryNum = (int) variables.get(MigrateConstants.DEPLOY_RETRY_NUM);
         if (deployRetryNum > 0) {
-            log.info("Process instance: {} retry deployment service,RetryNum:{}",
+            log.info("Process instance: {} retry deployment service, RetryCount:{}",
                     processInstanceId, deployRetryNum);
         }
         runtimeService.setVariable(processInstanceId, MigrateConstants.DEPLOY_RETRY_NUM,

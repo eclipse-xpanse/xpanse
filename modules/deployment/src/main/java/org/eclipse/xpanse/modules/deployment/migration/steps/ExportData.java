@@ -30,17 +30,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExportData implements Serializable, JavaDelegate {
 
-    private static RuntimeService runtimeService;
-    private static MigrationService migrationService;
+    private final RuntimeService runtimeService;
+    private final MigrationService migrationService;
 
     @Autowired
-    public void setRuntimeService(RuntimeService runtimeService) {
-        ExportData.runtimeService = runtimeService;
-    }
-
-    @Autowired
-    public void setMigrationService(MigrationService migrationService) {
-        ExportData.migrationService = migrationService;
+    public ExportData(RuntimeService runtimeService, MigrationService migrationService) {
+        this.runtimeService = runtimeService;
+        this.migrationService = migrationService;
     }
 
     /**

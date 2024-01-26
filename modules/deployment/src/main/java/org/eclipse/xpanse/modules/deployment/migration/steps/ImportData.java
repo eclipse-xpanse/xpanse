@@ -28,18 +28,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class ImportData implements Serializable, JavaDelegate {
 
-    private static RuntimeService runtimeService;
+    private final RuntimeService runtimeService;
 
-    private static MigrationService migrationService;
-
-    @Autowired
-    public void setRuntimeService(RuntimeService runtimeService) {
-        ImportData.runtimeService = runtimeService;
-    }
+    private final MigrationService migrationService;
 
     @Autowired
-    public void setMigrationService(MigrationService migrationService) {
-        ImportData.migrationService = migrationService;
+    public ImportData(RuntimeService runtimeService, MigrationService migrationService) {
+        this.runtimeService = runtimeService;
+        this.migrationService = migrationService;
     }
 
     /**
