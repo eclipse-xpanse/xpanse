@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ class UserOrderableServiceVoTest {
     private static List<FlavorBasic> flavorBasics;
     private static Billing billing;
     private static UserOrderableServiceVo userOrderableServiceVo;
+    private static ServiceProviderContactDetails serviceProviderContactDetails;
 
     @BeforeEach
     void setUp() {
@@ -71,6 +73,7 @@ class UserOrderableServiceVoTest {
         userOrderableServiceVo.setFlavors(flavorBasics);
         userOrderableServiceVo.setBilling(billing);
         userOrderableServiceVo.setServiceHostingType(ServiceHostingType.SELF);
+        userOrderableServiceVo.setServiceProviderContactDetails(serviceProviderContactDetails);
     }
 
     @Test
@@ -86,6 +89,7 @@ class UserOrderableServiceVoTest {
         assertEquals(variables, userOrderableServiceVo.getVariables());
         assertEquals(billing, userOrderableServiceVo.getBilling());
         assertEquals(ServiceHostingType.SELF, userOrderableServiceVo.getServiceHostingType());
+        assertEquals(serviceProviderContactDetails, userOrderableServiceVo.getServiceProviderContactDetails());
     }
 
     @Test
@@ -169,6 +173,7 @@ class UserOrderableServiceVoTest {
 
         userOrderableServiceVo1.setBilling(billing);
         userOrderableServiceVo1.setServiceHostingType(ServiceHostingType.SELF);
+        userOrderableServiceVo1.setServiceProviderContactDetails(serviceProviderContactDetails);
         assertEquals(userOrderableServiceVo, userOrderableServiceVo1);
         assertNotEquals(userOrderableServiceVo1, userOrderableServiceVo2);
         assertEquals(userOrderableServiceVo.hashCode(), userOrderableServiceVo1.hashCode());
@@ -189,7 +194,8 @@ class UserOrderableServiceVoTest {
                 "variables=" + variables + ", " +
                 "flavors=" + flavorBasics + ", " +
                 "billing=" + billing + ", " +
-                "serviceHostingType=" + ServiceHostingType.SELF + ")";
+                "serviceHostingType=" + ServiceHostingType.SELF + ", "+
+                "serviceProviderContactDetails=" + serviceProviderContactDetails + ")";
         assertEquals(expectedToString, userOrderableServiceVo.toString());
     }
 

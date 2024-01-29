@@ -163,6 +163,8 @@ public class ServiceCatalogApi {
                             .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
             userOrderableServiceVo.setServiceHostingType(
                     serviceTemplateEntity.getOcl().getServiceHostingType());
+            userOrderableServiceVo.setServiceProviderContactDetails(
+                    serviceTemplateEntity.getOcl().getServiceProviderContactDetails());
             return userOrderableServiceVo;
         }
         return null;
