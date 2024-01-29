@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.workflow.utils;
 
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +23,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.workflow.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.springframework.stereotype.Component;
 
@@ -82,6 +84,26 @@ public class WorkflowUtils {
                 .finished()
                 .list();
         return transHistoricTaskInstanceToWorkFlowTask(list);
+    }
+
+    /**
+     * Query all tasks of the given user.
+     *
+     * @param userId userId the ID of the currently logged in user.
+     */
+    public List<WorkFlowTask> queryAllTasks(TaskStatus status, String userId) {
+        List<WorkFlowTask> workFlowTasks = new ArrayList<>();
+        List<WorkFlowTask> todoTasks = todoTasks(userId);
+        List<WorkFlowTask> doneTasks = doneTasks(userId);
+        if (Objects.isNull(status)) {
+            workFlowTasks.addAll(todoTasks.stream().map(this::setTodoTaskStatus).toList());
+            workFlowTasks.addAll(doneTasks.stream().map(this::setDoneTaskStatus).toList());
+        } else if (status == TaskStatus.DONE) {
+            workFlowTasks.addAll(doneTasks.stream().map(this::setDoneTaskStatus).toList());
+        } else if (status == TaskStatus.FAILED) {
+            workFlowTasks.addAll(todoTasks.stream().map(this::setTodoTaskStatus).toList());
+        }
+        return workFlowTasks;
     }
 
     /**
@@ -146,5 +168,15 @@ public class WorkflowUtils {
             throw new ServiceNotDeployedException("The migrated activiti task was not found, "
                     + "taskId: " + taskId);
         }
+    }
+
+    private WorkFlowTask setTodoTaskStatus(WorkFlowTask workFlowTask) {
+        workFlowTask.setStatus(TaskStatus.FAILED);
+        return workFlowTask;
+    }
+
+    private WorkFlowTask setDoneTaskStatus(WorkFlowTask workFlowTask) {
+        workFlowTask.setStatus(TaskStatus.DONE);
+        return workFlowTask;
     }
 }

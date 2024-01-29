@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.models.workflow.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,27 +53,17 @@ public class WorkFlowApi {
     private IdentityProviderManager identityProviderManager;
 
     /**
-     * Query the tasks that need to be handled by the user.
+     * Query tasks of the given user by status.
      */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")
-    @Operation(description = "Query the tasks that need to be handled by the user")
-    @GetMapping(value = "/workflow/task/todo", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(description = "Query all tasks of the given user")
+    @GetMapping(value = "/workflow/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<WorkFlowTask> queryTodoTasks() {
+    public List<WorkFlowTask> queryTasks(
+            @Parameter(name = "status", description = "the status of task")
+            @RequestParam(name = "status", required = false) TaskStatus status) {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        return workflowUtils.todoTasks(userIdOptional.orElse(null));
-    }
-
-    /**
-     * Query the tasks the given has completed.
-     */
-    @Tag(name = "Workflow", description = "APIs to manage the Workflow")
-    @Operation(description = "Query the tasks the given user has completed")
-    @GetMapping(value = "/workflow/task/done", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public List<WorkFlowTask> queryDoneTasks() {
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        return workflowUtils.doneTasks(userIdOptional.orElse(null));
+        return workflowUtils.queryAllTasks(status, userIdOptional.orElse(null));
     }
 
     /**
