@@ -128,7 +128,8 @@ class WorkFlowTaskTest {
     void testToString() {
         String result = "WorkFlowTask(processInstanceId=null, processInstanceName=null,"
                 + " processDefinitionId=null, processDefinitionName=null, executionId=null,"
-                + " taskId=null, taskName=null, businessKey=null, createTime=mockCreateTime)";
+                + " taskId=null, taskName=null, businessKey=null, status=null, "
+                + "createTime=mockCreateTime)";
 
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
         workFlowTaskUnderTest.setCreateTime(mockCreateTime);

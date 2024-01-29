@@ -51,6 +51,10 @@ public class WorkFlowTask {
     private String businessKey;
 
     @NotNull
+    @Schema(description = "The status of the Task")
+    private TaskStatus status;
+
+    @NotNull
     @Schema(description = "The create time of the task")
     private Date createTime;
 }
