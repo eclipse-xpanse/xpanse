@@ -120,8 +120,6 @@ public class DeployService {
         }
     }
 
-
-
     private DeployServiceEntity storeNewDeployServiceEntity(DeployTask deployTask) {
         DeployServiceEntity entity = new DeployServiceEntity();
         entity.setId(deployTask.getId());

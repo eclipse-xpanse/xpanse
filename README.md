@@ -35,7 +35,7 @@ Details can be found on the project website [here](https://eclipse.dev/xpanse/do
 
 ## Generate terraform-boot client code
 
-1. Run the terraform-boot project with spring-profile 'oauth' with methods mentioned here.
+1. Run the terraform-boot project with spring-profile `oauth` with methods mentioned here.
    This is necessary even if the terraform-boot will be actually used without oauth enabled in production.
    This will make the client to handle both with and without authentication usecases automatically.
 2. Access “http://localhost:9090/v3/api-docs” to get the openapi json.

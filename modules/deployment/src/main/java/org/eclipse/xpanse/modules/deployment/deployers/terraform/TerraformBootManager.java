@@ -9,8 +9,8 @@ import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.AdminApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformBootSystemStatus;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -30,7 +30,7 @@ public class TerraformBootManager {
     private static final String ZITADEL_PROFILE_NAME = "zitadel";
 
     @Resource
-    private TerraformApi terraformApi;
+    private AdminApi terraformAdminApi;
     @Value("${spring.profiles.active}")
     private String springProfilesActive;
     @Value("${terraform.boot.endpoint:http://localhost:9090}")
@@ -52,9 +52,11 @@ public class TerraformBootManager {
             try {
                 List<String> profileList = Arrays.asList(springProfilesActive.split(","));
                 if (profileList.contains(ZITADEL_PROFILE_NAME)) {
-                    terraformApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
+                    terraformAdminApi.getApiClient().setAccessToken(
+                            CurrentUserInfoHolder.getToken());
                 }
-                TerraformBootSystemStatus terraformBootSystemStatus = terraformApi.healthCheck();
+                TerraformBootSystemStatus terraformBootSystemStatus =
+                        terraformAdminApi.healthCheck();
                 terraformBootStatus.setHealthStatus(HealthStatus.valueOf(
                         terraformBootSystemStatus.getHealthStatus().getValue()));
             } catch (RestClientException e) {

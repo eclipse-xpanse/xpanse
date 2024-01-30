@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -21,15 +23,14 @@ import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformProviderNotFoundException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDeployFromDirectoryRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformAsyncDestroyFromDirectoryRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformDeployWithScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlan;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlanWithScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.WebhookConfig.AuthTypeEnum;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDeployWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlan;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlanWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -42,6 +43,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfoHolder;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -63,7 +65,7 @@ public class TerraformBootDeployment implements Deployer {
     private final PluginManager pluginManager;
     private final TerraformBootConfig terraformBootConfig;
     private final String port;
-    private final TerraformApi terraformApi;
+    private final TerraformFromScriptsApi terraformFromScriptsApi;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final DeployServiceEntityHandler deployServiceEntityHandler;
 
@@ -78,13 +80,13 @@ public class TerraformBootDeployment implements Deployer {
             DeployEnvironments deployEnvironments,
             PluginManager pluginManager,
             TerraformBootConfig terraformBootConfig,
-            TerraformApi terraformApi,
+            TerraformFromScriptsApi terraformFromScriptsApi,
             @Value("${server.port}") String port,
             DeployServiceEntityHandler deployServiceEntityHandler) {
         this.deployEnvironments = deployEnvironments;
         this.pluginManager = pluginManager;
         this.terraformBootConfig = terraformBootConfig;
-        this.terraformApi = terraformApi;
+        this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.port = port;
         this.deployServiceEntityHandler = deployServiceEntityHandler;
     }
@@ -92,10 +94,10 @@ public class TerraformBootDeployment implements Deployer {
     @Override
     public DeployResult deploy(DeployTask deployTask) {
         DeployResult result = new DeployResult();
-        TerraformAsyncDeployFromDirectoryRequest request = getDeployRequest(deployTask);
+        TerraformAsyncDeployFromScriptsRequest request = getDeployRequest(deployTask);
         try {
             setHeaderTokenByProfiles();
-            terraformApi.asyncDeployWithScripts(request, deployTask.getId());
+            terraformFromScriptsApi.asyncDeployWithScripts(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -111,10 +113,10 @@ public class TerraformBootDeployment implements Deployer {
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(task.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
-        TerraformAsyncDestroyFromDirectoryRequest request = getDestroyRequest(task, resourceState);
+        TerraformAsyncDestroyFromScriptsRequest request = getDestroyRequest(task, resourceState);
         try {
             setHeaderTokenByProfiles();
-            terraformApi.asyncDestroyWithScripts(request, task.getId());
+            terraformFromScriptsApi.asyncDestroyWithScripts(request, task.getId());
             result.setId(task.getId());
             return result;
         } catch (RestClientException e) {
@@ -149,7 +151,9 @@ public class TerraformBootDeployment implements Deployer {
         DeployValidationResult result = null;
         try {
             TerraformValidationResult validate =
-                    terraformApi.validateWithScripts(getDeployWithScriptsRequest(ocl));
+                    terraformFromScriptsApi.validateWithScripts(getValidateRequest(ocl),
+                            Objects.nonNull(MDC.get("TASK_ID"))
+                                    ? UUID.fromString(MDC.get("TASK_ID")) : null);
             try {
                 result = objectMapper.readValue(objectMapper.writeValueAsString(validate),
                         DeployValidationResult.class);
@@ -167,12 +171,12 @@ public class TerraformBootDeployment implements Deployer {
     public String getDeploymentPlanAsJson(DeployTask task) {
         setHeaderTokenByProfiles();
         TerraformPlan terraformPlan =
-                terraformApi.planWithScripts(getPlanWithScriptsRequest(task), task.getId());
+                terraformFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(task),
+                        task.getId());
         return terraformPlan.getPlan();
     }
 
-
-    private TerraformDeployWithScriptsRequest getDeployWithScriptsRequest(Ocl ocl) {
+    private TerraformDeployWithScriptsRequest getValidateRequest(Ocl ocl) {
         TerraformDeployWithScriptsRequest request =
                 new TerraformDeployWithScriptsRequest();
         request.setIsPlanOnly(false);
@@ -191,11 +195,11 @@ public class TerraformBootDeployment implements Deployer {
     }
 
 
-    private TerraformAsyncDestroyFromDirectoryRequest getDestroyRequest(DeployTask task,
-                                                                        String stateFile)
+    private TerraformAsyncDestroyFromScriptsRequest getDestroyRequest(DeployTask task,
+                                                                      String stateFile)
             throws TerraformBootRequestFailedException {
-        TerraformAsyncDestroyFromDirectoryRequest request =
-                new TerraformAsyncDestroyFromDirectoryRequest();
+        TerraformAsyncDestroyFromScriptsRequest request =
+                new TerraformAsyncDestroyFromScriptsRequest();
         request.setScripts(getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(getInputVariables(task, false));
@@ -204,14 +208,14 @@ public class TerraformBootDeployment implements Deployer {
         String callbackUrl = getClientRequestBaseUrl(port)
                 + terraformBootConfig.getDestroyCallbackUri();
         hookConfig.setUrl(callbackUrl + SPLIT + task.getId());
-        hookConfig.setAuthType(AuthTypeEnum.NONE);
+        hookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
         request.setWebhookConfig(hookConfig);
         return request;
     }
 
-    private TerraformAsyncDeployFromDirectoryRequest getDeployRequest(DeployTask task) {
-        TerraformAsyncDeployFromDirectoryRequest request =
-                new TerraformAsyncDeployFromDirectoryRequest();
+    private TerraformAsyncDeployFromScriptsRequest getDeployRequest(DeployTask task) {
+        TerraformAsyncDeployFromScriptsRequest request =
+                new TerraformAsyncDeployFromScriptsRequest();
         request.setIsPlanOnly(false);
         request.setScripts(getFiles(task));
         request.setVariables(getInputVariables(task, true));
@@ -220,7 +224,7 @@ public class TerraformBootDeployment implements Deployer {
         String callbackUrl = getClientRequestBaseUrl(port)
                 + terraformBootConfig.getDeployCallbackUri();
         hookConfig.setUrl(callbackUrl + SPLIT + task.getId());
-        hookConfig.setAuthType(AuthTypeEnum.NONE);
+        hookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
         request.setWebhookConfig(hookConfig);
         return request;
     }
@@ -293,7 +297,7 @@ public class TerraformBootDeployment implements Deployer {
         }
         List<String> profileList = Arrays.asList(profiles.split(","));
         if (!CollectionUtils.isEmpty(profileList) && profileList.contains(ZITADEL_PROFILE_NAME)) {
-            terraformApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
+            terraformFromScriptsApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
         }
     }
 

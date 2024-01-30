@@ -151,7 +151,6 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
                       region = "%s"
                     }
                     """, terraformFlexibleEngineVersion, region);
-            default -> "";
         };
     }
 }

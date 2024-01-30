@@ -9,8 +9,8 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformBootSystemStatus;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.AdminApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformBootSystemStatus;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -27,7 +27,7 @@ import org.springframework.web.client.RestClientException;
 class TerraformBootManagerTest {
 
     @Mock
-    private TerraformApi mockTerraformApi;
+    private AdminApi mockTerraformApi;
 
     @InjectMocks
     private TerraformBootManager terraformBootManagerUnderTest;

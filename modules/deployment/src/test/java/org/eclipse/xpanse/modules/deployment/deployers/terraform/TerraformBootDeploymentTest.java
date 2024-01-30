@@ -19,10 +19,10 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api.TerraformApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformPlan;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidateDiagnostics;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformValidationResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlan;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidateDiagnostics;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -44,6 +44,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.MDC;
 
 /**
  * Test for TerraformDeploy.
@@ -68,7 +69,7 @@ class TerraformBootDeploymentTest {
     @Mock
     PluginManager pluginManager;
     @Mock
-    TerraformApi terraformApi;
+    TerraformFromScriptsApi terraformApi;
     @Mock
     TerraformBootConfig terraformBootConfig;
     @Mock
@@ -215,9 +216,7 @@ class TerraformBootDeploymentTest {
 
         TerraformValidationResult validate = new TerraformValidationResult();
         validate.setValid(true);
-
-        when(terraformApi.validateWithScripts(any())).thenReturn(validate);
-
+        when(terraformApi.validateWithScripts(any(), any())).thenReturn(validate);
         mockGetProvider();
 
         // Run the test
@@ -247,7 +246,7 @@ class TerraformBootDeploymentTest {
                 "A managed resource \"random_id_2\" \"new\" has not been declared in the root module.");
         validate.setDiagnostics(List.of(terraformValidateDiagnostics));
 
-        when(terraformApi.validateWithScripts(any())).thenReturn(validate);
+        when(terraformApi.validateWithScripts(any(), any())).thenReturn(validate);
 
         mockGetProvider();
 
@@ -262,7 +261,7 @@ class TerraformBootDeploymentTest {
     void testValidate_ThrowsTerraformExecutorException() {
         mockGetProvider();
         ocl.getDeployment().setDeployer(errorDeployer);
-        when(terraformApi.validateWithScripts(any())).thenThrow(
+        when(terraformApi.validateWithScripts(any(), any())).thenThrow(
                 new TerraformBootRequestFailedException("IO error"));
         Assertions.assertThrows(TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.validate(ocl));
