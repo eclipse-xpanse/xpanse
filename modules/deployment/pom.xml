@@ -103,10 +103,10 @@
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>
-                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.api
+                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api
                             </apiPackage>
                             <modelPackage>
-                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model
+                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model
                             </modelPackage>
                             <generateApiDocumentation>false</generateApiDocumentation>
                             <generateApiTests>false</generateApiTests>

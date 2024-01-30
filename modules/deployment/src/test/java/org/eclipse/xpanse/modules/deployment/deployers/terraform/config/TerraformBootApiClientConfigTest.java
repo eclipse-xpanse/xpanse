@@ -2,7 +2,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.config;
 
 import static org.mockito.Mockito.verify;
 
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.ApiClient;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

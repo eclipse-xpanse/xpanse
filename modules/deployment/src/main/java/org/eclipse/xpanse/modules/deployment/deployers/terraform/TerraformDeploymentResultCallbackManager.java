@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityToDeployTaskConverter;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.model.TerraformResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
