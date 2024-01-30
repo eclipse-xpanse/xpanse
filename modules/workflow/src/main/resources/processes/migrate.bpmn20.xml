@@ -34,7 +34,7 @@
     <sequenceFlow id="sid-9c3cbb3b-1a2a-4b71-8bbc-90b588d72a66" sourceRef="sid-ccf32734-7f92-4c34-a306-8a832ecdcd44" targetRef="sid-05accf33-d319-4221-bf3a-db7c6036f8fb">
       <conditionExpression xsi:type="tFormalExpression">${isDeploySuccess==false &amp;&amp; deployRetryNum&lt;=1}</conditionExpression>
     </sequenceFlow>
-    <userTask id="sid-383c2c42-e7b4-496b-9f83-a75507b6c8b3" name="ManuallyHandleDeployFailure" activiti:candidateUsers="${assignee}">
+    <userTask id="sid-383c2c42-e7b4-496b-9f83-a75507b6c8b3" name="ManuallyHandleDeployFailure" activiti:assignee="${assignee}">
       <extensionElements>
         <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.migration.steps.DeployFailedManualHandlerListener" event="end"/>
       </extensionElements>
@@ -44,9 +44,9 @@
       <conditionExpression xsi:type="tFormalExpression">${isDeploySuccess==false &amp;&amp; deployRetryNum&gt;1}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-36255298-d882-4ce1-9658-6a826871144c" sourceRef="sid-383c2c42-e7b4-496b-9f83-a75507b6c8b3" targetRef="sid-65dfefba-0b74-4484-84d1-d755265b6763"/>
-    <userTask id="sid-dfc178f2-6193-48b1-98df-df7328068412" name="ManuallyHandleDestroyFailure" activiti:candidateUsers="${assignee}">
+    <userTask id="sid-dfc178f2-6193-48b1-98df-df7328068412" name="ManuallyHandleDestroyFailure" activiti:assignee="${assignee}">
       <extensionElements>
-        <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.migration.steps.ProcessDeploymentResult.DestroyFailedManualHandlerListener" event="end"/>
+        <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.migration.steps.DestroyFailedManualHandlerListener" event="end"/>
       </extensionElements>
     </userTask>
     <parallelGateway id="sid-6c1a98d6-76ee-46cb-9734-de529dc71096"/>

@@ -140,27 +140,48 @@ public class WorkflowUtils {
 
     private WorkFlowTask getWorkFlow(TaskInfo task) {
         WorkFlowTask workFlowTask = new WorkFlowTask();
-        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(task.getProcessInstanceId()).singleResult();
         workFlowTask.setProcessInstanceId(task.getProcessInstanceId());
-        workFlowTask.setProcessInstanceName(instance.getProcessDefinitionName());
         workFlowTask.setProcessDefinitionId(task.getProcessDefinitionId());
-        workFlowTask.setProcessDefinitionName(instance.getProcessDefinitionName());
         workFlowTask.setExecutionId(task.getExecutionId());
         workFlowTask.setTaskId(task.getId());
         workFlowTask.setTaskName(task.getName());
-        workFlowTask.setBusinessKey(instance.getBusinessKey());
         workFlowTask.setCreateTime(task.getCreateTime());
         return workFlowTask;
     }
 
+    private WorkFlowTask getTodoWorkFlow(TaskInfo task) {
+        WorkFlowTask workFlowTask = getWorkFlow(task);
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(task.getProcessInstanceId()).singleResult();
+        if (Objects.nonNull(instance)) {
+            workFlowTask.setProcessInstanceName(instance.getProcessDefinitionName());
+            workFlowTask.setProcessDefinitionName(instance.getProcessDefinitionName());
+            workFlowTask.setBusinessKey(instance.getBusinessKey());
+        }
+        return workFlowTask;
+    }
+
+
+    private WorkFlowTask getDoneWorkFlow(TaskInfo task) {
+        WorkFlowTask workFlowTask = getWorkFlow(task);
+        HistoricProcessInstance instance =
+                historyService.createHistoricProcessInstanceQuery()
+                        .processInstanceId(task.getProcessInstanceId()).singleResult();
+        if (Objects.nonNull(instance)) {
+            workFlowTask.setProcessInstanceName(instance.getProcessDefinitionName());
+            workFlowTask.setProcessDefinitionName(instance.getProcessDefinitionName());
+            workFlowTask.setBusinessKey(instance.getBusinessKey());
+        }
+        return workFlowTask;
+    }
+
     private List<WorkFlowTask> transTaskToWorkFlowTask(List<Task> list) {
-        return list.stream().map(this::getWorkFlow).collect(Collectors.toList());
+        return list.stream().map(this::getTodoWorkFlow).collect(Collectors.toList());
     }
 
     private List<WorkFlowTask> transHistoricTaskInstanceToWorkFlowTask(
             List<HistoricTaskInstance> list) {
-        return list.stream().map(this::getWorkFlow).collect(Collectors.toList());
+        return list.stream().map(this::getDoneWorkFlow).collect(Collectors.toList());
     }
 
     private void validateTaskId(String taskId) {

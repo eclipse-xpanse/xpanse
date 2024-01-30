@@ -22,6 +22,7 @@ import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +43,9 @@ public class ActivitiConfig {
     private final TransactionManager transactionManager;
 
     private final ApplicationContext applicationContext;
+
+    @Value("${spring.activiti.history-level}")
+    private HistoryLevel historyLevel;
 
     /**
      * constructor for ActivitiConfig bean.
@@ -70,7 +74,7 @@ public class ActivitiConfig {
         Resource[] resources = new PathMatchingResourcePatternResolver().getResources(
                 ResourceLoader.CLASSPATH_URL_PREFIX + "processes/**.bpmn20.xml");
         springProcessEngineConfiguration.setDeploymentResources(resources);
-        springProcessEngineConfiguration.setHistoryLevel(HistoryLevel.NONE);
+        springProcessEngineConfiguration.setHistoryLevel(historyLevel);
         springProcessEngineConfiguration.setApplicationContext(this.applicationContext);
         return springProcessEngineConfiguration;
     }
