@@ -13,23 +13,27 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.junit.jupiter.api.Test;
 
 /**
- * Test of TerraformExecState.
+ * Test of DeployerTaskStatus.
  */
 class DeployerTaskStatusTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(DeployerTaskStatus.INIT, DeployerTaskStatus.INIT.getByValue("initial"));
+        assertEquals(DeployerTaskStatus.INIT, DeployerTaskStatus.getByValue("initial"));
         assertEquals(DeployerTaskStatus.DEPLOY_SUCCESS,
-                DeployerTaskStatus.DEPLOY_SUCCESS.getByValue("success"));
+                DeployerTaskStatus.getByValue("success"));
         assertEquals(DeployerTaskStatus.DEPLOY_FAILED,
-                DeployerTaskStatus.DEPLOY_FAILED.getByValue("failed"));
+                DeployerTaskStatus.getByValue("failed"));
         assertEquals(DeployerTaskStatus.DESTROY_SUCCESS,
-                DeployerTaskStatus.DESTROY_SUCCESS.getByValue("destroy_success"));
+                DeployerTaskStatus.getByValue("destroy_success"));
         assertEquals(DeployerTaskStatus.DESTROY_FAILED,
-                DeployerTaskStatus.DESTROY_FAILED.getByValue("destroy_failed"));
+                DeployerTaskStatus.getByValue("destroy_failed"));
+        assertEquals(DeployerTaskStatus.ROLLBACK_SUCCESS,
+                DeployerTaskStatus.getByValue("rollback_success"));
+        assertEquals(DeployerTaskStatus.ROLLBACK_FAILED,
+                DeployerTaskStatus.getByValue("rollback_failed"));
         assertThrows(UnsupportedEnumValueException.class,
-                () -> DeployerTaskStatus.DESTROY_FAILED.getByValue("unavailable"));
+                () -> DeployerTaskStatus.getByValue("unavailable"));
     }
 
     @Test
@@ -39,6 +43,8 @@ class DeployerTaskStatusTest {
         assertEquals("failed", DeployerTaskStatus.DEPLOY_FAILED.toValue());
         assertEquals("destroy_success", DeployerTaskStatus.DESTROY_SUCCESS.toValue());
         assertEquals("destroy_failed", DeployerTaskStatus.DESTROY_FAILED.toValue());
+        assertEquals("rollback_success", DeployerTaskStatus.ROLLBACK_SUCCESS.toValue());
+        assertEquals("rollback_failed", DeployerTaskStatus.ROLLBACK_FAILED.toValue());
     }
 
 }

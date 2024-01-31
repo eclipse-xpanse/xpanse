@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DestroyScenario;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Component;
 
@@ -59,23 +60,21 @@ public class OpenTofuDeploymentResultCallbackManager {
     /**
      * Callback method after deployment is complete.
      */
-    public void deployCallback(String taskId, OpenTofuExecutorResult result) {
+    public void deployCallback(UUID taskId, OpenTofuResult result) {
         log.info("Update database entity with id:{} with open tofu deploy callback result.",
                 taskId);
         DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(taskId));
-        DeployResult deployResult = handlerCallbackDeployResult(result);
-        deployResult.setId(UUID.fromString(taskId));
+                deployServiceEntityHandler.getDeployServiceEntity(taskId);
+        DeployResult deployResult = handlerCallbackOpenTofuResult(result);
+        deployResult.setId(taskId);
         if (StringUtils.isNotBlank(result.getTerraformState())) {
-            resourceHandlerManager.getResourceHandler(
-                            deployServiceEntity.getCsp(),
-                            deployServiceEntity.getDeployRequest().getOcl().getDeployment()
-                                    .getKind())
-                    .handler(deployResult);
+            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
+                    deployServiceEntity.getDeployRequest().getOcl()
+                            .getDeployment().getKind()).handler(deployResult);
         }
         DeployServiceEntity updatedDeployServiceEntity =
-                deployResultManager.updateDeployServiceEntityWithDeployResult(
-                        deployResult, deployServiceEntity);
+                deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
+                        deployServiceEntity);
         if (ServiceDeploymentState.DEPLOY_FAILED
                 == updatedDeployServiceEntity.getServiceDeploymentState()) {
             DeployTask deployTask =
@@ -85,24 +84,48 @@ public class OpenTofuDeploymentResultCallbackManager {
         }
 
         ServiceMigrationEntity serviceMigrationEntity =
-                migrationService.getServiceMigrationEntityByNewServiceId(taskId);
+                migrationService.getServiceMigrationEntityByNewServiceId(taskId.toString());
         if (Objects.nonNull(serviceMigrationEntity)) {
             workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
                     MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
         }
-
     }
 
-    private DeployResult handlerCallbackDeployResult(OpenTofuExecutorResult result) {
+    /**
+     * Callback method after the service is destroyed.
+     */
+    public void destroyCallback(UUID taskId, OpenTofuResult result) {
+        log.info("Update database entity with id:{} with open tofu destroy callback result.",
+                taskId);
+        DeployServiceEntity deployServiceEntity =
+                deployServiceEntityHandler.getDeployServiceEntity(taskId);
+        DeployResult destroyResult = handlerCallbackOpenTofuResult(result);
+        destroyResult.setId(taskId);
+        if (StringUtils.isNotBlank(result.getTerraformState())) {
+            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
+                    deployServiceEntity.getDeployRequest().getOcl()
+                            .getDeployment().getKind()).handler(destroyResult);
+        }
+        deployResultManager.updateDeployServiceEntityWithDeployResult(destroyResult,
+                deployServiceEntity);
+
+        ServiceMigrationEntity serviceMigrationEntity =
+                migrationService.getServiceMigrationEntityByOldServiceId(taskId.toString());
+        if (Objects.nonNull(serviceMigrationEntity)) {
+            workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
+                    MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
+        }
+    }
+
+    private DeployResult handlerCallbackOpenTofuResult(OpenTofuResult result) {
         DeployResult deployResult = new DeployResult();
-        if (Boolean.TRUE.equals(result.isCommandSuccessful())) {
-            deployResult.setState(DeployerTaskStatus.DEPLOY_SUCCESS);
-        } else {
-            deployResult.setState(DeployerTaskStatus.DEPLOY_FAILED);
+        if (Boolean.FALSE.equals(result.isCommandSuccessful())) {
             deployResult.setMessage(result.getCommandStdError());
         }
-        deployResult.getPrivateProperties().put(
-                TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
+        deployResult.setState(getDeployerTaskStatus(result.getDestroyScenario(),
+                Boolean.TRUE.equals(result.isCommandSuccessful())));
+        deployResult.getPrivateProperties()
+                .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
         if (Objects.nonNull(result.getImportantFileContentMap())) {
             deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
         }
@@ -110,50 +133,25 @@ public class OpenTofuDeploymentResultCallbackManager {
     }
 
     /**
-     * Callback method after the service is destroyed.
+     * Get deployer task status.
+     *
+     * @param destroyScenario     deployer task type.
+     * @param isCommandSuccessful command is successful or not.
+     * @return deployer task status.
      */
-    public void destroyCallback(String taskId, OpenTofuExecutorResult result) {
-        log.info("Update database entity with id:{} with open tofu destroy callback result.",
-                taskId);
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(taskId));
-        DeployResult destroyResult = handlerCallbackDestroyResult(result);
-        destroyResult.setId(UUID.fromString(taskId));
-        if (StringUtils.isNotBlank(result.getTerraformState())) {
-            resourceHandlerManager.getResourceHandler(
-                    deployServiceEntity.getCsp(),
-                    deployServiceEntity.getDeployRequest().getOcl().getDeployment()
-                            .getKind()).handler(destroyResult);
+    public DeployerTaskStatus getDeployerTaskStatus(DestroyScenario destroyScenario,
+                                                    boolean isCommandSuccessful) {
+        if (Objects.isNull(destroyScenario)) {
+            return isCommandSuccessful ? DeployerTaskStatus.DEPLOY_SUCCESS
+                    : DeployerTaskStatus.DEPLOY_FAILED;
         }
-        try {
-            deployResultManager.updateDeployServiceEntityWithDestroyResult(
-                    destroyResult, deployServiceEntity, false);
-        } catch (RuntimeException e) {
-            log.error("Update database entity with id:{} with open tofu destroy callback result "
-                    + "failed.", taskId, e);
-        }
-
-        ServiceMigrationEntity serviceMigrationEntity =
-                migrationService.getServiceMigrationEntityByOldServiceId(taskId);
-        if (Objects.nonNull(serviceMigrationEntity)) {
-            workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
-                    MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
-        }
-    }
-
-    private DeployResult handlerCallbackDestroyResult(OpenTofuExecutorResult result) {
-        DeployResult deployResult = new DeployResult();
-        if (Boolean.TRUE.equals(result.isCommandSuccessful())) {
-            deployResult.setState(DeployerTaskStatus.DESTROY_SUCCESS);
-        } else {
-            deployResult.setState(DeployerTaskStatus.DEPLOY_FAILED);
-            deployResult.setMessage(result.getCommandStdError());
-        }
-        deployResult.getPrivateProperties().put(
-                TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
-        if (Objects.nonNull(result.getImportantFileContentMap())) {
-            deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
-        }
-        return deployResult;
+        return switch (destroyScenario) {
+            case DESTROY -> isCommandSuccessful ? DeployerTaskStatus.DESTROY_SUCCESS
+                    : DeployerTaskStatus.DESTROY_FAILED;
+            case ROLLBACK -> isCommandSuccessful ? DeployerTaskStatus.ROLLBACK_SUCCESS
+                    : DeployerTaskStatus.ROLLBACK_FAILED;
+            case PURGE -> isCommandSuccessful ? DeployerTaskStatus.PURGE_SUCCESS
+                    : DeployerTaskStatus.PURGE_FAILED;
+        };
     }
 }

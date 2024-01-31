@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:9091",
+      "url": "http://localhost:9090",
       "description": "Generated server url"
     }
   ],
@@ -66,8 +66,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -86,8 +96,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -102,16 +112,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -148,8 +148,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -168,8 +178,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -184,16 +194,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
                 }
               }
             }
@@ -230,8 +230,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -250,8 +260,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -266,16 +276,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -312,8 +312,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -332,8 +342,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -348,16 +358,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -394,8 +394,11 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -414,8 +417,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -433,9 +436,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -446,7 +446,18 @@
           "TerraformFromGitRepo"
         ],
         "description": "Deploy resources via Terraform",
-        "operationId": "validateWithScripts_1",
+        "operationId": "validateScriptsFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -458,8 +469,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -478,8 +499,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -494,16 +515,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -540,8 +551,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -560,8 +581,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -579,16 +600,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
-                }
-              }
-            }
           }
         }
       }
@@ -599,7 +610,7 @@
           "TerraformFromGitRepo"
         ],
         "description": "Destroy resources via Terraform",
-        "operationId": "destroyWithScripts_1",
+        "operationId": "destroyFromGitRepo",
         "parameters": [
           {
             "name": "X-Custom-RequestId",
@@ -622,8 +633,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -642,8 +663,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -661,16 +682,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
-                }
-              }
-            }
           }
         }
       }
@@ -681,7 +692,7 @@
           "TerraformFromGitRepo"
         ],
         "description": "Deploy resources via Terraform",
-        "operationId": "deployWithScripts_1",
+        "operationId": "deployFromGitRepo",
         "parameters": [
           {
             "name": "X-Custom-RequestId",
@@ -704,8 +715,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -724,8 +745,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -743,16 +764,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
-                }
-              }
-            }
           }
         }
       }
@@ -763,7 +774,7 @@
           "TerraformFromGitRepo"
         ],
         "description": "async deploy resources via Terraform",
-        "operationId": "asyncDeployWithScripts_1",
+        "operationId": "asyncDeployFromGitRepo",
         "parameters": [
           {
             "name": "X-Custom-RequestId",
@@ -786,8 +797,11 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -806,8 +820,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -825,9 +839,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -870,8 +881,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -890,8 +911,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -909,16 +930,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
-                }
-              }
-            }
           }
         }
       }
@@ -929,7 +940,7 @@
           "TerraformFromDirectory"
         ],
         "description": "Deploy resources via Terraform from the given directory.",
-        "operationId": "deploy",
+        "operationId": "deployFromDirectory",
         "parameters": [
           {
             "name": "module_directory",
@@ -961,8 +972,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -981,8 +1002,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -997,16 +1018,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -1052,8 +1063,11 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1072,8 +1086,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1091,9 +1105,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1106,8 +1117,18 @@
         "description": "Check health of Terraform Boot API service",
         "operationId": "healthCheck",
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformBootSystemStatus"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1126,8 +1147,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1142,16 +1163,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformBootSystemStatus"
                 }
               }
             }
@@ -1165,7 +1176,7 @@
           "TerraformFromDirectory"
         ],
         "description": "Validate the Terraform modules in the given directory.",
-        "operationId": "validate",
+        "operationId": "validateFromDirectory",
         "parameters": [
           {
             "name": "module_directory",
@@ -1187,8 +1198,18 @@
           }
         ],
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1207,8 +1228,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1223,16 +1244,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -1269,8 +1280,11 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1289,8 +1303,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1308,9 +1322,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1321,7 +1332,7 @@
           "TerraformFromGitRepo"
         ],
         "description": "Async destroy the Terraform modules",
-        "operationId": "asyncDestroyWithScripts_1",
+        "operationId": "asyncDestroyFromGitRepo",
         "parameters": [
           {
             "name": "X-Custom-RequestId",
@@ -1344,8 +1355,11 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1364,8 +1378,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1383,9 +1397,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1396,7 +1407,7 @@
           "TerraformFromDirectory"
         ],
         "description": "Destroy the resources from the given directory.",
-        "operationId": "destroy",
+        "operationId": "destroyFromDirectory",
         "parameters": [
           {
             "name": "module_directory",
@@ -1428,8 +1439,18 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1448,8 +1469,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1464,16 +1485,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -1519,8 +1530,11 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1539,8 +1553,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1558,9 +1572,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1716,6 +1727,15 @@
         ],
         "type": "object",
         "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -1749,6 +1769,14 @@
       "TerraformResult": {
         "type": "object",
         "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
           "commandStdOutput": {
             "type": "string"
           },
@@ -1921,6 +1949,15 @@
         ],
         "type": "object",
         "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2093,6 +2130,15 @@
         ],
         "type": "object",
         "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2134,6 +2180,15 @@
         ],
         "type": "object",
         "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2168,6 +2223,15 @@
         ],
         "type": "object",
         "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2193,6 +2257,15 @@
         ],
         "type": "object",
         "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {

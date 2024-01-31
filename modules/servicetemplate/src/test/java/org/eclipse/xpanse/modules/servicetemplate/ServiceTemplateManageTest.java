@@ -126,8 +126,7 @@ class ServiceTemplateManageTest {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
-                        resourceHandlerManager);
+                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler);
 
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         doReturn("""
@@ -173,8 +172,7 @@ class ServiceTemplateManageTest {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
-                        resourceHandlerManager);
+                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         doReturn("""
                 terraform {
@@ -237,8 +235,7 @@ class ServiceTemplateManageTest {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
-                        resourceHandlerManager);
+                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         doReturn("""
                     terraform {
@@ -301,8 +298,7 @@ class ServiceTemplateManageTest {
         TerraformDeployment deployment =
                 new TerraformDeployment(new DeployEnvironments(null, null, null, null),
                         terraformLocalConfig, pluginManager, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
-                        resourceHandlerManager);
+                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         doReturn("""
                 terraform {

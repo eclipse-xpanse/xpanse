@@ -11,14 +11,16 @@ import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DestroyScenario;
 
 /**
  * OpenTofuExecutorResult.
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class OpenTofuExecutorResult extends SystemCmdResult {
+public class OpenTofuResult extends SystemCmdResult {
 
+    private DestroyScenario destroyScenario;
     private String terraformState;
     private Map<String, String> importantFileContentMap = new HashMap<>();
 

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
@@ -53,7 +54,7 @@ public class TerraformBootWebhookApi {
             @PathVariable("task_id") String taskId,
             @Valid @RequestBody TerraformResult result) {
 
-        terraformDeploymentResultCallbackManager.deployCallback(taskId, result);
+        terraformDeploymentResultCallbackManager.deployCallback(UUID.fromString(taskId), result);
     }
 
     /**
@@ -70,7 +71,7 @@ public class TerraformBootWebhookApi {
             @PathVariable("task_id") String taskId,
             @Valid @RequestBody TerraformResult result) {
 
-        terraformDeploymentResultCallbackManager.destroyCallback(taskId, result);
+        terraformDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result);
     }
 
 }

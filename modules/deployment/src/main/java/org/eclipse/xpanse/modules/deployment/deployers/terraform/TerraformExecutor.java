@@ -185,16 +185,16 @@ public class TerraformExecutor {
      * @return file contents as string.
      */
     public String getTerraformState() {
-        File tfState = new File(workspace + File.separator + STATE_FILE_NAME);
-        if (!tfState.exists()) {
-            log.error("Terraform state file not found");
-            return null;
-        }
+        String state = null;
         try {
-            return readFile(tfState);
+            File tfState = new File(workspace + File.separator + STATE_FILE_NAME);
+            if (tfState.exists()) {
+                state = Files.readString(tfState.toPath());
+            }
         } catch (IOException ex) {
-            throw new TerraformExecutorException("Read state file failed.", ex);
+            log.error("Read state file failed.", ex);
         }
+        return state;
     }
 
     /**

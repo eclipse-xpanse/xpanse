@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
- * Deployment state. This is the internal state of every task invoked by the deployer.
+ * Deployer task state. This is the internal state of every task invoked by the deployer.
  * This state is not exposed to the end user.
  */
 public enum DeployerTaskStatus {
@@ -19,7 +19,11 @@ public enum DeployerTaskStatus {
     DEPLOY_SUCCESS("success"),
     DEPLOY_FAILED("failed"),
     DESTROY_SUCCESS("destroy_success"),
-    DESTROY_FAILED("destroy_failed");
+    DESTROY_FAILED("destroy_failed"),
+    ROLLBACK_SUCCESS("rollback_success"),
+    ROLLBACK_FAILED("rollback_failed"),
+    PURGE_SUCCESS("purge_success"),
+    PURGE_FAILED("purge_failed");
 
     private final String status;
 
@@ -31,14 +35,14 @@ public enum DeployerTaskStatus {
      * For DeployerTaskStatus deserialize.
      */
     @JsonCreator
-    public DeployerTaskStatus getByValue(String period) {
-        for (DeployerTaskStatus xpanseDeployStatus : values()) {
-            if (xpanseDeployStatus.status.equals(StringUtils.lowerCase(period))) {
-                return xpanseDeployStatus;
+    public static DeployerTaskStatus getByValue(String status) {
+        for (DeployerTaskStatus deployerTaskStatus : values()) {
+            if (StringUtils.equalsIgnoreCase(status, deployerTaskStatus.status)) {
+                return deployerTaskStatus;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("DeployerTaskStatus value %s is not supported.", period));
+                String.format("DeployerTaskStatus value %s is not supported.", status));
     }
 
     /**

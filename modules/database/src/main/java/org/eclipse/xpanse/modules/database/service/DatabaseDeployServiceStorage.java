@@ -89,8 +89,12 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
                     predicateList.add(criteriaBuilder.equal(root.get("userId"),
                             serviceQuery.getUserId()));
 
-                    return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
+                    query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
+
+                    query.orderBy(criteriaBuilder.desc(root.get("createTime")));
+
+                    return query.getRestriction();
                 };
 
         return deployServiceRepository.findAll(specification);

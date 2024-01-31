@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * TerraformResult
  */
 @JsonPropertyOrder({
+  TerraformResult.JSON_PROPERTY_DESTROY_SCENARIO,
   TerraformResult.JSON_PROPERTY_COMMAND_STD_OUTPUT,
   TerraformResult.JSON_PROPERTY_COMMAND_STD_ERROR,
   TerraformResult.JSON_PROPERTY_TERRAFORM_STATE,
@@ -37,6 +38,46 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
 public class TerraformResult {
+  /**
+   * Gets or Sets destroyScenario
+   */
+  public enum DestroyScenarioEnum {
+    DESTROY("destroy"),
+    
+    ROLLBACK("rollback"),
+    
+    PURGE("purge");
+
+    private String value;
+
+    DestroyScenarioEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static DestroyScenarioEnum fromValue(String value) {
+      for (DestroyScenarioEnum b : DestroyScenarioEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  public static final String JSON_PROPERTY_DESTROY_SCENARIO = "destroyScenario";
+  private DestroyScenarioEnum destroyScenario;
+
   public static final String JSON_PROPERTY_COMMAND_STD_OUTPUT = "commandStdOutput";
   private String commandStdOutput;
 
@@ -54,6 +95,32 @@ public class TerraformResult {
 
   public TerraformResult() {
   }
+
+  public TerraformResult destroyScenario(DestroyScenarioEnum destroyScenario) {
+    
+    this.destroyScenario = destroyScenario;
+    return this;
+  }
+
+   /**
+   * Get destroyScenario
+   * @return destroyScenario
+  **/
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public DestroyScenarioEnum getDestroyScenario() {
+    return destroyScenario;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setDestroyScenario(DestroyScenarioEnum destroyScenario) {
+    this.destroyScenario = destroyScenario;
+  }
+
 
   public TerraformResult commandStdOutput(String commandStdOutput) {
     
@@ -201,7 +268,8 @@ public class TerraformResult {
       return false;
     }
     TerraformResult terraformResult = (TerraformResult) o;
-    return Objects.equals(this.commandStdOutput, terraformResult.commandStdOutput) &&
+    return Objects.equals(this.destroyScenario, terraformResult.destroyScenario) &&
+        Objects.equals(this.commandStdOutput, terraformResult.commandStdOutput) &&
         Objects.equals(this.commandStdError, terraformResult.commandStdError) &&
         Objects.equals(this.terraformState, terraformResult.terraformState) &&
         Objects.equals(this.importantFileContentMap, terraformResult.importantFileContentMap) &&
@@ -210,13 +278,14 @@ public class TerraformResult {
 
   @Override
   public int hashCode() {
-    return Objects.hash(commandStdOutput, commandStdError, terraformState, importantFileContentMap, commandSuccessful);
+    return Objects.hash(destroyScenario, commandStdOutput, commandStdError, terraformState, importantFileContentMap, commandSuccessful);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TerraformResult {\n");
+    sb.append("    destroyScenario: ").append(toIndentedString(destroyScenario)).append("\n");
     sb.append("    commandStdOutput: ").append(toIndentedString(commandStdOutput)).append("\n");
     sb.append("    commandStdError: ").append(toIndentedString(commandStdError)).append("\n");
     sb.append("    terraformState: ").append(toIndentedString(terraformState)).append("\n");

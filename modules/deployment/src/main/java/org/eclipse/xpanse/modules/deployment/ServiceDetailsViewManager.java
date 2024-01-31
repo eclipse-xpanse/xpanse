@@ -75,11 +75,11 @@ public class ServiceDetailsViewManager {
     /**
      * List deploy services with query model.
      *
-     * @param category of the services to be filtered.
-     * @param csp of the services to be filtered.
-     * @param serviceName of the services to be filtered.
+     * @param category       of the services to be filtered.
+     * @param csp            of the services to be filtered.
+     * @param serviceName    of the services to be filtered.
      * @param serviceVersion of the services to be filtered.
-     * @param state of the services to be filtered.
+     * @param state          of the services to be filtered.
      * @return serviceVos
      */
     public List<DeployedService> listDeployedServices(Category category,
@@ -163,11 +163,11 @@ public class ServiceDetailsViewManager {
     /**
      * Use query model to list SV deployment services.
      *
-     * @param category of the services to be filtered.
-     * @param csp of the services to be filtered.
-     * @param serviceName of the services to be filtered.
+     * @param category       of the services to be filtered.
+     * @param csp            of the services to be filtered.
+     * @param serviceName    of the services to be filtered.
      * @param serviceVersion of the services to be filtered.
-     * @param state of the services to be filtered.
+     * @param state          of the services to be filtered.
      * @return serviceVos
      */
     public List<DeployedService> listDeployedServicesOfIsv(Category category,
