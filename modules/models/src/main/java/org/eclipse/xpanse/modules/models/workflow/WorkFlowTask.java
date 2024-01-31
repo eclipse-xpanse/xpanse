@@ -6,10 +6,13 @@
 
 package org.eclipse.xpanse.modules.models.workflow;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import lombok.Data;
 
 /**
@@ -56,5 +59,7 @@ public class WorkFlowTask {
 
     @NotNull
     @Schema(description = "The create time of the task")
-    private Date createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
+    private OffsetDateTime createTime;
 }

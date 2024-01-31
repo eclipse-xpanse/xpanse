@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.models.workflow;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class WorkFlowTaskTest {
 
     @Mock
-    private Date mockCreateTime;
+    private OffsetDateTime mockCreateTime;
 
     @Test
     void testProcessInstanceIdGetterAndSetter() {
@@ -96,6 +96,7 @@ class WorkFlowTaskTest {
     @Test
     void testGetCreateTime() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
+        mockCreateTime = OffsetDateTime.now();
         workFlowTaskUnderTest.setCreateTime(mockCreateTime);
         assertThat(workFlowTaskUnderTest.getCreateTime()).isEqualTo(mockCreateTime);
     }

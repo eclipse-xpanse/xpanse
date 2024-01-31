@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.modules.workflow.utils;
 
 import jakarta.annotation.Resource;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +147,8 @@ public class WorkflowUtils {
         workFlowTask.setExecutionId(task.getExecutionId());
         workFlowTask.setTaskId(task.getId());
         workFlowTask.setTaskName(task.getName());
-        workFlowTask.setCreateTime(task.getCreateTime());
+        workFlowTask.setCreateTime(
+                OffsetDateTime.ofInstant(task.getCreateTime().toInstant(), ZoneOffset.UTC));
         return workFlowTask;
     }
 
