@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
@@ -48,27 +49,24 @@ public class DeployResultManager {
             throws RuntimeException {
         if (Objects.nonNull(deployResult.getState()) && Objects.nonNull(storedEntity)) {
             log.info("Deploy task update deploy service entity with id:{}", deployResult.getId());
-            DeployServiceEntity deployServiceEntityToFlush = new DeployServiceEntity();
-            BeanUtils.copyProperties(storedEntity, deployServiceEntityToFlush);
-            if (DeployerTaskStatus.DEPLOY_SUCCESS == deployResult.getState()) {
-                deployServiceEntityToFlush.setServiceDeploymentState(
-                        ServiceDeploymentState.DEPLOY_SUCCESS);
-                deployServiceEntityToFlush.setServiceState(ServiceState.RUNNING);
-            } else {
-                deployServiceEntityToFlush.setServiceDeploymentState(
-                        ServiceDeploymentState.DEPLOY_FAILED);
-                deployServiceEntityToFlush.setServiceState(ServiceState.NOT_RUNNING);
-                deployServiceEntityToFlush.setResultMessage(deployResult.getMessage());
-            }
-            updateDeployResourceEntity(deployResult, deployServiceEntityToFlush);
-            return deployServiceEntityHandler.storeAndFlush(deployServiceEntityToFlush);
+            DeployServiceEntity deployServiceEntityToStore = new DeployServiceEntity();
+            BeanUtils.copyProperties(storedEntity, deployServiceEntityToStore);
+            updateEntityWithDeployResult(deployResult, deployServiceEntityToStore);
+            return deployServiceEntityHandler.storeAndFlush(deployServiceEntityToStore);
         } else {
             return storedEntity;
         }
     }
 
-    private void updateDeployResourceEntity(DeployResult deployResult,
-                                            DeployServiceEntity deployServiceEntity) {
+    private void updateEntityWithDeployResult(DeployResult deployResult,
+                                              DeployServiceEntity deployServiceEntity) {
+
+        if (StringUtils.isNotBlank(deployResult.getMessage())) {
+            deployServiceEntity.setResultMessage(deployResult.getMessage());
+        }
+        deployServiceEntity.setServiceState(getServiceState(deployResult.getState()));
+        deployServiceEntity.setServiceDeploymentState(
+                getServiceDeploymentState(deployResult.getState()));
 
         if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
             deployServiceEntity.getProperties().clear();
@@ -94,6 +92,26 @@ public class DeployResultManager {
         sensitiveDataHandler.maskSensitiveFields(deployServiceEntity);
     }
 
+    private ServiceState getServiceState(DeployerTaskStatus state) {
+        if (state == DeployerTaskStatus.DEPLOY_SUCCESS) {
+            return ServiceState.RUNNING;
+        }
+        return ServiceState.NOT_RUNNING;
+    }
+
+    private ServiceDeploymentState getServiceDeploymentState(
+            DeployerTaskStatus deployerTaskStatus) {
+        return switch (deployerTaskStatus) {
+            case DEPLOY_SUCCESS -> ServiceDeploymentState.DEPLOY_SUCCESS;
+            case DEPLOY_FAILED, ROLLBACK_SUCCESS -> ServiceDeploymentState.DEPLOY_FAILED;
+            case DESTROY_SUCCESS, PURGE_SUCCESS -> ServiceDeploymentState.DESTROY_SUCCESS;
+            case DESTROY_FAILED -> ServiceDeploymentState.DESTROY_FAILED;
+            case ROLLBACK_FAILED -> ServiceDeploymentState.ROLLBACK_FAILED;
+            case INIT, PURGE_FAILED -> ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED;
+        };
+    }
+
+
     /**
      * Convert deploy resources to deploy resource entities.
      */
@@ -110,53 +128,5 @@ public class DeployResultManager {
             deployResourceEntities.add(deployResource);
         }
         return deployResourceEntities;
-    }
-
-    /**
-     * Method to update destroy result to DeployServiceEntity and store to database.
-     *
-     * @param destroyResult Destroy Result.
-     * @param deployServiceEntity DB entity to be updated
-     * @param isCalledWhenRollback is service destroyed as part of rollback.
-     * @return updated entity.
-     * @throws RuntimeException exception thrown in case of errors.
-     */
-    public DeployServiceEntity updateDeployServiceEntityWithDestroyResult(
-            DeployResult destroyResult,
-            DeployServiceEntity deployServiceEntity,
-            boolean isCalledWhenRollback)
-            throws RuntimeException {
-        if (Objects.nonNull(destroyResult) && Objects.nonNull(destroyResult.getState())) {
-            log.info("Update stored deploy service entity by result of destroy task with id:{}",
-                    destroyResult.getId());
-            DeployServiceEntity deployServiceEntityToFlush = new DeployServiceEntity();
-            BeanUtils.copyProperties(deployServiceEntity, deployServiceEntityToFlush);
-            if (isCalledWhenRollback) {
-                if (destroyResult.getState() == DeployerTaskStatus.DESTROY_SUCCESS) {
-                    deployServiceEntityToFlush.setServiceDeploymentState(
-                            ServiceDeploymentState.DEPLOY_FAILED);
-                    deployServiceEntityToFlush.setServiceState(ServiceState.NOT_RUNNING);
-                } else {
-                    deployServiceEntityToFlush.setServiceDeploymentState(
-                            ServiceDeploymentState.ROLLBACK_FAILED);
-                    deployServiceEntityToFlush.setServiceState(ServiceState.RUNNING);
-                }
-            } else {
-                if (destroyResult.getState() == DeployerTaskStatus.DESTROY_SUCCESS) {
-                    deployServiceEntityToFlush.setServiceDeploymentState(
-                            ServiceDeploymentState.DESTROY_SUCCESS);
-                    deployServiceEntityToFlush.setServiceState(ServiceState.NOT_RUNNING);
-                } else {
-                    deployServiceEntityToFlush.setServiceDeploymentState(
-                            ServiceDeploymentState.DESTROY_FAILED);
-                    deployServiceEntityToFlush.setServiceState(ServiceState.RUNNING);
-                    deployServiceEntityToFlush.setResultMessage(destroyResult.getMessage());
-                }
-            }
-            updateDeployResourceEntity(destroyResult, deployServiceEntityToFlush);
-            return deployServiceEntityHandler.storeAndFlush(deployServiceEntityToFlush);
-        } else {
-            return deployServiceEntity;
-        }
     }
 }

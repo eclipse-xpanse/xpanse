@@ -204,6 +204,9 @@ public class TerraformBootDeployment implements Deployer {
         request.setTfState(stateFile);
         request.setVariables(getInputVariables(task, false));
         request.setEnvVariables(getEnvironmentVariables(task));
+        request.setDestroyScenario(
+                TerraformAsyncDestroyFromScriptsRequest.DestroyScenarioEnum.fromValue(
+                        task.getDestroyScenario().toValue()));
         WebhookConfig hookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port)
                 + terraformBootConfig.getDestroyCallbackUri();

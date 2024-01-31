@@ -37,6 +37,14 @@ public class DeployTask {
      */
     private Ocl ocl;
 
+    /**
+     * The id of the service template.
+     */
     private UUID serviceTemplateId;
+
+    /**
+     * The action of the deployment task.
+     */
+    private DestroyScenario destroyScenario;
 
 }

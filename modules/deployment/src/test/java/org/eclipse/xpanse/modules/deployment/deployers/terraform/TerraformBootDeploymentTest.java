@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourc
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DestroyScenario;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -44,7 +45,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.MDC;
 
 /**
  * Test for TerraformDeploy.
@@ -102,6 +102,7 @@ class TerraformBootDeploymentTest {
         deployTask.setId(id);
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
+        deployTask.setDestroyScenario(DestroyScenario.DESTROY);
     }
 
     void mockGetProvider() {

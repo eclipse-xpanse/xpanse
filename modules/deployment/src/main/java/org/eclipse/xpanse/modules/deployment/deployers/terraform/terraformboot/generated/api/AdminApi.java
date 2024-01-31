@@ -51,11 +51,11 @@ public class AdminApi {
     /**
      * 
      * Check health of Terraform Boot API service
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @return TerraformBootSystemStatus
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
@@ -66,11 +66,11 @@ public class AdminApi {
     /**
      * 
      * Check health of Terraform Boot API service
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @return ResponseEntity&lt;TerraformBootSystemStatus&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
@@ -84,7 +84,7 @@ public class AdminApi {
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = { 
-            "*/*", "application/json"
+            "application/json", "*/*"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {  };
