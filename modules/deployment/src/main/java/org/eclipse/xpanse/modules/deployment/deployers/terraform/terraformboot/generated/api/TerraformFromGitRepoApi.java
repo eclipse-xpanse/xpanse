@@ -59,11 +59,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>202</b> - Accepted
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformAsyncDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -75,11 +75,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>202</b> - Accepted
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformAsyncDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
@@ -119,11 +119,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>202</b> - Accepted
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformAsyncDestroyFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -135,11 +135,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>202</b> - Accepted
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformAsyncDestroyFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
@@ -179,11 +179,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return TerraformResult
@@ -196,11 +196,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
@@ -224,7 +224,7 @@ public class TerraformFromGitRepoApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "*/*", "application/json"
+            "application/json", "*/*"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -240,11 +240,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformDestroyFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return TerraformResult
@@ -257,11 +257,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformDestroyFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
@@ -285,7 +285,7 @@ public class TerraformFromGitRepoApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "*/*", "application/json"
+            "application/json", "*/*"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -301,11 +301,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformPlanFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return TerraformPlan
@@ -318,11 +318,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformPlanFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformPlan&gt;
@@ -346,7 +346,7 @@ public class TerraformFromGitRepoApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "*/*", "application/json"
+            "application/json", "*/*"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -362,11 +362,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformDeployFromGitRepoRequest  (required)
      * @return TerraformValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -378,11 +378,11 @@ public class TerraformFromGitRepoApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>502</b> - Bad Gateway
-     * <p><b>422</b> - Unprocessable Entity
-     * <p><b>400</b> - Bad Request
-     * <p><b>503</b> - Service Unavailable
      * <p><b>200</b> - OK
+     * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
      * @param terraformDeployFromGitRepoRequest  (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -402,7 +402,7 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = { 
-            "*/*", "application/json"
+            "application/json", "*/*"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 

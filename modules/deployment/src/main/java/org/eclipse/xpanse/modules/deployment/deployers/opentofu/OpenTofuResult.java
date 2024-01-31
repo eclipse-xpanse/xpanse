@@ -17,8 +17,9 @@ import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class OpenTofuExecutorResult extends SystemCmdResult {
+public class OpenTofuResult extends SystemCmdResult {
 
+    private String destroyScenario;
     private String terraformState;
     private Map<String, String> importantFileContentMap = new HashMap<>();
 

@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.orchestrator.deployment;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DestroyScenario;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 
 /**
@@ -37,6 +38,14 @@ public class DeployTask {
      */
     private Ocl ocl;
 
+    /**
+     * The id of the service template.
+     */
     private UUID serviceTemplateId;
+
+    /**
+     * The action of the deployment task.
+     */
+    private DestroyScenario destroyScenario;
 
 }

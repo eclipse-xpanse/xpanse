@@ -15,21 +15,18 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
-import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuProviderNotFoundException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -51,14 +48,13 @@ public class OpenTofuDeployment implements Deployer {
 
     public static final String VERSION_FILE_NAME = "version.tf";
     public static final String SCRIPT_FILE_NAME = "resources.tf";
-    public static final String STATE_FILE_NAME = "terraform.tfstate";
+    public static final String STATE_FILE_NAME = "openTofu.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
     private final DeployEnvironments deployEnvironments;
     private final OpenTofuLocalConfig openTofuLocalConfig;
     private final PluginManager pluginManager;
     private final Executor taskExecutor;
     private final OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
-    private final ResourceHandlerManager resourceHandlerManager;
     private final DeployServiceEntityHandler deployServiceEntityHandler;
 
     /**
@@ -69,15 +65,13 @@ public class OpenTofuDeployment implements Deployer {
                               OpenTofuLocalConfig openTofuLocalConfig, PluginManager pluginManager,
                               @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
                               OpenTofuDeploymentResultCallbackManager
-                                          openTofuDeploymentResultCallbackManager,
-                              DeployServiceEntityHandler deployServiceEntityHandler,
-                              ResourceHandlerManager resourceHandlerManager) {
+                                      openTofuDeploymentResultCallbackManager,
+                              DeployServiceEntityHandler deployServiceEntityHandler) {
         this.deployEnvironments = deployEnvironments;
         this.openTofuLocalConfig = openTofuLocalConfig;
         this.pluginManager = pluginManager;
         this.taskExecutor = taskExecutor;
         this.openTofuDeploymentResultCallbackManager = openTofuDeploymentResultCallbackManager;
-        this.resourceHandlerManager = resourceHandlerManager;
         this.deployServiceEntityHandler = deployServiceEntityHandler;
     }
 
@@ -90,7 +84,7 @@ public class OpenTofuDeployment implements Deployer {
     public DeployResult deploy(DeployTask task) {
         DeployResult deployResult = new DeployResult();
         deployResult.setId(task.getId());
-        asyncExecDeploy(task, deployResult);
+        asyncExecDeploy(task);
         return deployResult;
     }
 
@@ -103,7 +97,7 @@ public class OpenTofuDeployment implements Deployer {
     @Override
     public DeployResult destroy(DeployTask task) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+                deployServiceEntityHandler.getDeployServiceEntity(task.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         if (StringUtils.isBlank(resourceState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
@@ -113,11 +107,11 @@ public class OpenTofuDeployment implements Deployer {
         }
         DeployResult destroyResult = new DeployResult();
         destroyResult.setId(task.getId());
-        asyncExecDestroy(task, destroyResult, resourceState);
+        asyncExecDestroy(task, resourceState);
         return destroyResult;
     }
 
-    private void asyncExecDeploy(DeployTask task, DeployResult deployResult) {
+    private void asyncExecDeploy(DeployTask task) {
         String workspace = getWorkspacePath(task.getId().toString());
         // Create the workspace.
         buildWorkspace(workspace);
@@ -126,91 +120,43 @@ public class OpenTofuDeployment implements Deployer {
         OpenTofuExecutor executor = getExecutorForDeployTask(task, workspace, true);
         // Execute the OpenTofu command asynchronously.
         taskExecutor.execute(() -> {
+            OpenTofuResult openTofuResult = new OpenTofuResult();
             try {
                 executor.deploy();
-                deployResult.setState(DeployerTaskStatus.DEPLOY_SUCCESS);
-                deployResult.setMessage(DeployerTaskStatus.DEPLOY_SUCCESS.toValue());
+                openTofuResult.setCommandSuccessful(true);
             } catch (OpenTofuExecutorException tfEx) {
                 log.error("Execute OpenTofu deploy script failed. {}", tfEx.getMessage());
-                deployResult.setState(DeployerTaskStatus.DEPLOY_FAILED);
-                deployResult.setMessage(tfEx.getMessage());
+                openTofuResult.setCommandSuccessful(false);
+                openTofuResult.setCommandStdError(tfEx.getMessage());
             }
-            handleOpenTofuExecuteResult(executor, task, deployResult,
-                    DeployerTaskStatus.DEPLOY_FAILED);
-            openTofuDeploymentResultCallbackManager.deployCallback(task.getId().toString(),
-                    getOpenTofuExecutorResult(executor, deployResult,
-                            DeployerTaskStatus.DEPLOY_SUCCESS));
+            openTofuResult.setTerraformState(executor.getTerraformState());
+            openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            openTofuDeploymentResultCallbackManager.deployCallback(task.getId(), openTofuResult);
         });
     }
 
-    private void asyncExecDestroy(DeployTask task, DeployResult destroyResult, String tfState) {
+    private void asyncExecDestroy(DeployTask task, String tfState) {
         String taskId = task.getId().toString();
         String workspace = getWorkspacePath(taskId);
         createDestroyScriptFile(task.getDeployRequest().getCsp(),
                 task.getDeployRequest().getRegion(), workspace, tfState);
         OpenTofuExecutor executor = getExecutorForDeployTask(task, workspace, false);
-        // Execute the OpenTofu command asynchronously.
+        // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
+            OpenTofuResult openTofuResult = new OpenTofuResult();
+            openTofuResult.setDestroyScenario(task.getDestroyScenario().toValue());
             try {
                 executor.destroy();
-                destroyResult.setState(DeployerTaskStatus.DESTROY_SUCCESS);
-                destroyResult.setMessage(DeployerTaskStatus.DESTROY_SUCCESS.toValue());
+                openTofuResult.setCommandSuccessful(true);
             } catch (OpenTofuExecutorException tfEx) {
-                log.error("Execute OpenTofu deploy script failed. {}", tfEx.getMessage());
-                destroyResult.setState(DeployerTaskStatus.DESTROY_FAILED);
-                destroyResult.setMessage(tfEx.getMessage());
+                log.error("Execute openTofu destroy script failed. {}", tfEx.getMessage());
+                openTofuResult.setCommandSuccessful(false);
+                openTofuResult.setCommandStdError(tfEx.getMessage());
             }
-            handleOpenTofuExecuteResult(executor, task, destroyResult,
-                    DeployerTaskStatus.DESTROY_FAILED);
-            openTofuDeploymentResultCallbackManager.destroyCallback(task.getId().toString(),
-                    getOpenTofuExecutorResult(executor, destroyResult,
-                            DeployerTaskStatus.DESTROY_SUCCESS));
+            openTofuResult.setTerraformState(executor.getTerraformState());
+            openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            openTofuDeploymentResultCallbackManager.destroyCallback(task.getId(), openTofuResult);
         });
-    }
-
-    private OpenTofuExecutorResult getOpenTofuExecutorResult(OpenTofuExecutor executor,
-                                                             DeployResult deployResult,
-                                                             DeployerTaskStatus state) {
-        OpenTofuExecutorResult openTofuExecutorResult = new OpenTofuExecutorResult();
-        openTofuExecutorResult.setTerraformState(executor.getTerraformState());
-        if (deployResult.getState() == state) {
-            openTofuExecutorResult.setCommandStdOutput(deployResult.getMessage());
-            openTofuExecutorResult.setCommandSuccessful(true);
-        } else {
-            openTofuExecutorResult.setCommandSuccessful(false);
-            openTofuExecutorResult.setCommandStdError(deployResult.getMessage());
-        }
-        openTofuExecutorResult.setImportantFileContentMap(executor.getImportantFilesContent());
-        return openTofuExecutorResult;
-    }
-
-    private void handleOpenTofuExecuteResult(OpenTofuExecutor executor, DeployTask task,
-                                             DeployResult result, DeployerTaskStatus failedState) {
-        Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
-        if (!importantFileContentMap.isEmpty()) {
-            result.getPrivateProperties().putAll(importantFileContentMap);
-        }
-        String tfState = null;
-        try {
-            tfState = executor.getTerraformState();
-        } catch (OpenTofuExecutorException tfEx) {
-            log.error("Read OpenTofu state file failed. {}", tfEx.getMessage());
-            result.setState(failedState);
-            result.setMessage(tfEx.getMessage());
-        }
-        if (Objects.nonNull(tfState)) {
-            if (StringUtils.isNotEmpty(tfState)) {
-                result.getPrivateProperties().put(STATE_FILE_NAME, tfState);
-            }
-            try {
-                resourceHandlerManager.getResourceHandler(task.getDeployRequest().getCsp(),
-                        task.getOcl().getDeployment().getKind()).handler(result);
-            } catch (OpenTofuExecutorException tfEx) {
-                log.error("Handle OpenTofu resources failed. {}", tfEx.getMessage());
-                result.setState(DeployerTaskStatus.DEPLOY_FAILED);
-                result.setMessage(tfEx.getMessage());
-            }
-        }
     }
 
     @Override

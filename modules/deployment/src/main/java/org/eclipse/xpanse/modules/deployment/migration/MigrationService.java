@@ -74,7 +74,7 @@ public class MigrationService {
         if (CollectionUtils.isEmpty(serviceMigrationEntities)) {
             return null;
         }
-        return serviceMigrationEntities.get(0);
+        return serviceMigrationEntities.getFirst();
     }
 
 

@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DestroyScenario;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
@@ -109,7 +110,6 @@ public class DeployService {
     }
 
 
-
     private String generateCustomerServiceName(DeployRequest deployRequest) {
         if (deployRequest.getServiceName().length() > 5) {
             return deployRequest.getServiceName().substring(0, 4) + "-"
@@ -178,11 +178,10 @@ public class DeployService {
                 rollbackOnDeploymentFailure(deployTask, updatedDeployServiceEntity);
             }
         } catch (RuntimeException e) {
-            log.info("Deploy service with id:{} update database entity failed.",
+            log.error("Deploy service with id:{} update database entity failed.",
                     deployTask.getId(), e);
         }
     }
-
 
 
     /**
@@ -193,45 +192,48 @@ public class DeployService {
         log.info("Performing rollback of already provisioned resources.");
         if (Objects.nonNull(deployServiceEntity.getDeployResourceList())
                 && !deployServiceEntity.getDeployResourceList().isEmpty()) {
-            log.info("destroying created resources for service with ID: {}", deployTask.getId());
-            destroy(deployTask, deployServiceEntity, true);
+            log.info("Rollback to destroy created resources for service with ID: {}",
+                    deployTask.getId());
+            deployTask.setDestroyScenario(DestroyScenario.ROLLBACK);
+            destroy(deployTask, deployServiceEntity);
         }
     }
 
     /**
      * Async method to destroy service.
      *
-     * @param deployTask          deployTask
+     * @param destroyTask         destroyTask.
      * @param deployServiceEntity deployServiceEntity
      */
-    public void destroyService(DeployTask deployTask, DeployServiceEntity deployServiceEntity) {
-        destroy(deployTask, deployServiceEntity, false);
+    public void destroyService(DeployTask destroyTask, DeployServiceEntity deployServiceEntity) {
+        destroyTask.setDestroyScenario(DestroyScenario.DESTROY);
+        destroy(destroyTask, deployServiceEntity);
     }
 
     private void destroy(DeployTask destroyTask,
-                         DeployServiceEntity deployServiceEntity,
-                         boolean isCalledWhenRollback) {
+                         DeployServiceEntity deployServiceEntity) {
         MDC.put(TASK_ID, destroyTask.getId().toString());
         DeployResult destroyResult;
         Deployer deployer = deployerKindManager.getDeployment(
                 destroyTask.getOcl().getDeployment().getKind());
         try {
-            deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            if (DestroyScenario.DESTROY == destroyTask.getDestroyScenario()) {
+                deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
+                deployServiceStorage.storeAndFlush(deployServiceEntity);
+            }
             destroyResult = deployer.destroy(destroyTask);
         } catch (RuntimeException e) {
             log.info("Destroy service with id:{} failed.", destroyTask.getId(), e);
             destroyResult = new DeployResult();
             destroyResult.setId(destroyTask.getId());
-            destroyResult.setState(DeployerTaskStatus.DESTROY_FAILED);
-            destroyResult.setState(DeployerTaskStatus.DESTROY_FAILED);
+            destroyResult.setState(getDestroyTaskState(destroyTask.getDestroyScenario()));
             destroyResult.setMessage(e.getMessage());
         }
 
         try {
             DeployServiceEntity updatedDeployServiceEntity =
-                    deployResultManager.updateDeployServiceEntityWithDestroyResult(
-                            destroyResult, deployServiceEntity, isCalledWhenRollback);
+                    deployResultManager.updateDeployServiceEntityWithDeployResult(
+                            destroyResult, deployServiceEntity);
             if (ServiceDeploymentState.DESTROY_SUCCESS
                     == updatedDeployServiceEntity.getServiceDeploymentState()
                     || ServiceDeploymentState.DEPLOY_FAILED
@@ -239,40 +241,49 @@ public class DeployService {
                 deployer.deleteTaskWorkspace(destroyTask.getId().toString());
             }
         } catch (RuntimeException e) {
-            log.info("Destroy service with id:{} update database entity failed.",
+            log.error("Destroy service with id:{} update database entity failed.",
                     destroyTask.getId(), e);
         }
+    }
+
+    private DeployerTaskStatus getDestroyTaskState(DestroyScenario destroyScenario) {
+        return switch (destroyScenario) {
+            case DESTROY -> DeployerTaskStatus.DESTROY_FAILED;
+            case ROLLBACK -> DeployerTaskStatus.ROLLBACK_FAILED;
+            case PURGE -> DeployerTaskStatus.PURGE_FAILED;
+        };
     }
 
     /**
      * purge the service based on the serviceDeploymentState.
      *
-     * @param deployTask          deployTask
+     * @param destroyTask          destroyTask
      * @param deployServiceEntity deployServiceEntity
      */
-    public void purgeService(DeployTask deployTask, DeployServiceEntity deployServiceEntity) {
-        MDC.put(TASK_ID, deployTask.getId().toString());
+    public void purgeService(DeployTask destroyTask, DeployServiceEntity deployServiceEntity) {
+        MDC.put(TASK_ID, destroyTask.getId().toString());
         try {
             if (Objects.nonNull(deployServiceEntity.getDeployResourceList())
                     && !deployServiceEntity.getDeployResourceList().isEmpty()) {
                 log.info("destroying created resources for service with ID: {}",
-                        deployTask.getId());
-                destroy(deployTask, deployServiceEntity, false);
+                        destroyTask.getId());
+                destroyTask.setDestroyScenario(DestroyScenario.PURGE);
+                destroy(destroyTask, deployServiceEntity);
             }
             deployServiceStorage.deleteDeployService(deployServiceEntity);
             log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
         } catch (RuntimeException e) {
             log.error("Error purging created resources for service with ID: {}. Ignoring.",
-                    deployTask.getId(), e);
+                    destroyTask.getId(), e);
         }
     }
 
     /**
      * Deployment service.
      *
-     * @param newId             new service id.
-     * @param userId            user id.
-     * @param deployRequest     deploy request.
+     * @param newId         new service id.
+     * @param userId        user id.
+     * @param deployRequest deploy request.
      */
     public void deployServiceById(UUID newId, String userId, DeployRequest deployRequest) {
         MDC.put(TASK_ID, newId.toString());
@@ -293,7 +304,7 @@ public class DeployService {
                 .getDeployServiceEntity(UUID.fromString(id));
         DeployTask deployTask = deployServiceEntityToDeployTaskConverter
                 .getDeployTaskByStoredService(deployServiceEntity);
-        destroy(deployTask, deployServiceEntity, false);
+        destroy(deployTask, deployServiceEntity);
     }
 
     /**
@@ -328,6 +339,7 @@ public class DeployService {
         ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
         if (!(state == ServiceDeploymentState.DEPLOY_FAILED
                 || state == ServiceDeploymentState.DESTROY_SUCCESS
+                || state == ServiceDeploymentState.DESTROY_FAILED
                 || state == ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED)) {
             throw new InvalidServiceStateException(
                     String.format("Service %s is not in the state allowed for purging.",
