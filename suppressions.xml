@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ SPDX-FileCopyrightText: Huawei Inc.
+  -->
+
 <!DOCTYPE suppressions PUBLIC
         "-//Puppy Crawl//DTD Suppressions 1.1//EN"
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-    <suppress files="[\\/]modules[\\/]deployment[\\/]src[\\/]main[\\/]java[\\/]org[\\/]eclipse[\\/]xpanse[\\/]modules[\\/]deployment[\\/]deployers[\\/]terraform[\\/]terraformboot[\\/]" checks=".*"/>
+    <suppress files="[\\/]modules[\\/]deployment[\\/]src[\\/]main[\\/]java[\\/]org[\\/]eclipse[\\/]xpanse[\\/]modules[\\/]deployment[\\/]deployers[\\/]terraform[\\/]terraformboot[\\/]generated[\\/]" checks=".*"/>
     <suppress files="[\\/]modules[\\/]policy[\\/]src[\\/]main[\\/]java[\\/]org[\\/]eclipse[\\/]xpanse[\\/]modules[\\/]policy[\\/]policyman[\\/]generated[\\/]" checks=".*"/>
 </suppressions>

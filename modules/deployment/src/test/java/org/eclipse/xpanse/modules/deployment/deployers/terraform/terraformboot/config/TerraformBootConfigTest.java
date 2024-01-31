@@ -1,7 +1,13 @@
-package org.eclipse.xpanse.modules.deployment.deployers.terraform.config;
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config.TerraformBootConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;

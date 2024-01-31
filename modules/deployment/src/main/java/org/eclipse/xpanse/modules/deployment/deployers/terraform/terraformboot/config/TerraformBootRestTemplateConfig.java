@@ -1,10 +1,9 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
-package org.eclipse.xpanse.modules.deployment.deployers.terraform.config;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config;
 
 import jakarta.annotation.Resource;
 import java.util.Collections;

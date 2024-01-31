@@ -1,5 +1,11 @@
-package org.eclipse.xpanse.modules.deployment.deployers.terraform.config;
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
 
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config;
+
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config.TerraformBootRestTemplateConfig;
 import org.eclipse.xpanse.modules.logging.RestTemplateLoggingInterceptor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
