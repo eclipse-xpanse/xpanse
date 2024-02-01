@@ -7,8 +7,6 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,11 +14,13 @@ import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Defines the Deployment.
  */
 @Data
+@Validated
 public class Deployment implements Serializable {
 
     @Serial
@@ -38,10 +38,12 @@ public class Deployment implements Serializable {
     @Schema(description = "The credential type to do the deployment")
     private CredentialType credentialType = CredentialType.VARIABLES;
 
-    @NotNull
-    @NotBlank
-    @NotEmpty
-    @Schema(description = "The real deployer, something like terraform scripts...")
+    @Schema(description = "The real deployer, something like terraform scripts. "
+            + "Either deployer or deployFromGitRepo must be provided.")
     private String deployer;
+
+    @Schema(description = "Deployment scripts hosted on a GIT repo. "
+            + "Either deployer or deployFromGitRepo must be provided.")
+    private ScriptsRepo scriptsRepo;
 
 }

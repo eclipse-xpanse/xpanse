@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api;
 
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;

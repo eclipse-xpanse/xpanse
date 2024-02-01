@@ -1,7 +1,6 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
 package org.eclipse.xpanse.modules.models.servicetemplate;
@@ -49,7 +48,6 @@ class DeploymentTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(deployment, deployment);
         assertEquals(deployment.hashCode(), deployment.hashCode());
 
         Object obj = new Object();
@@ -95,9 +93,10 @@ class DeploymentTest {
     void testToString() {
         String expectedString = "Deployment(" +
                 "kind=" + kind +
-                ", variables=" + variables + "" +
-                ", credentialType=" + credentialType + "" +
-                ", deployer=" + deployer + "" +
+                ", variables=" + variables +
+                ", credentialType=" + credentialType +
+                ", deployer=" + deployer +
+                ", scriptsRepo=null" +
                 ")";
         assertEquals(expectedString, deployment.toString());
     }

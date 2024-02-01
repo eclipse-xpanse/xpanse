@@ -1,7 +1,6 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
 package org.eclipse.xpanse.runtime;
@@ -20,7 +19,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformBootManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;

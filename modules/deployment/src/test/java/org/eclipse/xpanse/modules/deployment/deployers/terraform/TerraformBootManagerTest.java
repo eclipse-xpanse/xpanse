@@ -1,7 +1,6 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform;
@@ -9,6 +8,8 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootHelper;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.AdminApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformBootSystemStatus;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
@@ -28,6 +29,9 @@ class TerraformBootManagerTest {
 
     @Mock
     private AdminApi mockTerraformApi;
+
+    @Mock
+    private TerraformBootHelper terraformBootHelper;
 
     @InjectMocks
     private TerraformBootManager terraformBootManagerUnderTest;

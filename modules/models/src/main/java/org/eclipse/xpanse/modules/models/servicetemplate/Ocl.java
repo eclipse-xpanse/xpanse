@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.validators.DeploymentScriptsConstraint;
 
 /**
  * Defines for OCLv2.
@@ -79,6 +80,7 @@ public class Ocl implements Serializable {
 
     @Valid
     @NotNull
+    @DeploymentScriptsConstraint
     @Schema(description = "The deployment of the managed service")
     private Deployment deployment;
 

@@ -2,7 +2,6 @@
 <!--
   ~ SPDX-License-Identifier: Apache-2.0
   ~ SPDX-FileCopyrightText: Huawei Inc.
-  ~
   -->
 
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -100,6 +99,12 @@
                     <artifactId>commons-lang3</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-junit</artifactId>
+            <version>${instancio.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

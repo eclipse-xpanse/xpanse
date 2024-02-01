@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.deployment.deployers.terraform;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
 import jakarta.annotation.Resource;
 import java.util.Arrays;
@@ -14,8 +14,8 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
-import org.eclipse.xpanse.modules.security.common.CurrentUserInfoHolder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
@@ -24,10 +24,10 @@ import org.springframework.web.client.RestClientException;
  */
 @Slf4j
 @Component
+@Profile("terraform-boot")
 public class TerraformBootManager {
 
     private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
-    private static final String ZITADEL_PROFILE_NAME = "zitadel";
 
     @Resource
     private AdminApi terraformAdminApi;
@@ -35,6 +35,8 @@ public class TerraformBootManager {
     private String springProfilesActive;
     @Value("${terraform.boot.endpoint:http://localhost:9090}")
     private String terraformBootBaseUrl;
+    @Resource
+    private TerraformBootHelper terraformBootHelper;
 
     /**
      * Get system status of TerraformBoot.
@@ -50,11 +52,7 @@ public class TerraformBootManager {
             terraformBootStatus.setEndpoint(terraformBootBaseUrl);
 
             try {
-                List<String> profileList = Arrays.asList(springProfilesActive.split(","));
-                if (profileList.contains(ZITADEL_PROFILE_NAME)) {
-                    terraformAdminApi.getApiClient().setAccessToken(
-                            CurrentUserInfoHolder.getToken());
-                }
+                terraformBootHelper.setHeaderTokenByProfiles();
                 TerraformBootSystemStatus terraformBootSystemStatus =
                         terraformAdminApi.healthCheck();
                 terraformBootStatus.setHealthStatus(HealthStatus.valueOf(

@@ -6,6 +6,11 @@ import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.Operation;
 import java.util.List;
 import org.eclipse.xpanse.api.controllers.AdminServicesApi;
+import org.eclipse.xpanse.modules.database.DatabaseManager;
+import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthCheck;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.policy.PolicyManager;
+import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.zitadel.config.openapi.RequiredRoleDescriptionCustomizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +40,9 @@ class RequiredRoleDescriptionCustomizerTest {
         operation.externalDocs(externalDocs);
 
         final HandlerMethod handlerMethod =
-                new HandlerMethod(new AdminServicesApi(), "healthCheck", null);
+                new HandlerMethod(new AdminServicesApi(new IdentityProviderManager(), new PluginManager(),
+                        new DatabaseManager(), null, new PolicyManager(),
+                        new OpenTelemetryCollectorHealthCheck()), "healthCheck", null);
         final Operation expectedResult = new Operation();
         expectedResult.tags(List.of("value"));
         expectedResult.summary("summary");

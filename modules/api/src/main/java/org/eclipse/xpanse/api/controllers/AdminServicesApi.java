@@ -1,7 +1,6 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
 package org.eclipse.xpanse.api.controllers;
@@ -13,7 +12,7 @@ import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
+import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformBootManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
@@ -54,23 +53,29 @@ import org.springframework.web.bind.annotation.RestController;
 @Secured({ROLE_ADMIN})
 public class AdminServicesApi {
 
-    @Resource
-    private IdentityProviderManager identityProviderManager;
+    private final IdentityProviderManager identityProviderManager;
+    private final PluginManager pluginManager;
+    private final DatabaseManager databaseManager;
+    private final TerraformBootManager terraformBootManager;
+    private final PolicyManager policyManager;
+    private final OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
 
-    @Resource
-    private PluginManager pluginManager;
-
-    @Resource
-    private DatabaseManager databaseManager;
-
-    @Resource
-    private TerraformBootManager terraformBootManager;
-
-    @Resource
-    private PolicyManager policyManager;
-
-    @Resource
-    private OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
+    /**
+     * Constructor for AdminServicesApi bean.
+     */
+    public AdminServicesApi(IdentityProviderManager identityProviderManager,
+                            PluginManager pluginManager,
+                            DatabaseManager databaseManager,
+                            @Nullable TerraformBootManager terraformBootManager,
+                            PolicyManager policyManager,
+                            OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck) {
+        this.identityProviderManager = identityProviderManager;
+        this.pluginManager = pluginManager;
+        this.databaseManager = databaseManager;
+        this.terraformBootManager = terraformBootManager;
+        this.policyManager = policyManager;
+        this.openTelemetryHealthCheck = openTelemetryHealthCheck;
+    }
 
 
     /**
@@ -148,7 +153,8 @@ public class AdminServicesApi {
                     backendSystemStatuses.add(databaseStatus);
                 }
             }
-            if (type == BackendSystemType.TERRAFORM_BOOT) {
+            if (Objects.nonNull(terraformBootManager)
+                    && type == BackendSystemType.TERRAFORM_BOOT) {
                 BackendSystemStatus terraformBootStatus =
                         terraformBootManager.getTerraformBootStatus();
                 if (Objects.nonNull(terraformBootStatus)) {
@@ -163,7 +169,6 @@ public class AdminServicesApi {
                 }
             }
             if (type == BackendSystemType.OPEN_TELEMETRY_COLLECTOR) {
-
                 BackendSystemStatus otelExporterStatus =
                         openTelemetryHealthCheck.getOpenTelemetryHealthStatus();
                 if (Objects.nonNull(otelExporterStatus)) {
