@@ -1,8 +1,13 @@
-package org.eclipse.xpanse.modules.deployment.deployers.terraform;
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.SCRIPT_FILE_NAME;
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.VERSION_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.SCRIPT_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.VERSION_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,7 +26,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfState;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfState;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
@@ -37,7 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class TerraformExecutorTest {
+class TerraformLocalExecutorTest {
     private static final String workspace =
             System.getProperty("java.io.tmpdir") + "/terraform_workspace/" + UUID.randomUUID();
     private static final String version = "~> 1.51.0";
@@ -45,7 +50,7 @@ class TerraformExecutorTest {
     private Map<String, String> mockEnv;
     @Mock
     private Map<String, Object> mockVariables;
-    private TerraformExecutor terraformExecutorUnderTest;
+    private TerraformLocalExecutor terraformLocalExecutorUnderTest;
 
     @BeforeAll
     static void initWorkSpace() throws Exception {
@@ -81,7 +86,8 @@ class TerraformExecutorTest {
 
     @BeforeEach
     void setUp() {
-        terraformExecutorUnderTest = new TerraformExecutor(mockEnv, mockVariables, workspace);
+        terraformLocalExecutorUnderTest = new TerraformLocalExecutor(
+                mockEnv, mockVariables, workspace, null);
     }
 
     @Test
@@ -92,7 +98,7 @@ class TerraformExecutorTest {
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(Collections.emptyList());
         // Run the test
-        final DeployValidationResult result = terraformExecutorUnderTest.tfValidate();
+        final DeployValidationResult result = terraformLocalExecutorUnderTest.tfValidate();
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -102,7 +108,7 @@ class TerraformExecutorTest {
     @Order(2)
     void testTfInit() {
         // Run the test
-        final SystemCmdResult result = terraformExecutorUnderTest.tfInit();
+        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfInit();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -112,14 +118,14 @@ class TerraformExecutorTest {
     @Test
     @Order(3)
     void testGetTerraformPlanAsJson() {
-        assertNotNull(terraformExecutorUnderTest.getTerraformPlanAsJson());
+        assertNotNull(terraformLocalExecutorUnderTest.getTerraformPlanAsJson());
     }
 
     @Test
     @Order(4)
     void testTfPlan() {
         // Run the test
-        final SystemCmdResult result = terraformExecutorUnderTest.tfPlan();
+        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfPlan();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -132,7 +138,7 @@ class TerraformExecutorTest {
     void testTfPlanWithOutput() {
         // Setup
         // Run the test
-        final SystemCmdResult result = terraformExecutorUnderTest.tfPlanWithOutput();
+        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfPlanWithOutput();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -144,7 +150,7 @@ class TerraformExecutorTest {
     @Order(6)
     void testTfApply() {
         // Run the test
-        final SystemCmdResult result = terraformExecutorUnderTest.tfApply();
+        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfApply();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -156,7 +162,7 @@ class TerraformExecutorTest {
     @Order(7)
     void testTfDestroy() {
         // Run the test
-        final SystemCmdResult result = terraformExecutorUnderTest.tfDestroy();
+        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfDestroy();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -170,10 +176,10 @@ class TerraformExecutorTest {
     void testDeploy() throws JsonProcessingException {
         // Setup
         // Run the test
-        terraformExecutorUnderTest.deploy();
+        terraformLocalExecutorUnderTest.deploy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(terraformExecutorUnderTest.getTerraformState(),
+                new ObjectMapper().readValue(terraformLocalExecutorUnderTest.getTerraformState(),
                         TfState.class);
         assertFalse(tfState.getOutputs().isEmpty());
     }
@@ -183,10 +189,10 @@ class TerraformExecutorTest {
     void testDestroy() throws JsonProcessingException {
         // Setup
         // Run the test
-        terraformExecutorUnderTest.destroy();
+        terraformLocalExecutorUnderTest.destroy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(terraformExecutorUnderTest.getTerraformState(),
+                new ObjectMapper().readValue(terraformLocalExecutorUnderTest.getTerraformState(),
                         TfState.class);
         assertTrue(tfState.getOutputs().isEmpty());
     }
@@ -196,7 +202,7 @@ class TerraformExecutorTest {
     void testGetImportantFilesContent() throws Exception {
         // Setup
         // Run the test
-        final Map<String, String> result = terraformExecutorUnderTest.getImportantFilesContent();
+        final Map<String, String> result = terraformLocalExecutorUnderTest.getImportantFilesContent();
         // Verify the results
         assertTrue(result.containsKey("terraform.tfstate.backup"));
 

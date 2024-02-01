@@ -112,7 +112,7 @@ public class OpenTofuDeployment implements Deployer {
     }
 
     private void asyncExecDeploy(DeployTask task) {
-        String workspace = getWorkspacePath(task.getId().toString());
+        String workspace = getWorkspacePath(task.getId());
         // Create the workspace.
         buildWorkspace(workspace);
         createScriptFile(task.getDeployRequest().getCsp(), task.getDeployRequest().getRegion(),
@@ -136,8 +136,7 @@ public class OpenTofuDeployment implements Deployer {
     }
 
     private void asyncExecDestroy(DeployTask task, String tfState) {
-        String taskId = task.getId().toString();
-        String workspace = getWorkspacePath(taskId);
+        String workspace = getWorkspacePath(task.getId());
         createDestroyScriptFile(task.getDeployRequest().getCsp(),
                 task.getDeployRequest().getRegion(), workspace, tfState);
         OpenTofuExecutor executor = getExecutorForDeployTask(task, workspace, false);
@@ -161,7 +160,7 @@ public class OpenTofuDeployment implements Deployer {
 
     @Override
     public String getDeploymentPlanAsJson(DeployTask task) {
-        String workspace = getWorkspacePath(task.getId().toString());
+        String workspace = getWorkspacePath(task.getId());
         // Create the workspace.
         buildWorkspace(workspace);
         createScriptFile(task.getDeployRequest().getCsp(), task.getDeployRequest().getRegion(),
@@ -172,7 +171,7 @@ public class OpenTofuDeployment implements Deployer {
     }
 
     @Override
-    public void deleteTaskWorkspace(String taskId) {
+    public void deleteTaskWorkspace(UUID taskId) {
         String workspace = getWorkspacePath(taskId);
         deleteWorkSpace(workspace);
     }
@@ -291,7 +290,7 @@ public class OpenTofuDeployment implements Deployer {
      * @param workspace The workspace of the task.
      */
     private void buildWorkspace(String workspace) {
-        log.info("start create workspace");
+        log.info("start creating workspace");
         File ws = new File(workspace);
         if (!ws.exists() && !ws.mkdirs()) {
             throw new OpenTofuExecutorException(
@@ -305,7 +304,7 @@ public class OpenTofuDeployment implements Deployer {
      *
      * @param taskId The id of the task.
      */
-    private String getWorkspacePath(String taskId) {
+    private String getWorkspacePath(UUID taskId) {
         return System.getProperty("java.io.tmpdir") + File.separator
                 + openTofuLocalConfig.getWorkspaceDirectory() + File.separator + taskId;
     }
@@ -323,7 +322,7 @@ public class OpenTofuDeployment implements Deployer {
      * Validates the OpenTofu script.
      */
     public DeployValidationResult validate(Ocl ocl) {
-        String workspace = getWorkspacePath(UUID.randomUUID().toString());
+        String workspace = getWorkspacePath(UUID.randomUUID());
         // Create the workspace.
         buildWorkspace(workspace);
         createScriptFile(ocl.getCloudServiceProvider().getName(),

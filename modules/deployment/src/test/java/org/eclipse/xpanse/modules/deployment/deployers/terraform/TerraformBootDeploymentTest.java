@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlan;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -61,7 +62,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 TerraformFromScriptsApi.class, TerraformBootConfig.class, DeployServiceEntityHandler.class, TerraformBootScriptValidator.class,
         TerraformBootServiceDeployer.class, TerraformBootDeployment.class, TerraformFromGitRepoApi.class,
         TerraformBootHelper.class, AdminApi.class, TerraformBootDeploymentPlanManage.class,
-TerraformBootServiceDestroyer.class})
+TerraformBootServiceDestroyer.class, TerraformProviderHelper.class})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("terraform-boot")
 class TerraformBootDeploymentTest {

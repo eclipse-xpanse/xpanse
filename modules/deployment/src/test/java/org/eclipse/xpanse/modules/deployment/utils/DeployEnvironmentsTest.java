@@ -182,6 +182,7 @@ class DeployEnvironmentsTest {
         expectedResult.put("key1", null);
         expectedResult.put("key2", "value2");
         expectedResult.put("example", null);
+        expectedResult.put("region", null);
 
         final Map<String, Object> result = deployEnvironmentsUnderTest.getVariablesFromDeployTask(task, true);
 

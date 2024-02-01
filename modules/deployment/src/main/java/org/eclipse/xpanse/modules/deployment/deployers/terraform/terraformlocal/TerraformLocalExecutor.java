@@ -1,14 +1,14 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  * SPDX-FileCopyrightText: Huawei Inc.
- *
  */
 
-package org.eclipse.xpanse.modules.deployment.deployers.terraform;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +27,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult
  * An executor for terraform.
  */
 @Slf4j
-public class TerraformExecutor {
+public class TerraformLocalExecutor {
 
     private static final String VARS_FILE_NAME = "variables.tfvars.json";
     private static final String STATE_FILE_NAME = "terraform.tfstate";
@@ -50,11 +50,16 @@ public class TerraformExecutor {
      * @param variables variables for the terraform command line.
      * @param workspace workspace for the terraform command line.
      */
-    TerraformExecutor(Map<String, String> env, Map<String, Object> variables,
-                      String workspace) {
+    TerraformLocalExecutor(Map<String, String> env,
+                           Map<String, Object> variables,
+                           String workspace,
+                           @Nullable String subDirectory) {
         this.env = env;
         this.variables = variables;
-        this.workspace = workspace;
+        this.workspace =
+                Objects.nonNull(subDirectory)
+                        ? workspace + File.separator + subDirectory
+                        : workspace;
     }
 
     /**

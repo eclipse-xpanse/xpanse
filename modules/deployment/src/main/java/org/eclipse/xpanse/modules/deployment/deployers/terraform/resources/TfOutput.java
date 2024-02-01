@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.deployment.deployers.terraform.resource;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform.resources;
 
 import lombok.Data;
 

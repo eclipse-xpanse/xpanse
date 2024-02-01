@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine.resourcehandler;
 
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.TerraformDeployment.STATE_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.STATE_FILE_NAME;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -16,10 +16,10 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfOutput;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfState;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResource;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStateResourceInstance;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfOutput;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfState;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfStateResource;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfStateResourceInstance;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;

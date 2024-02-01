@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.exceptions.GitRepoCloneException;
 import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
@@ -182,5 +183,17 @@ public class CommonExceptionHandler {
             UserNotLoggedInException ex) {
         return Response.errorResponse(ResultType.USER_NO_LOGIN_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for GitRepoCloneException.
+     */
+    @ExceptionHandler({GitRepoCloneException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response handleGitRepoCloneException(GitRepoCloneException ex) {
+        log.error("GitRepoCloneException: ", ex);
+        String failMessage = ex.getMessage();
+        return Response.errorResponse(ResultType.INVALID_GIT_REPO_DETAILS,
+                Collections.singletonList(failMessage));
     }
 }
