@@ -4,16 +4,19 @@
  *
  */
 
-package org.eclipse.xpanse.modules.deployment.deployers.opentofu;
+package org.eclipse.xpanse.modules.deployment.deployers.terraform;
 
-import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.OpenTofuDeployment.STATE_FILE_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.STATE_FILE_NAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -22,10 +25,14 @@ import org.eclipse.xpanse.modules.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.config.OpenTofuLocalConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
+import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
@@ -36,6 +43,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -49,23 +58,33 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
- * Test for OpenTofuDeploy.
+ * Test for TerraformDeploy.
  */
 
 @ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = {OpenTofuDeployment.class, DeployEnvironments.class,
-        PluginManager.class, OpenTofuLocalConfig.class, DeployService.class,
-        TaskConfiguration.class, ResourceHandlerManager.class})
-class OpenTofuDeploymentTest {
+@ContextConfiguration(classes = {TerraformLocalDeployment.class, DeployEnvironments.class,
+        PluginManager.class, TerraformLocalConfig.class, DeployService.class,
+        TaskConfiguration.class,
+        ResourceHandlerManager.class, TerraformProviderHelper.class, ScriptsGitRepoManage.class})
+class TerraformLocalDeploymentTest {
 
     private final UUID id = UUID.randomUUID();
     private final String errorDeployer = "error_deployer";
+    private final String invalidDeployer = """
+            resource "random_id" "new" {
+              byte_length = 4
+            }
+                                    
+            output "random_id" {
+              value = resource.random_id_2.new.id
+            }
+            """;
     @Autowired
-    OpenTofuDeployment openTofuDeployment;
+    TerraformLocalDeployment terraformLocalDeployment;
     @MockBean
     DeployEnvironments deployEnvironments;
     @MockBean
-    OpenTofuLocalConfig openTofuLocalConfig;
+    TerraformLocalConfig terraformLocalConfig;
     @MockBean
     PluginManager pluginManager;
     @MockBean
@@ -73,7 +92,7 @@ class OpenTofuDeploymentTest {
     @MockBean
     Executor taskExecutor;
     @MockBean
-    OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+    TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
     @MockBean
     DeployServiceEntityHandler deployServiceEntityHandler;
     private DeployRequest deployRequest;
@@ -84,7 +103,7 @@ class OpenTofuDeploymentTest {
     @BeforeEach
     void setUp() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/opentofu_test.yaml").toURL());
+        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
 
         deployRequest = new DeployRequest();
         deployRequest.setOcl(ocl);
@@ -124,7 +143,7 @@ class OpenTofuDeploymentTest {
         deployTask.setId(id);
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
-        deployResult = openTofuDeployment.deploy(deployTask);
+        deployResult = terraformLocalDeployment.deploy(deployTask);
         Assertions.assertNotNull(deployResult);
         Assertions.assertNotNull(deployResult.getPrivateProperties());
         tfState = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
@@ -146,35 +165,26 @@ class OpenTofuDeploymentTest {
         when(this.deployEnvironments.getFlavorVariables(any(DeployTask.class))).thenReturn(
                 new HashMap<>());
         Assertions.assertThrows(ServiceNotDeployedException.class,
-                () -> openTofuDeployment.destroy(deployTask));
+                () -> terraformLocalDeployment.destroy(deployTask));
     }
 
     @Test
     @Order(3)
     void testDeleteTaskWorkspace() {
         String workspacePath = System.getProperty("java.io.tmpdir") + File.separator
-                + openTofuLocalConfig.getWorkspaceDirectory() + File.separator + id;
-        this.openTofuDeployment.deleteTaskWorkspace(id);
+                + terraformLocalConfig.getWorkspaceDirectory() + File.separator + id;
+        this.terraformLocalDeployment.deleteTaskWorkspace(id);
         Assertions.assertFalse(new File(workspacePath).exists());
     }
 
     @Test
-    void testDeploy_FailedCausedByOpenTofuExecutorException() {
-        String invalidDeployer = """
-                resource "random_id" "new" {
-                  byte_length = 4
-                }
-                                        
-                output "random_id" {
-                  value = resource.random_id_2.new.id
-                }
-                """;
+    void testDeploy_FailedCausedByTerraformExecutorException() {
         ocl.getDeployment().setDeployer(invalidDeployer);
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.randomUUID());
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
-        DeployResult deployResult = this.openTofuDeployment.deploy(deployTask);
+        DeployResult deployResult = this.terraformLocalDeployment.deploy(deployTask);
         Assertions.assertNull(deployResult.getState());
         Assertions.assertNotEquals(DeployerTaskStatus.DEPLOY_SUCCESS.toValue(),
                 deployResult.getMessage());
@@ -182,7 +192,7 @@ class OpenTofuDeploymentTest {
     }
 
     @Test
-    void testDestroy_FailedCausedByOpenTofuExecutorException() {
+    void testDestroy_FailedCausedByTerraformExecutorException() {
         try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
                 TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
@@ -192,7 +202,7 @@ class OpenTofuDeploymentTest {
             deployTask.setId(id);
             deployTask.setOcl(ocl);
             deployTask.setDeployRequest(deployRequest);
-            DeployResult deployResult = this.openTofuDeployment.destroy(deployTask);
+            DeployResult deployResult = this.terraformLocalDeployment.destroy(deployTask);
             Assertions.assertTrue(deployResult.getProperties().isEmpty());
             Assertions.assertNull(deployResult.getState());
             Assertions.assertNotEquals(DeployerTaskStatus.DESTROY_FAILED.toValue(),
@@ -202,9 +212,9 @@ class OpenTofuDeploymentTest {
 
     @Test
     void testGetDeployerKind() {
-        DeployerKind deployerKind = openTofuDeployment.getDeployerKind();
+        DeployerKind deployerKind = terraformLocalDeployment.getDeployerKind();
 
-        Assertions.assertEquals(DeployerKind.OPEN_TOFU, deployerKind);
+        Assertions.assertEquals(DeployerKind.TERRAFORM, deployerKind);
     }
 
     @Test
@@ -225,7 +235,7 @@ class OpenTofuDeploymentTest {
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
 
-        String deployPlanJson = openTofuDeployment.getDeploymentPlanAsJson(deployTask);
+        String deployPlanJson = terraformLocalDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
 
     }
@@ -238,11 +248,50 @@ class OpenTofuDeploymentTest {
         deployTask.setId(UUID.randomUUID());
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
-        deployResult = this.openTofuDeployment.deploy(deployTask);
+        deployResult = this.terraformLocalDeployment.deploy(deployTask);
 
-        Assertions.assertThrows(OpenTofuExecutorException.class,
-                () -> this.openTofuDeployment.getDeploymentPlanAsJson(deployTask));
+        Assertions.assertThrows(TerraformExecutorException.class,
+                () -> this.terraformLocalDeployment.getDeploymentPlanAsJson(deployTask));
 
+    }
+
+    @Test
+    void testValidate() {
+        DeployValidationResult expectedResult = new DeployValidationResult();
+        expectedResult.setValid(true);
+        expectedResult.setDiagnostics(new ArrayList<>());
+
+        // Run the test
+        final DeployValidationResult result = terraformLocalDeployment.validate(ocl);
+
+        // Verify the results
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testValidateFailed() {
+        ocl.getDeployment().setDeployer(invalidDeployer);
+
+        DeployValidationResult expectedResult = new DeployValidationResult();
+        expectedResult.setValid(false);
+        DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
+        diagnostics.setDetail(
+                "A managed resource \"random_id_2\" \"new\" has not been declared in the root module.");
+        expectedResult.setDiagnostics(List.of(diagnostics));
+
+        // Run the test
+        final DeployValidationResult result = terraformLocalDeployment.validate(ocl);
+
+        // Verify the results
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void testValidate_ThrowsTerraformExecutorException() {
+        ocl.getDeployment().setDeployer(errorDeployer);
+
+        Assertions.assertThrows(TerraformExecutorException.class,
+                () -> this.terraformLocalDeployment.validate(ocl));
     }
 
 }

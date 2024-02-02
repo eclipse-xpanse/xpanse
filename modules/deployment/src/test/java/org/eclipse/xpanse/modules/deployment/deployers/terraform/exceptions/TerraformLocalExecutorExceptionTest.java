@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test of TerraformExecutorException.
  */
-class TerraformExecutorExceptionTest {
+class TerraformLocalExecutorExceptionTest {
 
     private static final String message = "terraformExecutor exception.";
     private static final Throwable cause = new RuntimeException("Root cause");

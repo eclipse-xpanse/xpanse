@@ -138,10 +138,12 @@ public class DeployEnvironments {
      */
     public Map<String, Object> getVariablesFromDeployTask(DeployTask task,
                                                           boolean isDeployRequest) {
-        return getVariables(
+        Map<String, Object> variables = getVariables(
                 task.getDeployRequest().getServiceRequestProperties(),
                 task.getOcl().getDeployment().getVariables(),
                 isDeployRequest);
+        variables.put("region", task.getDeployRequest().getRegion());
+        return variables;
     }
 
     /**

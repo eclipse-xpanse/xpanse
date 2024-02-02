@@ -14,19 +14,17 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformProviderNotFoundException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.AdminApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformScriptGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.WebhookConfig;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfoHolder;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +50,7 @@ public class TerraformBootHelper {
     private String port;
 
     private final TerraformBootConfig terraformBootConfig;
-    private final PluginManager pluginManager;
+    private final TerraformProviderHelper terraformProviderHelper;
     private final TerraformFromScriptsApi terraformFromScriptsApi;
     private final TerraformFromGitRepoApi terraformFromGitRepoApi;
     private final DeployEnvironments deployEnvironments;
@@ -61,28 +59,17 @@ public class TerraformBootHelper {
     /**
      * Constructor for TerraformBootHelper.
      */
-    public TerraformBootHelper(TerraformBootConfig terraformBootConfig, PluginManager pluginManager,
+    public TerraformBootHelper(TerraformBootConfig terraformBootConfig,
+                               TerraformProviderHelper terraformProviderHelper,
                                TerraformFromScriptsApi terraformFromScriptsApi,
                                TerraformFromGitRepoApi terraformFromGitRepoApi,
                                DeployEnvironments deployEnvironments, AdminApi adminApi) {
         this.terraformBootConfig = terraformBootConfig;
-        this.pluginManager = pluginManager;
+        this.terraformProviderHelper = terraformProviderHelper;
         this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.deployEnvironments = deployEnvironments;
         this.adminApi = adminApi;
-    }
-
-    /**
-     * Build the provider terraform file content.
-     */
-    public String getProvider(Csp csp, String region) {
-        String provider = pluginManager.getDeployerProvider(csp, DeployerKind.TERRAFORM, region);
-        if (StringUtils.isBlank(provider)) {
-            String errMsg = String.format("Terraform provider for Csp %s not found.", csp);
-            throw new TerraformProviderNotFoundException(errMsg);
-        }
-        return provider;
     }
 
     /**
@@ -119,7 +106,7 @@ public class TerraformBootHelper {
     public List<String> getFiles(DeployTask task) {
         Csp csp = task.getDeployRequest().getCsp();
         String region = task.getDeployRequest().getRegion();
-        String provider = getProvider(csp, region);
+        String provider = terraformProviderHelper.getProvider(csp, region);
         String deployer = task.getOcl().getDeployment().getDeployer();
         return Arrays.asList(provider, deployer);
     }

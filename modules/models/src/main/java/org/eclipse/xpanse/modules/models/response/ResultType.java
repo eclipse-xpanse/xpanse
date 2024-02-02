@@ -56,7 +56,8 @@ public enum ResultType {
     USER_NO_LOGIN_EXCEPTION("Current Login User No Found"),
     SERVICE_DETAILS_NOT_ACCESSIBLE("Service Details No Accessible"),
     ACTIVITI_TASK_NOT_FOUND("Migrating activiti Task Not Found"),
-    SERVICE_MIGRATION_FAILED_EXCEPTION("Service Migration Failed Exception");
+    SERVICE_MIGRATION_FAILED_EXCEPTION("Service Migration Failed Exception"),
+    INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details");
 
     private final String value;
 

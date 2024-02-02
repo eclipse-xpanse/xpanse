@@ -2,6 +2,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;

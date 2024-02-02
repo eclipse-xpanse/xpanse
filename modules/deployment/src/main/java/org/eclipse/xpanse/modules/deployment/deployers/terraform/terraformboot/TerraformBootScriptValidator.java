@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDeployWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
@@ -37,6 +38,7 @@ public class TerraformBootScriptValidator {
     private final TerraformFromScriptsApi terraformFromScriptsApi;
     private final TerraformFromGitRepoApi terraformFromGitRepoApi;
     private final TerraformBootHelper terraformBootHelper;
+    private final TerraformProviderHelper terraformProviderHelper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -44,10 +46,12 @@ public class TerraformBootScriptValidator {
      */
     public TerraformBootScriptValidator(TerraformFromScriptsApi terraformFromScriptsApi,
                                         TerraformFromGitRepoApi terraformFromGitRepoApi,
-                                        TerraformBootHelper terraformBootHelper) {
+                                        TerraformBootHelper terraformBootHelper,
+                                        TerraformProviderHelper terraformProviderHelper) {
         this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.terraformBootHelper = terraformBootHelper;
+        this.terraformProviderHelper = terraformProviderHelper;
     }
 
     /**
@@ -122,7 +126,7 @@ public class TerraformBootScriptValidator {
     private List<String> getFilesByOcl(Ocl ocl) {
         Csp csp = ocl.getCloudServiceProvider().getName();
         String region = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
-        String provider = terraformBootHelper.getProvider(csp, region);
+        String provider = terraformProviderHelper.getProvider(csp, region);
         String deployer = ocl.getDeployment().getDeployer();
         return Arrays.asList(provider, deployer);
     }

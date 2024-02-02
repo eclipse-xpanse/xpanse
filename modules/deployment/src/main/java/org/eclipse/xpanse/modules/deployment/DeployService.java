@@ -233,7 +233,7 @@ public class DeployService {
                             deployServiceEntity);
             if (ServiceDeploymentState.DESTROY_SUCCESS
                     == updatedDeployServiceEntity.getServiceDeploymentState()) {
-                deployer.deleteTaskWorkspace(destroyTask.getId().toString());
+                deployer.deleteTaskWorkspace(destroyTask.getId());
             }
         } catch (RuntimeException e) {
             log.error("Destroy service with id:{} update database entity failed.",
