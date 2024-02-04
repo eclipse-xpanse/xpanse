@@ -1,13 +1,13 @@
 # The version of the Xpanse description language
 version: 1.0
 # The category of the service.
-category: middleware
+category: compute
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: Kafka-cluster
+name: opentofu-ecs
 # The version of the service, the end-user can select the version they want to deploy.
-serviceVersion: v1.0.1
+serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an enhanced Kafka cluster services by ISV-A.
+description: This is an ehanced compute services by ISV-A.
 namespace: ISV-A
 # Icon for the service.
 icon: |
@@ -30,34 +30,36 @@ billing:
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 1-zookeeper-with-3-worker-nodes-normal
+  - name: flavor-error-test
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 10
+    # Properties for the service, which can be used by the deployment.
+    properties:
+      flavor_id: s7.small.1
+  - name: 2vCPUs-4GB-normal
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 20
+    # Properties for the service, which can be used by the deployment.
+    properties:
+      flavor_id: s6.large.2
+  - name: 2vCPUs-8GB-normal
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 30
+    # Properties for the service, which can be used by the deployment.
+    properties:
+      flavor_id: s6.large.4
+  - name: 4vCPUs-8GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 40
     # Properties for the service, which can be used by the deployment.
     properties:
-      worker_nodes_count: 3
-      flavor_id: c7.large.4
-  - name: 1-zookeeper-with-3-worker-nodes-performance
+      flavor_id: s6.xlarge.2
+  - name: 4vCPUs-16GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
+    fixedPrice: 50
     # Properties for the service, which can be used by the deployment.
     properties:
-      worker_nodes_count: 3
-      flavor_id: c7.xlarge.4
-  - name: 1-zookeeper-with-5-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: c7.large.4
-  - name: 1-zookeeper-with-5-worker-nodes-performance
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 80
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: c7.xlarge.4
+      flavor_id: s6.xlarge.4
 # The contact details of the service.
 serviceProviderContactDetails:
   email: [ "test@test.com" ]
@@ -74,7 +76,7 @@ deployment:
   # The parameters will be used to generate the API of the managed service.
   variables:
     - name: admin_passwd
-      description: The admin password of all nodes in the Kafka cluster. If the value is empty, will create a random password.
+      description: The admin password of the compute. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -82,62 +84,69 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+    - name: image_name
+      description: The image name of the compute. If the value is empty, will use the default value to create compute instance.
+      kind: variable
+      dataType: string
+      example: "Ubuntu 22.04 server 64bit"
+      mandatory: false
+      value: "Ubuntu 22.04 server 64bit"
     - name: vpc_name
-      description: The vpc name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create VPC.
+      description: The vpc name of the compute. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
-      example: "kafka-vpc-default"
+      example: "ecs-vpc-default"
       mandatory: false
-      value: "kafka-vpc-default"
+      value: "ecs-vpc-default"
     - name: subnet_name
-      description: The sub network name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of the compute. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
-      example: "kafka-subnet-default"
+      example: "ecs-subnet-default"
       mandatory: false
-      value: "kafka-subnet-default"
+      value: "ecs-subnet-default"
     - name: secgroup_name
-      description: The security group name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of the compute. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
-      example: "kafka-secgroup-default"
+      example: "ecs-secgroup-default"
       mandatory: false
-      value: "kafka-secgroup-default"
+      value: "ecs-secgroup-default"
   deployer: |
     variable "flavor_id" {
       type        = string
-      default     = "c7.large.2"
-      description = "The flavor_id of all nodes in the Kafka cluster."
+      default     = "s6.large.2"
+      description = "The flavor_id of the compute."
     }
-
-    variable "worker_nodes_count" {
+    
+    variable "image_name" {
       type        = string
-      default     = 3
-      description = "The worker nodes count in the Kafka cluster."
+      default     = "Ubuntu 22.04 server 64bit"
+      description = "The image name of the compute."
     }
-
+    
     variable "admin_passwd" {
       type        = string
       default     = ""
-      description = "The root password of all nodes in the Kafka cluster."
+      description = "The root password of the compute."
     }
 
     variable "vpc_name" {
       type        = string
-      default     = "kafka-vpc-default"
-      description = "The vpc name of all nodes in the Kafka cluster."
+      default     = "ecs-vpc-default"
+      description = "The vpc name of the compute."
     }
-
+    
     variable "subnet_name" {
       type        = string
-      default     = "kafka-subnet-default"
-      description = "The subnet name of all nodes in the Kafka cluster."
+      default     = "ecs-subnet-default"
+      description = "The subnet name of the compute."
     }
 
     variable "secgroup_name" {
       type        = string
-      default     = "kafka-secgroup-default"
-      description = "The security group name of all nodes in the Kafka cluster."
+      default     = "ecs-secgroup-default"
+      description = "The security group name of the compute."
     }
 
     data "huaweicloud_vpcs" "existing" {
@@ -195,8 +204,8 @@ deployment:
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
-      port_range_min    = 2181
-      port_range_max    = 2181
+      port_range_min    = 8080
+      port_range_max    = 8088
       remote_ip_prefix  = "121.37.117.211/32"
       security_group_id = local.secgroup_id
     }
@@ -206,8 +215,8 @@ deployment:
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
-      port_range_min    = 9092
-      port_range_max    = 9093
+      port_range_min    = 9090
+      port_range_max    = 9099
       remote_ip_prefix  = "121.37.117.211/32"
       security_group_id = local.secgroup_id
     }
@@ -229,60 +238,68 @@ deployment:
     }
 
     resource "huaweicloud_kps_keypair" "keypair" {
-      name     = "keypair-kafka-${random_id.new.hex}"
+      name     = "keypair-ecs-${random_id.new.hex}"
       key_file = "keypair-kafka-${random_id.new.hex}.pem"
     }
 
     data "huaweicloud_images_image" "image" {
-      name        = "Kafka-v3.3.2_Ubuntu-20.04"
+      name_regex        = "^${var.image_name}"
       most_recent = true
     }
 
-    resource "huaweicloud_compute_instance" "zookeeper" {
+    resource "huaweicloud_compute_instance" "ecs-opentofu" {
       availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
-      name               = "kafka-zookeeper-${random_id.new.hex}"
+      name               = "ecs-opentofu-${random_id.new.hex}"
       flavor_id          = var.flavor_id
       security_group_ids = [ local.secgroup_id ]
       image_id           = data.huaweicloud_images_image.image.id
       key_pair           = huaweicloud_kps_keypair.keypair.name
+      admin_pass       = local.admin_passwd
       network {
         uuid = local.subnet_id
       }
-      user_data = <<EOF
-        #!bin/bash
-        echo root:${local.admin_passwd} | sudo chpasswd
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        sudo docker run -d --name zookeeper-server --privileged=true -p 2181:2181 -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:3.8.1
-      EOF
     }
-
-    resource "huaweicloud_compute_instance" "kafka-broker" {
-      count              = var.worker_nodes_count
-      availability_zone  = data.huaweicloud_availability_zones.osc-az.names[0]
-      name               = "kafka-broker-${random_id.new.hex}-${count.index}"
-      flavor_id          = var.flavor_id
-      security_group_ids = [ local.secgroup_id ]
-      image_id           = data.huaweicloud_images_image.image.id
-      key_pair           = huaweicloud_kps_keypair.keypair.name
-      network {
-        uuid = local.subnet_id
+    
+    resource "huaweicloud_evs_volume" "volume" {
+      name              = "volume-${random_id.new.hex}"
+      description       = "my volume"
+      volume_type       = "SSD"
+      size              = 40
+      availability_zone = data.huaweicloud_availability_zones.osc-az.names[0]
+      tags = {
+        foo = "bar"
+        key = "value"
       }
-      user_data = <<EOF
-        #!bin/bash
-        echo root:${local.admin_passwd} | sudo chpasswd
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        private_ip=$(ifconfig | grep -A1 "eth0" | grep 'inet' | awk -F ' ' ' {print $2}'|awk ' {print $1}')
-        sudo docker run -d --name kafka-server --restart always -p 9092:9092 -p 9093:9093  -e KAFKA_BROKER_ID=${count.index}  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://$private_ip:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=${huaweicloud_compute_instance.zookeeper.access_ip_v4}:2181 bitnami/kafka:3.3.2
-      EOF
-      depends_on = [
-        huaweicloud_compute_instance.zookeeper
-      ]
+    }
+    
+    resource "huaweicloud_compute_volume_attach" "attached" {
+      instance_id = huaweicloud_compute_instance.ecs-opentofu.id
+      volume_id   = huaweicloud_evs_volume.volume.id
+    }
+    
+    resource "huaweicloud_vpc_eip" "myeip" {
+       publicip {
+         type = "5_sbgp"
+      }
+      bandwidth {
+        name        = "mybandwidth"
+        size        = 5
+        share_type  = "PER"
+        charge_mode = "traffic"
+      }
+    }
+    
+    resource "huaweicloud_compute_eip_associate" "associated" {
+      public_ip   = huaweicloud_vpc_eip.myeip.address
+      instance_id = huaweicloud_compute_instance.ecs-opentofu.id
     }
 
-    output "zookeeper_server" {
-      value = "${huaweicloud_compute_instance.zookeeper.access_ip_v4}:2181"
+    output "ecs-host" {
+      value = huaweicloud_compute_instance.ecs-opentofu.access_ip_v4
+    }
+    
+    output "ecs-public-ip" {
+      value = huaweicloud_vpc_eip.myeip.address
     }
 
     output "admin_passwd" {

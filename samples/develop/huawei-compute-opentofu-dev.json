@@ -1,0 +1,11 @@
+{
+  "serviceName": "opentofu-ecs",
+  "version": "v1.0.0",
+  "csp": "huawei",
+  "category": "container",
+  "flavor": "2vCPUs-4GB-normal",
+  "region": "cn-southwest-2",
+  "customerServiceName": "default-opentofu-ecs",
+  "serviceHostingType": "self",
+  "serviceRequestProperties": {}
+}

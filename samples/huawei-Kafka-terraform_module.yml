@@ -36,33 +36,33 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 3
-      flavor_id: c7.large.4
+      flavor_id: s6.large.4
   - name: 1-zookeeper-with-3-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 3
-      flavor_id: c7.xlarge.4
+      flavor_id: s6.xlarge.4
   - name: 1-zookeeper-with-5-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 5
-      flavor_id: c7.large.4
+      flavor_id: s6.large.4
   - name: 1-zookeeper-with-5-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 80
     # Properties for the service, which can be used by the deployment.
     properties:
       worker_nodes_count: 5
-      flavor_id: c7.xlarge.4
+      flavor_id: s6.xlarge.4
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test@test.com"]
 deployment:
-  # kind, Supported values are terraform, pulumi, crossplane.
+  # kind, Supported values are terraform, opentofu.
   kind: terraform
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
@@ -103,7 +103,7 @@ deployment:
   deployer: |
     variable "flavor_id" {
       type        = string
-      default     = "c7.large.2"
+      default     = "s6.large.2"
       description = "The flavor_id of all nodes in the Kafka cluster."
     }
 
@@ -241,7 +241,7 @@ deployment:
         subnet_id                = local.subnet_id
         instance_name            = "kafka-broker-module${random_id.new.hex}-${count.index}"
         instance_flavor_id       = var.flavor_id
-        instance_image_id        = "60197a48-4452-4119-96b2-dc7ab245ecb1"
+        instance_image_id        = "60197a48-4452-4119-96b2-ds6ab245ecb1"
         security_group_ids       = [ local.secgroup_id ]
         system_disk_size         = 50
         admin_password           = local.admin_passwd

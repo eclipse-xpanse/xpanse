@@ -62,7 +62,7 @@ flavors:
 serviceProviderContactDetails:
   email: ["test@test.com"]
 deployment:
-  # kind, Supported values are terraform, pulumi, crossplane.
+  # kind, Supported values are terraform, opentofu.
   kind: terraform
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
