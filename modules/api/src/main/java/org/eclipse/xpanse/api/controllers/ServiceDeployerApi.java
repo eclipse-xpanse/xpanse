@@ -135,6 +135,32 @@ public class ServiceDeployerApi {
     }
 
     /**
+     * List all deployed services details.
+     *
+     * @return list of all services deployed by a user.
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "List all deployed services details.")
+    @GetMapping(value = "/services/details",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<DeployedService> listDeployedServicesDetails(
+            @Parameter(name = "categoryName", description = "category of the service")
+            @RequestParam(name = "categoryName", required = false) Category category,
+            @Parameter(name = "cspName", description = "name of the cloud service provider")
+            @RequestParam(name = "cspName", required = false) Csp csp,
+            @Parameter(name = "serviceName", description = "name of the service")
+            @RequestParam(name = "serviceName", required = false) String serviceName,
+            @Parameter(name = "serviceVersion", description = "version of the service")
+            @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
+            @Parameter(name = "serviceState", description = "deployment state of the service")
+            @RequestParam(name = "serviceState", required = false)
+                    ServiceDeploymentState serviceState) {
+        return this.serviceDetailsViewManager.listDeployedServicesDetails(
+                category, csp, serviceName, serviceVersion, serviceState);
+    }
+
+    /**
      * Start a task to deploy registered service.
      *
      * @param deployRequest the managed service to create.

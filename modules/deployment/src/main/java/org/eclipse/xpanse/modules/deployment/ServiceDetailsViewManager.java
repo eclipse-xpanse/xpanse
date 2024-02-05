@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Bean to manage all methods used for viewing deployed service details.
@@ -96,6 +97,34 @@ public class ServiceDetailsViewManager {
         return deployServices.stream()
                 .map(this::convertToDeployedService).toList();
 
+    }
+
+    /**
+     * List all deployed services details.
+     *
+     * @param category       of the services to be filtered.
+     * @param csp            of the services to be filtered.
+     * @param serviceName    of the services to be filtered.
+     * @param serviceVersion of the services to be filtered.
+     * @return serviceVos
+     */
+    public List<DeployedService> listDeployedServicesDetails(Category category, Csp csp,
+            String serviceName, String serviceVersion, ServiceDeploymentState serviceState) {
+        List<DeployedService> servicesDetails = new ArrayList<>();
+        List<DeployedService> services =
+                listDeployedServices(category, csp, serviceName, serviceVersion, serviceState);
+        if (!CollectionUtils.isEmpty(services)) {
+            for (DeployedService deployService : services) {
+                if (deployService.getServiceHostingType() == ServiceHostingType.SERVICE_VENDOR) {
+                    servicesDetails.add(
+                            getVendorHostedServiceDetailsByIdForEndUser(deployService.getId()));
+                } else {
+                    servicesDetails.add(
+                            getSelfHostedServiceDetailsByIdForEndUser(deployService.getId()));
+                }
+            }
+        }
+        return servicesDetails;
     }
 
     /**
