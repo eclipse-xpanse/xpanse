@@ -37,8 +37,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -364,7 +364,7 @@ public class TerraformLocalDeployment implements Deployer {
     /**
      * Validates the Terraform script.
      */
-    public DeployValidationResult validate(Ocl ocl) {
+    public DeploymentScriptValidationResult validate(Ocl ocl) {
         String workspace = getWorkspacePath(UUID.randomUUID());
         // Create the workspace.
         buildWorkspace(workspace);

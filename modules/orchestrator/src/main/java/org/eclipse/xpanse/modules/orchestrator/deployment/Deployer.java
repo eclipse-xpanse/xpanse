@@ -29,7 +29,7 @@ public interface Deployer {
 
     DeployerKind getDeployerKind();
 
-    DeployValidationResult validate(Ocl ocl);
+    DeploymentScriptValidationResult validate(Ocl ocl);
 
     /**
      * Method to get the changes the infrastructure changes the service deployment would do for a

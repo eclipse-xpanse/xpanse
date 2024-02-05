@@ -14,7 +14,7 @@ import lombok.Data;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DeployValidationResult {
+public class DeploymentScriptValidationResult {
 
     private boolean valid;
     private List<DeployValidateDiagnostics> diagnostics;

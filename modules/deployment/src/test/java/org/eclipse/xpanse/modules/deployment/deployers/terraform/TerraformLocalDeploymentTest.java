@@ -44,7 +44,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -257,12 +257,12 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testValidate() {
-        DeployValidationResult expectedResult = new DeployValidationResult();
+        DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(new ArrayList<>());
 
         // Run the test
-        final DeployValidationResult result = terraformLocalDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result = terraformLocalDeployment.validate(ocl);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -272,7 +272,7 @@ class TerraformLocalDeploymentTest {
     void testValidateFailed() {
         ocl.getDeployment().setDeployer(invalidDeployer);
 
-        DeployValidationResult expectedResult = new DeployValidationResult();
+        DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
         DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
         diagnostics.setDetail(
@@ -280,7 +280,7 @@ class TerraformLocalDeploymentTest {
         expectedResult.setDiagnostics(List.of(diagnostics));
 
         // Run the test
-        final DeployValidationResult result = terraformLocalDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result = terraformLocalDeployment.validate(ocl);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);

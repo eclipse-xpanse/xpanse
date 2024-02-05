@@ -37,7 +37,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScr
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
@@ -290,7 +290,7 @@ public class ServiceTemplateManage {
 
     private void validateTerraformScript(Ocl ocl) {
         if (ocl.getDeployment().getKind() == DeployerKind.TERRAFORM) {
-            DeployValidationResult tfValidationResult =
+            DeploymentScriptValidationResult tfValidationResult =
                     this.deployerKindManager.getDeployment(ocl.getDeployment().getKind())
                             .validate(ocl);
             if (!tfValidationResult.isValid()) {
@@ -302,7 +302,7 @@ public class ServiceTemplateManage {
         }
 
         if (ocl.getDeployment().getKind() == DeployerKind.OPEN_TOFU) {
-            DeployValidationResult tfValidationResult =
+            DeploymentScriptValidationResult tfValidationResult =
                     this.deployerKindManager.getDeployment(ocl.getDeployment().getKind())
                             .validate(ocl);
             if (!tfValidationResult.isValid()) {

@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.slf4j.MDC;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -57,18 +57,18 @@ public class TerraformBootScriptValidator {
     /**
      * Validate scripts provided in the OCL.
      */
-    public DeployValidationResult validateTerraformScripts(Ocl ocl) {
+    public DeploymentScriptValidationResult validateTerraformScripts(Ocl ocl) {
         terraformBootHelper.setHeaderTokenByProfiles();
-        DeployValidationResult deployValidationResult = null;
+        DeploymentScriptValidationResult deploymentScriptValidationResult = null;
         try {
             TerraformValidationResult validate =
                     terraformFromScriptsApi.validateWithScripts(getValidateScriptsInOclRequest(ocl),
                             Objects.nonNull(MDC.get("TASK_ID"))
                                     ? UUID.fromString(MDC.get("TASK_ID")) : null);
             try {
-                deployValidationResult =
+                deploymentScriptValidationResult =
                         objectMapper.readValue(objectMapper.writeValueAsString(validate),
-                                DeployValidationResult.class);
+                                DeploymentScriptValidationResult.class);
             } catch (JsonProcessingException e) {
                 log.error("JsonProcessingException", e);
             }
@@ -76,15 +76,15 @@ public class TerraformBootScriptValidator {
             log.error("Request to terraform-boot API failed", restClientException);
             throw new TerraformBootRequestFailedException(restClientException.getMessage());
         }
-        return deployValidationResult;
+        return deploymentScriptValidationResult;
     }
 
     /**
      * Validate scripts in the GIT repo.
      */
-    public DeployValidationResult validateTerraformScriptsFromGitRepo(Ocl ocl) {
+    public DeploymentScriptValidationResult validateTerraformScriptsFromGitRepo(Ocl ocl) {
         terraformBootHelper.setHeaderTokenByProfiles();
-        DeployValidationResult deployValidationResult = null;
+        DeploymentScriptValidationResult deploymentScriptValidationResult = null;
         try {
             TerraformValidationResult validate =
                     terraformFromGitRepoApi.validateScriptsFromGitRepo(
@@ -92,9 +92,9 @@ public class TerraformBootScriptValidator {
                             Objects.nonNull(MDC.get("TASK_ID"))
                                     ? UUID.fromString(MDC.get("TASK_ID")) : null);
             try {
-                deployValidationResult =
+                deploymentScriptValidationResult =
                         objectMapper.readValue(objectMapper.writeValueAsString(validate),
-                                DeployValidationResult.class);
+                                DeploymentScriptValidationResult.class);
             } catch (JsonProcessingException e) {
                 log.error("JsonProcessingException", e);
             }
@@ -102,7 +102,7 @@ public class TerraformBootScriptValidator {
             log.error("Request to terraform-boot API failed", restClientException);
             throw new TerraformBootRequestFailedException(restClientException.getMessage());
         }
-        return deployValidationResult;
+        return deploymentScriptValidationResult;
     }
 
     private TerraformDeployWithScriptsRequest getValidateScriptsInOclRequest(Ocl ocl) {
