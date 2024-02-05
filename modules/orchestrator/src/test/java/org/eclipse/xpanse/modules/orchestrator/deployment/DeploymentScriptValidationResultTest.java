@@ -8,14 +8,14 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class DeployValidationResultTest {
+class DeploymentScriptValidationResultTest {
     String detail = "detail";
     DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
-    private DeployValidationResult test;
+    private DeploymentScriptValidationResult test;
 
     @BeforeEach
     void setUp() {
-        test = new DeployValidationResult();
+        test = new DeploymentScriptValidationResult();
         test.setValid(true);
         diagnostics.setDetail(detail);
         test.setDiagnostics(List.of(diagnostics));
@@ -36,12 +36,12 @@ class DeployValidationResultTest {
         assertNotEquals(test, object);
         assertNotEquals(test.hashCode(), object.hashCode());
 
-        DeployValidationResult test1 = new DeployValidationResult();
+        DeploymentScriptValidationResult test1 = new DeploymentScriptValidationResult();
         assertNotEquals(test, test1);
         assertNotEquals(test.hashCode(), test1.hashCode());
 
-        DeployValidationResult test2 = new DeployValidationResult();
-        DeployValidationResult test3 = new DeployValidationResult();
+        DeploymentScriptValidationResult test2 = new DeploymentScriptValidationResult();
+        DeploymentScriptValidationResult test3 = new DeploymentScriptValidationResult();
         test2.setValid(true);
         test3.setValid(false);
         assertNotEquals(test, test1);
@@ -71,7 +71,7 @@ class DeployValidationResultTest {
     void testToString() {
         assertNotEquals(test.toString(), null);
 
-        String exceptedString = "DeployValidationResult(valid=true,"
+        String exceptedString = "DeploymentScriptValidationResult(valid=true,"
                 + " diagnostics=[DeployValidateDiagnostics(detail=detail)])";
         assertEquals(test.toString(), exceptedString);
     }

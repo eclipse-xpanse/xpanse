@@ -29,7 +29,7 @@ import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfState;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -94,11 +94,12 @@ class TerraformLocalExecutorTest {
     @Order(1)
     void testTfValidate() {
         // Setup
-        final DeployValidationResult expectedResult = new DeployValidationResult();
+        final DeploymentScriptValidationResult
+                expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(Collections.emptyList());
         // Run the test
-        final DeployValidationResult result = terraformLocalExecutorUnderTest.tfValidate();
+        final DeploymentScriptValidationResult result = terraformLocalExecutorUnderTest.tfValidate();
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
     }

@@ -12,8 +12,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -82,8 +82,8 @@ public class TerraformBootDeployment implements Deployer {
      * Validates the Terraform script.
      */
     @Override
-    public DeployValidationResult validate(Ocl ocl) {
-        DeployValidationResult result = null;
+    public DeploymentScriptValidationResult validate(Ocl ocl) {
+        DeploymentScriptValidationResult result = null;
         if (Objects.nonNull(ocl.getDeployment().getDeployer())) {
             result = terraformBootScriptValidator.validateTerraformScripts(ocl);
         }

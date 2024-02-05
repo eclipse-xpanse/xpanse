@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.systemcmd.SystemCmd;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 
 /**
  * An executor for terraform.
@@ -269,7 +269,7 @@ public class TerraformLocalExecutor {
      *
      * @return TfValidationResult.
      */
-    public DeployValidationResult tfValidate() {
+    public DeploymentScriptValidationResult tfValidate() {
         SystemCmdResult initResult = tfInit();
         if (!initResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfInit failed.");
@@ -279,7 +279,7 @@ public class TerraformLocalExecutor {
         SystemCmdResult systemCmdResult = execute("terraform validate -json -no-color");
         try {
             return new ObjectMapper().readValue(systemCmdResult.getCommandStdOutput(),
-                    DeployValidationResult.class);
+                    DeploymentScriptValidationResult.class);
         } catch (JsonProcessingException ex) {
             throw new IllegalStateException("Serialising string to object failed.", ex);
         }

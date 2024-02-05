@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourc
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DestroyScenario;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -42,7 +43,6 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidationResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -233,14 +233,14 @@ class TerraformBootDeploymentTest {
     @Test
     void testValidate() {
 
-        DeployValidationResult expectedResult = new DeployValidationResult();
+        DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(Collections.emptyList());
 
         when(terraformBootScriptValidator.validateTerraformScripts(any())).thenReturn(expectedResult);
 
         // Run the test
-        final DeployValidationResult result = terraformBootDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result = terraformBootDeployment.validate(ocl);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -250,7 +250,7 @@ class TerraformBootDeploymentTest {
     void testValidateFailed() {
         ocl.getDeployment().setDeployer(invalidDeployer);
 
-        DeployValidationResult expectedResult = new DeployValidationResult();
+        DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
         DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
         diagnostics.setDetail(
@@ -260,7 +260,7 @@ class TerraformBootDeploymentTest {
         when(terraformBootScriptValidator.validateTerraformScripts(any())).thenReturn(expectedResult);
 
         // Run the test
-        final DeployValidationResult result = terraformBootDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result = terraformBootDeployment.validate(ocl);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
