@@ -13,7 +13,9 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api.OpenTofuFromScriptsApi;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.OpenTofuDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.OpenTofuDeployWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.OpenTofuValidationResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.OpenTofuProviderHelper;
@@ -34,6 +36,7 @@ import org.springframework.web.client.RestClientException;
 public class OpenTofuMakerScriptValidator {
 
     private final OpenTofuFromScriptsApi openTofuFromScriptsApi;
+    private final OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
     private final OpenTofuMakerHelper openTofuMakerHelper;
     private final OpenTofuProviderHelper openTofuProviderHelper;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -42,9 +45,11 @@ public class OpenTofuMakerScriptValidator {
      * constructor for OpenTofuMakerScriptValidator.
      */
     public OpenTofuMakerScriptValidator(OpenTofuFromScriptsApi openTofuFromScriptsApi,
+                                        OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
                                         OpenTofuMakerHelper openTofuMakerHelper,
                                         OpenTofuProviderHelper openTofuProviderHelper) {
         this.openTofuFromScriptsApi = openTofuFromScriptsApi;
+        this.openTofuFromGitRepoApi = openTofuFromGitRepoApi;
         this.openTofuMakerHelper = openTofuMakerHelper;
         this.openTofuProviderHelper = openTofuProviderHelper;
     }
@@ -74,11 +79,47 @@ public class OpenTofuMakerScriptValidator {
         return deployValidationResult;
     }
 
+    /**
+     * Validate scripts in the GIT repo.
+     */
+    public DeploymentScriptValidationResult validateOpenTofuScriptsFromGitRepo(Ocl ocl) {
+        openTofuMakerHelper.setHeaderTokenByProfiles();
+        DeploymentScriptValidationResult deployValidationResult = null;
+        try {
+            OpenTofuValidationResult validate =
+                    openTofuFromGitRepoApi.validateScriptsFromGitRepo(
+                            getValidateScriptsInGitRepoRequest(ocl),
+                            Objects.nonNull(MDC.get("TASK_ID"))
+                                    ? UUID.fromString(MDC.get("TASK_ID")) : null);
+            try {
+                deployValidationResult =
+                        objectMapper.readValue(objectMapper.writeValueAsString(validate),
+                                DeploymentScriptValidationResult.class);
+            } catch (JsonProcessingException e) {
+                log.error("JsonProcessingException", e);
+            }
+        } catch (RestClientException restClientException) {
+            log.error("Request to tofu-maker API failed", restClientException);
+            throw new OpenTofuMakerRequestFailedException(restClientException.getMessage());
+        }
+        return deployValidationResult;
+    }
+
     private OpenTofuDeployWithScriptsRequest getValidateScriptsInOclRequest(Ocl ocl) {
         OpenTofuDeployWithScriptsRequest request =
                 new OpenTofuDeployWithScriptsRequest();
         request.setIsPlanOnly(false);
         request.setScripts(getFilesByOcl(ocl));
+        return request;
+    }
+
+    private OpenTofuDeployFromGitRepoRequest getValidateScriptsInGitRepoRequest(Ocl ocl) {
+        OpenTofuDeployFromGitRepoRequest request =
+                new OpenTofuDeployFromGitRepoRequest();
+        request.setIsPlanOnly(false);
+        request.setGitRepoDetails(
+                openTofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
+                        ocl.getDeployment().getScriptsRepo()));
         return request;
     }
 

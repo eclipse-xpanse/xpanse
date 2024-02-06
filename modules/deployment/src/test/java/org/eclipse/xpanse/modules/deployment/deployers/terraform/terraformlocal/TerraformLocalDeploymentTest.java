@@ -26,9 +26,8 @@ import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -58,14 +57,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
- * Test for TerraformDeploy.
+ * Test for TerraformDeployment.
  */
 
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {TerraformLocalDeployment.class, DeployEnvironments.class,
         PluginManager.class, TerraformLocalConfig.class, DeployService.class,
-        TaskConfiguration.class,
-        ResourceHandlerManager.class, TerraformProviderHelper.class, ScriptsGitRepoManage.class})
+        TaskConfiguration.class, ResourceHandlerManager.class, TerraformProviderHelper.class,
+        ScriptsGitRepoManage.class})
 class TerraformLocalDeploymentTest {
 
     private final UUID id = UUID.randomUUID();
