@@ -10,5 +10,6 @@
 
 <suppressions>
     <suppress files="[\\/]modules[\\/]deployment[\\/]src[\\/]main[\\/]java[\\/]org[\\/]eclipse[\\/]xpanse[\\/]modules[\\/]deployment[\\/]deployers[\\/]terraform[\\/]terraformboot[\\/]generated[\\/]" checks=".*"/>
+    <suppress files="[\\/]modules[\\/]deployment[\\/]src[\\/]main[\\/]java[\\/]org[\\/]eclipse[\\/]xpanse[\\/]modules[\\/]deployment[\\/]deployers[\\/]opentofu[\\/]opentofumaker[\\/]generated[\\/]" checks=".*"/>
     <suppress files="[\\/]modules[\\/]policy[\\/]src[\\/]main[\\/]java[\\/]org[\\/]eclipse[\\/]xpanse[\\/]modules[\\/]policy[\\/]policyman[\\/]generated[\\/]" checks=".*"/>
 </suppressions>

@@ -211,7 +211,8 @@
                     <dataFile>${project.parent.basedir}/target/coverage-reports/jacoco.exec</dataFile>
                     <skip>${jacoco.skip}</skip>
                     <excludes>
-                        <exclude>**/org/eclipse/xpanse/modules/deployment/deployers/terraform/terraformboot/**</exclude>
+                        <exclude>**/org/eclipse/xpanse/modules/deployment/deployers/terraform/terraformboot/generated/**</exclude>
+                        <exclude>**/org/eclipse/xpanse/modules/deployment/deployers/opentofu/opentofumaker/generated/**</exclude>
                         <exclude>**/org/eclipse/xpanse/modules/policy/policyman/generated/**</exclude>
                     </excludes>
                 </configuration>

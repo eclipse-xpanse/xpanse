@@ -18,13 +18,13 @@ import org.springframework.context.annotation.Profile;
 @Profile("terraform-boot")
 public class TerraformBootConfig {
 
-    @Value("${terraform.webhook.endpoint}")
+    @Value("${terraform-boot.webhook.endpoint}")
     private String clientBaseUri;
 
-    @Value("${webhook.deployCallbackUri}")
+    @Value("${webhook.terraform-boot.deployCallbackUri}")
     private String deployCallbackUri;
 
-    @Value("${webhook.destroyCallbackUri}")
+    @Value("${webhook.terraform-boot.destroyCallbackUri}")
     private String destroyCallbackUri;
 
 }

@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -52,17 +53,18 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed,terraform-boot"})
 @AutoConfigureMockMvc
 public class TerraformBootWebhookApiTest {
-
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static DeployedServiceDetails deployedServiceDetails;
     private static final String taskId = "bfdbc175-9f27-4679-8a4d-1f6b8c91386b";
+    private static DeployedServiceDetails deployedServiceDetails;
     private static ServiceDeploymentState state;
+    @Value("${webhook.terraform-boot.deployCallbackUri}")
+    private String deployCallbackUri;
+    @Value("${webhook.terraform-boot.destroyCallbackUri}")
+    private String destroyCallbackUri;
     @Resource
     private DeployService deployService;
-
     @Resource
     private MockMvc mockMvc;
-
 
     @BeforeAll
     static void configureObjectMapper() {
@@ -114,7 +116,7 @@ public class TerraformBootWebhookApiTest {
 
         // Run the test
         final MockHttpServletResponse deployCallbackResponse =
-                mockMvc.perform(post("/webhook/deploy/bfdbc175-9f27-4679-8a4d-1f6b8c91386b")
+                mockMvc.perform(post(deployCallbackUri + "/" + taskId)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .accept(MediaType.APPLICATION_JSON_VALUE)
                                 .content(requestBody))
@@ -165,7 +167,7 @@ public class TerraformBootWebhookApiTest {
 
         // Run the test
         final MockHttpServletResponse deployCallbackResponse =
-                mockMvc.perform(post("/webhook/deploy/bfdbc175-9f27-4679-8a4d-1f6b8c91386b")
+                mockMvc.perform(post(destroyCallbackUri + "/" + taskId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(requestBody))
@@ -209,7 +211,7 @@ public class TerraformBootWebhookApiTest {
 
         // Run the test
         final MockHttpServletResponse destroyCallbackResponse =
-                mockMvc.perform(post("/webhook/destroy/bfdbc175-9f27-4679-8a4d-1f6b8c91386b")
+                mockMvc.perform(post(destroyCallbackUri + "/" + taskId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(requestBody))
@@ -261,14 +263,15 @@ public class TerraformBootWebhookApiTest {
 
         // Run the test
         final MockHttpServletResponse destroyCallbackResponse =
-                mockMvc.perform(post("/webhook/destroy/bfdbc175-9f27-4679-8a4d-1f6b8c91386b")
+                mockMvc.perform(post(destroyCallbackUri + "/" + taskId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(requestBody))
                         .andReturn().getResponse();
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), destroyCallbackResponse.getStatus());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(),
+                destroyCallbackResponse.getStatus());
 
     }
 }

@@ -1,0 +1,2312 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Tofu-Maker API",
+    "description": "RESTful Services to interact with Tofu-Maker runtime",
+    "version": "1.0.0-SNAPSHOT"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:9092",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "OAuth2Flow": [
+        "openid"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "OpenTofuFromGitRepo",
+      "description": "APIs for running OpenTofu commands using OpenTofu scripts from a GIT Repo."
+    },
+    {
+      "name": "Admin",
+      "description": "Admin services for managing the application."
+    },
+    {
+      "name": "OpenTofuFromScripts",
+      "description": "APIs for running OpenTofu commands on the scripts sent via request body."
+    },
+    {
+      "name": "OpenTofuFromDirectory",
+      "description": "APIs for running OpenTofu commands inside a provided directory."
+    }
+  ],
+  "paths": {
+    "/tofu-maker/scripts/validate": {
+      "post": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "Deploy resources via OpenTofu",
+        "operationId": "validateWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDeployWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/scripts/plan": {
+      "post": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "Get OpenTofu Plan as JSON string from the list of script files provided",
+        "operationId": "planWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuPlanWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/scripts/destroy": {
+      "post": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "Destroy resources via OpenTofu",
+        "operationId": "destroyWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDestroyWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/scripts/deploy": {
+      "post": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "Deploy resources via OpenTofu",
+        "operationId": "deployWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDeployWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/scripts/deploy/async": {
+      "post": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "async deploy resources via OpenTofu",
+        "operationId": "asyncDeployWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncDeployFromScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/git/validate": {
+      "post": {
+        "tags": [
+          "OpenTofuFromGitRepo"
+        ],
+        "description": "Deploy resources via OpenTofu",
+        "operationId": "validateScriptsFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDeployFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/git/plan": {
+      "post": {
+        "tags": [
+          "OpenTofuFromGitRepo"
+        ],
+        "description": "Get OpenTofu Plan as JSON string from the list of script files provided",
+        "operationId": "planFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuPlanFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/git/destroy": {
+      "post": {
+        "tags": [
+          "OpenTofuFromGitRepo"
+        ],
+        "description": "Destroy resources via OpenTofu",
+        "operationId": "destroyFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDestroyFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/git/deploy": {
+      "post": {
+        "tags": [
+          "OpenTofuFromGitRepo"
+        ],
+        "description": "Deploy resources via OpenTofu",
+        "operationId": "deployFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDeployFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/git/deploy/async": {
+      "post": {
+        "tags": [
+          "OpenTofuFromGitRepo"
+        ],
+        "description": "async deploy resources via OpenTofu",
+        "operationId": "asyncDeployFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncDeployFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/plan/{module_directory}": {
+      "post": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "Get OpenTofu Plan as JSON string from the given directory.",
+        "operationId": "plan",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the OpenTofu module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuPlanFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/deploy/{module_directory}": {
+      "post": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "Deploy resources via OpenTofu from the given directory.",
+        "operationId": "deployFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the OpenTofu module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDeployFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/deploy/async/{module_directory}": {
+      "post": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "async deploy resources via OpenTofu from the given directory.",
+        "operationId": "asyncDeployFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the OpenTofu module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncDeployFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/health": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "Check health of OpenTofu Maker API service",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuMakerSystemStatus"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/validate/{module_directory}": {
+      "get": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "Validate the OpenTofu modules in the given directory.",
+        "operationId": "validateFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the OpenTofu module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/scripts/destroy/async": {
+      "delete": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "Async destroy the OpenTofu modules",
+        "operationId": "asyncDestroyWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncDestroyFromScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/git/destroy/async": {
+      "delete": {
+        "tags": [
+          "OpenTofuFromGitRepo"
+        ],
+        "description": "Async destroy the OpenTofu modules",
+        "operationId": "asyncDestroyFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncDestroyFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/destroy/{module_directory}": {
+      "delete": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "Destroy the resources from the given directory.",
+        "operationId": "destroyFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the OpenTofu module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDestroyFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/destroy/async/{module_directory}": {
+      "delete": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "async destroy resources via OpenTofu from the given directory.",
+        "operationId": "asyncDestroyFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the OpenTofu module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncDestroyFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Response": {
+        "required": [
+          "details",
+          "resultType",
+          "success"
+        ],
+        "type": "object",
+        "properties": {
+          "resultType": {
+            "type": "string",
+            "description": "The result code of response.",
+            "enum": [
+              "Parameters Invalid",
+              "Unprocessable Entity",
+              "OpenTofu Execution Failed",
+              "Unsupported Enum Value",
+              "Service Unavailable",
+              "Unauthorized",
+              "Invalid Git Repo Details"
+            ]
+          },
+          "details": {
+            "type": "array",
+            "description": "Details of the errors occurred",
+            "items": {
+              "type": "string",
+              "description": "Details of the errors occurred"
+            }
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Describes if the request is successful"
+          }
+        }
+      },
+      "OpenTofuDeployWithScriptsRequest": {
+        "required": [
+          "isPlanOnly",
+          "scripts",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of OpenTofu script files to be considered for deploying changes.",
+            "items": {
+              "type": "string",
+              "description": "List of OpenTofu script files to be considered for deploying changes."
+            }
+          }
+        }
+      },
+      "OpenTofuValidateDiagnostics": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string"
+          }
+        }
+      },
+      "OpenTofuValidationResult": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OpenTofuValidateDiagnostics"
+            }
+          }
+        }
+      },
+      "OpenTofuPlanWithScriptsRequest": {
+        "required": [
+          "scripts",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of openTofu script files to be considered for generating openTofu plan",
+            "items": {
+              "type": "string",
+              "description": "List of openTofu script files to be considered for generating openTofu plan"
+            }
+          }
+        }
+      },
+      "OpenTofuPlan": {
+        "required": [
+          "plan"
+        ],
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "description": "OpenTofu plan as a JSON string"
+          }
+        }
+      },
+      "OpenTofuDestroyWithScriptsRequest": {
+        "required": [
+          "scripts",
+          "tfState",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for destroy requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for destroy requests deployed via scripts"
+            }
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          }
+        }
+      },
+      "OpenTofuResult": {
+        "type": "object",
+        "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "This value is set only if the same is set in the request as well. This is useful only for the caller to differentiate what type of destroy it is. No difference in the way destroy will be executed.based on this flag. User may use this flag in case callback are used. So the calling application can know the result is for which specific destroy use case within the calling system.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "commandStdOutput": {
+            "type": "string",
+            "description": "stdout of the command returned as string."
+          },
+          "commandStdError": {
+            "type": "string",
+            "description": "stderr of the command returned as string."
+          },
+          "terraformState": {
+            "type": "string",
+            "description": ".tfstate file contents returned as string."
+          },
+          "importantFileContentMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Data of all other files generated by the openTofu execution.The map key contains the file name and value is the file contents as string."
+            },
+            "description": "Data of all other files generated by the openTofu execution.The map key contains the file name and value is the file contents as string."
+          },
+          "commandSuccessful": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OpenTofuAsyncDeployFromScriptsRequest": {
+        "required": [
+          "isPlanOnly",
+          "scripts",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of OpenTofu script files to be considered for deploying changes.",
+            "items": {
+              "type": "string",
+              "description": "List of OpenTofu script files to be considered for deploying changes."
+            }
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
+      "WebhookConfig": {
+        "required": [
+          "authType",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Callback address after deployment/destroy is completed."
+          },
+          "authType": {
+            "type": "string",
+            "description": "The permission type when calling back.",
+            "enum": [
+              "NONE",
+              "OAUTH2"
+            ]
+          }
+        },
+        "description": "Configuration information of webhook."
+      },
+      "OpenTofuDeployFromGitRepoRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails"
+          }
+        }
+      },
+      "OpenTofuScriptGitRepoDetails": {
+        "required": [
+          "branch",
+          "repoUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "repoUrl": {
+            "type": "string",
+            "description": "url of the GIT repo. This repo will be cloned."
+          },
+          "branch": {
+            "type": "string",
+            "description": "Branch to be checked-out after the repo is cloned."
+          },
+          "scriptPath": {
+            "type": "string",
+            "description": "Location of the scripts. If not provided, the scripts will be executed from root folder of the repo."
+          }
+        },
+        "description": "GIT Repo details from where the scripts can be fetched."
+      },
+      "OpenTofuPlanFromGitRepoRequest": {
+        "required": [
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails"
+          }
+        }
+      },
+      "OpenTofuDestroyFromGitRepoRequest": {
+        "required": [
+          "tfState",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails"
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          }
+        }
+      },
+      "OpenTofuAsyncDeployFromGitRepoRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails"
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
+      "OpenTofuPlanFromDirectoryRequest": {
+        "required": [
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
+          }
+        }
+      },
+      "OpenTofuDeployFromDirectoryRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          }
+        }
+      },
+      "OpenTofuAsyncDeployFromDirectoryRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
+      "OpenTofuMakerSystemStatus": {
+        "required": [
+          "healthStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "healthStatus": {
+            "type": "string",
+            "description": "The health status of api service.",
+            "enum": [
+              "OK",
+              "NOK"
+            ]
+          }
+        }
+      },
+      "OpenTofuAsyncDestroyFromScriptsRequest": {
+        "required": [
+          "scripts",
+          "tfState",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for destroy requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for destroy requests deployed via scripts"
+            }
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
+      "OpenTofuAsyncDestroyFromGitRepoRequest": {
+        "required": [
+          "tfState",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails"
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
+      "OpenTofuDestroyFromDirectoryRequest": {
+        "required": [
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          }
+        }
+      },
+      "OpenTofuAsyncDestroyFromDirectoryRequest": {
+        "required": [
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "destroyScenario": {
+            "type": "string",
+            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "enum": [
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth2Flow": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://iam.xpanse.site/oauth/v2/authorize",
+            "tokenUrl": "https://iam.xpanse.site/oauth/v2/token",
+            "scopes": {
+              "openid": "mandatory must be selected."
+            }
+          }
+        }
+      }
+    }
+  }
+}

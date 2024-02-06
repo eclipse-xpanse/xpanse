@@ -18,6 +18,7 @@ public enum BackendSystemType {
     IDENTITY_PROVIDER("IdentityProvider"),
     DATABASE("Database"),
     TERRAFORM_BOOT("Terraform Boot"),
+    TOFU_MAKER("Tofu Maker"),
     POLICY_MAN("PolicyMan"),
     OPEN_TELEMETRY_COLLECTOR("OpenTelemetry Collector");
 

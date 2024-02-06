@@ -10,6 +10,7 @@
     </parent>
     <properties>
         <skipTerraformBootClientGeneration>true</skipTerraformBootClientGeneration>
+        <skipTofuMakerClientGeneration>true</skipTofuMakerClientGeneration>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -100,11 +101,12 @@
                 <version>${openapi.generator.plugin.version}</version>
                 <executions>
                     <execution>
+                        <id>generate-terraformBoot-client</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/terraformbootApi.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/terraformBootApis.json</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>
@@ -133,6 +135,41 @@
                         <phase>generate-sources</phase>
                         <inherited>false</inherited>
                     </execution>
+                    <execution>
+                        <id>generate-tofuMaker-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/tofuMakerApis.json</inputSpec>
+                            <generatorName>java</generatorName>
+                            <output>${project.basedir}</output>
+                            <apiPackage>
+                                org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api
+                            </apiPackage>
+                            <modelPackage>
+                                org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model
+                            </modelPackage>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiTests>false</generateApiTests>
+                            <library>resttemplate</library>
+                            <skip>${skipTofuMakerClientGeneration}</skip>
+                            <supportingFilesToGenerate>
+                                ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,OAuth.java
+                            </supportingFilesToGenerate>
+                            <configOptions>
+                                <generateClientAsBean>true</generateClientAsBean>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <useJakartaEe>true</useJakartaEe>
+                                <openApiNullable>false</openApiNullable>
+                            </configOptions>
+                        </configuration>
+                        <phase>generate-sources</phase>
+                        <inherited>false</inherited>
+                    </execution>
                 </executions>
             </plugin>
             <!-- Clean up unwanted generated files and directories -->
@@ -142,7 +179,7 @@
                 <version>${maven.clean.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>clean-terraformboot-generated-files</id>
+                        <id>clean-terraformBoot-generated-files</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>clean</goal>
@@ -160,6 +197,27 @@
                                 </fileset>
                             </filesets>
                             <skip>${skipTerraformBootClientGeneration}</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>clean-tofuMaker-generated-files</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.basedir}</directory>
+                                    <excludes>
+                                        <exclude>**/src/**</exclude>
+                                        <exclude>**/pom.xml</exclude>
+                                    </excludes>
+                                </fileset>
+                            </filesets>
+                            <skip>${skipTofuMakerClientGeneration}</skip>
                         </configuration>
                     </execution>
                 </executions>

@@ -12,7 +12,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.resource.TfStateResourceInstance;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.resources.TfStateResourceInstance;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.springframework.util.CollectionUtils;
