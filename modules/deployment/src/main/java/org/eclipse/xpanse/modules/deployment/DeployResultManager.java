@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,6 +52,7 @@ public class DeployResultManager {
             log.info("Deploy task update deploy service entity with id:{}", deployResult.getId());
             DeployServiceEntity deployServiceEntityToStore = new DeployServiceEntity();
             BeanUtils.copyProperties(storedEntity, deployServiceEntityToStore);
+            deployServiceEntityToStore.setLastStartedAt(OffsetDateTime.now());
             updateEntityWithDeployResult(deployResult, deployServiceEntityToStore);
             return deployServiceEntityHandler.storeAndFlush(deployServiceEntityToStore);
         } else {
