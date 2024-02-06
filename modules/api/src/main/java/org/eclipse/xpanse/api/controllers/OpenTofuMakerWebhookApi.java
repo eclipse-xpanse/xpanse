@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Webhook class for openTofu-boot. These API methods are not exposed to the end user.
+ * Webhook class for tofu-maker. These API methods are not exposed to the end user.
  * They are only for machine-to-machine communication.
  * This class implements the callback methods described in the tofu-maker specifications.
  */

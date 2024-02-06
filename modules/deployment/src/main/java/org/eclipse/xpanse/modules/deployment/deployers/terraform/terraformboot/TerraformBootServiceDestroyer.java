@@ -62,7 +62,7 @@ public class TerraformBootServiceDestroyer {
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
+            log.error("terraform-boot destroy service failed. service id: {} , error:{} ",
                     deployTask.getId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }

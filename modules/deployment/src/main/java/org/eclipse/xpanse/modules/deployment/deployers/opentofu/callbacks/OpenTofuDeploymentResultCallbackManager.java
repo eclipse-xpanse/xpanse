@@ -73,8 +73,8 @@ public class OpenTofuDeploymentResultCallbackManager {
                             .getDeployment().getKind()).handler(deployResult);
         }
         DeployServiceEntity updatedDeployServiceEntity =
-                deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
-                        deployServiceEntity);
+                deployResultManager.updateDeployServiceEntityWithDeployResult(
+                        deployResult, deployServiceEntity);
         if (ServiceDeploymentState.DEPLOY_FAILED
                 == updatedDeployServiceEntity.getServiceDeploymentState()) {
             DeployTask deployTask =

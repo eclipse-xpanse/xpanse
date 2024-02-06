@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
-import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuDeployment.STATE_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuLocalDeployment.STATE_FILE_NAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -23,8 +23,8 @@ import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.OpenTofuProviderHelper;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -52,20 +52,20 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
- * Test for OpenTofuDeploy.
+ * Test for OpenTofuDeployment.
  */
 
 @ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = {OpenTofuDeployment.class, DeployEnvironments.class,
+@ContextConfiguration(classes = {OpenTofuLocalDeployment.class, DeployEnvironments.class,
         PluginManager.class, OpenTofuLocalConfig.class, DeployService.class,
         TaskConfiguration.class, ResourceHandlerManager.class, OpenTofuProviderHelper.class,
         ScriptsGitRepoManage.class})
-class OpenTofuDeploymentTest {
+class OpenTofuLocalDeploymentTest {
 
     private final UUID id = UUID.randomUUID();
     private final String errorDeployer = "error_deployer";
     @Autowired
-    OpenTofuDeployment openTofuDeployment;
+    OpenTofuLocalDeployment openTofuLocalDeployment;
     @MockBean
     DeployEnvironments deployEnvironments;
     @MockBean
@@ -128,7 +128,7 @@ class OpenTofuDeploymentTest {
         deployTask.setId(id);
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
-        deployResult = openTofuDeployment.deploy(deployTask);
+        deployResult = openTofuLocalDeployment.deploy(deployTask);
         Assertions.assertNotNull(deployResult);
         Assertions.assertNotNull(deployResult.getPrivateProperties());
         tfState = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
@@ -150,7 +150,7 @@ class OpenTofuDeploymentTest {
         when(this.deployEnvironments.getFlavorVariables(any(DeployTask.class))).thenReturn(
                 new HashMap<>());
         Assertions.assertThrows(ServiceNotDeployedException.class,
-                () -> openTofuDeployment.destroy(deployTask));
+                () -> openTofuLocalDeployment.destroy(deployTask));
     }
 
     @Test
@@ -158,7 +158,7 @@ class OpenTofuDeploymentTest {
     void testDeleteTaskWorkspace() {
         String workspacePath = System.getProperty("java.io.tmpdir") + File.separator
                 + openTofuLocalConfig.getWorkspaceDirectory() + File.separator + id;
-        this.openTofuDeployment.deleteTaskWorkspace(id);
+        this.openTofuLocalDeployment.deleteTaskWorkspace(id);
         Assertions.assertFalse(new File(workspacePath).exists());
     }
 
@@ -178,7 +178,7 @@ class OpenTofuDeploymentTest {
         deployTask.setId(UUID.randomUUID());
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
-        DeployResult deployResult = this.openTofuDeployment.deploy(deployTask);
+        DeployResult deployResult = this.openTofuLocalDeployment.deploy(deployTask);
         Assertions.assertNull(deployResult.getState());
         Assertions.assertNotEquals(DeployerTaskStatus.DEPLOY_SUCCESS.toValue(),
                 deployResult.getMessage());
@@ -196,7 +196,7 @@ class OpenTofuDeploymentTest {
             deployTask.setId(id);
             deployTask.setOcl(ocl);
             deployTask.setDeployRequest(deployRequest);
-            DeployResult deployResult = this.openTofuDeployment.destroy(deployTask);
+            DeployResult deployResult = this.openTofuLocalDeployment.destroy(deployTask);
             Assertions.assertTrue(deployResult.getProperties().isEmpty());
             Assertions.assertNull(deployResult.getState());
             Assertions.assertNotEquals(DeployerTaskStatus.DESTROY_FAILED.toValue(),
@@ -206,7 +206,7 @@ class OpenTofuDeploymentTest {
 
     @Test
     void testGetDeployerKind() {
-        DeployerKind deployerKind = openTofuDeployment.getDeployerKind();
+        DeployerKind deployerKind = openTofuLocalDeployment.getDeployerKind();
 
         Assertions.assertEquals(DeployerKind.OPEN_TOFU, deployerKind);
     }
@@ -229,7 +229,7 @@ class OpenTofuDeploymentTest {
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
 
-        String deployPlanJson = openTofuDeployment.getDeploymentPlanAsJson(deployTask);
+        String deployPlanJson = openTofuLocalDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
 
     }
@@ -242,10 +242,10 @@ class OpenTofuDeploymentTest {
         deployTask.setId(UUID.randomUUID());
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(deployRequest);
-        deployResult = this.openTofuDeployment.deploy(deployTask);
+        deployResult = this.openTofuLocalDeployment.deploy(deployTask);
 
         Assertions.assertThrows(OpenTofuExecutorException.class,
-                () -> this.openTofuDeployment.getDeploymentPlanAsJson(deployTask));
+                () -> this.openTofuLocalDeployment.getDeploymentPlanAsJson(deployTask));
 
     }
 

@@ -42,19 +42,16 @@ public class TerraformBootHelper {
 
     private static final String ZITADEL_PROFILE_NAME = "zitadel";
     private static final String SPLIT = "/";
-
-    @Value("${spring.profiles.active}")
-    private String profiles;
-
-    @Value("${server.port}")
-    private String port;
-
     private final TerraformBootConfig terraformBootConfig;
     private final TerraformProviderHelper terraformProviderHelper;
     private final TerraformFromScriptsApi terraformFromScriptsApi;
     private final TerraformFromGitRepoApi terraformFromGitRepoApi;
     private final DeployEnvironments deployEnvironments;
     private final AdminApi adminApi;
+    @Value("${spring.profiles.active}")
+    private String profiles;
+    @Value("${server.port}")
+    private String port;
 
     /**
      * Constructor for TerraformBootHelper.

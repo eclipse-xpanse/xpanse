@@ -16,12 +16,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.config.OpenTofuMakerConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api.AdminApi;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api.OpenTofuFromScriptsApi;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.OpenTofuScriptGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.OpenTofuProviderHelper;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfoHolder;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,9 +43,10 @@ public class OpenTofuMakerHelper {
     private static final String ZITADEL_PROFILE_NAME = "zitadel";
     private static final String SPLIT = "/";
     private final OpenTofuMakerConfig openTofuMakerConfig;
-    private final OpenTofuFromScriptsApi openTofuFromScriptsApi;
-    private final DeployEnvironments deployEnvironments;
     private final OpenTofuProviderHelper openTofuProviderHelper;
+    private final OpenTofuFromScriptsApi openTofuFromScriptsApi;
+    private final OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
+    private final DeployEnvironments deployEnvironments;
     private final AdminApi adminApi;
     @Value("${spring.profiles.active}")
     private String profiles;
@@ -53,14 +57,29 @@ public class OpenTofuMakerHelper {
      * Constructor for OpenTofuMakerHelper.
      */
     public OpenTofuMakerHelper(OpenTofuMakerConfig openTofuMakerConfig,
+                               OpenTofuProviderHelper openTofuProviderHelper, 
                                OpenTofuFromScriptsApi openTofuFromScriptsApi,
-                               DeployEnvironments deployEnvironments,
-                               OpenTofuProviderHelper openTofuProviderHelper, AdminApi adminApi) {
+                               OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
+                               DeployEnvironments deployEnvironments, AdminApi adminApi) {
         this.openTofuMakerConfig = openTofuMakerConfig;
-        this.openTofuFromScriptsApi = openTofuFromScriptsApi;
-        this.deployEnvironments = deployEnvironments;
         this.openTofuProviderHelper = openTofuProviderHelper;
+        this.openTofuFromScriptsApi = openTofuFromScriptsApi;
+        this.openTofuFromGitRepoApi = openTofuFromGitRepoApi;
+        this.deployEnvironments = deployEnvironments;
         this.adminApi = adminApi;
+    }
+
+    /**
+     * Converts OCL DeployFromGitRepo type to tofu-maker OpenTofuScriptGitRepoDetails type.
+     */
+    public OpenTofuScriptGitRepoDetails convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
+            ScriptsRepo scriptsRepo) {
+        OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails =
+                new OpenTofuScriptGitRepoDetails();
+        openTofuScriptGitRepoDetails.setRepoUrl(scriptsRepo.getRepoUrl());
+        openTofuScriptGitRepoDetails.setBranch(scriptsRepo.getBranch());
+        openTofuScriptGitRepoDetails.setScriptPath(scriptsRepo.getScriptsPath());
+        return openTofuScriptGitRepoDetails;
     }
 
     /**
@@ -73,6 +92,7 @@ public class OpenTofuMakerHelper {
         List<String> profileList = Arrays.asList(profiles.split(","));
         if (!CollectionUtils.isEmpty(profileList) && profileList.contains(ZITADEL_PROFILE_NAME)) {
             openTofuFromScriptsApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
+            openTofuFromGitRepoApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
             adminApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
         }
     }

@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executor;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -73,7 +74,7 @@ public class TerraformLocalDeployment implements Deployer {
                                     TerraformProviderHelper terraformProviderHelper,
                                     @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
                                     TerraformDeploymentResultCallbackManager
-                                       terraformDeploymentResultCallbackManager,
+                                                terraformDeploymentResultCallbackManager,
                                     DeployServiceEntityHandler deployServiceEntityHandler,
                                     ScriptsGitRepoManage scriptsGitRepoManage) {
         this.deployEnvironments = deployEnvironments;
@@ -126,8 +127,7 @@ public class TerraformLocalDeployment implements Deployer {
         // Create the workspace.
         buildWorkspace(workspace);
         prepareDeployWorkspaceWithScripts(task, workspace);
-        TerraformLocalExecutor executor = getExecutorForDeployTask(
-                task, workspace, true);
+        TerraformLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
@@ -190,9 +190,8 @@ public class TerraformLocalDeployment implements Deployer {
      */
     private void deleteWorkSpace(String workspace) {
         Path path = Paths.get(workspace);
-        try {
-            Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile)
-                    .forEach(File::delete);
+        try (Stream<Path> pathStream = Files.walk(path)) {
+            pathStream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -223,54 +222,44 @@ public class TerraformLocalDeployment implements Deployer {
     }
 
     private TerraformLocalExecutor getExecutor(Map<String, String> envVariables,
-                                               Map<String, Object> inputVariables,
-                                               String workspace,
+                                               Map<String, Object> inputVariables, String workspace,
                                                Ocl ocl) {
         if (terraformLocalConfig.isDebugEnabled()) {
             log.info("Debug enabled for Terraform CLI with level {}",
                     terraformLocalConfig.getDebugLogLevel());
             envVariables.put(TF_DEBUG_FLAG, terraformLocalConfig.getDebugLogLevel());
         }
-        return new TerraformLocalExecutor(
-                envVariables, inputVariables, workspace, getSubDirectory(ocl));
+        return new TerraformLocalExecutor(envVariables, inputVariables, workspace,
+                getSubDirectory(ocl));
     }
 
     private void prepareDeployWorkspaceWithScripts(DeployTask deployTask, String workspace) {
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            createScriptFile(
-                    deployTask.getDeployRequest().getCsp(),
-                    deployTask.getDeployRequest().getRegion(),
-                    workspace,
+            createScriptFile(deployTask.getDeployRequest().getCsp(),
+                    deployTask.getDeployRequest().getRegion(), workspace,
                     deployTask.getOcl().getDeployment().getDeployer());
         }
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getScriptsRepo())) {
-            scriptsGitRepoManage.checkoutScripts(
-                    workspace, deployTask.getOcl().getDeployment().getScriptsRepo());
+            scriptsGitRepoManage.checkoutScripts(workspace,
+                    deployTask.getOcl().getDeployment().getScriptsRepo());
         }
     }
 
-    private void prepareDestroyWorkspaceWithScripts(
-            DeployTask deployTask, String workspace, String tfState) {
+    private void prepareDestroyWorkspaceWithScripts(DeployTask deployTask, String workspace,
+                                                    String tfState) {
         log.info("start create terraform destroy workspace and script");
         File parentPath = new File(workspace);
         if (!parentPath.exists() || !parentPath.isDirectory()) {
             parentPath.mkdirs();
         }
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            createDestroyScriptFile(
-                    deployTask.getDeployRequest().getCsp(),
-                    deployTask.getDeployRequest().getRegion(),
-                    workspace,
-                    tfState);
+            createDestroyScriptFile(deployTask.getDeployRequest().getCsp(),
+                    deployTask.getDeployRequest().getRegion(), workspace, tfState);
         } else if (Objects.nonNull(deployTask.getOcl().getDeployment().getScriptsRepo())) {
-            scriptsGitRepoManage.checkoutScripts(
-                    workspace, deployTask.getOcl().getDeployment().getScriptsRepo()
-            );
-            String scriptPath = workspace
-                    + File.separator
-                    + deployTask.getOcl().getDeployment().getScriptsRepo().getScriptsPath()
-                    + File.separator
-                    + STATE_FILE_NAME;
+            scriptsGitRepoManage.checkoutScripts(workspace,
+                    deployTask.getOcl().getDeployment().getScriptsRepo());
+            String scriptPath = workspace + File.separator + deployTask.getOcl().getDeployment()
+                    .getScriptsRepo().getScriptsPath() + File.separator + STATE_FILE_NAME;
             try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
                 scriptWriter.write(tfState);
             } catch (IOException e) {
@@ -348,7 +337,7 @@ public class TerraformLocalDeployment implements Deployer {
      * @param taskId The id of the task.
      */
     private String getWorkspacePath(UUID taskId) {
-        return  System.getProperty("java.io.tmpdir") + File.separator
+        return System.getProperty("java.io.tmpdir") + File.separator
                 + terraformLocalConfig.getWorkspaceDirectory() + File.separator + taskId.toString();
     }
 
@@ -375,8 +364,8 @@ public class TerraformLocalDeployment implements Deployer {
         } else {
             scriptsGitRepoManage.checkoutScripts(workspace, ocl.getDeployment().getScriptsRepo());
         }
-        TerraformLocalExecutor
-                executor = getExecutor(new HashMap<>(), new HashMap<>(), workspace, ocl);
+        TerraformLocalExecutor executor =
+                getExecutor(new HashMap<>(), new HashMap<>(), workspace, ocl);
         return executor.tfValidate();
     }
 

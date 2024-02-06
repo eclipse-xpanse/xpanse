@@ -1,7 +1,7 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
-import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuDeployment.SCRIPT_FILE_NAME;
-import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuDeployment.VERSION_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuLocalDeployment.SCRIPT_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuLocalDeployment.VERSION_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,7 +15,6 @@ import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuExecutor;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.resources.TfState;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -31,7 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class OpenTofuExecutorTest {
+class OpenTofuLocalExecutorTest {
     private static final String workspace =
             System.getProperty("java.io.tmpdir") + "/opentofu_workspace/" + UUID.randomUUID();
     private static final String version = "~> 1.51.0";
@@ -39,7 +38,7 @@ class OpenTofuExecutorTest {
     private Map<String, String> mockEnv;
     @Mock
     private Map<String, Object> mockVariables;
-    private OpenTofuExecutor openTofuExecutorUnderTest;
+    private OpenTofuLocalExecutor openTofuLocalExecutorUnderTest;
 
     @BeforeAll
     static void initWorkSpace() throws Exception {
@@ -74,14 +73,15 @@ class OpenTofuExecutorTest {
 
     @BeforeEach
     void setUp() {
-        openTofuExecutorUnderTest = new OpenTofuExecutor(mockEnv, mockVariables, workspace);
+        openTofuLocalExecutorUnderTest = new OpenTofuLocalExecutor(mockEnv, mockVariables,
+                workspace, null);
     }
 
     @Test
     @Order(1)
     void testTfInit() {
         // Run the test
-        final SystemCmdResult result = openTofuExecutorUnderTest.tfInit();
+        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfInit();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -91,14 +91,14 @@ class OpenTofuExecutorTest {
     @Test
     @Order(2)
     void testGetOpenTofuPlanAsJson() {
-        assertNotNull(openTofuExecutorUnderTest.getOpenTofuPlanAsJson());
+        assertNotNull(openTofuLocalExecutorUnderTest.getOpenTofuPlanAsJson());
     }
 
     @Test
     @Order(3)
     void testTfPlan() {
         // Run the test
-        final SystemCmdResult result = openTofuExecutorUnderTest.tfPlan();
+        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfPlan();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -111,7 +111,7 @@ class OpenTofuExecutorTest {
     void testTfPlanWithOutput() {
         // Setup
         // Run the test
-        final SystemCmdResult result = openTofuExecutorUnderTest.tfPlanWithOutput();
+        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfPlanWithOutput();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -123,7 +123,7 @@ class OpenTofuExecutorTest {
     @Order(5)
     void testTfApply() {
         // Run the test
-        final SystemCmdResult result = openTofuExecutorUnderTest.tfApply();
+        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfApply();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -135,7 +135,7 @@ class OpenTofuExecutorTest {
     @Order(6)
     void testTfDestroy() {
         // Run the test
-        final SystemCmdResult result = openTofuExecutorUnderTest.tfDestroy();
+        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfDestroy();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -149,10 +149,10 @@ class OpenTofuExecutorTest {
     void testDeploy() throws JsonProcessingException {
         // Setup
         // Run the test
-        openTofuExecutorUnderTest.deploy();
+        openTofuLocalExecutorUnderTest.deploy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(openTofuExecutorUnderTest.getTerraformState(),
+                new ObjectMapper().readValue(openTofuLocalExecutorUnderTest.getTerraformState(),
                         TfState.class);
         assertFalse(tfState.getOutputs().isEmpty());
     }
@@ -162,10 +162,10 @@ class OpenTofuExecutorTest {
     void testDestroy() throws JsonProcessingException {
         // Setup
         // Run the test
-        openTofuExecutorUnderTest.destroy();
+        openTofuLocalExecutorUnderTest.destroy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(openTofuExecutorUnderTest.getTerraformState(),
+                new ObjectMapper().readValue(openTofuLocalExecutorUnderTest.getTerraformState(),
                         TfState.class);
         assertTrue(tfState.getOutputs().isEmpty());
     }
@@ -175,7 +175,8 @@ class OpenTofuExecutorTest {
     void testGetImportantFilesContent() {
         // Setup
         // Run the test
-        final Map<String, String> result = openTofuExecutorUnderTest.getImportantFilesContent();
+        final Map<String, String> result =
+                openTofuLocalExecutorUnderTest.getImportantFilesContent();
         // Verify the results
         assertTrue(result.containsKey("terraform.tfstate.backup"));
     }

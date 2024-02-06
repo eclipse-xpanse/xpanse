@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +28,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValida
  * An executor for OpenTofu.
  */
 @Slf4j
-public class OpenTofuExecutor {
+public class OpenTofuLocalExecutor {
 
     private static final String VARS_FILE_NAME = "variables.tfvars.json";
     private static final String STATE_FILE_NAME = "terraform.tfstate";
@@ -50,11 +51,16 @@ public class OpenTofuExecutor {
      * @param variables variables for the open tofu command line.
      * @param workspace workspace for the open tofu command line.
      */
-    OpenTofuExecutor(Map<String, String> env, Map<String, Object> variables,
-                     String workspace) {
+    OpenTofuLocalExecutor(Map<String, String> env, 
+                           Map<String, Object> variables,
+                           String workspace,
+                           @Nullable String subDirectory) {
         this.env = env;
         this.variables = variables;
-        this.workspace = workspace;
+        this.workspace =
+                Objects.nonNull(subDirectory)
+                        ? workspace + File.separator + subDirectory
+                        : workspace;
     }
 
     /**
