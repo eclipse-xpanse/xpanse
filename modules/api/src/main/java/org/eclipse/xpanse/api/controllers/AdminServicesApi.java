@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.OpenTofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
@@ -57,6 +58,7 @@ public class AdminServicesApi {
     private final PluginManager pluginManager;
     private final DatabaseManager databaseManager;
     private final TerraformBootManager terraformBootManager;
+    private final OpenTofuMakerManager openTofuMakerManager;
     private final PolicyManager policyManager;
     private final OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
 
@@ -67,12 +69,14 @@ public class AdminServicesApi {
                             PluginManager pluginManager,
                             DatabaseManager databaseManager,
                             @Nullable TerraformBootManager terraformBootManager,
+                            @Nullable OpenTofuMakerManager openTofuMakerManager,
                             PolicyManager policyManager,
                             OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck) {
         this.identityProviderManager = identityProviderManager;
         this.pluginManager = pluginManager;
         this.databaseManager = databaseManager;
         this.terraformBootManager = terraformBootManager;
+        this.openTofuMakerManager = openTofuMakerManager;
         this.policyManager = policyManager;
         this.openTelemetryHealthCheck = openTelemetryHealthCheck;
     }
@@ -159,6 +163,14 @@ public class AdminServicesApi {
                         terraformBootManager.getTerraformBootStatus();
                 if (Objects.nonNull(terraformBootStatus)) {
                     backendSystemStatuses.add(terraformBootStatus);
+                }
+            }
+            if (Objects.nonNull(openTofuMakerManager)
+                    && type == BackendSystemType.TOFU_MAKER) {
+                BackendSystemStatus openTofuMakerStatus =
+                        openTofuMakerManager.getOpenTofuMakerStatus();
+                if (Objects.nonNull(openTofuMakerStatus)) {
+                    backendSystemStatuses.add(openTofuMakerStatus);
                 }
             }
             if (type == BackendSystemType.POLICY_MAN) {

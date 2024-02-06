@@ -19,12 +19,14 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.OpenTofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
+import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthCheck;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -44,7 +46,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed,terraform-boot"})
+@SpringBootTest
 @AutoConfigureMockMvc
 class AdminServicesApiTest {
 
@@ -62,6 +64,10 @@ class AdminServicesApiTest {
     private TerraformBootManager terraformBootManager;
     @Resource
     private PolicyManager policyManager;
+    @Resource
+    private OpenTofuMakerManager openTofuMakerManager;
+    @Resource
+    private OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -180,6 +186,21 @@ class AdminServicesApiTest {
                         policyManager.getPolicyManStatus();
                 if (Objects.nonNull(terraformBootStatus)) {
                     backendSystemStatuses.add(terraformBootStatus);
+                }
+            }
+            if (Objects.nonNull(openTofuMakerManager)
+                    && type == BackendSystemType.TOFU_MAKER) {
+                BackendSystemStatus openTofuMakerStatus =
+                        openTofuMakerManager.getOpenTofuMakerStatus();
+                if (Objects.nonNull(openTofuMakerStatus)) {
+                    backendSystemStatuses.add(openTofuMakerStatus);
+                }
+            }
+            if (type == BackendSystemType.OPEN_TELEMETRY_COLLECTOR) {
+                BackendSystemStatus otelExporterStatus =
+                        openTelemetryHealthCheck.getOpenTelemetryHealthStatus();
+                if (Objects.nonNull(otelExporterStatus)) {
+                    backendSystemStatuses.add(otelExporterStatus);
                 }
             }
         }

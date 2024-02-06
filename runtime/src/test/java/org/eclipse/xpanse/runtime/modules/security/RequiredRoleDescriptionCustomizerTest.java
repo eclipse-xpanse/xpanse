@@ -40,9 +40,10 @@ class RequiredRoleDescriptionCustomizerTest {
         operation.externalDocs(externalDocs);
 
         final HandlerMethod handlerMethod =
-                new HandlerMethod(new AdminServicesApi(new IdentityProviderManager(), new PluginManager(),
-                        new DatabaseManager(), null, new PolicyManager(),
-                        new OpenTelemetryCollectorHealthCheck()), "healthCheck", null);
+                new HandlerMethod(
+                        new AdminServicesApi(new IdentityProviderManager(), new PluginManager(),
+                                new DatabaseManager(), null, null, new PolicyManager(),
+                                new OpenTelemetryCollectorHealthCheck()), "healthCheck", null);
         final Operation expectedResult = new Operation();
         expectedResult.tags(List.of("value"));
         expectedResult.summary("summary");

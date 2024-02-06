@@ -46,7 +46,7 @@ public class TerraformBootWebhookApi {
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result after terraform executes the command "
             + "line.")
-    @PostMapping(value = "${webhook.deployCallbackUri}/{task_id}", produces =
+    @PostMapping(value = "${webhook.terraform-boot.deployCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void deployCallback(
@@ -63,7 +63,7 @@ public class TerraformBootWebhookApi {
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result after terraform executes the command "
             + "line.")
-    @PostMapping(value = "${webhook.destroyCallbackUri}/{task_id}", produces =
+    @PostMapping(value = "${webhook.terraform-boot.destroyCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void destroyCallback(
