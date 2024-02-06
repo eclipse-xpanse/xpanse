@@ -122,6 +122,7 @@ public class ServiceStateManager {
             deployServiceEntity.setServiceState(ServiceState.STARTING);
             deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
             if (restart(deployServiceEntity)) {
+                deployServiceEntity.setLastStartedAt(OffsetDateTime.now());
                 deployServiceEntity.setServiceState(ServiceState.RUNNING);
             } else {
                 deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
