@@ -1869,6 +1869,7 @@
       },
       "TerraformDeployFromGitRepoRequest": {
         "required": [
+          "gitRepoDetails",
           "isPlanOnly",
           "variables"
         ],
@@ -1991,6 +1992,7 @@
       },
       "TerraformAsyncDeployFromGitRepoRequest": {
         "required": [
+          "gitRepoDetails",
           "isPlanOnly",
           "variables",
           "webhookConfig"

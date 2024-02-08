@@ -118,6 +118,9 @@ public class TerraformBootServiceDestroyer {
         request.setDestroyScenario(
                 TerraformAsyncDestroyFromGitRepoRequest.DestroyScenarioEnum.fromValue(
                         task.getDestroyScenario().toValue()));
+        request.setGitRepoDetails(
+                terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
+                        task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }
 

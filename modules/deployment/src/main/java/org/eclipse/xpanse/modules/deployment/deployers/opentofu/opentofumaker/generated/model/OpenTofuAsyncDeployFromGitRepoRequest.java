@@ -14,11 +14,18 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.OpenTofuScriptGitRepoDetails;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.WebhookConfig;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * OpenTofuAsyncDeployFromGitRepoRequest
@@ -151,9 +158,9 @@ public class OpenTofuAsyncDeployFromGitRepoRequest {
    * Get gitRepoDetails
    * @return gitRepoDetails
   **/
-  @jakarta.annotation.Nullable
+  @jakarta.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public OpenTofuScriptGitRepoDetails getGitRepoDetails() {
     return gitRepoDetails;
@@ -161,7 +168,7 @@ public class OpenTofuAsyncDeployFromGitRepoRequest {
 
 
   @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setGitRepoDetails(OpenTofuScriptGitRepoDetails gitRepoDetails) {
     this.gitRepoDetails = gitRepoDetails;
   }

@@ -3,23 +3,31 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.g
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.ApiClient;
 
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.OpenTofuMakerSystemStatus;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model.Response;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
-@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.AdminApi")
+@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api.AdminApi")
 public class AdminApi {
     private ApiClient apiClient;
 

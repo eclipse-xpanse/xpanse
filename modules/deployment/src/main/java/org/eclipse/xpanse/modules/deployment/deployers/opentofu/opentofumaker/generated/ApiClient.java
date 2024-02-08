@@ -7,6 +7,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -39,6 +40,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,13 +51,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
+import java.util.function.Supplier;
 import java.time.OffsetDateTime;
 
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.auth.Authentication;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.auth.OAuth;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
-@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient")
+@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.ApiClient")
 public class ApiClient extends JavaTimeFormatter {
     public enum CollectionFormat {
         CSV(","), TSV("\t"), SSV(" "), PIPES("|"), MULTI(null);

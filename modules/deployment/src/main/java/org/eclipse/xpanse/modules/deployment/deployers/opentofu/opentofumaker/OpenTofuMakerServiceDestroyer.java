@@ -118,6 +118,9 @@ public class OpenTofuMakerServiceDestroyer {
         request.setDestroyScenario(
                 OpenTofuAsyncDestroyFromGitRepoRequest.DestroyScenarioEnum.fromValue(
                         task.getDestroyScenario().toValue()));
+        request.setGitRepoDetails(
+                openTofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
+                        task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }
 
