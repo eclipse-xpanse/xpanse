@@ -300,6 +300,7 @@ public class DeployService {
         DeployTask deployTask =
                 deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
                         deployServiceEntity);
+        deployTask.setDestroyScenario(DestroyScenario.DESTROY);
         destroy(deployTask, deployServiceEntity);
     }
 
