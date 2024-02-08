@@ -1869,6 +1869,7 @@
       },
       "OpenTofuDeployFromGitRepoRequest": {
         "required": [
+          "gitRepoDetails",
           "isPlanOnly",
           "variables"
         ],
@@ -1991,6 +1992,7 @@
       },
       "OpenTofuAsyncDeployFromGitRepoRequest": {
         "required": [
+          "gitRepoDetails",
           "isPlanOnly",
           "variables",
           "webhookConfig"

@@ -158,9 +158,9 @@ public class TerraformAsyncDeployFromGitRepoRequest {
    * Get gitRepoDetails
    * @return gitRepoDetails
   **/
-  @jakarta.annotation.Nullable
+  @jakarta.annotation.Nonnull
   @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public TerraformScriptGitRepoDetails getGitRepoDetails() {
     return gitRepoDetails;
@@ -168,7 +168,7 @@ public class TerraformAsyncDeployFromGitRepoRequest {
 
 
   @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setGitRepoDetails(TerraformScriptGitRepoDetails gitRepoDetails) {
     this.gitRepoDetails = gitRepoDetails;
   }

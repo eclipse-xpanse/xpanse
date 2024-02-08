@@ -21,11 +21,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class ScriptsGitRepoManage {
+    private static final int MAX_RETRY_COUNT = 5;
 
     /**
      * Method to check out scripts from a GIT repo.
      *
-     * @param workspace directory where the GIT clone must be executed.
+     * @param workspace   directory where the GIT clone must be executed.
      * @param scriptsRepo directory inside the GIT repo where scripts are expected to be present.
      */
     public void checkoutScripts(String workspace,
@@ -35,17 +36,28 @@ public class ScriptsGitRepoManage {
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
         repositoryBuilder.findGitDir(workspaceDirectory);
         if (Objects.isNull(repositoryBuilder.getGitDir())) {
+            CloneCommand cloneCommand = new CloneCommand();
+            cloneCommand.setURI(scriptsRepo.getRepoUrl());
+            cloneCommand.setProgressMonitor(null);
+            cloneCommand.setDirectory(workspaceDirectory);
+            cloneCommand.setBranch(scriptsRepo.getBranch());
+            cloneCommand.setTimeout(20);
             log.info("Repo does not exist in the workspace. Cloning it.");
-            try {
-                CloneCommand cloneCommand = new CloneCommand();
-                cloneCommand.setURI(scriptsRepo.getRepoUrl());
-                cloneCommand.setProgressMonitor(null);
-                cloneCommand.setDirectory(workspaceDirectory);
-                cloneCommand.setBranch(scriptsRepo.getBranch());
-                cloneCommand.call();
-            } catch (GitAPIException e) {
-                log.error(e.getMessage(), e);
-                throw new GitRepoCloneException(e.getMessage());
+            boolean cloneSuccess = false;
+            int retryCount = 0;
+            String errMsg = "";
+            while (!cloneSuccess && retryCount < MAX_RETRY_COUNT) {
+                try {
+                    cloneCommand.call();
+                    cloneSuccess = true;
+                } catch (GitAPIException e) {
+                    retryCount++;
+                    errMsg = String.format("Clone scripts form GIT repo error:%s", e.getMessage());
+                    log.error(errMsg);
+                }
+            }
+            if (!cloneSuccess) {
+                throw new GitRepoCloneException(errMsg);
             }
         } else {
             log.info("Scripts repo is already cloned in the workspace.");
@@ -56,8 +68,8 @@ public class ScriptsGitRepoManage {
     private void folderContainsScripts(String workspace, ScriptsRepo scriptsRepo) {
         File directory = new File(workspace
                 + (Objects.nonNull(scriptsRepo.getScriptsPath())
-                        ? File.separator + scriptsRepo.getScriptsPath()
-                        : ""));
+                ? File.separator + scriptsRepo.getScriptsPath()
+                : ""));
         File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".tf"));
         if (Objects.isNull(files) || files.length == 0) {
             throw new GitRepoCloneException(

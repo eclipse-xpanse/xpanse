@@ -70,26 +70,34 @@ public class DeployResultManager {
         deployServiceEntity.setServiceDeploymentState(
                 getServiceDeploymentState(deployResult.getState()));
 
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
-            deployServiceEntity.getProperties().clear();
-        }
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getPrivateProperties())) {
-            deployServiceEntity.getPrivateProperties().clear();
-        }
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
-            deployServiceEntity.getDeployResourceList().clear();
-        }
+        boolean taskExecutedSuccess = deployResult.getState() == DeployerTaskStatus.DESTROY_SUCCESS
+                || deployResult.getState() == DeployerTaskStatus.ROLLBACK_SUCCESS
+                || deployResult.getState() == DeployerTaskStatus.PURGE_SUCCESS
+                || deployResult.getState() == DeployerTaskStatus.DEPLOY_SUCCESS;
 
-        if (!CollectionUtils.isEmpty(deployResult.getPrivateProperties())) {
+        if (CollectionUtils.isEmpty(deployResult.getPrivateProperties())) {
+            if (taskExecutedSuccess) {
+                deployServiceEntity.getPrivateProperties().clear();
+            }
+        } else {
             deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
         }
-        if (!CollectionUtils.isEmpty(deployResult.getProperties())) {
+
+        if (CollectionUtils.isEmpty(deployResult.getProperties())) {
+            if (taskExecutedSuccess) {
+                deployServiceEntity.getProperties().clear();
+            }
+        } else {
             deployServiceEntity.setProperties(deployResult.getProperties());
         }
-        if (!CollectionUtils.isEmpty(deployResult.getResources())) {
+
+        if (CollectionUtils.isEmpty(deployResult.getResources())) {
+            if (taskExecutedSuccess) {
+                deployServiceEntity.getDeployResourceList().clear();
+            }
+        } else {
             deployServiceEntity.setDeployResourceList(
-                    getDeployResourceEntityList(deployResult.getResources(),
-                            deployServiceEntity));
+                    getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
         }
         sensitiveDataHandler.maskSensitiveFields(deployServiceEntity);
     }

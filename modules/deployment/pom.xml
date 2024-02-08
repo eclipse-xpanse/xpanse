@@ -106,7 +106,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/terraformBootApis.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/terraform-boot-openapi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>
@@ -141,7 +141,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/tofuMakerApis.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/tofu-maker-openapi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>
