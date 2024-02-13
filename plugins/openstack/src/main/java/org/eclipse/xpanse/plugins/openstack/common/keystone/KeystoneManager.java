@@ -102,7 +102,7 @@ public class KeystoneManager {
                         credentialVariable.getName())) {
                     tenant = credentialVariable.getValue();
                 }
-                if (OpenstackEnvironmentConstants.DOMAIN.equals(
+                if (OpenstackEnvironmentConstants.USER_DOMAIN.equals(
                         credentialVariable.getName())) {
                     domain = credentialVariable.getValue();
                 }

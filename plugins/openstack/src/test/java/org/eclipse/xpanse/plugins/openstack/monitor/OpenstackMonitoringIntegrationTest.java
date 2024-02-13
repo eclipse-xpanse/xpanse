@@ -245,7 +245,7 @@ class OpenstackMonitoringIntegrationTest {
             if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.PASSWORD)) {
                 credentialVariable.setValue("test");
             }
-            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.DOMAIN)) {
+            if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.USER_DOMAIN)) {
                 credentialVariable.setValue("default");
             }
             if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.PROJECT)) {
