@@ -58,7 +58,6 @@ public class TerraformBootScriptValidator {
      * Validate scripts provided in the OCL.
      */
     public DeploymentScriptValidationResult validateTerraformScripts(Ocl ocl) {
-        terraformBootHelper.setHeaderTokenByProfiles();
         DeploymentScriptValidationResult deploymentScriptValidationResult = null;
         try {
             TerraformValidationResult validate =
@@ -83,7 +82,6 @@ public class TerraformBootScriptValidator {
      * Validate scripts in the GIT repo.
      */
     public DeploymentScriptValidationResult validateTerraformScriptsFromGitRepo(Ocl ocl) {
-        terraformBootHelper.setHeaderTokenByProfiles();
         DeploymentScriptValidationResult deploymentScriptValidationResult = null;
         try {
             TerraformValidationResult validate =

@@ -40,7 +40,6 @@ public class TerraformBootDeploymentPlanManage {
      * Method to get terraform plan from scripts provided in OCL.
      */
     public TerraformPlan getTerraformPlanFromScripts(DeployTask deployTask) {
-        terraformBootHelper.setHeaderTokenByProfiles();
         return terraformFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(deployTask),
                 deployTask.getId());
     }
@@ -49,7 +48,6 @@ public class TerraformBootDeploymentPlanManage {
      * Method to get terraform plan from scripts provided in GIT repo.
      */
     public TerraformPlan getTerraformPlanFromGitRepo(DeployTask deployTask) {
-        terraformBootHelper.setHeaderTokenByProfiles();
         return terraformFromGitRepoApi.planFromGitRepo(getPlanFromGitRepoRequest(deployTask),
                 deployTask.getId());
     }
