@@ -14,7 +14,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.eclipse.xpanse.common.oauth2.client.Oauth2ClientAccessTokenProvider;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient;
 import org.springframework.stereotype.Component;
 
 /**

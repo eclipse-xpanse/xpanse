@@ -39,7 +39,7 @@ public class TerraformBootHelper {
     private final TerraformBootConfig terraformBootConfig;
     private final TerraformProviderHelper terraformProviderHelper;
     private final DeployEnvironments deployEnvironments;
-    
+
     @Value("${server.port}")
     private String port;
 
