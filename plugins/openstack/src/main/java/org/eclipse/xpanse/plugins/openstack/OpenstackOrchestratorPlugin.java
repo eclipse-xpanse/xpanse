@@ -95,7 +95,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.PROJECT_DOMAIN,
                 "The domain to which the openstack project is linked to.", true, false));
         CredentialVariables httpAuth =
-                new CredentialVariables(getCsp(), CredentialType.VARIABLES, "Variables",
+                new CredentialVariables(getCsp(), CredentialType.VARIABLES, "USERNAME_PASSWORD",
                         "Authenticate at the specified URL using an account and password.", null,
                         credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();

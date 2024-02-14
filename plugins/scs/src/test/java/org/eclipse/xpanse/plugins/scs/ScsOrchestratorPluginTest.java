@@ -84,7 +84,7 @@ class ScsOrchestratorPluginTest {
         CredentialVariables credentialVariables = (CredentialVariables) result.get(0);
         assertEquals(plugin.getCsp(), credentialVariables.getCsp());
         assertNull(credentialVariables.getUserId());
-        assertEquals("Variables", credentialVariables.getName());
+        assertEquals("USERNAME_PASSWORD", credentialVariables.getName());
         assertEquals("Authenticate at the specified URL using an account and password.",
                 credentialVariables.getDescription());
         assertEquals(CredentialType.VARIABLES, credentialVariables.getType());

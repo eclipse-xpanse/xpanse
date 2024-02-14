@@ -98,7 +98,7 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
                 new CredentialVariable(ScsEnvironmentConstants.DOMAIN,
                         "The domain of the SCS installation to be used.", true, false));
         CredentialVariables httpAuth = new CredentialVariables(
-                getCsp(), CredentialType.VARIABLES, "Variables",
+                getCsp(), CredentialType.VARIABLES, "USERNAME_PASSWORD",
                 "Authenticate at the specified URL using an account and password.",
                 null, credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
