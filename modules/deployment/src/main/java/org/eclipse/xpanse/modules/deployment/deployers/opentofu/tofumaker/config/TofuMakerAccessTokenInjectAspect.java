@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.springframework.stereotype.Component;
 
 /**
- * Aspect for inserting bearer token implicity to all API calls.
+ * Aspect for inserting bearer token implicitly to all API calls.
  */
 @Slf4j
 @Aspect
