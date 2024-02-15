@@ -47,7 +47,6 @@ public class TerraformBootServiceDeployer {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromScriptsRequest request = getDeployFromScriptsRequest(deployTask);
         try {
-            terraformBootHelper.setHeaderTokenByProfiles();
             terraformFromScriptsApi.asyncDeployWithScripts(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;
@@ -65,7 +64,6 @@ public class TerraformBootServiceDeployer {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromGitRepoRequest request = getDeployFromGitRepoRequest(deployTask);
         try {
-            terraformBootHelper.setHeaderTokenByProfiles();
             terraformFromGitRepoApi.asyncDeployFromGitRepo(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;

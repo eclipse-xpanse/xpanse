@@ -52,7 +52,6 @@ public class TerraformBootManager {
             terraformBootStatus.setEndpoint(terraformBootBaseUrl);
 
             try {
-                terraformBootHelper.setHeaderTokenByProfiles();
                 TerraformBootSystemStatus terraformBootSystemStatus =
                         terraformAdminApi.healthCheck();
                 terraformBootStatus.setHealthStatus(HealthStatus.valueOf(

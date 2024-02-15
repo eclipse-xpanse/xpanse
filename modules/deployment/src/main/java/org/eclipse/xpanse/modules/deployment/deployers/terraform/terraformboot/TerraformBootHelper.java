@@ -15,9 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config.TerraformBootConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.AdminApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformScriptGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
@@ -26,11 +23,9 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.security.common.CurrentUserInfoHolder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Bean for all helpers methods to interact with terraform-boot.
@@ -40,16 +35,11 @@ import org.springframework.util.CollectionUtils;
 @Profile("terraform-boot")
 public class TerraformBootHelper {
 
-    private static final String ZITADEL_PROFILE_NAME = "zitadel";
     private static final String SPLIT = "/";
     private final TerraformBootConfig terraformBootConfig;
     private final TerraformProviderHelper terraformProviderHelper;
-    private final TerraformFromScriptsApi terraformFromScriptsApi;
-    private final TerraformFromGitRepoApi terraformFromGitRepoApi;
     private final DeployEnvironments deployEnvironments;
-    private final AdminApi adminApi;
-    @Value("${spring.profiles.active}")
-    private String profiles;
+
     @Value("${server.port}")
     private String port;
 
@@ -58,15 +48,10 @@ public class TerraformBootHelper {
      */
     public TerraformBootHelper(TerraformBootConfig terraformBootConfig,
                                TerraformProviderHelper terraformProviderHelper,
-                               TerraformFromScriptsApi terraformFromScriptsApi,
-                               TerraformFromGitRepoApi terraformFromGitRepoApi,
-                               DeployEnvironments deployEnvironments, AdminApi adminApi) {
+                               DeployEnvironments deployEnvironments) {
         this.terraformBootConfig = terraformBootConfig;
         this.terraformProviderHelper = terraformProviderHelper;
-        this.terraformFromScriptsApi = terraformFromScriptsApi;
-        this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.deployEnvironments = deployEnvironments;
-        this.adminApi = adminApi;
     }
 
     /**
@@ -80,21 +65,6 @@ public class TerraformBootHelper {
         terraformScriptGitRepoDetails.setBranch(scriptsRepo.getBranch());
         terraformScriptGitRepoDetails.setScriptPath(scriptsRepo.getScriptsPath());
         return terraformScriptGitRepoDetails;
-    }
-
-    /**
-     * Sets Oauth access token to terraform-boot request.
-     */
-    public void setHeaderTokenByProfiles() {
-        if (StringUtils.isBlank(profiles)) {
-            return;
-        }
-        List<String> profileList = Arrays.asList(profiles.split(","));
-        if (!CollectionUtils.isEmpty(profileList) && profileList.contains(ZITADEL_PROFILE_NAME)) {
-            terraformFromScriptsApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
-            terraformFromGitRepoApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
-            adminApi.getApiClient().setAccessToken(CurrentUserInfoHolder.getToken());
-        }
     }
 
     /**

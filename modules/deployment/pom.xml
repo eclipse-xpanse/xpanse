@@ -91,6 +91,11 @@
             <artifactId>org.eclipse.jgit</artifactId>
             <version>${jgit.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -145,10 +150,10 @@
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>
-                                org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api
+                                org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api
                             </apiPackage>
                             <modelPackage>
-                                org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.model
+                                org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model
                             </modelPackage>
                             <generateApiDocumentation>false</generateApiDocumentation>
                             <generateApiTests>false</generateApiTests>

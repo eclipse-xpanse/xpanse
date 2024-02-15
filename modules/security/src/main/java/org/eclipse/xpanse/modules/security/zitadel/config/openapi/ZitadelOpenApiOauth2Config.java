@@ -41,8 +41,8 @@ import org.springframework.context.annotation.Profile;
         type = SecuritySchemeType.OAUTH2,
         flows = @OAuthFlows(authorizationCode =
         @OAuthFlow(
-                authorizationUrl = "${springdoc.oAuthFlow.authorizationUrl}",
-                tokenUrl = "${springdoc.oAuthFlow.tokenUrl}",
+                authorizationUrl = "${oauth.authorization.url}",
+                tokenUrl = "${oauth.token.url}",
                 scopes = {
                         @OAuthScope(name = OPENID_SCOPE,
                                 description = "mandatory must be selected."),

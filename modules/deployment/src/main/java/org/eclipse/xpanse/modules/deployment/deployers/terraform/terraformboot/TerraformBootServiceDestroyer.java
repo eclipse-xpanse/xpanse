@@ -57,7 +57,6 @@ public class TerraformBootServiceDestroyer {
         TerraformAsyncDestroyFromScriptsRequest request =
                 getDestroyFromScriptsRequest(deployTask, resourceState);
         try {
-            terraformBootHelper.setHeaderTokenByProfiles();
             terraformFromScriptsApi.asyncDestroyWithScripts(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;
@@ -79,7 +78,6 @@ public class TerraformBootServiceDestroyer {
         TerraformAsyncDestroyFromGitRepoRequest request =
                 getDestroyFromGitRepoRequest(deployTask, resourceState);
         try {
-            terraformBootHelper.setHeaderTokenByProfiles();
             terraformFromGitRepoApi.asyncDestroyFromGitRepo(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;

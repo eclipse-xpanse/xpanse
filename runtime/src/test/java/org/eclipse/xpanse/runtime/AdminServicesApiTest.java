@@ -19,7 +19,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.OpenTofuMakerManager;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
@@ -65,7 +65,7 @@ class AdminServicesApiTest {
     @Resource
     private PolicyManager policyManager;
     @Resource
-    private OpenTofuMakerManager openTofuMakerManager;
+    private TofuMakerManager tofuMakerManager;
     @Resource
     private OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
 
@@ -188,10 +188,10 @@ class AdminServicesApiTest {
                     backendSystemStatuses.add(terraformBootStatus);
                 }
             }
-            if (Objects.nonNull(openTofuMakerManager)
+            if (Objects.nonNull(tofuMakerManager)
                     && type == BackendSystemType.TOFU_MAKER) {
                 BackendSystemStatus openTofuMakerStatus =
-                        openTofuMakerManager.getOpenTofuMakerStatus();
+                        tofuMakerManager.getOpenTofuMakerStatus();
                 if (Objects.nonNull(openTofuMakerStatus)) {
                     backendSystemStatuses.add(openTofuMakerStatus);
                 }
