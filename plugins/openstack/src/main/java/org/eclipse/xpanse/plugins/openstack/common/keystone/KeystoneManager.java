@@ -86,7 +86,8 @@ public class KeystoneManager {
         String userName = null;
         String password = null;
         String tenant = null;
-        String domain = null;
+        String userDomain = null;
+        String projectDomain = null;
         if (CredentialType.VARIABLES.toValue().equals(credential.getType().toValue())) {
             List<CredentialVariable> variables = ((CredentialVariables) credential).getVariables();
             for (CredentialVariable credentialVariable : variables) {
@@ -102,14 +103,18 @@ public class KeystoneManager {
                         credentialVariable.getName())) {
                     tenant = credentialVariable.getValue();
                 }
-                if (OpenstackEnvironmentConstants.DOMAIN.equals(
+                if (OpenstackEnvironmentConstants.USER_DOMAIN.equals(
                         credentialVariable.getName())) {
-                    domain = credentialVariable.getValue();
+                    userDomain = credentialVariable.getValue();
+                }
+                if (OpenstackEnvironmentConstants.PROJECT_DOMAIN.equals(
+                        credentialVariable.getName())) {
+                    projectDomain = credentialVariable.getValue();
                 }
             }
         }
         if (Objects.isNull(userName) || Objects.isNull(password) || Objects.isNull(tenant)
-                || Objects.isNull(domain)) {
+                || Objects.isNull(userDomain)) {
             throw new CredentialsNotFoundException(
                     "Values for all openstack credential"
                             + " variables to connect to Openstack API is not found");
@@ -127,10 +132,10 @@ public class KeystoneManager {
         return OSFactory
                 .builderV3()
                 .withConfig(buildClientConfig(url, proxyHost, proxyPort, sslDisabled))
-                .credentials(userName, password, Identifier.byName(domain))
+                .credentials(userName, password, Identifier.byName(userDomain))
                 .scopeToProject(
                         Identifier.byName(Objects.isNull(serviceTenant) ? tenant : serviceTenant),
-                        Identifier.byName(domain))
+                        Identifier.byName(projectDomain))
                 .endpoint(url)
                 .authenticate();
     }

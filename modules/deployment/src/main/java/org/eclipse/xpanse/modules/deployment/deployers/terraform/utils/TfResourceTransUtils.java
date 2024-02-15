@@ -63,7 +63,10 @@ public class TfResourceTransUtils {
         if (Objects.isNull(instanceAttributes)) {
             return null;
         }
-        return instanceAttributes.getOrDefault(key, StringUtils.EMPTY).toString();
+        if (Objects.nonNull(instanceAttributes.getOrDefault(key, StringUtils.EMPTY))) {
+            return instanceAttributes.getOrDefault(key, StringUtils.EMPTY).toString();
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
