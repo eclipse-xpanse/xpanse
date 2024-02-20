@@ -331,7 +331,6 @@ class ServiceDeployerApiTest {
         deployRequest.setFlavor("flavor2");
         deployRequest.setRegion("region");
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
-        deployRequest.setOcl(ocl);
         String requestBody = objectMapper.writeValueAsString(deployRequest);
 
         // Run the test

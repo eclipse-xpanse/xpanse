@@ -15,7 +15,6 @@ import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
@@ -88,9 +87,6 @@ public class DeployRequestBase implements Serializable {
     @Schema(description = "Defines which cloud service account is used "
             + "for deploying cloud resources.")
     private ServiceHostingType serviceHostingType;
-
-    @Hidden
-    private Ocl ocl;
 
     /**
      * The property of the Service.

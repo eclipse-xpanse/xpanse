@@ -32,6 +32,8 @@ class DeployedServiceTest {
     private static final String version = "v1.0.0";
     private static final Csp csp = Csp.AWS;
     private static final String flavor = "basic";
+    private static final UUID serviceTemplateId =
+            UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f4");
     private static final ServiceDeploymentState serviceDeploymentState =
             ServiceDeploymentState.DEPLOY_SUCCESS;
     private static final ServiceState SERVICE_STATE = ServiceState.NOT_RUNNING;
@@ -51,6 +53,7 @@ class DeployedServiceTest {
         deployedService.setVersion(version);
         deployedService.setCsp(csp);
         deployedService.setFlavor(flavor);
+        deployedService.setServiceTemplateId(serviceTemplateId);
         deployedService.setServiceDeploymentState(serviceDeploymentState);
         deployedService.setServiceState(SERVICE_STATE);
         deployedService.setCreateTime(createTime);
@@ -69,6 +72,7 @@ class DeployedServiceTest {
         assertEquals(version, deployedService.getVersion());
         assertEquals(csp, deployedService.getCsp());
         assertEquals(flavor, deployedService.getFlavor());
+        assertEquals(serviceTemplateId, deployedService.getServiceTemplateId());
         assertEquals(serviceDeploymentState, deployedService.getServiceDeploymentState());
         assertEquals(createTime, deployedService.getCreateTime());
         assertEquals(lastModifiedTime, deployedService.getLastModifiedTime());
@@ -141,6 +145,12 @@ class DeployedServiceTest {
         assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
         assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
 
+        deployedService1.setServiceTemplateId(serviceTemplateId);
+        assertNotEquals(deployedService, deployedService1);
+        assertNotEquals(deployedService1, deployedService2);
+        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        assertNotEquals(deployedService1.hashCode(), deployedService2.hashCode());
+
         deployedService1.setServiceDeploymentState(serviceDeploymentState);
         assertNotEquals(deployedService, deployedService1);
         assertNotEquals(deployedService1, deployedService2);
@@ -185,6 +195,7 @@ class DeployedServiceTest {
                 ", version=" + version +
                 ", csp=" + csp +
                 ", flavor=" + flavor +
+                ", serviceTemplateId=" + serviceTemplateId +
                 ", serviceDeploymentState=" + serviceDeploymentState +
                 ", serviceState=" + SERVICE_STATE +
                 ", serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR +

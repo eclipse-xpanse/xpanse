@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
@@ -57,6 +59,9 @@ public class OpenTofuDeploymentResultCallbackManager {
     @Resource
     private WorkflowUtils workflowUtils;
 
+    @Resource
+    private ServiceTemplateStorage serviceTemplateStorage;
+
     /**
      * Callback method after deployment is complete.
      */
@@ -68,8 +73,11 @@ public class OpenTofuDeploymentResultCallbackManager {
         DeployResult deployResult = handlerCallbackOpenTofuResult(result);
         deployResult.setId(taskId);
         if (StringUtils.isNotBlank(result.getTerraformState())) {
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            deployServiceEntity.getServiceTemplateId());
             resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    deployServiceEntity.getDeployRequest().getOcl()
+                    serviceTemplateEntity.getOcl()
                             .getDeployment().getKind()).handler(deployResult);
         }
         DeployServiceEntity updatedDeployServiceEntity =
@@ -102,8 +110,11 @@ public class OpenTofuDeploymentResultCallbackManager {
         DeployResult destroyResult = handlerCallbackOpenTofuResult(result);
         destroyResult.setId(taskId);
         if (StringUtils.isNotBlank(result.getTerraformState())) {
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            deployServiceEntity.getServiceTemplateId());
             resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    deployServiceEntity.getDeployRequest().getOcl()
+                    serviceTemplateEntity.getOcl()
                             .getDeployment().getKind()).handler(destroyResult);
         }
         deployResultManager.updateDeployServiceEntityWithDeployResult(destroyResult,

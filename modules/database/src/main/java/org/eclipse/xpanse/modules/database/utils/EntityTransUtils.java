@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.database.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -70,6 +71,9 @@ public class EntityTransUtils {
             deployedServiceDetails.setDeployedServiceProperties(
                     deployServiceEntity.getProperties());
         }
+        if (Objects.nonNull(deployServiceEntity.getServiceTemplateId())) {
+            deployedServiceDetails.setServiceTemplateId(deployServiceEntity.getServiceTemplateId());
+        }
         return deployedServiceDetails;
     }
 
@@ -90,6 +94,10 @@ public class EntityTransUtils {
         if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
             vendorHostedDeployedServiceDetails.setDeployedServiceProperties(
                     deployServiceEntity.getProperties());
+        }
+        if (Objects.nonNull(deployServiceEntity.getServiceTemplateId())) {
+            vendorHostedDeployedServiceDetails.setServiceTemplateId(
+                    deployServiceEntity.getServiceTemplateId());
         }
         return vendorHostedDeployedServiceDetails;
     }

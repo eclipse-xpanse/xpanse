@@ -35,6 +35,8 @@ class DeployServiceEntityTest {
     private final String FLAVOR = "1-zookeeper-with-3-worker-nodes-normal";
     private final ServiceDeploymentState SERVICE_STATE = ServiceDeploymentState.DEPLOYING;
     private final ServiceState SERVICE_RUN_STATE = ServiceState.NOT_RUNNING;
+    private final UUID SERVICE_TEMPLATE_ID =
+            UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f3d");
     private final DeployRequest CREATE_REQUEST = new DeployRequest();
     private final List<DeployResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
     private final Map<String, String> PROPERTIES = new HashMap<>();
@@ -60,6 +62,7 @@ class DeployServiceEntityTest {
         test.setFlavor(FLAVOR);
         test.setServiceDeploymentState(SERVICE_STATE);
         test.setServiceState(SERVICE_RUN_STATE);
+        test.setServiceTemplateId(SERVICE_TEMPLATE_ID);
         test.setDeployRequest(CREATE_REQUEST);
         test.setDeployResourceList(DEPLOY_RESOURCE_LIST);
         test.setProperties(PROPERTIES);
@@ -83,6 +86,7 @@ class DeployServiceEntityTest {
                         + "flavor=" + FLAVOR + ", "
                         + "serviceDeploymentState=" + SERVICE_STATE + ", "
                         + "serviceState=" + SERVICE_RUN_STATE + ", "
+                        + "serviceTemplateId=" + SERVICE_TEMPLATE_ID + ", "
                         + "deployRequest=" + CREATE_REQUEST + ", "
                         //+ "deployResourceList=" + DEPLOY_RESOURCE_LIST+ ", "
                         + "properties=" + PROPERTIES + ", "
@@ -177,6 +181,13 @@ class DeployServiceEntityTest {
         Assertions.assertNotEquals(test1.hashCode(), test2.hashCode());
 
         test1.setServiceDeploymentState(SERVICE_STATE);
+        Assertions.assertNotEquals(test, test1);
+        Assertions.assertNotEquals(test, test2);
+        Assertions.assertNotEquals(test1, test2);
+        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
+        Assertions.assertNotEquals(test1.hashCode(), test2.hashCode());
+
+        test1.setServiceTemplateId(SERVICE_TEMPLATE_ID);
         Assertions.assertNotEquals(test, test1);
         Assertions.assertNotEquals(test, test2);
         Assertions.assertNotEquals(test1, test2);

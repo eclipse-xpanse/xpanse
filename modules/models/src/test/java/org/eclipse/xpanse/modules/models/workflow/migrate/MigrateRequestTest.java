@@ -42,7 +42,7 @@ class MigrateRequestTest {
     void testToString() {
         String result = "MigrateRequest(super=DeployRequestBase(userId=null, category=null, "
                 + "serviceName=null, customerServiceName=null, version=null, region=null, csp=null,"
-                + " flavor=null, serviceHostingType=null, ocl=null, serviceRequestProperties=null), id=null)";
+                + " flavor=null, serviceHostingType=null, serviceRequestProperties=null), id=null)";
         assertThat(migrateRequestUnderTest.toString()).isEqualTo(result);
     }
 }

@@ -12,6 +12,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
@@ -28,6 +29,9 @@ public class SensitiveDataHandler {
     @Resource
     private AesUtil aesUtil;
 
+    @Resource
+    private ServiceTemplateStorage serviceTemplateStorage;
+
     /**
      * Method to mask all sensitive data after deployment is completed.
      *
@@ -36,8 +40,11 @@ public class SensitiveDataHandler {
     public void maskSensitiveFields(DeployServiceEntity deployServiceEntity) {
         log.debug("masking sensitive input data after deployment");
         if (Objects.nonNull(deployServiceEntity.getDeployRequest().getServiceRequestProperties())) {
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            deployServiceEntity.getServiceTemplateId());
             for (DeployVariable deployVariable
-                    : deployServiceEntity.getDeployRequest().getOcl().getDeployment()
+                    : serviceTemplateEntity.getOcl().getDeployment()
                     .getVariables()) {
                 if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
                         && (deployServiceEntity.getDeployRequest().getServiceRequestProperties()

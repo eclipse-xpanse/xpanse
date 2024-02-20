@@ -16,6 +16,7 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemp
 import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -30,8 +33,12 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFou
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -65,7 +72,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         KeystoneManager.class, ResourcesService.class, GnocchiToXpanseModelConverter.class,
         AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class,
         CredentialCenter.class, ServiceMetricsStore.class, OpenstackTerraformResourceHandler.class,
-        DeployEnvironments.class, AesUtil.class, PluginManager.class})
+        DeployEnvironments.class, AesUtil.class, PluginManager.class,ServiceTemplateStorage.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpenstackMonitoringIntegrationTest {
 
@@ -88,6 +95,8 @@ class OpenstackMonitoringIntegrationTest {
     ServersManager serversManager;
     @MockBean
     private DatabaseDeployServiceStorage databaseDeployServiceStorage;
+    @MockBean
+    private ServiceTemplateStorage serviceTemplateStorage;
     @MockBean
     private DeployEnvironments deployEnvironments;
 
@@ -121,8 +130,19 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsHappyCase() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
-                Instancio.create(DeployServiceEntity.class));
+        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        DeployRequest deployRequest = new DeployRequest();
+        deployServiceEntity.setDeployRequest(deployRequest);
+        deployServiceEntity.setServiceTemplateId(UUID.randomUUID());
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        Ocl ocl = new Ocl();
+        Deployment deployment = new Deployment();
+        List<DeployVariable> variables = new ArrayList<>();
+        deployment.setVariables(variables);
+        ocl.setDeployment(deployment);
+        serviceTemplateEntity.setOcl(ocl);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
                 any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
@@ -144,8 +164,19 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsWithFromAndTo() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
-                Instancio.create(DeployServiceEntity.class));
+        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        DeployRequest deployRequest = new DeployRequest();
+        deployServiceEntity.setDeployRequest(deployRequest);
+        deployServiceEntity.setServiceTemplateId(UUID.randomUUID());
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        Ocl ocl = new Ocl();
+        Deployment deployment = new Deployment();
+        List<DeployVariable> variables = new ArrayList<>();
+        deployment.setVariables(variables);
+        ocl.setDeployment(deployment);
+        serviceTemplateEntity.setOcl(ocl);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
                 any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         Long currentTime = Instant.now().getEpochSecond();
@@ -169,8 +200,19 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsWithGranularity() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
-                Instancio.create(DeployServiceEntity.class));
+        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        DeployRequest deployRequest = new DeployRequest();
+        deployServiceEntity.setDeployRequest(deployRequest);
+        deployServiceEntity.setServiceTemplateId(UUID.randomUUID());
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        Ocl ocl = new Ocl();
+        Deployment deployment = new Deployment();
+        List<DeployVariable> variables = new ArrayList<>();
+        deployment.setVariables(variables);
+        ocl.setDeployment(deployment);
+        serviceTemplateEntity.setOcl(ocl);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
                 any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
@@ -188,8 +230,19 @@ class OpenstackMonitoringIntegrationTest {
     void testGetOnlyLastKnownMetric() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
-                Instancio.create(DeployServiceEntity.class));
+        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        DeployRequest deployRequest = new DeployRequest();
+        deployServiceEntity.setDeployRequest(deployRequest);
+        deployServiceEntity.setServiceTemplateId(UUID.randomUUID());
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        Ocl ocl = new Ocl();
+        Deployment deployment = new Deployment();
+        List<DeployVariable> variables = new ArrayList<>();
+        deployment.setVariables(variables);
+        ocl.setDeployment(deployment);
+        serviceTemplateEntity.setOcl(ocl);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
                 any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
@@ -209,8 +262,19 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsForServiceOnlyLastKnownMetric() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
-                Instancio.create(DeployServiceEntity.class));
+        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        DeployRequest deployRequest = new DeployRequest();
+        deployServiceEntity.setDeployRequest(deployRequest);
+        deployServiceEntity.setServiceTemplateId(UUID.randomUUID());
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        Ocl ocl = new Ocl();
+        Deployment deployment = new Deployment();
+        List<DeployVariable> variables = new ArrayList<>();
+        deployment.setVariables(variables);
+        ocl.setDeployment(deployment);
+        serviceTemplateEntity.setOcl(ocl);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
                 any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =

@@ -104,7 +104,6 @@ class TerraformBootDeploymentTest {
         ocl = oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setOcl(ocl);
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
