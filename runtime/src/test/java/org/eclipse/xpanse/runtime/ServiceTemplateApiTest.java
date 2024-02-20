@@ -345,9 +345,6 @@ class ServiceTemplateApiTest {
     void testListRegisteredServices() throws Exception {
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(
                 serviceTemplateDetailVo);
-
-        String result = objectMapper.writeValueAsString(serviceTemplateDetailVos);
-
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/service_templates")
                         .param("categoryName", "middleware")

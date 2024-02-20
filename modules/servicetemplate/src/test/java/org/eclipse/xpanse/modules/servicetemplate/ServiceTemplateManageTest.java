@@ -28,8 +28,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -368,7 +368,7 @@ class ServiceTemplateManageTest {
 
         List<ServiceTemplateEntity> ServiceTemplateEntities1 =
                 serviceTemplateManageTest.listServiceTemplates(
-                        Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1", null);
+                        Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1", null, true);
         Assertions.assertEquals(ServiceTemplateEntities, ServiceTemplateEntities1);
     }
 
@@ -389,7 +389,7 @@ class ServiceTemplateManageTest {
 
         List<ServiceTemplateEntity> result =
                 serviceTemplateManageTest.listServiceTemplates(
-                        Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1", null);
+                        Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1", null, true);
         assertThat(result).isEqualTo(Collections.emptyList());
     }
 

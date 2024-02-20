@@ -249,9 +249,10 @@ public class ServiceTemplateManage {
                                                             Csp csp,
                                                             String serviceName,
                                                             String serviceVersion,
-                                                            ServiceHostingType serviceHostingType) {
+                                                            ServiceHostingType serviceHostingType,
+                                                            boolean checkNamespace) {
         ServiceTemplateQueryModel query = getServiceTemplateQueryModel(
-                category, csp, serviceName, serviceVersion, serviceHostingType
+                category, csp, serviceName, serviceVersion, serviceHostingType, checkNamespace
         );
         return storage.listServiceTemplates(query);
     }
@@ -319,7 +320,8 @@ public class ServiceTemplateManage {
             @Nullable Csp csp,
             @Nullable String serviceName,
             @Nullable String serviceVersion,
-            @Nullable ServiceHostingType serviceHostingType) {
+            @Nullable ServiceHostingType serviceHostingType,
+            boolean checkNamespace) {
         ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
         if (Objects.nonNull(category)) {
             query.setCategory(category);
@@ -336,10 +338,12 @@ public class ServiceTemplateManage {
         if (Objects.nonNull(serviceHostingType)) {
             query.setServiceHostingType(serviceHostingType);
         }
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        if (Objects.nonNull(currentUserInfo)
-                && StringUtils.isNotEmpty(currentUserInfo.getNamespace())) {
-            query.setNamespace(currentUserInfo.getNamespace());
+        if (checkNamespace) {
+            CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
+            if (Objects.nonNull(currentUserInfo)
+                    && StringUtils.isNotEmpty(currentUserInfo.getNamespace())) {
+                query.setNamespace(currentUserInfo.getNamespace());
+            }
         }
         return query;
     }

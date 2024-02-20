@@ -28,4 +28,6 @@ public class ServiceTemplateQueryModel {
     private String namespace;
 
     private ServiceHostingType serviceHostingType;
+
+    private boolean checkNamespace;
 }
