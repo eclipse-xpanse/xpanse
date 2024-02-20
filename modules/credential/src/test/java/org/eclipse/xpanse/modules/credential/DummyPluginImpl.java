@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -34,6 +35,12 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         return null;
+    }
+
+    @Override
+    public List<String> getExistingResourcesOfType(String userId, String region,
+            DeployResourceKind kind) {
+        return new ArrayList<>();
     }
 
     @Override

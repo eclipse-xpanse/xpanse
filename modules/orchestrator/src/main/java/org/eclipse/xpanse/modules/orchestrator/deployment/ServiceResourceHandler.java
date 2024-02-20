@@ -6,7 +6,9 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
+import java.util.List;
 import java.util.Map;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 
 /**
@@ -22,4 +24,7 @@ public interface ServiceResourceHandler {
      * @return the resource handler of the plugin.
      */
     Map<DeployerKind, DeployResourceHandler> resourceHandlers();
+
+    List<String> getExistingResourcesOfType(String userId, String region,
+            DeployResourceKind kind);
 }

@@ -19,12 +19,14 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
+import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
@@ -51,12 +53,21 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Resource
     private HuaweiCloudVmStateManager huaweiCloudVmStateManager;
 
+    @Resource
+    private HuaweiCloudResourceManager huaweiCloudResourceManager;
+
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
         resourceHandlers.put(DeployerKind.TERRAFORM, huaweiCloudTerraformResourceHandler);
         resourceHandlers.put(DeployerKind.OPEN_TOFU, huaweiCloudTerraformResourceHandler);
         return resourceHandlers;
+    }
+
+    @Override
+    public List<String> getExistingResourcesOfType(String userId, String region,
+            DeployResourceKind kind) {
+        return huaweiCloudResourceManager.getExistingResourcesOfType(userId, region, kind);
     }
 
     @Override
@@ -126,7 +137,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public String getProvider(DeployerKind deployerKind, String region) {
         return switch (deployerKind) {
-            case DeployerKind.OPEN_TOFU, DeployerKind.TERRAFORM -> String.format("""
+            case OPEN_TOFU, TERRAFORM -> String.format("""
                     terraform {
                       required_providers {
                         huaweicloud = {

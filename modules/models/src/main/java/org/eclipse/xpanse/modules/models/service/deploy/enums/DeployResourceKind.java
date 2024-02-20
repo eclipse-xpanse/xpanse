@@ -15,28 +15,32 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  * The kind of the Resources.
  */
 public enum DeployResourceKind {
-    VM("vm"),
-    CONTAINER("container"),
-    PUBLIC_IP("publicIP"),
-    VPC("vpc"),
-    VOLUME("volume"),
-    UNKNOWN("unknown"),
-    SECURITY_GROUP("security_group"),
-    SECURITY_GROUP_RULE("security_group_rule"),
-    KEYPAIR("keypair"),
-    SUBNET("subnet");
+    VM("vm", null),
+    CONTAINER("container", null),
+    PUBLIC_IP("publicIP", null),
+    VPC("vpc", null),
+    VOLUME("volume", null),
+    UNKNOWN("unknown", null),
+    SECURITY_GROUP("security_group", DeployResourceKind.VPC),
+    SECURITY_GROUP_RULE("security_group_rule", DeployResourceKind.VPC),
+    KEYPAIR("keypair", null),
+    SUBNET("subnet", DeployResourceKind.VPC);
 
     private final String kind;
+    private final DeployResourceKind parent;
 
-    DeployResourceKind(String kind) {
+
+    DeployResourceKind(String kind,
+            DeployResourceKind parent) {
         this.kind = kind;
+        this.parent = parent;
     }
 
     /**
      * For XpanseResourceKind serialize.
      */
     @JsonCreator
-    public DeployResourceKind getByValue(String kind) {
+    public static DeployResourceKind getByValue(String kind) {
         for (DeployResourceKind resourceKind : values()) {
             if (StringUtils.endsWithIgnoreCase(resourceKind.kind, kind)) {
                 return resourceKind;

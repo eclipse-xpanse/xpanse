@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
@@ -344,6 +345,12 @@ class DeployEnvironmentsTest {
             @Override
             public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
                 return null;
+            }
+
+            @Override
+            public List<String> getExistingResourcesOfType(String userId, String region,
+                    DeployResourceKind kind) {
+                return new ArrayList<>();
             }
 
             @Override
