@@ -6,7 +6,10 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import jakarta.annotation.Resource;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +19,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DeployServiceEntityToDeployTaskConverter {
+
+    @Resource
+    private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
      * Method to create a DeployTask from DeployServiceEntity.
@@ -28,7 +34,9 @@ public class DeployServiceEntityToDeployTaskConverter {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(deployServiceEntity.getId());
         deployTask.setDeployRequest(deployServiceEntity.getDeployRequest());
-        deployTask.setOcl(deployServiceEntity.getDeployRequest().getOcl());
+        ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
+                deployServiceEntity.getServiceTemplateId());
+        deployTask.setOcl(serviceTemplateEntity.getOcl());
         return deployTask;
 
     }

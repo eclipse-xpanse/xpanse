@@ -184,6 +184,9 @@ public class ServiceDetailsViewManager {
             BeanUtils.copyProperties(serviceEntity, deployedService);
             deployedService.setServiceHostingType(
                     serviceEntity.getDeployRequest().getServiceHostingType());
+            if (Objects.nonNull(serviceEntity.getServiceTemplateId())) {
+                deployedService.setServiceTemplateId(serviceEntity.getServiceTemplateId());
+            }
             return deployedService;
         }
         return null;

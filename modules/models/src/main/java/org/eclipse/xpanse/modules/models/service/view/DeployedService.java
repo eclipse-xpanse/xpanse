@@ -74,6 +74,12 @@ public class DeployedService {
     private String flavor;
 
     /**
+     * The id of the Service Template.
+     */
+    @Schema(description = "The id of the Service Template")
+    private UUID serviceTemplateId;
+
+    /**
      * The state of the Service.
      */
     @NotNull

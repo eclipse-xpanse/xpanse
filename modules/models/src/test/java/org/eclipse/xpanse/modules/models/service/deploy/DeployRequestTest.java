@@ -33,7 +33,6 @@ class DeployRequestTest {
     private static final String region = "us-east-1";
     private static final Csp csp = Csp.AWS;
     private static final String flavor = "flavor";
-    private static final Ocl ocl = new Ocl();
     private static final Map<String, Object> properties = Collections.singletonMap("key", "value");
     private static DeployRequest request;
 
@@ -49,7 +48,6 @@ class DeployRequestTest {
         request.setRegion(region);
         request.setCsp(csp);
         request.setFlavor(flavor);
-        request.setOcl(ocl);
         request.setServiceRequestProperties(properties);
     }
 
@@ -64,7 +62,6 @@ class DeployRequestTest {
         assertEquals(region, request.getRegion());
         assertEquals(csp, request.getCsp());
         assertEquals(flavor, request.getFlavor());
-        assertEquals(ocl, request.getOcl());
         assertEquals(properties, request.getServiceRequestProperties());
     }
 
@@ -141,7 +138,6 @@ class DeployRequestTest {
         assertNotEquals(request.hashCode(), request1.hashCode());
         assertNotEquals(request1.hashCode(), request2.hashCode());
 
-        request1.setOcl(ocl);
         assertNotEquals(request, request1);
         assertNotEquals(request1, request2);
         assertNotEquals(request.hashCode(), request1.hashCode());
@@ -166,7 +162,6 @@ class DeployRequestTest {
         request.setRegion(region);
         request.setCsp(csp);
         request.setFlavor(flavor);
-        request.setOcl(ocl);
         request.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         request.setServiceRequestProperties(properties);
 
@@ -180,7 +175,6 @@ class DeployRequestTest {
                 ", csp=" + csp +
                 ", flavor=" + flavor +
                 ", serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR +
-                ", ocl=" + ocl +
                 ", serviceRequestProperties=" + properties +
                 "), id=" + id + ")";
         assertEquals(expectedToString, request.toString());

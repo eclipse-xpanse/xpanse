@@ -205,7 +205,10 @@ public class ServicePolicyManager {
                         StringUtils.split(servicePolicyEntity.getFlavorNames(), SEPARATOR));
                 servicePolicy.setFlavorNameList(flavorNames);
             }
-            servicePolicy.setServiceTemplateId(servicePolicyEntity.getServiceTemplate().getId());
+            if (Objects.nonNull(servicePolicyEntity.getServiceTemplate().getId())) {
+                servicePolicy.setServiceTemplateId(
+                        servicePolicyEntity.getServiceTemplate().getId());
+            }
             return servicePolicy;
         }
         return null;

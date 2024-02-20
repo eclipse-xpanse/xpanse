@@ -108,6 +108,11 @@ public class DeployServiceEntity extends CreateModifiedTime {
     private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
     /**
+     * The id of the Service Template.
+     */
+    private UUID serviceTemplateId;
+
+    /**
      * The Ocl object of the XpanseDeployTask.
      */
     @Column(columnDefinition = "json")

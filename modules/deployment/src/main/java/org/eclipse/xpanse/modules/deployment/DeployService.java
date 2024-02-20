@@ -101,11 +101,14 @@ public class DeployService {
         // Create new deploy task by deploy request.
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.randomUUID());
-        deployRequest.setOcl(serviceTemplate.getOcl());
         deployTask.setDeployRequest(deployRequest);
         deployTask.setNamespace(serviceTemplate.getNamespace());
         deployTask.setOcl(serviceTemplate.getOcl());
-        deployTask.setServiceTemplateId(serviceTemplate.getId());
+        if (Objects.nonNull(serviceTemplate.getId())) {
+            deployTask.setServiceTemplateId(serviceTemplate.getId());
+        } else {
+            throw new ServiceTemplateNotRegistered("service template id can't be null.");
+        }
         return deployTask;
     }
 
@@ -134,6 +137,11 @@ public class DeployService {
         entity.setDeployResourceList(new ArrayList<>());
         entity.setNamespace(deployTask.getNamespace());
         entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
+        if (Objects.nonNull(deployTask.getServiceTemplateId())) {
+            entity.setServiceTemplateId(deployTask.getServiceTemplateId());
+        } else {
+            throw new ServiceTemplateNotRegistered("service template id can't be null.");
+        }
         DeployServiceEntity storedEntity = deployServiceEntityHandler.storeAndFlush(entity);
         if (Objects.isNull(storedEntity)) {
             log.error("Store new deploy service entity with id:{} failed.", deployTask.getId());

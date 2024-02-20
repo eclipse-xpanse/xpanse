@@ -105,7 +105,6 @@ class TerraformLocalDeploymentTest {
         ocl = oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
 
         deployRequest = new DeployRequest();
-        deployRequest.setOcl(ocl);
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
@@ -219,7 +218,6 @@ class TerraformLocalDeploymentTest {
     @Test
     void testGetDeployPlanAsJson() {
         DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setOcl(ocl);
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());

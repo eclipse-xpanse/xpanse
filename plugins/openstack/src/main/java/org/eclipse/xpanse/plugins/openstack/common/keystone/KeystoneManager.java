@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.plugins.openstack.common.keystone;
 
+import jakarta.annotation.Resource;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -15,6 +16,8 @@ import java.util.Objects;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -41,6 +44,9 @@ public class KeystoneManager {
     private final Environment environment;
     private final DeployEnvironments deployEnvironments;
     private final DeployServiceStorage deployServiceStorage;
+
+    @Resource
+    private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
      * Constructor for KeystoneManager.
@@ -157,13 +163,15 @@ public class KeystoneManager {
     private String getUrlFromDeploymentVariables(UUID serviceId) {
         DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(
                 serviceId);
+        ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
+                deployServiceEntity.getServiceTemplateId());
         Map<String, Object> serviceRequestVariables =
                 this.deployEnvironments.getAllDeploymentVariablesForService(
                         deployServiceEntity.getDeployRequest().getServiceRequestProperties(),
-                        deployServiceEntity.getDeployRequest().getOcl().getDeployment()
+                        serviceTemplateEntity.getOcl().getDeployment()
                                 .getVariables(),
                         deployServiceEntity.getFlavor(),
-                        deployServiceEntity.getDeployRequest().getOcl()
+                        serviceTemplateEntity.getOcl()
                 );
         return (String) serviceRequestVariables.get(OpenstackEnvironmentConstants.AUTH_URL);
     }
