@@ -7,15 +7,18 @@
 package org.eclipse.xpanse.modules.database.servicetemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 
 /**
- * Test of RegisteredServiceQuery.
+ * Test of ServiceTemplateQueryModel.
  */
 class ServiceTemplateQueryModelTest {
 
@@ -24,6 +27,8 @@ class ServiceTemplateQueryModelTest {
     private static final String serviceName = "kafka";
     private static final String serviceVersion = "v1.0.0";
     private static final String namespace = "huawei";
+    private static final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
+    private static final boolean checkNamespace = true;
     private static ServiceTemplateQueryModel serviceTemplateQueryModel;
 
     @BeforeEach
@@ -34,6 +39,8 @@ class ServiceTemplateQueryModelTest {
         serviceTemplateQueryModel.setServiceName(serviceName);
         serviceTemplateQueryModel.setServiceVersion(serviceVersion);
         serviceTemplateQueryModel.setNamespace(namespace);
+        serviceTemplateQueryModel.setServiceHostingType(serviceHostingType);
+        serviceTemplateQueryModel.setCheckNamespace(checkNamespace);
     }
 
     @Test
@@ -43,66 +50,31 @@ class ServiceTemplateQueryModelTest {
         assertEquals(serviceName, serviceTemplateQueryModel.getServiceName());
         assertEquals(serviceVersion, serviceTemplateQueryModel.getServiceVersion());
         assertEquals(namespace, serviceTemplateQueryModel.getNamespace());
+        assertEquals(serviceHostingType, serviceTemplateQueryModel.getServiceHostingType());
+        assertEquals(checkNamespace, serviceTemplateQueryModel.isCheckNamespace());
     }
 
     @Test
-    void testEqualsAndHashCode() {
-        assertEquals(serviceTemplateQueryModel.hashCode(), serviceTemplateQueryModel.hashCode());
+    void testEquals() {
+        ServiceTemplateQueryModel test1 = new ServiceTemplateQueryModel();
+        assertNotEquals(serviceTemplateQueryModel, test1);
 
-        Object obj = new Object();
-        assertNotEquals(serviceTemplateQueryModel, obj);
-        assertNotEquals(serviceTemplateQueryModel, null);
-        assertNotEquals(serviceTemplateQueryModel.hashCode(), obj.hashCode());
+        BeanUtils.copyProperties(serviceTemplateQueryModel, test1);
+        assertEquals(serviceTemplateQueryModel, test1);
+    }
 
-        ServiceTemplateQueryModel serviceTemplateQueryModel1 = new ServiceTemplateQueryModel();
-        ServiceTemplateQueryModel serviceTemplateQueryModel2 = new ServiceTemplateQueryModel();
-        assertNotEquals(serviceTemplateQueryModel, serviceTemplateQueryModel1);
-        assertNotEquals(serviceTemplateQueryModel, serviceTemplateQueryModel2);
-        assertEquals(serviceTemplateQueryModel1, serviceTemplateQueryModel2);
-        assertNotEquals(serviceTemplateQueryModel.hashCode(),
-                serviceTemplateQueryModel1.hashCode());
-        assertNotEquals(serviceTemplateQueryModel.hashCode(),
-                serviceTemplateQueryModel2.hashCode());
-        assertEquals(serviceTemplateQueryModel1.hashCode(), serviceTemplateQueryModel2.hashCode());
+    @Test
+    void testCanEqual() {
+        assertFalse(serviceTemplateQueryModel.canEqual("other"));
+    }
 
-        serviceTemplateQueryModel1.setCsp(csp);
-        assertNotEquals(serviceTemplateQueryModel, serviceTemplateQueryModel1);
-        assertNotEquals(serviceTemplateQueryModel1, serviceTemplateQueryModel2);
-        assertNotEquals(serviceTemplateQueryModel.hashCode(),
-                serviceTemplateQueryModel1.hashCode());
-        assertNotEquals(serviceTemplateQueryModel1.hashCode(),
-                serviceTemplateQueryModel2.hashCode());
+    @Test
+    void testHashCode() {
+        ServiceTemplateQueryModel test1 = new ServiceTemplateQueryModel();
+        assertNotEquals(serviceTemplateQueryModel.hashCode(), test1.hashCode());
 
-        serviceTemplateQueryModel1.setCategory(category);
-        assertNotEquals(serviceTemplateQueryModel, serviceTemplateQueryModel1);
-        assertNotEquals(serviceTemplateQueryModel1, serviceTemplateQueryModel2);
-        assertNotEquals(serviceTemplateQueryModel.hashCode(),
-                serviceTemplateQueryModel1.hashCode());
-        assertNotEquals(serviceTemplateQueryModel1.hashCode(),
-                serviceTemplateQueryModel2.hashCode());
-
-        serviceTemplateQueryModel1.setServiceName(serviceName);
-        assertNotEquals(serviceTemplateQueryModel, serviceTemplateQueryModel1);
-        assertNotEquals(serviceTemplateQueryModel1, serviceTemplateQueryModel2);
-        assertNotEquals(serviceTemplateQueryModel.hashCode(),
-                serviceTemplateQueryModel1.hashCode());
-        assertNotEquals(serviceTemplateQueryModel1.hashCode(),
-                serviceTemplateQueryModel2.hashCode());
-
-        serviceTemplateQueryModel1.setServiceVersion(serviceVersion);
-        assertNotEquals(serviceTemplateQueryModel, serviceTemplateQueryModel1);
-        assertNotEquals(serviceTemplateQueryModel1, serviceTemplateQueryModel2);
-        assertNotEquals(serviceTemplateQueryModel.hashCode(),
-                serviceTemplateQueryModel1.hashCode());
-        assertNotEquals(serviceTemplateQueryModel1.hashCode(),
-                serviceTemplateQueryModel2.hashCode());
-
-        serviceTemplateQueryModel1.setNamespace(namespace);
-        assertEquals(serviceTemplateQueryModel, serviceTemplateQueryModel1);
-        assertNotEquals(serviceTemplateQueryModel1, serviceTemplateQueryModel2);
-        assertEquals(serviceTemplateQueryModel.hashCode(), serviceTemplateQueryModel1.hashCode());
-        assertNotEquals(serviceTemplateQueryModel1.hashCode(),
-                serviceTemplateQueryModel2.hashCode());
+        BeanUtils.copyProperties(serviceTemplateQueryModel, test1);
+        assertEquals(serviceTemplateQueryModel.hashCode(), test1.hashCode());
     }
 
     @Test
@@ -113,7 +85,8 @@ class ServiceTemplateQueryModelTest {
                 ", serviceName=" + serviceName +
                 ", serviceVersion=" + serviceVersion +
                 ", namespace=" + namespace +
-                ", serviceHostingType=" + null +
+                ", serviceHostingType=" + serviceHostingType +
+                ", checkNamespace=" + checkNamespace +
                 ")";
         assertEquals(expectedString, serviceTemplateQueryModel.toString());
     }

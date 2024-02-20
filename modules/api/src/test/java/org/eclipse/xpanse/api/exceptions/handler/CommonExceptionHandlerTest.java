@@ -58,10 +58,10 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testRuntimeException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new RuntimeException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(500))
                 .andExpect(jsonPath("$.resultType").value("Runtime Error"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -69,10 +69,10 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testHttpMessageConversionException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new HttpMessageConversionException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Parameters Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -80,10 +80,10 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testIllegalArgumentException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new IllegalArgumentException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Parameters Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -94,9 +94,7 @@ class CommonExceptionHandlerTest {
         when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new Exception("test error"));
 
-        this.mockMvc.perform(post("/xpanse/service_templates/file")
-                        .param("oclLocation", "file://test")
-                )
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(500))
                 .andExpect(jsonPath("$.resultType").value("Runtime Error"))
                 .andExpect(jsonPath("$.details[0]").value("java.lang.Exception:test error"));
@@ -104,10 +102,10 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testResponseInvalidException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new ResponseInvalidException(List.of("test error")));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.resultType").value("Response Not Valid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -115,10 +113,10 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testXpanseUnhandledException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new XpanseUnhandledException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(500))
                 .andExpect(jsonPath("$.resultType").value("Unhandled Exception"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -127,10 +125,10 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testHandleAccessDeniedException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new AccessDeniedException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(403))
                 .andExpect(jsonPath("$.resultType").value("Access Denied"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -138,10 +136,10 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testSensitiveFieldEncryptionOrDecryptionFailedException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new SensitiveFieldEncryptionOrDecryptionFailedException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Sensitive "
                         + "Field Encryption Or Decryption Failed Exception"))
@@ -150,10 +148,10 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testUnsupportedEnumValueException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new UnsupportedEnumValueException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.resultType").value("Unsupported Enum Value"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -161,11 +159,11 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testMethodArgumentTypeMismatchException() throws Exception {
-        when(serviceTemplateManage.listServiceTemplates(any(), any(), any(), any(), any()))
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
                 .thenThrow(new MethodArgumentTypeMismatchException(
                         "errorValue", Csp.class, null, null, null));
 
-        this.mockMvc.perform(get("/xpanse/service_templates"))
+        this.mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.resultType").value("Unprocessable Entity"))
                 .andExpect(jsonPath("$.details[0]").value("Failed to convert value of type "

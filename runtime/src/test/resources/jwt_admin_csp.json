@@ -5,7 +5,8 @@
   "scope": "openid user isv admin csp",
   "roles": ["user", "isv", "admin", "csp"],
   "urn:zitadel:iam:org:project:roles": {
-    "isv": "isv"
+    "admin": "admin",
+    "csp": "csp"
   },
   "sub": "1234566"
 }

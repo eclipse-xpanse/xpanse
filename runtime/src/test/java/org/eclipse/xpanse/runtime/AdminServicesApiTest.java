@@ -46,7 +46,8 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(properties = {"spring.profiles.active="
+        + "zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
 @AutoConfigureMockMvc
 class AdminServicesApiTest {
 

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.api.controllers;
 
+import static org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter.convertToUserOrderableServiceVo;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
@@ -16,19 +17,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
-import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -81,18 +78,16 @@ public class ServiceCatalogApi {
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
             @RequestParam(name = "serviceHostingType", required = false)
             ServiceHostingType serviceHostingType) {
-        List<ServiceTemplateEntity> serviceEntities =
+        List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(
-                        categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
-        List<UserOrderableServiceVo> userOrderableServiceVos =
-                serviceEntities.stream().map(this::convertToUserOrderableServiceVo).sorted(
-                                Comparator.comparingInt(o -> {
-                                    assert o != null;
-                                    return o.getCsp().ordinal();
-                                }))
-                        .collect(Collectors.toList());
-        log.info(serviceEntities.size() + " orderable services found.");
-        return userOrderableServiceVos;
+                        categoryName, cspName, serviceName, serviceVersion, serviceHostingType,
+                        false);
+        log.info(serviceTemplateEntities.size() + " orderable services found.");
+        return serviceTemplateEntities.stream().sorted(Comparator.comparingInt(
+                        serviceTemplateDetailVo -> serviceTemplateDetailVo != null
+                                ? serviceTemplateDetailVo.getCsp().ordinal() : -1))
+                .map(ServiceTemplateEntityConverter::convertToUserOrderableServiceVo)
+                .toList();
     }
 
     /**
@@ -110,12 +105,11 @@ public class ServiceCatalogApi {
     public UserOrderableServiceVo getOrderableServiceDetails(
             @Parameter(name = "id", description = "The id of orderable service.")
             @PathVariable("id") String id) {
-        UserOrderableServiceVo userOrderableServiceVo = convertToUserOrderableServiceVo(
-                serviceTemplateManage.getServiceTemplateDetails(id, false));
-        String successMsg = String.format(
-                "Get orderable service with id %s successful.", id);
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateManage.getServiceTemplateDetails(id, false);
+        String successMsg = String.format("Get orderable service with id %s successful.", id);
         log.info(successMsg);
-        return userOrderableServiceVo;
+        return convertToUserOrderableServiceVo(serviceTemplateEntity);
     }
 
     /**
@@ -136,37 +130,5 @@ public class ServiceCatalogApi {
                 "Get API document of the orderable service successful with Url %s.", apiUrl);
         log.info(successMsg);
         return Link.of(apiUrl, "OpenApi");
-    }
-
-    private UserOrderableServiceVo convertToUserOrderableServiceVo(
-            ServiceTemplateEntity serviceTemplateEntity) {
-        if (Objects.nonNull(serviceTemplateEntity)) {
-            UserOrderableServiceVo userOrderableServiceVo = new UserOrderableServiceVo();
-            BeanUtils.copyProperties(serviceTemplateEntity, userOrderableServiceVo);
-            userOrderableServiceVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
-            userOrderableServiceVo.setDescription(
-                    serviceTemplateEntity.getOcl().getDescription());
-            userOrderableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
-            List<FlavorBasic> flavorBasics = serviceTemplateEntity.getOcl().getFlavors()
-                    .stream().map(flavor -> {
-                        FlavorBasic flavorBasic = new FlavorBasic();
-                        BeanUtils.copyProperties(flavor, flavorBasic);
-                        return flavorBasic;
-                    }).toList();
-            userOrderableServiceVo.setFlavors(flavorBasics);
-            userOrderableServiceVo.setVariables(
-                    serviceTemplateEntity.getOcl().getDeployment().getVariables());
-            userOrderableServiceVo.setRegions(
-                    serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
-            userOrderableServiceVo.add(
-                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
-                            .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
-            userOrderableServiceVo.setServiceHostingType(
-                    serviceTemplateEntity.getOcl().getServiceHostingType());
-            userOrderableServiceVo.setServiceProviderContactDetails(
-                    serviceTemplateEntity.getOcl().getServiceProviderContactDetails());
-            return userOrderableServiceVo;
-        }
-        return null;
     }
 }
