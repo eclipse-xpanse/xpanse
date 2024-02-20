@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
+import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
@@ -49,7 +50,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         HuaweiCloudMetricsService.class, HuaweiCloudClient.class,
         HuaweiCloudMonitorConstants.class, HuaweiCloudDataModelConverter.class,
         CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
-        HuaweiCloudTerraformResourceHandler.class})
+        HuaweiCloudTerraformResourceHandler.class, HuaweiCloudResourceManager.class})
 class HuaweiCloudMonitorIntegrationTest {
 
     @RegisterExtension

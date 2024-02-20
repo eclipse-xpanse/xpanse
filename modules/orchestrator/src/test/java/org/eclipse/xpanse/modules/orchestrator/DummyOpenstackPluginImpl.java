@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.orchestrator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.java.Log;
@@ -13,6 +14,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -27,6 +29,12 @@ public class DummyOpenstackPluginImpl implements OrchestratorPlugin {
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         return null;
+    }
+
+    @Override
+    public List<String> getExistingResourcesOfType(String userId, String region,
+            DeployResourceKind kind) {
+        return new ArrayList<>();
     }
 
     @Override

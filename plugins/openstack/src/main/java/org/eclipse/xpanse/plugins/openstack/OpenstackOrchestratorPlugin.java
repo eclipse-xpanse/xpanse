@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -59,6 +60,12 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         resourceHandlers.put(DeployerKind.TERRAFORM, openstackTerraformResourceHandler);
         resourceHandlers.put(DeployerKind.OPEN_TOFU, openstackTerraformResourceHandler);
         return resourceHandlers;
+    }
+
+    @Override
+    public List<String> getExistingResourcesOfType(String userId, String region,
+            DeployResourceKind kind) {
+        return new ArrayList<>();
     }
 
     /**
@@ -148,7 +155,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public String getProvider(DeployerKind deployerKind, String region) {
         return switch (deployerKind) {
-            case DeployerKind.OPEN_TOFU, DeployerKind.TERRAFORM -> String.format("""
+            case OPEN_TOFU, TERRAFORM -> String.format("""
                     terraform {
                       required_providers {
                         openstack = {

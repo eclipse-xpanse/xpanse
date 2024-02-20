@@ -18,6 +18,12 @@ import com.huaweicloud.sdk.core.exception.ServiceResponseException;
 import com.huaweicloud.sdk.core.http.HttpConfig;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.region.EcsRegion;
+import com.huaweicloud.sdk.eip.v2.EipClient;
+import com.huaweicloud.sdk.eip.v2.region.EipRegion;
+import com.huaweicloud.sdk.evs.v2.EvsClient;
+import com.huaweicloud.sdk.evs.v2.region.EvsRegion;
+import com.huaweicloud.sdk.vpc.v2.VpcClient;
+import com.huaweicloud.sdk.vpc.v2.region.VpcRegion;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +40,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      * Get HuaweiCloud CES Client.
      *
      * @param credential ICredential.
+     * @param regionName region.
      */
     public CesClient getCesClient(ICredential credential, String regionName) {
         return CesClient.newBuilder()
@@ -47,11 +54,51 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      * Get HuaweiCloud ECS Client.
      *
      * @param credential ICredential.
+     * @param regionName region.
      */
     public EcsClient getEcsClient(ICredential credential, String regionName) {
         return EcsClient.newBuilder()
                 .withCredential(credential)
                 .withRegion(EcsRegion.valueOf(regionName))
+                .build();
+    }
+
+    /**
+     * Get HuaweiCloud Vpc Client.
+     *
+     * @param credential ICredential.
+     * @param regionName region.
+     */
+    public VpcClient getVpcClient(ICredential credential, String regionName) {
+        return VpcClient.newBuilder()
+                .withCredential(credential)
+                .withRegion(VpcRegion.valueOf(regionName))
+                .build();
+    }
+
+    /**
+     * Get HuaweiCloud Eip Client.
+     *
+     * @param icredential ICredential
+     * @param regionName  region.
+     */
+    public EipClient getEipClient(ICredential icredential, String regionName) {
+        return EipClient.newBuilder()
+                .withCredential(icredential)
+                .withRegion(EipRegion.valueOf(regionName))
+                .build();
+    }
+
+    /**
+     * Get HuaweiCloud Evs Client.
+     *
+     * @param icredential ICredential
+     * @param regionName  region.
+     */
+    public EvsClient getEvsClient(ICredential icredential, String regionName) {
+        return  EvsClient.newBuilder()
+                .withCredential(icredential)
+                .withRegion(EvsRegion.valueOf(regionName))
                 .build();
     }
 

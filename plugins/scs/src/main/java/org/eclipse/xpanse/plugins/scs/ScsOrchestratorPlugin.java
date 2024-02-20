@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
+import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -60,6 +61,12 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
         resourceHandlers.put(DeployerKind.TERRAFORM, scsTerraformResourceHandler);
         resourceHandlers.put(DeployerKind.OPEN_TOFU, scsTerraformResourceHandler);
         return resourceHandlers;
+    }
+
+    @Override
+    public List<String> getExistingResourcesOfType(String userId, String region,
+            DeployResourceKind kind) {
+        return new ArrayList<>();
     }
 
     /**
@@ -139,7 +146,7 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public String getProvider(DeployerKind deployerKind, String region) {
         return switch (deployerKind) {
-            case DeployerKind.OPEN_TOFU, DeployerKind.TERRAFORM -> String.format("""
+            case OPEN_TOFU, TERRAFORM -> String.format("""
                     terraform {
                       required_providers {
                         openstack = {

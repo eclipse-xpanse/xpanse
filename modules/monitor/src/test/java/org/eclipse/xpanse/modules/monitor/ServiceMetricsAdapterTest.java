@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -247,6 +248,12 @@ class ServiceMetricsAdapterTest {
             @Override
             public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
                 return null;
+            }
+
+            @Override
+            public List<String> getExistingResourcesOfType(String userId, String region,
+                    DeployResourceKind kind) {
+                return new ArrayList<>();
             }
 
             @Override
