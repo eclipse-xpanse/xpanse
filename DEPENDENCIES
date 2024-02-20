@@ -1,6 +1,6 @@
 maven/mavencentral/ch.qos.logback/logback-classic/1.4.14, EPL-1.0 OR LGPL-2.1-only, approved, #3435
 maven/mavencentral/ch.qos.logback/logback-core/1.4.14, EPL-1.0 OR LGPL-2.1-only, approved, #3373
-maven/mavencentral/com.ethlo.time/itu/1.7.0, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.ethlo.time/itu/1.8.0, Apache-2.0, approved, #12927
 maven/mavencentral/com.fasterxml.jackson.core/jackson-annotations/2.15.3, Apache-2.0, approved, #7947
 maven/mavencentral/com.fasterxml.jackson.core/jackson-core/2.15.3, MIT AND Apache-2.0, approved, #7932
 maven/mavencentral/com.fasterxml.jackson.core/jackson-databind/2.15.3, Apache-2.0, approved, #7934
@@ -28,16 +28,20 @@ maven/mavencentral/com.google.errorprone/error_prone_annotations/2.1.3, Apache-2
 maven/mavencentral/com.google.errorprone/error_prone_annotations/2.21.1, Apache-2.0, approved, #9834
 maven/mavencentral/com.google.guava/guava/24.1.1-jre, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.google.j2objc/j2objc-annotations/1.1, Apache-2.0, approved, CQ18765
-maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-ces/3.1.79, Apache-2.0, approved, #12601
-maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-core/3.1.79, Apache-2.0, approved, #11922
-maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-ecs/3.1.79, Apache-2.0, approved, #12599
-maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-iam/3.1.79, Apache-2.0, approved, #12598
+maven/mavencentral/com.googlecode.javaewah/JavaEWAH/1.2.3, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-ces/3.1.81, Apache-2.0, approved, #12601
+maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-core/3.1.81, Apache-2.0, approved, #11922
+maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-ecs/3.1.81, Apache-2.0, approved, #12599
+maven/mavencentral/com.huaweicloud.sdk/huaweicloud-sdk-iam/3.1.81, Apache-2.0, approved, #12598
 maven/mavencentral/com.jayway.jsonpath/json-path/2.8.0, Apache-2.0, approved, clearlydefined
-maven/mavencentral/com.networknt/json-schema-validator/1.2.0, Apache-2.0 AND Unicode-TOU, approved, #12849
+maven/mavencentral/com.networknt/json-schema-validator/1.3.3, Apache-2.0 AND Unicode-TOU, approved, #13037
+maven/mavencentral/com.nimbusds/content-type/2.2, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/content-type/2.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/lang-tag/1.7, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.nimbusds/nimbus-jose-jwt/9.24.4, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.nimbusds/nimbus-jose-jwt/9.37.3, Apache-2.0, approved, #11701
-maven/mavencentral/com.nimbusds/oauth2-oidc-sdk/11.9.1, Apache-2.0, approved, #12667
+maven/mavencentral/com.nimbusds/oauth2-oidc-sdk/11.10, Apache-2.0, approved, #13308
+maven/mavencentral/com.nimbusds/oauth2-oidc-sdk/9.43.3, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.squareup.okhttp3/okhttp/4.12.0, Apache-2.0, approved, #11156
 maven/mavencentral/com.squareup.okio/okio-jvm/3.6.0, Apache-2.0, approved, #11158
 maven/mavencentral/com.squareup.okio/okio/3.6.0, Apache-2.0, approved, #11155
@@ -52,7 +56,7 @@ maven/mavencentral/commons-io/commons-io/2.15.1, Apache-2.0, approved, #11244
 maven/mavencentral/commons-net/commons-net/3.10.0, Apache-2.0, approved, #10928
 maven/mavencentral/commons-validator/commons-validator/1.8.0, Apache-2.0, approved, #11891
 maven/mavencentral/io.hypersistence/hypersistence-tsid/2.1.1, MIT, approved, #11907
-maven/mavencentral/io.hypersistence/hypersistence-utils-hibernate-60/3.7.0, Apache-2.0, approved, #12852
+maven/mavencentral/io.hypersistence/hypersistence-utils-hibernate-60/3.7.2, Apache-2.0, approved, #12852
 maven/mavencentral/io.micrometer/micrometer-commons/1.12.2, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #11679
 maven/mavencentral/io.micrometer/micrometer-observation/1.12.2, Apache-2.0, approved, #11680
 maven/mavencentral/io.opentelemetry.instrumentation/opentelemetry-instrumentation-annotations/1.32.0, Apache-2.0, approved, #11684
@@ -104,7 +108,7 @@ maven/mavencentral/org.activiti/activiti-bpmn-model/8.0.0, Apache-2.0, approved,
 maven/mavencentral/org.activiti/activiti-common-util/8.0.0, Apache-2.0, approved, #12476
 maven/mavencentral/org.activiti/activiti-connector-model/8.0.0, Apache-2.0, approved, #12466
 maven/mavencentral/org.activiti/activiti-core-common-dependencies/8.0.0, Apache-2.0, approved, #12497
-maven/mavencentral/org.activiti/activiti-engine/8.0.0, Apache-2.0 AND (Apache-2.0 AND JSON), restricted, #12472
+maven/mavencentral/org.activiti/activiti-engine/8.0.0, Apache-2.0, approved, #12472
 maven/mavencentral/org.activiti/activiti-expression-language/8.0.0, Apache-2.0, approved, #12494
 maven/mavencentral/org.activiti/activiti-juel-jakarta/8.0.0, Apache-2.0, approved, #12463
 maven/mavencentral/org.activiti/activiti-process-validation/8.0.0, Apache-2.0, approved, #12489
@@ -138,6 +142,7 @@ maven/mavencentral/org.bouncycastle/bcprov-jdk18on/1.75, MIT AND CC0-1.0, approv
 maven/mavencentral/org.checkerframework/checker-compat-qual/2.0.0, CC-BY-2.5, approved, #804
 maven/mavencentral/org.checkerframework/checker-qual/3.37.0, MIT, approved, clearlydefined
 maven/mavencentral/org.codehaus.mojo/animal-sniffer-annotations/1.14, Apache-2.0 AND MIT, approved, CQ19603
+maven/mavencentral/org.eclipse.jgit/org.eclipse.jgit/6.8.0.202311291450-r, BSD-3-Clause, approved, technology.jgit
 maven/mavencentral/org.eclipse.xpanse.modules/api/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
 maven/mavencentral/org.eclipse.xpanse.modules/async/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
 maven/mavencentral/org.eclipse.xpanse.modules/common/1.0.8-SNAPSHOT, Apache-2.0, approved, technology.xpanse
@@ -180,7 +185,7 @@ maven/mavencentral/org.projectlombok/lombok/1.18.30, MIT AND LicenseRef-Public-D
 maven/mavencentral/org.reactivestreams/reactive-streams/1.0.4, CC0-1.0, approved, CQ16332
 maven/mavencentral/org.slf4j/jcl-over-slf4j/2.0.11, MIT AND Apache-2.0, approved, #11889
 maven/mavencentral/org.slf4j/jul-to-slf4j/2.0.11, MIT, approved, #7698
-maven/mavencentral/org.slf4j/slf4j-api/2.0.11, MIT, approved, #5915
+maven/mavencentral/org.slf4j/slf4j-api/2.0.12, MIT, approved, #5915
 maven/mavencentral/org.springdoc/springdoc-openapi-starter-common/2.3.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-api/2.3.0, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-ui/2.3.0, Apache-2.0, approved, clearlydefined
@@ -205,6 +210,7 @@ maven/mavencentral/org.springframework.plugin/spring-plugin-core/3.0.0, Apache-2
 maven/mavencentral/org.springframework.security/spring-security-config/6.2.1, Apache-2.0, approved, #11896
 maven/mavencentral/org.springframework.security/spring-security-core/6.2.1, Apache-2.0, approved, #11904
 maven/mavencentral/org.springframework.security/spring-security-crypto/6.2.1, Apache-2.0 AND ISC, approved, #11908
+maven/mavencentral/org.springframework.security/spring-security-oauth2-client/6.2.1, Apache-2.0, approved, #12586
 maven/mavencentral/org.springframework.security/spring-security-oauth2-core/6.2.1, Apache-2.0, approved, #11925
 maven/mavencentral/org.springframework.security/spring-security-oauth2-jose/6.2.1, Apache-2.0, approved, #11893
 maven/mavencentral/org.springframework.security/spring-security-oauth2-resource-server/6.2.1, Apache-2.0, approved, #11920
