@@ -43,7 +43,7 @@ class ServiceTemplateDetailVoTest {
     private static final OffsetDateTime createTime = OffsetDateTime.now();
     private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private static final ServiceRegistrationState serviceRegistrationState =
-            ServiceRegistrationState.REGISTERED;
+            ServiceRegistrationState.APPROVED;
     private static ServiceProviderContactDetails serviceProviderContactDetails;
     private static List<@Valid Region> regions;
     private static List<@Valid DeployVariable> variables;

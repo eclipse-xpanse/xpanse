@@ -30,7 +30,7 @@ class ServiceTemplateEntityTest {
     private static final Csp CSP = Csp.HUAWEI;
     private static final Category CATEGORY = Category.MIDDLEWARE;
     private static final ServiceRegistrationState SERVICE_STATE =
-            ServiceRegistrationState.REGISTERED;
+            ServiceRegistrationState.APPROVED;
     private Ocl ocl;
     private JsonObjectSchema jsonObjectSchema;
     private ServiceProviderContactDetails serviceProviderContactDetails;

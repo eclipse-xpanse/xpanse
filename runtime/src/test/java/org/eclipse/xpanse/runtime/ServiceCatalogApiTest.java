@@ -26,10 +26,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
@@ -64,6 +68,9 @@ class ServiceCatalogApiTest {
     @Resource
     private MockMvc mockMvc;
 
+    @Resource
+    private DatabaseServiceTemplateStorage serviceTemplateStorage;
+
     @BeforeAll
     static void configureObjectMapper() {
         objectMapper.registerModule(new JavaTimeModule());
@@ -77,8 +84,9 @@ class ServiceCatalogApiTest {
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testOrderableServices() throws Exception {
-        registerService();
+        registerServiceTemplate();
         Thread.sleep(3000);
+        approveServiceTemplateRegistration();
         testOpenApi();
         testOrderableServiceDetails();
         testListOrderableServices();
@@ -88,13 +96,19 @@ class ServiceCatalogApiTest {
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testOrderableServicesThrowsException() throws Exception {
-        testOrderableServiceDetailsThrowsException();
+        testOrderableServiceDetailsThrowsServiceTemplateNotRegistered();
         testListOrderableServicesThrowsException();
         testOpenApiThrowsException();
         testListOrderableServicesReturnsNoItems();
     }
 
-    void registerService() throws Exception {
+    @Test
+    @WithJwt(file = "jwt_all_roles.json")
+    void testGetOrderableServiceDetailsThrowsException() throws Exception {
+        testOrderableServiceDetailsThrowsServiceTemplateNotApproved();
+    }
+
+    void registerServiceTemplate() throws Exception {
         // Setup
         ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
@@ -110,8 +124,18 @@ class ServiceCatalogApiTest {
                 objectMapper.readValue(registerResponse.getContentAsString(),
                         ServiceTemplateDetailVo.class);
         id = serviceTemplateDetailVo.getId().toString();
-
     }
+
+    void approveServiceTemplateRegistration() throws Exception {
+        if (serviceTemplateDetailVo == null || StringUtils.isBlank(id)) {
+            registerServiceTemplate();
+        }
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(UUID.fromString(id));
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
+        serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
+    }
+
 
     void unregisterService() throws Exception {
         final MockHttpServletResponse response =
@@ -221,7 +245,7 @@ class ServiceCatalogApiTest {
         Assertions.assertEquals(result, response.getContentAsString());
     }
 
-    void testOrderableServiceDetailsThrowsException() throws Exception {
+    void testOrderableServiceDetailsThrowsServiceTemplateNotRegistered() throws Exception {
         // Setup
         String uuid = UUID.randomUUID().toString();
         Response expectedResponse = Response.errorResponse(
@@ -233,6 +257,28 @@ class ServiceCatalogApiTest {
         // Run the test
         final MockHttpServletResponse response =
                 mockMvc.perform(get("/xpanse/catalog/services/{id}", uuid)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        Assertions.assertEquals(result, response.getContentAsString());
+    }
+
+    void testOrderableServiceDetailsThrowsServiceTemplateNotApproved() throws Exception {
+        // Setup
+        if (serviceTemplateDetailVo == null || StringUtils.isBlank(id)) {
+            registerServiceTemplate();
+        }
+        Response expectedResponse = Response.errorResponse(
+                ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
+                Collections.singletonList(
+                        String.format("Service template with id %s not approved.", id)));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+
+        // Run the test
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/catalog/services/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 

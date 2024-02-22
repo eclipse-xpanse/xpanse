@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
@@ -103,5 +104,17 @@ public class RegistrationExceptionHandler {
             InvalidValueSchemaException ex) {
         return Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
                 ex.getInvalidValueSchemaKeys());
+    }
+
+    /**
+     * Exception handler for ServiceTemplateNotApproved.
+     */
+    @ExceptionHandler({ServiceTemplateNotApproved.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceTemplateNotApproved(
+            ServiceTemplateNotApproved ex) {
+        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
+                Collections.singletonList(ex.getMessage()));
     }
 }

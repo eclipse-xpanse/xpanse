@@ -15,17 +15,22 @@ class ServiceRegistrationStateTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(ServiceRegistrationState.REGISTERED,
-                ServiceRegistrationState.REGISTERED.getByValue("registered"));
-        assertEquals(ServiceRegistrationState.UPDATED,
-                ServiceRegistrationState.UPDATED.getByValue("updated"));
+        assertEquals(ServiceRegistrationState.APPROVED,
+                ServiceRegistrationState.getByValue("approved"));
+        assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
+                ServiceRegistrationState.getByValue("approval pending"));
+        assertEquals(ServiceRegistrationState.REJECTED,
+                ServiceRegistrationState.getByValue("rejected"));
         assertThrows(UnsupportedEnumValueException.class,
-                () -> ServiceRegistrationState.UPDATED.getByValue("null"));
+                () -> ServiceRegistrationState.getByValue("error_value"));
+        assertThrows(UnsupportedEnumValueException.class,
+                () -> ServiceRegistrationState.getByValue(null));
     }
 
     @Test
     void testToValue() {
-        assertEquals("registered", ServiceRegistrationState.REGISTERED.toValue());
-        assertEquals("updated", ServiceRegistrationState.UPDATED.toValue());
+        assertEquals("approved", ServiceRegistrationState.APPROVED.toValue());
+        assertEquals("approval pending", ServiceRegistrationState.APPROVAL_PENDING.toValue());
+        assertEquals("rejected", ServiceRegistrationState.REJECTED.toValue());
     }
 }

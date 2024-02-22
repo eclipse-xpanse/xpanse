@@ -108,7 +108,7 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setName(oclRegister.getName());
         serviceTemplateEntity.setId(UUID.randomUUID());
         serviceTemplateEntity.setCategory(oclRegister.getCategory());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
         serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         serviceTemplateEntity.setServiceHostingType(oclRegister.getServiceHostingType());
@@ -152,7 +152,7 @@ class ServiceTemplateManageTest {
                 serviceTemplateManageTest.updateServiceTemplateByUrl(uuid.toString(),
                         oclLocation);
         log.error(ServiceTemplateEntityByUrl.toString());
-        Assertions.assertEquals(ServiceRegistrationState.UPDATED,
+        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
                 ServiceTemplateEntityByUrl.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).updateServiceApi(serviceTemplateEntity);
     }
@@ -196,7 +196,7 @@ class ServiceTemplateManageTest {
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         ServiceTemplateEntity updateServiceTemplateEntity =
                 serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl);
-        Assertions.assertEquals(ServiceRegistrationState.UPDATED,
+        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
                 updateServiceTemplateEntity.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).updateServiceApi(serviceTemplateEntity);
     }
@@ -262,7 +262,7 @@ class ServiceTemplateManageTest {
 
         ServiceTemplateEntity savedServiceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplate(oclRegister);
-        Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
+        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
                 savedServiceTemplateEntity.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).generateServiceApi(savedServiceTemplateEntity);
     }
@@ -277,7 +277,7 @@ class ServiceTemplateManageTest {
         entity.setCategory(ocl.getCategory());
         entity.setServiceHostingType(ServiceHostingType.SELF);
         entity.setOcl(ocl);
-        entity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+        entity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
 
         ServiceTemplateEntity existedServiceTemplateEntity = getServiceTemplateEntity();
 
@@ -327,7 +327,7 @@ class ServiceTemplateManageTest {
 
         ServiceTemplateEntity savedServiceTemplateEntity =
                 serviceTemplateManageTest.registerServiceTemplateByUrl(oclLocation);
-        Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
+        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
                 savedServiceTemplateEntity.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).generateServiceApi(savedServiceTemplateEntity);
     }
