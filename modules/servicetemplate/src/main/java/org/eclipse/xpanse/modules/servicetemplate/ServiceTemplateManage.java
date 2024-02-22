@@ -102,7 +102,7 @@ public class ServiceTemplateManage {
         checkParams(existingService, ocl);
         validateTerraformScript(ocl);
         existingService.setOcl(ocl);
-        existingService.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
+        existingService.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
                         existingService.getOcl().getDeployment().getVariables());
@@ -153,7 +153,7 @@ public class ServiceTemplateManage {
         entity.setCategory(ocl.getCategory());
         entity.setServiceHostingType(ocl.getServiceHostingType());
         entity.setOcl(ocl);
-        entity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+        entity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         entity.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
         return entity;
     }

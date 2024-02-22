@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
@@ -45,6 +47,7 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
@@ -71,12 +74,14 @@ import org.springframework.test.web.servlet.MockMvc;
 class ServiceDeployerApiTest {
 
     private static final long waitTime = 60 * 1000;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     static ServiceTemplateDetailVo serviceTemplateDetailVo;
     static Ocl ocl;
     static boolean credentialReady = false;
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     @Resource
     private MockMvc mockMvc;
+    @Resource
+    private DatabaseServiceTemplateStorage serviceTemplateStorage;
 
     @BeforeAll
     static void configureObjectMapper() {
@@ -101,6 +106,13 @@ class ServiceDeployerApiTest {
                         .andReturn().getResponse();
         serviceTemplateDetailVo = objectMapper.readValue(registerResponse.getContentAsString(),
                 ServiceTemplateDetailVo.class);
+    }
+
+    void approveServiceTemplateRegistration() {
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(serviceTemplateDetailVo.getId());
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
+        serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
     }
 
     void addCredential() throws Exception {
@@ -138,6 +150,8 @@ class ServiceDeployerApiTest {
         if (Objects.isNull(serviceTemplateDetailVo)) {
             registerServiceTemplate();
         }
+        testDeployServiceThrowsServiceTemplateNotApproved();
+        approveServiceTemplateRegistration();
         UUID serviceId = testDeploy();
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             listDeployedServices();
@@ -178,8 +192,8 @@ class ServiceDeployerApiTest {
         deployRequest.setVersion(serviceTemplateDetailVo.getVersion());
         deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
         deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
-        deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().get(0).getName());
-        deployRequest.setRegion(serviceTemplateDetailVo.getRegions().get(0).toString());
+        deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().getFirst().getName());
+        deployRequest.setRegion(serviceTemplateDetailVo.getRegions().getFirst().toString());
         deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
@@ -208,7 +222,7 @@ class ServiceDeployerApiTest {
 
         // Verify the results
         Assertions.assertFalse(result.isEmpty());
-        Assertions.assertEquals(result.get(0).getServiceDeploymentState(),
+        Assertions.assertEquals(result.getFirst().getServiceDeploymentState(),
                 ServiceDeploymentState.DEPLOYING);
     }
 
@@ -235,10 +249,43 @@ class ServiceDeployerApiTest {
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testServiceDeployerThrowsException() throws Exception {
-        testDeployThrowsException();
+        testDeployThrowsServiceTemplateNotRegistered();
         testGetServiceDetailsThrowsException();
         testDestroyThrowsException();
         testPurgeThrowsException();
+    }
+
+    void testDeployServiceThrowsServiceTemplateNotApproved() throws Exception {
+        // SetUp
+        Response expectedResponse = Response.errorResponse(
+                ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
+                Collections.singletonList("No available service templates found."));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setServiceName(serviceTemplateDetailVo.getName());
+        deployRequest.setVersion(serviceTemplateDetailVo.getVersion());
+        deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
+        deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
+        deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().getFirst().getName());
+        deployRequest.setRegion(serviceTemplateDetailVo.getRegions().getFirst().toString());
+        deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
+        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
+        deployRequest.setServiceRequestProperties(serviceRequestProperties);
+        String requestBody = objectMapper.writeValueAsString(deployRequest);
+
+        // Run the test
+        final MockHttpServletResponse deployResponse =
+                mockMvc.perform(post("/xpanse/services")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
+        Assertions.assertEquals(result, deployResponse.getContentAsString());
     }
 
     void testPurgeThrowsException() throws Exception {
@@ -316,10 +363,10 @@ class ServiceDeployerApiTest {
         }
     }
 
-    void testDeployThrowsException() throws Exception {
+    void testDeployThrowsServiceTemplateNotRegistered() throws Exception {
         Response expectedResponse = Response.errorResponse(
                 ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
-                Collections.singletonList("Service template not found."));
+                Collections.singletonList("No available service templates found."));
         String result = objectMapper.writeValueAsString(expectedResponse);
 
         DeployRequest deployRequest = new DeployRequest();

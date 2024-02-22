@@ -23,6 +23,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.hateoas.Link;
@@ -83,9 +85,11 @@ public class ServiceCatalogApi {
                         categoryName, cspName, serviceName, serviceVersion, serviceHostingType,
                         false);
         log.info(serviceTemplateEntities.size() + " orderable services found.");
-        return serviceTemplateEntities.stream().sorted(Comparator.comparingInt(
-                        serviceTemplateDetailVo -> serviceTemplateDetailVo != null
-                                ? serviceTemplateDetailVo.getCsp().ordinal() : -1))
+        return serviceTemplateEntities.stream()
+                .filter(template -> ServiceRegistrationState.APPROVED
+                        == template.getServiceRegistrationState())
+                .sorted(Comparator.comparingInt(
+                        serviceTemplateDetailVo -> serviceTemplateDetailVo.getCsp().ordinal()))
                 .map(ServiceTemplateEntityConverter::convertToUserOrderableServiceVo)
                 .toList();
     }
@@ -107,6 +111,12 @@ public class ServiceCatalogApi {
             @PathVariable("id") String id) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManage.getServiceTemplateDetails(id, false);
+        if (ServiceRegistrationState.APPROVED
+                != serviceTemplateEntity.getServiceRegistrationState()) {
+            String errMsg = String.format("Service template with id %s not approved.", id);
+            log.error(errMsg);
+            throw new ServiceTemplateNotApproved(errMsg);
+        }
         String successMsg = String.format("Get orderable service with id %s successful.", id);
         log.info(successMsg);
         return convertToUserOrderableServiceVo(serviceTemplateEntity);

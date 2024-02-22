@@ -16,6 +16,7 @@ import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
@@ -96,6 +97,18 @@ class RegistrationExceptionHandlerTest {
                         post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Template Not Registered"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testServiceTemplateNotApproved() throws Exception {
+        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
+                .thenThrow(new ServiceTemplateNotApproved("test error"));
+
+        this.mockMvc.perform(
+                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Service Template Not Approved"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 

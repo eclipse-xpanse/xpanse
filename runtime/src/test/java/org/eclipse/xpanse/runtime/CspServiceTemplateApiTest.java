@@ -93,7 +93,7 @@ class CspServiceTemplateApiTest {
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), registerResponse.getStatus());
-        Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
+        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
                 serviceTemplateDetailVo.getServiceRegistrationState());
         Assertions.assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
         Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),

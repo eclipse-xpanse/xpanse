@@ -59,7 +59,7 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setCsp(Csp.HUAWEI);
         serviceTemplateEntity.setCategory(Category.MIDDLEWARE);
         serviceTemplateEntity.setOcl(ocl);
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.REGISTERED);
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
         OpenApiGeneratorJarManage openApiGeneratorJarManage =
@@ -90,7 +90,7 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setCsp(Csp.HUAWEI);
         serviceTemplateEntity.setCategory(Category.AI);
         serviceTemplateEntity.setOcl(ocl);
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.UPDATED);
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
         OpenApiGeneratorJarManage openApiGeneratorJarManage =

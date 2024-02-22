@@ -5,7 +5,10 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
+import jakarta.annotation.Resource;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +20,8 @@ import org.eclipse.xpanse.api.controllers.ServiceMigrationApi;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
@@ -26,13 +31,13 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -45,18 +50,20 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     static ServiceTemplateDetailVo serviceTemplate;
-    @Autowired
+    @Resource
     ServiceDeployerApi serviceDeployerApi;
-    @Autowired
+    @Resource
     ServiceTemplateApi ServiceTemplateApi;
-    @Autowired
+    @Resource
     DatabaseDeployServiceStorage deployServiceStorage;
-    @Autowired
+    @Resource
     ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
-    @Autowired
+    @Resource
     OclLoader oclLoader;
-    @Autowired
+    @Resource
     ServiceMigrationApi serviceMigrationApi;
+    @Resource
+    private DatabaseServiceTemplateStorage serviceTemplateStorage;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -64,6 +71,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         if (Objects.isNull(serviceTemplate)) {
             registerServiceTemplate();
         }
+        testDeployServiceThrowsServiceTemplateNotApproved();
+        approveServiceTemplateRegistration();
         UUID serviceId = deployService();
 
         if (waitServiceUtilTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {
@@ -103,6 +112,13 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         }
     }
 
+    void approveServiceTemplateRegistration() {
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(serviceTemplate.getId());
+        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
+        serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
+    }
+
     UUID deployService() {
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setUserId("userId");
@@ -110,8 +126,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequest.setVersion(serviceTemplate.getVersion());
         deployRequest.setCsp(serviceTemplate.getCsp());
         deployRequest.setCategory(serviceTemplate.getCategory());
-        deployRequest.setFlavor(serviceTemplate.getFlavors().get(0).getName());
-        deployRequest.setRegion(serviceTemplate.getRegions().get(0).getName());
+        deployRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
+        deployRequest.setRegion(serviceTemplate.getRegions().getFirst().getName());
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
@@ -148,11 +164,29 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         Ocl ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         serviceTemplate = ServiceTemplateApi.register(ocl);
         Assertions.assertNotNull(serviceTemplate);
-        Assertions.assertEquals(ServiceRegistrationState.REGISTERED,
+        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
                 serviceTemplate.getServiceRegistrationState());
         Assertions.assertEquals(serviceTemplate.getCsp(), ocl.getCloudServiceProvider().getName());
         Assertions.assertEquals(serviceTemplate.getName(), ocl.getName().toLowerCase());
         Assertions.assertTrue(serviceTemplate.getVariables().size() > 1);
+    }
+
+    void testDeployServiceThrowsServiceTemplateNotApproved() {
+        // SetUp
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setServiceName(serviceTemplate.getName());
+        deployRequest.setVersion(serviceTemplate.getVersion());
+        deployRequest.setCsp(serviceTemplate.getCsp());
+        deployRequest.setCategory(serviceTemplate.getCategory());
+        deployRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
+        deployRequest.setRegion(serviceTemplate.getRegions().getFirst().toString());
+        deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
+        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
+        deployRequest.setServiceRequestProperties(serviceRequestProperties);
+        // run the test
+        assertThrows(ServiceTemplateNotApproved.class,
+                () -> serviceDeployerApi.deploy(deployRequest));
     }
 
     UUID migrateService(UUID taskId) {
@@ -163,8 +197,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         migrateRequest.setVersion(serviceTemplate.getVersion());
         migrateRequest.setCsp(serviceTemplate.getCsp());
         migrateRequest.setCategory(serviceTemplate.getCategory());
-        migrateRequest.setFlavor(serviceTemplate.getFlavors().get(0).getName());
-        migrateRequest.setRegion(serviceTemplate.getRegions().get(0).toString());
+        migrateRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
+        migrateRequest.setRegion(serviceTemplate.getRegions().getFirst().toString());
         migrateRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "22222222@Qq");
@@ -209,7 +243,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
         Thread.sleep(30 * 1000);
 
-        Assertions.assertThrows(ServiceNotDeployedException.class,
+        assertThrows(ServiceNotDeployedException.class,
                 () -> serviceDeployerApi.getSelfHostedServiceDetailsById(taskId.toString()));
     }
 }

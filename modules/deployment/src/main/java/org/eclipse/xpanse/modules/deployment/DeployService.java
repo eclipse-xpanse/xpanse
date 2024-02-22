@@ -25,6 +25,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentS
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -70,29 +72,37 @@ public class DeployService {
      * @return new deploy task.
      */
     public DeployTask createNewDeployTask(DeployRequest deployRequest) {
-        // Find the registered service template and fill Ocl.
-        ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
-        serviceTemplate.setName(StringUtils.lowerCase(deployRequest.getServiceName()));
-        serviceTemplate.setVersion(StringUtils.lowerCase(deployRequest.getVersion()));
-        serviceTemplate.setCsp(deployRequest.getCsp());
-        serviceTemplate.setCategory(deployRequest.getCategory());
-        serviceTemplate.setServiceHostingType(deployRequest.getServiceHostingType());
-        serviceTemplate = serviceTemplateStorage.findServiceTemplate(serviceTemplate);
-        if (Objects.isNull(serviceTemplate) || Objects.isNull(serviceTemplate.getOcl())) {
-            throw new ServiceTemplateNotRegistered("Service template not found.");
+        // Find the approved service template and fill Ocl.
+        ServiceTemplateEntity searchServiceTemplate = new ServiceTemplateEntity();
+        searchServiceTemplate.setName(StringUtils.lowerCase(deployRequest.getServiceName()));
+        searchServiceTemplate.setVersion(StringUtils.lowerCase(deployRequest.getVersion()));
+        searchServiceTemplate.setCsp(deployRequest.getCsp());
+        searchServiceTemplate.setCategory(deployRequest.getCategory());
+        searchServiceTemplate.setServiceHostingType(deployRequest.getServiceHostingType());
+        ServiceTemplateEntity existingServiceTemplate =
+                serviceTemplateStorage.findServiceTemplate(searchServiceTemplate);
+        if (Objects.isNull(existingServiceTemplate)
+                || Objects.isNull(existingServiceTemplate.getOcl())) {
+            throw new ServiceTemplateNotRegistered("No available service templates found.");
         }
-
+        if (ServiceRegistrationState.APPROVED
+                != existingServiceTemplate.getServiceRegistrationState()) {
+            String errMsg = String.format("Found service template with id %s but not approved.",
+                    existingServiceTemplate.getId());
+            log.error(errMsg);
+            throw new ServiceTemplateNotApproved("No available service templates found.");
+        }
         // Check context validation
-        if (Objects.nonNull(serviceTemplate.getOcl().getDeployment()) && Objects.nonNull(
-                deployRequest.getServiceRequestProperties())) {
+        if (Objects.nonNull(existingServiceTemplate.getOcl().getDeployment())
+                && Objects.nonNull(deployRequest.getServiceRequestProperties())) {
             List<DeployVariable> deployVariables =
-                    serviceTemplate.getOcl().getDeployment().getVariables();
+                    existingServiceTemplate.getOcl().getDeployment().getVariables();
 
             serviceVariablesJsonSchemaValidator.validateDeployVariables(deployVariables,
                     deployRequest.getServiceRequestProperties(),
-                    serviceTemplate.getJsonObjectSchema());
+                    existingServiceTemplate.getJsonObjectSchema());
         }
-        sensitiveDataHandler.encodeDeployVariable(serviceTemplate,
+        sensitiveDataHandler.encodeDeployVariable(existingServiceTemplate,
                 deployRequest.getServiceRequestProperties());
 
         if (StringUtils.isEmpty(deployRequest.getCustomerServiceName())) {
@@ -102,10 +112,10 @@ public class DeployService {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(UUID.randomUUID());
         deployTask.setDeployRequest(deployRequest);
-        deployTask.setNamespace(serviceTemplate.getNamespace());
-        deployTask.setOcl(serviceTemplate.getOcl());
-        if (Objects.nonNull(serviceTemplate.getId())) {
-            deployTask.setServiceTemplateId(serviceTemplate.getId());
+        deployTask.setNamespace(existingServiceTemplate.getNamespace());
+        deployTask.setOcl(existingServiceTemplate.getOcl());
+        if (Objects.nonNull(existingServiceTemplate.getId())) {
+            deployTask.setServiceTemplateId(existingServiceTemplate.getId());
         } else {
             throw new ServiceTemplateNotRegistered("service template id can't be null.");
         }

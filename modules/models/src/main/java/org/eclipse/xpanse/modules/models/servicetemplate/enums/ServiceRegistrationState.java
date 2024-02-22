@@ -14,9 +14,9 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  * Defines possible states of a managed service registration.
  */
 public enum ServiceRegistrationState {
-
-    REGISTERED("registered"),
-    UPDATED("updated");
+    APPROVAL_PENDING("approval pending"),
+    APPROVED("approved"),
+    REJECTED("rejected");
 
     private final String state;
 
@@ -28,9 +28,9 @@ public enum ServiceRegistrationState {
      * For ServiceRegistrationState deserialize.
      */
     @JsonCreator
-    public ServiceRegistrationState getByValue(String state) {
+    public static ServiceRegistrationState getByValue(String state) {
         for (ServiceRegistrationState serviceState : values()) {
-            if (serviceState.state.equals(StringUtils.lowerCase(state))) {
+            if (StringUtils.equalsIgnoreCase(serviceState.state, state)) {
                 return serviceState;
             }
         }
