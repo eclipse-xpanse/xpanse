@@ -31,6 +31,7 @@ class DeployVariableTest {
     private static final Map<String,Object> validatorMap  = Map.of("minLength","10");
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
     private static DeployVariable deployVariable;
+    private static AutoFill autoFill = null;
 
     @BeforeEach
     void setUp() {
@@ -44,6 +45,7 @@ class DeployVariableTest {
         deployVariable.setMandatory(mandatory);
         deployVariable.setValueSchema(validatorMap);
         deployVariable.setSensitiveScope(sensitiveScope);
+        deployVariable.setAutoFill(autoFill);
     }
 
     @Test
@@ -131,6 +133,12 @@ class DeployVariableTest {
         assertNotEquals(deployVariable1, deployVariable2);
         assertEquals(deployVariable.hashCode(), deployVariable1.hashCode());
         assertNotEquals(deployVariable1.hashCode(), deployVariable2.hashCode());
+
+        deployVariable1.setAutoFill(autoFill);
+        assertEquals(deployVariable, deployVariable1);
+        assertNotEquals(deployVariable1, deployVariable2);
+        assertEquals(deployVariable.hashCode(), deployVariable1.hashCode());
+        assertNotEquals(deployVariable1.hashCode(), deployVariable2.hashCode());
     }
 
     @Test
@@ -145,6 +153,7 @@ class DeployVariableTest {
                 ", mandatory=" + mandatory + "" +
                 ", valueSchema=" + validatorMap + "" +
                 ", sensitiveScope=" + sensitiveScope + "" +
+                ", autoFill=" + autoFill + "" +
                 ")";
         assertEquals(expectedString, deployVariable.toString());
     }
