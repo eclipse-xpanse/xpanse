@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceManager;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
@@ -45,6 +46,8 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     private FlexibleEngineMetricsService flexibleEngineMetricsService;
     @Resource
     private FlexibleEngineVmStateManager flexibleEngineVmStateManagerService;
+    @Resource
+    private FlexibleEngineResourceManager flexibleEngineResourceManager;
 
     @Value("${terraform.provider.flexibleengine.version}")
     private String terraformFlexibleEngineVersion;
@@ -60,7 +63,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<String> getExistingResourcesOfType(String userId, String region,
             DeployResourceKind kind) {
-        return new ArrayList<>();
+        return flexibleEngineResourceManager.getExistingResourcesOfType(userId, region, kind);
     }
 
     @Override

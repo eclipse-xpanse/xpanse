@@ -8,9 +8,12 @@ package org.eclipse.xpanse.plugins.flexibleengine.common;
 
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.CES_ENDPOINT_PREFIX;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.ECS_ENDPOINT_PREFIX;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.EIP_ENDPOINT_PREFIX;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.ENDPOINT_SUFFIX;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.EVS_ENDPOINT_PREFIX;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.IAM_ENDPOINT_PREFIX;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.PROTOCOL_HTTPS;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.VPC_ENDPOINT_PREFIX;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_DELAY_MILLIS;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_RETRY_TIMES;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.ERROR_CODE_INTERNAL_SERVER_ERROR;
@@ -25,9 +28,12 @@ import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.core.exception.ServiceResponseException;
 import com.huaweicloud.sdk.core.http.HttpConfig;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
+import com.huaweicloud.sdk.eip.v2.EipClient;
+import com.huaweicloud.sdk.evs.v2.EvsClient;
 import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsRequest;
 import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsResponse;
+import com.huaweicloud.sdk.vpc.v2.VpcClient;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -66,6 +72,42 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
     public CesClient getCesClient(ICredential credential, String regionName) {
         HcClient hcClient = getHcClient(credential, CES_ENDPOINT_PREFIX, regionName);
         return new CesClient(hcClient);
+    }
+
+    /**
+     * Get client for service VPC.
+     *
+     * @param credential credential
+     * @param regionName region name
+     * @return client for service VPC.
+     */
+    public VpcClient getVpcClient(ICredential credential, String regionName) {
+        HcClient hcClient = getHcClient(credential, VPC_ENDPOINT_PREFIX, regionName);
+        return new VpcClient(hcClient);
+    }
+
+    /**
+     * Get client for service EIP.
+     *
+     * @param credential credential
+     * @param regionName region name
+     * @return client for service EIP.
+     */
+    public EipClient getEipClient(ICredential credential, String regionName) {
+        HcClient hcClient = getHcClient(credential, EIP_ENDPOINT_PREFIX, regionName);
+        return new EipClient(hcClient);
+    }
+
+    /**
+     * Get client for service EVS.
+     *
+     * @param credential credential
+     * @param regionName region name
+     * @return client for service EVS.
+     */
+    public EvsClient getEvsClient(ICredential credential, String regionName) {
+        HcClient hcClient = getHcClient(credential, EVS_ENDPOINT_PREFIX, regionName);
+        return new EvsClient(hcClient);
     }
 
     /**
