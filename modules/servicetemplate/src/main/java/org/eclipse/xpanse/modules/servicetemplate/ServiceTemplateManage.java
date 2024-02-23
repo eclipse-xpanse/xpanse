@@ -40,6 +40,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnost
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
+import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableAutoFillValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.springframework.security.access.AccessDeniedException;
@@ -183,6 +184,8 @@ public class ServiceTemplateManage {
             log.error(errorMsg);
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
+        DeployVariableAutoFillValidator.validateDeployVariableAutoFill(
+                newEntity.getOcl().getDeployment().getVariables());
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
                         newEntity.getOcl().getDeployment().getVariables());

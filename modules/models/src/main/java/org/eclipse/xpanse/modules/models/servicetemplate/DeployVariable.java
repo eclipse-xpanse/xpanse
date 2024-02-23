@@ -61,4 +61,7 @@ public class DeployVariable implements Serializable {
 
     @Schema(description = "Sensitive scope of variable storage")
     private SensitiveScope sensitiveScope = SensitiveScope.NONE;
+
+    @Schema(description = "Variable autofill")
+    private AutoFill autoFill;
 }

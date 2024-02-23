@@ -57,4 +57,11 @@ public enum DeployResourceKind {
     public String toValue() {
         return this.kind;
     }
+
+    /**
+     * For XpanseResourceKind deserialize.
+     */
+    public DeployResourceKind getParent() {
+        return this.parent;
+    }
 }
