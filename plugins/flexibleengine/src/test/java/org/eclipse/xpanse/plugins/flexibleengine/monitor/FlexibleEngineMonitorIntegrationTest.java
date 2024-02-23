@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceManager;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
@@ -50,7 +51,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         FlexibleEngineMetricsService.class, FlexibleEngineClient.class,
         FlexibleEngineMonitorConstants.class, FlexibleEngineDataModelConverter.class,
         CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
-        FlexibleEngineTerraformResourceHandler.class})
+        FlexibleEngineTerraformResourceHandler.class, FlexibleEngineResourceManager.class})
 class FlexibleEngineMonitorIntegrationTest {
 
     @RegisterExtension

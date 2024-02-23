@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
+import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceManager;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
@@ -43,6 +44,8 @@ class FlexibleEngineOrchestratorPluginTest {
     private FlexibleEngineMetricsService mockFlexibleEngineMetricsService;
     @Mock
     private FlexibleEngineVmStateManager mockFlexibleEngineVmStateManagerService;
+    @Mock
+    private FlexibleEngineResourceManager flexibleEngineResourceManager;
     @InjectMocks
     private FlexibleEngineOrchestratorPlugin flexibleEngineOrchestratorPluginUnderTest;
 
