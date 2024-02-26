@@ -45,7 +45,7 @@ class ServiceTemplateOpenApiGeneratorTest {
     void createServiceApi_test() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_testOpenApi.yaml").toURL());
+                URI.create("file:src/test/resources/ocl_test.yaml").toURL());
 
         ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
                 new ServiceVariablesJsonSchemaGenerator();
@@ -77,7 +77,7 @@ class ServiceTemplateOpenApiGeneratorTest {
     void updateServiceApi_test() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_testOpenApi.yaml").toURL());
+                URI.create("file:src/test/resources/ocl_test.yaml").toURL());
         ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
                 new ServiceVariablesJsonSchemaGenerator();
         JsonObjectSchema jsonObjectSchema =

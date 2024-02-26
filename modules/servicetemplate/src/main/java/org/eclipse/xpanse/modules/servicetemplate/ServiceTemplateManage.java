@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.servicetemplate;
 
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import java.net.URI;
 import java.util.List;
@@ -21,16 +20,16 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
-import org.eclipse.xpanse.modules.models.common.enums.Category;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
@@ -47,7 +46,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 /**
- * Implement Interface to manage service template entity in database.
+ * Implement Interface to manage service template newTemplate in database.
  */
 @Slf4j
 @Service
@@ -71,7 +70,7 @@ public class ServiceTemplateManage {
      *
      * @param id          id of the service template.
      * @param oclLocation url of the ocl file.
-     * @return Returns service template DB entity.
+     * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity updateServiceTemplateByUrl(String id, String oclLocation)
             throws Exception {
@@ -84,54 +83,49 @@ public class ServiceTemplateManage {
      *
      * @param id  id of the service template.
      * @param ocl the Ocl model describing the service template.
-     * @return Returns service template DB entity.
+     * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity updateServiceTemplate(String id, Ocl ocl) {
-        ServiceTemplateEntity existingService = storage.getServiceTemplateById(UUID.fromString(id));
-        if (Objects.isNull(existingService)) {
-            String errMsg = String.format("Service template with id %s not found.", id);
-            log.error(errMsg);
-            throw new ServiceTemplateNotRegistered(errMsg);
-        }
+        ServiceTemplateEntity existingTemplate = getServiceTemplateById(id);
         Optional<String> namespace = identityProviderManager.getUserNamespace();
         if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
-                existingService.getNamespace())) {
+                existingTemplate.getNamespace())) {
             throw new AccessDeniedException("No permissions to update service templates "
                     + "belonging to other namespaces.");
         }
-        iconUpdate(existingService, ocl);
-        checkParams(existingService, ocl);
+        iconUpdate(existingTemplate, ocl);
+        checkParams(existingTemplate, ocl);
         validateTerraformScript(ocl);
-        existingService.setOcl(ocl);
-        existingService.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+        existingTemplate.setOcl(ocl);
+        existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
-                        existingService.getOcl().getDeployment().getVariables());
-        existingService.setJsonObjectSchema(jsonObjectSchema);
-        ServiceTemplateEntity updatedServiceTemplate = storage.storeAndFlush(existingService);
+                        existingTemplate.getOcl().getDeployment().getVariables());
+        existingTemplate.setJsonObjectSchema(jsonObjectSchema);
+        ServiceTemplateEntity updatedServiceTemplate = storage.storeAndFlush(existingTemplate);
         serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
         return updatedServiceTemplate;
     }
 
-    private void checkParams(ServiceTemplateEntity existingService, Ocl ocl) {
+    private void checkParams(ServiceTemplateEntity existingTemplate, Ocl ocl) {
 
-        String oldCategory = existingService.getCategory().name();
+        String oldCategory = existingTemplate.getCategory().name();
         String newCategory = ocl.getCategory().name();
         compare(oldCategory, newCategory, "category");
 
-        String oldName = existingService.getName();
+        String oldName = existingTemplate.getName();
         String newName = ocl.getName();
         compare(oldName, newName, "service name");
 
-        String oldVersion = existingService.getVersion();
+        String oldVersion = existingTemplate.getVersion();
         String newVersion = ocl.getServiceVersion();
         compare(oldVersion, newVersion, "service version");
 
-        String oldCsp = existingService.getCsp().name();
+        String oldCsp = existingTemplate.getCsp().name();
         String newCsp = ocl.getCloudServiceProvider().getName().name();
         compare(oldCsp, newCsp, "csp");
 
-        String oldServiceHostingType = existingService.getServiceHostingType().toValue();
+        String oldServiceHostingType = existingTemplate.getServiceHostingType().toValue();
         String newServiceHostingType = ocl.getServiceHostingType().toValue();
         compare(oldServiceHostingType, newServiceHostingType, "service hosting type");
     }
@@ -147,16 +141,16 @@ public class ServiceTemplateManage {
     }
 
     private ServiceTemplateEntity getNewServiceTemplateEntity(Ocl ocl) {
-        ServiceTemplateEntity entity = new ServiceTemplateEntity();
-        entity.setName(StringUtils.lowerCase(ocl.getName()));
-        entity.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
-        entity.setCsp(ocl.getCloudServiceProvider().getName());
-        entity.setCategory(ocl.getCategory());
-        entity.setServiceHostingType(ocl.getServiceHostingType());
-        entity.setOcl(ocl);
-        entity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
-        entity.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
-        return entity;
+        ServiceTemplateEntity newTemplate = new ServiceTemplateEntity();
+        newTemplate.setName(StringUtils.lowerCase(ocl.getName()));
+        newTemplate.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
+        newTemplate.setCsp(ocl.getCloudServiceProvider().getName());
+        newTemplate.setCategory(ocl.getCategory());
+        newTemplate.setServiceHostingType(ocl.getServiceHostingType());
+        newTemplate.setOcl(ocl);
+        newTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+        newTemplate.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
+        return newTemplate;
     }
 
     private void iconUpdate(ServiceTemplateEntity serviceTemplateEntity, Ocl ocl) {
@@ -171,33 +165,32 @@ public class ServiceTemplateManage {
      * Register service template using the ocl.
      *
      * @param ocl the Ocl model describing the service template.
-     * @return Returns service template DB entity.
+     * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity registerServiceTemplate(Ocl ocl) {
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
-        ServiceTemplateEntity newEntity = getNewServiceTemplateEntity(ocl);
-        ServiceTemplateEntity existedEntity = storage.findServiceTemplate(newEntity);
-        if (Objects.nonNull(existedEntity)) {
-            String errorMsg =
-                    String.format("Service already registered. service template id: %s.",
-                            existedEntity.getId());
+        ServiceTemplateEntity newTemplate = getNewServiceTemplateEntity(ocl);
+        ServiceTemplateEntity existingTemplate = storage.findServiceTemplate(newTemplate);
+        if (Objects.nonNull(existingTemplate)) {
+            String errorMsg = String.format("Service template already registered with id %s",
+                    existingTemplate.getId());
             log.error(errorMsg);
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
         DeployVariableAutoFillValidator.validateDeployVariableAutoFill(
-                newEntity.getOcl().getDeployment().getVariables());
+                newTemplate.getOcl().getDeployment().getVariables());
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
-                        newEntity.getOcl().getDeployment().getVariables());
+                        newTemplate.getOcl().getDeployment().getVariables());
         validateTerraformScript(ocl);
         Optional<String> namespace = identityProviderManager.getUserNamespace();
         if (namespace.isPresent()) {
-            newEntity.setNamespace(namespace.get());
+            newTemplate.setNamespace(namespace.get());
         } else {
-            newEntity.setNamespace(ocl.getNamespace());
+            newTemplate.setNamespace(ocl.getNamespace());
         }
-        newEntity.setJsonObjectSchema(jsonObjectSchema);
-        ServiceTemplateEntity storedServiceTemplate = storage.storeAndFlush(newEntity);
+        newTemplate.setJsonObjectSchema(jsonObjectSchema);
+        ServiceTemplateEntity storedServiceTemplate = storage.storeAndFlush(newTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
         return storedServiceTemplate;
     }
@@ -206,7 +199,7 @@ public class ServiceTemplateManage {
      * service template using the url of ocl file.
      *
      * @param oclLocation the url of the ocl file.
-     * @return Returns service template DB entity.
+     * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity registerServiceTemplateByUrl(String oclLocation) throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
@@ -217,48 +210,59 @@ public class ServiceTemplateManage {
      * Get detail of service template using ID.
      *
      * @param id the ID of
-     * @return Returns service template DB entity.
+     * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity getServiceTemplateDetails(String id, boolean checkNamespace) {
-        UUID uuid = UUID.fromString(id);
-        ServiceTemplateEntity existedService = storage.getServiceTemplateById(uuid);
-        if (Objects.isNull(existedService)) {
-            String errMsg = String.format("Service template with id %s not found.", id);
-            log.error(errMsg);
-            throw new ServiceTemplateNotRegistered(errMsg);
-        }
+        ServiceTemplateEntity existingTemplate = getServiceTemplateById(id);
         if (checkNamespace) {
             Optional<String> namespace = identityProviderManager.getUserNamespace();
             if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
-                    existedService.getNamespace())) {
+                    existingTemplate.getNamespace())) {
                 throw new AccessDeniedException("No permissions to view details of service "
                         + "templates belonging to other namespaces.");
             }
         }
-        return existedService;
+        return existingTemplate;
     }
 
     /**
-     * Search service template by query model.
+     * Search service templates with query model.
      *
-     * @param category           the category of the service template.
-     * @param csp                the CSP of the service template.
-     * @param serviceName        the serviceName of the service template.
-     * @param serviceVersion     the serviceVersion of the service template.
-     * @param serviceHostingType the serviceHostingType of the service template.
-     * @return Returns list of service template entity.
+     * @param query service template query model.
+     * @return Returns list of service template newTemplate.
      */
-    public List<ServiceTemplateEntity> listServiceTemplates(Category category,
-                                                            Csp csp,
-                                                            String serviceName,
-                                                            String serviceVersion,
-                                                            ServiceHostingType serviceHostingType,
-                                                            boolean checkNamespace) {
-        ServiceTemplateQueryModel query = getServiceTemplateQueryModel(
-                category, csp, serviceName, serviceVersion, serviceHostingType, checkNamespace
-        );
+    public List<ServiceTemplateEntity> listServiceTemplates(ServiceTemplateQueryModel query) {
+        fillParamFromUserMetadata(query);
         return storage.listServiceTemplates(query);
     }
+
+    /**
+     * Review service template registration.
+     *
+     * @param id      ID of service template.
+     * @param request the request of review registration.
+     */
+    public void reviewServiceTemplateRegistration(String id, ReviewRegistrationRequest request) {
+        ServiceTemplateEntity existingTemplate = getServiceTemplateById(id);
+        if (ServiceRegistrationState.APPROVED == existingTemplate.getServiceRegistrationState()
+                || ServiceRegistrationState.REJECTED
+                == existingTemplate.getServiceRegistrationState()) {
+            String errMsg = String.format("Service template with id %s already reviewed.",
+                    existingTemplate.getId());
+            log.error(errMsg);
+            throw new ServiceTemplateAlreadyReviewed(errMsg);
+        }
+        if (ServiceReviewResult.APPROVED == request.getReviewResult()) {
+            existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
+        } else if (ServiceReviewResult.REJECTED == request.getReviewResult()) {
+            existingTemplate.setServiceRegistrationState(ServiceRegistrationState.REJECTED);
+        }
+        if (StringUtils.isNotBlank(request.getReviewComment())) {
+            existingTemplate.setReviewComment(request.getReviewComment());
+        }
+        storage.storeAndFlush(existingTemplate);
+    }
+
 
     /**
      * Unregister service template using the ID of service template.
@@ -266,8 +270,8 @@ public class ServiceTemplateManage {
      * @param id ID of service template.
      */
     public void unregisterServiceTemplate(String id) {
-        ServiceTemplateEntity existedService = getServiceTemplateDetails(id, true);
-        storage.removeById(existedService.getId());
+        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true);
+        storage.removeById(existingTemplate.getId());
         serviceTemplateOpenApiGenerator.deleteServiceApi(id);
     }
 
@@ -278,6 +282,14 @@ public class ServiceTemplateManage {
      * @return path of openapi.html
      */
     public String getOpenApiUrl(String id) {
+        String openApiUrl = serviceTemplateOpenApiGenerator.getOpenApi(getServiceTemplateById(id));
+        if (StringUtils.isBlank(openApiUrl)) {
+            throw new OpenApiFileGenerationException("Get openApi Url is Empty.");
+        }
+        return openApiUrl;
+    }
+
+    private ServiceTemplateEntity getServiceTemplateById(String id) {
         UUID uuid = UUID.fromString(id);
         ServiceTemplateEntity serviceTemplate = storage.getServiceTemplateById(uuid);
         if (Objects.isNull(serviceTemplate) || Objects.isNull(serviceTemplate.getOcl())) {
@@ -285,11 +297,7 @@ public class ServiceTemplateManage {
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
-        String openApiUrl = serviceTemplateOpenApiGenerator.getOpenApi(serviceTemplate);
-        if (StringUtils.isBlank(openApiUrl)) {
-            throw new OpenApiFileGenerationException("Get openApi Url is Empty.");
-        }
-        return openApiUrl;
+        return serviceTemplate;
     }
 
     private void validateTerraformScript(Ocl ocl) {
@@ -318,37 +326,16 @@ public class ServiceTemplateManage {
         }
     }
 
-    private ServiceTemplateQueryModel getServiceTemplateQueryModel(
-            @Nullable Category category,
-            @Nullable Csp csp,
-            @Nullable String serviceName,
-            @Nullable String serviceVersion,
-            @Nullable ServiceHostingType serviceHostingType,
-            boolean checkNamespace) {
-        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
-        if (Objects.nonNull(category)) {
-            query.setCategory(category);
-        }
-        if (Objects.nonNull(csp)) {
-            query.setCsp(csp);
-        }
-        if (StringUtils.isNotBlank(serviceName)) {
-            query.setServiceName(serviceName);
-        }
-        if (StringUtils.isNotBlank(serviceVersion)) {
-            query.setServiceVersion(serviceVersion);
-        }
-        if (Objects.nonNull(serviceHostingType)) {
-            query.setServiceHostingType(serviceHostingType);
-        }
-        if (checkNamespace) {
+    private void fillParamFromUserMetadata(ServiceTemplateQueryModel query) {
+        if (query.isCheckNamespace()) {
             CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-            if (Objects.nonNull(currentUserInfo)
-                    && StringUtils.isNotEmpty(currentUserInfo.getNamespace())) {
+            if (Objects.nonNull(currentUserInfo) && StringUtils.isNotEmpty(
+                    currentUserInfo.getNamespace())) {
                 query.setNamespace(currentUserInfo.getNamespace());
+                log.info("Add parameter namespace with value {} to search service templates",
+                        currentUserInfo.getNamespace());
             }
         }
-        return query;
     }
 
 

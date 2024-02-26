@@ -84,6 +84,9 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Enumerated(EnumType.STRING)
     private ServiceRegistrationState serviceRegistrationState;
 
+    @Column(name = "REVIEW_COMMENT", length = Integer.MAX_VALUE)
+    private String reviewComment;
+
     @Column(name = "SERVICE_PROVIDER_CONTACT_DETAILS", columnDefinition = "json", nullable = false)
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)

@@ -13,82 +13,92 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.BeanUtils;
 
 /**
  * Test of ServiceTemplateQueryModel.
  */
 class ServiceTemplateQueryModelTest {
 
-    private static final Csp csp = Csp.HUAWEI;
-    private static final Category category = Category.COMPUTE;
-    private static final String serviceName = "kafka";
-    private static final String serviceVersion = "v1.0.0";
-    private static final String namespace = "huawei";
-    private static final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
-    private static final boolean checkNamespace = true;
-    private static ServiceTemplateQueryModel serviceTemplateQueryModel;
+    private final Category category = Category.COMPUTE;
+    private final Csp csp = Csp.HUAWEI;
+    private final String serviceName = "kafka";
+    private final String serviceVersion = "v1.0.0";
+    private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
+    private final ServiceRegistrationState serviceRegistrationState =
+            ServiceRegistrationState.APPROVED;
+    private final boolean checkNamespace = true;
+    private final String namespace = "huawei";
+    private ServiceTemplateQueryModel testModel;
 
     @BeforeEach
     void setUp() {
-        serviceTemplateQueryModel = new ServiceTemplateQueryModel();
-        serviceTemplateQueryModel.setCsp(csp);
-        serviceTemplateQueryModel.setCategory(category);
-        serviceTemplateQueryModel.setServiceName(serviceName);
-        serviceTemplateQueryModel.setServiceVersion(serviceVersion);
-        serviceTemplateQueryModel.setNamespace(namespace);
-        serviceTemplateQueryModel.setServiceHostingType(serviceHostingType);
-        serviceTemplateQueryModel.setCheckNamespace(checkNamespace);
+        testModel = new ServiceTemplateQueryModel(category, csp, serviceName, serviceVersion,
+                serviceHostingType, serviceRegistrationState, checkNamespace);
+        testModel.setNamespace(namespace);
     }
 
     @Test
-    void testGetterAndSetter() {
-        assertEquals(csp, serviceTemplateQueryModel.getCsp());
-        assertEquals(category, serviceTemplateQueryModel.getCategory());
-        assertEquals(serviceName, serviceTemplateQueryModel.getServiceName());
-        assertEquals(serviceVersion, serviceTemplateQueryModel.getServiceVersion());
-        assertEquals(namespace, serviceTemplateQueryModel.getNamespace());
-        assertEquals(serviceHostingType, serviceTemplateQueryModel.getServiceHostingType());
-        assertEquals(checkNamespace, serviceTemplateQueryModel.isCheckNamespace());
+    void testGetters() {
+        assertEquals(csp, testModel.getCsp());
+        assertEquals(category, testModel.getCategory());
+        assertEquals(serviceName, testModel.getServiceName());
+        assertEquals(serviceVersion, testModel.getServiceVersion());
+        assertEquals(namespace, testModel.getNamespace());
+        assertEquals(serviceHostingType, testModel.getServiceHostingType());
+        assertEquals(ServiceRegistrationState.APPROVED, testModel.getServiceRegistrationState());
+        assertEquals(checkNamespace, testModel.isCheckNamespace());
     }
 
     @Test
     void testEquals() {
-        ServiceTemplateQueryModel test1 = new ServiceTemplateQueryModel();
-        assertNotEquals(serviceTemplateQueryModel, test1);
+        ServiceTemplateQueryModel test =
+                new ServiceTemplateQueryModel(category, csp, serviceName, serviceVersion,
+                        serviceHostingType, serviceRegistrationState, checkNamespace);
+        assertNotEquals(testModel, test);
 
-        BeanUtils.copyProperties(serviceTemplateQueryModel, test1);
-        assertEquals(serviceTemplateQueryModel, test1);
+        ServiceTemplateQueryModel test1 =
+                new ServiceTemplateQueryModel(category, csp, serviceName, serviceVersion,
+                        serviceHostingType, serviceRegistrationState, checkNamespace);
+        test1.setNamespace(namespace);
+        assertEquals(testModel, test1);
     }
 
     @Test
     void testCanEqual() {
-        assertFalse(serviceTemplateQueryModel.canEqual("other"));
+        assertFalse(testModel.canEqual("other"));
     }
 
     @Test
     void testHashCode() {
-        ServiceTemplateQueryModel test1 = new ServiceTemplateQueryModel();
-        assertNotEquals(serviceTemplateQueryModel.hashCode(), test1.hashCode());
+        ServiceTemplateQueryModel test =
+                new ServiceTemplateQueryModel(category, csp, serviceName, serviceVersion,
+                        serviceHostingType, serviceRegistrationState, checkNamespace);
+        test.setNamespace("other");
+        assertNotEquals(testModel.hashCode(), test.hashCode());
 
-        BeanUtils.copyProperties(serviceTemplateQueryModel, test1);
-        assertEquals(serviceTemplateQueryModel.hashCode(), test1.hashCode());
+        ServiceTemplateQueryModel test1 =
+                new ServiceTemplateQueryModel(category, csp, serviceName, serviceVersion,
+                        serviceHostingType, serviceRegistrationState, checkNamespace);
+        test1.setNamespace(namespace);
+        assertEquals(testModel.hashCode(), test1.hashCode());
     }
 
     @Test
     void testToString() {
         String expectedString = "ServiceTemplateQueryModel(" +
-                "csp=" + csp +
-                ", category=" + category +
+                "category=" + category +
+                ", csp=" + csp +
                 ", serviceName=" + serviceName +
                 ", serviceVersion=" + serviceVersion +
-                ", namespace=" + namespace +
                 ", serviceHostingType=" + serviceHostingType +
+                ", serviceRegistrationState=" + serviceRegistrationState +
                 ", checkNamespace=" + checkNamespace +
+                ", namespace=" + namespace +
                 ")";
-        assertEquals(expectedString, serviceTemplateQueryModel.toString());
+        assertEquals(expectedString, testModel.toString());
     }
 
 }

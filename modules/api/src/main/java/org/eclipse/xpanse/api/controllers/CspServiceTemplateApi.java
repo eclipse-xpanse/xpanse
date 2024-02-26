@@ -14,14 +14,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.http.HttpStatus;
@@ -29,6 +33,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -51,11 +58,13 @@ public class CspServiceTemplateApi {
     /**
      * List service templates with query params.
      *
-     * @param categoryName   name of category.
-     * @param cspName        name of cloud service provider.
-     * @param serviceName    name of service template.
-     * @param serviceVersion version of service template.
-     * @return response
+     * @param categoryName             category of the service.
+     * @param cspName                  name of the cloud service provider.
+     * @param serviceName              name of the service.
+     * @param serviceVersion           version of the service.
+     * @param serviceHostingType       type of the service hosting.
+     * @param serviceRegistrationState state of the service registration.
+     * @return service templates
      */
     @Tag(name = "Cloud Service Provider",
             description = "APIs for cloud service provider to manage service templates.")
@@ -73,16 +82,39 @@ public class CspServiceTemplateApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
             @RequestParam(name = "serviceHostingType", required = false)
-            ServiceHostingType serviceHostingType) {
+            ServiceHostingType serviceHostingType,
+            @Parameter(name = "serviceRegistrationState", description = "state of registration")
+            @RequestParam(name = "serviceRegistrationState", required = false)
+            ServiceRegistrationState serviceRegistrationState) {
+        ServiceTemplateQueryModel queryRequest =
+                new ServiceTemplateQueryModel(categoryName, cspName, serviceName, serviceVersion,
+                        serviceHostingType, serviceRegistrationState, false);
         List<ServiceTemplateEntity> serviceTemplateEntities =
-                serviceTemplateManage.listServiceTemplates(
-                        categoryName, cspName, serviceName, serviceVersion, serviceHostingType,
-                        false);
+                serviceTemplateManage.listServiceTemplates(queryRequest);
         log.info(serviceTemplateEntities.size() + " service templates found.");
         return serviceTemplateEntities.stream().sorted(Comparator.comparingInt(
                         serviceTemplateDetailVo -> serviceTemplateDetailVo != null
                                 ? serviceTemplateDetailVo.getCsp().ordinal() : -1))
                 .map(ServiceTemplateEntityConverter::convertToServiceTemplateDetailVo)
                 .toList();
+    }
+
+    /**
+     * Review service template registration.
+     *
+     * @param id                        id of service template.
+     * @param reviewRegistrationRequest review request for service template registration.
+     */
+    @Tag(name = "Cloud Service Provider",
+            description = "APIs for cloud service provider to manage service templates.")
+    @Operation(description = "Review service template registration.")
+    @PutMapping(value = "/service_templates/review/{id}", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void reviewServiceRegistrationRequest(
+            @Parameter(name = "id", description = "id of service template")
+            @PathVariable("id") String id,
+            @Valid @RequestBody ReviewRegistrationRequest reviewRegistrationRequest) {
+        serviceTemplateManage.reviewServiceTemplateRegistration(id, reviewRegistrationRequest);
     }
 }

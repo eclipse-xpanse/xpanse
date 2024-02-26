@@ -43,8 +43,9 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         ServiceTemplateDetailVo serviceTemplateDetailVo =
                 serviceTemplateApi.register(getOclFromFile());
         Assertions.assertTrue(Objects.nonNull(serviceTemplateDetailVo));
+
         Assertions.assertEquals(1, serviceTemplateApi.listServiceTemplates(
-                null, null, null, null, null
+                null, null, null, null, null, null
         ).stream().filter(registeredServiceVo1 -> registeredServiceVo1.getName()
                 .equals(serviceTemplateDetailVo.getName())).toList().size());
         Assertions.assertEquals("v3.3.2",
@@ -71,7 +72,7 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
                 serviceTemplateApi.update(serviceTemplateDetailVo.getId().toString(), ocl);
         Assertions.assertEquals(1, serviceTemplateApi.listServiceTemplates(
-                null, null, null, null, null
+                null, null, null, null, null, null
         ).stream().filter(registeredServiceVo1 -> registeredServiceVo1.getName()
                 .equals(serviceTemplateDetailVo.getName())).toList().size());
         Assertions.assertEquals("Hello",

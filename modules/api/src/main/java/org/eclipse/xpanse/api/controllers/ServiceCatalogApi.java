@@ -20,6 +20,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -53,18 +54,19 @@ public class ServiceCatalogApi {
     private ServiceTemplateManage serviceTemplateManage;
 
     /**
-     * List all registered service templates which are available for user to order/deploy.
+     * List all approved service templates which are available for user to order/deploy.
      *
-     * @param categoryName   name of category.
-     * @param cspName        name of cloud service provider.
-     * @param serviceName    name of registered service.
-     * @param serviceVersion version of registered service.
-     * @return response
+     * @param categoryName       category of the service.
+     * @param cspName            name of the cloud service provider.
+     * @param serviceName        name of the service.
+     * @param serviceVersion     version of the service.
+     * @param serviceHostingType type of the service hosting.
+     * @return service templates
      */
     @Tag(name = "Service Catalog", description =
             "APIs to query the services which are available for the user to order.")
     @Operation(description =
-            "List of all registered services which are available for user to order.")
+            "List of all approved services which are available for user to order.")
     @GetMapping(value = "/catalog/services",
             produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     @ResponseStatus(HttpStatus.OK)
@@ -80,14 +82,14 @@ public class ServiceCatalogApi {
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
             @RequestParam(name = "serviceHostingType", required = false)
             ServiceHostingType serviceHostingType) {
+
+        ServiceTemplateQueryModel queryRequest = new ServiceTemplateQueryModel(categoryName,
+                cspName, serviceName, serviceVersion, serviceHostingType,
+                ServiceRegistrationState.APPROVED, false);
         List<ServiceTemplateEntity> serviceTemplateEntities =
-                serviceTemplateManage.listServiceTemplates(
-                        categoryName, cspName, serviceName, serviceVersion, serviceHostingType,
-                        false);
+                serviceTemplateManage.listServiceTemplates(queryRequest);
         log.info(serviceTemplateEntities.size() + " orderable services found.");
         return serviceTemplateEntities.stream()
-                .filter(template -> ServiceRegistrationState.APPROVED
-                        == template.getServiceRegistrationState())
                 .sorted(Comparator.comparingInt(
                         serviceTemplateDetailVo -> serviceTemplateDetailVo.getCsp().ordinal()))
                 .map(ServiceTemplateEntityConverter::convertToUserOrderableServiceVo)
@@ -98,7 +100,7 @@ public class ServiceCatalogApi {
      * Get deployable service by id.
      *
      * @param id The id of deployable service.
-     * @return userorderableServiceVoVo
+     * @return userOrderableServiceVo
      */
     @Tag(name = "Service Catalog",
             description = "APIs to query the services which are available for the user to order.")

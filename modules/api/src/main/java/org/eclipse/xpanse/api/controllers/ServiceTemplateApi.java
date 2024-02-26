@@ -22,11 +22,13 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.http.HttpStatus;
@@ -170,15 +172,16 @@ public class ServiceTemplateApi {
         return Response.successResponse(Collections.singletonList(successMsg));
     }
 
-
     /**
      * List service templates with query params.
      *
-     * @param categoryName   name of category.
-     * @param cspName        name of cloud service provider.
-     * @param serviceName    name of service template.
-     * @param serviceVersion version of service template.
-     * @return response
+     * @param categoryName             category of the service.
+     * @param cspName                  name of the cloud service provider.
+     * @param serviceName              name of the service.
+     * @param serviceVersion           version of the service.
+     * @param serviceHostingType       type of the service hosting.
+     * @param serviceRegistrationState state of the service registration.
+     * @return service templates
      */
     @Tag(name = "Service Vendor", description = "APIs to manage service templates.")
     @Operation(description = "List service templates with query params.")
@@ -195,10 +198,15 @@ public class ServiceTemplateApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
             @RequestParam(name = "serviceHostingType", required = false)
-            ServiceHostingType serviceHostingType) {
+            ServiceHostingType serviceHostingType,
+            @Parameter(name = "serviceRegistrationState", description = "state of registration")
+            @RequestParam(name = "serviceRegistrationState", required = false)
+            ServiceRegistrationState serviceRegistrationState) {
+        ServiceTemplateQueryModel queryRequest =
+                new ServiceTemplateQueryModel(categoryName, cspName, serviceName, serviceVersion,
+                        serviceHostingType, serviceRegistrationState, true);
         List<ServiceTemplateEntity> serviceTemplateEntities =
-                serviceTemplateManage.listServiceTemplates(categoryName, cspName, serviceName,
-                        serviceVersion, serviceHostingType, true);
+                serviceTemplateManage.listServiceTemplates(queryRequest);
         log.info(serviceTemplateEntities.size() + " service templates found.");
         return serviceTemplateEntities.stream().sorted(Comparator.comparingInt(
                         serviceTemplateDetailVo -> serviceTemplateDetailVo != null

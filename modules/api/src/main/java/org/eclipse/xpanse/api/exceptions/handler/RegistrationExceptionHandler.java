@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
@@ -115,6 +116,19 @@ public class RegistrationExceptionHandler {
     public Response handleServiceTemplateNotApproved(
             ServiceTemplateNotApproved ex) {
         return Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+
+    /**
+     * Exception handler for ServiceTemplateAlreadyReviewed.
+     */
+    @ExceptionHandler({ServiceTemplateAlreadyReviewed.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceTemplateAlreadyReviewed(
+            ServiceTemplateAlreadyReviewed ex) {
+        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REVIEWED,
                 Collections.singletonList(ex.getMessage()));
     }
 }
