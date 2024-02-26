@@ -95,7 +95,9 @@ public class ScsKeystoneManager {
         OSFactory.enableHttpLoggingFilter(true);
         // there is no need to return the authenticated client because the below method already sets
         // the authentication details in the thread context.
-        String url = getUrlFromDeploymentVariables(serviceId);
+        String url = Objects.nonNull(serviceId) ? getUrlFromDeploymentVariables(serviceId)
+                : System.getProperty(ScsEnvironmentConstants.AUTH_URL);
+
         return OSFactory
                 .builderV3()
                 .credentials(userName, password, Identifier.byName(domain))

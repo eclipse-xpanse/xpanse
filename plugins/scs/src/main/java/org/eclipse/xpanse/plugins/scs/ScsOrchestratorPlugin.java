@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
+import org.eclipse.xpanse.plugins.scs.manage.ScsResourceManager;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
 import org.eclipse.xpanse.plugins.scs.resourcehandler.ScsTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +42,21 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
     private final ScsTerraformResourceHandler scsTerraformResourceHandler;
     private final ScsServersManager scsServersManager;
+    private final ScsResourceManager scsResourceManager;
 
     @Value("${terraform.provider.scs.version}")
     private String terraformScsVersion;
 
+    /**
+     * Get the resource handlers for Scs.
+     */
     @Autowired
     public ScsOrchestratorPlugin(ScsTerraformResourceHandler scsTerraformResourceHandler,
-                                 ScsServersManager scsServersManager) {
+            ScsServersManager scsServersManager,
+            ScsResourceManager scsResourceManager) {
         this.scsTerraformResourceHandler = scsTerraformResourceHandler;
         this.scsServersManager = scsServersManager;
+        this.scsResourceManager = scsResourceManager;
     }
 
 
@@ -66,7 +73,7 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<String> getExistingResourcesOfType(String userId, String region,
             DeployResourceKind kind) {
-        return new ArrayList<>();
+        return scsResourceManager.getExistingResourcesOfType(userId, region, kind);
     }
 
     /**
