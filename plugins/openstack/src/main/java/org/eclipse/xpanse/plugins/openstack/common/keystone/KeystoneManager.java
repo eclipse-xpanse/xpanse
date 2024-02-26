@@ -128,7 +128,8 @@ public class KeystoneManager {
         OSFactory.enableHttpLoggingFilter(true);
         // there is no need to return the authenticated client because the below method already sets
         // the authentication details in the thread context.
-        String url = getUrlFromDeploymentVariables(serviceId);
+        String url = Objects.nonNull(serviceId) ? getUrlFromDeploymentVariables(serviceId)
+                : this.environment.getProperty(OpenstackEnvironmentConstants.AUTH_URL);
         String serviceTenant =
                 this.environment.getProperty(OpenstackEnvironmentConstants.SERVICE_PROJECT);
         String proxyHost = this.environment.getProperty(OpenstackEnvironmentConstants.PROXY_HOST);

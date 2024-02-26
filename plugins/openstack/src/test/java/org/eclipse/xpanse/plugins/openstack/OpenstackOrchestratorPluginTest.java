@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
+import org.eclipse.xpanse.plugins.openstack.manage.OpenStackResourceManager;
 import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
@@ -42,6 +43,8 @@ class OpenstackOrchestratorPluginTest {
     private MetricsManager mockMetricsManager;
     @Mock
     private ServersManager mockServersManager;
+    @Mock
+    private OpenStackResourceManager mockOpenStackResourceManager;
 
     @InjectMocks
     private OpenstackOrchestratorPlugin openstackOrchestratorPluginUnderTest;

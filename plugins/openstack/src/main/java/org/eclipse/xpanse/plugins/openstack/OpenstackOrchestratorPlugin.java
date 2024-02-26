@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
+import org.eclipse.xpanse.plugins.openstack.manage.OpenStackResourceManager;
 import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
@@ -47,6 +48,8 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     private MetricsManager metricsManager;
     @Resource
     private ServersManager serversManager;
+    @Resource
+    private OpenStackResourceManager openStackResourceManager;
 
     @Value("${terraform.provider.openstack.version}")
     private String terraformOpenStackVersion;
@@ -65,7 +68,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<String> getExistingResourcesOfType(String userId, String region,
             DeployResourceKind kind) {
-        return new ArrayList<>();
+        return openStackResourceManager.getExistingResourcesOfType(userId, region, kind);
     }
 
     /**
