@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
+import org.eclipse.xpanse.plugins.scs.manage.ScsResourceManager;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
 import org.eclipse.xpanse.plugins.scs.resourcehandler.ScsTerraformResourceHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,8 @@ class ScsOrchestratorPluginTest {
     private ScsTerraformResourceHandler mockScsTerraformResourceHandler;
     @Mock
     private ScsServersManager mockScsServersManager;
+    @Mock
+    private ScsResourceManager scsResourceManager;
 
     @BeforeEach
     void setUp() {
