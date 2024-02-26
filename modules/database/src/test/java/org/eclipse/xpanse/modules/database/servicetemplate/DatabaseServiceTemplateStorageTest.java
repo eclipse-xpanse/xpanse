@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -169,11 +170,9 @@ class DatabaseServiceTemplateStorageTest {
     @Test
     void testQueryServiceTemplates() {
         // Setup
-        final ServiceTemplateQueryModel serviceQuery = new ServiceTemplateQueryModel();
-        serviceQuery.setCsp(Csp.HUAWEI);
-        serviceQuery.setCategory(Category.AI);
-        serviceQuery.setServiceName("serviceName");
-        serviceQuery.setServiceVersion("serviceVersion");
+        final ServiceTemplateQueryModel serviceQuery =
+                new ServiceTemplateQueryModel(Category.AI, Csp.HUAWEI, null, null, null, null,
+                        false);
 
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(id);
@@ -205,11 +204,9 @@ class DatabaseServiceTemplateStorageTest {
     @Test
     void testQueryServiceTemplates_ServiceTemplateRepositoryReturnsNoItems() {
         // Setup
-        final ServiceTemplateQueryModel serviceQuery = new ServiceTemplateQueryModel();
-        serviceQuery.setCsp(Csp.HUAWEI);
-        serviceQuery.setCategory(Category.AI);
-        serviceQuery.setServiceName("serviceName");
-        serviceQuery.setServiceVersion("serviceVersion");
+        final ServiceTemplateQueryModel serviceQuery = new ServiceTemplateQueryModel(Category.AI,
+                Csp.HUAWEI, "serviceName", "serviceVersion", ServiceHostingType.SELF,
+                ServiceRegistrationState.APPROVED, false);
 
         when(mockServiceTemplateRepository.findAll(any(Specification.class)))
                 .thenReturn(Collections.emptyList());

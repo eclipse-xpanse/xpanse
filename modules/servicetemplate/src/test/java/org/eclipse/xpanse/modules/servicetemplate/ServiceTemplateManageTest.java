@@ -27,7 +27,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
-import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
@@ -57,7 +56,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
- * Test for ServiceTemplateImpl.
+ * Test for ServiceTemplateManage.
  */
 @Slf4j
 @ExtendWith({MockitoExtension.class})
@@ -68,11 +67,11 @@ class ServiceTemplateManageTest {
     private static Ocl oclRegister;
     private static UUID uuid;
     @Mock
-    TerraformLocalConfig terraformLocalConfig;
+    private TerraformLocalConfig terraformLocalConfig;
     @Mock
-    Executor taskExecutor;
+    private Executor taskExecutor;
     @Mock
-    ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
+    private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @Mock
     private ServiceTemplateStorage mockStorage;
     @Mock
@@ -90,8 +89,6 @@ class ServiceTemplateManageTest {
     @InjectMocks
     private ServiceTemplateManage serviceTemplateManageTest;
     @Mock
-    private ResourceHandlerManager resourceHandlerManager;
-    @Mock
     private ScriptsGitRepoManage scriptsGitRepoManage;
     @Mock
     private TerraformProviderHelper terraformProviderHelper;
@@ -108,7 +105,8 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setName(oclRegister.getName());
         serviceTemplateEntity.setId(UUID.randomUUID());
         serviceTemplateEntity.setCategory(oclRegister.getCategory());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+        serviceTemplateEntity.setServiceRegistrationState(
+                ServiceRegistrationState.APPROVAL_PENDING);
         serviceTemplateEntity.setVersion(oclRegister.getServiceVersion());
         serviceTemplateEntity.setCsp(oclRegister.getCloudServiceProvider().getName());
         serviceTemplateEntity.setServiceHostingType(oclRegister.getServiceHostingType());
@@ -214,14 +212,14 @@ class ServiceTemplateManageTest {
 
 
     @Test
-    void testUpdateThrowsAccessDeniedException() throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
+    void testUpdateThrowsAccessDeniedException() {
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setNamespace("ISV-A");
+        serviceTemplateEntity.setOcl(oclRegister);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
         Assertions.assertThrows(AccessDeniedException.class, () ->
-                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl));
+                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), oclRegister));
     }
 
 
@@ -360,36 +358,31 @@ class ServiceTemplateManageTest {
 
     @Test
     void testListServiceTemplates() {
+        // setup
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        List<ServiceTemplateEntity> ServiceTemplateEntities = new ArrayList<>();
-        ServiceTemplateEntities.add(serviceTemplateEntity);
-        when(mockStorage.listServiceTemplates(any())).thenReturn(
-                ServiceTemplateEntities);
+        List<ServiceTemplateEntity> exceptedList = new ArrayList<>();
+        exceptedList.add(serviceTemplateEntity);
+        when(mockStorage.listServiceTemplates(any())).thenReturn(exceptedList);
 
-        List<ServiceTemplateEntity> ServiceTemplateEntities1 =
-                serviceTemplateManageTest.listServiceTemplates(
-                        Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1", null, true);
-        Assertions.assertEquals(ServiceTemplateEntities, ServiceTemplateEntities1);
+        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel(Category.MIDDLEWARE,
+                Csp.HUAWEI, "kafka", "v3.1.1", null, ServiceRegistrationState.APPROVAL_PENDING,
+                true);
+
+        List<ServiceTemplateEntity> result = serviceTemplateManageTest.listServiceTemplates(query);
+
+        Assertions.assertEquals(exceptedList, result);
     }
 
     @Test
     void testListServiceTemplates_ServiceTemplateStorageReturnsNoItems() {
-        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel();
-        query.setCsp(Csp.HUAWEI);
-        query.setCategory(Category.MIDDLEWARE);
-        query.setServiceName("kafka");
-        query.setServiceVersion("v3.1.1");
 
-        ServiceTemplateQueryModel query1 = new ServiceTemplateQueryModel();
-        query1.setCsp(Csp.HUAWEI);
-        query1.setCategory(Category.MIDDLEWARE);
-        query1.setServiceName("kafka");
-        query1.setServiceVersion("v3.1.1");
-        when(mockStorage.listServiceTemplates(query1)).thenReturn(Collections.emptyList());
+        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel(Category.MIDDLEWARE,
+                Csp.HUAWEI, "kafka", "v3.1.1", null, ServiceRegistrationState.APPROVAL_PENDING,
+                true);
 
+        when(mockStorage.listServiceTemplates(query)).thenReturn(Collections.emptyList());
         List<ServiceTemplateEntity> result =
-                serviceTemplateManageTest.listServiceTemplates(
-                        Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1", null, true);
+                serviceTemplateManageTest.listServiceTemplates(query);
         assertThat(result).isEqualTo(Collections.emptyList());
     }
 

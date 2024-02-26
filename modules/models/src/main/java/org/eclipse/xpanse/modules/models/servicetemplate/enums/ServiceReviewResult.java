@@ -11,40 +11,39 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
- * Defines possible states of a managed service registration.
+ * Defines review result for service template registration.
  */
-public enum ServiceRegistrationState {
+public enum ServiceReviewResult {
 
-    APPROVAL_PENDING("approval pending"),
     APPROVED("approved"),
     REJECTED("rejected");
 
-    private final String state;
+    private final String result;
 
-    ServiceRegistrationState(String state) {
-        this.state = state;
+    ServiceReviewResult(String result) {
+        this.result = result;
     }
 
     /**
-     * For ServiceRegistrationState deserialize.
+     * For ServiceReviewResult deserialize.
      */
     @JsonCreator
-    public static ServiceRegistrationState getByValue(String state) {
-        for (ServiceRegistrationState serviceState : values()) {
-            if (serviceState.state.equals(StringUtils.lowerCase(state))) {
+    public static ServiceReviewResult getByValue(String result) {
+        for (ServiceReviewResult serviceState : values()) {
+            if (serviceState.result.equals(StringUtils.lowerCase(result))) {
                 return serviceState;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("ServiceRegistrationState value %s is not supported.", state));
+                String.format("ServiceReviewResult value %s is not supported.", result));
     }
 
     /**
-     * For ServiceRegistrationState serialize.
+     * For ServiceReviewResult serialize.
      */
     @JsonValue
     public String toValue() {
-        return this.state;
+        return this.result;
     }
 }
 
