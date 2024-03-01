@@ -283,7 +283,7 @@ class DeployEnvironmentsTest {
 
         OclLoader oclLoader = new OclLoader();
         Ocl ocl =
-                oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
+                oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
@@ -302,11 +302,6 @@ class DeployEnvironmentsTest {
         xpanseDeployTask.setDeployRequest(deployRequest);
 
         OrchestratorPlugin plugin = new OrchestratorPlugin() {
-            @Override
-            public String getProvider(DeployerKind deployerKind, String region) {
-                return null;
-            }
-
             @Override
             public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
                 return true;

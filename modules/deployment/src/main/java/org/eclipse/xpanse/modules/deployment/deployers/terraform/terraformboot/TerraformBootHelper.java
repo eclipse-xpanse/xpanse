@@ -7,7 +7,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +17,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.Terr
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformScriptGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.WebhookConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -37,7 +35,6 @@ public class TerraformBootHelper {
 
     private static final String SPLIT = "/";
     private final TerraformBootConfig terraformBootConfig;
-    private final TerraformProviderHelper terraformProviderHelper;
     private final DeployEnvironments deployEnvironments;
 
     @Value("${server.port}")
@@ -47,10 +44,8 @@ public class TerraformBootHelper {
      * Constructor for TerraformBootHelper.
      */
     public TerraformBootHelper(TerraformBootConfig terraformBootConfig,
-                               TerraformProviderHelper terraformProviderHelper,
                                DeployEnvironments deployEnvironments) {
         this.terraformBootConfig = terraformBootConfig;
-        this.terraformProviderHelper = terraformProviderHelper;
         this.deployEnvironments = deployEnvironments;
     }
 
@@ -71,11 +66,8 @@ public class TerraformBootHelper {
      * Returns all terraform script files.
      */
     public List<String> getFiles(DeployTask task) {
-        Csp csp = task.getDeployRequest().getCsp();
-        String region = task.getDeployRequest().getRegion();
-        String provider = terraformProviderHelper.getProvider(csp, region);
         String deployer = task.getOcl().getDeployment().getDeployer();
-        return Arrays.asList(provider, deployer);
+        return Collections.singletonList(deployer);
     }
 
     /**

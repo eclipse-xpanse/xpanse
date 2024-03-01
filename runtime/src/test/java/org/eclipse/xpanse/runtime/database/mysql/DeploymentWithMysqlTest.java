@@ -161,7 +161,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     }
 
     void registerServiceTemplate() throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
+        Ocl ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         serviceTemplate = ServiceTemplateApi.register(ocl);
         Assertions.assertNotNull(serviceTemplate);
         Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,

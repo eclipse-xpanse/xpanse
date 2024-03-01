@@ -95,9 +95,4 @@ public class DummyFlexibleEnginePluginImpl implements OrchestratorPlugin {
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         return true;
     }
-
-    @Override
-    public String getProvider(DeployerKind deployerKind, String region) {
-        return null;
-    }
 }

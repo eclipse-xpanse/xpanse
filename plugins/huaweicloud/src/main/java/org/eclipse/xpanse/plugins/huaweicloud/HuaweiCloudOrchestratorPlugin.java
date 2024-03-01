@@ -31,7 +31,6 @@ import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,9 +39,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
-
-    @Value("${terraform.provider.huaweicloud.version}")
-    private String terraformHuaweiCloudVersion;
 
     @Resource
     private HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler;
@@ -66,7 +62,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourcesOfType(String userId, String region,
-            DeployResourceKind kind) {
+                                                   DeployResourceKind kind) {
         return huaweiCloudResourceManager.getExistingResourcesOfType(userId, region, kind);
     }
 
@@ -132,27 +128,6 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
         return huaweiCloudMetricsService.getMetricsByService(serviceMetricRequest);
-    }
-
-    @Override
-    public String getProvider(DeployerKind deployerKind, String region) {
-        return switch (deployerKind) {
-            case OPEN_TOFU, TERRAFORM -> String.format("""
-                    terraform {
-                      required_providers {
-                        huaweicloud = {
-                          source = "huaweicloud/huaweicloud"
-                          version = "%s"
-                        }
-                      }
-                    }
-                                
-                    provider "huaweicloud" {
-                      region = "%s"
-                    }
-                    """, terraformHuaweiCloudVersion, region);
-            default -> "";
-        };
     }
 
     @Override

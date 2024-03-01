@@ -29,11 +29,9 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenT
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.OpenTofuProviderHelper;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -53,14 +51,11 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnMissingBean(TofuMakerDeployment.class)
 public class OpenTofuLocalDeployment implements Deployer {
-
-    public static final String VERSION_FILE_NAME = "version.tf";
     public static final String SCRIPT_FILE_NAME = "resources.tf";
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
     private final DeployEnvironments deployEnvironments;
     private final OpenTofuLocalConfig openTofuLocalConfig;
-    private final OpenTofuProviderHelper openTofuProviderHelper;
     private final Executor taskExecutor;
     private final OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
     private final DeployServiceEntityHandler deployServiceEntityHandler;
@@ -72,15 +67,13 @@ public class OpenTofuLocalDeployment implements Deployer {
     @Autowired
     public OpenTofuLocalDeployment(DeployEnvironments deployEnvironments,
                                    OpenTofuLocalConfig openTofuLocalConfig,
-                                   OpenTofuProviderHelper openTofuProviderHelper,
                                    @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
                                    OpenTofuDeploymentResultCallbackManager
-                                               openTofuDeploymentResultCallbackManager,
+                                           openTofuDeploymentResultCallbackManager,
                                    DeployServiceEntityHandler deployServiceEntityHandler,
                                    ScriptsGitRepoManage scriptsGitRepoManage) {
         this.deployEnvironments = deployEnvironments;
         this.openTofuLocalConfig = openTofuLocalConfig;
-        this.openTofuProviderHelper = openTofuProviderHelper;
         this.taskExecutor = taskExecutor;
         this.openTofuDeploymentResultCallbackManager = openTofuDeploymentResultCallbackManager;
         this.deployServiceEntityHandler = deployServiceEntityHandler;
@@ -236,8 +229,7 @@ public class OpenTofuLocalDeployment implements Deployer {
 
     private void prepareDeployWorkspaceWithScripts(DeployTask deployTask, String workspace) {
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            createScriptFile(deployTask.getDeployRequest().getCsp(),
-                    deployTask.getDeployRequest().getRegion(), workspace,
+            createScriptFile(workspace,
                     deployTask.getOcl().getDeployment().getDeployer());
         }
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getScriptsRepo())) {
@@ -254,8 +246,7 @@ public class OpenTofuLocalDeployment implements Deployer {
             parentPath.mkdirs();
         }
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            createDestroyScriptFile(deployTask.getDeployRequest().getCsp(),
-                    deployTask.getDeployRequest().getRegion(), workspace, tfState);
+            createDestroyScriptFile(workspace, tfState);
         } else if (Objects.nonNull(deployTask.getOcl().getDeployment().getScriptsRepo())) {
             scriptsGitRepoManage.checkoutScripts(workspace,
                     deployTask.getOcl().getDeployment().getScriptsRepo());
@@ -272,18 +263,13 @@ public class OpenTofuLocalDeployment implements Deployer {
     /**
      * Create OpenTofu script.
      *
-     * @param csp       the cloud service provider.
      * @param workspace the workspace for OpenTofu.
      * @param script    OpenTofu scripts of the task.
      */
-    private void createScriptFile(Csp csp, String region, String workspace, String script) {
+    private void createScriptFile(String workspace, String script) {
         log.info("start create OpenTofu script");
-        String verScript = openTofuProviderHelper.getProvider(csp, region);
-        String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
-        try (FileWriter verWriter = new FileWriter(verScriptPath);
-                FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(verScript);
+        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(script);
             log.info("OpenTofu script create success");
         } catch (IOException ex) {
@@ -295,24 +281,18 @@ public class OpenTofuLocalDeployment implements Deployer {
     /**
      * Create OpenTofu workspace and script.
      *
-     * @param csp       the cloud service provider.
      * @param workspace the workspace for OpenTofu.
      * @param tfState   OpenTofu file tfstate of the task.
      */
-    private void createDestroyScriptFile(Csp csp, String region, String workspace, String tfState) {
-
-        String verScript = openTofuProviderHelper.getProvider(csp, region);
-        String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
+    private void createDestroyScriptFile(String workspace, String tfState) {
         String scriptPath = workspace + File.separator + STATE_FILE_NAME;
-        try (FileWriter verWriter = new FileWriter(verScriptPath);
-                FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(verScript);
+        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(tfState);
-            log.info("create OpenTofu destroy workspace and script success.");
+            log.info("Create OpenTofu destroy workspace and script success.");
         } catch (IOException e) {
-            log.error("create OpenTofu destroy workspace and script failed.", e);
+            log.error("Create OpenTofu destroy workspace and script failed.", e);
             throw new OpenTofuExecutorException(
-                    "create OpenTofu destroy workspace and script failed.", e);
+                    "Create OpenTofu destroy workspace and script failed.", e);
         }
 
     }
@@ -359,9 +339,7 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Create the workspace.
         buildWorkspace(workspace);
         if (Objects.nonNull(ocl.getDeployment().getDeployer())) {
-            createScriptFile(ocl.getCloudServiceProvider().getName(),
-                    ocl.getCloudServiceProvider().getRegions().getFirst().getName(), workspace,
-                    ocl.getDeployment().getDeployer());
+            createScriptFile(workspace, ocl.getDeployment().getDeployer());
         } else {
             scriptsGitRepoManage.checkoutScripts(workspace, ocl.getDeployment().getScriptsRepo());
         }

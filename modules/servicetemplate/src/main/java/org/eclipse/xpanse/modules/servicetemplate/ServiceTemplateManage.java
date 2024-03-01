@@ -86,13 +86,7 @@ public class ServiceTemplateManage {
      * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity updateServiceTemplate(String id, Ocl ocl) {
-        ServiceTemplateEntity existingTemplate = getServiceTemplateById(id);
-        Optional<String> namespace = identityProviderManager.getUserNamespace();
-        if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
-                existingTemplate.getNamespace())) {
-            throw new AccessDeniedException("No permissions to update service templates "
-                    + "belonging to other namespaces.");
-        }
+        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true);
         iconUpdate(existingTemplate, ocl);
         checkParams(existingTemplate, ocl);
         validateTerraformScript(ocl);
@@ -209,17 +203,19 @@ public class ServiceTemplateManage {
     /**
      * Get detail of service template using ID.
      *
-     * @param id the ID of
+     * @param id             the ID of
+     * @param checkNamespace check the namespace of the service template belonging to.
      * @return Returns service template DB newTemplate.
      */
-    public ServiceTemplateEntity getServiceTemplateDetails(String id, boolean checkNamespace) {
+    public ServiceTemplateEntity getServiceTemplateDetails(String id, boolean checkNamespace)
+            throws AccessDeniedException {
         ServiceTemplateEntity existingTemplate = getServiceTemplateById(id);
         if (checkNamespace) {
             Optional<String> namespace = identityProviderManager.getUserNamespace();
             if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
                     existingTemplate.getNamespace())) {
-                throw new AccessDeniedException("No permissions to view details of service "
-                        + "templates belonging to other namespaces.");
+                throw new AccessDeniedException("No permissions to view or manage service template "
+                        + "belonging to other namespaces.");
             }
         }
         return existingTemplate;

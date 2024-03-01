@@ -28,11 +28,9 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.Terr
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -52,14 +50,11 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnMissingBean(TerraformBootDeployment.class)
 public class TerraformLocalDeployment implements Deployer {
-
-    public static final String VERSION_FILE_NAME = "version.tf";
     public static final String SCRIPT_FILE_NAME = "resources.tf";
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
     private final DeployEnvironments deployEnvironments;
     private final TerraformLocalConfig terraformLocalConfig;
-    private final TerraformProviderHelper terraformProviderHelper;
     private final Executor taskExecutor;
     private final TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
     private final DeployServiceEntityHandler deployServiceEntityHandler;
@@ -71,7 +66,6 @@ public class TerraformLocalDeployment implements Deployer {
     @Autowired
     public TerraformLocalDeployment(DeployEnvironments deployEnvironments,
                                     TerraformLocalConfig terraformLocalConfig,
-                                    TerraformProviderHelper terraformProviderHelper,
                                     @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
                                     TerraformDeploymentResultCallbackManager
                                                 terraformDeploymentResultCallbackManager,
@@ -79,7 +73,6 @@ public class TerraformLocalDeployment implements Deployer {
                                     ScriptsGitRepoManage scriptsGitRepoManage) {
         this.deployEnvironments = deployEnvironments;
         this.terraformLocalConfig = terraformLocalConfig;
-        this.terraformProviderHelper = terraformProviderHelper;
         this.taskExecutor = taskExecutor;
         this.terraformDeploymentResultCallbackManager = terraformDeploymentResultCallbackManager;
         this.deployServiceEntityHandler = deployServiceEntityHandler;
@@ -235,9 +228,7 @@ public class TerraformLocalDeployment implements Deployer {
 
     private void prepareDeployWorkspaceWithScripts(DeployTask deployTask, String workspace) {
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            createScriptFile(deployTask.getDeployRequest().getCsp(),
-                    deployTask.getDeployRequest().getRegion(), workspace,
-                    deployTask.getOcl().getDeployment().getDeployer());
+            createScriptFile(workspace, deployTask.getOcl().getDeployment().getDeployer());
         }
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getScriptsRepo())) {
             scriptsGitRepoManage.checkoutScripts(workspace,
@@ -253,8 +244,7 @@ public class TerraformLocalDeployment implements Deployer {
             parentPath.mkdirs();
         }
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            createDestroyScriptFile(deployTask.getDeployRequest().getCsp(),
-                    deployTask.getDeployRequest().getRegion(), workspace, tfState);
+            createDestroyScriptFile(workspace, tfState);
         } else if (Objects.nonNull(deployTask.getOcl().getDeployment().getScriptsRepo())) {
             scriptsGitRepoManage.checkoutScripts(workspace,
                     deployTask.getOcl().getDeployment().getScriptsRepo());
@@ -271,18 +261,13 @@ public class TerraformLocalDeployment implements Deployer {
     /**
      * Create terraform script.
      *
-     * @param csp       the cloud service provider.
      * @param workspace the workspace for terraform.
      * @param script    terraform scripts of the task.
      */
-    private void createScriptFile(Csp csp, String region, String workspace, String script) {
+    private void createScriptFile(String workspace, String script) {
         log.info("start create terraform script");
-        String verScript = terraformProviderHelper.getProvider(csp, region);
-        String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
-        try (FileWriter verWriter = new FileWriter(verScriptPath);
-                FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(verScript);
+        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(script);
             log.info("Terraform script create success");
         } catch (IOException ex) {
@@ -294,18 +279,13 @@ public class TerraformLocalDeployment implements Deployer {
     /**
      * Create terraform workspace and script.
      *
-     * @param csp       the cloud service provider.
      * @param workspace the workspace for terraform.
      * @param tfState   terraform file tfstate of the task.
      */
-    private void createDestroyScriptFile(Csp csp, String region, String workspace, String tfState) {
+    private void createDestroyScriptFile(String workspace, String tfState) {
 
-        String verScript = terraformProviderHelper.getProvider(csp, region);
-        String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + STATE_FILE_NAME;
-        try (FileWriter verWriter = new FileWriter(verScriptPath);
-                FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(verScript);
+        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(tfState);
             log.info("create terraform destroy workspace and script success.");
         } catch (IOException e) {
@@ -358,9 +338,7 @@ public class TerraformLocalDeployment implements Deployer {
         // Create the workspace.
         buildWorkspace(workspace);
         if (Objects.nonNull(ocl.getDeployment().getDeployer())) {
-            createScriptFile(ocl.getCloudServiceProvider().getName(),
-                    ocl.getCloudServiceProvider().getRegions().getFirst().getName(), workspace,
-                    ocl.getDeployment().getDeployer());
+            createScriptFile(workspace, ocl.getDeployment().getDeployer());
         } else {
             scriptsGitRepoManage.checkoutScripts(workspace, ocl.getDeployment().getScriptsRepo());
         }

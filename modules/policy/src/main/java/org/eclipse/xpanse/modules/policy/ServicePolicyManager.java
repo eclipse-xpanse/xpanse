@@ -94,8 +94,8 @@ public class ServicePolicyManager {
         Optional<String> namespace = identityProviderManager.getUserNamespace();
         if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
                 existedServiceTemplate.getNamespace())) {
-            throw new AccessDeniedException("No permissions to add policy belonging to the "
-                    + "service template belonging to other namespaces.");
+            throw new AccessDeniedException("No permissions to view or manage policy belonging to "
+                    + "the service template belonging to other namespaces.");
         }
         return existedServiceTemplate;
     }
@@ -108,7 +108,7 @@ public class ServicePolicyManager {
      */
     public ServicePolicy updateServicePolicy(ServicePolicyUpdateRequest updateRequest) {
         ServicePolicyEntity existingPolicy =
-                getServicePolicyEntity(updateRequest.getId(), "update");
+                getServicePolicyEntity(updateRequest.getId());
 
         ServicePolicyEntity policyToUpdate =
                 getServicePolicyToUpdate(updateRequest, existingPolicy);
@@ -139,7 +139,7 @@ public class ServicePolicyManager {
      * @return Returns the policy view object.
      */
     public ServicePolicy getServicePolicyDetails(UUID id) {
-        ServicePolicyEntity existingEntity = getServicePolicyEntity(id, "view");
+        ServicePolicyEntity existingEntity = getServicePolicyEntity(id);
         return conventToServicePolicy(existingEntity);
     }
 
@@ -149,11 +149,11 @@ public class ServicePolicyManager {
      * @param id the id of policy.
      */
     public void deleteServicePolicy(UUID id) {
-        getServicePolicyEntity(id, "delete");
+        getServicePolicyEntity(id);
         servicePolicyStorage.deletePolicyById(id);
     }
 
-    private ServicePolicyEntity getServicePolicyEntity(UUID policyId, String managementType) {
+    private ServicePolicyEntity getServicePolicyEntity(UUID policyId) {
         ServicePolicyEntity existingPolicy = servicePolicyStorage.findPolicyById(policyId);
         if (Objects.isNull(existingPolicy)) {
             String errorMsg = String.format("The policy with id %s not found.", policyId);
@@ -162,9 +162,8 @@ public class ServicePolicyManager {
         Optional<String> namespace = identityProviderManager.getUserNamespace();
         if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
                 existingPolicy.getServiceTemplate().getNamespace())) {
-            String errorMsg = String.format("No permissions to %s policy belonging to the "
-                    + "service templates belonging to other namespaces.", managementType);
-            throw new AccessDeniedException(errorMsg);
+            throw new AccessDeniedException("No permissions to view or manage policy belonging to "
+                    + "the service templates belonging to other namespaces.");
         }
         return existingPolicy;
     }

@@ -87,7 +87,7 @@ public class ServiceVariablesJsonSchemaGenerator {
                 variableValueSchema.forEach((schemaDefKey, schemaDefValue) -> {
                     if (!allowedKeys.contains(schemaDefKey)) {
                         invalidKeys.add(String.format(
-                                "Value schema key %s in deploy variable  %s is invalid",
+                                "Value schema key %s in deploy variable %s is invalid",
                                 schemaDefKey, deployVariable));
                     }
                 }));

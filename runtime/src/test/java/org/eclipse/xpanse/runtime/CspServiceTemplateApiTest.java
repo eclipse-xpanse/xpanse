@@ -1,7 +1,6 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -17,7 +16,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.net.URI;
-import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,7 +51,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class CspServiceTemplateApiTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static ServiceTemplateDetailVo serviceTemplateDetailVo;
     @Resource
     private MockMvc mockMvc;
 
@@ -66,31 +63,32 @@ class CspServiceTemplateApiTest {
         objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
     }
 
-    void registerServiceTemplateByUrl(URL url) throws Exception {
+    ServiceTemplateDetailVo registerServiceTemplate(Ocl ocl) throws Exception {
 
-        if (serviceTemplateDetailVo == null) {
-            Ocl ocl = new OclLoader().getOcl(url);
-            ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-            String requestBody = yamlMapper.writeValueAsString(ocl);
-            final MockHttpServletResponse registerResponse = mockMvc.perform(
-                            post("/xpanse/service_templates").content(requestBody)
-                                    .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
-                    .andReturn().getResponse();
-            serviceTemplateDetailVo = objectMapper.readValue(registerResponse.getContentAsString(),
-                    ServiceTemplateDetailVo.class);
-        }
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        String requestBody = yamlMapper.writeValueAsString(ocl);
+        final MockHttpServletResponse registerResponse = mockMvc.perform(
+                        post("/xpanse/service_templates").content(requestBody)
+                                .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        return objectMapper.readValue(registerResponse.getContentAsString(),
+                ServiceTemplateDetailVo.class);
     }
 
     @Test
     @WithJwt(file = "jwt_admin_csp.json")
     void testCspManageServiceTemplates() throws Exception {
-        registerServiceTemplateByUrl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
-        testListAllServiceTemplatesWithStateApprovalPending();
-        testReviewServiceTemplateRegistration();
-        testAllListServiceTemplatesWithStateApproved();
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("cspServiceTemplateApiTest-1");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        testListAllServiceTemplatesWithStateApprovalPending(serviceTemplate);
+        testReviewServiceTemplateRegistration(serviceTemplate);
+        testAllListServiceTemplatesWithStateApproved(serviceTemplate);
     }
 
-    void testReviewServiceTemplateRegistration() throws Exception {
+    void testReviewServiceTemplateRegistration(ServiceTemplateDetailVo serviceTemplateDetailVo)
+            throws Exception {
         // Setup request 1
         UUID id1 = serviceTemplateDetailVo.getId();
         ReviewRegistrationRequest request1 = new ReviewRegistrationRequest();
@@ -139,7 +137,8 @@ class CspServiceTemplateApiTest {
         assertThat(response3.getContentAsString()).isEqualTo(result3);
     }
 
-    void testAllListServiceTemplatesWithStateApproved() throws Exception {
+    void testAllListServiceTemplatesWithStateApproved(
+            ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
 
         // Setup request 1
         String serviceRegistrationState1 = "errorState";
@@ -163,24 +162,33 @@ class CspServiceTemplateApiTest {
                         serviceRegistrationState2);
         // Verify the results 2
         assertThat(response2.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(serviceTemplateDetailVos).usingRecursiveFieldByFieldElementComparatorIgnoringFields("lastModifiedTime").isEqualTo(
+        assertThat(
+                serviceTemplateDetailVos).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "lastModifiedTime").isEqualTo(
                 Arrays.stream(objectMapper.readValue(response2.getContentAsString(),
                         ServiceTemplateDetailVo[].class)).toList());
 
 
     }
 
-    void testListAllServiceTemplatesWithStateApprovalPending() throws Exception {
+    void testListAllServiceTemplatesWithStateApprovalPending(
+            ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup
         String serviceRegistrationState = ServiceRegistrationState.APPROVAL_PENDING.toValue();
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(serviceTemplateDetailVo);
         // Run the test
-        MockHttpServletResponse response =
-                listServiceTemplatesWithParams(null, null, null, null, null,
-                        serviceRegistrationState);
+        MockHttpServletResponse response = listServiceTemplatesWithParams(
+                serviceTemplateDetailVo.getCategory().toValue(),
+                serviceTemplateDetailVo.getCsp().toValue(),
+                serviceTemplateDetailVo.getName(),
+                serviceTemplateDetailVo.getVersion(),
+                serviceTemplateDetailVo.getServiceHostingType().toValue(),
+                serviceRegistrationState);
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(serviceTemplateDetailVos).usingRecursiveFieldByFieldElementComparatorIgnoringFields("lastModifiedTime").isEqualTo(
+        assertThat(
+                serviceTemplateDetailVos).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "lastModifiedTime").isEqualTo(
                 Arrays.stream(objectMapper.readValue(response.getContentAsString(),
                         ServiceTemplateDetailVo[].class)).toList());
     }

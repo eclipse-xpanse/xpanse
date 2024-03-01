@@ -107,7 +107,7 @@ public class UserPolicyManager {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No permissions to update policy belonging to other users.");
+                    "No permissions to view or manage policy belonging to other users.");
         }
 
         UserPolicyEntity policyToUpdate = getUserPolicyToUpdate(updateRequest, existingEntity);
@@ -131,7 +131,7 @@ public class UserPolicyManager {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No permissions to view policy belonging to other users.");
+                    "No permissions to view or manage policy belonging to other users.");
         }
         return conventToUserPolicy(existingEntity);
     }
@@ -151,7 +151,7 @@ public class UserPolicyManager {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No permissions to delete policy belonging to other users.");
+                    "No permissions to view or manage policy belonging to other users.");
         }
         userPolicyStorage.deletePolicyById(id);
     }

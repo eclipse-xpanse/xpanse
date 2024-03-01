@@ -134,7 +134,7 @@ class AuthorizationApiTest {
     }
 
     @Test
-   @WithJwt(file = "jwt_isv.json")
+    @WithJwt(file = "jwt_isv.json")
     void testCallApiAccessDenied() throws Exception {
         // SetUp
         Response responseModel = Response.errorResponse(ResultType.ACCESS_DENIED,
@@ -150,21 +150,6 @@ class AuthorizationApiTest {
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
     }
-
-    @Test
-   @WithJwt(file = "jwt_user.json")
-    void testCallApiWell() throws Exception {
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
-        assertEquals("[]", response.getContentAsString());
-    }
-
 
     private ResponseEntity<TokenResponse> getAccessToken(String url) {
         TestRestTemplate testRestTemplate = new TestRestTemplate();

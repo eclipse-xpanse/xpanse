@@ -30,7 +30,6 @@ import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
@@ -62,7 +61,7 @@ import org.springframework.security.access.AccessDeniedException;
 @ExtendWith({MockitoExtension.class})
 class ServiceTemplateManageTest {
 
-    private static final String oclLocation = "file:src/test/resources/ocl_test.yaml";
+    private static final String oclLocation = "file:src/test/resources/ocl_terraform_test.yml";
     private static OclLoader oclLoader;
     private static Ocl oclRegister;
     private static UUID uuid;
@@ -90,8 +89,6 @@ class ServiceTemplateManageTest {
     private ServiceTemplateManage serviceTemplateManageTest;
     @Mock
     private ScriptsGitRepoManage scriptsGitRepoManage;
-    @Mock
-    private TerraformProviderHelper terraformProviderHelper;
 
     @BeforeAll
     static void init() throws Exception {
@@ -125,26 +122,11 @@ class ServiceTemplateManageTest {
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
         TerraformLocalDeployment deployment =
                 new TerraformLocalDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, terraformProviderHelper, taskExecutor,
+                        terraformLocalConfig, taskExecutor,
                         terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
                         scriptsGitRepoManage);
 
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
-        doReturn("""
-                terraform {
-                  required_providers {
-                    huaweicloud = {
-                      source = "huaweicloud/huaweicloud"
-                      version = "~> 1.51.0"
-                    }
-                  }
-                }
-                            
-                provider "huaweicloud" {
-                  region = "test"
-                }
-                """).when(this.terraformProviderHelper)
-                .getProvider(any(Csp.class), any());
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         ServiceTemplateEntity ServiceTemplateEntityByUrl =
                 serviceTemplateManageTest.updateServiceTemplateByUrl(uuid.toString(),
@@ -172,25 +154,10 @@ class ServiceTemplateManageTest {
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
         TerraformLocalDeployment deployment =
                 new TerraformLocalDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, terraformProviderHelper, taskExecutor,
+                        terraformLocalConfig, taskExecutor,
                         terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
                         scriptsGitRepoManage);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
-        doReturn("""
-                terraform {
-                      required_providers {
-                        huaweicloud = {
-                          source = "huaweicloud/huaweicloud"
-                          version = "~> 1.51.0"
-                        }
-                      }
-                    }
-                                
-                    provider "huaweicloud" {
-                      region = "test"
-                        }
-                        """).when(this.terraformProviderHelper)
-                .getProvider(any(Csp.class), any());
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         ServiceTemplateEntity updateServiceTemplateEntity =
                 serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl);
@@ -236,25 +203,10 @@ class ServiceTemplateManageTest {
     void testRegisterServiceTemplate() {
         TerraformLocalDeployment deployment =
                 new TerraformLocalDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, terraformProviderHelper, taskExecutor,
+                        terraformLocalConfig, taskExecutor,
                         terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
                         scriptsGitRepoManage);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
-        doReturn("""
-                    terraform {
-                  required_providers {
-                    huaweicloud = {
-                      source = "huaweicloud/huaweicloud"
-                      version = "~> 1.51.0"
-                    }
-                  }
-                }
-                            
-                provider "huaweicloud" {
-                      region = "test"
-                    }
-                    """).when(this.terraformProviderHelper)
-                .getProvider(any(Csp.class), any());
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
 
@@ -276,6 +228,7 @@ class ServiceTemplateManageTest {
         entity.setServiceHostingType(ServiceHostingType.SELF);
         entity.setOcl(ocl);
         entity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+        entity.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
 
         ServiceTemplateEntity existedServiceTemplateEntity = getServiceTemplateEntity();
 
@@ -300,25 +253,10 @@ class ServiceTemplateManageTest {
         when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(oclRegister);
         TerraformLocalDeployment deployment =
                 new TerraformLocalDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, terraformProviderHelper, taskExecutor,
+                        terraformLocalConfig, taskExecutor,
                         terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
                         scriptsGitRepoManage);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
-        doReturn("""
-                terraform {
-                  required_providers {
-                    huaweicloud = {
-                          source = "huaweicloud/huaweicloud"
-                          version = "~> 1.51.0"
-                        }
-                      }
-                    }
-                                
-                    provider "huaweicloud" {
-                      region = "test"
-                    }
-                    """).when(this.terraformProviderHelper)
-                .getProvider(any(Csp.class), any());
 
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
@@ -352,7 +290,7 @@ class ServiceTemplateManageTest {
     void testGetServiceTemplateThrowsServiceTemplateNotRegistered() {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
         Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
-                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString(), false));
+                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString(),  false));
 
     }
 

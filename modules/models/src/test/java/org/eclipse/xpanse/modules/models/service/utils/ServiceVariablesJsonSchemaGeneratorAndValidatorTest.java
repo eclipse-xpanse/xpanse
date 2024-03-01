@@ -45,7 +45,7 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
     @BeforeEach
     void setup() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(new File("target/test-classes/test.yaml").toURI().toURL());
+        Ocl ocl = oclLoader.getOcl(new File("src/test/resources/ocl_terraform_test.yml").toURI().toURL());
         variables = ocl.getDeployment().getVariables();
     }
 

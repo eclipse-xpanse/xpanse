@@ -31,20 +31,16 @@ import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
 import org.eclipse.xpanse.plugins.scs.manage.ScsResourceManager;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
 import org.eclipse.xpanse.plugins.scs.resourcehandler.ScsTerraformResourceHandler;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = {ScsOrchestratorPlugin.class})
 class ScsOrchestratorPluginTest {
-    private final String terraformScsVersion = "1.52.0";
-
     @InjectMocks
     private ScsOrchestratorPlugin plugin;
     @Mock
@@ -54,11 +50,6 @@ class ScsOrchestratorPluginTest {
     @Mock
     private ScsResourceManager scsResourceManager;
 
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(plugin,
-                "terraformScsVersion", terraformScsVersion);
-    }
     @Test
     void getResourceHandler() {
         assertInstanceOf(ScsTerraformResourceHandler.class,
@@ -109,27 +100,6 @@ class ScsOrchestratorPluginTest {
     }
 
     @Test
-    void testGetProvider() {
-        String region = "region";
-        String result = String.format("""
-                terraform {
-                  required_providers {
-                    openstack = {
-                          source  = "terraform-provider-openstack/openstack"
-                          version = "%s"
-                        }
-                  }
-                }
-                            
-                provider "openstack" {
-                  region = "%s"
-                }
-                """, terraformScsVersion, region);
-        Assertions.assertThat(plugin.getProvider(DeployerKind.TERRAFORM,
-                "region")).isEqualTo(result);
-    }
-
-    @Test
     void testStartService() {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
@@ -152,8 +122,7 @@ class ScsOrchestratorPluginTest {
         when(mockScsServersManager.startService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.startService(serviceStateManageRequest);
+        final boolean result = plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         Assertions.assertThat(result).isFalse();
@@ -182,8 +151,7 @@ class ScsOrchestratorPluginTest {
         when(mockScsServersManager.startService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.startService(serviceStateManageRequest);
+        final boolean result = plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         Assertions.assertThat(result).isTrue();
@@ -212,8 +180,7 @@ class ScsOrchestratorPluginTest {
         when(mockScsServersManager.stopService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.stopService(serviceStateManageRequest);
+        final boolean result = plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         Assertions.assertThat(result).isFalse();
@@ -242,8 +209,7 @@ class ScsOrchestratorPluginTest {
         when(mockScsServersManager.stopService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.stopService(serviceStateManageRequest);
+        final boolean result = plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         Assertions.assertThat(result).isTrue();
@@ -272,8 +238,7 @@ class ScsOrchestratorPluginTest {
         when(mockScsServersManager.restartService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.restartService(serviceStateManageRequest);
+        final boolean result = plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         Assertions.assertThat(result).isFalse();
@@ -302,8 +267,7 @@ class ScsOrchestratorPluginTest {
         when(mockScsServersManager.restartService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.restartService(serviceStateManageRequest);
+        final boolean result = plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         Assertions.assertThat(result).isTrue();

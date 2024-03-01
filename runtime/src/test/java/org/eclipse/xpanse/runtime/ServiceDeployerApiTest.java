@@ -6,9 +6,13 @@
 
 package org.eclipse.xpanse.runtime;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,7 +25,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -32,24 +35,33 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
+import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesEvaluationApi;
+import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalCmdList;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolicyList;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidateResponse;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -57,6 +69,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -67,21 +80,18 @@ import org.springframework.test.web.servlet.MockMvc;
  * Test for ServiceDeployerApi.
  */
 @Slf4j
-@Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest {
-
     private static final long waitTime = 60 * 1000;
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    static ServiceTemplateDetailVo serviceTemplateDetailVo;
-    static Ocl ocl;
-    static boolean credentialReady = false;
     @Resource
     private MockMvc mockMvc;
-    @Resource
-    private DatabaseServiceTemplateStorage serviceTemplateStorage;
+    @MockBean
+    private PoliciesValidateApi mockPoliciesValidateApi;
+    @MockBean
+    private PoliciesEvaluationApi mockPoliciesEvaluationApi;
 
     @BeforeAll
     static void configureObjectMapper() {
@@ -92,31 +102,95 @@ class ServiceDeployerApiTest {
         objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
     }
 
-    void registerServiceTemplate() throws Exception {
-        // Setup
-        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
+    ServiceTemplateDetailVo registerServiceTemplate(Ocl ocl) throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
-
-        // Run the test
         final MockHttpServletResponse registerResponse =
                 mockMvc.perform(post("/xpanse/service_templates")
                                 .content(requestBody).contentType("application/x-yaml")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
-        serviceTemplateDetailVo = objectMapper.readValue(registerResponse.getContentAsString(),
-                ServiceTemplateDetailVo.class);
+        if (registerResponse.getStatus() == HttpStatus.OK.value()) {
+            return objectMapper.readValue(registerResponse.getContentAsString(),
+                    ServiceTemplateDetailVo.class);
+        } else {
+            log.error("Register service template failed, response: {}",
+                    registerResponse.getContentAsString());
+            return null;
+        }
     }
 
-    void approveServiceTemplateRegistration() {
-        ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateStorage.getServiceTemplateById(serviceTemplateDetailVo.getId());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
-        serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
+    void unregisterServiceTemplate(UUID id) throws Exception {
+        mockMvc.perform(
+                        delete("/xpanse/service_templates/{id}", id).accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+    }
+
+    void approvedServiceTemplateRegistration(UUID id) throws Exception {
+        ReviewRegistrationRequest request = new ReviewRegistrationRequest();
+        request.setReviewResult(ServiceReviewResult.APPROVED);
+        request.setReviewComment("Approved");
+        String requestBody = objectMapper.writeValueAsString(request);
+        mockMvc.perform(put("/xpanse/service_templates/review/{id}", id)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+    }
+
+    void setMockPoliciesValidateApi() {
+        ValidateResponse validateResponse = new ValidateResponse();
+        validateResponse.setIsSuccessful(true);
+        when(mockPoliciesValidateApi.validatePoliciesPost(
+                any(ValidatePolicyList.class))).thenReturn(validateResponse);
+    }
+
+    void addServicePolicies(ServiceTemplateDetailVo serviceTemplate) throws Exception {
+        ServicePolicyCreateRequest servicePolicy = new ServicePolicyCreateRequest();
+        servicePolicy.setServiceTemplateId(serviceTemplate.getId());
+        servicePolicy.setPolicy("servicePolicy");
+        servicePolicy.setEnabled(true);
+        mockMvc.perform(post("/xpanse/service/policies")
+                        .content(objectMapper.writeValueAsString(servicePolicy))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        ServicePolicyCreateRequest serviceFlavorPolicy = new ServicePolicyCreateRequest();
+        serviceFlavorPolicy.setServiceTemplateId(serviceTemplate.getId());
+        List<String> flavors =
+                serviceTemplate.getFlavors().stream().map(Flavor::getName).toList();
+        serviceFlavorPolicy.setFlavorNameList(flavors);
+        serviceFlavorPolicy.setPolicy("serviceFlavorPolicy");
+        serviceFlavorPolicy.setEnabled(true);
+        mockMvc.perform(post("/xpanse/service/policies")
+                        .content(objectMapper.writeValueAsString(serviceFlavorPolicy))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+    }
+
+    UserPolicy addUserPolicy(ServiceTemplateDetailVo serviceTemplate) throws Exception {
+        UserPolicyCreateRequest userPolicy = new UserPolicyCreateRequest();
+        userPolicy.setCsp(serviceTemplate.getCsp());
+        userPolicy.setPolicy("userPolicy");
+        userPolicy.setEnabled(true);
+        final MockHttpServletResponse response = mockMvc.perform(post("/xpanse/policies")
+                        .content(objectMapper.writeValueAsString(userPolicy))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        return objectMapper.readValue(response.getContentAsString(), UserPolicy.class);
+    }
+
+    void deleteUserPolicy(UUID id) throws Exception {
+        mockMvc.perform(delete("/xpanse/policies/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
     }
 
     void addCredential() throws Exception {
-
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.HUAWEI);
         createCredential.setType(CredentialType.VARIABLES);
@@ -130,29 +204,39 @@ class ServiceDeployerApiTest {
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
                         "The security key.", true, false, "SK_VALUE"));
         createCredential.setVariables(credentialVariables);
-        createCredential.setTimeToLive(3000);
-        String requestBody = objectMapper.writeValueAsString(createCredential);
-        final MockHttpServletResponse response = mockMvc.perform(post("/xpanse/user/credentials")
-                        .content(requestBody).contentType(MediaType.APPLICATION_JSON)
+        createCredential.setTimeToLive(30000);
+        mockMvc.perform(post("/xpanse/user/credentials")
+                        .content(objectMapper.writeValueAsString(createCredential))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-        if (HttpStatus.NO_CONTENT.value() == response.getStatus()) {
-            credentialReady = true;
-        }
+    }
+
+    void mockPolicyEvaluationResult(boolean isSuccessful) {
+        final EvalResult evalResult = new EvalResult();
+        evalResult.setIsSuccessful(isSuccessful);
+        evalResult.setPolicy("policy");
+        // Configure PoliciesEvaluationApi.evaluatePoliciesPost(...).
+        when(mockPoliciesEvaluationApi.evaluatePoliciesPost(any(EvalCmdList.class)))
+                .thenReturn(evalResult);
     }
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
-    void testServiceDeployerWell() throws Exception {
-        if (!credentialReady) {
-            addCredential();
-        }
-        if (Objects.isNull(serviceTemplateDetailVo)) {
-            registerServiceTemplate();
-        }
-        testDeployServiceThrowsServiceTemplateNotApproved();
-        approveServiceTemplateRegistration();
-        UUID serviceId = testDeploy();
+    void testDeployApisWellWithDeployerTerraformLocal() throws Exception {
+        // Setup
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceDeployApiTest-1");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        approvedServiceTemplateRegistration(serviceTemplate.getId());
+        setMockPoliciesValidateApi();
+        UserPolicy userPolicy = addUserPolicy(serviceTemplate);
+        addServicePolicies(serviceTemplate);
+        addCredential();
+        mockPolicyEvaluationResult(true);
+
+        UUID serviceId = testDeploy(serviceTemplate);
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             listDeployedServices();
         }
@@ -164,7 +248,73 @@ class ServiceDeployerApiTest {
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
             testPurge(serviceId);
         }
+        unregisterServiceTemplate(serviceTemplate.getId());
+        deleteUserPolicy(userPolicy.getId());
+    }
 
+    @Test
+    @WithJwt(file = "jwt_all_roles.json")
+    void testDeployApisWellWithDeployerOpenTofuLocal() throws Exception {
+        // Setup
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
+        ocl.setName("serviceDeployApiTest-2");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        approvedServiceTemplateRegistration(serviceTemplate.getId());
+        setMockPoliciesValidateApi();
+        UserPolicy userPolicy = addUserPolicy(serviceTemplate);
+        addServicePolicies(serviceTemplate);
+        addCredential();
+        mockPolicyEvaluationResult(true);
+        UUID serviceId = testDeploy(serviceTemplate);
+        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+            listDeployedServices();
+        }
+        testListDeployedServices();
+        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+            testDestroy(serviceId);
+
+        }
+        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
+            testPurge(serviceId);
+        }
+        unregisterServiceTemplate(serviceTemplate.getId());
+        deleteUserPolicy(userPolicy.getId());
+    }
+
+    @Test
+    @WithJwt(file = "jwt_all_roles.json")
+    void testDeployApisThrowsException() throws Exception {
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceDeployApiTest-3");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        testDeployThrowsServiceTemplateNotRegistered();
+        testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
+        testGetServiceDetailsThrowsException();
+        testDestroyThrowsException();
+        testPurgeThrowsException();
+        unregisterServiceTemplate(serviceTemplate.getId());
+    }
+
+    @Test
+    @WithJwt(file = "jwt_all_roles.json")
+    void testDeployApiFailedWithDeployerOpenTofuLocal() throws Exception {
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
+        ocl.setName("serviceDeployApiTest-4");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        testDeployThrowsPolicyEvaluationFailedException(serviceTemplate);
+    }
+
+    @Test
+    @WithJwt(file = "jwt_all_roles.json")
+    void testDeployApiFailedWithDeployerTerraformLocal() throws Exception {
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceDeployApiTest-5");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        testDeployThrowsPolicyEvaluationFailedException(serviceTemplate);
     }
 
     boolean waitUntilExceptedState(UUID id, ServiceDeploymentState targetState) throws Exception {
@@ -179,38 +329,26 @@ class ServiceDeployerApiTest {
                 if (System.currentTimeMillis() - startTime > waitTime) {
                     break;
                 }
-                Thread.sleep(5 * 3000);
+                Thread.sleep(5 * 1000);
             }
 
         }
         return isDone;
     }
 
-    UUID testDeploy() throws Exception {
-        DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setServiceName(serviceTemplateDetailVo.getName());
-        deployRequest.setVersion(serviceTemplateDetailVo.getVersion());
-        deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
-        deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
-        deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().getFirst().getName());
-        deployRequest.setRegion(serviceTemplateDetailVo.getRegions().getFirst().toString());
-        deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
-        Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        deployRequest.setServiceRequestProperties(serviceRequestProperties);
-        String requestBody = objectMapper.writeValueAsString(deployRequest);
-
+    UUID testDeploy(ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
+        DeployRequest deployRequest = getDeployRequest(serviceTemplateDetailVo);
         // Run the test
         final MockHttpServletResponse deployResponse =
                 mockMvc.perform(post("/xpanse/services")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .content(requestBody))
+                                .content(objectMapper.writeValueAsString(deployRequest)))
                         .andReturn().getResponse();
         UUID taskId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), deployResponse.getStatus());
+        assertEquals(HttpStatus.ACCEPTED.value(), deployResponse.getStatus());
         Assertions.assertNotNull(taskId);
         return taskId;
 
@@ -222,8 +360,8 @@ class ServiceDeployerApiTest {
 
         // Verify the results
         Assertions.assertFalse(result.isEmpty());
-        Assertions.assertEquals(result.getFirst().getServiceDeploymentState(),
-                ServiceDeploymentState.DEPLOYING);
+        assertEquals(result.getFirst().getServiceDeploymentState(),
+                ServiceDeploymentState.DEPLOY_SUCCESS);
     }
 
     void testDestroy(UUID taskId) throws Exception {
@@ -239,53 +377,45 @@ class ServiceDeployerApiTest {
                 mockMvc.perform(delete("/xpanse/services/{id}", taskId))
                         .andReturn().getResponse();
 
-
         // Verify the results
-        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
-        Assertions.assertEquals(result, destroyResponse.getContentAsString());
+        assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
+        assertEquals(result, destroyResponse.getContentAsString());
     }
 
-
-    @Test
-    @WithJwt(file = "jwt_all_roles.json")
-    void testServiceDeployerThrowsException() throws Exception {
-        testDeployThrowsServiceTemplateNotRegistered();
-        testGetServiceDetailsThrowsException();
-        testDestroyThrowsException();
-        testPurgeThrowsException();
-    }
-
-    void testDeployServiceThrowsServiceTemplateNotApproved() throws Exception {
+    void testDeployThrowsServiceTemplateNotApproved(ServiceTemplateDetailVo serviceTemplate)
+            throws Exception {
         // SetUp
         Response expectedResponse = Response.errorResponse(
                 ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
                 Collections.singletonList("No available service templates found."));
         String result = objectMapper.writeValueAsString(expectedResponse);
 
-        DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setServiceName(serviceTemplateDetailVo.getName());
-        deployRequest.setVersion(serviceTemplateDetailVo.getVersion());
-        deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
-        deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
-        deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().getFirst().getName());
-        deployRequest.setRegion(serviceTemplateDetailVo.getRegions().getFirst().toString());
-        deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
-        Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        deployRequest.setServiceRequestProperties(serviceRequestProperties);
-        String requestBody = objectMapper.writeValueAsString(deployRequest);
-
+        DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         // Run the test
         final MockHttpServletResponse deployResponse =
                 mockMvc.perform(post("/xpanse/services")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .content(requestBody))
+                                .content(objectMapper.writeValueAsString(deployRequest)))
                         .andReturn().getResponse();
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
-        Assertions.assertEquals(result, deployResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
+        assertEquals(result, deployResponse.getContentAsString());
+        unregisterServiceTemplate(serviceTemplate.getId());
+    }
+
+    void testDeployThrowsPolicyEvaluationFailedException(ServiceTemplateDetailVo serviceTemplate)
+            throws Exception {
+        approvedServiceTemplateRegistration(serviceTemplate.getId());
+        setMockPoliciesValidateApi();
+        UserPolicy userPolicy = addUserPolicy(serviceTemplate);
+        addServicePolicies(serviceTemplate);
+        addCredential();
+        mockPolicyEvaluationResult(false);
+        testDeploy(serviceTemplate);
+        deleteUserPolicy(userPolicy.getId());
+        unregisterServiceTemplate(serviceTemplate.getId());
     }
 
     void testPurgeThrowsException() throws Exception {
@@ -300,8 +430,8 @@ class ServiceDeployerApiTest {
         final MockHttpServletResponse purgeResponse =
                 mockMvc.perform(delete("/xpanse/services/purge/{id}", serviceId))
                         .andReturn().getResponse();
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
-        Assertions.assertEquals(result, purgeResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
+        assertEquals(result, purgeResponse.getContentAsString());
     }
 
     void testPurge(UUID taskId) throws Exception {
@@ -314,12 +444,10 @@ class ServiceDeployerApiTest {
         final MockHttpServletResponse purgeResponse =
                 mockMvc.perform(delete("/xpanse/services/purge/{id}", taskId))
                         .andReturn().getResponse();
-        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), purgeResponse.getStatus());
-        Assertions.assertEquals(result, purgeResponse.getContentAsString());
+        assertEquals(HttpStatus.ACCEPTED.value(), purgeResponse.getStatus());
+        assertEquals(result, purgeResponse.getContentAsString());
 
         Thread.sleep(waitTime);
-
-
         // SetUp
         String refuseMsg = String.format(
                 "Service with id %s not found.", taskId);
@@ -331,8 +459,8 @@ class ServiceDeployerApiTest {
                 mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", taskId))
                         .andReturn().getResponse();
 
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());
-        Assertions.assertEquals(detailsResult, detailsResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());
+        assertEquals(detailsResult, detailsResponse.getContentAsString());
     }
 
 
@@ -389,8 +517,8 @@ class ServiceDeployerApiTest {
                         .andReturn().getResponse();
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
-        Assertions.assertEquals(result, deployResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
+        assertEquals(result, deployResponse.getContentAsString());
 
     }
 
@@ -410,8 +538,8 @@ class ServiceDeployerApiTest {
 
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
-        Assertions.assertEquals(result, detailResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
+        assertEquals(result, detailResponse.getContentAsString());
 
 
     }
@@ -432,9 +560,24 @@ class ServiceDeployerApiTest {
                         .andReturn().getResponse();
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
-        Assertions.assertEquals(result, destroyResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
+        assertEquals(result, destroyResponse.getContentAsString());
 
+    }
+
+    DeployRequest getDeployRequest(ServiceTemplateDetailVo serviceTemplateDetailVo) {
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setServiceName(serviceTemplateDetailVo.getName());
+        deployRequest.setVersion(serviceTemplateDetailVo.getVersion());
+        deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
+        deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
+        deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().getFirst().getName());
+        deployRequest.setRegion(serviceTemplateDetailVo.getRegions().getFirst().getName());
+        deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
+        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
+        deployRequest.setServiceRequestProperties(serviceRequestProperties);
+        return deployRequest;
     }
 
 }

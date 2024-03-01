@@ -23,13 +23,11 @@ import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.OpenTofuProviderHelper;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
@@ -58,8 +56,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {OpenTofuLocalDeployment.class, DeployEnvironments.class,
         PluginManager.class, OpenTofuLocalConfig.class, DeployService.class,
-        TaskConfiguration.class, ResourceHandlerManager.class, OpenTofuProviderHelper.class,
-        ScriptsGitRepoManage.class})
+        TaskConfiguration.class, ResourceHandlerManager.class, ScriptsGitRepoManage.class})
 class OpenTofuLocalDeploymentTest {
 
     private final UUID id = UUID.randomUUID();
@@ -88,7 +85,7 @@ class OpenTofuLocalDeploymentTest {
     @BeforeEach
     void setUp() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/opentofu_test.yaml").toURL());
+        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
 
         deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
@@ -102,22 +99,6 @@ class OpenTofuLocalDeploymentTest {
 
         doReturn(new HashMap<>()).when(this.deployEnvironments)
                 .getCredentialVariablesByHostingType(any(), any(), any(), any());
-
-        doReturn("""
-                    terraform {
-                      required_providers {
-                        huaweicloud = {
-                          source = "huaweicloud/huaweicloud"
-                          version = "~>1.51.0"
-                        }
-                      }
-                    }
-                                
-                    provider "huaweicloud" {
-                      region = "test"
-                    }
-                """).when(this.pluginManager)
-                .getDeployerProvider(any(Csp.class), any(DeployerKind.class), any());
     }
 
     @Test

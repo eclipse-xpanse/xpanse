@@ -66,7 +66,7 @@ flavors:
 serviceProviderContactDetails:
   email: ["test@test.com"]
 deployment:
-  # kind, Supported values are terraform, pulumi, crossplane.
+  # kind, Supported values are terraform, opentofu.
   kind: terraform
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
@@ -88,7 +88,7 @@ deployment:
       sensitiveScope: none
       value: "https://keystone.services.a.regiocloud.tech"
     - name: admin_passwd
-      description: The admin password of all nodes in the Kafka cluster. If the value is empty, will create a random password.
+      description: The admin password of all nodes in the Kafka cluster instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -98,21 +98,21 @@ deployment:
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
       sensitiveScope: always
     - name: vpc_name
-      description: The vpc name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create VPC.
+      description: The vpc name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
       example: "kafka-vpc-default"
       mandatory: false
       value: "kafka-vpc-default"
     - name: subnet_name
-      description: The sub network name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
       example: "kafka-subnet-default"
       mandatory: false
       value: "kafka-subnet-default"
     - name: secgroup_name
-      description: The security group name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
       example: "kafka-secgroup-default"
@@ -122,42 +122,60 @@ deployment:
     variable "flavor_name" {
       type        = string
       default     = "cirros256"
-      description = "The flavor_name of all nodes in the Kafka cluster."
+      description = "The flavor_name of all nodes in the Kafka cluster instance."
     }
     
     variable "image_name" {
       type        = string
-      description = "The flavor_name of all nodes in the Kafka cluster."
+      description = "The flavor_name of all nodes in the Kafka cluster instance."
     }
 
     variable "worker_nodes_count" {
       type        = string
       default     = 3
-      description = "The worker nodes count in the Kafka cluster."
+      description = "The worker nodes count in the Kafka cluster instance."
     }
 
     variable "admin_passwd" {
       type= string
       default = ""
-      description = "The root password of all nodes in the Kafka cluster."
+      description = "The root password of all nodes in the Kafka cluster instance."
     }
 
     variable "vpc_name" {
       type        = string
       default     = "kafka-vpc-default"
-      description = "The vpc name of all nodes in the Kafka cluster."
+      description = "The vpc name of all nodes in the Kafka cluster instance."
     }
 
     variable "subnet_name" {
       type        = string
       default     = "kafka-subnet-default"
-      description = "The subnet name of all nodes in the Kafka cluster."
+      description = "The subnet name of all nodes in the Kafka cluster instance."
     }
 
     variable "secgroup_name" {
       type        = string
       default     = "kafka-secgroup-default"
-      description = "The security group name of all nodes in the Kafka cluster."
+      description = "The security group name of all nodes in the Kafka cluster instance."
+    }
+    
+    variable "region" {
+      type        = string
+      default     = "RegionOne"
+      description = "The region to deploy the Kafka cluster instance."
+    }
+    
+    terraform {
+      required_providers {
+        openstack = {
+          source  = "terraform-provider-openstack/openstack"
+          version = "~> 1.53.0"
+        }
+    }
+    
+    provider "openstack" {
+      region = var.region
     }
 
     data "openstack_networking_network_v2" "existing" {
