@@ -26,5 +26,7 @@ public class CurrentUserInfo {
 
     private String namespace;
 
+    private String csp;
+
     private String token;
 }

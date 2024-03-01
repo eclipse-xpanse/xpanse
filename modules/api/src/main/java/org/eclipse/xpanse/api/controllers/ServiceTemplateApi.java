@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -96,7 +97,8 @@ public class ServiceTemplateApi {
     public ServiceTemplateDetailVo update(
             @Parameter(name = "id", description = "id of service template") @PathVariable("id")
             String id, @Valid @RequestBody Ocl ocl) {
-        ServiceTemplateEntity templateEntity = serviceTemplateManage.updateServiceTemplate(id, ocl);
+        ServiceTemplateEntity templateEntity =
+                serviceTemplateManage.updateServiceTemplate(UUID.fromString(id), ocl);
         String successMsg = String.format("Update service template with id %s successful.", id);
         log.info(successMsg);
         return convertToServiceTemplateDetailVo(templateEntity);
@@ -144,7 +146,7 @@ public class ServiceTemplateApi {
             @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
         log.info("Update service template {} with Url {}", id, oclLocation);
         ServiceTemplateEntity templateEntity =
-                serviceTemplateManage.updateServiceTemplateByUrl(id, oclLocation);
+                serviceTemplateManage.updateServiceTemplateByUrl(UUID.fromString(id), oclLocation);
         String successMsg = String.format("Update service template with id %s by Url %s", id,
                 oclLocation);
         log.info(successMsg);
@@ -165,7 +167,7 @@ public class ServiceTemplateApi {
     public Response unregister(
             @Parameter(name = "id", description = "id of service template") @PathVariable("id")
             String id) {
-        serviceTemplateManage.unregisterServiceTemplate(id);
+        serviceTemplateManage.unregisterServiceTemplate(UUID.fromString(id));
         String successMsg =
                 String.format("Unregister service template using id %s successful.", id);
         log.info(successMsg);
@@ -216,7 +218,7 @@ public class ServiceTemplateApi {
     }
 
     /**
-     * Get service template using id.
+     * Get details of service template using id.
      *
      * @param id id of service template.
      * @return response
@@ -226,12 +228,10 @@ public class ServiceTemplateApi {
     @GetMapping(value = "/service_templates/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ServiceTemplateDetailVo details(
-            @Parameter(name = "id", description = "id of service template") @PathVariable("id")
-            String id) {
+            @Parameter(name = "id", description = "id of service template")
+            @PathVariable("id") String id) {
         ServiceTemplateEntity templateEntity =
-                serviceTemplateManage.getServiceTemplateDetails(id, true);
-        String successMsg = String.format("Get detail of service template with id %s success.", id);
-        log.info(successMsg);
+                serviceTemplateManage.getServiceTemplateDetails(UUID.fromString(id), true, false);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 }

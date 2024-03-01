@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -112,7 +113,7 @@ public class ServiceCatalogApi {
             @Parameter(name = "id", description = "The id of orderable service.")
             @PathVariable("id") String id) {
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateManage.getServiceTemplateDetails(id, false);
+                serviceTemplateManage.getServiceTemplateDetails(UUID.fromString(id), false, false);
         if (ServiceRegistrationState.APPROVED
                 != serviceTemplateEntity.getServiceRegistrationState()) {
             String errMsg = String.format("Service template with id %s not approved.", id);
@@ -137,7 +138,7 @@ public class ServiceCatalogApi {
     @Operation(description = "Get the API document of the orderable service.")
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     public Link openApi(@PathVariable("id") String id) {
-        String apiUrl = this.serviceTemplateManage.getOpenApiUrl(id);
+        String apiUrl = this.serviceTemplateManage.getOpenApiUrl(UUID.fromString(id));
         String successMsg = String.format(
                 "Get API document of the orderable service successful with Url %s.", apiUrl);
         log.info(successMsg);
