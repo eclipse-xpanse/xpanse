@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,6 +25,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.net.URI;
+import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,14 +33,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +55,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  * Test for ServiceTemplateManageApi.
@@ -59,13 +67,12 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 class ServiceTemplateApiTest {
 
-    private static String id;
-    private static ServiceTemplateDetailVo serviceTemplateDetailVo;
-    private static Ocl ocl;
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final OclLoader oclLoader = new OclLoader();
     @Resource
     private MockMvc mockMvc;
+    @Resource
+    private DatabaseServiceTemplateStorage serviceTemplateStorage;
 
     @BeforeAll
     static void configureObjectMapper() {
@@ -79,416 +86,420 @@ class ServiceTemplateApiTest {
 
     @Test
     @WithJwt(file = "jwt_isv.json")
-    void testManageServiceTemplate() throws Exception {
-        testRegister();
-        Thread.sleep(1000);
-        testDetail();
-        testListRegisteredServices();
-        testUpdate();
-        testUnregister();
+    void testManageApisWorkWell() throws Exception {
+        testServiceTemplateApisWorkWell();
+        testFetchApisWorkWell();
     }
 
-    @Test
-    @WithJwt(file = "jwt_isv.json")
-    void testFetchMethods() throws Exception {
-        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
-        testFetch();
-        testFetchUpdate();
-        testUnregister();
-    }
-
-    @Test
-    @WithJwt(file = "jwt_isv.json")
-    void testRegisterServiceThrowsException() throws Exception {
-        testRegisterThrowsMethodArgumentNotValidException();
-        testRegisterThrowsTerraformExecutionException();
-        testDetailThrowsException();
-        testUpdateThrowsException();
-        testListRegisteredServicesThrowsException();
-        testListRegisteredServicesReturnsNoItems();
-        testUnregisterThrowsException();
-    }
-
-    @Test
-    @WithJwt(file = "jwt_isv.json")
-    void testFetchMethodsThrowsException() throws Exception {
-        testFetchThrowsException();
-        testDetailThrowsException();
-        testFetchUpdateThrowsException();
-        testUnregisterThrowsException();
-    }
-
-
-    void testRegister() throws Exception {
-        // Setup
-        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
-        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        String requestBody = yamlMapper.writeValueAsString(ocl);
-
+    void testServiceTemplateApisWorkWell() throws Exception {
+        // Setup register request
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceTemplateApiTest-01");
         // Run the test
-        final MockHttpServletResponse registerResponse =
-                mockMvc.perform(post("/xpanse/service_templates")
-                                .content(requestBody).contentType("application/x-yaml")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-        serviceTemplateDetailVo =
+        final MockHttpServletResponse registerResponse = register(ocl);
+        ServiceTemplateDetailVo serviceTemplateDetailVo =
                 objectMapper.readValue(registerResponse.getContentAsString(),
                         ServiceTemplateDetailVo.class);
-        id = serviceTemplateDetailVo.getId().toString();
-
         // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), registerResponse.getStatus());
-        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
+        assertEquals(HttpStatus.OK.value(), registerResponse.getStatus());
+        assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
                 serviceTemplateDetailVo.getServiceRegistrationState());
-        Assertions.assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
-        Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
+        assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
+        assertEquals(ocl.getCloudServiceProvider().getName(),
                 serviceTemplateDetailVo.getCsp());
-        Assertions.assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
+        assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
                 serviceTemplateDetailVo.getName());
-        Assertions.assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
+        assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
+
+        // Setup detail request
+        UUID id = serviceTemplateDetailVo.getId();
+        String result = objectMapper.writeValueAsString(serviceTemplateDetailVo);
+        // Run the test
+        final MockHttpServletResponse detailResponse = detail(id);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), detailResponse.getStatus());
+        assertEquals(result, detailResponse.getContentAsString());
+
+
+        // Setup list request
+        List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(serviceTemplateDetailVo);
+        // Run the test
+        final MockHttpServletResponse response =
+                listServiceTemplatesWithParams(ocl.getCategory().toValue(),
+                        ocl.getCloudServiceProvider().getName().toValue(),
+                        ocl.getName(), ocl.getServiceVersion(),
+                        ocl.getServiceHostingType().toValue(),
+                        ServiceRegistrationState.APPROVAL_PENDING.toValue());
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertThat(
+                serviceTemplateDetailVos).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "lastModifiedTime").isEqualTo(Arrays.stream(
+                objectMapper.readValue(response.getContentAsString(),
+                        ServiceTemplateDetailVo[].class)).toList());
+
+
+        // Setup update request
+        Ocl updateOcl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL());
+        updateOcl.setName("serviceTemplateApiTest-01");
+        // Run the test
+        final MockHttpServletResponse updateResponse = update(id, updateOcl);
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
+                objectMapper.readValue(updateResponse.getContentAsString(),
+                        ServiceTemplateDetailVo.class);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(serviceTemplateDetailVo.getId(),
+                updatedServiceTemplateDetailVo.getId());
+        assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
+                serviceTemplateDetailVo.getNamespace() + "_update");
+        assertNotEquals(serviceTemplateDetailVo.getLastModifiedTime(),
+                updatedServiceTemplateDetailVo.getLastModifiedTime());
+
+        // Setup unregister request
+        Response expectedResponse = Response.successResponse(Collections.singletonList(
+                String.format("Unregister service template using id %s successful.", id)));
+        // Run the test
+        final MockHttpServletResponse unregisterResponse = unregister(id);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), unregisterResponse.getStatus());
+        assertEquals(unregisterResponse.getContentAsString(),
+                objectMapper.writeValueAsString(expectedResponse));
+    }
+
+    void testFetchApisWorkWell() throws Exception {
+        // Setup fetch request
+        URL url = URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
+        Ocl ocl = oclLoader.getOcl(url);
+        // Run the test
+        final MockHttpServletResponse fetchResponse = fetch(url.toString());
+        ServiceTemplateDetailVo serviceTemplateDetailVo =
+                objectMapper.readValue(fetchResponse.getContentAsString(),
+                        ServiceTemplateDetailVo.class);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), fetchResponse.getStatus());
+        assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
+                serviceTemplateDetailVo.getServiceRegistrationState());
+        assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
+        assertEquals(ocl.getCloudServiceProvider().getName(),
+                serviceTemplateDetailVo.getCsp());
+        assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
+                serviceTemplateDetailVo.getName());
+        assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
+
+        // Setup fetch update request
+        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        UUID id = serviceTemplateDetailVo.getId();
+        // Run the test
+        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
+                objectMapper.readValue(fetchUpdateResponse.getContentAsString(),
+                        ServiceTemplateDetailVo.class);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
+        assertEquals(serviceTemplateDetailVo.getId(),
+                updatedServiceTemplateDetailVo.getId());
+        assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
+                serviceTemplateDetailVo.getNamespace() + "_update");
+        unregister(id);
+    }
+
+
+    @Test
+    @WithJwt(file = "jwt_isv.json")
+    void testManageApisThrowsException() throws Exception {
+        testManageApisThrowsServiceTemplateNotRegistered();
+        testManageApisThrowsAccessDeniedException();
+
+        testRegisterThrowsMethodArgumentNotValidException();
+        testRegisterThrowsTerraformExecutionException();
+        testRegisterThrowsInvalidValueSchemaException();
+        testRegisterThrowsServiceTemplateAlreadyRegistered();
+
+        testFetchThrowsRuntimeException();
+        testListServiceTemplatesThrowsException();
+    }
+
+    void testManageApisThrowsServiceTemplateNotRegistered() throws Exception {
+        // Setup
+        UUID uuid = UUID.randomUUID();
+        Response expectedResponse =
+                Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
+                        Collections.singletonList(
+                                String.format("Service template with id %s not found.", uuid)));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+
+        // Run the test -detail
+        final MockHttpServletResponse detailResponse = detail(uuid);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
+        assertEquals(result, detailResponse.getContentAsString());
+
+        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        // Run the test -update
+        Ocl updateOcl = oclLoader.getOcl(updateUrl);
+        final MockHttpServletResponse updateResponse = update(uuid, updateOcl);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse.getStatus());
+        assertEquals(result, updateResponse.getContentAsString());
+
+        // Run the test -fetchUpdate
+        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(uuid, updateUrl.toString());
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), fetchUpdateResponse.getStatus());
+        assertEquals(result, fetchUpdateResponse.getContentAsString());
+
+        // Run the test -unregister
+        final MockHttpServletResponse unregisterResponse = unregister(uuid);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), unregisterResponse.getStatus());
+        assertEquals(result, unregisterResponse.getContentAsString());
+    }
+
+    void testManageApisThrowsAccessDeniedException() throws Exception {
+
+        Response accessDeniedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+                Collections.singletonList("No permissions to view or manage service template "
+                        + "belonging to other namespaces."));
+        // Setup
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceTemplateApiTest-02");
+        MockHttpServletResponse response = register(ocl);
+        ServiceTemplateDetailVo serviceTemplateDetail = objectMapper.readValue(
+                response.getContentAsString(), ServiceTemplateDetailVo.class);
+        UUID uuid = serviceTemplateDetail.getId();
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(uuid);
+        serviceTemplateEntity.setNamespace("test");
+        serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
+
+        // Run the test detail
+        final MockHttpServletResponse detailResponse = detail(uuid);
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), detailResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                detailResponse.getContentAsString());
+
+        // Setup request update
+        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        // Run the test update
+        Ocl updateOcl = oclLoader.getOcl(updateUrl);
+        updateOcl.setName("serviceTemplateApiTest-02");
+        final MockHttpServletResponse updateResponse = update(uuid, updateOcl);
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), updateResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                updateResponse.getContentAsString());
+
+        // Run the test -fetchUpdate
+        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(uuid, updateUrl.toString());
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), fetchUpdateResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                fetchUpdateResponse.getContentAsString());
+
+
+        // Run the test unregister
+        final MockHttpServletResponse unregisterResponse = unregister(uuid);
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), unregisterResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                unregisterResponse.getContentAsString());
+
+        unregister(uuid);
     }
 
     void testRegisterThrowsMethodArgumentNotValidException() throws Exception {
         // Setup
-        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
-        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setFlavors(null);
-        String requestBody = yamlMapper.writeValueAsString(ocl);
-
         Response expectedResponse = Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY,
-                Collections.singletonList(
-                        "flavors:must not be null"));
-
+                Collections.singletonList("flavors:must not be null"));
         // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(post("/xpanse/service_templates")
-                                .content(requestBody).contentType("application/x-yaml")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        Response actualResponse =
-                objectMapper.readValue(response.getContentAsString(), Response.class);
-
+        final MockHttpServletResponse response = register(ocl);
         // Verify the results
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
-        Assertions.assertEquals(expectedResponse.getResultType(), actualResponse.getResultType());
-        Assertions.assertEquals(expectedResponse.getDetails(), actualResponse.getDetails());
-        Assertions.assertEquals(expectedResponse.getSuccess(), actualResponse.getSuccess());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse),
+                response.getContentAsString());
     }
 
     void testRegisterThrowsTerraformExecutionException() throws Exception {
         // Setup
-        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL());
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getDeployment().setDeployer("error_" + ocl.getDeployment().getDeployer());
-        String requestBody = yamlMapper.writeValueAsString(ocl);
         Response expectedResponse = Response.errorResponse(ResultType.TERRAFORM_EXECUTION_FAILED,
-                Collections.singletonList(
-                        "Executor Exception:TFExecutor.tfInit failed"));
+                Collections.singletonList("Executor Exception:TFExecutor.tfInit failed"));
         // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(post("/xpanse/service_templates")
-                                .content(requestBody).contentType("application/x-yaml")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        Response actualResponse =
+        final MockHttpServletResponse response = register(ocl);
+        Response responseModel =
                 objectMapper.readValue(response.getContentAsString(), Response.class);
-
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), response.getStatus());
-        Assertions.assertEquals(expectedResponse.getResultType(),
-                actualResponse.getResultType());
-        Assertions.assertFalse(actualResponse.getSuccess());
-        Assertions.assertEquals(expectedResponse.getSuccess(), actualResponse.getSuccess());
+        assertEquals(HttpStatus.BAD_GATEWAY.value(), response.getStatus());
+        assertEquals(responseModel.getResultType(), expectedResponse.getResultType());
+        assertEquals(responseModel.getSuccess(), expectedResponse.getSuccess());
     }
 
-    void testUpdate() throws Exception {
+    void testRegisterThrowsInvalidValueSchemaException() throws Exception {
         // Setup
-        ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
-        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL());
-        ocl.setIcon("https://avatars.githubusercontent.com/u/127229590?s=48&v=4");
-        String requestBody = yamlMapper.writeValueAsString(ocl);
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        DeployVariable errorVariable = new DeployVariable();
+        errorVariable.setKind(DeployVariableKind.VARIABLE);
+        errorVariable.setDataType(DeployVariableDataType.STRING);
+        errorVariable.setMandatory(true);
+        errorVariable.setName("errorVarName");
+        errorVariable.setDescription("description");
+        errorVariable.setExample("example");
+        String errorSchemaKey = "errorSchemaKey";
+        errorVariable.setValue("errorValue");
+        errorVariable.setValueSchema(Collections.singletonMap(errorSchemaKey, "errorSchemaValue"));
+        ocl.getDeployment().getVariables().add(errorVariable);
 
+        String errorMessage = String.format(
+                "Value schema key %s in deploy variable %s is invalid", errorSchemaKey,
+                errorVariable.getName());
+        Response expectedResponse =
+                Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+                        Collections.singletonList(errorMessage));
         // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(put("/xpanse/service_templates/{id}", id)
-                                .content(requestBody).contentType("application/x-yaml")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
-                objectMapper.readValue(response.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
+        final MockHttpServletResponse response = register(ocl);
+        Response responseModel =
+                objectMapper.readValue(response.getContentAsString(), Response.class);
         // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                updatedServiceTemplateDetailVo.getServiceRegistrationState());
-        Assertions.assertEquals(id, updatedServiceTemplateDetailVo.getId().toString());
-        Assertions.assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
-                serviceTemplateDetailVo.getNamespace() + "_update");
-        Assertions.assertNotEquals(
-                updatedServiceTemplateDetailVo.getDeployment().getDeployer(),
-                serviceTemplateDetailVo.getDeployment().getDeployer());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(responseModel.getResultType(), expectedResponse.getResultType());
+        assertEquals(responseModel.getSuccess(), expectedResponse.getSuccess());
+        assertEquals(responseModel.getDetails(), expectedResponse.getDetails());
     }
 
-    void testUpdateThrowsException() throws Exception {
+    void testRegisterThrowsServiceTemplateAlreadyRegistered() throws Exception {
         // Setup
-        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL());
-        String requestBody = yamlMapper.writeValueAsString(ocl);
-        String uuid = UUID.randomUUID().toString();
-        Response expectedResponse = Response.errorResponse(
-                ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
-                Collections.singletonList(
-                        String.format("Service template with id %s not found.", uuid)));
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceTemplateApiTest-03");
+        MockHttpServletResponse response = register(ocl);
+        ServiceTemplateDetailVo serviceTemplateDetail = objectMapper.readValue(
+                response.getContentAsString(), ServiceTemplateDetailVo.class);
+        Response expectedResponse =
+                Response.errorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
+                        Collections.singletonList(
+                                String.format("Service template already registered with id %s",
+                                        serviceTemplateDetail.getId())));
+        String result = objectMapper.writeValueAsString(expectedResponse);
         // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(put("/xpanse/service_templates/{id}", uuid)
-                                .content(requestBody).contentType("application/x-yaml")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
+        final MockHttpServletResponse registerSameResponse = register(ocl);
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        Assertions.assertEquals(response.getContentAsString(),
-                objectMapper.writeValueAsString(expectedResponse));
+        assertEquals(HttpStatus.BAD_REQUEST.value(), registerSameResponse.getStatus());
+        assertEquals(registerSameResponse.getContentAsString(), result);
+        unregister(serviceTemplateDetail.getId());
     }
 
-    void testFetchThrowsException() throws Exception {
+    void testFetchThrowsRuntimeException() throws Exception {
         // Setup
         String fileUrl =
-                URI.create("file:src/test/resources/ocl_test_update.yaml").toURL().toString();
+                URI.create("file:src/test/resources/ocl_terraform_error.yml").toURL().toString();
         Response expectedResponse = Response.errorResponse(ResultType.RUNTIME_ERROR,
                 Collections.singletonList("java.io.FileNotFoundException:"));
 
         // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(post("/xpanse/service_templates/file")
-                                .param("oclLocation", fileUrl)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+        final MockHttpServletResponse response = fetch(fileUrl);
         Response responseModel =
                 objectMapper.readValue(response.getContentAsString(), Response.class);
-
         // Verify the results
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
-        Assertions.assertEquals(responseModel.getResultType(), expectedResponse.getResultType());
-        Assertions.assertEquals(responseModel.getSuccess(), expectedResponse.getSuccess());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
+        assertEquals(responseModel.getResultType(), expectedResponse.getResultType());
+        assertEquals(responseModel.getSuccess(), expectedResponse.getSuccess());
     }
 
-    void testFetchUpdateThrowsException() throws Exception {
-        // Setup
-        String fileUrl =
-                URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL().toString();
-        String uuid = UUID.randomUUID().toString();
-        Response expectedResponse = Response.errorResponse(
-                ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
-                Collections.singletonList(
-                        String.format("Service template with id %s not found.", uuid)));
-
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(put("/xpanse/service_templates/file/{id}", uuid)
-                                .param("oclLocation", fileUrl)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        Assertions.assertEquals(response.getContentAsString(),
-                objectMapper.writeValueAsString(expectedResponse));
-    }
-
-
-    void testUnregister() throws Exception {
-        // Setup
-        Response expectedResponse = Response.successResponse(
-                Collections.singletonList(
-                        String.format("Unregister service template using id %s successful.",
-                                id)));
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(delete("/xpanse/service_templates/{id}", id)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(response.getContentAsString(),
-                objectMapper.writeValueAsString(expectedResponse));
-    }
-
-    void testUnregisterThrowsException() throws Exception {
-        // Setup
-        String uuid = UUID.randomUUID().toString();
-        Response expectedResponse = Response.errorResponse(
-                ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
-                Collections.singletonList(
-                        String.format("Service template with id %s not found.", uuid)));
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(delete("/xpanse/service_templates/{id}", uuid)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        Assertions.assertEquals(response.getContentAsString(),
-                objectMapper.writeValueAsString(expectedResponse));
-    }
-
-    void testListRegisteredServices() throws Exception {
-        List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(
-                serviceTemplateDetailVo);
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/service_templates")
-                        .param("categoryName", "middleware")
-                        .param("cspName", "huawei")
-                        .param("serviceName", "kafka-cluster")
-                        .param("serviceVersion", "v3.3.2")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertThat(serviceTemplateDetailVos).usingRecursiveFieldByFieldElementComparatorIgnoringFields("lastModifiedTime").isEqualTo(
-                Arrays.stream(objectMapper.readValue(response.getContentAsString(), ServiceTemplateDetailVo[].class)).toList());
-    }
-
-    void testListRegisteredServicesThrowsException() throws Exception {
+    void testListServiceTemplatesThrowsException() throws Exception {
         // Setup
         String errorMessage = "Failed to convert value of type 'java.lang.String' to required type";
         Response expectedResponse =
                 Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY, List.of(errorMessage));
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/service_templates")
-                        .param("categoryName", Category.AI.toValue())
-                        .param("cspName", "errorCspName")
-                        .param("serviceName", "kafka-cluster")
-                        .param("serviceVersion", "v3.3.2")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                listServiceTemplatesWithParams("errorCategory", null, null, null, null, null);
         Response resultResponse =
                 objectMapper.readValue(response.getContentAsString(), Response.class);
 
         // Verify the results
-        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
-        Assertions.assertFalse(resultResponse.getSuccess());
-        Assertions.assertEquals(expectedResponse.getSuccess(), resultResponse.getSuccess());
-        Assertions.assertEquals(expectedResponse.getResultType(), resultResponse.getResultType());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
+        assertEquals(expectedResponse.getSuccess(), resultResponse.getSuccess());
+        assertEquals(expectedResponse.getResultType(), resultResponse.getResultType());
     }
 
+    MockHttpServletResponse register(Ocl ocl) throws Exception {
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        String requestBody = yamlMapper.writeValueAsString(ocl);
+        return mockMvc.perform(post("/xpanse/service_templates").content(requestBody)
+                        .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON)).andReturn()
+                .getResponse();
+    }
 
-    void testListRegisteredServicesReturnsNoItems() throws Exception {
-        // Setup
-        String result = "[]";
+    MockHttpServletResponse update(UUID id, Ocl ocl) throws Exception {
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        String requestBody = yamlMapper.writeValueAsString(ocl);
+        return mockMvc.perform(put("/xpanse/service_templates/{id}", id).content(requestBody)
+                        .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON)).andReturn()
+                .getResponse();
+    }
 
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/service_templates")
-                        .param("categoryName", "middleware")
-                        .param("cspName", "aws")
-                        .param("serviceName", "kafka-cluster")
-                        .param("serviceVersion", "v3.3.2")
-                        .accept(MediaType.APPLICATION_JSON))
+    MockHttpServletResponse fetch(String url) throws Exception {
+        return mockMvc.perform(post("/xpanse/service_templates/file").param("oclLocation", url)
+                .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+    }
+
+    MockHttpServletResponse fetchUpdate(UUID id, String url) throws Exception {
+        return mockMvc.perform(
+                put("/xpanse/service_templates/file/{id}", id).param("oclLocation", url)
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+    }
+
+    MockHttpServletResponse detail(UUID id) throws Exception {
+        return mockMvc.perform(
+                        get("/xpanse/service_templates/{id}", id).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
     }
 
-
-    void testDetail() throws Exception {
-        // Setup
-        String result = objectMapper.writeValueAsString(serviceTemplateDetailVo);
-
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/service_templates/{id}", id)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
+    MockHttpServletResponse unregister(UUID id) throws Exception {
+        return mockMvc.perform(
+                        delete("/xpanse/service_templates/{id}", id).accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
     }
 
-    void testDetailThrowsException() throws Exception {
-        // Setup
-        String uuid = UUID.randomUUID().toString();
-        Response expectedResponse = Response.errorResponse(
-                ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
-                Collections.singletonList(
-                        String.format("Service template with id %s not found.", uuid)));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/service_templates/{id}", uuid)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
+    MockHttpServletResponse listServiceTemplatesWithParams(String categoryName, String cspName,
+                                                           String serviceName,
+                                                           String serviceVersion,
+                                                           String serviceHostingType,
+                                                           String serviceRegistrationState)
+            throws Exception {
+        MockHttpServletRequestBuilder getRequestBuilder = get("/xpanse/service_templates");
+        if (StringUtils.isNotBlank(categoryName)) {
+            getRequestBuilder = getRequestBuilder.param("categoryName", categoryName);
+        }
+        if (StringUtils.isNotBlank(cspName)) {
+            getRequestBuilder = getRequestBuilder.param("cspName", cspName);
+        }
+        if (StringUtils.isNotBlank(serviceName)) {
+            getRequestBuilder = getRequestBuilder.param("serviceName", serviceName);
+        }
+        if (StringUtils.isNotBlank(serviceVersion)) {
+            getRequestBuilder = getRequestBuilder.param("serviceVersion", serviceVersion);
+        }
+        if (StringUtils.isNotBlank(serviceHostingType)) {
+            getRequestBuilder = getRequestBuilder.param("serviceHostingType", serviceHostingType);
+        }
+        if (StringUtils.isNotBlank(serviceRegistrationState)) {
+            getRequestBuilder =
+                    getRequestBuilder.param("serviceRegistrationState", serviceRegistrationState);
+        }
+        return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
     }
 
-    void testFetch() throws Exception {
-        // Setup
-        String fileUrl = URI.create("file:src/test/resources/ocl_test.yaml").toURL().toString();
-
-        // Run the test
-        final MockHttpServletResponse fetchResponse =
-                mockMvc.perform(post("/xpanse/service_templates/file")
-                                .param("oclLocation", fileUrl)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        serviceTemplateDetailVo =
-                objectMapper.readValue(fetchResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
-        id = serviceTemplateDetailVo.getId().toString();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), fetchResponse.getStatus());
-        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                serviceTemplateDetailVo.getServiceRegistrationState());
-        Assertions.assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
-        Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
-                serviceTemplateDetailVo.getCsp());
-        Assertions.assertEquals(ocl.getName().toLowerCase(Locale.ROOT),
-                serviceTemplateDetailVo.getName());
-        Assertions.assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
-    }
-
-    void testFetchUpdate() throws Exception {
-        // Setup
-        String fileUrl = URI.create("file:src/test/resources/ocl_test_dummy.yaml").toURL().toString();
-
-        // Run the test
-        final MockHttpServletResponse fetchUpdateResponse =
-                mockMvc.perform(put("/xpanse/service_templates/file/{id}", id)
-                                .param("oclLocation", fileUrl)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
-                objectMapper.readValue(fetchUpdateResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
-        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                updatedServiceTemplateDetailVo.getServiceRegistrationState());
-        Assertions.assertEquals(id, updatedServiceTemplateDetailVo.getId().toString());
-        Assertions.assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
-                serviceTemplateDetailVo.getNamespace() + "_update");
-        Assertions.assertNotEquals(
-                updatedServiceTemplateDetailVo.getDeployment().getDeployer(),
-                serviceTemplateDetailVo.getDeployment().getDeployer());
-    }
 }

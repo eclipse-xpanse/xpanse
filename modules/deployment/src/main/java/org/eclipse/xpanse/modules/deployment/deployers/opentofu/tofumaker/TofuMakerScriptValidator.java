@@ -7,7 +7,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,8 +18,6 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDeployWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.OpenTofuProviderHelper;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.slf4j.MDC;
@@ -38,7 +36,6 @@ public class TofuMakerScriptValidator {
     private final OpenTofuFromScriptsApi openTofuFromScriptsApi;
     private final OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
     private final TofuMakerHelper tofuMakerHelper;
-    private final OpenTofuProviderHelper openTofuProviderHelper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -46,12 +43,10 @@ public class TofuMakerScriptValidator {
      */
     public TofuMakerScriptValidator(OpenTofuFromScriptsApi openTofuFromScriptsApi,
                                     OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
-                                    TofuMakerHelper tofuMakerHelper,
-                                    OpenTofuProviderHelper openTofuProviderHelper) {
+                                    TofuMakerHelper tofuMakerHelper) {
         this.openTofuFromScriptsApi = openTofuFromScriptsApi;
         this.openTofuFromGitRepoApi = openTofuFromGitRepoApi;
         this.tofuMakerHelper = tofuMakerHelper;
-        this.openTofuProviderHelper = openTofuProviderHelper;
     }
 
     /**
@@ -122,10 +117,7 @@ public class TofuMakerScriptValidator {
     }
 
     private List<String> getFilesByOcl(Ocl ocl) {
-        Csp csp = ocl.getCloudServiceProvider().getName();
-        String region = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
-        String provider = openTofuProviderHelper.getProvider(csp, region);
         String deployer = ocl.getDeployment().getDeployer();
-        return Arrays.asList(provider, deployer);
+        return Collections.singletonList(deployer);
     }
 }

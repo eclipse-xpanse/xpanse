@@ -83,20 +83,20 @@ class ServiceMetricsAdapterTest {
         deployResourceEntity.setKind(DeployResourceKind.VM);
         deployResourceEntity.setProperties(Map.ofEntries(Map.entry("value", "value")));
         deployServiceEntity.setDeployResourceList(List.of(deployResourceEntity));
-        when(mockDeployServiceStorage.findDeployServiceById(eq(UUID.fromString(serviceId))))
-                .thenReturn(deployServiceEntity);
+        when(mockDeployServiceStorage.findDeployServiceById(
+                eq(UUID.fromString(serviceId)))).thenReturn(deployServiceEntity);
         when(mockPluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(
                 getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
         when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
         // Run the test
         final List<Metric> result =
-                serviceMetricsAdapterUnderTest.getMetricsByServiceId(serviceId,
-                        null, null, null, null, true);
+                serviceMetricsAdapterUnderTest.getMetricsByServiceId(serviceId, null, null, null,
+                        null, true);
 
         final List<Metric> result1 =
-                serviceMetricsAdapterUnderTest.getMetricsByServiceId(serviceId,
-                        null, null, null, null, false);
+                serviceMetricsAdapterUnderTest.getMetricsByServiceId(serviceId, null, null, null,
+                        null, false);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -111,25 +111,22 @@ class ServiceMetricsAdapterTest {
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setKind(DeployResourceKind.PUBLIC_IP);
         deployResourceEntity.setResourceId(resourceId);
-        when(mockDeployResourceStorage.findDeployResourceByResourceId(eq(resourceId)))
-                .thenReturn(deployResourceEntity);
+        when(mockDeployResourceStorage.findDeployResourceByResourceId(eq(resourceId))).thenReturn(
+                deployResourceEntity);
 
         Assertions.assertThrows(ResourceNotSupportedForMonitoringException.class,
                 () -> serviceMetricsAdapterUnderTest.getMetricsByResourceId(resourceId, null, null,
-                        null, null,
-                        false));
+                        null, null, false));
 
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> serviceMetricsAdapterUnderTest.getMetricsByResourceId(
-                        UUID.randomUUID().toString(), null,
-                        Long.MAX_VALUE, Long.MAX_VALUE, null,
+                        UUID.randomUUID().toString(), null, Long.MAX_VALUE, Long.MAX_VALUE, null,
                         false));
 
         // Verify the results
         Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> serviceMetricsAdapterUnderTest.getMetricsByResourceId("id", null, null, null,
-                        null,
-                        false));
+                        null, false));
     }
 
     @Test
@@ -155,13 +152,13 @@ class ServiceMetricsAdapterTest {
         deployService.setDeployResourceList(List.of(new DeployResourceEntity()));
         deployResourceEntity.setDeployService(deployService);
         deployResourceEntity.setProperties(Map.ofEntries(Map.entry("value", "value")));
-        when(mockDeployResourceStorage.findDeployResourceByResourceId(eq(resourceId)))
-                .thenReturn(deployResourceEntity);
+        when(mockDeployResourceStorage.findDeployResourceByResourceId(eq(resourceId))).thenReturn(
+                deployResourceEntity);
         when(mockPluginManager.getOrchestratorPlugin(Csp.HUAWEI)).thenReturn(
                 getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
-        when(mockDeployServiceStorage.findDeployServiceById(eq(UUID.fromString(serviceId))))
-                .thenReturn(deployService);
+        when(mockDeployServiceStorage.findDeployServiceById(
+                eq(UUID.fromString(serviceId)))).thenReturn(deployService);
         when(mockPluginManager.getOrchestratorPlugin(Csp.HUAWEI)).thenReturn(
                 getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
@@ -169,13 +166,11 @@ class ServiceMetricsAdapterTest {
         // Run the test
         final List<Metric> result =
                 serviceMetricsAdapterUnderTest.getMetricsByResourceId(resourceId, null, null, null,
-                        null,
-                        true);
+                        null, true);
 
         final List<Metric> result1 =
                 serviceMetricsAdapterUnderTest.getMetricsByResourceId(resourceId, null, null, null,
-                        null,
-                        false);
+                        null, false);
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
 
@@ -187,29 +182,20 @@ class ServiceMetricsAdapterTest {
         long currentTimeMillis = System.currentTimeMillis();
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> serviceMetricsAdapterUnderTest.getMetricsByServiceId(
-                        UUID.randomUUID().toString(), null,
-                        currentTimeMillis, 1L, null,
-                        false));
+                        UUID.randomUUID().toString(), null, currentTimeMillis, 1L, null, false));
 
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> serviceMetricsAdapterUnderTest.getMetricsByServiceId(
-                        UUID.randomUUID().toString(), null,
-                        currentTimeMillis + 3000, currentTimeMillis + 5000, null,
-                        false));
+                        UUID.randomUUID().toString(), null, currentTimeMillis + 3000,
+                        currentTimeMillis + 5000, null, false));
 
         Assertions.assertThrows(ServiceNotDeployedException.class,
                 () -> serviceMetricsAdapterUnderTest.getMetricsByServiceId(
-                        UUID.randomUUID().toString(), null,
-                        null, null, null,
-                        false));
+                        UUID.randomUUID().toString(), null, null, null, null, false));
     }
 
     private OrchestratorPlugin getOrchestratorPlugin(Csp csp, List<Metric> metrics) {
         return new OrchestratorPlugin() {
-            @Override
-            public String getProvider(DeployerKind deployerKind, String region) {
-                return null;
-            }
 
             @Override
             public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
@@ -225,6 +211,7 @@ class ServiceMetricsAdapterTest {
             public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
                 return true;
             }
+
             @Override
             public Csp getCsp() {
                 return csp;
@@ -252,7 +239,7 @@ class ServiceMetricsAdapterTest {
 
             @Override
             public List<String> getExistingResourcesOfType(String userId, String region,
-                    DeployResourceKind kind) {
+                                                           DeployResourceKind kind) {
                 return new ArrayList<>();
             }
 
@@ -263,8 +250,7 @@ class ServiceMetricsAdapterTest {
             }
 
             @Override
-            public List<Metric> getMetricsForService(
-                    ServiceMetricsRequest serviceMetricRequest) {
+            public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
                 return metrics;
             }
         };

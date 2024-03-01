@@ -70,7 +70,7 @@ public class ExistingCloudResourcesApi {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         if (StringUtils.isEmpty(userIdOptional.get())) {
             throw new AccessDeniedException(
-                    "No permissions to view details of services belonging to other users.");
+                    "No permissions to view resources of services belonging to other users.");
         }
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
         return orchestratorPlugin.getExistingResourcesOfType(userIdOptional.get(), region,

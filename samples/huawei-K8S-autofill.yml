@@ -74,7 +74,7 @@ deployment:
   # The parameters will be used to generate the API of the managed service.
   variables:
     - name: admin_passwd
-      description: The admin password of all nodes in the K8S cluster. If the value is empty, will create a random password.
+      description: The admin password of all nodes in the K8S cluster instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -83,7 +83,7 @@ deployment:
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
     - name: vpc_name
-      description: The vpc name of all nodes in the K8S cluster. If the value is empty, will use the default value to find or create VPC.
+      description: The vpc name of all nodes in the K8S cluster instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
       example: "k8s-vpc-default"
@@ -93,7 +93,7 @@ deployment:
         deployResourceKind: vpc
         isAllowCreate: false
     - name: subnet_name
-      description: The sub network name of all nodes in the K8S cluster. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of all nodes in the K8S cluster instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
       example: "k8s-subnet-default"
@@ -103,7 +103,7 @@ deployment:
         deployResourceKind: subnet
         isAllowCreate: false
     - name: secgroup_name
-      description: The security group name of all nodes in the K8S cluster. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of all nodes in the K8S cluster instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
       example: "k8s-secgroup-default"
@@ -116,37 +116,57 @@ deployment:
     variable "flavor_id" {
       type        = string
       default     = "s6.large.2"
-      description = "The flavor_id of all nodes in the k8s cluster."
+      description = "The flavor_id of all nodes in the K8S cluster instance."
     }
 
     variable "worker_nodes_count" {
       type        = string
       default     = 3
-      description = "The worker nodes count in the k8s cluster."
+      description = "The worker nodes count in the K8S cluster instance."
     }
 
     variable "admin_passwd" {
       type        = string
       default     = ""
-      description = "The root password of all nodes in the k8s cluster."
+      description = "The root password of all nodes in the K8S cluster instance."
     }
 
     variable "vpc_name" {
       type        = string
       default     = "k8s-vpc-default"
-      description = "The vpc name of all nodes in the k8s cluster."
+      description = "The vpc name of all nodes in the K8S cluster instance."
     }
 
     variable "subnet_name" {
       type        = string
       default     = "k8s-subnet-default"
-      description = "The subnet name of all nodes in the k8s cluster."
+      description = "The subnet name of all nodes in the K8S cluster instance."
     }
 
     variable "secgroup_name" {
       type        = string
       default     = "k8s-secgroup-default"
-      description = "The security group name of all nodes in the k8s cluster."
+      description = "The security group name of all nodes in the K8S cluster instance."
+    }
+    
+    
+    variable "region" {
+      type        = string
+      default     = "cn-southwest-2"
+      description = "The region to deploy the K8S cluster instance."
+    }
+    
+    terraform {
+      required_providers {
+        huaweicloud = {
+          source  = "huaweicloud/huaweicloud"
+          version = "~> 1.61.0"
+        }
+      }
+    }
+    
+    provider "huaweicloud" {
+      region = var.region
     }
 
     data "huaweicloud_vpcs" "existing" {

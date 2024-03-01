@@ -76,7 +76,7 @@ deployment:
   # The parameters will be used to generate the API of the managed service.
   variables:
     - name: admin_passwd
-      description: The admin password of the compute. If the value is empty, will create a random password.
+      description: The admin password of the compute instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -85,28 +85,28 @@ deployment:
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
     - name: image_name
-      description: The image name of the compute. If the value is empty, will use the default value to create compute instance.
+      description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
       kind: variable
       dataType: string
       example: "Ubuntu 22.04 server 64bit"
       mandatory: false
       value: "Ubuntu 22.04 server 64bit"
     - name: vpc_name
-      description: The vpc name of the compute. If the value is empty, will use the default value to find or create VPC.
+      description: The vpc name of the compute instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
       example: "ecs-vpc-default"
       mandatory: false
       value: "ecs-vpc-default"
     - name: subnet_name
-      description: The sub network name of the compute. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of the compute instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
       example: "ecs-subnet-default"
       mandatory: false
       value: "ecs-subnet-default"
     - name: secgroup_name
-      description: The security group name of the compute. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of the compute instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
       example: "ecs-secgroup-default"

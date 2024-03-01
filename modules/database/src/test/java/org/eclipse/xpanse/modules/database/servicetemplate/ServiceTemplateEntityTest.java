@@ -44,7 +44,7 @@ class ServiceTemplateEntityTest {
     @BeforeEach
     void setUp() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
+        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
                 new ServiceVariablesJsonSchemaGenerator();
         jsonObjectSchema = serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(

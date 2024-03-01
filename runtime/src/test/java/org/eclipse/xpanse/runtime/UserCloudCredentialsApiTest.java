@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,6 +47,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
  * Test for UserCloudCredentialsApi.
  */
 @ExtendWith(SpringExtension.class)
+@Transactional
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

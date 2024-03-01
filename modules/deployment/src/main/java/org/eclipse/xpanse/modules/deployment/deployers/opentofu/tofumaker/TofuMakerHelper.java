@@ -7,7 +7,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +17,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenT
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.config.TofuMakerConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuScriptGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.WebhookConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.OpenTofuProviderHelper;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -37,7 +35,6 @@ public class TofuMakerHelper {
 
     private static final String SPLIT = "/";
     private final TofuMakerConfig tofuMakerConfig;
-    private final OpenTofuProviderHelper openTofuProviderHelper;
     private final DeployEnvironments deployEnvironments;
     @Value("${server.port}")
     private String port;
@@ -46,10 +43,8 @@ public class TofuMakerHelper {
      * Constructor for OpenTofuMakerHelper.
      */
     public TofuMakerHelper(TofuMakerConfig tofuMakerConfig,
-                           OpenTofuProviderHelper openTofuProviderHelper,
                            DeployEnvironments deployEnvironments) {
         this.tofuMakerConfig = tofuMakerConfig;
-        this.openTofuProviderHelper = openTofuProviderHelper;
         this.deployEnvironments = deployEnvironments;
     }
 
@@ -70,11 +65,8 @@ public class TofuMakerHelper {
      * Returns all openTofu script files.
      */
     public List<String> getFiles(DeployTask task) {
-        Csp csp = task.getDeployRequest().getCsp();
-        String region = task.getDeployRequest().getRegion();
-        String provider = openTofuProviderHelper.getProvider(csp, region);
         String deployer = task.getOcl().getDeployment().getDeployer();
-        return Arrays.asList(provider, deployer);
+        return Collections.singletonList(deployer);
     }
 
     /**

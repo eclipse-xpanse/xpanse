@@ -219,7 +219,7 @@ public class ServiceStateManager {
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No permissions to start service by service id.");
+                    "No permissions to start service belonging to other users.");
         }
     }
 

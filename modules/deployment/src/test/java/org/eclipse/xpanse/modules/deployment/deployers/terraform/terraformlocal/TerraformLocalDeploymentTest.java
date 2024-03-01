@@ -28,11 +28,9 @@ import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TerraformProviderHelper;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
@@ -63,8 +61,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = {TerraformLocalDeployment.class, DeployEnvironments.class,
         PluginManager.class, TerraformLocalConfig.class, DeployService.class,
-        TaskConfiguration.class, ResourceHandlerManager.class, TerraformProviderHelper.class,
-        ScriptsGitRepoManage.class})
+        TaskConfiguration.class, ResourceHandlerManager.class, ScriptsGitRepoManage.class})
 class TerraformLocalDeploymentTest {
 
     private final UUID id = UUID.randomUUID();
@@ -102,7 +99,7 @@ class TerraformLocalDeploymentTest {
     @BeforeEach
     void setUp() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
+        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
@@ -116,22 +113,6 @@ class TerraformLocalDeploymentTest {
 
         doReturn(new HashMap<>()).when(this.deployEnvironments)
                 .getCredentialVariablesByHostingType(any(), any(), any(), any());
-
-        doReturn("""
-                    terraform {
-                      required_providers {
-                        huaweicloud = {
-                          source = "huaweicloud/huaweicloud"
-                          version = "~>1.51.0"
-                        }
-                      }
-                    }
-                                
-                    provider "huaweicloud" {
-                      region = "test"
-                    }
-                """).when(this.pluginManager)
-                .getDeployerProvider(any(Csp.class), any(DeployerKind.class), any());
     }
 
     @Test

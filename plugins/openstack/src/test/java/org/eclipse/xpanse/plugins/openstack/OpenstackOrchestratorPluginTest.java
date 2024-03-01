@@ -26,17 +26,14 @@ import org.eclipse.xpanse.plugins.openstack.manage.OpenStackResourceManager;
 import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class OpenstackOrchestratorPluginTest {
-    private final String terraformOpenStackVersion = "1.52.1";
     @Mock
     private OpenstackTerraformResourceHandler mockOpenstackTerraformResourceHandler;
     @Mock
@@ -47,45 +44,34 @@ class OpenstackOrchestratorPluginTest {
     private OpenStackResourceManager mockOpenStackResourceManager;
 
     @InjectMocks
-    private OpenstackOrchestratorPlugin openstackOrchestratorPluginUnderTest;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(openstackOrchestratorPluginUnderTest,
-                "terraformOpenStackVersion", terraformOpenStackVersion);
-    }
+    private OpenstackOrchestratorPlugin plugin;
 
     @Test
     void testGetResourceHandler() {
-        assertThat(
-                openstackOrchestratorPluginUnderTest.resourceHandlers().get(DeployerKind.TERRAFORM))
+        assertThat(plugin.resourceHandlers().get(DeployerKind.TERRAFORM))
                 .isEqualTo(mockOpenstackTerraformResourceHandler);
     }
 
     @Test
     void testGetCsp() {
-        assertThat(openstackOrchestratorPluginUnderTest.getCsp()).isEqualTo(Csp.OPENSTACK);
+        assertThat(plugin.getCsp()).isEqualTo(Csp.OPENSTACK);
     }
 
     @Test
     void testRequiredProperties() {
-        assertThat(openstackOrchestratorPluginUnderTest.requiredProperties())
-                .isEqualTo(Collections.emptyList());
+        assertThat(plugin.requiredProperties()).isEqualTo(Collections.emptyList());
     }
 
     @Test
     void testGetAvailableCredentialTypes() {
-        assertThat(openstackOrchestratorPluginUnderTest.getAvailableCredentialTypes())
-                .isEqualTo(List.of(CredentialType.VARIABLES));
+        assertThat(plugin.getAvailableCredentialTypes()).isEqualTo(List.of(CredentialType.VARIABLES));
     }
 
     @Test
     void testGetCredentialDefinitions() {
         // Setup
         // Run the test
-        final List<AbstractCredentialInfo> result =
-                openstackOrchestratorPluginUnderTest.getCredentialDefinitions();
-
+        final List<AbstractCredentialInfo> result = plugin.getCredentialDefinitions();
         // Verify the results
         assertFalse(result.isEmpty());
     }
@@ -132,7 +118,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final List<Metric> result =
-                openstackOrchestratorPluginUnderTest.getMetricsForResource(resourceMetricRequest);
+                plugin.getMetricsForResource(resourceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -167,7 +153,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final List<Metric> result =
-                openstackOrchestratorPluginUnderTest.getMetricsForResource(resourceMetricRequest);
+                plugin.getMetricsForResource(resourceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -215,7 +201,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final List<Metric> result =
-                openstackOrchestratorPluginUnderTest.getMetricsForService(serviceMetricRequest);
+                plugin.getMetricsForService(serviceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -250,31 +236,10 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final List<Metric> result =
-                openstackOrchestratorPluginUnderTest.getMetricsForService(serviceMetricRequest);
+                plugin.getMetricsForService(serviceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
-    }
-
-    @Test
-    void testGetProvider() {
-        String region = "region";
-        String result = String.format("""
-                terraform {
-                  required_providers {
-                    openstack = {
-                          source  = "terraform-provider-openstack/openstack"
-                          version = "%s"
-                        }
-                  }
-                }
-                            
-                provider "openstack" {
-                  region = "%s"
-                }
-                """, terraformOpenStackVersion, region);
-        assertThat(openstackOrchestratorPluginUnderTest.getProvider(DeployerKind.TERRAFORM,
-                "region")).isEqualTo(result);
     }
 
     @Test
@@ -301,7 +266,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.startService(serviceStateManageRequest);
+                plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -331,7 +296,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.startService(serviceStateManageRequest);
+                plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -361,7 +326,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.stopService(serviceStateManageRequest);
+                plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -391,7 +356,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.stopService(serviceStateManageRequest);
+                plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -421,7 +386,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.restartService(serviceStateManageRequest);
+                plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -451,7 +416,7 @@ class OpenstackOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                openstackOrchestratorPluginUnderTest.restartService(serviceStateManageRequest);
+                plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();

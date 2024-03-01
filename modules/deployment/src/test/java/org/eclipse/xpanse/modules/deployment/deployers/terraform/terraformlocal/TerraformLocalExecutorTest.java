@@ -7,7 +7,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.SCRIPT_FILE_NAME;
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.VERSION_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,7 +44,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class TerraformLocalExecutorTest {
     private static final String workspace =
             System.getProperty("java.io.tmpdir") + "/terraform_workspace/" + UUID.randomUUID();
-    private static final String version = "~> 1.51.0";
     @Mock
     private Map<String, String> mockEnv;
     @Mock
@@ -55,31 +53,13 @@ class TerraformLocalExecutorTest {
     @BeforeAll
     static void initWorkSpace() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl =
-                oclLoader.getOcl(URI.create("file:src/test/resources/terraform_test.yaml").toURL());
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         String script = ocl.getDeployment().getDeployer();
         File ws = new File(workspace);
         ws.mkdirs();
-        String verScript = String.format("""
-                        terraform {
-                          required_providers {
-                            huaweicloud = {
-                              source = "huaweicloud/huaweicloud"
-                              version = "%s"
-                            }
-                          }
-                        }
-                                    
-                        provider "huaweicloud" {
-                          region = "%s"
-                        }
-                        """, version,
-                ocl.getCloudServiceProvider().getRegions().getFirst().getName());
-        String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
-        try (FileWriter verWriter = new FileWriter(verScriptPath);
-             FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(verScript);
+        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(script);
         }
     }
@@ -99,7 +79,8 @@ class TerraformLocalExecutorTest {
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(Collections.emptyList());
         // Run the test
-        final DeploymentScriptValidationResult result = terraformLocalExecutorUnderTest.tfValidate();
+        final DeploymentScriptValidationResult result =
+                terraformLocalExecutorUnderTest.tfValidate();
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -203,7 +184,8 @@ class TerraformLocalExecutorTest {
     void testGetImportantFilesContent() throws Exception {
         // Setup
         // Run the test
-        final Map<String, String> result = terraformLocalExecutorUnderTest.getImportantFilesContent();
+        final Map<String, String> result =
+                terraformLocalExecutorUnderTest.getImportantFilesContent();
         // Verify the results
         assertTrue(result.containsKey("terraform.tfstate.backup"));
 

@@ -31,7 +31,6 @@ import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceMa
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,9 +48,6 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Resource
     private FlexibleEngineResourceManager flexibleEngineResourceManager;
 
-    @Value("${terraform.provider.flexibleengine.version}")
-    private String terraformFlexibleEngineVersion;
-
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
@@ -62,7 +58,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourcesOfType(String userId, String region,
-            DeployResourceKind kind) {
+                                                   DeployResourceKind kind) {
         return flexibleEngineResourceManager.getExistingResourcesOfType(userId, region, kind);
     }
 
@@ -142,25 +138,5 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         return flexibleEngineVmStateManagerService.restartService(serviceStateManageRequest);
-    }
-
-    @Override
-    public String getProvider(DeployerKind deployerKind, String region) {
-        return switch (deployerKind) {
-            case OPEN_TOFU, TERRAFORM -> String.format("""
-                    terraform {
-                      required_providers {
-                        flexibleengine = {
-                          source  = "FlexibleEngineCloud/flexibleengine"
-                          version = "%s"
-                        }
-                      }
-                    }
-                                
-                    provider "flexibleengine" {
-                      region = "%s"
-                    }
-                    """, terraformFlexibleEngineVersion, region);
-        };
     }
 }

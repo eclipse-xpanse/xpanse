@@ -1,9 +1,9 @@
 # The version of the Xpanse description language
 version: 1.0
 # The category of the service.
-category: compute
+category: others
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: terraform-ecs-from-git-repo
+name: opentofu-test
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
@@ -30,12 +30,6 @@ billing:
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: flavor-error-test
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 10
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: s7.small.1
   - name: 2vCPUs-4GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 20
@@ -48,19 +42,6 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: s6.large.4
-  - name: 4vCPUs-8GB-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: s6.xlarge.2
-  - name: 4vCPUs-16GB-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 50
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: s6.xlarge.4
-# The contact details of the service.
 serviceProviderContactDetails:
   email: [ "test@test.com" ]
 deployment:
@@ -76,7 +57,7 @@ deployment:
   # The parameters will be used to generate the API of the managed service.
   variables:
     - name: admin_passwd
-      description: The admin password of the compute instance. If the value is empty, will create a random password.
+      description: The admin password of the service instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -84,35 +65,111 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
-    - name: image_name
-      description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
-      kind: variable
-      dataType: string
-      example: "Ubuntu 22.04 server 64bit"
-      mandatory: false
-      value: "Ubuntu 22.04 server 64bit"
     - name: vpc_name
-      description: The vpc name of the compute instance. If the value is empty, will use the default value to find or create VPC.
+      description: The vpc name of the service instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
-      example: "ecs-vpc-default"
+      example: "vpc-default"
       mandatory: false
-      value: "ecs-vpc-default"
+      value: "vpc-default"
     - name: subnet_name
-      description: The sub network name of the compute instance. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of the service instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
-      example: "ecs-subnet-default"
+      example: "subnet-default"
       mandatory: false
-      value: "ecs-subnet-default"
+      value: "subnet-default"
     - name: secgroup_name
-      description: The security group name of the compute instance. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of the service instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
-      example: "ecs-secgroup-default"
+      example: "secgroup-default"
       mandatory: false
-      value: "ecs-secgroup-default"
-  scriptsRepo:
-    repoUrl: https://github.com/baixinsui/xpanse-samples.git
-    branch: main
-    scriptsPath: huaweicloud/compute/ecs
+      value: "secgroup-default"
+  deployer: |
+    variable "flavor_id" {
+      type        = string
+      default     = "s6.large.2"
+      description = "The flavor id of the service instance."
+    }
+
+    variable "admin_passwd" {
+      type        = string
+      default     = ""
+      description = "The root password of the service instance."
+    }
+
+    variable "vpc_name" {
+      type        = string
+      default     = "vpc-default"
+      description = "The vpc name of the service instance."
+    }
+
+    variable "subnet_name" {
+      type        = string
+      default     = "subnet-default"
+      description = "The subnet name of the service instance."
+    }
+
+    variable "secgroup_name" {
+      type        = string
+      default     = "secgroup-default"
+      description = "The security group name of the service instance."
+    }
+    
+    variable "region" {
+      type        = string
+      default     = "cn-southwest-2"
+      description = "The region to deploy the service instance."
+    }
+    
+    terraform {
+      required_providers {
+        huaweicloud = {
+          source  = "huaweicloud/huaweicloud"
+          version = "~> 1.61.0"
+        }
+      }
+    }
+    
+    provider "huaweicloud" {
+      region = var.region
+    }
+
+    locals {
+      admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
+    }
+
+    resource "random_password" "password" {
+      length           = 12
+      upper            = true
+      lower            = true
+      numeric          = true
+      special          = true
+      min_special      = 1
+      override_special = "#%@"
+    }
+
+    output "flavor_id" {
+      value = var.flavor_id
+    }
+
+    output "vpc_name" {
+      value = var.vpc_name
+    }
+
+    output "subnet_name" {
+      value = var.subnet_name
+    }
+
+    output "secgroup_name" {
+      value = var.secgroup_name
+    }
+
+    output "region_name" {
+      value = var.region
+    }
+
+    output "admin_passwd" {
+      value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
+    }

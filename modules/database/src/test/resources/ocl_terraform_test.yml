@@ -1,13 +1,13 @@
-# The version of the OCL
-version: 2.0
+# The version of the Xpanse description language
+version: 1.0
 # The category of the service.
-category: middleware
+category: others
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: Kafka-cluster
+name: terraform-test
 # The version of the service, the end-user can select the version they want to deploy.
-serviceVersion: v3.3.2
+serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an enhanced Kafka cluster services by ISV-A.
+description: This is an ehanced compute services by ISV-A.
 namespace: ISV-A
 # Icon for the service.
 icon: |
@@ -20,7 +20,6 @@ cloudServiceProvider:
       area: Asia China
     - name: cn-north-4
       area: Asia China
-serviceHostingType: self
 billing:
   # The business model(`flat`, `exponential`, ...)
   model: flat
@@ -28,38 +27,25 @@ billing:
   period: monthly
   # The billing currency (`euro`, `usd`, ...)
   currency: euro
+serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 1-zookeeper-with-3-worker-nodes-normal
+  - name: 2vCPUs-4GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
+    fixedPrice: 20
     # Properties for the service, which can be used by the deployment.
     properties:
-      worker_nodes_count: 3
-      flavor_id: c7.large.4
-  - name: 1-zookeeper-with-3-worker-nodes-performance
+      flavor_id: s6.large.2
+  - name: 2vCPUs-8GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
+    fixedPrice: 30
     # Properties for the service, which can be used by the deployment.
     properties:
-      worker_nodes_count: 3
-      flavor_id: c7.xlarge.4
-  - name: 1-zookeeper-with-5-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: c7.large.4
-  - name: 1-zookeeper-with-5-worker-nodes-performance
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 80
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: c7.xlarge.4
+      flavor_id: s6.large.4
+serviceProviderContactDetails:
+  email: [ "test@test.com" ]
 deployment:
-  # kind, Supported values are terraform, pulumi, crossplane.
+  # kind, Supported values are terraform, opentofu.
   kind: terraform
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
@@ -71,7 +57,7 @@ deployment:
   # The parameters will be used to generate the API of the managed service.
   variables:
     - name: admin_passwd
-      description: The admin password of all nodes in the Kafka cluster. If the value is empty, will create a random password.
+      description: The admin password of the service instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -80,44 +66,110 @@ deployment:
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
     - name: vpc_name
-      description: The vpc name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create VPC.
+      description: The vpc name of the service instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
-      example: "kafka-vpc-default"
+      example: "vpc-default"
       mandatory: false
-      value: "kafka-vpc-default"
+      value: "vpc-default"
     - name: subnet_name
-      description: The sub network name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of the service instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
-      example: "kafka-subnet-default"
+      example: "subnet-default"
       mandatory: false
-      value: "kafka-subnet-default"
+      value: "subnet-default"
     - name: secgroup_name
-      description: The security group name of all nodes in the Kafka cluster. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of the service instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
-      example: "kafka-secgroup-default"
+      example: "secgroup-default"
       mandatory: false
-      value: "kafka-secgroup-default"
+      value: "secgroup-default"
   deployer: |
-    variable "secgroup_id" {}
-    data "huaweicloud_availability_zones" "myaz" {}
-    data "huaweicloud_compute_flavors" "myflavor" {
-        availability_zone = data.huaweicloud_availability_zones.myaz.names[0]
-        performance_type  = "normal"
-        cpu_core_count    = 2
-        memory_size       = 4
+    variable "flavor_id" {
+      type        = string
+      default     = "s6.large.2"
+      description = "The flavor id of the service instance."
     }
-    data "huaweicloud_vpc_subnet" "mynet" {
-        name = "xpanse_subnet1"
+
+    variable "admin_passwd" {
+      type        = string
+      default     = ""
+      description = "The root password of the service instance."
     }
-    resource "huaweicloud_compute_instance" "basic" {
-        name               = "basic"
-        image_id           = "a8601887-81d5-4eed-9338-382cf5b6d80b"
-        flavor_id          = data.huaweicloud_compute_flavors.myflavor.ids[0]
-        availability_zone  = data.huaweicloud_availability_zones.myaz.names[0]
-        network {
-            uuid = data.huaweicloud_vpc_subnet.mynet.id
+
+    variable "vpc_name" {
+      type        = string
+      default     = "vpc-default"
+      description = "The vpc name of the service instance."
+    }
+
+    variable "subnet_name" {
+      type        = string
+      default     = "subnet-default"
+      description = "The subnet name of the service instance."
+    }
+
+    variable "secgroup_name" {
+      type        = string
+      default     = "secgroup-default"
+      description = "The security group name of the service instance."
+    }
+    
+    variable "region" {
+      type        = string
+      default     = "cn-southwest-2"
+      description = "The region to deploy the service instance."
+    }
+    
+    terraform {
+      required_providers {
+        huaweicloud = {
+          source  = "huaweicloud/huaweicloud"
+          version = "~> 1.61.0"
         }
+      }
+    }
+    
+    provider "huaweicloud" {
+      region = var.region
+    }
+
+    locals {
+      admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
+    }
+
+    resource "random_password" "password" {
+      length           = 12
+      upper            = true
+      lower            = true
+      numeric          = true
+      special          = true
+      min_special      = 1
+      override_special = "#%@"
+    }
+
+    output "flavor_id" {
+      value = var.flavor_id
+    }
+
+    output "vpc_name" {
+      value = var.vpc_name
+    }
+
+    output "subnet_name" {
+      value = var.subnet_name
+    }
+
+    output "secgroup_name" {
+      value = var.secgroup_name
+    }
+
+    output "region_name" {
+      value = var.region
+    }
+
+    output "admin_passwd" {
+      value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
     }

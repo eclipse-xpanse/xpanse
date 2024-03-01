@@ -1,7 +1,6 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
 import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuLocalDeployment.SCRIPT_FILE_NAME;
-import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuLocalDeployment.VERSION_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,7 +32,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class OpenTofuLocalExecutorTest {
     private static final String workspace =
             System.getProperty("java.io.tmpdir") + "/opentofu_workspace/" + UUID.randomUUID();
-    private static final String version = "~> 1.51.0";
     @Mock
     private Map<String, String> mockEnv;
     @Mock
@@ -44,29 +42,13 @@ class OpenTofuLocalExecutorTest {
     static void initWorkSpace() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl =
-                oclLoader.getOcl(URI.create("file:src/test/resources/opentofu_test.yaml").toURL());
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
         String script = ocl.getDeployment().getDeployer();
         File ws = new File(workspace + "/" + UUID.randomUUID());
         ws.mkdirs();
-        String verScript = String.format("""
-                terraform {
-                  required_providers {
-                    huaweicloud = {
-                      source = "huaweicloud/huaweicloud"
-                      version = "%s"
-                    }
-                  }
-                }
-                            
-                provider "huaweicloud" {
-                  region = "%s"
-                }
-                """, version, ocl.getCloudServiceProvider().getRegions().getFirst().getName());
-        String verScriptPath = workspace + File.separator + VERSION_FILE_NAME;
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
-        try (FileWriter verWriter = new FileWriter(verScriptPath);
-             FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            verWriter.write(verScript);
+        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(script);
         }
     }

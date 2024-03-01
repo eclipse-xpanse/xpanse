@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -64,7 +65,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class ServiceCatalogApiTest {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    private static ServiceTemplateDetailVo serviceTemplateDetailVo;
     @Resource
     private MockMvc mockMvc;
 
@@ -81,15 +81,17 @@ class ServiceCatalogApiTest {
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testServiceCatalogServices() throws Exception {
-        registerServiceTemplateByUrl(URI.create("file:src/test/resources/ocl_test.yaml").toURL());
-        testGetOrderableServiceDetailsThrowsException();
-        testOpenApi();
-        testListOrderableServices();
-        testGetOrderableServiceDetails();
+        Ocl ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceCatalogApiTest-1");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        testGetOrderableServiceDetailsThrowsException(serviceTemplate);
+        testOpenApi(serviceTemplate);
+        testListOrderableServices(serviceTemplate);
+        testGetOrderableServiceDetails(serviceTemplate);
+        unregisterServiceTemplate(serviceTemplate.getId());
     }
 
-    void registerServiceTemplateByUrl(URL url) throws Exception {
-        Ocl ocl = new OclLoader().getOcl(url);
+    ServiceTemplateDetailVo registerServiceTemplate(Ocl ocl) throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
         final MockHttpServletResponse registerResponse =
@@ -97,11 +99,19 @@ class ServiceCatalogApiTest {
                                 .content(requestBody).contentType("application/x-yaml")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
-        serviceTemplateDetailVo = objectMapper.readValue(registerResponse.getContentAsString(),
+
+        return objectMapper.readValue(registerResponse.getContentAsString(),
                 ServiceTemplateDetailVo.class);
     }
 
-    void approveServiceTemplateRegistration() throws Exception {
+    void unregisterServiceTemplate(UUID id) throws Exception {
+        mockMvc.perform(delete("/xpanse/service_templates/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+    }
+
+    void approveServiceTemplateRegistration(ServiceTemplateDetailVo serviceTemplateDetailVo)
+            throws Exception {
         UUID id = serviceTemplateDetailVo.getId();
         ReviewRegistrationRequest request = new ReviewRegistrationRequest();
         request.setReviewResult(ServiceReviewResult.APPROVED);
@@ -116,7 +126,8 @@ class ServiceCatalogApiTest {
                 ServiceTemplateDetailVo.class);
     }
 
-    void testListOrderableServices() throws Exception {
+    void testListOrderableServices(ServiceTemplateDetailVo serviceTemplateDetailVo)
+            throws Exception {
         // Setup request 1
         String result1 = "[]";
         // Run the test case 1
@@ -136,13 +147,17 @@ class ServiceCatalogApiTest {
         assertThat(errorMessage).isSubstringOf(response2.getContentAsString());
 
         // Setup request 3
-        approveServiceTemplateRegistration();
+        approveServiceTemplateRegistration(serviceTemplateDetailVo);
         List<UserOrderableServiceVo> userOrderableServiceVos =
                 List.of(transToUserOrderableServiceVo(serviceTemplateDetailVo));
         String result3 = objectMapper.writeValueAsString(userOrderableServiceVos);
         // Run the test case 3
-        final MockHttpServletResponse response3 = listOrderableServicesWithParams(null, null, null,
-                null, null);
+        final MockHttpServletResponse response3 =
+                listOrderableServicesWithParams(serviceTemplateDetailVo.getCategory().toValue(),
+                        serviceTemplateDetailVo.getCsp().toValue(),
+                        serviceTemplateDetailVo.getName(),
+                        serviceTemplateDetailVo.getVersion(),
+                        serviceTemplateDetailVo.getServiceHostingType().toValue());
         // Verify the result 3
         Assertions.assertEquals(HttpStatus.OK.value(), response3.getStatus());
         Assertions.assertEquals(result3, response3.getContentAsString());
@@ -167,7 +182,8 @@ class ServiceCatalogApiTest {
         return userOrderableServiceVo;
     }
 
-    void testGetOrderableServiceDetails() throws Exception {
+    void testGetOrderableServiceDetails(ServiceTemplateDetailVo serviceTemplateDetailVo)
+            throws Exception {
 
         // Setup request 1
         UUID id1 = UUID.randomUUID();
@@ -193,7 +209,8 @@ class ServiceCatalogApiTest {
         Assertions.assertEquals(result2, response2.getContentAsString());
     }
 
-    void testGetOrderableServiceDetailsThrowsException() throws Exception {
+    void testGetOrderableServiceDetailsThrowsException(
+            ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup request 1
         UUID id1 = serviceTemplateDetailVo.getId();
         Response expectedResponse1 = Response.errorResponse(
@@ -214,7 +231,7 @@ class ServiceCatalogApiTest {
                 .andReturn().getResponse();
     }
 
-    void testOpenApi() throws Exception {
+    void testOpenApi(ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup request 1
         UUID id1 = serviceTemplateDetailVo.getId();
         Link link = Link.of(String.format("http://localhost/openapi/%s.html", id1), "OpenApi");

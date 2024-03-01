@@ -26,18 +26,14 @@ import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceMa
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class FlexibleEngineOrchestratorPluginTest {
-
-    private final String terraformFlexibleEngineVersion = "1.52.1";
     @Mock
     private FlexibleEngineTerraformResourceHandler mockFlexibleEngineTerraformResourceHandler;
     @Mock
@@ -49,16 +45,10 @@ class FlexibleEngineOrchestratorPluginTest {
     @InjectMocks
     private FlexibleEngineOrchestratorPlugin flexibleEngineOrchestratorPluginUnderTest;
 
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(flexibleEngineOrchestratorPluginUnderTest,
-                "terraformFlexibleEngineVersion", terraformFlexibleEngineVersion);
-    }
-
     @Test
     void testGetResourceHandler() {
-        assertThat(flexibleEngineOrchestratorPluginUnderTest.resourceHandlers().get(DeployerKind.TERRAFORM)).isEqualTo(
-                mockFlexibleEngineTerraformResourceHandler);
+        assertThat(flexibleEngineOrchestratorPluginUnderTest.resourceHandlers()
+                .get(DeployerKind.TERRAFORM)).isEqualTo(mockFlexibleEngineTerraformResourceHandler);
     }
 
     @Test
@@ -101,8 +91,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
-                        false, "userId");
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
+                        0L, 0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
         metric.setDescription("description");
@@ -125,8 +115,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
-                        false, "userId");
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                        0L, 0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByResource(
                 resourceMetricRequest1)).thenReturn(metrics);
 
@@ -148,8 +138,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L, 0L, 0,
-                        false, "userId");
+                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
+                        0L, 0, false, "userId");
 
         // Configure FlexibleEngineMetricsService.getMetricsByResource(...).
         final DeployResource deployResource1 = new DeployResource();
@@ -158,8 +148,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L, 0L, 0,
-                        false, "userId");
+                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                        0L, 0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByResource(
                 resourceMetricRequest1)).thenReturn(Collections.emptyList());
 
@@ -181,8 +171,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
-                        0, false, "userId");
+                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
         metric.setDescription("description");
@@ -205,8 +195,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
-                        0, false, "userId");
+                new ServiceMetricsRequest(serviceId, List.of(deployResource1),
+                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByService(
                 serviceMetricRequest1)).thenReturn(metrics);
 
@@ -228,8 +218,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource), MonitorResourceType.CPU, 0L, 0L,
-                        0, false, "userId");
+                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
 
         // Configure FlexibleEngineMetricsService.getMetricsByService(...).
         final DeployResource deployResource1 = new DeployResource();
@@ -238,8 +228,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource1), MonitorResourceType.CPU, 0L, 0L,
-                        0, false, "userId");
+                new ServiceMetricsRequest(serviceId, List.of(deployResource1),
+                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByService(
                 serviceMetricRequest1)).thenReturn(Collections.emptyList());
 
@@ -263,7 +253,8 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.startService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -293,7 +284,8 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.startService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -323,7 +315,8 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.stopService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -353,7 +346,8 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.stopService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -383,7 +377,8 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.restartService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -413,7 +408,8 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.restartService(...).
-        final ServiceStateManageRequest serviceStateManageRequest1 = new ServiceStateManageRequest();
+        final ServiceStateManageRequest serviceStateManageRequest1 =
+                new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegionName("regionName");
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
@@ -429,27 +425,5 @@ class FlexibleEngineOrchestratorPluginTest {
 
         // Verify the results
         assertThat(result).isTrue();
-    }
-
-    @Test
-    void testGetProvider() {
-        String regionName = "region";
-        String result = String.format("""
-                terraform {
-                  required_providers {
-                    flexibleengine = {
-                      source  = "FlexibleEngineCloud/flexibleengine"
-                      version = "%s"
-                    }
-                  }
-                }
-                            
-                provider "flexibleengine" {
-                  region = "%s"
-                }
-                """, terraformFlexibleEngineVersion, regionName);
-        assertThat(flexibleEngineOrchestratorPluginUnderTest.getProvider(DeployerKind.TERRAFORM,
-                regionName)).isEqualTo(
-                result);
     }
 }

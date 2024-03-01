@@ -30,7 +30,6 @@ import org.eclipse.xpanse.plugins.scs.manage.ScsResourceManager;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
 import org.eclipse.xpanse.plugins.scs.resourcehandler.ScsTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,11 +43,8 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     private final ScsServersManager scsServersManager;
     private final ScsResourceManager scsResourceManager;
 
-    @Value("${terraform.provider.scs.version}")
-    private String terraformScsVersion;
-
     /**
-     * Get the resource handlers for Scs.
+     * Constructor.
      */
     @Autowired
     public ScsOrchestratorPlugin(ScsTerraformResourceHandler scsTerraformResourceHandler,
@@ -148,27 +144,6 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
         return Collections.emptyList();
-    }
-
-    @Override
-    public String getProvider(DeployerKind deployerKind, String region) {
-        return switch (deployerKind) {
-            case OPEN_TOFU, TERRAFORM -> String.format("""
-                    terraform {
-                      required_providers {
-                        openstack = {
-                              source  = "terraform-provider-openstack/openstack"
-                              version = "%s"
-                            }
-                      }
-                    }
-                                
-                    provider "openstack" {
-                      region = "%s"
-                    }
-                    """, terraformScsVersion, region);
-            default -> "";
-        };
     }
 
     @Override

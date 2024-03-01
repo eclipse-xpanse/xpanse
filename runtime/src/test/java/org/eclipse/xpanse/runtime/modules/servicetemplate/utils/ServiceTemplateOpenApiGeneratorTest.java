@@ -7,13 +7,12 @@ package org.eclipse.xpanse.runtime.modules.servicetemplate.utils;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.models.common.enums.Category;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -43,24 +42,8 @@ class ServiceTemplateOpenApiGeneratorTest {
     @Test
     @Order(1)
     void createServiceApi_test() throws Exception {
-        OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_test.yaml").toURL());
-
-        ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
-                new ServiceVariablesJsonSchemaGenerator();
-        JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
-                        ocl.getDeployment().getVariables());
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setId(RANDOM_UUID);
-        serviceTemplateEntity.setName("kafka2");
-        serviceTemplateEntity.setVersion("2.0");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
-        serviceTemplateEntity.setCategory(Category.MIDDLEWARE);
-        serviceTemplateEntity.setOcl(ocl);
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
-        serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
         OpenApiGeneratorJarManage openApiGeneratorJarManage =
                 new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
@@ -75,23 +58,8 @@ class ServiceTemplateOpenApiGeneratorTest {
     @Test
     @Order(2)
     void updateServiceApi_test() throws Exception {
-        OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_test.yaml").toURL());
-        ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
-                new ServiceVariablesJsonSchemaGenerator();
-        JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
-                        ocl.getDeployment().getVariables());
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setId(RANDOM_UUID);
-        serviceTemplateEntity.setName("kafka");
-        serviceTemplateEntity.setVersion("1.0");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
-        serviceTemplateEntity.setCategory(Category.AI);
-        serviceTemplateEntity.setOcl(ocl);
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
-        serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(OPENAPI_PATH, SERVICER_PORT);
         OpenApiGeneratorJarManage openApiGeneratorJarManage =
                 new OpenApiGeneratorJarManage(CLIENT_DOWNLOAD_URL, OPENAPI_PATH);
@@ -119,5 +87,26 @@ class ServiceTemplateOpenApiGeneratorTest {
         String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");
         Assertions.assertFalse(htmlFile.exists());
+    }
+
+    ServiceTemplateEntity getServiceTemplateEntity(URL url) throws Exception {
+        OclLoader oclLoader = new OclLoader();
+        Ocl ocl = oclLoader.getOcl(url);
+        ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
+                new ServiceVariablesJsonSchemaGenerator();
+        JsonObjectSchema jsonObjectSchema =
+                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                        ocl.getDeployment().getVariables());
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        serviceTemplateEntity.setId(RANDOM_UUID);
+        serviceTemplateEntity.setName(ocl.getName());
+        serviceTemplateEntity.setVersion(ocl.getServiceVersion());
+        serviceTemplateEntity.setCsp(ocl.getCloudServiceProvider().getName());
+        serviceTemplateEntity.setCategory(ocl.getCategory());
+        serviceTemplateEntity.setOcl(ocl);
+        serviceTemplateEntity.setServiceRegistrationState(
+                ServiceRegistrationState.APPROVAL_PENDING);
+        serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
+        return serviceTemplateEntity;
     }
 }

@@ -32,7 +32,6 @@ import org.eclipse.xpanse.plugins.openstack.manage.OpenStackResourceManager;
 import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,9 +50,6 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Resource
     private OpenStackResourceManager openStackResourceManager;
 
-    @Value("${terraform.provider.openstack.version}")
-    private String terraformOpenStackVersion;
-
     /**
      * Get the resource handlers for OpenStack.
      */
@@ -67,7 +63,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourcesOfType(String userId, String region,
-            DeployResourceKind kind) {
+                                                   DeployResourceKind kind) {
         return openStackResourceManager.getExistingResourcesOfType(userId, region, kind);
     }
 
@@ -143,8 +139,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
         List<Metric> metrics = new ArrayList<>();
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
             ResourceMetricsRequest resourceMetricRequest =
-                    new ResourceMetricsRequest(serviceMetricRequest.getServiceId(),
-                            deployResource,
+                    new ResourceMetricsRequest(serviceMetricRequest.getServiceId(), deployResource,
                             serviceMetricRequest.getMonitorResourceType(),
                             serviceMetricRequest.getFrom(), serviceMetricRequest.getTo(),
                             serviceMetricRequest.getGranularity(),
@@ -153,27 +148,6 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
             metrics.addAll(this.metricsManager.getMetrics(resourceMetricRequest));
         }
         return metrics;
-    }
-
-    @Override
-    public String getProvider(DeployerKind deployerKind, String region) {
-        return switch (deployerKind) {
-            case OPEN_TOFU, TERRAFORM -> String.format("""
-                    terraform {
-                      required_providers {
-                        openstack = {
-                              source  = "terraform-provider-openstack/openstack"
-                              version = "%s"
-                            }
-                      }
-                    }
-                                
-                    provider "openstack" {
-                      region = "%s"
-                    }
-                    """, terraformOpenStackVersion, region);
-            default -> "";
-        };
     }
 
     @Override

@@ -7,7 +7,7 @@ name: K8S-cluster
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an enhanced k8s cluster services by ISV-A.
+description: This is an enhanced K8S cluster services by ISV-A.
 namespace: ISV-A
 # Icon for the service.
 icon: |
@@ -74,7 +74,7 @@ deployment:
   # The parameters will be used to generate the API of the managed service.
   variables:
     - name: admin_passwd
-      description: The admin password of all nodes in the K8S cluster. If the value is empty, will create a random password.
+      description: The admin password of all nodes in the K8S cluster instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -83,21 +83,21 @@ deployment:
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
     - name: vpc_name
-      description: The vpc name of all nodes in the K8S cluster. If the value is empty, will use the example value to find or create VPC.
+      description: The vpc name of all nodes in the K8S cluster instance. If the value is empty, will use the example value to find or create VPC.
       kind: variable
       dataType: string
       example: "k8s-vpc-default"
       mandatory: false
       value: "k8s-vpc-default"
     - name: subnet_name
-      description: The sub network name of all nodes in the K8S cluster. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of all nodes in the K8S cluster instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
       example: "k8s-subnet-default"
       mandatory: false
       value: "k8s-subnet-default"
     - name: secgroup_name
-      description: The security group name of all nodes in the K8S cluster. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of all nodes in the K8S cluster instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
       example: "k8s-secgroup-default"
@@ -107,37 +107,56 @@ deployment:
     variable "flavor_id" {
       type        = string
       default     = "s6.large.4"
-      description = "The flavor_id of all nodes in the k8s cluster."
+      description = "The flavor_id of all nodes in the K8S cluster instance."
     }
 
     variable "worker_nodes_count" {
       type        = string
       default     = 3
-      description = "The worker nodes count in the k8s cluster."
+      description = "The worker nodes count in the K8S cluster instance."
     }
 
     variable "admin_passwd" {
       type        = string
       default     = ""
-      description = "The root password of all nodes in the k8s cluster."
+      description = "The root password of all nodes in the K8S cluster instance."
     }
 
     variable "vpc_name" {
       type        = string
       default     = "k8s-vpc-default"
-      description = "The vpc name of all nodes in the k8s cluster."
+      description = "The vpc name of all nodes in the K8S cluster instance."
     }
 
     variable "subnet_name" {
       type        = string
       default     = "k8s-subnet-default"
-      description = "The subnet name of all nodes in the k8s cluster."
+      description = "The subnet name of all nodes in the K8S cluster instance."
     }
 
     variable "secgroup_name" {
       type        = string
       default     = "k8s-secgroup-default"
-      description = "The security group name of all nodes in the k8s cluster."
+      description = "The security group name of all nodes in the K8S cluster instance."
+    } 
+    
+    variable "region" {
+      type        = string
+      default     = "eu-west-0"
+      description = "The region to deploy the K8S cluster instance."
+    }
+    
+    terraform {
+      required_providers {
+        flexibleengine = {
+          source  = "FlexibleEngineCloud/flexibleengine"
+          version = "~> 1.45.0"
+        }
+      }
+    }
+    
+    provider "flexibleengine" {
+      region = var.region
     }
 
     data "flexibleengine_vpc_v1" "existing" {
@@ -181,7 +200,7 @@ deployment:
     resource "flexibleengine_networking_secgroup_v2" "new" {
       count       = length(data.flexibleengine_networking_secgroup_v2.existing) == 0 ? 1 : 0
       name        = "${var.secgroup_name}-${random_id.new.hex}"
-      description = "k8s cluster security group"
+      description = "K8S cluster security group"
     }
 
     resource "flexibleengine_networking_secgroup_rule_v2" "secgroup_rule_0" {
