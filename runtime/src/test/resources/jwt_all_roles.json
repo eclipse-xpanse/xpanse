@@ -10,5 +10,8 @@
     "admin": "admin",
     "csp": "csp"
   },
+  "urn:zitadel:iam:user:metadata": {
+    "csp": "aHVhd2Vp"
+  },
   "sub": "1234566"
 }

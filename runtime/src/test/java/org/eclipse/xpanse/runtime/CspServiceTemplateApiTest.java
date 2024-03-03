@@ -1,6 +1,8 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -75,6 +78,12 @@ class CspServiceTemplateApiTest {
                 ServiceTemplateDetailVo.class);
     }
 
+    void unregisterServiceTemplate(UUID id) throws Exception {
+        mockMvc.perform(
+                        delete("/xpanse/service_templates/{id}", id).accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+    }
+
     @Test
     @WithJwt(file = "jwt_admin_csp.json")
     void testCspManageServiceTemplates() throws Exception {
@@ -82,12 +91,57 @@ class CspServiceTemplateApiTest {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("cspServiceTemplateApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        testListAllServiceTemplatesWithStateApprovalPending(serviceTemplate);
-        testReviewServiceTemplateRegistration(serviceTemplate);
-        testAllListServiceTemplatesWithStateApproved(serviceTemplate);
+        testGetRegistrationDetails(serviceTemplate);
+        testListManagedServiceTemplatesWithStateApprovalPending(serviceTemplate);
+        testReviewRegistration(serviceTemplate);
+        testListManagedServiceTemplatesWithStateApproved(serviceTemplate);
+        unregisterServiceTemplate(serviceTemplate.getId());
     }
 
-    void testReviewServiceTemplateRegistration(ServiceTemplateDetailVo serviceTemplateDetailVo)
+    @Test
+    @WithJwt(file = "jwt_admin_csp.json")
+    void testCspManageServiceTemplatesWithoutCsp() throws Exception {
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
+        ocl.getCloudServiceProvider().setName(Csp.FLEXIBLE_ENGINE);
+        ocl.setName("cspServiceTemplateApiTest-2");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        testGetRegistrationDetailsThrowsAccessDeniedException(serviceTemplate);
+        testReviewRegistrationThrowsAccessDeniedException(serviceTemplate);
+        testListManagedServiceTemplatesReturnsEmptyList(serviceTemplate);
+        unregisterServiceTemplate(serviceTemplate.getId());
+    }
+
+    void testGetRegistrationDetails(ServiceTemplateDetailVo serviceTemplateDetailVo)
+            throws Exception {
+        // Setup detail request
+        UUID id = serviceTemplateDetailVo.getId();
+        String result = objectMapper.writeValueAsString(serviceTemplateDetailVo);
+        // Run the test
+        final MockHttpServletResponse detailResponse = getRegistrationDetails(id);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), detailResponse.getStatus());
+        assertEquals(result, detailResponse.getContentAsString());
+    }
+
+    void testGetRegistrationDetailsThrowsAccessDeniedException(
+            ServiceTemplateDetailVo serviceTemplateDetailVo)
+            throws Exception {
+
+        Response accessDeniedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+                Collections.singletonList("No permissions to review service template "
+                        + "belonging to other cloud service providers."));
+        // Setup detail request
+        UUID id = serviceTemplateDetailVo.getId();
+        // Run the test detail
+        final MockHttpServletResponse detailResponse = getRegistrationDetails(id);
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), detailResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                detailResponse.getContentAsString());
+    }
+
+    void testReviewRegistration(ServiceTemplateDetailVo serviceTemplateDetailVo)
             throws Exception {
         // Setup request 1
         UUID id1 = serviceTemplateDetailVo.getId();
@@ -137,7 +191,30 @@ class CspServiceTemplateApiTest {
         assertThat(response3.getContentAsString()).isEqualTo(result3);
     }
 
-    void testAllListServiceTemplatesWithStateApproved(
+
+    void testReviewRegistrationThrowsAccessDeniedException(
+            ServiceTemplateDetailVo serviceTemplateDetailVo)
+            throws Exception {
+
+        // Setup request
+        Response accessDeniedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+                Collections.singletonList("No permissions to review service template "
+                        + "belonging to other cloud service providers."));
+        UUID id = serviceTemplateDetailVo.getId();
+        ReviewRegistrationRequest request = new ReviewRegistrationRequest();
+        request.setReviewResult(ServiceReviewResult.APPROVED);
+        request.setReviewComment("reviewComment");
+        // Run the test case 1
+        final MockHttpServletResponse response =
+                reviewServiceRegistrationWithParams(id, request);
+        // Verify the result 1
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                response.getContentAsString());
+    }
+
+    void testListManagedServiceTemplatesWithStateApproved(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
 
         // Setup request 1
@@ -146,7 +223,7 @@ class CspServiceTemplateApiTest {
 
         // Run the test case 1
         MockHttpServletResponse response1 =
-                listServiceTemplatesWithParams(null, null, null, null, null,
+                listServiceTemplatesWithParams(null, null, null, null,
                         serviceRegistrationState1);
         // Verify the results 1
         assertThat(response1.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -158,7 +235,7 @@ class CspServiceTemplateApiTest {
         String serviceRegistrationState2 = ServiceRegistrationState.APPROVED.toValue();
         // Run the test case 2
         MockHttpServletResponse response2 =
-                listServiceTemplatesWithParams(null, null, null, null, null,
+                listServiceTemplatesWithParams(null, null, null, null,
                         serviceRegistrationState2);
         // Verify the results 2
         assertThat(response2.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -171,7 +248,7 @@ class CspServiceTemplateApiTest {
 
     }
 
-    void testListAllServiceTemplatesWithStateApprovalPending(
+    void testListManagedServiceTemplatesWithStateApprovalPending(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup
         String serviceRegistrationState = ServiceRegistrationState.APPROVAL_PENDING.toValue();
@@ -179,7 +256,6 @@ class CspServiceTemplateApiTest {
         // Run the test
         MockHttpServletResponse response = listServiceTemplatesWithParams(
                 serviceTemplateDetailVo.getCategory().toValue(),
-                serviceTemplateDetailVo.getCsp().toValue(),
                 serviceTemplateDetailVo.getName(),
                 serviceTemplateDetailVo.getVersion(),
                 serviceTemplateDetailVo.getServiceHostingType().toValue(),
@@ -193,18 +269,37 @@ class CspServiceTemplateApiTest {
                         ServiceTemplateDetailVo[].class)).toList());
     }
 
-    MockHttpServletResponse listServiceTemplatesWithParams(String categoryName, String cspName,
+    void testListManagedServiceTemplatesReturnsEmptyList(
+            ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
+        // Setup
+        String serviceRegistrationState = ServiceRegistrationState.APPROVAL_PENDING.toValue();
+        // Run the test
+        MockHttpServletResponse response = listServiceTemplatesWithParams(
+                serviceTemplateDetailVo.getCategory().toValue(),
+                serviceTemplateDetailVo.getName(),
+                serviceTemplateDetailVo.getVersion(),
+                serviceTemplateDetailVo.getServiceHostingType().toValue(),
+                serviceRegistrationState);
+        // Verify the results
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo("[]");
+    }
+
+    MockHttpServletResponse getRegistrationDetails(UUID id) throws Exception {
+        return mockMvc.perform(get("/xpanse/csp/service_templates/{id}", id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+    }
+
+    MockHttpServletResponse listServiceTemplatesWithParams(String categoryName,
                                                            String serviceName,
                                                            String serviceVersion,
                                                            String serviceHostingType,
                                                            String serviceRegistrationState)
             throws Exception {
-        MockHttpServletRequestBuilder getRequestBuilder = get("/xpanse/service_templates/all");
+        MockHttpServletRequestBuilder getRequestBuilder = get("/xpanse/csp/service_templates");
         if (StringUtils.isNotBlank(categoryName)) {
             getRequestBuilder = getRequestBuilder.param("categoryName", categoryName);
-        }
-        if (StringUtils.isNotBlank(cspName)) {
-            getRequestBuilder = getRequestBuilder.param("cspName", cspName);
         }
         if (StringUtils.isNotBlank(serviceName)) {
             getRequestBuilder = getRequestBuilder.param("serviceName", serviceName);

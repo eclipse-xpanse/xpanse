@@ -1,12 +1,24 @@
 package org.eclipse.xpanse.modules.security.common;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.BeanUtils;
 
+@ExtendWith(MockitoExtension.class)
 class CurrentUserInfoTest {
+
+    @Mock
+    private List<String> mockRoles;
+    @Mock
+    private Map<String, String> mockMetadata;
 
     private CurrentUserInfo test;
 
@@ -15,96 +27,51 @@ class CurrentUserInfoTest {
         test = new CurrentUserInfo();
         test.setUserId("userId");
         test.setUserName("userName");
-        test.setRoles(List.of("admin"));
-        test.setMetadata(Map.of("namespace", "test"));
-        test.setNamespace("test");
+        test.setRoles(mockRoles);
+        test.setMetadata(mockMetadata);
+        test.setNamespace("namespace");
+        test.setCsp(Csp.HUAWEI.toValue());
         test.setToken("token");
     }
 
     @Test
     void testGetters() {
-        Assertions.assertEquals("userId", test.getUserId());
-        Assertions.assertEquals("userName", test.getUserName());
-        Assertions.assertEquals("admin", test.getRoles().get(0));
-        Assertions.assertTrue(test.getMetadata().containsKey("namespace"));
-        Assertions.assertEquals("test", test.getMetadata().get("namespace"));
-        Assertions.assertEquals("test", test.getNamespace());
+        assertThat(test.getUserId()).isEqualTo("userId");
+        assertThat(test.getUserName()).isEqualTo("userName");
+        assertThat(test.getRoles()).isEqualTo(mockRoles);
+        assertThat(test.getMetadata()).isEqualTo(mockMetadata);
+        assertThat(test.getNamespace()).isEqualTo("namespace");
+        assertThat(test.getCsp()).isEqualTo(Csp.HUAWEI.toValue());
+        assertThat(test.getToken()).isEqualTo("token");
     }
-
 
     @Test
-    void testEqualsAndHashCode() {
-
-        Assertions.assertEquals(test, test);
-        Assertions.assertNotEquals(test.hashCode(), 0);
-
-        Object object = new Object();
-        Assertions.assertNotEquals(test, object);
-        Assertions.assertNotEquals(test.hashCode(), object.hashCode());
-
+    void testEquals() {
         CurrentUserInfo test1 = new CurrentUserInfo();
-        Assertions.assertNotEquals(test, test1);
-        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
-
+        assertThat(test).isNotEqualTo(test1);
         CurrentUserInfo test2 = new CurrentUserInfo();
-        CurrentUserInfo test3 = new CurrentUserInfo();
-        test2.setUserId("userId2");
-        test3.setUserId("userId3");
-        Assertions.assertNotEquals(test, test1);
-        Assertions.assertNotEquals(test, test2);
-        Assertions.assertNotEquals(test, test3);
-        Assertions.assertNotEquals(test1, test2);
-        Assertions.assertNotEquals(test2, test3);
-        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
-        Assertions.assertNotEquals(test2.hashCode(), test3.hashCode());
-
-        test2.setUserName("userName2");
-        test3.setUserName("userName3");
-        Assertions.assertNotEquals(test, test1);
-        Assertions.assertNotEquals(test, test2);
-        Assertions.assertNotEquals(test, test3);
-        Assertions.assertNotEquals(test1, test2);
-        Assertions.assertNotEquals(test2, test3);
-        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
-        Assertions.assertNotEquals(test2.hashCode(), test3.hashCode());
-
-        test2.setRoles(List.of("user"));
-        test3.setRoles(List.of("csp"));
-        Assertions.assertNotEquals(test, test1);
-        Assertions.assertNotEquals(test, test2);
-        Assertions.assertNotEquals(test, test3);
-        Assertions.assertNotEquals(test1, test2);
-        Assertions.assertNotEquals(test2, test3);
-        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
-        Assertions.assertNotEquals(test2.hashCode(), test3.hashCode());
-
-        test2.setMetadata(Map.of("namespace", "test"));
-        test3.setMetadata(Map.of("namespace", "test1"));
-        Assertions.assertNotEquals(test, test1);
-        Assertions.assertNotEquals(test, test2);
-        Assertions.assertNotEquals(test, test3);
-        Assertions.assertNotEquals(test1, test2);
-        Assertions.assertNotEquals(test2, test3);
-        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
-        Assertions.assertNotEquals(test2.hashCode(), test3.hashCode());
-
-        test2.setNamespace("test");
-        test3.setNamespace("test1");
-        Assertions.assertNotEquals(test, test1);
-        Assertions.assertNotEquals(test, test2);
-        Assertions.assertNotEquals(test, test3);
-        Assertions.assertNotEquals(test1, test2);
-        Assertions.assertNotEquals(test2, test3);
-        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
-        Assertions.assertNotEquals(test2.hashCode(), test3.hashCode());
+        BeanUtils.copyProperties(test, test2);
+        assertThat(test).isEqualTo(test2);
     }
 
+    @Test
+    void testCanEqual() {
+        assertThat(test.canEqual("other")).isFalse();
+    }
+
+    @Test
+    void testHashCode() {
+        CurrentUserInfo test1 = new CurrentUserInfo();
+        assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
+        CurrentUserInfo test2 = new CurrentUserInfo();
+        BeanUtils.copyProperties(test, test2);
+        assertThat(test.hashCode()).isEqualTo(test2.hashCode());
+    }
 
     @Test
     void testToString() {
-        String exceptedString = "CurrentUserInfo(userId=userId, userName=userName, roles=[admin],"
-                + " metadata={namespace=test}, namespace=test, token=token)";
-        Assertions.assertEquals(test.toString(), exceptedString);
-        Assertions.assertNotEquals(test.toString(), null);
+        String result = "CurrentUserInfo(userId=userId, userName=userName, roles=mockRoles, "
+                + "metadata=mockMetadata, namespace=namespace, csp=huawei, token=token)";
+        assertThat(test.toString()).isEqualTo(result);
     }
 }

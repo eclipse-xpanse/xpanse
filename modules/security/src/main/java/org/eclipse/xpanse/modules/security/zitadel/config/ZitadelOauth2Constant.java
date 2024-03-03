@@ -93,8 +93,13 @@ public class ZitadelOauth2Constant {
     public static final String ADDRESS_KEY = "address";
 
     /**
-     * Key in metadata for getting the specified value from the metadata of the user.
+     * Key in metadata for getting the namespace value from the metadata of the user.
      */
     public static final String NAMESPACE_KEY = "namespace";
+
+    /**
+     * Key in metadata for getting the csp value from the metadata of the user.
+     */
+    public static final String CSP_KEY = "csp";
 
 }

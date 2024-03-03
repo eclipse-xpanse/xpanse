@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.security.zitadel;
 
+import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.CSP_KEY;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.METADATA_KEY;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.NAMESPACE_KEY;
 import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.REQUIRED_SCOPES;
@@ -157,6 +158,9 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                             userMetadata.put(key, value);
                             if (StringUtils.equals(NAMESPACE_KEY, key)) {
                                 currentUserInfo.setNamespace(value);
+                            }
+                            if (StringUtils.equals(CSP_KEY, key)) {
+                                currentUserInfo.setCsp(value);
                             }
                         }
                         currentUserInfo.setMetadata(userMetadata);

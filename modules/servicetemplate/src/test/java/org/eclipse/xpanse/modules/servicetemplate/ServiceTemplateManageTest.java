@@ -128,21 +128,20 @@ class ServiceTemplateManageTest {
 
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
-        ServiceTemplateEntity ServiceTemplateEntityByUrl =
-                serviceTemplateManageTest.updateServiceTemplateByUrl(uuid.toString(),
-                        oclLocation);
-        log.error(ServiceTemplateEntityByUrl.toString());
+        ServiceTemplateEntity serviceTemplateEntityByUrl =
+                serviceTemplateManageTest.updateServiceTemplateByUrl(uuid, oclLocation);
+        log.error(serviceTemplateEntityByUrl.toString());
         Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                ServiceTemplateEntityByUrl.getServiceRegistrationState());
+                serviceTemplateEntityByUrl.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).updateServiceApi(serviceTemplateEntity);
     }
 
     @Test
     void testUpdateServiceTemplateByUrl_OclLoaderThrowsException() throws Exception {
         when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenThrow(Exception.class);
-        assertThatThrownBy(() -> serviceTemplateManageTest.updateServiceTemplateByUrl(
-                UUID.randomUUID().toString(), oclLocation))
-                .isInstanceOf(Exception.class);
+        assertThatThrownBy(
+                () -> serviceTemplateManageTest.updateServiceTemplateByUrl(UUID.randomUUID(),
+                        oclLocation)).isInstanceOf(Exception.class);
     }
 
     @Test
@@ -160,7 +159,7 @@ class ServiceTemplateManageTest {
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
         ServiceTemplateEntity updateServiceTemplateEntity =
-                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl);
+                serviceTemplateManageTest.updateServiceTemplate(uuid, ocl);
         Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
                 updateServiceTemplateEntity.getServiceRegistrationState());
         verify(serviceTemplateOpenApiGenerator).updateServiceApi(serviceTemplateEntity);
@@ -173,8 +172,8 @@ class ServiceTemplateManageTest {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
-        Assertions.assertThrows(ServiceTemplateUpdateNotAllowed.class, () ->
-                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl));
+        Assertions.assertThrows(ServiceTemplateUpdateNotAllowed.class,
+                () -> serviceTemplateManageTest.updateServiceTemplate(uuid, ocl));
     }
 
 
@@ -185,8 +184,9 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setOcl(oclRegister);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
-        Assertions.assertThrows(AccessDeniedException.class, () ->
-                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), oclRegister));
+        Assertions.assertThrows(AccessDeniedException.class,
+                () -> serviceTemplateManageTest.updateServiceTemplate(uuid,
+                        oclRegister));
     }
 
 
@@ -195,8 +195,8 @@ class ServiceTemplateManageTest {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setServiceVersion("1.0");
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
-        Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
-                serviceTemplateManageTest.updateServiceTemplate(uuid.toString(), ocl));
+        Assertions.assertThrows(ServiceTemplateNotRegistered.class,
+                () -> serviceTemplateManageTest.updateServiceTemplate(uuid, ocl));
     }
 
     @Test
@@ -234,8 +234,8 @@ class ServiceTemplateManageTest {
 
         when(mockStorage.findServiceTemplate(entity)).thenReturn(existedServiceTemplateEntity);
 
-        Assertions.assertThrows(ServiceTemplateAlreadyRegistered.class, () ->
-                serviceTemplateManageTest.registerServiceTemplate(ocl));
+        Assertions.assertThrows(ServiceTemplateAlreadyRegistered.class,
+                () -> serviceTemplateManageTest.registerServiceTemplate(ocl));
     }
 
 
@@ -244,8 +244,8 @@ class ServiceTemplateManageTest {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ocl.setIcon(
                 "https://raw.githubusercontent.com/eclipse-xpanse/xpanse/main/static/full-logo.png");
-        Assertions.assertThrows(IconProcessingFailedException.class, () ->
-                serviceTemplateManageTest.registerServiceTemplate(ocl));
+        Assertions.assertThrows(IconProcessingFailedException.class,
+                () -> serviceTemplateManageTest.registerServiceTemplate(ocl));
     }
 
     @Test
@@ -276,21 +276,54 @@ class ServiceTemplateManageTest {
     }
 
     @Test
-    void testGetServiceTemplate() {
+    void testGetServiceTemplateDetails() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-
+        when(identityProviderManager.getUserNamespace()).thenReturn(
+                Optional.of(serviceTemplateEntity.getNamespace()));
+        when(identityProviderManager.getCspFromMetadata()).thenReturn(
+                Optional.of(serviceTemplateEntity.getCsp()));
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
-        ServiceTemplateEntity ServiceTemplate =
-                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString(), false);
-        Assertions.assertEquals(serviceTemplateEntity, ServiceTemplate);
+        ServiceTemplateEntity serviceTemplate =
+                serviceTemplateManageTest.getServiceTemplateDetails(uuid, true, true);
+        Assertions.assertEquals(serviceTemplateEntity, serviceTemplate);
+    }
+
+    @Test
+    void testGetServiceTemplateDetailsWithoutNamespace() {
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
+        when(identityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+        Assertions.assertThrows(AccessDeniedException.class,
+                () -> serviceTemplateManageTest.getServiceTemplateDetails(uuid, true, false));
+    }
+
+    @Test
+    void testGetServiceTemplateDetailsWithoutCsp() {
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
+        when(identityProviderManager.getCspFromMetadata()).thenReturn(Optional.empty());
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+        Assertions.assertThrows(AccessDeniedException.class,
+                () -> serviceTemplateManageTest.getServiceTemplateDetails(uuid, false, true));
+    }
+
+    @Test
+    void testReviewServiceTemplateRegistration() {
+        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
+        when(identityProviderManager.getCspFromMetadata()).thenReturn(
+                Optional.of(serviceTemplateEntity.getCsp()));
+        ServiceTemplateEntity serviceTemplate =
+                serviceTemplateManageTest.getServiceTemplateDetails(uuid, false, true);
+        Assertions.assertEquals(serviceTemplateEntity, serviceTemplate);
     }
 
 
     @Test
     void testGetServiceTemplateThrowsServiceTemplateNotRegistered() {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
-        Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
-                serviceTemplateManageTest.getServiceTemplateDetails(uuid.toString(),  false));
+        Assertions.assertThrows(ServiceTemplateNotRegistered.class,
+                () -> serviceTemplateManageTest.getServiceTemplateDetails(uuid, false,
+                        false));
 
     }
 
@@ -302,9 +335,9 @@ class ServiceTemplateManageTest {
         exceptedList.add(serviceTemplateEntity);
         when(mockStorage.listServiceTemplates(any())).thenReturn(exceptedList);
 
-        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel(Category.MIDDLEWARE,
-                Csp.HUAWEI, "kafka", "v3.1.1", null, ServiceRegistrationState.APPROVAL_PENDING,
-                true);
+        ServiceTemplateQueryModel query =
+                new ServiceTemplateQueryModel(Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1",
+                        null, ServiceRegistrationState.APPROVAL_PENDING, true);
 
         List<ServiceTemplateEntity> result = serviceTemplateManageTest.listServiceTemplates(query);
 
@@ -314,13 +347,12 @@ class ServiceTemplateManageTest {
     @Test
     void testListServiceTemplates_ServiceTemplateStorageReturnsNoItems() {
 
-        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel(Category.MIDDLEWARE,
-                Csp.HUAWEI, "kafka", "v3.1.1", null, ServiceRegistrationState.APPROVAL_PENDING,
-                true);
+        ServiceTemplateQueryModel query =
+                new ServiceTemplateQueryModel(Category.MIDDLEWARE, Csp.HUAWEI, "kafka", "v3.1.1",
+                        null, ServiceRegistrationState.APPROVAL_PENDING, true);
 
         when(mockStorage.listServiceTemplates(query)).thenReturn(Collections.emptyList());
-        List<ServiceTemplateEntity> result =
-                serviceTemplateManageTest.listServiceTemplates(query);
+        List<ServiceTemplateEntity> result = serviceTemplateManageTest.listServiceTemplates(query);
         assertThat(result).isEqualTo(Collections.emptyList());
     }
 
@@ -330,8 +362,7 @@ class ServiceTemplateManageTest {
         when(mockStorage.getServiceTemplateById(serviceTemplateEntity.getId())).thenReturn(
                 serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
-        serviceTemplateManageTest.unregisterServiceTemplate(
-                serviceTemplateEntity.getId().toString());
+        serviceTemplateManageTest.unregisterServiceTemplate(serviceTemplateEntity.getId());
         verify(mockStorage).removeById(serviceTemplateEntity.getId());
         verify(serviceTemplateOpenApiGenerator).deleteServiceApi(
                 serviceTemplateEntity.getId().toString());
@@ -340,8 +371,8 @@ class ServiceTemplateManageTest {
     @Test
     void testUnregisterThrowsServiceTemplateNotRegistered() {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
-        Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
-                serviceTemplateManageTest.unregisterServiceTemplate(uuid.toString()));
+        Assertions.assertThrows(ServiceTemplateNotRegistered.class,
+                () -> serviceTemplateManageTest.unregisterServiceTemplate(uuid));
 
     }
 
@@ -349,20 +380,18 @@ class ServiceTemplateManageTest {
     @Test
     void testGetOpenApiUrl() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        when(mockStorage.getServiceTemplateById(uuid))
-                .thenReturn(serviceTemplateEntity);
+        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(serviceTemplateOpenApiGenerator.getOpenApi(serviceTemplateEntity)).thenReturn(
                 "result");
-        String result =
-                serviceTemplateManageTest.getOpenApiUrl(uuid.toString());
+        String result = serviceTemplateManageTest.getOpenApiUrl(uuid);
         Assertions.assertEquals(result, "result");
     }
 
     @Test
     void testGetOpenApiUrlThrowsServiceTemplateNotRegistered() {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
-        Assertions.assertThrows(ServiceTemplateNotRegistered.class, () ->
-                serviceTemplateManageTest.getOpenApiUrl(uuid.toString()));
+        Assertions.assertThrows(ServiceTemplateNotRegistered.class,
+                () -> serviceTemplateManageTest.getOpenApiUrl(uuid));
 
     }
 }

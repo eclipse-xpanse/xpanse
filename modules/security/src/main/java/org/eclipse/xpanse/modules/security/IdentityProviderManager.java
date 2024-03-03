@@ -13,6 +13,8 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfoHolder;
 import org.springframework.context.ApplicationContext;
@@ -49,7 +51,7 @@ public class IdentityProviderManager {
                 throw new IllegalStateException(
                         "More than one identity provider service is active.");
             }
-            activeIdentityProviderService = identityProviderServices.get(0);
+            activeIdentityProviderService = identityProviderServices.getFirst();
             log.info("Identity provider service with type:{} is active.",
                     activeIdentityProviderService.getIdentityProviderType());
         }
@@ -97,5 +99,23 @@ public class IdentityProviderManager {
         return StringUtils.isBlank(currentUserInfo.getNamespace())
                 ? Optional.ofNullable(currentUserInfo.getUserId())
                 : Optional.ofNullable(currentUserInfo.getNamespace());
+    }
+
+    /**
+     * Get csp from metadata fo current login user.
+     *
+     * @return csp of current login user.
+     */
+    public Optional<Csp> getCspFromMetadata() {
+        CurrentUserInfo currentUserInfo = getCurrentUserInfo();
+        if (Objects.nonNull(currentUserInfo) && StringUtils.isNotBlank(currentUserInfo.getCsp())) {
+            try {
+                Csp csp = Csp.getByValue(currentUserInfo.getCsp());
+                return Optional.of(csp);
+            } catch (UnsupportedEnumValueException e) {
+                log.error("Unsupported csp value:{}", currentUserInfo.getCsp());
+            }
+        }
+        return Optional.empty();
     }
 }
