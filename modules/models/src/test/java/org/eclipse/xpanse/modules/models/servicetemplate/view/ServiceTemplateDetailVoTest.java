@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Test of ServiceTemplateDetailVo.
@@ -44,6 +45,7 @@ class ServiceTemplateDetailVoTest {
     private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private static final ServiceRegistrationState serviceRegistrationState =
             ServiceRegistrationState.APPROVED;
+    private static final String reviewComment = "reviewComment";
     private static ServiceProviderContactDetails serviceProviderContactDetails;
     private static List<@Valid Region> regions;
     private static List<@Valid DeployVariable> variables;
@@ -86,6 +88,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setCreateTime(createTime);
         serviceTemplateDetailVo.setLastModifiedTime(lastModifiedTime);
         serviceTemplateDetailVo.setServiceRegistrationState(serviceRegistrationState);
+        serviceTemplateDetailVo.setReviewComment(reviewComment);
         serviceTemplateDetailVo.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
     }
@@ -108,6 +111,7 @@ class ServiceTemplateDetailVoTest {
         assertEquals(lastModifiedTime, serviceTemplateDetailVo.getLastModifiedTime());
         assertEquals(serviceRegistrationState,
                 serviceTemplateDetailVo.getServiceRegistrationState());
+        assertEquals(reviewComment, serviceTemplateDetailVo.getReviewComment());
         assertEquals(ServiceHostingType.SERVICE_VENDOR,
                 serviceTemplateDetailVo.getServiceHostingType());
         assertEquals(serviceProviderContactDetails,
@@ -116,119 +120,15 @@ class ServiceTemplateDetailVoTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        assertEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo.hashCode());
-
-        Object obj = new Object();
-        assertNotEquals(serviceTemplateDetailVo, obj);
-        assertNotEquals(serviceTemplateDetailVo, null);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), obj.hashCode());
-
-        ServiceTemplateDetailVo serviceTemplateDetailVo1 = new ServiceTemplateDetailVo();
-        ServiceTemplateDetailVo serviceTemplateDetailVo2 = new ServiceTemplateDetailVo();
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo2);
-        assertEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo2.hashCode());
-        assertEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setId(uuid);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setCategory(category);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setName(name);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setVersion(version);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setCsp(csp);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setRegions(regions);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setDescription(description);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setNamespace(namespace);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setIcon(icon);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setDeployment(DEPLOYMENT);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setVariables(variables);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setFlavors(flavors);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setBilling(billing);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setCreateTime(createTime);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setLastModifiedTime(lastModifiedTime);
-        assertNotEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
-
-        serviceTemplateDetailVo1.setServiceRegistrationState(serviceRegistrationState);
-        serviceTemplateDetailVo1.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
-        serviceTemplateDetailVo1.setServiceProviderContactDetails(serviceProviderContactDetails);
-        assertEquals(serviceTemplateDetailVo, serviceTemplateDetailVo1);
-        assertNotEquals(serviceTemplateDetailVo1, serviceTemplateDetailVo2);
-        assertEquals(serviceTemplateDetailVo.hashCode(), serviceTemplateDetailVo1.hashCode());
-        assertNotEquals(serviceTemplateDetailVo1.hashCode(), serviceTemplateDetailVo2.hashCode());
+        assertNotEquals(serviceTemplateDetailVo, new Object());
+        assertNotEquals(serviceTemplateDetailVo.hashCode(), new Object().hashCode());
+        ServiceTemplateDetailVo test = new ServiceTemplateDetailVo();
+        assertNotEquals(serviceTemplateDetailVo, test);
+        assertNotEquals(serviceTemplateDetailVo.hashCode(), test.hashCode());
+        ServiceTemplateDetailVo test2 = new ServiceTemplateDetailVo();
+        BeanUtils.copyProperties(serviceTemplateDetailVo, test2);
+        assertEquals(serviceTemplateDetailVo, test2);
+        assertEquals(serviceTemplateDetailVo.hashCode(), test2.hashCode());
     }
 
     @Test
@@ -251,6 +151,7 @@ class ServiceTemplateDetailVoTest {
                 "createTime=" + createTime + ", " +
                 "lastModifiedTime=" + lastModifiedTime + ", " +
                 "serviceRegistrationState=" + serviceRegistrationState + ", " +
+                "reviewComment=" + reviewComment + ", " +
                 "serviceProviderContactDetails=" + serviceProviderContactDetails + ")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());

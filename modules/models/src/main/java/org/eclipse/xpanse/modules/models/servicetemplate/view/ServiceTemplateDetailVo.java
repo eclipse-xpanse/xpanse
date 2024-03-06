@@ -115,8 +115,11 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
     private OffsetDateTime lastModifiedTime;
 
     @NotNull
-    @Schema(description = "State of registered service.")
+    @Schema(description = "State of registered service template.")
     private ServiceRegistrationState serviceRegistrationState;
+
+    @Schema(description = "Comment of reviewed service template.")
+    private String reviewComment;
 
     @NotNull
     @Schema(description = "The contact details of the service provider.")

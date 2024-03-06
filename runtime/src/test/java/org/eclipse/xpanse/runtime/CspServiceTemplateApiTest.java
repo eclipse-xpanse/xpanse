@@ -94,6 +94,10 @@ class CspServiceTemplateApiTest {
         testGetRegistrationDetails(serviceTemplate);
         testListManagedServiceTemplatesWithStateApprovalPending(serviceTemplate);
         testReviewRegistration(serviceTemplate);
+        final MockHttpServletResponse registrationDetails =
+                getRegistrationDetails(serviceTemplate.getId());
+        serviceTemplate = objectMapper.readValue(registrationDetails.getContentAsString()
+                , ServiceTemplateDetailVo.class);
         testListManagedServiceTemplatesWithStateApproved(serviceTemplate);
         unregisterServiceTemplate(serviceTemplate.getId());
     }
@@ -154,7 +158,6 @@ class CspServiceTemplateApiTest {
         // Verify the result 1
         assertThat(response1.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(response1.getContentAsString()).isEmpty();
-        serviceTemplateDetailVo.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
 
         // Setup request 2
         ReviewRegistrationRequest request2 = new ReviewRegistrationRequest();
