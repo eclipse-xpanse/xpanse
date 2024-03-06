@@ -263,9 +263,9 @@ public class ServiceTemplateManage {
         } else if (ServiceReviewResult.REJECTED == request.getReviewResult()) {
             existingTemplate.setServiceRegistrationState(ServiceRegistrationState.REJECTED);
         }
-        if (StringUtils.isNotBlank(request.getReviewComment())) {
-            existingTemplate.setReviewComment(request.getReviewComment());
-        }
+        String reviewComment = StringUtils.isNotBlank(request.getReviewComment())
+                ? request.getReviewComment() : request.getReviewResult().toValue();
+        existingTemplate.setReviewComment(reviewComment);
         storage.storeAndFlush(existingTemplate);
     }
 
