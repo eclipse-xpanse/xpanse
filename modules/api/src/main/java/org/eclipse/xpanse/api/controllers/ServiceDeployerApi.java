@@ -156,6 +156,8 @@ public class ServiceDeployerApi {
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
                     ServiceDeploymentState serviceState) {
+        // return type is DeployedService but actually returns one of the child types
+        // VendorHostedDeployedServiceDetails or DeployedServiceDetails
         return this.serviceDetailsViewManager.listDeployedServicesDetails(
                 category, csp, serviceName, serviceVersion, serviceState);
     }
