@@ -49,7 +49,7 @@
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hypersistence-utils-hibernate.version>3.7.3</hypersistence-utils-hibernate.version>
         <mockito.version>5.11.0</mockito.version>
-        <testcontainers.version>1.19.6</testcontainers.version>
+        <testcontainers.version>1.19.7</testcontainers.version>
         <apache.commons.io.version>2.15.1</apache.commons.io.version>
         <apache.commons.lang.version>3.14.0</apache.commons.lang.version>
         <apache.commons.collections.version>4.4</apache.commons.collections.version>
