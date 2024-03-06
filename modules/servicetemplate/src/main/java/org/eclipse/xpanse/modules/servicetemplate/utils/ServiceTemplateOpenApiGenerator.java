@@ -397,12 +397,12 @@ public class ServiceTemplateOpenApiGenerator {
                                                    "type": "string",
                                                    "description": "The flavor of the Service."
                                                },
-                                               "property": {
-                                                   "$ref": "#/components/schemas/property"
+                                               "serviceRequestProperties": {
+                                                   "$ref": "#/components/schemas/serviceRequestProperties"
                                                }
                                            }
                                        },
-                                       "property": {
+                                       "serviceRequestProperties": {
                                            "required": %s,
                                            "description": "The deploy variables of registered service.",
                                            "type": "object",
