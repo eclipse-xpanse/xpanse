@@ -128,7 +128,7 @@ public class OpenTofuLocalDeployment implements Deployer {
             try {
                 executor.deploy();
                 openTofuResult.setCommandSuccessful(true);
-            } catch (OpenTofuExecutorException tfEx) {
+            } catch (RuntimeException tfEx) {
                 log.error("Execute OpenTofu deploy script failed. {}", tfEx.getMessage());
                 openTofuResult.setCommandSuccessful(false);
                 openTofuResult.setCommandStdError(tfEx.getMessage());
@@ -151,7 +151,7 @@ public class OpenTofuLocalDeployment implements Deployer {
             try {
                 executor.destroy();
                 openTofuResult.setCommandSuccessful(true);
-            } catch (OpenTofuExecutorException tfEx) {
+            } catch (RuntimeException tfEx) {
                 log.error("Execute openTofu destroy script failed. {}", tfEx.getMessage());
                 openTofuResult.setCommandSuccessful(false);
                 openTofuResult.setCommandStdError(tfEx.getMessage());

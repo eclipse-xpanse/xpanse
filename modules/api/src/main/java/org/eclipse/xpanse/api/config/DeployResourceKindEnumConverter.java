@@ -10,7 +10,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * Bean for serializing string in request parameters to ReusbaleCloudResource enum.
+ * Bean for serializing string in request parameters to ReusableCloudResource enum.
  */
 @Component
 public class DeployResourceKindEnumConverter
