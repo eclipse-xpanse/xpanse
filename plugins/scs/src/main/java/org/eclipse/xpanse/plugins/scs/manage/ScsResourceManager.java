@@ -41,7 +41,7 @@ public class ScsResourceManager {
     }
 
     /**
-     * List Scs resource by the kind of ReusbaleCloudResource.
+     * List Scs resource by the kind of ReusableCloudResource.
      */
     public List<String> getExistingResourcesOfType(String userId,
             String region, DeployResourceKind kind) {

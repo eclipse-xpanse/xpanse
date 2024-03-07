@@ -64,7 +64,7 @@ public class FlexibleEngineResourceManager {
     }
 
     /**
-     * List FlexibleEngine resource by the kind of ReusbaleCloudResource.
+     * List FlexibleEngine resource by the kind of ReusableCloudResource.
      */
     public List<String> getExistingResourcesOfType(String userId,
             String region, DeployResourceKind kind) {
