@@ -127,7 +127,7 @@ public class TerraformLocalDeployment implements Deployer {
             try {
                 executor.deploy();
                 terraformResult.setCommandSuccessful(true);
-            } catch (TerraformExecutorException tfEx) {
+            } catch (RuntimeException tfEx) {
                 log.error("Execute Terraform deploy script failed. {}", tfEx.getMessage());
                 terraformResult.setCommandSuccessful(false);
                 terraformResult.setCommandStdError(tfEx.getMessage());
@@ -150,7 +150,7 @@ public class TerraformLocalDeployment implements Deployer {
             try {
                 executor.destroy();
                 terraformResult.setCommandSuccessful(true);
-            } catch (TerraformExecutorException tfEx) {
+            } catch (RuntimeException tfEx) {
                 log.error("Execute terraform destroy script failed. {}", tfEx.getMessage());
                 terraformResult.setCommandSuccessful(false);
                 terraformResult.setCommandStdError(tfEx.getMessage());
