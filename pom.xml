@@ -80,7 +80,7 @@
         <opentelemetry.version>1.32.0</opentelemetry.version>
         <eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
         <java.uuid.generator.version>5.0.0</java.uuid.generator.version>
-        <jgit.version>6.8.0.202311291450-r</jgit.version>
+        <jgit.version>6.9.0.202403050737-r</jgit.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
