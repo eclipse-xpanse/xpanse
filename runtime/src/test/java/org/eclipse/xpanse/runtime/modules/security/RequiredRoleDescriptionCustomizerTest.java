@@ -7,6 +7,8 @@ import io.swagger.v3.oas.models.Operation;
 import java.util.List;
 import org.eclipse.xpanse.api.controllers.AdminServicesApi;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
 import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthCheck;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
@@ -39,16 +41,19 @@ class RequiredRoleDescriptionCustomizerTest {
         externalDocs.description("description");
         operation.externalDocs(externalDocs);
 
+        final AdminServicesApi adminServicesApi = new AdminServicesApi(
+                new IdentityProviderManager(), new PluginManager(),
+                new DatabaseManager(), new TerraformBootManager(),
+                new TofuMakerManager(), new PolicyManager(),
+                new OpenTelemetryCollectorHealthCheck());
+
         final HandlerMethod handlerMethod =
-                new HandlerMethod(
-                        new AdminServicesApi(new IdentityProviderManager(), new PluginManager(),
-                                new DatabaseManager(), null, null, new PolicyManager(),
-                                new OpenTelemetryCollectorHealthCheck()), "healthCheck", null);
+                new HandlerMethod(adminServicesApi, "healthCheck", null);
         final Operation expectedResult = new Operation();
         expectedResult.tags(List.of("value"));
         expectedResult.summary("summary");
-        expectedResult.setDescription(
-                "description<br>Required role:<b> admin</b> or <b>isv</b> or <b>user</b>");
+        expectedResult.setDescription("description<br>Required role:"
+                + "<b> admin</b> or <b>csp</b> or <b>isv</b> or <b>user</b>");
         final ExternalDocumentation externalDocs1 = new ExternalDocumentation();
         externalDocs1.description("description");
         expectedResult.externalDocs(externalDocs1);

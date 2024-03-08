@@ -35,7 +35,6 @@ public class PluginManager {
 
     @Getter
     private final Map<Csp, OrchestratorPlugin> pluginsMap = new ConcurrentHashMap<>();
-
     @Resource
     private ApplicationContext applicationContext;
 
@@ -44,17 +43,20 @@ public class PluginManager {
      */
     @Bean
     public void loadPlugins() {
-        applicationContext.getBeansOfType(OrchestratorPlugin.class)
-                .forEach((key, value) -> {
-                    if (isPluginUsable(value.requiredProperties(), value.getCsp())) {
-                        pluginsMap.put(value.getCsp(), value);
-                    } else {
-                        log.error(String.format(
-                                "Plugin for csp %s is not in usable state. Will not be activated.",
-                                value.getCsp()));
-                    }
-                });
+        applicationContext.getBeansOfType(OrchestratorPlugin.class).forEach((key, value) -> {
+            if (isPluginUsable(value.requiredProperties(), value.getCsp())) {
+                pluginsMap.put(value.getCsp(), value);
+            } else {
+                log.error(String.format(
+                        "Plugin for csp %s is not in usable state. Will not be activated.",
+                        value.getCsp()));
+            }
+        });
         checkCredentialDefinitions();
+        log.info("Cloud service providers:{} with activated plugins.", pluginsMap.keySet());
+        if (pluginsMap.isEmpty()) {
+            throw new PluginNotFoundException("No plugin is activated.");
+        }
     }
 
 

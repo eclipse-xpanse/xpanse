@@ -30,7 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ContextConfiguration(classes = {CaffeineCredentialCacheManager.class, CredentialsStore.class,
-        PluginManager.class, AesUtil.class})
+        AesUtil.class})
 @ExtendWith(SpringExtension.class)
 class CredentialSearchTests {
 
@@ -55,7 +55,7 @@ class CredentialSearchTests {
                         "userId",
                         List.of(new CredentialVariable("name", "description", false))));
         when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
-                credentialVariables.get(0));
+                credentialVariables.getFirst());
         Assertions.assertThrows(CredentialVariablesNotComplete.class,
                 () -> this.credentialCenter.getCredential(Csp.OPENSTACK,
                         CredentialType.VARIABLES, "user"));
@@ -72,7 +72,7 @@ class CredentialSearchTests {
                                 new CredentialVariable("id", "description", true, false,
                                         "testName"))));
         when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
-                credentialVariables.get(0));
+                credentialVariables.getFirst());
         AbstractCredentialInfo abstractCredentialInfo =
                 this.credentialCenter.getCredential(Csp.OPENSTACK,
                         CredentialType.VARIABLES, "user");
@@ -93,7 +93,7 @@ class CredentialSearchTests {
                                     new CredentialVariable("id", "description", true, false,
                                             "testName"))));
             when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
-                    credentialVariables.get(0));
+                    credentialVariables.getFirst());
             AbstractCredentialInfo abstractCredentialInfo =
                     this.credentialCenter.getCredential(Csp.OPENSTACK,
                             CredentialType.VARIABLES, "user");
@@ -118,7 +118,7 @@ class CredentialSearchTests {
                             List.of(new CredentialVariable("name", "description", true, false),
                                     new CredentialVariable("id", "description", true, false))));
             when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
-                    credentialVariables.get(0));
+                    credentialVariables.getFirst());
             AbstractCredentialInfo abstractCredentialInfo =
                     this.credentialCenter.getCredential(Csp.OPENSTACK,
                             CredentialType.VARIABLES, "user");

@@ -86,21 +86,6 @@
             <artifactId>servicetemplate</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.plugins</groupId>
-            <artifactId>flexibleengine</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.plugins</groupId>
-            <artifactId>huaweicloud</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.plugins</groupId>
-            <artifactId>openstack</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!--junit4 dependency needed in classpath for testcontainers due to a known issue-->
         <dependency>
             <groupId>junit</groupId>
@@ -136,11 +121,6 @@
             <artifactId>spring-addons-oauth2-test</artifactId>
             <version>${spring.oauth.addon.test.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xpanse.plugins</groupId>
-            <artifactId>scs</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
@@ -207,13 +187,20 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputDirectory>${project.parent.basedir}/target/coverage-reports</outputDirectory>
-                    <dataFile>${project.parent.basedir}/target/coverage-reports/jacoco.exec</dataFile>
+                    <outputDirectory>${project.parent.basedir}/target/coverage-reports
+                    </outputDirectory>
+                    <dataFile>${project.parent.basedir}/target/coverage-reports/jacoco.exec
+                    </dataFile>
                     <skip>${jacoco.skip}</skip>
                     <excludes>
-                        <exclude>**/org/eclipse/xpanse/modules/deployment/deployers/terraform/terraformboot/generated/**</exclude>
-                        <exclude>**/org/eclipse/xpanse/modules/deployment/deployers/opentofu/tofumaker/generated/**</exclude>
-                        <exclude>**/org/eclipse/xpanse/modules/policy/policyman/generated/**</exclude>
+                        <exclude>
+                            **/org/eclipse/xpanse/modules/deployment/deployers/terraform/terraformboot/generated/**
+                        </exclude>
+                        <exclude>
+                            **/org/eclipse/xpanse/modules/deployment/deployers/opentofu/tofumaker/generated/**
+                        </exclude>
+                        <exclude>**/org/eclipse/xpanse/modules/policy/policyman/generated/**
+                        </exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -247,6 +234,28 @@
     <profiles>
         <profile>
             <id>generate-openapi-doc</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>huaweicloud</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>flexibleengine</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>openstack</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>scs</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -287,6 +296,80 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!-- Add all the plugins into dependencies by default-->
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>huaweicloud</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>flexibleengine</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>openstack</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>scs</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>plugin-huawei</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>huaweicloud</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>plugin-flexibleengine</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>flexibleengine</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>scs</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>plugin-openstack</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>openstack</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>plugin-scs</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>scs</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

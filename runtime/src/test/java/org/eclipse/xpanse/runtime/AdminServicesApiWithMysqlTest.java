@@ -46,8 +46,8 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active="
-        + "zitadel,zitadel-testbed,terraform-boot,tofu-maker,mysql"})
+@SpringBootTest(properties = {
+        "spring.profiles.active=zitadel,zitadel-testbed,terraform-boot,tofu-maker,mysql"})
 @AutoConfigureMockMvc
 class AdminServicesApiWithMysqlTest extends AbstractMysqlIntegrationTest {
 

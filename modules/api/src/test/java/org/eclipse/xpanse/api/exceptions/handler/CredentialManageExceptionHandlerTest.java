@@ -14,12 +14,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Optional;
 import java.util.Set;
+import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.UserCloudCredentialsApi;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialCapabilityNotFound;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariablesNotComplete;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.modules.models.credential.exceptions.NoCredentialDefinitionAvailable;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,22 +38,21 @@ import org.springframework.web.context.WebApplicationContext;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {UserCloudCredentialsApi.class, CommonExceptionHandler.class,
         CredentialCenter.class, CredentialManageExceptionHandler.class,
-        IdentityProviderManager.class})
+        IdentityProviderManager.class, CspPluginValidator.class, PluginManager.class})
 @WebMvcTest
 class CredentialManageExceptionHandlerTest {
-
-    private String userId = "defaultUserId";
-
-    @MockBean
-    private CredentialCenter credentialCenter;
-
-    @MockBean
-    private IdentityProviderManager identityProviderManager;
-
+    private final String userId = "defaultUserId";
+    private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext context;
-
-    private MockMvc mockMvc;
+    @MockBean
+    private PluginManager pluginManager;
+    @MockBean
+    private CspPluginValidator cspPluginValidator;
+    @MockBean
+    private CredentialCenter credentialCenter;
+    @MockBean
+    private IdentityProviderManager identityProviderManager;
 
     @BeforeEach
     public void setup() {
@@ -110,6 +111,7 @@ class CredentialManageExceptionHandlerTest {
         this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(401))
                 .andExpect(jsonPath("$.resultType").value("Current Login User No Found"))
-                .andExpect(jsonPath("$.details[0]").value("Unable to get current login information"));
+                .andExpect(
+                        jsonPath("$.details[0]").value("Unable to get current login information"));
     }
 }

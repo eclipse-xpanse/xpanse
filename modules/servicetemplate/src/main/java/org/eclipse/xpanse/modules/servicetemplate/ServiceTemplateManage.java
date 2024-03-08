@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.servicetemplate;
 
 import jakarta.annotation.Resource;
-import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -35,7 +34,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
-import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -56,8 +54,6 @@ public class ServiceTemplateManage {
     @Resource
     private ServiceTemplateStorage storage;
     @Resource
-    private OclLoader oclLoader;
-    @Resource
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
     @Resource
     private IdentityProviderManager identityProviderManager;
@@ -65,19 +61,6 @@ public class ServiceTemplateManage {
     private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @Resource
     private DeployerKindManager deployerKindManager;
-
-    /**
-     * Update service template using id and the ocl file url.
-     *
-     * @param id          id of the service template.
-     * @param oclLocation url of the ocl file.
-     * @return Returns service template DB newTemplate.
-     */
-    public ServiceTemplateEntity updateServiceTemplateByUrl(UUID id, String oclLocation)
-            throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        return updateServiceTemplate(id, ocl);
-    }
 
     /**
      * Update service template using id and the ocl model.
@@ -188,17 +171,6 @@ public class ServiceTemplateManage {
         ServiceTemplateEntity storedServiceTemplate = storage.storeAndFlush(newTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
         return storedServiceTemplate;
-    }
-
-    /**
-     * service template using the url of ocl file.
-     *
-     * @param oclLocation the url of the ocl file.
-     * @return Returns service template DB newTemplate.
-     */
-    public ServiceTemplateEntity registerServiceTemplateByUrl(String oclLocation) throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        return registerServiceTemplate(ocl);
     }
 
     /**

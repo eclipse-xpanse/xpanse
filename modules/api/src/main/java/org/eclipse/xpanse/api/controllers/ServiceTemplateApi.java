@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.http.HttpStatus;
@@ -61,6 +63,8 @@ public class ServiceTemplateApi {
 
     @Resource
     private ServiceTemplateManage serviceTemplateManage;
+    @Resource
+    private OclLoader oclLoader;
 
     /**
      * Register new service template using ocl model.
@@ -118,8 +122,8 @@ public class ServiceTemplateApi {
     public ServiceTemplateDetailVo fetch(
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
-        ServiceTemplateEntity templateEntity =
-                serviceTemplateManage.registerServiceTemplateByUrl(oclLocation);
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
+        ServiceTemplateEntity templateEntity = serviceTemplateManage.registerServiceTemplate(ocl);
         String message = String.format("Register service template by file with URL %s successful.",
                 oclLocation);
         log.info(message);
@@ -145,8 +149,9 @@ public class ServiceTemplateApi {
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
         log.info("Update service template {} with Url {}", id, oclLocation);
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ServiceTemplateEntity templateEntity =
-                serviceTemplateManage.updateServiceTemplateByUrl(UUID.fromString(id), oclLocation);
+                serviceTemplateManage.updateServiceTemplate(UUID.fromString(id), ocl);
         String successMsg = String.format("Update service template with id %s by Url %s", id,
                 oclLocation);
         log.info(successMsg);
@@ -177,8 +182,8 @@ public class ServiceTemplateApi {
     /**
      * List service templates with query params.
      *
-     * @param categoryName             category of the service.
-     * @param cspName                  name of the cloud service provider.
+     * @param category                 category of the service.
+     * @param csp                      name of the cloud service provider.
      * @param serviceName              name of the service.
      * @param serviceVersion           version of the service.
      * @param serviceHostingType       type of the service hosting.
@@ -191,9 +196,9 @@ public class ServiceTemplateApi {
     @ResponseStatus(HttpStatus.OK)
     public List<ServiceTemplateDetailVo> listServiceTemplates(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) Category categoryName,
+            @RequestParam(name = "categoryName", required = false) Category category,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
-            @RequestParam(name = "cspName", required = false) Csp cspName,
+            @RequestParam(name = "cspName", required = false) Csp csp,
             @Parameter(name = "serviceName", description = "name of the service")
             @RequestParam(name = "serviceName", required = false) String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
@@ -205,7 +210,7 @@ public class ServiceTemplateApi {
             @RequestParam(name = "serviceRegistrationState", required = false)
             ServiceRegistrationState serviceRegistrationState) {
         ServiceTemplateQueryModel queryRequest =
-                new ServiceTemplateQueryModel(categoryName, cspName, serviceName, serviceVersion,
+                new ServiceTemplateQueryModel(category, csp, serviceName, serviceVersion,
                         serviceHostingType, serviceRegistrationState, true);
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);
