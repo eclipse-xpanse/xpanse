@@ -6,15 +6,14 @@
 package org.eclipse.xpanse.api.controllers;
 
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -40,7 +39,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,8 +64,7 @@ public class AdminServicesApi {
      * Constructor for AdminServicesApi bean.
      */
     public AdminServicesApi(IdentityProviderManager identityProviderManager,
-                            PluginManager pluginManager,
-                            DatabaseManager databaseManager,
+                            PluginManager pluginManager, DatabaseManager databaseManager,
                             @Nullable TerraformBootManager terraformBootManager,
                             @Nullable TofuMakerManager tofuMakerManager,
                             PolicyManager policyManager,
@@ -91,7 +88,7 @@ public class AdminServicesApi {
     @Operation(description = "Check health of API service and backend systems.")
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
+    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
     public SystemStatus healthCheck() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
@@ -109,20 +106,14 @@ public class AdminServicesApi {
      * @return Returns list of cloud service provider.
      */
     @Tag(name = "Admin", description = "APIs for administrating Xpanse")
-    @Operation(description = "List cloud service provider.")
-    @GetMapping(value = "/csp", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(description = "List cloud service providers with active plugin.")
+    @GetMapping(value = "/csps/active", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
-    public List<Csp> getCsps(
-            @Parameter(name = "active",
-                    description = "Whether only list cloud service provider with active plugin.")
-            @RequestParam(name = "active") Boolean active) {
-        if (Objects.nonNull(active) && active) {
-            Set<Csp> cspSet = pluginManager.getPluginsMap().keySet();
-            log.info("List cloud service provider:{} with active plugin.", cspSet);
-            return cspSet.stream().sorted().toList();
-        }
-        return Arrays.asList(Csp.values());
+    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
+    public List<Csp> getActiveCsps() {
+        Set<Csp> cspSet = pluginManager.getPluginsMap().keySet();
+        log.info("Cloud service providers:{} with active plugins.", cspSet);
+        return cspSet.stream().sorted().toList();
     }
 
 
@@ -157,25 +148,21 @@ public class AdminServicesApi {
                     backendSystemStatuses.add(databaseStatus);
                 }
             }
-            if (Objects.nonNull(terraformBootManager)
-                    && type == BackendSystemType.TERRAFORM_BOOT) {
+            if (Objects.nonNull(terraformBootManager) && type == BackendSystemType.TERRAFORM_BOOT) {
                 BackendSystemStatus terraformBootStatus =
                         terraformBootManager.getTerraformBootStatus();
                 if (Objects.nonNull(terraformBootStatus)) {
                     backendSystemStatuses.add(terraformBootStatus);
                 }
             }
-            if (Objects.nonNull(tofuMakerManager)
-                    && type == BackendSystemType.TOFU_MAKER) {
-                BackendSystemStatus openTofuMakerStatus =
-                        tofuMakerManager.getOpenTofuMakerStatus();
+            if (Objects.nonNull(tofuMakerManager) && type == BackendSystemType.TOFU_MAKER) {
+                BackendSystemStatus openTofuMakerStatus = tofuMakerManager.getOpenTofuMakerStatus();
                 if (Objects.nonNull(openTofuMakerStatus)) {
                     backendSystemStatuses.add(openTofuMakerStatus);
                 }
             }
             if (type == BackendSystemType.POLICY_MAN) {
-                BackendSystemStatus policyManStatus =
-                        policyManager.getPolicyManStatus();
+                BackendSystemStatus policyManStatus = policyManager.getPolicyManStatus();
                 if (Objects.nonNull(policyManStatus)) {
                     backendSystemStatuses.add(policyManStatus);
                 }

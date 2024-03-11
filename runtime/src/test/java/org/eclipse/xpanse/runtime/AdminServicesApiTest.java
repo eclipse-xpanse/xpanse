@@ -46,13 +46,12 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active="
-        + "zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
+@SpringBootTest(properties = {
+        "spring.profiles.active=zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
 @AutoConfigureMockMvc
 class AdminServicesApiTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Resource
     private MockMvc mockMvc;
     @Resource
@@ -122,40 +121,19 @@ class AdminServicesApiTest {
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
-    void testGetCsps() throws Exception {
+    void testGetActiveCsps() throws Exception {
         // SetUp
-        List<Csp> cspList = Arrays.asList(Csp.values());
-        String resultBody = objectMapper.writeValueAsString(cspList);
+        List<Csp> activeCspList = pluginManager.getPluginsMap().keySet().stream().sorted().toList();
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/csp")
-                        .param("active", "false")
+        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/csps/active")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
         // Verify the results
         assertEquals(response.getStatus(), HttpStatus.OK.value());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
-        assertEquals(resultBody, response.getContentAsString());
-    }
-
-    @Test
-    @WithJwt(file = "jwt_all_roles.json")
-    void testGetCspsWithActive() throws Exception {
-        // SetUp
-        List<Csp> cspList = pluginManager.getPluginsMap().keySet().stream().sorted().toList();
-        String resultBody = objectMapper.writeValueAsString(cspList);
-
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/csp")
-                        .param("active", "true")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        assertEquals(response.getStatus(), HttpStatus.OK.value());
-        assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
-        assertEquals(resultBody, response.getContentAsString());
+        assertEquals(objectMapper.writeValueAsString(activeCspList), response.getContentAsString());
     }
 
     private List<BackendSystemStatus> setUpBackendSystemStatusList(boolean isAdmin) {

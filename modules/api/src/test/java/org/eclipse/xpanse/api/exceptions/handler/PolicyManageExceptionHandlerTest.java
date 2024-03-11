@@ -11,11 +11,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
+import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.UserPolicyManageApi;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.UserPolicyManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,16 +33,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {UserPolicyManageApi.class, PolicyManageExceptionHandler.class})
+@ContextConfiguration(classes = {UserPolicyManageApi.class, PolicyManageExceptionHandler.class,
+        CspPluginValidator.class, PluginManager.class, OclLoader.class})
 @WebMvcTest
 class PolicyManageExceptionHandlerTest {
-
-    @Autowired
-    private WebApplicationContext context;
     private final UUID id = UUID.randomUUID();
     private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext context;
     @MockBean
     private UserPolicyManager userPolicyManager;
+    @MockBean
+    private PluginManager pluginManager;
 
     @BeforeEach
     public void setup() {

@@ -10,12 +10,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.ServiceMetricsApi;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsAdapter;
+import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,13 +34,19 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceMetricsApi.class, ServiceMetricsAdapter.class,
-        ServiceMetricsExceptionHandler.class, IdentityProviderManager.class})
+        ServiceMetricsExceptionHandler.class, IdentityProviderManager.class, PluginManager.class,
+        CspPluginValidator.class})
 @WebMvcTest
 class ServiceMetricsExceptionHandlerTest {
 
     private final String serviceId = "e034af0c-be03-453e-92cd-fd69acbfe526";
     private final String resourceId = "a034af0c-be03-453e-92cd-fd69acbfe526";
-
+    @MockBean
+    private PluginManager pluginManager;
+    @MockBean
+    private CspPluginValidator cspPluginValidator;
+    @MockBean
+    private OrchestratorPlugin orchestratorPlugin;
     @Autowired
     private WebApplicationContext context;
 

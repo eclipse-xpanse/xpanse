@@ -5,13 +5,14 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
@@ -21,6 +22,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,15 +40,20 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceTemplateApi.class, ServiceTemplateManage.class,
-        RegistrationExceptionHandler.class, IdentityProviderManager.class})
+        RegistrationExceptionHandler.class, IdentityProviderManager.class, OclLoader.class,
+        CspPluginValidator.class, PluginManager.class})
 @WebMvcTest
 class RegistrationExceptionHandlerTest {
 
-    @Autowired
-    private WebApplicationContext context;
+    private final String oclLocation = "file:src/test/resources/ocl_terraform_test.yml";
     @MockBean
     private ServiceTemplateManage serviceTemplateManage;
-
+    @MockBean
+    private PluginManager pluginManager;
+    @MockBean
+    private CspPluginValidator cspPluginValidator;
+    @Autowired
+    private WebApplicationContext context;
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -55,11 +63,11 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testTerraformScriptFormatInvalidException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
-                .thenThrow(new TerraformScriptFormatInvalidException(List.of("test error")));
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new TerraformScriptFormatInvalidException(List.of("test error")));
 
         this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Terraform Script Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -67,11 +75,11 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testServiceTemplateAlreadyRegistered() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
-                .thenThrow(new ServiceTemplateAlreadyRegistered("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new ServiceTemplateAlreadyRegistered("test error"));
 
         this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Template Already Registered"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -79,11 +87,11 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testIconProcessingFailedException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
-                .thenThrow(new IconProcessingFailedException("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new IconProcessingFailedException("test error"));
 
         this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Icon Processing Failed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -91,11 +99,11 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testServiceTemplateNotRegistered() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
-                .thenThrow(new ServiceTemplateNotRegistered("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new ServiceTemplateNotRegistered("test error"));
 
         this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Template Not Registered"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -103,11 +111,11 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testServiceTemplateNotApproved() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
-                .thenThrow(new ServiceTemplateNotApproved("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new ServiceTemplateNotApproved("test error"));
 
         this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Template Not Approved"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -115,11 +123,11 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testServiceTemplateAlreadyReviewed() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
-                .thenThrow(new ServiceTemplateAlreadyReviewed("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new ServiceTemplateAlreadyReviewed("test error"));
 
         this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Template Already Reviewed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -127,11 +135,11 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testServiceTemplateUpdateNotAllowed() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
-                .thenThrow(new ServiceTemplateUpdateNotAllowed("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new ServiceTemplateUpdateNotAllowed("test error"));
 
         this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Service Template Update Not Allowed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -139,11 +147,11 @@ class RegistrationExceptionHandlerTest {
 
     @Test
     void testInvalidValueSchemaException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplateByUrl(anyString()))
-                .thenThrow(new InvalidValueSchemaException(List.of("test error")));
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new InvalidValueSchemaException(List.of("test error")));
 
         this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", "file://test"))
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Variable Schema Definition Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));

@@ -29,9 +29,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {XpanseApplication.class, CaffeineCredentialCacheManager.class,
-        CredentialsStore.class,
-        ServletUriComponentsBuilder.class, OpenApiUrlManage.class, PluginManager.class},
-        properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
+        CredentialsStore.class, ServletUriComponentsBuilder.class, OpenApiUrlManage.class,
+        PluginManager.class},
+        properties = {"spring.profiles.active=zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
 class CredentialOpenApiGeneratorTest {
 
     @Autowired

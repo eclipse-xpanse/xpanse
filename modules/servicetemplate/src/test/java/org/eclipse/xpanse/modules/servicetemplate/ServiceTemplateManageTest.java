@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.servicetemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -74,8 +73,6 @@ class ServiceTemplateManageTest {
     @Mock
     private ServiceTemplateStorage mockStorage;
     @Mock
-    private OclLoader mockOclLoader;
-    @Mock
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
     @Mock
     private DeployerKindManager deployerKindManager;
@@ -110,38 +107,6 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setOcl(oclRegister);
         serviceTemplateEntity.setNamespace("ISV-A");
         return serviceTemplateEntity;
-    }
-
-    @Test
-    void testUpdateServiceTemplateByUrl() throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ocl.setVersion("2.1");
-        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(ocl);
-        when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
-        when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
-        TerraformLocalDeployment deployment =
-                new TerraformLocalDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
-                        scriptsGitRepoManage);
-
-        doReturn(deployment).when(deployerKindManager).getDeployment(any());
-        when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
-        ServiceTemplateEntity serviceTemplateEntityByUrl =
-                serviceTemplateManageTest.updateServiceTemplateByUrl(uuid, oclLocation);
-        log.error(serviceTemplateEntityByUrl.toString());
-        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                serviceTemplateEntityByUrl.getServiceRegistrationState());
-        verify(serviceTemplateOpenApiGenerator).updateServiceApi(serviceTemplateEntity);
-    }
-
-    @Test
-    void testUpdateServiceTemplateByUrl_OclLoaderThrowsException() throws Exception {
-        when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenThrow(Exception.class);
-        assertThatThrownBy(
-                () -> serviceTemplateManageTest.updateServiceTemplateByUrl(UUID.randomUUID(),
-                        oclLocation)).isInstanceOf(Exception.class);
     }
 
     @Test
@@ -246,33 +211,6 @@ class ServiceTemplateManageTest {
                 "https://raw.githubusercontent.com/eclipse-xpanse/xpanse/main/static/full-logo.png");
         Assertions.assertThrows(IconProcessingFailedException.class,
                 () -> serviceTemplateManageTest.registerServiceTemplate(ocl));
-    }
-
-    @Test
-    void testRegisterServiceTemplateByUrl() throws Exception {
-        when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenReturn(oclRegister);
-        TerraformLocalDeployment deployment =
-                new TerraformLocalDeployment(new DeployEnvironments(null, null, null, null),
-                        terraformLocalConfig, taskExecutor,
-                        terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
-                        scriptsGitRepoManage);
-        doReturn(deployment).when(deployerKindManager).getDeployment(any());
-
-        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
-
-        ServiceTemplateEntity savedServiceTemplateEntity =
-                serviceTemplateManageTest.registerServiceTemplateByUrl(oclLocation);
-        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                savedServiceTemplateEntity.getServiceRegistrationState());
-        verify(serviceTemplateOpenApiGenerator).generateServiceApi(savedServiceTemplateEntity);
-    }
-
-    @Test
-    void testServiceTemplateByUrl_OclLoaderThrowsException() throws Exception {
-        when(mockOclLoader.getOcl(URI.create(oclLocation).toURL())).thenThrow(Exception.class);
-        assertThatThrownBy(() -> serviceTemplateManageTest.registerServiceTemplateByUrl(
-                oclLocation)).isInstanceOf(Exception.class);
     }
 
     @Test
