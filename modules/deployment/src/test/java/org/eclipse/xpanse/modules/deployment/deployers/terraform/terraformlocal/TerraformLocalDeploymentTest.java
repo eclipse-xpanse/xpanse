@@ -247,7 +247,8 @@ class TerraformLocalDeploymentTest {
         expectedResult.setDiagnostics(new ArrayList<>());
 
         // Run the test
-        final DeploymentScriptValidationResult result = terraformLocalDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result =
+                terraformLocalDeployment.validate(ocl.getDeployment());
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -265,7 +266,8 @@ class TerraformLocalDeploymentTest {
         expectedResult.setDiagnostics(List.of(diagnostics));
 
         // Run the test
-        final DeploymentScriptValidationResult result = terraformLocalDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result =
+                terraformLocalDeployment.validate(ocl.getDeployment());
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -274,9 +276,8 @@ class TerraformLocalDeploymentTest {
     @Test
     void testValidate_ThrowsTerraformExecutorException() {
         ocl.getDeployment().setDeployer(errorDeployer);
-
         Assertions.assertThrows(TerraformExecutorException.class,
-                () -> this.terraformLocalDeployment.validate(ocl));
+                () -> this.terraformLocalDeployment.validate(ocl.getDeployment()));
     }
 
 }

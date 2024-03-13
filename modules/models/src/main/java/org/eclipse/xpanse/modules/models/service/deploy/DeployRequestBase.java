@@ -92,4 +92,7 @@ public class DeployRequestBase implements Serializable {
      */
     @Schema(description = "The properties for the requested service")
     private Map<String, Object> serviceRequestProperties;
+
+    @Schema(description = "The availability zones to deploy the service instance.")
+    private Map<String, String> availabilityZones;
 }

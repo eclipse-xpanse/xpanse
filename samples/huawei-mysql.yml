@@ -1,17 +1,17 @@
 # The version of the Xpanse description language
 version: 1.0
 # The category of the service.
-category: middleware
+category: database
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: Kafka-cluster
+name: RDS-MySQL
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an enhanced Kafka cluster services by ISV-A.
+description: This is an enhanced MySQL server service by ISV-A.
 namespace: ISV-A
 # Icon for the service.
 icon: |
-  data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACRAQMAAAAPc4+9AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAZQTFRF+/v7Hh8gVD0A0wAAAcVJREFUeJzNlc1twzAMhSX44KNH0CgaTd6gK3kUd4McDVTwq/hjiUyaIkV7qNA2/QCFIh+ppxB+svLNEqqBGTC0ANugBOwmCGDCFOAwIWGDOoqoODtN2BdL6wxD9NMTO9tXPa1PqL5M30W5p8lm5vNcF0t7ahSrVguqNqmMokRW4YQucVjBCBWH1Z2g3WDlW2skoYU+2x8JOtGedBF3k2iXMO0j16iUiI6gxzPdQhnU/s2G9pCO57QY2r6hvjPbKJHq7DRTRXT60avtuTRdbrFJI3mSZhNOqYjVbd99YyK1QKWzEqSWrE0k07U60uPaelflMzaaeu1KBuurHSsn572I1KWy2joX5ZBfWbS/VEt50H5P6aL4JxTuyJ/+QCNPX4PWF3Q8Xe1eF9FsLdD2VaOnaP2hWvs+zI58/7i3vH3nRFtDZpyTUNaZkON5XnBNsp8lrmDMrpvBr+b6pUl+4XbkQdndqnzYGzfuJm1JmIWimIbe6dndd/bk7gVce/cJdo3uIeLJl7+I2xTnPek67mjtDeppE7b03Ov+kSfDe3JweW53njxeGfXkaz28VeYd86+af/H8a7hgJKaebILaFzakLfxyfQLTxVB6K1K9KQAAAABJRU5ErkJggg==
+  data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAmCAYAAACoPemuAAAACXBIWXMAAAsTAAALEwEAmpwYAAAEyUlEQVR4nO1XW2geVRA+52yrVrS2hGjFineleKNVSrHgXVD0RSWgVaoijVJaa0l2Zv+GslBERLw81Ae1XkB8ihaxlZhkZ3ZpUqOFasVLRVG0oGjVqFjx1ja/zNnN/tez+dNEC9KBJcnJmdlvbt/MKnVEDof4g+do5IcM8Hq1jk5Rh12Az9dILxmg/Qa5bB/gv+RMwP73gJAvtoCQD+SA6h/ggxq4V8Hggn8fEPBlGnmrQRpzAmoGEHmr8pNLpx2P58fXaOCkCIAG3qSRNrvv0JhGel0BLZ4inLL2/Ogmg/R2K5FRQIs9jG9t5a5GHlTIl08eEyTzDfKOltOFXDYB3W87cxI6GqlfrUnmtIxLIz07KVBoa2mFRtpwCHrrWwZmgL+org0D9GWB8T0a6FVVGmpXPp+ngbcYpG/dQGhf3d/bWkPVncyrK+o3pd400gu15zSgSvFS+V+DjY5ezwui6w3QO3Wp26zCZIZBHqpy/HfVuXPmhLg84FvqPPrDAIEKorYsxaMG6W57uWvgDI30sAZ6vlIG/JpNT4lOEtAmIBQCtpSxJpkjugbp1/rGmRCYBn7MkYJPVLjlWBWGJkt3SVg+67KteRkg7cpTFsSd9hCjE1TYe5QBHnHYfnBCYE5l5LLQQX6xFC81wJ9mwJ6uRIzeyO5LZO+sAOZlzu6UCVEoYXKMQf7TYWC31IcKonPz+2tHZmnkxw1QWBXxTTaC67adnN+zEeubbYC+d3Tm18XAJAqubvLjlRnwvQaop0Zv7cisinN9s6sbIovUcAb6EZd91cWnOXEZZN+p2NN/qod0c1Vd1IJrIl7AHeObh8JoYaHjAd/uNGQ7qnmof0w9pker2vxvGepWMRieq5H7LIUEUVsKytJFZR1CXq3C5DhnnSFvdEcM+DuH4mcZsGdkENuilrrJ9ainiqs25Aa7+SwDtEoAjzO8pZ/m73i3OaogObugaxJ7J0ypoiFlQNdl0TngYXxjUXoN0lsOytgvEW2iwMvrQvuk8JAQblNmLg21q266KC90TE5XQXRm/v+ugRNtFzdIWStIlng+XWWA7q2lI7664Xpt/XBZ+bRIVhPhGDvP/PgK5W8/3iB9VJWO0aYvD0NjgH4ar0/blenZbVZfVingFbY5aqIWP9AYMeB7nB2TRrDPOoC8seosJ1Y7VqpGS92G4tvxBPRh0Tu8ILq2McJhaOTlbkUas4o2avxBRgFXWt2OXs8AvW+A35Pf5UjupvVJbAd3XdqaOP6cckowPNcgfV5gYI/9POtO5mnkVypzk1ZVFfF9qaPJDA38ojiiSskFBunnArs71Oq+o1WhYHShQf6twMhu2SoqzkRttS+lH1L2z+0tNMjfFNjbK+StWpG0SN1hN8i/1MxMiaKQLSRLbLeOi0+LCngrpQhpqsmIc/3BrGthcIHxozs08FPyU+pNvqYMRHfJfibjS5qh0MFW1p0GsTVC3LxQqV8iVvjBa0dWMt8AbXcU+8vqkKU01G6Qvqrzcp899+OVE6RbnmVCvAKyDvQuu3ROSYL4kpo6Abu1LhdqaAHYUMqPNV/uozXNMxWRod0CiPKED/BBD+gGNZ1iixynCCwgVNMunTtnaqAn7J4v352Tez5O154mn3pH5P8u/wCL4t6vwR2T7QAAAABJRU5ErkJggg==
 # Reserved for CSP, aws,azure,ali,huawei and ...
 cloudServiceProvider:
   name: huawei
@@ -30,45 +30,33 @@ billing:
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 1-zookeeper-with-3-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 3
-      flavor_id: s6.large.4
-  - name: 1-zookeeper-with-3-worker-nodes-performance
+  - name: 2vCPUs-4GB-general
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
     # Properties for the service, which can be used by the deployment.
     properties:
-      worker_nodes_count: 3
-      flavor_id: s6.xlarge.4
-  - name: 1-zookeeper-with-5-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: s6.large.4
-  - name: 1-zookeeper-with-5-worker-nodes-performance
+      flavor_id: rds.mysql.n1.large.2.ha
+  - name: 2vCPUs-4GB-dedicated
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 80
     # Properties for the service, which can be used by the deployment.
     properties:
-      worker_nodes_count: 5
-      flavor_id: s6.xlarge.4
+      flavor_id: rds.mysql.x1.large.2.ha
 # The contact details of the service.
 serviceProviderContactDetails:
-  email: ["test@test.com"]
+  email: [ "test@test.com" ]
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: terraform
   serviceAvailability:
-    - displayName: Availability Zone
-      varName: availability_zone
-      mandatory: false
-      description: The availability zone to deploy the service instance. If the value is empty, the service instance will be deployed in a random availability zone.
+    - displayName: Primary AZ
+      varName: primary_az
+      mandatory: true
+      description: The primary availability zone to deploy the service instance.
+    - displayName: Secondary AZ
+      varName: secondary_az
+      mandatory: true
+      description: The secondary availability zone to deploy the service instance. Different from primary_az.
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
   # - fix_variable: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as usual variables. This variable is not visible to the end user.
@@ -79,7 +67,7 @@ deployment:
   # The parameters will be used to generate the API of the managed service.
   variables:
     - name: admin_passwd
-      description: The admin password of all nodes in the Kafka cluster instance. If the value is empty, will create a random password.
+      description: The admin password of all nodes in the MySQL server instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -88,73 +76,95 @@ deployment:
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
     - name: vpc_name
-      description: The vpc name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create VPC.
+      description: The vpc name of all nodes in the MySQL server instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
-      example: "kafka-vpc-default"
+      example: "mysql-vpc-default"
       mandatory: false
-      value: "kafka-vpc-default"
+      value: "mysql-vpc-default"
     - name: subnet_name
-      description: The sub network name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of all nodes in the MySQL server instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
-      example: "kafka-subnet-default"
+      example: "mysql-subnet-default"
       mandatory: false
-      value: "kafka-subnet-default"
+      value: "mysql-subnet-default"
     - name: secgroup_name
-      description: The security group name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of all nodes in the MySQL server instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
-      example: "kafka-secgroup-default"
+      example: "mysql-secgroup-default"
       mandatory: false
-      value: "kafka-secgroup-default"
+      value: "mysql-secgroup-default"
   deployer: |
     variable "region" {
       type        = string
-      description = "The region to deploy the Kafka cluster instance."
-    }
-    
-    variable "availability_zone" {
-      type        = string
-      description = "The availability zone to deploy the Kafka cluster instance."
-    }
-    
-    variable "flavor_id" {
-      type        = string
-      default     = "s6.large.2"
-      description = "The flavor_id of all nodes in the Kafka cluster instance."
+      description = "The region to deploy the mysql service instance."
     }
 
-    variable "worker_nodes_count" {
+    variable "primary_az" {
       type        = string
-      default     = 3
-      description = "The worker nodes count in the Kafka cluster instance."
+      description = "The primary availability zone to deploy the mysql service instance."
+    }
+
+    variable "secondary_az" {
+      type        = string
+      description = "The secondary availability zone to deploy the mysql service instance."
+    }
+
+    variable "flavor_id" {
+      type        = string
+      description = "The flavor_id of the mysql service instance."
+    }
+
+    variable "db_version" {
+      type        = string
+      default     = "8.0"
+      description = "The version of the database to create in the mysql service instance."
     }
 
     variable "admin_passwd" {
       type        = string
       default     = ""
-      description = "The root password of all nodes in the Kafka cluster instance."
+      description = "The root password of the mysql service instance."
+    }
+
+    variable "db_name" {
+      type        = string
+      default     = "test"
+      description = "The database name to create in the mysql service instance."
+    }
+
+    variable "db_port" {
+      type        = number
+      default     = 3306
+      description = "The port of the created database in the mysql service instance."
+    }
+
+    variable "user_name" {
+      type        = string
+      default     = "test"
+      description = "The user name of the created database."
     }
 
     variable "vpc_name" {
       type        = string
-      default     = "kafka-vpc-default"
-      description = "The vpc name of all nodes in the Kafka cluster instance."
+      default     = "rds-vpc-default"
+      description = "The vpc name of the mysql service instance."
     }
 
     variable "subnet_name" {
       type        = string
-      default     = "kafka-subnet-default"
-      description = "The subnet name of all nodes in the Kafka cluster instance."
+      default     = "rds-subnet-default"
+      description = "The subnet name of the mysql service instance."
     }
 
     variable "secgroup_name" {
       type        = string
-      default     = "kafka-secgroup-default"
-      description = "The security group name of all nodes in the Kafka cluster instance."
+      default     = "rds-secgroup-default"
+      description = "The security group name of the mysql service instance."
     }
-    
+
     terraform {
       required_providers {
         huaweicloud = {
@@ -163,12 +173,10 @@ deployment:
         }
       }
     }
-    
+
     provider "huaweicloud" {
       region = var.region
     }
-    
-    data "huaweicloud_availability_zones" "osc-az" {}
 
     data "huaweicloud_vpcs" "existing" {
       name = var.vpc_name
@@ -183,7 +191,6 @@ deployment:
     }
 
     locals {
-      availability_zone = var.availability_zone == "" ? data.huaweicloud_availability_zones.osc-az.names[0] : var.availability_zone
       admin_passwd      = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
       vpc_id            = length(data.huaweicloud_vpcs.existing.vpcs) > 0 ? data.huaweicloud_vpcs.existing.vpcs[0].id : huaweicloud_vpc.new[0].id
       subnet_id         = length(data.huaweicloud_vpc_subnets.existing.subnets)> 0 ? data.huaweicloud_vpc_subnets.existing.subnets[0].id : huaweicloud_vpc_subnet.new[0].id
@@ -207,7 +214,6 @@ deployment:
     resource "huaweicloud_networking_secgroup" "new" {
       count       = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
       name        = var.secgroup_name
-      description = "Kafka cluster security group"
     }
 
     resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_0" {
@@ -226,19 +232,8 @@ deployment:
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
-      port_range_min    = 2181
-      port_range_max    = 2181
-      remote_ip_prefix  = "121.37.117.211/32"
-      security_group_id = local.secgroup_id
-    }
-
-    resource "huaweicloud_networking_secgroup_rule" "secgroup_rule_2" {
-      count             = length(data.huaweicloud_networking_secgroups.existing.security_groups) == 0 ? 1 : 0
-      direction         = "ingress"
-      ethertype         = "IPv4"
-      protocol          = "tcp"
-      port_range_min    = 9092
-      port_range_max    = 9093
+      port_range_min    = var.db_port
+      port_range_max    = var.db_port
       remote_ip_prefix  = "121.37.117.211/32"
       security_group_id = local.secgroup_id
     }
@@ -257,61 +252,92 @@ deployment:
       override_special = "#%@"
     }
 
-    resource "huaweicloud_kps_keypair" "keypair" {
-      name     = "keypair-kafka-${random_id.new.hex}"
-      key_file = "keypair-kafka-${random_id.new.hex}.pem"
-    }
-
-    data "huaweicloud_images_image" "image" {
-      name        = "Kafka-v3.3.2_Ubuntu-20.04"
-      most_recent = true
-    }
-
-    resource "huaweicloud_compute_instance" "zookeeper" {
-      availability_zone  = local.availability_zone
-      name               = "kafka-zookeeper-${random_id.new.hex}"
-      flavor_id          = var.flavor_id
-      security_group_ids = [ local.secgroup_id ]
-      image_id           = data.huaweicloud_images_image.image.id
-      key_pair           = huaweicloud_kps_keypair.keypair.name
-      network {
-        uuid = local.subnet_id
+    resource "huaweicloud_vpc_eip" "eip-tf" {
+      publicip {
+        type = "5_sbgp"
       }
-      user_data = <<EOF
-        #!bin/bash
-        echo root:${local.admin_passwd} | sudo chpasswd
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        sudo docker run -d --name zookeeper-server --privileged=true -p 2181:2181 -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:3.8.1
-      EOF
-    }
-
-    resource "huaweicloud_compute_instance" "kafka-broker" {
-      count              = var.worker_nodes_count
-      availability_zone  = local.availability_zone
-      name               = "kafka-broker-${random_id.new.hex}-${count.index}"
-      flavor_id          = var.flavor_id
-      security_group_ids = [ local.secgroup_id ]
-      image_id           = data.huaweicloud_images_image.image.id
-      key_pair           = huaweicloud_kps_keypair.keypair.name
-      network {
-        uuid = local.subnet_id
+      bandwidth {
+        name        = "rds-tf-${random_id.new.hex}"
+        size        = 5
+        share_type  = "PER"
+        charge_mode = "traffic"
       }
-      user_data = <<EOF
-        #!bin/bash
-        echo root:${local.admin_passwd} | sudo chpasswd
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        private_ip=$(ifconfig | grep -A1 "eth0" | grep 'inet' | awk -F ' ' ' {print $2}'|awk ' {print $1}')
-        sudo docker run -d --name kafka-server --restart always -p 9092:9092 -p 9093:9093  -e KAFKA_BROKER_ID=${count.index}  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://$private_ip:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=${huaweicloud_compute_instance.zookeeper.access_ip_v4}:2181 bitnami/kafka:3.3.2
-      EOF
-      depends_on = [
-        huaweicloud_compute_instance.zookeeper
-      ]
     }
 
-    output "zookeeper_server" {
-      value = "${huaweicloud_compute_instance.zookeeper.access_ip_v4}:2181"
+
+    resource "huaweicloud_rds_instance" "instance" {
+      name                = "rds-tf-${random_id.new.hex}"
+      flavor              = var.flavor_id
+      ha_replication_mode = "async"
+      vpc_id              = local.vpc_id
+      subnet_id           = local.subnet_id
+      security_group_id   = local.secgroup_id
+      availability_zone   = [
+        var.primary_az,
+        var.secondary_az]
+
+      db {
+        type     = "MySQL"
+        version  = var.db_version
+        password = local.admin_passwd
+        port     = var.db_port
+      }
+
+      volume {
+        type = "ESSD"
+        size = 100
+      }
+
+      backup_strategy {
+        start_time = "01:00-02:00"
+        keep_days  = 1
+      }
+
+      parameters {
+        name  = "lower_case_table_names"
+        value = 1
+      }
+    }
+
+    resource "huaweicloud_vpc_eip_associate" "associated" {
+      public_ip  = huaweicloud_vpc_eip.eip-tf.address
+      network_id = local.subnet_id
+      fixed_ip   = huaweicloud_rds_instance.instance.fixed_ip
+    }
+
+    resource "huaweicloud_rds_mysql_database" "db" {
+      instance_id   = huaweicloud_rds_instance.instance.id
+      name          = var.db_name
+      character_set = "utf8"
+    }
+
+    resource "huaweicloud_rds_mysql_account" "user" {
+      instance_id = huaweicloud_rds_instance.instance.id
+      name        = var.user_name
+      password    = local.admin_passwd
+    }
+
+    resource "huaweicloud_rds_mysql_database_privilege" "privilege" {
+      instance_id = huaweicloud_rds_instance.instance.id
+      db_name     = var.db_name
+
+      users {
+        name     = var.user_name
+        readonly = false
+      }
+    }
+
+    resource "huaweicloud_rds_mysql_binlog" "test" {
+      instance_id            = huaweicloud_rds_instance.instance.id
+      binlog_retention_hours = 6
+    }
+
+    output "rds_instance_public_ips" {
+      value = huaweicloud_vpc_eip.eip-tf.address
+    }
+
+    output "rds_instance_private_ips" {
+      value = huaweicloud_rds_instance.instance.private_ips
     }
 
     output "admin_passwd" {

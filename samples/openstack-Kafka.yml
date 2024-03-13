@@ -64,6 +64,11 @@ serviceProviderContactDetails:
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: terraform
+  serviceAvailability:
+    - displayName: Availability Zone
+      varName: availability_zone
+      mandatory: false
+      description: The availability zone to deploy the service instance. If the value is empty, the service instance will be deployed in a random availability zone.
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
   # - fix_variable: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as usual variables. This variable is not visible to the end user.
@@ -115,6 +120,16 @@ deployment:
       mandatory: false
       value: "kafka-secgroup-default"
   deployer: |
+    variable "region" {
+      type        = string
+      description = "The region to deploy the Kafka cluster instance."
+    }
+    
+    variable "availability_zone" {
+      type        = string
+      description = "The availability zone to deploy the Kafka cluster instance."
+    }
+    
     variable "flavor_id" {
       type        = string
       default     = "cirros256"
@@ -150,12 +165,6 @@ deployment:
       default     = "kafka-secgroup-default"
       description = "The security group name of all nodes in the Kafka cluster instance."
     }
-     
-    variable "region" {
-      type        = string
-      default     = "RegionOne"
-      description = "The region to deploy the Kafka cluster instance."
-    }
     
     terraform {
       required_providers {
@@ -163,11 +172,14 @@ deployment:
           source  = "terraform-provider-openstack/openstack"
           version = "~> 1.53.0"
         }
+      }
     }
     
     provider "openstack" {
       region = var.region
     }
+    
+    data "openstack_compute_availability_zones_v2" "osc-az" {}
 
     data "openstack_networking_network_v2" "existing" {
       name  = var.vpc_name
@@ -185,11 +197,12 @@ deployment:
     }
 
     locals {
-      admin_passwd  = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
-      vpc_id        = length(data.openstack_networking_network_v2.existing) > 0 ? data.openstack_networking_network_v2.existing[0].id : openstack_networking_network_v2.new[0].id
-      subnet_id     = length(data.openstack_networking_subnet_v2.existing) > 0 ? data.openstack_networking_subnet_v2.existing[0].id : openstack_networking_subnet_v2.new[0].id
-      secgroup_id   = length(data.openstack_networking_secgroup_v2.existing) > 0 ? data.openstack_networking_secgroup_v2.existing[0].id : openstack_networking_secgroup_v2.new[0].id
-      secgroup_name = length(data.openstack_networking_secgroup_v2.existing) > 0 ? data.openstack_networking_secgroup_v2.existing[0].name : openstack_networking_secgroup_v2.new[0].name
+      availability_zone = var.availability_zone == "" ? data.openstack_compute_availability_zones_v2.osc-az.names[0] : var.availability_zone
+      admin_passwd      = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
+      vpc_id            = length(data.openstack_networking_network_v2.existing) > 0 ? data.openstack_networking_network_v2.existing[0].id : openstack_networking_network_v2.new[0].id
+      subnet_id         = length(data.openstack_networking_subnet_v2.existing) > 0 ? data.openstack_networking_subnet_v2.existing[0].id : openstack_networking_subnet_v2.new[0].id
+      secgroup_id       = length(data.openstack_networking_secgroup_v2.existing) > 0 ? data.openstack_networking_secgroup_v2.existing[0].id : openstack_networking_secgroup_v2.new[0].id
+      secgroup_name     = length(data.openstack_networking_secgroup_v2.existing) > 0 ? data.openstack_networking_secgroup_v2.existing[0].name : openstack_networking_secgroup_v2.new[0].name
     }
 
     resource "openstack_networking_network_v2" "new" {
@@ -244,8 +257,6 @@ deployment:
       security_group_id = local.secgroup_id
     }
 
-    data "openstack_compute_availability_zones_v2" "osc-az" {}
-
     resource "random_id" "new" {
       byte_length = 4
     }
@@ -270,7 +281,7 @@ deployment:
     }
 
     resource "openstack_compute_instance_v2" "zookeeper" {
-      availability_zone  = data.openstack_compute_availability_zones_v2.osc-az.names[0]
+      availability_zone  = local.availability_zone
       name               = "kafka-zookeeper-${random_id.new.hex}"
       flavor_name        = var.flavor_id
       security_groups    = [ local.secgroup_name ]
@@ -290,7 +301,7 @@ deployment:
 
     resource "openstack_compute_instance_v2" "kafka-broker" {
       count              = var.worker_nodes_count
-      availability_zone  = data.openstack_compute_availability_zones_v2.osc-az.names[0]
+      availability_zone  = local.availability_zone
       name               = "kafka-broker-${count.index}-${random_id.new.hex}"
       flavor_name        = var.flavor_id
       security_groups    = [ local.secgroup_name ]

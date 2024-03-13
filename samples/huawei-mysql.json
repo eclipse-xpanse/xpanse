@@ -1,0 +1,18 @@
+{
+  "serviceName": "RDS-MySQL",
+  "version": "v1.0.0",
+  "csp": "huawei",
+  "category": "database",
+  "flavor": "2vCPUs-4GB-general",
+  "region": {
+    "area": "Asia China",
+    "name": "cn-southwest-2"
+  },
+  "customerServiceName": "default-kafka",
+  "serviceHostingType": "self",
+  "serviceRequestProperties": {},
+  "availabilityZones" : {
+    "primary_az" : "cn-southwest-2a",
+    "secondary_az" : "cn-southwest-2d"
+  }
+}

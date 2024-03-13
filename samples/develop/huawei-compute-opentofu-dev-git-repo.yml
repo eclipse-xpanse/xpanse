@@ -66,6 +66,11 @@ serviceProviderContactDetails:
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: opentofu
+  serviceAvailability:
+    - displayName: Availability Zone
+      varName: availability_zone
+      mandatory: false
+      description: The availability zone to deploy the service instance. If the value is empty, the service instance will be deployed in a random availability zone.
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
   # - fix_variable: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as usual variables. This variable is not visible to the end user.

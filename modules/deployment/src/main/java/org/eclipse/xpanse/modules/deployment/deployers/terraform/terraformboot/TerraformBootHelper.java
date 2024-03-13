@@ -78,9 +78,7 @@ public class TerraformBootHelper {
         inputVariables.putAll(this.deployEnvironments.getVariablesFromDeployTask(
                 deployTask, isDeployRequest));
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(deployTask));
-        // we additionally pass the region as var since the provider information is
-        // also taken from GIT repo.
-        inputVariables.put("region", deployTask.getDeployRequest().getRegion().getName());
+        inputVariables.putAll(this.deployEnvironments.getAvailabilityZoneVariables(deployTask));
         return inputVariables;
     }
 

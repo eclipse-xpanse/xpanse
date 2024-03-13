@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -29,12 +30,15 @@ import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Environment variables utils for deployment.
  */
 @Component
 public class DeployEnvironments {
+
+    private static final String VAR_REGION = "region";
 
     private final AesUtil aesUtil;
 
@@ -132,6 +136,30 @@ public class DeployEnvironments {
     }
 
     /**
+     * Get availability zone variables.
+     *
+     * @param task the DeployTask.
+     */
+    public Map<String, String> getAvailabilityZoneVariables(DeployTask task) {
+        Map<String, String> variables = new HashMap<>();
+        List<AvailabilityZoneConfig> availabilityZoneConfigs =
+                task.getOcl().getDeployment().getServiceAvailability();
+
+        Map<String, String> inputAvailabilityZones = task.getDeployRequest().getAvailabilityZones();
+
+        if (!CollectionUtils.isEmpty(availabilityZoneConfigs)
+                && !CollectionUtils.isEmpty(inputAvailabilityZones)) {
+            for (AvailabilityZoneConfig config : availabilityZoneConfigs) {
+                if (inputAvailabilityZones.containsKey(config.getVarName())) {
+                    variables.put(config.getVarName(),
+                            inputAvailabilityZones.get(config.getVarName()));
+                }
+            }
+        }
+        return variables;
+    }
+
+    /**
      * Get deployment variables.
      *
      * @param task the DeployTask.
@@ -142,7 +170,7 @@ public class DeployEnvironments {
                 task.getDeployRequest().getServiceRequestProperties(),
                 task.getOcl().getDeployment().getVariables(),
                 isDeployRequest);
-        variables.put("region", task.getDeployRequest().getRegion().getName());
+        variables.put(VAR_REGION, task.getDeployRequest().getRegion().getName());
         return variables;
     }
 

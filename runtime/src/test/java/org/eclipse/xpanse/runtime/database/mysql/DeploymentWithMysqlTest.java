@@ -12,6 +12,7 @@ import jakarta.annotation.Resource;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,13 +25,13 @@ import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTempla
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequestBase;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.Region;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -39,6 +40,7 @@ import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -50,34 +52,31 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
-    static ServiceTemplateDetailVo serviceTemplate;
     @Resource
-    ServiceDeployerApi serviceDeployerApi;
+    private ServiceDeployerApi serviceDeployerApi;
     @Resource
-    ServiceTemplateApi ServiceTemplateApi;
+    private ServiceTemplateApi serviceTemplateApi;
     @Resource
-    DatabaseDeployServiceStorage deployServiceStorage;
+    private DatabaseDeployServiceStorage deployServiceStorage;
     @Resource
-    ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
+    private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @Resource
-    OclLoader oclLoader;
+    private OclLoader oclLoader;
     @Resource
-    ServiceMigrationApi serviceMigrationApi;
+    private ServiceMigrationApi serviceMigrationApi;
     @Resource
     private DatabaseServiceTemplateStorage serviceTemplateStorage;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testDeployer() throws Exception {
-        if (Objects.isNull(serviceTemplate)) {
-            registerServiceTemplate();
-        }
-        testDeployServiceThrowsServiceTemplateNotApproved();
-        approveServiceTemplateRegistration();
-        UUID serviceId = deployService();
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate();
+        testDeployServiceThrowsServiceTemplateNotApproved(serviceTemplate);
+        approveServiceTemplateRegistration(serviceTemplate);
+        UUID serviceId = deployService(serviceTemplate);
 
         if (waitServiceUtilTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {
-            UUID newServiceId = migrateService(serviceId);
+            UUID newServiceId = migrateService(serviceId, serviceTemplate);
             if (serviceIsTargetState(newServiceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
                 DeployedServiceDetails newServiceDetails =
                         serviceDeployerApi.getSelfHostedServiceDetailsById(newServiceId.toString());
@@ -113,30 +112,17 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         }
     }
 
-    void approveServiceTemplateRegistration() {
+    void approveServiceTemplateRegistration(ServiceTemplateDetailVo serviceTemplate) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplate.getId());
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
         serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
     }
 
-    UUID deployService() {
+    UUID deployService(ServiceTemplateDetailVo serviceTemplate) {
         DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setUserId("userId");
-        deployRequest.setServiceName(serviceTemplate.getName());
-        deployRequest.setVersion(serviceTemplate.getVersion());
-        deployRequest.setCsp(serviceTemplate.getCsp());
-        deployRequest.setCategory(serviceTemplate.getCategory());
-        deployRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
-        Region region = new Region();
-        region.setName(serviceTemplate.getRegions().getFirst().getName());
-        region.setArea(serviceTemplate.getRegions().getFirst().getArea());
-        deployRequest.setRegion(region);
-        deployRequest.setServiceHostingType(ServiceHostingType.SELF);
-        Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        deployRequest.setServiceRequestProperties(serviceRequestProperties);
-
+        DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
+        BeanUtils.copyProperties(deployRequestBase, deployRequest);
         UUID deployUUid = serviceDeployerApi.deploy(deployRequest);
         Assertions.assertNotNull(deployUUid);
         return deployUUid;
@@ -164,62 +150,56 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
                 deployedService.getServiceDeploymentState() == targetState;
     }
 
-    void registerServiceTemplate() throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        serviceTemplate = ServiceTemplateApi.register(ocl);
-        Assertions.assertNotNull(serviceTemplate);
-        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                serviceTemplate.getServiceRegistrationState());
-        Assertions.assertEquals(serviceTemplate.getCsp(), ocl.getCloudServiceProvider().getName());
-        Assertions.assertEquals(serviceTemplate.getName(), ocl.getName().toLowerCase());
-        Assertions.assertTrue(serviceTemplate.getVariables().size() > 1);
-    }
+    DeployRequestBase getDeployRequestBase(ServiceTemplateDetailVo serviceTemplate) {
+        DeployRequestBase deployRequestBase = new DeployRequestBase();
+        deployRequestBase.setServiceName(serviceTemplate.getName());
+        deployRequestBase.setVersion(serviceTemplate.getVersion());
+        deployRequestBase.setCsp(serviceTemplate.getCsp());
+        deployRequestBase.setCategory(serviceTemplate.getCategory());
+        deployRequestBase.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
+        deployRequestBase.setRegion(serviceTemplate.getRegions().getFirst());
+        deployRequestBase.setServiceHostingType(serviceTemplate.getServiceHostingType());
 
-    void testDeployServiceThrowsServiceTemplateNotApproved() {
-        // SetUp
-        DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setServiceName(serviceTemplate.getName());
-        deployRequest.setVersion(serviceTemplate.getVersion());
-        deployRequest.setCsp(serviceTemplate.getCsp());
-        deployRequest.setCategory(serviceTemplate.getCategory());
-        deployRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
-        Region region = new Region();
-        region.setName(serviceTemplate.getRegions().getFirst().getName());
-        region.setArea(serviceTemplate.getRegions().getFirst().getArea());
-        deployRequest.setRegion(region);
-        deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        deployRequest.setServiceRequestProperties(serviceRequestProperties);
+        deployRequestBase.setServiceRequestProperties(serviceRequestProperties);
+
+        List<AvailabilityZoneConfig> availabilityZoneConfigs =
+                serviceTemplate.getDeployment().getServiceAvailability();
+        Map<String, String> availabilityZones = new HashMap<>();
+        availabilityZoneConfigs.forEach(availabilityZoneConfig -> {
+            availabilityZones.put(availabilityZoneConfig.getVarName(),
+                    availabilityZoneConfig.getDisplayName());
+        });
+        deployRequestBase.setAvailabilityZones(availabilityZones);
+        return deployRequestBase;
+    }
+
+    ServiceTemplateDetailVo registerServiceTemplate() throws Exception {
+        Ocl ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        return serviceTemplateApi.register(ocl);
+    }
+
+    void testDeployServiceThrowsServiceTemplateNotApproved(
+            ServiceTemplateDetailVo serviceTemplate) {
+        // SetUp
+        DeployRequest deployRequest = new DeployRequest();
+        DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
+        BeanUtils.copyProperties(deployRequestBase, deployRequest);
         // run the test
         assertThrows(ServiceTemplateNotApproved.class,
                 () -> serviceDeployerApi.deploy(deployRequest));
     }
 
-    UUID migrateService(UUID taskId) {
-
+    UUID migrateService(UUID taskId, ServiceTemplateDetailVo serviceTemplate) {
         MigrateRequest migrateRequest = new MigrateRequest();
         migrateRequest.setId(taskId);
-        migrateRequest.setServiceName(serviceTemplate.getName());
-        migrateRequest.setVersion(serviceTemplate.getVersion());
-        migrateRequest.setCsp(serviceTemplate.getCsp());
-        migrateRequest.setCategory(serviceTemplate.getCategory());
-        migrateRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
-        Region region = new Region();
-        region.setName(serviceTemplate.getRegions().getFirst().getName());
-        region.setArea(serviceTemplate.getRegions().getFirst().getArea());
-        migrateRequest.setRegion(region);
-        migrateRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
-        Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("admin_passwd", "22222222@Qq");
-        migrateRequest.setServiceRequestProperties(serviceRequestProperties);
-
-
+        DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
+        BeanUtils.copyProperties(deployRequestBase, migrateRequest);
         UUID migrateId = serviceMigrationApi.migrate(migrateRequest);
         // Verify the results
         Assertions.assertNotNull(migrateId);
         return migrateId;
-
     }
 
     void testDestroyAndGetDetails(UUID taskId) throws Exception {

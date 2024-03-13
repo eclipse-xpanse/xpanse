@@ -217,7 +217,8 @@ class TofuMakerDeploymentTest {
         when(tofuMakerScriptValidator.validateOpenTofuScripts(any())).thenReturn(expectedResult);
 
         // Run the test
-        final DeploymentScriptValidationResult result = openTofuMakerDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result =
+                openTofuMakerDeployment.validate(ocl.getDeployment());
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -237,7 +238,8 @@ class TofuMakerDeploymentTest {
         when(tofuMakerScriptValidator.validateOpenTofuScripts(any())).thenReturn(expectedResult);
 
         // Run the test
-        final DeploymentScriptValidationResult result = openTofuMakerDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result =
+                openTofuMakerDeployment.validate(ocl.getDeployment());
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -250,7 +252,7 @@ class TofuMakerDeploymentTest {
                 new OpenTofuMakerRequestFailedException("IO error"));
 
         Assertions.assertThrows(OpenTofuMakerRequestFailedException.class,
-                () -> this.openTofuMakerDeployment.validate(ocl));
+                () -> this.openTofuMakerDeployment.validate(ocl.getDeployment()));
     }
 
 }

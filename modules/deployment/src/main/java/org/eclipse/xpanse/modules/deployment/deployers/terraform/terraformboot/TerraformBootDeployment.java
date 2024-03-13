@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -82,13 +82,13 @@ public class TerraformBootDeployment implements Deployer {
      * Validates the Terraform script.
      */
     @Override
-    public DeploymentScriptValidationResult validate(Ocl ocl) {
+    public DeploymentScriptValidationResult validate(Deployment deployment) {
         DeploymentScriptValidationResult result = null;
-        if (Objects.nonNull(ocl.getDeployment().getDeployer())) {
-            result = terraformBootScriptValidator.validateTerraformScripts(ocl);
+        if (Objects.nonNull(deployment.getDeployer())) {
+            result = terraformBootScriptValidator.validateTerraformScripts(deployment);
         }
-        if (Objects.nonNull(ocl.getDeployment().getScriptsRepo())) {
-            result = terraformBootScriptValidator.validateTerraformScriptsFromGitRepo(ocl);
+        if (Objects.nonNull(deployment.getScriptsRepo())) {
+            result = terraformBootScriptValidator.validateTerraformScriptsFromGitRepo(deployment);
         }
         return result;
     }
