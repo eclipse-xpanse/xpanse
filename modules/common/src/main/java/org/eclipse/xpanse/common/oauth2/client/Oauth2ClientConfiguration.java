@@ -24,8 +24,8 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
  * within the application to fetch authorization tokens.
  */
 @Configuration
-@Profile("zitadel")
-public class OauthClientConfiguration {
+@Profile("oauth")
+public class Oauth2ClientConfiguration {
 
     public static final String OAUTH_CLIENT_ID = "oauth2";
 

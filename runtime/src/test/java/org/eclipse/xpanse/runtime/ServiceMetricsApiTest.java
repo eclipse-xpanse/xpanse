@@ -32,7 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {XpanseApplication.class, ServiceMetricsApi.class},
-        properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
+        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServiceMetricsApiTest {
 

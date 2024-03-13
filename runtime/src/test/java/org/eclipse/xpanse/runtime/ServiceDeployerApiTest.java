@@ -81,7 +81,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest {
     private static final long waitTime = 60 * 1000;

@@ -6,13 +6,6 @@
 
 package org.eclipse.xpanse.modules.security.zitadel;
 
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.CSP_KEY;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.METADATA_KEY;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.NAMESPACE_KEY;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.REQUIRED_SCOPES;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERID_KEY;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERNAME_KEY;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
@@ -69,6 +62,18 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     private String iamServerEndpoint;
     @Value("${authorization.swagger.ui.client.id}")
     private String clientId;
+    @Value("${authorization.csp.key}")
+    private String cspKey;
+    @Value("${authorization.required.scopes}")
+    private String requiredScopes;
+    @Value("${authorization.userid.key}")
+    private String userIdKey;
+    @Value("${authorization.username.key}")
+    private String usernameKey;
+    @Value("${authorization.metadata.key}")
+    private String metadataKey;
+    @Value("${authorization.namespace.key}")
+    private String namespaceKey;
 
     private static Map<String, String> initCodeChallengeMap() {
         Map<String, String> map = new HashMap<>(2);
@@ -132,20 +137,20 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
 
         if (Objects.nonNull(claimsMap) && !claimsMap.isEmpty()) {
             CurrentUserInfo currentUserInfo = new CurrentUserInfo();
-            if (claimsMap.containsKey(USERID_KEY)) {
-                currentUserInfo.setUserId(String.valueOf(claimsMap.get(USERID_KEY)));
+            if (claimsMap.containsKey(userIdKey)) {
+                currentUserInfo.setUserId(String.valueOf(claimsMap.get(userIdKey)));
             }
 
-            if (claimsMap.containsKey(USERNAME_KEY)) {
-                currentUserInfo.setUserName(String.valueOf(claimsMap.get(USERNAME_KEY)));
+            if (claimsMap.containsKey(usernameKey)) {
+                currentUserInfo.setUserName(String.valueOf(claimsMap.get(usernameKey)));
             }
 
             List<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority).toList();
             currentUserInfo.setRoles(roles);
 
-            if (claimsMap.containsKey(METADATA_KEY)) {
-                Object metadataObject = claimsMap.get(METADATA_KEY);
+            if (claimsMap.containsKey(metadataKey)) {
+                Object metadataObject = claimsMap.get(metadataKey);
                 if (Objects.nonNull(metadataObject)) {
                     Map<String, String> metadataMap =
                             OBJECT_MAPPER.convertValue(metadataObject, Map.class);
@@ -156,10 +161,10 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                                     java.util.Base64.getDecoder().decode(metadataMap.get(key)),
                                     StandardCharsets.UTF_8);
                             userMetadata.put(key, value);
-                            if (StringUtils.equals(NAMESPACE_KEY, key)) {
+                            if (StringUtils.equals(namespaceKey, key)) {
                                 currentUserInfo.setNamespace(value);
                             }
-                            if (StringUtils.equals(CSP_KEY, key)) {
+                            if (StringUtils.equals(cspKey, key)) {
                                 currentUserInfo.setCsp(value);
                             }
                         }
@@ -181,7 +186,7 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
         stringBuilder.append(iamServerEndpoint).append("/oauth/v2/authorize").append("?")
                 .append("client_id=").append(clientId).append("&")
                 .append("response_type=code").append("&")
-                .append("scope=").append(REQUIRED_SCOPES).append("&")
+                .append("scope=").append(requiredScopes).append("&")
                 .append("redirect_uri=").append(redirectUrl).append("&")
                 .append("code_challenge_method=S256").append("&")
                 .append("code_challenge=").append(CODE_CHALLENGE_MAP.get("code_challenge"));

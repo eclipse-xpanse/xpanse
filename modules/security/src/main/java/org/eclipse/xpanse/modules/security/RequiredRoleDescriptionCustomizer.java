@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.zitadel.config.openapi;
+package org.eclipse.xpanse.modules.security;
 
 import io.swagger.v3.oas.models.Operation;
 import java.util.Objects;
@@ -17,7 +17,7 @@ import org.springframework.web.method.HandlerMethod;
 /**
  * Customizer for appending required role to description of Swagger Annotation operation.
  */
-@Profile("zitadel")
+@Profile("oauth")
 @Component
 public class RequiredRoleDescriptionCustomizer implements OperationCustomizer {
 

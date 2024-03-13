@@ -4,9 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.zitadel.config.jwt;
-
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERID_KEY;
+package org.eclipse.xpanse.modules.security;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -17,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -32,10 +31,14 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
  * Beans necessary to manage Oauth2 with OpaqueToken.
  */
 @Configuration
-public class JwtConfig {
+@Profile("oauth")
+public class Oauth2JwtConfig {
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:}") // default is set to empty.
     private String issuerUri;
+
+    @Value("${authorization.userid.key}")
+    private String userIdKey;
 
     /**
      * This Converter&lt;Jwt,AbstractAuthenticationToken&gt; must be exposed as a bean to be
@@ -49,7 +52,7 @@ public class JwtConfig {
     XpanseAuthenticationConverter jwtAuthenticationConverter(
             Converter<Map<String, Object>, Collection<GrantedAuthority>> authoritiesConverter) {
         return (Jwt jwt) -> {
-            final var username = (String) jwt.getClaims().get(USERID_KEY);
+            final var username = (String) jwt.getClaims().get(userIdKey);
             final var authorities = authoritiesConverter.convert(jwt.getClaims());
             return new XpanseAuthentication(username, authorities, jwt.getClaims(),
                     jwt.getTokenValue());

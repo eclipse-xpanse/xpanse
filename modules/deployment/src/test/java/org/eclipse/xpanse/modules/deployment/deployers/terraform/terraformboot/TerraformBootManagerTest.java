@@ -107,7 +107,7 @@ class TerraformBootManagerTest {
     @Test
     void testGetTerraformBootStatus_WhenTerraformBootNotActive() {
         ReflectionTestUtils.setField(terraformBootManagerUnderTest, "springProfilesActive",
-                "zitadel");
+                "oauth");
 
         // Run the test
         final BackendSystemStatus result = terraformBootManagerUnderTest.getTerraformBootStatus();
