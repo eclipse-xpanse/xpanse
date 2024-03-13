@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourc
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -107,7 +108,10 @@ class TerraformBootDeploymentTest {
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
-        deployRequest.setRegion(ocl.getCloudServiceProvider().getRegions().getFirst().getName());
+        Region region = new Region();
+        region.setName(ocl.getCloudServiceProvider().getRegions().getFirst().getName());
+        region.setArea(ocl.getCloudServiceProvider().getRegions().getFirst().getArea());
+        deployRequest.setRegion(region);
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
         deployRequest.setCategory(ocl.getCategory());
         deployRequest.setCustomerServiceName("test_deploy");

@@ -35,6 +35,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -62,6 +63,9 @@ import org.springframework.core.env.Environment;
 class DeployEnvironmentsTest {
 
     private static final String userId = "userId";
+    private static final String regionName = "us-east-1";
+    private static final String areaName = "Asia China";
+
     private static DeployTask task;
     private static DeployRequest deployRequest;
     private static Flavor flavor;
@@ -92,6 +96,10 @@ class DeployEnvironmentsTest {
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
         deployRequest.setCsp(Csp.HUAWEI);
+        Region region = new Region();
+        region.setName(regionName);
+        region.setArea(areaName);
+        deployRequest.setRegion(region);
 
         Deployment deployment = new Deployment();
         deployVariable1 = new DeployVariable();
@@ -183,7 +191,7 @@ class DeployEnvironmentsTest {
         expectedResult.put("key1", null);
         expectedResult.put("key2", "value2");
         expectedResult.put("example", null);
-        expectedResult.put("region", null);
+        expectedResult.put("region", regionName);
 
         final Map<String, Object> result = deployEnvironmentsUnderTest.getVariablesFromDeployTask(task, true);
 

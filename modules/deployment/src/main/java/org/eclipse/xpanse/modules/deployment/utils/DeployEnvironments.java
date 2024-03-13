@@ -142,7 +142,7 @@ public class DeployEnvironments {
                 task.getDeployRequest().getServiceRequestProperties(),
                 task.getOcl().getDeployment().getVariables(),
                 isDeployRequest);
-        variables.put("region", task.getDeployRequest().getRegion());
+        variables.put("region", task.getDeployRequest().getRegion().getName());
         return variables;
     }
 

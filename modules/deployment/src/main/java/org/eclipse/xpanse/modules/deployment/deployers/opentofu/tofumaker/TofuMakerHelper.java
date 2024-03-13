@@ -79,7 +79,7 @@ public class TofuMakerHelper {
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(deployTask));
         // we additionally pass the region as var since the provider information is
         // also taken from GIT repo.
-        inputVariables.put("region", deployTask.getDeployRequest().getRegion());
+        inputVariables.put("region", deployTask.getDeployRequest().getRegion().getName());
         return inputVariables;
     }
 

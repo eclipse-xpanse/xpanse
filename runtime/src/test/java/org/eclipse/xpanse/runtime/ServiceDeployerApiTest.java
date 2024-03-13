@@ -51,6 +51,7 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
@@ -84,6 +85,9 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest {
+
+    private static final String regionName = "us-east-1";
+    private static final String areaName = "Asia China";
     private static final long waitTime = 60 * 1000;
     private static final ObjectMapper objectMapper = new ObjectMapper();
     @Resource
@@ -504,7 +508,10 @@ class ServiceDeployerApiTest {
         deployRequest.setCsp(Csp.HUAWEI);
         deployRequest.setCategory(Category.AI);
         deployRequest.setFlavor("flavor2");
-        deployRequest.setRegion("region");
+        Region region = new Region();
+        region.setName(regionName);
+        region.setArea(areaName);
+        deployRequest.setRegion(region);
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
         String requestBody = objectMapper.writeValueAsString(deployRequest);
 
@@ -572,7 +579,10 @@ class ServiceDeployerApiTest {
         deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
         deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
         deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().getFirst().getName());
-        deployRequest.setRegion(serviceTemplateDetailVo.getRegions().getFirst().getName());
+        Region region = new Region();
+        region.setName(serviceTemplateDetailVo.getRegions().getFirst().getName());
+        region.setArea(serviceTemplateDetailVo.getRegions().getFirst().getArea());
+        deployRequest.setRegion(region);
         deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");

@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,8 @@ class DeployRequestTest {
     private static final String serviceName = "service";
     private static final String customerServiceName = "customerService";
     private static final String version = "1.0";
-    private static final String region = "us-east-1";
+    private static final String regionName = "us-east-1";
+    private static final String areaName = "Asia China";
     private static final Csp csp = Csp.AWS;
     private static final String flavor = "flavor";
     private static final Map<String, Object> properties = Collections.singletonMap("key", "value");
@@ -45,6 +47,9 @@ class DeployRequestTest {
         request.setServiceName(serviceName);
         request.setCustomerServiceName(customerServiceName);
         request.setVersion(version);
+        Region region = new Region();
+        region.setName(regionName);
+        region.setArea(areaName);
         request.setRegion(region);
         request.setCsp(csp);
         request.setFlavor(flavor);
@@ -59,6 +64,9 @@ class DeployRequestTest {
         assertEquals(serviceName, request.getServiceName());
         assertEquals(customerServiceName, request.getCustomerServiceName());
         assertEquals(version, request.getVersion());
+        Region region = new Region();
+        region.setName(regionName);
+        region.setArea(areaName);
         assertEquals(region, request.getRegion());
         assertEquals(csp, request.getCsp());
         assertEquals(flavor, request.getFlavor());
@@ -120,6 +128,9 @@ class DeployRequestTest {
         assertNotEquals(request.hashCode(), request1.hashCode());
         assertNotEquals(request1.hashCode(), request2.hashCode());
 
+        Region region = new Region();
+        region.setName(regionName);
+        region.setArea(areaName);
         request1.setRegion(region);
         assertNotEquals(request, request1);
         assertNotEquals(request1, request2);
@@ -159,6 +170,9 @@ class DeployRequestTest {
         request.setServiceName(serviceName);
         request.setCustomerServiceName(customerServiceName);
         request.setVersion(version);
+        Region region = new Region();
+        region.setName(regionName);
+        region.setArea(areaName);
         request.setRegion(region);
         request.setCsp(csp);
         request.setFlavor(flavor);
