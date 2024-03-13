@@ -40,7 +40,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class AuthorizationApiTest {
 

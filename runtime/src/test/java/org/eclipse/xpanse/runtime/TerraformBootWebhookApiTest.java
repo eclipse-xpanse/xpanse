@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
-@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed,terraform-boot"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot"})
 @AutoConfigureMockMvc
 public class TerraformBootWebhookApiTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();

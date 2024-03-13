@@ -5,7 +5,7 @@
 
 package org.eclipse.xpanse.common.oauth2.client;
 
-import static org.eclipse.xpanse.common.oauth2.client.OauthClientConfiguration.OAUTH_CLIENT_ID;
+import static org.eclipse.xpanse.common.oauth2.client.Oauth2ClientConfiguration.OAUTH_CLIENT_ID;
 
 import jakarta.annotation.Resource;
 import java.util.Objects;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * application.
  */
 @Component
-@Profile("zitadel")
+@Profile("oauth")
 public class Oauth2ClientAccessTokenProvider {
 
     @Resource

@@ -48,7 +48,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
  */
 @ExtendWith(SpringExtension.class)
 @Transactional
-@SpringBootTest(properties = {"spring.profiles.active=zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserCloudCredentialsApiTest {

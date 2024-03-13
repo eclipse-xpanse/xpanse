@@ -4,16 +4,16 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.zitadel.config.opaquetoken;
-
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERID_KEY;
+package org.eclipse.xpanse.modules.security;
 
 import java.util.Collection;
 import java.util.Map;
 import org.eclipse.xpanse.modules.security.common.XpanseAuthentication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
@@ -23,7 +23,11 @@ import org.springframework.security.oauth2.server.resource.introspection.OpaqueT
  * Beans necessary to manage Oauth2 with OpaqueToken.
  */
 @Configuration
-public class OpaqueTokenConfig {
+@Profile("oauth")
+public class Oauth2OpaqueTokenConfig {
+
+    @Value("${authorization.userid.key}")
+    private String userIdKey;
 
     /*
     * OpaqueTokenAuthenticationConverter must be exposed as a bean to be
@@ -34,7 +38,7 @@ public class OpaqueTokenConfig {
     OpaqueTokenAuthenticationConverter opaqueTokenAuthenticationConverter(
             Converter<Map<String, Object>, Collection<GrantedAuthority>> authoritiesConverter) {
         return (String introspectedToken, OAuth2AuthenticatedPrincipal authenticatedPrincipal) -> {
-            final var username = (String) authenticatedPrincipal.getAttributes().get(USERID_KEY);
+            final var username = (String) authenticatedPrincipal.getAttributes().get(userIdKey);
             final var authorities =
                     authoritiesConverter.convert(authenticatedPrincipal.getAttributes());
             return new XpanseAuthentication(username, authorities,

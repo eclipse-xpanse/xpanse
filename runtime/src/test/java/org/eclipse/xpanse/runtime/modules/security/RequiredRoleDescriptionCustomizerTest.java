@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthChec
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.eclipse.xpanse.modules.security.zitadel.config.openapi.RequiredRoleDescriptionCustomizer;
+import org.eclipse.xpanse.modules.security.RequiredRoleDescriptionCustomizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,8 @@ import org.springframework.web.method.HandlerMethod;
 @ExtendWith(SpringExtension.class)
 class RequiredRoleDescriptionCustomizerTest {
 
-    private RequiredRoleDescriptionCustomizer requiredRoleDescriptionCustomizerUnderTest;
+    private RequiredRoleDescriptionCustomizer
+            requiredRoleDescriptionCustomizerUnderTest;
 
     @BeforeEach
     void setUp() {

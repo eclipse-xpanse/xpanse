@@ -1,11 +1,6 @@
 package org.eclipse.xpanse.modules.security.zitadel;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.GRANTED_ROLES_SCOPE;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.METADATA_KEY;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.NAMESPACE_KEY;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERID_KEY;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.USERNAME_KEY;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Collection;
@@ -28,9 +23,19 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestTemplate;
 
 @ExtendWith(MockitoExtension.class)
 class ZitadelIdentityProviderServiceTest {
+
+    private static final String GRANTED_ROLES_SCOPE = "urn:zitadel:iam:org:project:roles";
+    private static final String METADATA_KEY = "urn:zitadel:iam:user:metadata";
+    private static final String NAMESPACE_KEY = "namespace";
+    private static final String USERID_KEY = "sub";
+    private static final String USERNAME_KEY = "name";
+    private final String REQUIRED_SCOPES =
+            "openid profile urn:zitadel:iam:org:projects:roles urn:zitadel:iam:user:metadata";
+    private static final String CSP_KEY = "csp";
 
     @InjectMocks
     private ZitadelIdentityProviderService zitadelIdentityProviderServiceUnderTest;
@@ -41,6 +46,21 @@ class ZitadelIdentityProviderServiceTest {
                 "http://localhost:8081");
         ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "clientId",
                 "clientId");
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "restTemplate",
+                new RestTemplate());
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "cspKey",
+                CSP_KEY);
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "requiredScopes",
+                REQUIRED_SCOPES);
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "userIdKey",
+                USERID_KEY);
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "usernameKey",
+                USERNAME_KEY);
+
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "metadataKey",
+                METADATA_KEY);
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "namespaceKey",
+                NAMESPACE_KEY);
     }
 
     Map<String, Object> getAttributesMap(boolean putMetaData) {

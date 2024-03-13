@@ -107,7 +107,7 @@ class TofuMakerManagerTest {
     @Test
     void testGetOpenTofuMakerStatus_WhenOpenTofuMakerNotActive() {
         ReflectionTestUtils.setField(tofuMakerManagerUnderTest, "springProfilesActive",
-                "zitadel");
+                "oauth");
 
         // Run the test
         final BackendSystemStatus result = tofuMakerManagerUnderTest.getOpenTofuMakerStatus();

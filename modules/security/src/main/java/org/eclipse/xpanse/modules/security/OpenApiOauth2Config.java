@@ -4,12 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.zitadel.config.openapi;
-
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.GRANTED_ROLES_SCOPE;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.METADATA_SCOPE;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.OPENID_SCOPE;
-import static org.eclipse.xpanse.modules.security.zitadel.config.ZitadelOauth2Constant.PROFILE_SCOPE;
+package org.eclipse.xpanse.modules.security;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -26,7 +21,7 @@ import org.springframework.context.annotation.Profile;
 /**
  * Configuration springdoc security oauth2.
  */
-@Profile("zitadel")
+@Profile("oauth")
 @OpenAPIDefinition(
         info = @Info(
                 title = "Xpanse API",
@@ -34,7 +29,8 @@ import org.springframework.context.annotation.Profile;
                 version = "${app.version}"
         ),
         security = @SecurityRequirement(name = "OAuth2Flow",
-                scopes = {OPENID_SCOPE, PROFILE_SCOPE, GRANTED_ROLES_SCOPE, METADATA_SCOPE})
+                scopes = {"${authorization.openid.scope}", "${authorization.profile.scope}",
+                        "${authorization.granted.roles.scope}", "${authorization.metadata.scope}"})
 )
 @SecurityScheme(
         name = "OAuth2Flow",
@@ -44,17 +40,17 @@ import org.springframework.context.annotation.Profile;
                 authorizationUrl = "${oauth.authorization.url}",
                 tokenUrl = "${oauth.token.url}",
                 scopes = {
-                        @OAuthScope(name = OPENID_SCOPE,
+                        @OAuthScope(name = "${authorization.openid.scope}",
                                 description = "mandatory must be selected."),
-                        @OAuthScope(name = PROFILE_SCOPE,
+                        @OAuthScope(name = "${authorization.profile.scope}",
                                 description = "mandatory must be selected."),
-                        @OAuthScope(name = GRANTED_ROLES_SCOPE,
+                        @OAuthScope(name = "${authorization.granted.roles.scope}",
                                 description = "mandatory must be selected."),
-                        @OAuthScope(name = METADATA_SCOPE,
+                        @OAuthScope(name = "${authorization.metadata.scope}",
                                 description = "mandatory must be selected.")
                 })
         )
 )
 @Configuration
-public class ZitadelOpenApiOauth2Config {
+public class OpenApiOauth2Config {
 }

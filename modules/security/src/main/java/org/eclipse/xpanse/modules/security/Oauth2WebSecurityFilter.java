@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.security.zitadel.config;
+package org.eclipse.xpanse.modules.security;
 
 import static org.springframework.web.cors.CorsConfiguration.ALL;
 
@@ -46,11 +46,11 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
  * in addition to these global rules.
  */
 @Slf4j
-@Profile("zitadel")
+@Profile("oauth")
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
-public class ZitadelWebSecurityFilter {
+public class Oauth2WebSecurityFilter {
 
     @Value("${spring.security.oauth2.resourceserver.opaquetoken.introspection-uri}")
     private String introspectionUri;
