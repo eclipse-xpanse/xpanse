@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,8 @@ class DeployedServiceDetailsTest {
     private static final Category category = Category.COMPUTE;
     private static final String serviceName = "serviceName";
     private static final String version = "v1.0.0";
-    private static final String region = "us-east-1";
+    private static final String regionName = "us-east-1";
+    private static final String areaName = "Asia China";
     private static final Csp csp = Csp.AWS;
     private static final String flavor = "basic";
     private static final String customerServiceName = "customerServiceName";
@@ -54,6 +56,9 @@ class DeployedServiceDetailsTest {
         deployRequest.setCategory(category);
         deployRequest.setServiceName(serviceName);
         deployRequest.setVersion(version);
+        Region region = new Region();
+        region.setName(regionName);
+        region.setArea(areaName);
         deployRequest.setRegion(region);
         deployRequest.setCsp(csp);
         deployRequest.setFlavor(flavor);
@@ -87,6 +92,9 @@ class DeployedServiceDetailsTest {
         assertEquals(category, deployRequest.getCategory());
         assertEquals(serviceName, deployRequest.getServiceName());
         assertEquals(version, deployRequest.getVersion());
+        Region region = new Region();
+        region.setName(regionName);
+        region.setArea(areaName);
         assertEquals(region, deployRequest.getRegion());
         assertEquals(csp, deployRequest.getCsp());
         assertEquals(flavor, deployRequest.getFlavor());

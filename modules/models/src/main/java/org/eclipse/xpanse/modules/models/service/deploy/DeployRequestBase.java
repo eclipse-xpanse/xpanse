@@ -15,6 +15,7 @@ import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
@@ -62,10 +63,8 @@ public class DeployRequestBase implements Serializable {
 
 
     @NotNull
-    @NotBlank
-    @NotEmpty
     @Schema(description = "The region of the provider.")
-    private String region;
+    private Region region;
 
     /**
      * The csp of the Service.

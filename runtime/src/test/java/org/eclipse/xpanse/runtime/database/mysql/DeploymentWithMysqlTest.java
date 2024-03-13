@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDep
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
@@ -127,7 +128,10 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequest.setCsp(serviceTemplate.getCsp());
         deployRequest.setCategory(serviceTemplate.getCategory());
         deployRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
-        deployRequest.setRegion(serviceTemplate.getRegions().getFirst().getName());
+        Region region = new Region();
+        region.setName(serviceTemplate.getRegions().getFirst().getName());
+        region.setArea(serviceTemplate.getRegions().getFirst().getArea());
+        deployRequest.setRegion(region);
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
@@ -179,7 +183,10 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequest.setCsp(serviceTemplate.getCsp());
         deployRequest.setCategory(serviceTemplate.getCategory());
         deployRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
-        deployRequest.setRegion(serviceTemplate.getRegions().getFirst().toString());
+        Region region = new Region();
+        region.setName(serviceTemplate.getRegions().getFirst().getName());
+        region.setArea(serviceTemplate.getRegions().getFirst().getArea());
+        deployRequest.setRegion(region);
         deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
@@ -198,7 +205,10 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         migrateRequest.setCsp(serviceTemplate.getCsp());
         migrateRequest.setCategory(serviceTemplate.getCategory());
         migrateRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
-        migrateRequest.setRegion(serviceTemplate.getRegions().getFirst().toString());
+        Region region = new Region();
+        region.setName(serviceTemplate.getRegions().getFirst().getName());
+        region.setArea(serviceTemplate.getRegions().getFirst().getArea());
+        migrateRequest.setRegion(region);
         migrateRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "22222222@Qq");

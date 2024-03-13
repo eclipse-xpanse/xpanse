@@ -67,7 +67,7 @@ public class TerraformBootDeploymentPlanManage {
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
-        request.getVariables().put("region", task.getDeployRequest().getRegion());
+        request.getVariables().put("region", task.getDeployRequest().getRegion().getName());
         return request;
     }
 }
