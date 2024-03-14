@@ -220,7 +220,8 @@ class TerraformBootDeploymentTest {
                 expectedResult);
 
         // Run the test
-        final DeploymentScriptValidationResult result = terraformBootDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result =
+                terraformBootDeployment.validate(ocl.getDeployment());
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -241,7 +242,8 @@ class TerraformBootDeploymentTest {
                 expectedResult);
 
         // Run the test
-        final DeploymentScriptValidationResult result = terraformBootDeployment.validate(ocl);
+        final DeploymentScriptValidationResult result =
+                terraformBootDeployment.validate(ocl.getDeployment());
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -254,7 +256,7 @@ class TerraformBootDeploymentTest {
                 new TerraformBootRequestFailedException("IO error"));
 
         Assertions.assertThrows(TerraformBootRequestFailedException.class,
-                () -> this.terraformBootDeployment.validate(ocl));
+                () -> this.terraformBootDeployment.validate(ocl.getDeployment()));
     }
 
 }

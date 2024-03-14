@@ -33,7 +33,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResource
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -205,6 +205,8 @@ public class OpenTofuLocalDeployment implements Deployer {
                 this.deployEnvironments.getVariablesFromDeployTask(task, isDeployTask);
         // load flavor variables also as input variables for OpenTofu executor.
         inputVariables.putAll(this.deployEnvironments.getFlavorVariables(task));
+        // load availability zone variables also as input variables for OpenTofu executor.
+        inputVariables.putAll(this.deployEnvironments.getAvailabilityZoneVariables(task));
         // load credential variables also as env variables for OpenTofu executor.
         envVariables.putAll(this.deployEnvironments.getCredentialVariablesByHostingType(
                 task.getDeployRequest().getServiceHostingType(),
@@ -212,19 +214,19 @@ public class OpenTofuLocalDeployment implements Deployer {
                 task.getDeployRequest().getUserId()));
         envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(
                 task.getDeployRequest().getCsp()));
-        return getExecutor(envVariables, inputVariables, workspace, task.getOcl());
+        return getExecutor(envVariables, inputVariables, workspace, task.getOcl().getDeployment());
     }
 
     private OpenTofuLocalExecutor getExecutor(Map<String, String> envVariables,
                                               Map<String, Object> inputVariables, String workspace,
-                                              Ocl ocl) {
+                                              Deployment deployment) {
         if (openTofuLocalConfig.isDebugEnabled()) {
             log.info("Debug enabled for OpenTofu CLI with level {}",
                     openTofuLocalConfig.getDebugLogLevel());
             envVariables.put(TF_DEBUG_FLAG, openTofuLocalConfig.getDebugLogLevel());
         }
         return new OpenTofuLocalExecutor(envVariables, inputVariables, workspace,
-                getSubDirectory(ocl));
+                getSubDirectory(deployment));
     }
 
     private void prepareDeployWorkspaceWithScripts(DeployTask deployTask, String workspace) {
@@ -334,25 +336,26 @@ public class OpenTofuLocalDeployment implements Deployer {
     /**
      * Validates the OpenTofu script.
      */
-    public DeploymentScriptValidationResult validate(Ocl ocl) {
+    @Override
+    public DeploymentScriptValidationResult validate(Deployment deployment) {
         String workspace = getWorkspacePath(UUID.randomUUID());
         // Create the workspace.
         buildWorkspace(workspace);
-        if (Objects.nonNull(ocl.getDeployment().getDeployer())) {
-            createScriptFile(workspace, ocl.getDeployment().getDeployer());
+        if (Objects.nonNull(deployment.getDeployer())) {
+            createScriptFile(workspace, deployment.getDeployer());
         } else {
-            scriptsGitRepoManage.checkoutScripts(workspace, ocl.getDeployment().getScriptsRepo());
+            scriptsGitRepoManage.checkoutScripts(workspace, deployment.getScriptsRepo());
         }
         OpenTofuLocalExecutor executor =
-                getExecutor(new HashMap<>(), new HashMap<>(), workspace, ocl);
+                getExecutor(new HashMap<>(), new HashMap<>(), workspace, deployment);
         return executor.tfValidate();
     }
 
-    private @Nullable String getSubDirectory(Ocl ocl) {
-        if (Objects.nonNull(ocl.getDeployment().getDeployer())) {
+    private @Nullable String getSubDirectory(Deployment deployment) {
+        if (Objects.nonNull(deployment.getDeployer())) {
             return null;
-        } else if (Objects.nonNull(ocl.getDeployment().getScriptsRepo())) {
-            return ocl.getDeployment().getScriptsRepo().getScriptsPath();
+        } else if (Objects.nonNull(deployment.getScriptsRepo())) {
+            return deployment.getScriptsRepo().getScriptsPath();
         }
         return null;
     }

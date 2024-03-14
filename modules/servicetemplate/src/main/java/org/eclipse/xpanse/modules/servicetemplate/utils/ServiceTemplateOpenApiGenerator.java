@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,10 +34,14 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Bean to generate OpenApi files for registered services.
@@ -48,9 +53,13 @@ public class ServiceTemplateOpenApiGenerator {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String OPENAPI_FILE_EXTENSION = ".html";
     private static final String OPENAPI_EXAMPLE_KEYWORD = "example";
+    private static final String OPENAPI_DESCRIPTION_KEYWORD = "description";
+    private static final String OPENAPI_TYPE_KEYWORD = "type";
     private static final String JSON_SCHEMA_DEF_EXAMPLE_KEYWORD = "examples";
     private final OpenApiUrlManage openApiUrlManage;
     private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
+
+    private final PluginManager pluginManager;
 
     /**
      * Constructor to instantiate ServiceTemplateOpenApiGenerator bean.
@@ -60,9 +69,11 @@ public class ServiceTemplateOpenApiGenerator {
      */
     @Autowired
     public ServiceTemplateOpenApiGenerator(OpenApiUrlManage openApiUrlManage,
-                                           OpenApiGeneratorJarManage openApiGeneratorJarManage) {
+                                           OpenApiGeneratorJarManage openApiGeneratorJarManage,
+                                           PluginManager pluginManager) {
         this.openApiUrlManage = openApiUrlManage;
         this.openApiGeneratorJarManage = openApiGeneratorJarManage;
+        this.pluginManager = pluginManager;
     }
 
     /**
@@ -229,10 +240,16 @@ public class ServiceTemplateOpenApiGenerator {
         String csp = registerService.getCsp().toValue();
         // string of csp values list.
         String cspValuesStr = null;
+        // serviceHostingType value of registered service.
+        String serviceHostingType = registerService.getServiceHostingType().toValue();
+        // string of csp serviceHostingType list.
+        String serviceHostingTypesStr = null;
         // properties for deploy service
         String propertiesStr = null;
         // string of required properties.
         String propertiesRequiredStr = null;
+        // schema of availabilityZones.
+        String availabilityZonesSchemaStr = null;
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
@@ -244,177 +261,241 @@ public class ServiceTemplateOpenApiGenerator {
             propertiesRequiredStr =
                     objectMapper.writeValueAsString(
                             registerService.getJsonObjectSchema().getRequired());
-            cspValuesStr = mapper.writeValueAsString(getCspValues());
+            cspValuesStr = mapper.writeValueAsString(getActiveCspValues());
             categoryValuesStr = mapper.writeValueAsString(getCategoryValues());
+            serviceHostingTypesStr = mapper.writeValueAsString(getServiceHostingTypeValues());
+            availabilityZonesSchemaStr = getSchemaOfAvailabilityZones(
+                    registerService.getOcl().getDeployment().getServiceAvailability(), mapper);
         } catch (JsonProcessingException e) {
             log.error("Failed to write value as string.", e);
         }
         //CHECKSTYLE OFF: LineLength
         return String.format("""
                         {
-                               "openapi": "3.0.1",
-                               "info": {
-                                   "title": "OpenAPI definition",
-                                   "version": "%s",
-                                   "description": "OpenAPI for starting a task to deploy service using registered service template."
-                               },
-                               "servers": [
-                                   {
-                                       "url": "%s",
-                                       "description": "Generated server url"
-                                   }
-                               ],
-                               "tags": [
-                                   {
-                                       "name": "Service Vendor",
-                                       "description": "APIs to manage register services."
-                                   }
-                               ],
-                               "paths": {
-                                   "/xpanse/services": {
-                                       "post": {
-                                           "tags": [
-                                               "Service"
-                                           ],
-                                           "description": "Start a task to deploy service using registered service template.",
-                                           "operationId": "deploy",
-                                           "requestBody": {
-                                               "content": {
-                                                   "application/json": {
-                                                       "schema": {
-                                                           "$ref": "#/components/schemas/CreateRequest"
-                                                       }
-                                                   }
-                                               },
-                                               "required": true
+                            "openapi": "3.0.1",
+                            "info": {
+                                "title": "OpenAPI definition",
+                                "version": "%s",
+                                "description": "OpenAPI for starting a task to deploy service using registered service template."
+                            },
+                            "servers": [
+                                {
+                                    "url": "%s",
+                                    "description": "Generated server url"
+                                }
+                            ],
+                            "security": [
+                                {
+                                    "OAuth2Flow": [
+                                        "openid",
+                                        "profile",
+                                        "urn:zitadel:iam:org:project:roles",
+                                        "urn:zitadel:iam:user:metadata"
+                                    ]
+                                }
+                            ],
+                            "tags": [
+                                {
+                                    "name": "Service",
+                                    "description": "APIs to manage the service instances"
+                                }
+                            ],
+                            "paths": {
+                                "/xpanse/services": {
+                                    "post": {
+                                        "tags": [
+                                            "Service"
+                                        ],
+                                        "description": "Start a task to deploy service using registered service template.<br>Required role:<b> admin</b> or <b>user</b>",
+                                        "operationId": "deploy",
+                                        "requestBody": {
+                                            "content": {
+                                                "application/json": {
+                                                    "schema": {
+                                                        "$ref": "#/components/schemas/DeployRequest"
+                                                    }
+                                                }
+                                            },
+                                            "required": true
+                                        },
+                                        "responses": {
+                                            "202": {
+                                                "description": "Accepted",
+                                                "content": {
+                                                    "application/json": {
+                                                        "schema": {
+                                                            "type": "string",
+                                                            "format": "uuid"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "400": {
+                                                "description": "Bad Request",
+                                                "content": {
+                                                    "application/json": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "401": {
+                                                "description": "Unauthorized",
+                                                "content": {
+                                                    "application/json": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "403": {
+                                                "description": "Forbidden",
+                                                "content": {
+                                                    "application/json": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "422": {
+                                                "description": "Unprocessable Entity",
+                                                "content": {
+                                                    "application/json": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "500": {
+                                                "description": "Internal Server Error",
+                                                "content": {
+                                                    "application/json": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "502": {
+                                                "description": "Bad Gateway",
+                                                "content": {
+                                                    "application/json": {
+                                                        "schema": {
+                                                            "$ref": "#/components/schemas/Response"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "components": {
+                                "schemas": {
+                                    "Response": {
+                                       "required": [
+                                           "code",
+                                           "message",
+                                           "success"
+                                       ],
+                                       "type": "object",
+                                       "properties": {
+                                           "code": {
+                                               "type": "string",
+                                               "description": "The result code of response."
                                            },
-                                           "responses": {
-                                               "202": {
-                                                   "description": "Accepted",
-                                                   "content": {
-                                                       "application/json": {
-                                                           "schema": {
-                                                               "type": "string",
-                                                               "format": "uuid"
-                                                           }
-                                                       }
-                                                   }
-                                               },
-                                               
-                                               "400": {
-                                                   "description": "Bad Request",
-                                                   "content": {
-                                                       "*/*": {
-                                                           "schema": {
-                                                               "$ref": "#/components/schemas/Response"
-                                                           }
-                                                       }
-                                                   }
-                                               },
-                                               "404": {
-                                                   "description": "Not Found",
-                                                   "content": {
-                                                       "*/*": {
-                                                           "schema": {
-                                                               "$ref": "#/components/schemas/Response"
-                                                           }
-                                                       }
-                                                   }
-                                               },
-                                               "500": {
-                                                   "description": "Internal Server Error",
-                                                   "content": {
-                                                       "*/*": {
-                                                           "schema": {
-                                                               "$ref": "#/components/schemas/Response"
-                                                           }
-                                                       }
-                                                   }
-                                               }
+                                           "message": {
+                                               "type": "string",
+                                               "description": "The result message of response."
+                                           },
+                                           "success": {
+                                               "type": "boolean",
+                                               "description": "The success boolean of response."
                                            }
                                        }
-                                   }
-                               },
-                               "components": {
-                                   "schemas": {
-                                       "Response": {
-                                           "required": [
-                                               "code",
-                                               "message",
-                                               "success"
-                                           ],
-                                           "type": "object",
-                                           "properties": {
-                                               "code": {
-                                                   "type": "string",
-                                                   "description": "The result code of response."
-                                               },
-                                               "message": {
-                                                   "type": "string",
-                                                   "description": "The result message of response."
-                                               },
-                                               "success": {
-                                                   "type": "boolean",
-                                                   "description": "The success boolean of response."
-                                               }
-                                           }
-                                       },
-                                       "CreateRequest": {
-                                           "required": %s,
-                                           "type": "object",
-                                           "properties": {
-                                               "category": {
-                                                   "default": "%s",
-                                                   "type": "string",
-                                                   "description": "The category of the service",
-                                                   "enum": %s
-                                               },
-                                               "serviceName": {
-                                                   "default": "%s",
-                                                   "type": "string",
-                                                   "description": "The name of the service ordered."
-                                               },
-                                               "customerServiceName": {
-                                                   "type": "string",
-                                                   "description": "Customer's name for the service. Used only for customer's reference.If not provided, this value will be auto-generated"
-                                               },
-                                               "version": {
-                                                   "default": "%s",
-                                                   "type": "string",
-                                                   "description": "The version of service"
-                                               },
-                                               "region": {
-                                                   "type": "string",
-                                                   "description": "The region of the provider."
-                                               },
-                                               "csp": {
-                                                   "default": "%s",
-                                                   "type": "string",
-                                                   "description": "The csp of the Service.",
-                                                   "enum": %s
-                                               },
-                                               "flavor": {
-                                                   "type": "string",
-                                                   "description": "The flavor of the Service."
-                                               },
-                                               "serviceRequestProperties": {
-                                                   "$ref": "#/components/schemas/serviceRequestProperties"
-                                               }
-                                           }
-                                       },
-                                       "serviceRequestProperties": {
-                                           "required": %s,
-                                           "description": "The deploy variables of registered service.",
-                                           "type": "object",
-                                           "properties": %s
-                                       }
-                                   }
-                               }
-                           }
-                          """,
+                                   },
+                                    "DeployRequest": {
+                                        "required": %s,
+                                        "type": "object",
+                                        "properties": {
+                                            "category": {
+                                                "default": "%s",
+                                                "type": "string",
+                                                "description": "The category of the service",
+                                                "enum": %s
+                                            },
+                                            "serviceName": {
+                                                "default": "%s",
+                                                "type": "string",
+                                                "description": "The name of the service ordered."
+                                            },
+                                            "customerServiceName": {
+                                                "type": "string",
+                                                "description": "Customer's name for the service. Used only for customer's reference.If not provided, this value will be auto-generated"
+                                            },
+                                            "version": {
+                                                "default": "%s",
+                                                "type": "string",
+                                                "description": "The version of service"
+                                            },
+                                            "region": {
+                                                "type": "string",
+                                                "description": "The region of the provider."
+                                            },
+                                            "csp": {
+                                                "default": "%s",
+                                                "type": "string",
+                                                "description": "The csp of the Service.",
+                                                "enum": %s
+                                            },
+                                            "flavor": {
+                                                "type": "string",
+                                                "description": "The flavor of the Service."
+                                            },
+                                            "serviceHostingType": {
+                                                "default": "%s",
+                                                "type": "string",
+                                                "description": "Defines which cloud service account is used for deploying cloud resources.",
+                                                "enum": %s
+                                            },
+                                            "serviceRequestProperties": {
+                                                 "required": %s,
+                                                 "description": "The variables to deploy the service instance.",
+                                                 "type": "object",
+                                                 "properties": %s
+                                            }        \s
+                                            %s                           \s
+                                        }
+                                    }                                                           \s
+                                },
+                                "securitySchemes": {
+                                    "OAuth2Flow": {
+                                        "type": "oauth2",
+                                        "flows": {
+                                            "authorizationCode": {
+                                                "authorizationUrl": "https://iam.xpanse.site/oauth/v2/authorize",
+                                                "tokenUrl": "https://iam.xpanse.site/oauth/v2/token",
+                                                "scopes": {
+                                                    "openid": "mandatory must be selected.",
+                                                    "profile": "mandatory must be selected.",
+                                                    "urn:zitadel:iam:org:project:roles": "mandatory must be selected.",
+                                                    "urn:zitadel:iam:user:metadata": "mandatory must be selected."
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        """,
                 serviceVersion, serviceUrl, createRequiredStr, category, categoryValuesStr,
-                serviceName,
-                serviceVersion, csp, cspValuesStr, propertiesRequiredStr, propertiesStr);
+                serviceName, serviceVersion, csp, cspValuesStr, serviceHostingType,
+                serviceHostingTypesStr, propertiesRequiredStr, propertiesStr,
+                availabilityZonesSchemaStr);
     }
 
     private List<String> getRequiredFields(Object object) {
@@ -430,12 +511,18 @@ public class ServiceTemplateOpenApiGenerator {
         return fieldNames;
     }
 
-    private List<String> getCspValues() {
-        return Arrays.stream(Csp.values()).map(Csp::toValue).collect(Collectors.toList());
+    private List<String> getActiveCspValues() {
+        return pluginManager.getPluginsMap().keySet().stream().map(Csp::toValue)
+                .collect(Collectors.toList());
     }
 
     private List<String> getCategoryValues() {
         return Arrays.stream(Category.values()).map(Category::toValue).collect(Collectors.toList());
+    }
+
+    private List<String> getServiceHostingTypeValues() {
+        return Arrays.stream(ServiceHostingType.values()).map(ServiceHostingType::toValue)
+                .collect(Collectors.toList());
     }
 
     private Map<String, Map<String, Object>> convertJsonSchemaSpecToOpenApiSpec(
@@ -449,5 +536,44 @@ public class ServiceTemplateOpenApiGenerator {
                 }
         );
         return properties;
+    }
+
+    private String getSchemaOfAvailabilityZones(List<AvailabilityZoneConfig> availabilityZones,
+                                                ObjectMapper mapper) {
+        String availabilityZonesSchemaStr = "";
+        try {
+            if (!CollectionUtils.isEmpty(availabilityZones)) {
+                availabilityZonesSchemaStr = String.format("""
+                                ,
+                                "availabilityZones": {
+                                   "required": %s,
+                                   "description": "The availability zones to deploy the service instance.",
+                                   "type": "object",
+                                   "properties": %s
+                                }
+                                """,
+                        mapper.writeValueAsString(getRequiredAvailabilityZones(availabilityZones)),
+                        mapper.writeValueAsString(
+                                convertAvailabilityZonesToOpenApiSpec(availabilityZones)));
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Failed to get schema of availability zones.", e);
+        }
+        return availabilityZonesSchemaStr;
+    }
+
+    private List<String> getRequiredAvailabilityZones(
+            List<AvailabilityZoneConfig> availabilityZones) {
+        return availabilityZones.stream().filter(AvailabilityZoneConfig::getMandatory)
+                .map(AvailabilityZoneConfig::getVarName).toList();
+    }
+
+    private Map<String, Map<String, Object>> convertAvailabilityZonesToOpenApiSpec(
+            List<AvailabilityZoneConfig> availabilityZones) {
+        Map<String, Map<String, Object>> availabilityZonesExample = new HashMap<>();
+        availabilityZones.forEach(azc -> availabilityZonesExample.put(azc.getVarName(),
+                Map.of(OPENAPI_EXAMPLE_KEYWORD, "valid zone", OPENAPI_DESCRIPTION_KEYWORD,
+                        azc.getDescription(), OPENAPI_TYPE_KEYWORD, "string")));
+        return availabilityZonesExample;
     }
 }

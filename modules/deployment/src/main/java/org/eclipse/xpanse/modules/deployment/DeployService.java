@@ -105,6 +105,10 @@ public class DeployService {
         sensitiveDataHandler.encodeDeployVariable(existingServiceTemplate,
                 deployRequest.getServiceRequestProperties());
 
+        AvailabilityZonesRequestValidator.validateAvailabilityZones(
+                deployRequest.getAvailabilityZones(),
+                existingServiceTemplate.getOcl().getDeployment().getServiceAvailability());
+
         if (StringUtils.isEmpty(deployRequest.getCustomerServiceName())) {
             deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
         }

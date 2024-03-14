@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -82,13 +82,13 @@ public class TofuMakerDeployment implements Deployer {
      * Validates the OpenTofu script.
      */
     @Override
-    public DeploymentScriptValidationResult validate(Ocl ocl) {
+    public DeploymentScriptValidationResult validate(Deployment deployment) {
         DeploymentScriptValidationResult result = null;
-        if (Objects.nonNull(ocl.getDeployment().getDeployer())) {
-            result = tofuMakerScriptValidator.validateOpenTofuScripts(ocl);
+        if (Objects.nonNull(deployment.getDeployer())) {
+            result = tofuMakerScriptValidator.validateOpenTofuScripts(deployment);
         }
-        if (Objects.nonNull(ocl.getDeployment().getScriptsRepo())) {
-            result = tofuMakerScriptValidator.validateOpenTofuScriptsFromGitRepo(ocl);
+        if (Objects.nonNull(deployment.getScriptsRepo())) {
+            result = tofuMakerScriptValidator.validateOpenTofuScriptsFromGitRepo(deployment);
         }
         return result;
     }

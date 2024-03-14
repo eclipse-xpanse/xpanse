@@ -4,7 +4,10 @@
   "csp": "huawei",
   "category": "container",
   "flavor": "1-master-with-3-worker-nodes-normal",
-  "region": "cn-southwest-2",
+  "region": {
+    "area": "Asia China",
+    "name": "cn-southwest-2"
+  },
   "customerServiceName": "default-k8s",
   "serviceHostingType": "self",
   "serviceRequestProperties": {}

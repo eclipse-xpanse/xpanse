@@ -5,25 +5,28 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Test of Deployment.
  */
 class DeploymentTest {
 
-    private static final DeployerKind kind = DeployerKind.TERRAFORM;
-    private static final String deployer = "deployer";
-    private static List<DeployVariable> variables;
-    private static Deployment deployment;
+    private final DeployerKind kind = DeployerKind.TERRAFORM;
+    private final String deployer = "deployer";
+    private ScriptsRepo scriptsRepo;
+    private List<DeployVariable> variables;
+    private List<AvailabilityZoneConfig> availabilityZones;
     private final CredentialType credentialType = CredentialType.API_KEY;
+    private Deployment test;
 
     @BeforeEach
     void setUp() {
@@ -31,63 +34,57 @@ class DeploymentTest {
         deployVariable.setName("HW_AK");
         variables = List.of(deployVariable);
 
-        deployment = new Deployment();
-        deployment.setKind(kind);
-        deployment.setDeployer(deployer);
-        deployment.setVariables(variables);
-        deployment.setCredentialType(credentialType);
+        AvailabilityZoneConfig availabilityZoneConfig = new AvailabilityZoneConfig();
+        availabilityZoneConfig.setDisplayName("displayName");
+        availabilityZoneConfig.setVarName("varName");
+        availabilityZoneConfig.setMandatory(true);
+        availabilityZoneConfig.setDescription("description");
+        availabilityZones = List.of(availabilityZoneConfig);
+
+        scriptsRepo = new ScriptsRepo();
+        scriptsRepo.setRepoUrl("repoUrl");
+        scriptsRepo.setBranch("branch");
+        scriptsRepo.setScriptsPath("scriptsPath");
+
+        test = new Deployment();
+        test.setKind(kind);
+        test.setDeployer(deployer);
+        test.setVariables(variables);
+        test.setCredentialType(credentialType);
+        test.setServiceAvailability(availabilityZones);
+        test.setScriptsRepo(scriptsRepo);
     }
 
     @Test
     void testGetterAndSetter() {
-        assertEquals(kind, deployment.getKind());
-        assertEquals(deployer, deployment.getDeployer());
-        assertEquals(variables, deployment.getVariables());
-        assertEquals(credentialType, deployment.getCredentialType());
+        assertEquals(kind, test.getKind());
+        assertEquals(deployer, test.getDeployer());
+        assertEquals(variables, test.getVariables());
+        assertEquals(credentialType, test.getCredentialType());
+        assertEquals(availabilityZones, test.getServiceAvailability());
+        assertEquals(scriptsRepo, test.getScriptsRepo());
     }
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(deployment.hashCode(), deployment.hashCode());
-
         Object obj = new Object();
-        assertNotEquals(deployment, obj);
-        assertNotEquals(deployment, null);
-        assertNotEquals(deployment.hashCode(), obj.hashCode());
-
-        Deployment deployment1 = new Deployment();
-        Deployment deployment2 = new Deployment();
-        assertNotEquals(deployment, deployment1);
-        assertNotEquals(deployment, deployment2);
-        assertEquals(deployment1, deployment2);
-        assertNotEquals(deployment.hashCode(), deployment1.hashCode());
-        assertNotEquals(deployment.hashCode(), deployment2.hashCode());
-        assertEquals(deployment1.hashCode(), deployment2.hashCode());
-
-        deployment1.setKind(kind);
-        assertNotEquals(deployment, deployment1);
-        assertNotEquals(deployment1, deployment2);
-        assertNotEquals(deployment.hashCode(), deployment1.hashCode());
-        assertNotEquals(deployment1.hashCode(), deployment2.hashCode());
-
-        deployment1.setVariables(variables);
-        assertNotEquals(deployment, deployment1);
-        assertNotEquals(deployment1, deployment2);
-        assertNotEquals(deployment.hashCode(), deployment1.hashCode());
-        assertNotEquals(deployment1.hashCode(), deployment2.hashCode());
-
-        deployment1.setDeployer(deployer);
-        assertNotEquals(deployment, deployment1);
-        assertNotEquals(deployment1, deployment2);
-        assertNotEquals(deployment.hashCode(), deployment1.hashCode());
-        assertNotEquals(deployment1.hashCode(), deployment2.hashCode());
-
-        deployment1.setCredentialType(credentialType);
-        assertEquals(deployment, deployment1);
-        assertNotEquals(deployment1, deployment2);
-        assertEquals(deployment.hashCode(), deployment1.hashCode());
-        assertNotEquals(deployment1.hashCode(), deployment2.hashCode());
+        assertThat(test).isNotEqualTo(obj);
+        assertThat(test.hashCode()).isNotEqualTo(obj.hashCode());
+        Deployment test1 = new Deployment();
+        assertThat(test).isNotEqualTo(test1);
+        assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
+        Deployment test2 = new Deployment();
+        BeanUtils.copyProperties(test, test2);
+        assertThat(test).isEqualTo(test2);
+        assertThat(test.hashCode()).isEqualTo(test2.hashCode());
     }
+
+    @Test
+    void testCanEqual() {
+        assertThat(test.canEqual("other")).isFalse();
+        assertThat(test.canEqual(new Deployment())).isTrue();
+    }
+
 
     @Test
     void testToString() {
@@ -95,10 +92,11 @@ class DeploymentTest {
                 "kind=" + kind +
                 ", variables=" + variables +
                 ", credentialType=" + credentialType +
+                ", serviceAvailability=" + availabilityZones +
                 ", deployer=" + deployer +
-                ", scriptsRepo=null" +
+                ", scriptsRepo=" + scriptsRepo +
                 ")";
-        assertEquals(expectedString, deployment.toString());
+        assertEquals(expectedString, test.toString());
     }
 
 }

@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 
 /**
@@ -29,7 +29,7 @@ public interface Deployer {
 
     DeployerKind getDeployerKind();
 
-    DeploymentScriptValidationResult validate(Ocl ocl);
+    DeploymentScriptValidationResult validate(Deployment deployment);
 
     /**
      * Method to get the changes the infrastructure changes the service deployment would do for a

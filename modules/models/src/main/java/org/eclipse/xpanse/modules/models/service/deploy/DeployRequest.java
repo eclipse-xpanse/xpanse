@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.modules.models.service.deploy;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import java.io.Serial;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,6 +21,8 @@ import lombok.ToString;
 @Data
 public class DeployRequest extends DeployRequestBase {
 
+    @Serial
+    private static final long serialVersionUID = -8027459207480627100L;
     /**
      * The id of the service to deploy.
      */

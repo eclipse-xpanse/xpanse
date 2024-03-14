@@ -47,6 +47,11 @@ serviceProviderContactDetails:
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: terraform
+  serviceAvailability:
+    - displayName: Availability Zone
+      varName: availability_zone
+      mandatory: true
+      description: The availability zone to deploy the service instance. If the value is empty, the service instance will be deployed in a random availability zone.
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
   # - fix_variable: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as usual variables. This variable is not visible to the end user.
@@ -87,10 +92,19 @@ deployment:
       mandatory: false
       value: "secgroup-default"
   deployer: |
+    variable "region" {
+      type        = string
+      description = "The region to deploy the service instance."
+    }
+    
     variable "flavor_id" {
       type        = string
-      default     = "s6.large.2"
       description = "The flavor id of the service instance."
+    }
+    
+    variable "availability_zone" {
+      type        = string
+      description = "The availability zone of the service instance."
     }
 
     variable "admin_passwd" {
@@ -115,12 +129,6 @@ deployment:
       type        = string
       default     = "secgroup-default"
       description = "The security group name of the service instance."
-    }
-    
-    variable "region" {
-      type        = string
-      default     = "cn-southwest-2"
-      description = "The region to deploy the service instance."
     }
     
     terraform {
@@ -152,6 +160,14 @@ deployment:
 
     output "flavor_id" {
       value = var.flavor_id
+    }
+    
+    output "region" {
+      value = var.region
+    }
+    
+    output "availability_zone" {
+      value = var.availability_zone == "" ? "" : var.availability_zone
     }
 
     output "vpc_name" {

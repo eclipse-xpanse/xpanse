@@ -67,7 +67,6 @@ public class TofuMakerDeploymentPlanManage {
         request.setGitRepoDetails(
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
-        request.getVariables().put("region", task.getDeployRequest().getRegion().getName());
         return request;
     }
 }

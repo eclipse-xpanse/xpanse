@@ -4,7 +4,10 @@
   "csp": "huawei",
   "category": "middleware",
   "flavor": "1-zookeeper-with-3-worker-nodes-normal",
-  "region": "cn-southwest-2",
+  "region": {
+    "area": "Asia China",
+    "name": "cn-southwest-2"
+  },
   "customerServiceName": "default-kafka",
   "serviceHostingType": "self",
   "serviceRequestProperties": {}

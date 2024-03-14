@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDeployWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
-import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.slf4j.MDC;
 import org.springframework.context.annotation.Profile;
@@ -52,11 +52,12 @@ public class TerraformBootScriptValidator {
     /**
      * Validate scripts provided in the OCL.
      */
-    public DeploymentScriptValidationResult validateTerraformScripts(Ocl ocl) {
+    public DeploymentScriptValidationResult validateTerraformScripts(Deployment deployment) {
         DeploymentScriptValidationResult deploymentScriptValidationResult = null;
         try {
             TerraformValidationResult validate =
-                    terraformFromScriptsApi.validateWithScripts(getValidateScriptsInOclRequest(ocl),
+                    terraformFromScriptsApi.validateWithScripts(
+                            getValidateScriptsInOclRequest(deployment),
                             Objects.nonNull(MDC.get("TASK_ID"))
                                     ? UUID.fromString(MDC.get("TASK_ID")) : null);
             try {
@@ -76,12 +77,13 @@ public class TerraformBootScriptValidator {
     /**
      * Validate scripts in the GIT repo.
      */
-    public DeploymentScriptValidationResult validateTerraformScriptsFromGitRepo(Ocl ocl) {
+    public DeploymentScriptValidationResult validateTerraformScriptsFromGitRepo(
+            Deployment deployment) {
         DeploymentScriptValidationResult deploymentScriptValidationResult = null;
         try {
             TerraformValidationResult validate =
                     terraformFromGitRepoApi.validateScriptsFromGitRepo(
-                            getValidateScriptsInGitRepoRequest(ocl),
+                            getValidateScriptsInGitRepoRequest(deployment),
                             Objects.nonNull(MDC.get("TASK_ID"))
                                     ? UUID.fromString(MDC.get("TASK_ID")) : null);
             try {
@@ -98,26 +100,28 @@ public class TerraformBootScriptValidator {
         return deploymentScriptValidationResult;
     }
 
-    private TerraformDeployWithScriptsRequest getValidateScriptsInOclRequest(Ocl ocl) {
+    private TerraformDeployWithScriptsRequest getValidateScriptsInOclRequest(
+            Deployment deployment) {
         TerraformDeployWithScriptsRequest request =
                 new TerraformDeployWithScriptsRequest();
         request.setIsPlanOnly(false);
-        request.setScripts(getFilesByOcl(ocl));
+        request.setScripts(getFilesByOcl(deployment));
         return request;
     }
 
-    private TerraformDeployFromGitRepoRequest getValidateScriptsInGitRepoRequest(Ocl ocl) {
+    private TerraformDeployFromGitRepoRequest getValidateScriptsInGitRepoRequest(
+            Deployment deployment) {
         TerraformDeployFromGitRepoRequest request =
                 new TerraformDeployFromGitRepoRequest();
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
-                        ocl.getDeployment().getScriptsRepo()));
+                        deployment.getScriptsRepo()));
         return request;
     }
 
-    private List<String> getFilesByOcl(Ocl ocl) {
-        String deployer = ocl.getDeployment().getDeployer();
+    private List<String> getFilesByOcl(Deployment deployment) {
+        String deployer = deployment.getDeployer();
         return Collections.singletonList(deployer);
     }
 }

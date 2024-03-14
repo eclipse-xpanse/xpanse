@@ -49,6 +49,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
@@ -174,10 +175,7 @@ class ServiceDeployerApiTest {
 
     }
 
-    UserPolicy addUserPolicy(ServiceTemplateDetailVo serviceTemplate) throws Exception {
-        UserPolicyCreateRequest userPolicy = new UserPolicyCreateRequest();
-        userPolicy.setCsp(serviceTemplate.getCsp());
-        userPolicy.setPolicy("userPolicy");
+    UserPolicy addUserPolicy(UserPolicyCreateRequest userPolicy) throws Exception {
         userPolicy.setEnabled(true);
         final MockHttpServletResponse response = mockMvc.perform(post("/xpanse/policies")
                         .content(objectMapper.writeValueAsString(userPolicy))
@@ -235,7 +233,10 @@ class ServiceDeployerApiTest {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approvedServiceTemplateRegistration(serviceTemplate.getId());
         setMockPoliciesValidateApi();
-        UserPolicy userPolicy = addUserPolicy(serviceTemplate);
+        UserPolicyCreateRequest userPolicyCreateRequest =  new UserPolicyCreateRequest();
+        userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
+        userPolicyCreateRequest.setPolicy("userPolicy-1");
+        UserPolicy userPolicy = addUserPolicy(userPolicyCreateRequest);
         addServicePolicies(serviceTemplate);
         addCredential();
         mockPolicyEvaluationResult(true);
@@ -266,7 +267,10 @@ class ServiceDeployerApiTest {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approvedServiceTemplateRegistration(serviceTemplate.getId());
         setMockPoliciesValidateApi();
-        UserPolicy userPolicy = addUserPolicy(serviceTemplate);
+        UserPolicyCreateRequest userPolicyCreateRequest =  new UserPolicyCreateRequest();
+        userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
+        userPolicyCreateRequest.setPolicy("userPolicy-2");
+        UserPolicy userPolicy = addUserPolicy(userPolicyCreateRequest);
         addServicePolicies(serviceTemplate);
         addCredential();
         mockPolicyEvaluationResult(true);
@@ -413,7 +417,10 @@ class ServiceDeployerApiTest {
             throws Exception {
         approvedServiceTemplateRegistration(serviceTemplate.getId());
         setMockPoliciesValidateApi();
-        UserPolicy userPolicy = addUserPolicy(serviceTemplate);
+        UserPolicyCreateRequest userPolicyCreateRequest =  new UserPolicyCreateRequest();
+        userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
+        userPolicyCreateRequest.setPolicy("userPolicy-3");
+        UserPolicy userPolicy = addUserPolicy(userPolicyCreateRequest);
         addServicePolicies(serviceTemplate);
         addCredential();
         mockPolicyEvaluationResult(false);
@@ -572,21 +579,28 @@ class ServiceDeployerApiTest {
 
     }
 
-    DeployRequest getDeployRequest(ServiceTemplateDetailVo serviceTemplateDetailVo) {
+    DeployRequest getDeployRequest(ServiceTemplateDetailVo serviceTemplate) {
         DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setServiceName(serviceTemplateDetailVo.getName());
-        deployRequest.setVersion(serviceTemplateDetailVo.getVersion());
-        deployRequest.setCsp(serviceTemplateDetailVo.getCsp());
-        deployRequest.setCategory(serviceTemplateDetailVo.getCategory());
-        deployRequest.setFlavor(serviceTemplateDetailVo.getFlavors().getFirst().getName());
-        Region region = new Region();
-        region.setName(serviceTemplateDetailVo.getRegions().getFirst().getName());
-        region.setArea(serviceTemplateDetailVo.getRegions().getFirst().getArea());
-        deployRequest.setRegion(region);
-        deployRequest.setServiceHostingType(serviceTemplateDetailVo.getServiceHostingType());
+        deployRequest.setServiceName(serviceTemplate.getName());
+        deployRequest.setVersion(serviceTemplate.getVersion());
+        deployRequest.setCsp(serviceTemplate.getCsp());
+        deployRequest.setCategory(serviceTemplate.getCategory());
+        deployRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
+        deployRequest.setRegion(serviceTemplate.getRegions().getFirst());
+        deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
+
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
+
+        List<AvailabilityZoneConfig> availabilityZoneConfigs =
+                serviceTemplate.getDeployment().getServiceAvailability();
+        Map<String, String> availabilityZones = new HashMap<>();
+        availabilityZoneConfigs.forEach(availabilityZoneConfig -> {
+            availabilityZones.put(availabilityZoneConfig.getVarName(),
+                    availabilityZoneConfig.getDisplayName());
+        });
+        deployRequest.setAvailabilityZones(availabilityZones);
         return deployRequest;
     }
 

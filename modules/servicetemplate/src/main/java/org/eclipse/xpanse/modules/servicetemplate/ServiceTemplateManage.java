@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -38,6 +39,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnost
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
+import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableAutoFillValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
@@ -73,13 +75,9 @@ public class ServiceTemplateManage {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
         iconUpdate(existingTemplate, ocl);
         checkParams(existingTemplate, ocl);
-        validateTerraformScript(ocl);
+        validateServiceTemplate(ocl.getDeployment(), existingTemplate);
         existingTemplate.setOcl(ocl);
         existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
-        JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
-                        existingTemplate.getOcl().getDeployment().getVariables());
-        existingTemplate.setJsonObjectSchema(jsonObjectSchema);
         ServiceTemplateEntity updatedServiceTemplate = storage.storeAndFlush(existingTemplate);
         serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
         return updatedServiceTemplate;
@@ -146,7 +144,6 @@ public class ServiceTemplateManage {
      * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity registerServiceTemplate(Ocl ocl) {
-        ocl.setIcon(IconProcessorUtil.processImage(ocl));
         ServiceTemplateEntity newTemplate = getNewServiceTemplateEntity(ocl);
         ServiceTemplateEntity existingTemplate = storage.findServiceTemplate(newTemplate);
         if (Objects.nonNull(existingTemplate)) {
@@ -155,22 +152,29 @@ public class ServiceTemplateManage {
             log.error(errorMsg);
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
-        DeployVariableAutoFillValidator.validateDeployVariableAutoFill(
-                newTemplate.getOcl().getDeployment().getVariables());
-        JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
-                        newTemplate.getOcl().getDeployment().getVariables());
-        validateTerraformScript(ocl);
+        ocl.setIcon(IconProcessorUtil.processImage(ocl));
+        validateServiceTemplate(ocl.getDeployment(), newTemplate);
         Optional<String> namespace = identityProviderManager.getUserNamespace();
         if (namespace.isPresent()) {
             newTemplate.setNamespace(namespace.get());
         } else {
             newTemplate.setNamespace(ocl.getNamespace());
         }
-        newTemplate.setJsonObjectSchema(jsonObjectSchema);
         ServiceTemplateEntity storedServiceTemplate = storage.storeAndFlush(newTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
         return storedServiceTemplate;
+    }
+
+    private void validateServiceTemplate(Deployment deployment,
+                                         ServiceTemplateEntity serviceTemplate) {
+        AvailabilityZoneSchemaValidator.validateServiceAvailability(
+                deployment.getServiceAvailability());
+        DeployVariableAutoFillValidator.validateDeployVariableAutoFill(deployment.getVariables());
+        JsonObjectSchema jsonObjectSchema =
+                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                        deployment.getVariables());
+        serviceTemplate.setJsonObjectSchema(jsonObjectSchema);
+        validateTerraformScript(deployment);
     }
 
     /**
@@ -277,11 +281,11 @@ public class ServiceTemplateManage {
         return serviceTemplate;
     }
 
-    private void validateTerraformScript(Ocl ocl) {
-        if (ocl.getDeployment().getKind() == DeployerKind.TERRAFORM) {
+    private void validateTerraformScript(Deployment deployment) {
+        if (deployment.getKind() == DeployerKind.TERRAFORM) {
             DeploymentScriptValidationResult tfValidationResult =
-                    this.deployerKindManager.getDeployment(ocl.getDeployment().getKind())
-                            .validate(ocl);
+                    this.deployerKindManager.getDeployment(deployment.getKind())
+                            .validate(deployment);
             if (!tfValidationResult.isValid()) {
                 throw new TerraformScriptFormatInvalidException(
                         tfValidationResult.getDiagnostics().stream()
@@ -290,10 +294,10 @@ public class ServiceTemplateManage {
             }
         }
 
-        if (ocl.getDeployment().getKind() == DeployerKind.OPEN_TOFU) {
+        if (deployment.getKind() == DeployerKind.OPEN_TOFU) {
             DeploymentScriptValidationResult tfValidationResult =
-                    this.deployerKindManager.getDeployment(ocl.getDeployment().getKind())
-                            .validate(ocl);
+                    this.deployerKindManager.getDeployment(deployment.getKind())
+                            .validate(deployment);
             if (!tfValidationResult.isValid()) {
                 throw new OpenTofuScriptFormatInvalidException(
                         tfValidationResult.getDiagnostics().stream()

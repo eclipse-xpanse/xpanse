@@ -38,6 +38,9 @@ public class Deployment implements Serializable {
     @Schema(description = "The credential type to do the deployment")
     private CredentialType credentialType = CredentialType.VARIABLES;
 
+    @Schema(description = "The list of availability zones of the service.")
+    private List<AvailabilityZoneConfig> serviceAvailability;
+
     @Schema(description = "The real deployer, something like terraform scripts. "
             + "Either deployer or deployFromGitRepo must be provided.")
     private String deployer;
