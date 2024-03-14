@@ -8,6 +8,9 @@ package org.eclipse.xpanse.plugins.huaweicloud.manage;
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.core.exception.SdkException;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
+import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
+import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesRequest;
+import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesResponse;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsRequest;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsResponse;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsResult;
@@ -66,7 +69,7 @@ public class HuaweiCloudResourceManager {
     /**
      * List HuaweiCloud resource by the kind of ReusableCloudResource.
      */
-    public List<String> getExistingResourcesOfType(String userId,
+    public List<String> getExistingResourceNamesWithKind(String userId,
             String region, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
             return getVpcList(userId, region);
@@ -85,6 +88,31 @@ public class HuaweiCloudResourceManager {
         } else {
             return new ArrayList<>();
         }
+    }
+
+
+    /**
+     * List availability zones of region.
+     *
+     * @param userId user id
+     * @param region region
+     * @return availability zones
+     */
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+        List<String> availabilityZones = new ArrayList<>();
+        try {
+            EcsClient ecsClient = getEcsClient(userId, region);
+            NovaListAvailabilityZonesResponse response =
+                    ecsClient.novaListAvailabilityZones(new NovaListAvailabilityZonesRequest());
+            if (response.getHttpStatusCode() == 200) {
+                availabilityZones = response.getAvailabilityZoneInfo().stream()
+                        .map(NovaAvailabilityZone::getZoneName).toList();
+            }
+        } catch (SdkException e) {
+            log.error("Get HuaweiCloud availability zones of region:{} failed, error:{}", region,
+                    e.getMessage());
+        }
+        return availabilityZones;
     }
 
     private List<String> getVpcList(String userId, String region) {

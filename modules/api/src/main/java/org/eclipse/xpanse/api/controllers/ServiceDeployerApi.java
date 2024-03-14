@@ -33,6 +33,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentS
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
+import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.springframework.http.HttpStatus;
@@ -72,6 +74,9 @@ public class ServiceDeployerApi {
 
     @Resource
     private DeployServiceEntityHandler deployServiceEntityHandler;
+
+    @Resource
+    private PluginManager pluginManager;
 
     /**
      * Get details of the managed service by id.
@@ -241,6 +246,31 @@ public class ServiceDeployerApi {
         this.deployService.purgeService(purgeTask, deployServiceEntity);
         String successMsg = String.format("Purging task for service with ID %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
+    }
+
+
+    /**
+     * Get details of the managed service by id.
+     *
+     * @return Details of the managed service.
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Get availability zones with csp and region.")
+    @GetMapping(value = "/csp/region/azs",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<String> getAvailabilityZones(
+            @Parameter(name = "cspName", description = "name of the cloud service provider")
+            @RequestParam(name = "cspName") Csp csp,
+            @Parameter(name = "regionName", description = "name of the region")
+            @RequestParam(name = "regionName") String regionName) {
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (userIdOptional.isPresent()) {
+            OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
+            return orchestratorPlugin.getAvailabilityZonesOfRegion(
+                    userIdOptional.get(), regionName);
+        }
+        return Collections.emptyList();
     }
 
 }

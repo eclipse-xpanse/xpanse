@@ -23,13 +23,13 @@ import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.net.URI;
-import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
@@ -81,7 +81,8 @@ class ServiceCatalogApiTest {
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testServiceCatalogServices() throws Exception {
-        Ocl ocl = new OclLoader().getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceCatalogApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         testGetOrderableServiceDetailsThrowsException(serviceTemplate);
@@ -110,7 +111,8 @@ class ServiceCatalogApiTest {
         ).andReturn().getResponse();
     }
 
-    void approveServiceTemplateRegistration(ServiceTemplateDetailVo serviceTemplateDetailVo)
+    UserOrderableServiceVo approveServiceTemplateRegistration(
+            ServiceTemplateDetailVo serviceTemplateDetailVo)
             throws Exception {
         UUID id = serviceTemplateDetailVo.getId();
         ReviewRegistrationRequest request = new ReviewRegistrationRequest();
@@ -122,8 +124,8 @@ class ServiceCatalogApiTest {
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
         final MockHttpServletResponse response = getOrderableServiceDetailsWithId(id);
-        serviceTemplateDetailVo = objectMapper.readValue(response.getContentAsString(),
-                ServiceTemplateDetailVo.class);
+        return objectMapper.readValue(response.getContentAsString(),
+                UserOrderableServiceVo.class);
     }
 
     void testListOrderableServices(ServiceTemplateDetailVo serviceTemplateDetailVo)
@@ -141,16 +143,16 @@ class ServiceCatalogApiTest {
         String errorMessage = "Failed to convert value of type 'java.lang.String' to required type";
         // Run the test case 2
         final MockHttpServletResponse response2 = listOrderableServicesWithParams("errorValue",
-                "huawei", null, null, null);
+                Csp.HUAWEI.toValue(), null, null, null);
         // Verify the result 2
         assertThat(response2.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
         assertThat(errorMessage).isSubstringOf(response2.getContentAsString());
 
         // Setup request 3
-        approveServiceTemplateRegistration(serviceTemplateDetailVo);
-        List<UserOrderableServiceVo> userOrderableServiceVos =
-                List.of(transToUserOrderableServiceVo(serviceTemplateDetailVo));
-        String result3 = objectMapper.writeValueAsString(userOrderableServiceVos);
+        UserOrderableServiceVo userOrderableServiceVo =
+                approveServiceTemplateRegistration(serviceTemplateDetailVo);
+
+        String result3 = objectMapper.writeValueAsString(List.of(userOrderableServiceVo));
         // Run the test case 3
         final MockHttpServletResponse response3 =
                 listOrderableServicesWithParams(serviceTemplateDetailVo.getCategory().toValue(),
@@ -175,6 +177,8 @@ class ServiceCatalogApiTest {
                     return flavorBasic;
                 }).toList();
         userOrderableServiceVo.setFlavors(flavorBasics);
+        userOrderableServiceVo.setServiceAvailability(serviceTemplateDetailVo.getDeployment()
+                .getServiceAvailability());
         userOrderableServiceVo.add(
                 Link.of(String.format("http://localhost/xpanse/catalog/services/%s/openapi",
                         serviceTemplateDetailVo.getId().toString()), "openApi"));

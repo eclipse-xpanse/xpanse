@@ -25,6 +25,24 @@ public interface ServiceResourceHandler {
      */
     Map<DeployerKind, DeployResourceHandler> resourceHandlers();
 
-    List<String> getExistingResourcesOfType(String userId, String region,
+    /**
+     * get the existing resources of the specified kind.
+     *
+     * @param userId id of the user.
+     * @param region region of the resource.
+     * @param kind   kind of the resource.
+     * @return the existing resources names with the specified kind.
+     */
+    List<String> getExistingResourceNamesWithKind(String userId, String region,
             DeployResourceKind kind);
+
+
+    /**
+     * get the availability zones of the specified region.
+     *
+     * @param userId id of the user.
+     * @param region region.
+     * @return the availability zones of the specified region.
+     */
+    List<String> getAvailabilityZonesOfRegion(String userId, String region);
 }
