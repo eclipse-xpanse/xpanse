@@ -32,6 +32,7 @@ class DeployVariableTest {
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
     private static DeployVariable deployVariable;
     private static AutoFill autoFill = null;
+    private static ModificationImpact modificationImpact;
 
     @BeforeEach
     void setUp() {
@@ -46,6 +47,7 @@ class DeployVariableTest {
         deployVariable.setValueSchema(validatorMap);
         deployVariable.setSensitiveScope(sensitiveScope);
         deployVariable.setAutoFill(autoFill);
+        deployVariable.setModificationImpact(modificationImpact);
     }
 
     @Test
@@ -59,6 +61,7 @@ class DeployVariableTest {
         assertEquals(mandatory, deployVariable.getMandatory());
         assertEquals(validatorMap, deployVariable.getValueSchema());
         assertEquals(sensitiveScope, deployVariable.getSensitiveScope());
+        assertEquals(modificationImpact, deployVariable.getModificationImpact());
     }
 
     @Test
@@ -139,6 +142,12 @@ class DeployVariableTest {
         assertNotEquals(deployVariable1, deployVariable2);
         assertEquals(deployVariable.hashCode(), deployVariable1.hashCode());
         assertNotEquals(deployVariable1.hashCode(), deployVariable2.hashCode());
+
+        deployVariable1.setModificationImpact(modificationImpact);
+        assertEquals(deployVariable, deployVariable1);
+        assertNotEquals(deployVariable1, deployVariable2);
+        assertEquals(deployVariable.hashCode(), deployVariable1.hashCode());
+        assertNotEquals(deployVariable1.hashCode(), deployVariable2.hashCode());
     }
 
     @Test
@@ -154,6 +163,7 @@ class DeployVariableTest {
                 ", valueSchema=" + validatorMap + "" +
                 ", sensitiveScope=" + sensitiveScope + "" +
                 ", autoFill=" + autoFill + "" +
+                ", modificationImpact=" + modificationImpact + "" +
                 ")";
         assertEquals(expectedString, deployVariable.toString());
     }

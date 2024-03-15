@@ -37,6 +37,9 @@ flavors:
     properties:
       worker_nodes_count: 3
       flavor_id: s6.large.4
+    modificationImpact:
+      isDataLost: true
+      isServiceInterrupted: true
   - name: 1-zookeeper-with-3-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
@@ -44,6 +47,9 @@ flavors:
     properties:
       worker_nodes_count: 3
       flavor_id: s6.xlarge.4
+    modificationImpact:
+      isDataLost: true
+      isServiceInterrupted: true
   - name: 1-zookeeper-with-5-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60
@@ -51,6 +57,9 @@ flavors:
     properties:
       worker_nodes_count: 5
       flavor_id: s6.large.4
+    modificationImpact:
+      isDataLost: true
+      isServiceInterrupted: true
   - name: 1-zookeeper-with-5-worker-nodes-performance
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 80
@@ -58,6 +67,9 @@ flavors:
     properties:
       worker_nodes_count: 5
       flavor_id: s6.xlarge.4
+    modificationImpact:
+      isDataLost: true
+      isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test@test.com"]
@@ -87,6 +99,9 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: vpc_name
       description: The vpc name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
@@ -94,6 +109,9 @@ deployment:
       example: "kafka-vpc-default"
       mandatory: false
       value: "kafka-vpc-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: subnet_name
       description: The sub network name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
@@ -101,6 +119,9 @@ deployment:
       example: "kafka-subnet-default"
       mandatory: false
       value: "kafka-subnet-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: secgroup_name
       description: The security group name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
@@ -108,6 +129,9 @@ deployment:
       example: "kafka-secgroup-default"
       mandatory: false
       value: "kafka-secgroup-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
   deployer: |
     variable "region" {
       type        = string

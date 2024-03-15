@@ -31,4 +31,8 @@ public class Flavor extends FlavorBasic implements Serializable {
     @Schema(description = "The properties of the flavor")
     private Map<String, String> properties;
 
+    @NotNull
+    @Schema(description = "Impact on service when flavor is changed.")
+    private ModificationImpact modificationImpact;
+
 }

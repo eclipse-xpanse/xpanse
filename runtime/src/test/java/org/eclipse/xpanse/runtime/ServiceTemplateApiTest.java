@@ -39,6 +39,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
@@ -316,9 +317,9 @@ class ServiceTemplateApiTest {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setFlavors(null);
+        ocl.setBilling(null);
         Response expectedResponse = Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY,
-                Collections.singletonList("flavors:must not be null"));
+                Collections.singletonList("billing:must not be null"));
         // Run the test
         final MockHttpServletResponse response = register(ocl);
         // Verify the results
@@ -355,6 +356,10 @@ class ServiceTemplateApiTest {
         errorVariable.setName("errorVarName");
         errorVariable.setDescription("description");
         errorVariable.setExample("example");
+        ModificationImpact modificationImpact = new ModificationImpact();
+        modificationImpact.setIsDataLost(true);
+        modificationImpact.setIsServiceInterrupted(true);
+        errorVariable.setModificationImpact(modificationImpact);
         String errorSchemaKey = "errorSchemaKey";
         errorVariable.setValue("errorValue");
         errorVariable.setValueSchema(Collections.singletonMap(errorSchemaKey, "errorSchemaValue"));

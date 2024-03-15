@@ -22,6 +22,7 @@ class FlavorTest {
     private static final Integer fixedPrice = 1;
     private static final Map<String, String> properties = Map.of("key", "value");
     private static Flavor flavor;
+    private static ModificationImpact modificationImpact;
 
     @BeforeEach
     void setUp() {
@@ -29,6 +30,7 @@ class FlavorTest {
         flavor.setName(name);
         flavor.setFixedPrice(fixedPrice);
         flavor.setProperties(properties);
+        flavor.setModificationImpact(modificationImpact);
     }
 
     @Test
@@ -36,6 +38,7 @@ class FlavorTest {
         assertEquals(name, flavor.getName());
         assertEquals(fixedPrice, flavor.getFixedPrice());
         assertEquals(properties, flavor.getProperties());
+        assertEquals(modificationImpact, flavor.getModificationImpact());
     }
 
     @Test
@@ -74,6 +77,12 @@ class FlavorTest {
         assertNotEquals(flavor1, flavor2);
         assertEquals(flavor.hashCode(), flavor1.hashCode());
         assertNotEquals(flavor1.hashCode(), flavor2.hashCode());
+
+        flavor1.setModificationImpact(modificationImpact);
+        assertEquals(flavor, flavor1);
+        assertNotEquals(flavor1, flavor2);
+        assertEquals(flavor.hashCode(), flavor1.hashCode());
+        assertNotEquals(flavor1.hashCode(), flavor2.hashCode());
     }
 
     @Test
@@ -81,7 +90,8 @@ class FlavorTest {
         String expectedString = "Flavor(" +
                 "super=FlavorBasic(name=" + name +
                 ", fixedPrice=" + fixedPrice + ")" +
-                ", properties=" + properties + ")";
+                ", properties=" + properties  +
+                ", modificationImpact=" + modificationImpact + ")";
         assertEquals(expectedString, flavor.toString());
     }
 
