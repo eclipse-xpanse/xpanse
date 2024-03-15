@@ -89,6 +89,8 @@ public class ServiceTemplateEntityConverter {
                     serviceTemplateEntity.getOcl().getServiceHostingType());
             userOrderableServiceVo.setServiceProviderContactDetails(
                     serviceTemplateEntity.getOcl().getServiceProviderContactDetails());
+            userOrderableServiceVo.setServiceAvailability(
+                    serviceTemplateEntity.getOcl().getDeployment().getServiceAvailability());
             return userOrderableServiceVo;
         }
         return null;

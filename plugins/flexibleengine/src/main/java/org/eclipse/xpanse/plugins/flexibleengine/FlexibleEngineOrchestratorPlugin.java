@@ -57,9 +57,14 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public List<String> getExistingResourcesOfType(String userId, String region,
-                                                   DeployResourceKind kind) {
-        return flexibleEngineResourceManager.getExistingResourcesOfType(userId, region, kind);
+    public List<String> getExistingResourceNamesWithKind(String userId, String region,
+                                                         DeployResourceKind kind) {
+        return flexibleEngineResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
+    }
+
+    @Override
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+        return flexibleEngineResourceManager.getAvailabilityZonesOfRegion(userId, region);
     }
 
     @Override

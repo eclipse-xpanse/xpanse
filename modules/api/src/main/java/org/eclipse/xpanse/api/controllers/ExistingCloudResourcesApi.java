@@ -15,7 +15,6 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
@@ -58,8 +57,8 @@ public class ExistingCloudResourcesApi {
     @GetMapping(value = "/csp/resources/{deployResourceKind}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List existing cloud resource types")
-    public List<String> getExistingResourcesOfType(
+    @Operation(description = "List existing cloud resource names with kind")
+    public List<String> getExistingResourceNamesWithKind(
             @Parameter(name = "csp", description = "name of the cloud service provider")
             @RequestParam(name = "csp") Csp csp,
             @Parameter(name = "region", description = "name of he region")
@@ -68,12 +67,12 @@ public class ExistingCloudResourcesApi {
             @PathVariable("deployResourceKind") DeployResourceKind deployResourceKind) {
 
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (StringUtils.isEmpty(userIdOptional.get())) {
+        if (userIdOptional.isEmpty()) {
             throw new AccessDeniedException(
                     "No permissions to view resources of services belonging to other users.");
         }
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        return orchestratorPlugin.getExistingResourcesOfType(userIdOptional.get(), region,
+        return orchestratorPlugin.getExistingResourceNamesWithKind(userIdOptional.get(), region,
                 deployResourceKind);
     }
 }

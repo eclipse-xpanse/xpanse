@@ -8,7 +8,6 @@ package org.eclipse.xpanse.plugins.scs.manage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -33,9 +32,8 @@ public class ScsResourceManager {
     private final ScsKeystoneManager scsKeystoneManager;
 
     @Autowired
-    public ScsResourceManager(
-            CredentialCenter credentialCenter,
-            ScsKeystoneManager scsKeystoneManager) {
+    public ScsResourceManager(CredentialCenter credentialCenter,
+                              ScsKeystoneManager scsKeystoneManager) {
         this.credentialCenter = credentialCenter;
         this.scsKeystoneManager = scsKeystoneManager;
     }
@@ -43,8 +41,8 @@ public class ScsResourceManager {
     /**
      * List Scs resource by the kind of ReusableCloudResource.
      */
-    public List<String> getExistingResourcesOfType(String userId,
-            String region, DeployResourceKind kind) {
+    public List<String> getExistingResourceNamesWithKind(String userId, String region,
+                                                         DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
             return getVpcList(userId, region);
         } else if (kind == DeployResourceKind.SUBNET) {
@@ -64,13 +62,31 @@ public class ScsResourceManager {
         }
     }
 
+    /**
+     * List availability zones of region.
+     *
+     * @param userId user id
+     * @param region region
+     * @return availability zones
+     */
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+        List<String> availabilityZones = new ArrayList<>();
+        try {
+            OSClientV3 osClient = getOsClient(userId, region);
+            osClient.networking().availabilityzone().list()
+                    .forEach(availabilityZone -> availabilityZones.add(availabilityZone.getName()));
+        } catch (RuntimeException e) {
+            log.error("Get Openstack availability zones of region:{} failed, error:{}", region,
+                    e.getMessage());
+        }
+        return availabilityZones;
+    }
+
     private List<String> getVpcList(String userId, String region) {
         try {
-            OSClientV3 osClient = getOsClient(userId, null, region);
+            OSClientV3 osClient = getOsClient(userId, region);
             List<String> vpcs = new ArrayList<>();
-            osClient.networking().network().list().stream().forEach(network -> {
-                vpcs.add(network.getName());
-            });
+            osClient.networking().network().list().forEach(network -> vpcs.add(network.getName()));
             return vpcs;
         } catch (RuntimeException e) {
             log.error("Get Scs vpc resources failed, error:{}", e.getMessage());
@@ -80,11 +96,9 @@ public class ScsResourceManager {
 
     private List<String> getSubnetList(String userId, String region) {
         try {
-            OSClientV3 osClient = getOsClient(userId, null, region);
+            OSClientV3 osClient = getOsClient(userId, region);
             List<String> subnets = new ArrayList<>();
-            osClient.networking().subnet().list().stream().forEach(subnet -> {
-                subnets.add(subnet.getName());
-            });
+            osClient.networking().subnet().list().forEach(subnet -> subnets.add(subnet.getName()));
             return subnets;
         } catch (RuntimeException e) {
             log.error("Get Scs subnet resources failed, error:{}", e.getMessage());
@@ -94,11 +108,10 @@ public class ScsResourceManager {
 
     private List<String> getSecurityGroupsList(String userId, String region) {
         try {
-            OSClientV3 osClient = getOsClient(userId, null, region);
+            OSClientV3 osClient = getOsClient(userId, region);
             List<String> securityGroups = new ArrayList<>();
-            osClient.networking().securitygroup().list().stream().forEach(securityGroup -> {
-                securityGroups.add(securityGroup.getName());
-            });
+            osClient.networking().securitygroup().list()
+                    .forEach(securityGroup -> securityGroups.add(securityGroup.getName()));
             return securityGroups;
         } catch (RuntimeException e) {
             log.error("Get Scs SecurityGroup resources failed, error:{}", e.getMessage());
@@ -108,11 +121,10 @@ public class ScsResourceManager {
 
     private List<String> getSecurityGroupRuleList(String userId, String region) {
         try {
-            OSClientV3 osClient = getOsClient(userId, null, region);
+            OSClientV3 osClient = getOsClient(userId, region);
             List<String> securityGroupRules = new ArrayList<>();
-            osClient.networking().securityrule().list().stream().forEach(securityGroupRule -> {
-                securityGroupRules.add(securityGroupRule.getId());
-            });
+            osClient.networking().securityrule().list().forEach(
+                    securityGroupRule -> securityGroupRules.add(securityGroupRule.getId()));
             return securityGroupRules;
         } catch (RuntimeException e) {
             log.error("Get Scs SecurityGroupRule resources failed, error:{}", e.getMessage());
@@ -122,11 +134,10 @@ public class ScsResourceManager {
 
     private List<String> getPublicIpList(String userId, String region) {
         try {
-            OSClientV3 osClient = getOsClient(userId, null, region);
+            OSClientV3 osClient = getOsClient(userId, region);
             List<String> publicIps = new ArrayList<>();
-            osClient.networking().floatingip().list().stream().forEach(floatingip -> {
-                publicIps.add(floatingip.getFloatingIpAddress());
-            });
+            osClient.networking().floatingip().list()
+                    .forEach(floatingIp -> publicIps.add(floatingIp.getFloatingIpAddress()));
             return publicIps;
         } catch (RuntimeException e) {
             log.error("Get Scs publicIp resources failed, error:{}", e.getMessage());
@@ -136,11 +147,10 @@ public class ScsResourceManager {
 
     private List<String> getVolumeList(String userId, String region) {
         try {
-            OSClientV3 osClient = getOsClient(userId, null, region);
+            OSClientV3 osClient = getOsClient(userId, region);
             List<String> volumes = new ArrayList<>();
-            osClient.blockStorage().volumes().list().stream().forEach(volume -> {
-                volumes.add(volume.getName());
-            });
+            osClient.blockStorage().volumes().list()
+                    .forEach(volume -> volumes.add(volume.getName()));
             return volumes;
         } catch (RuntimeException e) {
             log.error("Get Scs volume resources failed, error:{}", e.getMessage());
@@ -150,11 +160,10 @@ public class ScsResourceManager {
 
     private List<String> getKeyPairsList(String userId, String region) {
         try {
-            OSClientV3 osClient = getOsClient(userId, null, region);
+            OSClientV3 osClient = getOsClient(userId, region);
             List<String> keyPairs = new ArrayList<>();
-            osClient.compute().keypairs().list().stream().forEach(keyPair -> {
-                keyPairs.add(keyPair.getName());
-            });
+            osClient.compute().keypairs().list()
+                    .forEach(keyPair -> keyPairs.add(keyPair.getName()));
             return keyPairs;
         } catch (RuntimeException e) {
             log.error("Get Scs keyPair resources failed, error:{}", e.getMessage());
@@ -162,11 +171,10 @@ public class ScsResourceManager {
         }
     }
 
-    private OSClient.OSClientV3 getOsClient(String userId, UUID serviceId, String region) {
+    private OSClient.OSClientV3 getOsClient(String userId, String region) {
         AbstractCredentialInfo credentialInfo =
                 credentialCenter.getCredential(Csp.SCS, CredentialType.VARIABLES, userId);
-        return scsKeystoneManager.getAuthenticatedClient(serviceId, credentialInfo)
-                .useRegion(region);
+        return scsKeystoneManager.getAuthenticatedClient(null, credentialInfo).useRegion(region);
     }
 
 }

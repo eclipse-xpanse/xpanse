@@ -62,9 +62,14 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public List<String> getExistingResourcesOfType(String userId, String region,
+    public List<String> getExistingResourceNamesWithKind(String userId, String region,
                                                    DeployResourceKind kind) {
-        return openStackResourceManager.getExistingResourcesOfType(userId, region, kind);
+        return openStackResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
+    }
+
+    @Override
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+        return openStackResourceManager.getAvailabilityZonesOfRegion(userId, region);
     }
 
     /**

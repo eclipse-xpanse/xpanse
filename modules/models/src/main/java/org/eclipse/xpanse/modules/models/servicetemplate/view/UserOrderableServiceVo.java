@@ -17,6 +17,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
@@ -90,4 +91,6 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
     @Schema(description = "The contact details of the service provider.")
     private ServiceProviderContactDetails serviceProviderContactDetails;
 
+    @Schema(description = "The list of availability zones of the service.")
+    private List<AvailabilityZoneConfig> serviceAvailability;
 }

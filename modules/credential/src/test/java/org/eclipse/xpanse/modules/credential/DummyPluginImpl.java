@@ -7,6 +7,7 @@ package org.eclipse.xpanse.modules.credential;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.java.Log;
@@ -34,12 +35,17 @@ public class DummyPluginImpl implements OrchestratorPlugin {
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
-        return null;
+        return new HashMap<>();
     }
 
     @Override
-    public List<String> getExistingResourcesOfType(String userId, String region,
-            DeployResourceKind kind) {
+    public List<String> getExistingResourceNamesWithKind(String userId, String region,
+                                                         DeployResourceKind kind) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
         return new ArrayList<>();
     }
 

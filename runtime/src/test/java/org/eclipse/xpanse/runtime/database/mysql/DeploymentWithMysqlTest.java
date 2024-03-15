@@ -146,8 +146,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     private boolean serviceIsTargetState(UUID id, ServiceDeploymentState targetState) {
         DeployServiceEntity deployedService = deployServiceStorage.findDeployServiceById(id);
-        return Objects.nonNull(deployedService) &&
-                deployedService.getServiceDeploymentState() == targetState;
+        return Objects.nonNull(deployedService)
+                && deployedService.getServiceDeploymentState() == targetState;
     }
 
     DeployRequestBase getDeployRequestBase(ServiceTemplateDetailVo serviceTemplate) {
@@ -176,7 +176,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     }
 
     ServiceTemplateDetailVo registerServiceTemplate() throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         return serviceTemplateApi.register(ocl);
     }
 
@@ -205,8 +206,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     void testDestroyAndGetDetails(UUID taskId) throws Exception {
 
         // SetUp
-        String successMsg = String.format(
-                "Task for destroying managed service %s has started.", taskId);
+        String successMsg =
+                String.format("Task for destroying managed service %s has started.", taskId);
         Response response = Response.successResponse(Collections.singletonList(successMsg));
 
         // Run the test
@@ -224,8 +225,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     void testPurgeAndGetDetails(UUID taskId) throws Exception {
         // SetUp
-        String successMsg = String.format(
-                "Purging task for service with ID %s has started.", taskId);
+        String successMsg =
+                String.format("Purging task for service with ID %s has started.", taskId);
         Response response = Response.successResponse(Collections.singletonList(successMsg));
         // Run the test
         Response result = serviceDeployerApi.purge(taskId.toString());

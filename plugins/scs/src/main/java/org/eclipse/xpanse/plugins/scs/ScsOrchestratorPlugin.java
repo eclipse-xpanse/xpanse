@@ -59,6 +59,7 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     /**
      * Get the resource handlers for SCS.
      */
+    @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
         resourceHandlers.put(DeployerKind.TERRAFORM, scsTerraformResourceHandler);
@@ -67,9 +68,14 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public List<String> getExistingResourcesOfType(String userId, String region,
-            DeployResourceKind kind) {
-        return scsResourceManager.getExistingResourcesOfType(userId, region, kind);
+    public List<String> getExistingResourceNamesWithKind(String userId, String region,
+                                                         DeployResourceKind kind) {
+        return scsResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
+    }
+
+    @Override
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+        return scsResourceManager.getAvailabilityZonesOfRegion(userId, region);
     }
 
     /**

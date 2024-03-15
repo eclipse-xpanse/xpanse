@@ -351,11 +351,15 @@ class DeployEnvironmentsTest {
             }
 
             @Override
-            public List<String> getExistingResourcesOfType(String userId, String region,
-                    DeployResourceKind kind) {
+            public List<String> getExistingResourceNamesWithKind(String userId, String region,
+                                                                 DeployResourceKind kind) {
                 return new ArrayList<>();
             }
 
+            @Override
+            public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+                return new ArrayList<>();
+            }
             @Override
             public List<Metric> getMetricsForResource(
                     ResourceMetricsRequest resourceMetricRequest) {
