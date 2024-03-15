@@ -6,14 +6,16 @@
 
 package org.eclipse.xpanse.modules.security;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.security.OAuthFlow;
-import io.swagger.v3.oas.annotations.security.OAuthFlows;
-import io.swagger.v3.oas.annotations.security.OAuthScope;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.Scopes;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
@@ -21,36 +23,58 @@ import org.springframework.context.annotation.Profile;
 /**
  * Configuration springdoc security oauth2.
  */
-@Profile("oauth")
-@OpenAPIDefinition(
-        info = @Info(
-                title = "Xpanse API",
-                description = "RESTful Services to interact with Xpanse runtime",
-                version = "${app.version}"
-        ),
-        security = @SecurityRequirement(name = "OAuth2Flow",
-                scopes = {"${authorization.openid.scope}", "${authorization.profile.scope}",
-                        "${authorization.granted.roles.scope}", "${authorization.metadata.scope}"})
-)
-@SecurityScheme(
-        name = "OAuth2Flow",
-        type = SecuritySchemeType.OAUTH2,
-        flows = @OAuthFlows(authorizationCode =
-        @OAuthFlow(
-                authorizationUrl = "${oauth.authorization.url}",
-                tokenUrl = "${oauth.token.url}",
-                scopes = {
-                        @OAuthScope(name = "${authorization.openid.scope}",
-                                description = "mandatory must be selected."),
-                        @OAuthScope(name = "${authorization.profile.scope}",
-                                description = "mandatory must be selected."),
-                        @OAuthScope(name = "${authorization.granted.roles.scope}",
-                                description = "mandatory must be selected."),
-                        @OAuthScope(name = "${authorization.metadata.scope}",
-                                description = "mandatory must be selected.")
-                })
-        )
-)
+@Profile({"oauth"})
 @Configuration
 public class OpenApiOauth2Config {
+
+    @Value("${app.version}")
+    private String appVersion;
+
+    @Value("${oauth.authorization.url}")
+    private String authorizationUrl;
+
+    @Value("${oauth.token.url}")
+    private String tokenUrl;
+
+    @Value("${authorization.openid.scope}")
+    private String openidScope;
+
+    @Value("${authorization.profile.scope}")
+    private String profileScope;
+
+    @Value("${authorization.granted.roles.scope}")
+    private String rolesScope;
+
+    @Value("${authorization.metadata.scope}")
+    private String metadataScope;
+
+    /**
+     * Config open api.
+     *
+     * @return the open api
+     */
+    @Bean
+    public OpenAPI customOpenApi() {
+
+        OAuthFlows oauthFlows = new OAuthFlows();
+        OAuthFlow oauthFlow = new OAuthFlow().authorizationUrl(authorizationUrl).tokenUrl(tokenUrl)
+                .scopes(new Scopes().addString(openidScope, "mandatory must be selected.")
+                        .addString(profileScope, "mandatory must be selected.")
+                        .addString(rolesScope, "mandatory must be selected.")
+                        .addString(metadataScope, "mandatory must be selected."));
+        oauthFlows.authorizationCode(oauthFlow);
+
+        SecurityScheme securityScheme = new SecurityScheme();
+        securityScheme.flows(oauthFlows).type(SecurityScheme.Type.OAUTH2);
+        Components components = new Components();
+        String securityName = "OAuth2Flow";
+        components.addSecuritySchemes(securityName, securityScheme);
+        SecurityRequirement securityRequirement = new SecurityRequirement();
+        securityRequirement.addList(securityName);
+
+        Info info = new Info().title("Xpanse API").version(appVersion)
+                .description("RESTful Services to interact with Xpanse runtime.");
+
+        return new OpenAPI().info(info).components(components).addSecurityItem(securityRequirement);
+    }
 }
