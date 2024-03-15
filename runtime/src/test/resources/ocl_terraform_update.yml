@@ -104,6 +104,7 @@ deployment:
     
     variable "availability_zone" {
       type        = string
+      default     = ""
       description = "The availability zone of the service instance."
     }
 

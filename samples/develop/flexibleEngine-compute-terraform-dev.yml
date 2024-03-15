@@ -125,6 +125,7 @@ deployment:
     
     variable "availability_zone" {
       type        = string
+      default     = ""
       description = "The availability zone to deploy the compute instance."
     }
     
