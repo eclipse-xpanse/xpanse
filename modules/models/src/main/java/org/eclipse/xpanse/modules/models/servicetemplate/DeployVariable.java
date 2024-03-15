@@ -64,4 +64,8 @@ public class DeployVariable implements Serializable {
 
     @Schema(description = "Variable autofill")
     private AutoFill autoFill;
+
+    @NotNull
+    @Schema(description = "Variable modificationImpact")
+    private ModificationImpact modificationImpact;
 }
