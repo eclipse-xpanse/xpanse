@@ -4,7 +4,10 @@
   "csp": "flexibleengine",
   "category": "compute",
   "flavor": "2vCPUs-4GB-normal",
-  "region": "eu-west-0",
+  "region": {
+    "name": "eu-west-0",
+    "area": "Western Europe"
+  },
   "customerServiceName": "default-terraform-ecs",
   "serviceHostingType": "self",
   "serviceRequestProperties": {}

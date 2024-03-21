@@ -56,7 +56,7 @@ deployment:
   serviceAvailability:
     - displayName: Availability Zone
       varName: availability_zone
-      mandatory: true
+      mandatory: false
       description: The availability zone to deploy the service instance. If the value is empty, the service instance will be deployed in a random availability zone.
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
@@ -148,19 +148,6 @@ deployment:
       type        = string
       default     = "secgroup-default"
       description = "The security group name of the service instance."
-    }
-    
-    terraform {
-      required_providers {
-        huaweicloud = {
-          source  = "huaweicloud/huaweicloud"
-          version = "~> 1.61.0"
-        }
-      }
-    }
-    
-    provider "huaweicloud" {
-      region = var.region
     }
 
     locals {

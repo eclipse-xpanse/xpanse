@@ -52,7 +52,7 @@ serviceProviderContactDetails:
   email: [ "test@test.com" ]
 deployment:
   # kind, Supported values are terraform, opentofu.
-  kind: terraform
+  kind: opentofu
   serviceAvailability:
     - displayName: Availability Zone
       varName: availability_zone
@@ -148,19 +148,6 @@ deployment:
       type        = string
       default     = "secgroup-default"
       description = "The security group name of the service instance."
-    }
-    
-    terraform {
-      required_providers {
-        huaweicloud = {
-          source  = "huaweicloud/huaweicloud"
-          version = "~> 1.61.0"
-        }
-      }
-    }
-    
-    provider "huaweicloud" {
-      region = var.region
     }
 
     locals {

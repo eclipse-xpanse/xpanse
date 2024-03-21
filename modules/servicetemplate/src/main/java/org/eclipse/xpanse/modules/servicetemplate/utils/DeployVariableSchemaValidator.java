@@ -6,8 +6,10 @@
 
 package org.eclipse.xpanse.modules.servicetemplate.utils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
@@ -15,23 +17,40 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 
 /**
- * Deployment variables automatically fill in the verification class.
+ * Defines method to validate the deploy variable configuration list of deployment.
  */
 @Slf4j
-public class DeployVariableAutoFillValidator {
+public class DeployVariableSchemaValidator {
 
     /**
-     * Define a method to verify automatic filling of deployment variables.
+     * Validate the deploy variable configuration list of deployment.
      *
      * @param deployVariables deployVariables.
      */
-    public static void validateDeployVariableAutoFill(List<DeployVariable> deployVariables) {
+    public static void validateDeployVariable(List<DeployVariable> deployVariables) {
+        if (Objects.isNull(deployVariables)) {
+            return;
+        }
+        if (deployVariables.isEmpty()) {
+            String errorMessage = "The deploy variable configuration list could not be empty.";
+            throw new InvalidValueSchemaException(List.of(errorMessage));
+        }
+        Set<String> varNameSet = new HashSet<>();
+        for (DeployVariable deployVariable : deployVariables) {
+            if (varNameSet.contains(deployVariable.getName())) {
+                String errorMessage = String.format(
+                        "The deploy variable configuration list with duplicated variable name %s",
+                        deployVariable.getName());
+                throw new InvalidValueSchemaException(List.of(errorMessage));
+            } else {
+                varNameSet.add(deployVariable.getName());
+            }
+        }
         if (!hasAutoFillAndParentKind(deployVariables)) {
             log.error("variable schema definition invalid");
             throw new InvalidValueSchemaException(
                     List.of(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID.toValue()));
         }
-        return;
     }
 
     private static boolean hasAutoFillAndParentKind(List<DeployVariable> deployVariables) {

@@ -104,6 +104,9 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: image_name
       description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
       kind: variable
@@ -121,6 +124,9 @@ deployment:
       autoFill:
         deployResourceKind: vpc
         isAllowCreate: false
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: subnet_name
       description: The sub network name of the compute instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
@@ -131,6 +137,9 @@ deployment:
       autoFill:
         deployResourceKind: subnet
         isAllowCreate: false
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: secgroup_name
       description: The security group name of the compute instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
@@ -141,6 +150,9 @@ deployment:
       autoFill:
         deployResourceKind: security_group
         isAllowCreate: false
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
   deployer: |
     variable "region" {
       type        = string

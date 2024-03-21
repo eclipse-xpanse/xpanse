@@ -65,6 +65,9 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: vpc_name
       description: The vpc name of the service instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
@@ -72,6 +75,9 @@ deployment:
       example: "vpc-default"
       mandatory: false
       value: "vpc-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: subnet_name
       description: The sub network name of the service instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
@@ -79,6 +85,9 @@ deployment:
       example: "subnet-default"
       mandatory: false
       value: "subnet-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: secgroup_name
       description: The security group name of the service instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
@@ -86,6 +95,9 @@ deployment:
       example: "secgroup-default"
       mandatory: false
       value: "secgroup-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
   deployer: |
     variable "flavor_id" {
       type        = string
@@ -123,19 +135,6 @@ deployment:
       description = "The region to deploy the service instance."
     }
     
-    terraform {
-      required_providers {
-        huaweicloud = {
-          source  = "huaweicloud/huaweicloud"
-          version = "~> 1.61.0"
-        }
-      }
-    }
-    
-    provider "huaweicloud" {
-      region = var.region
-    }
-
     locals {
       admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
     }

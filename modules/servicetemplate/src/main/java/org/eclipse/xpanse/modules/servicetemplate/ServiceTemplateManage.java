@@ -40,7 +40,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValida
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
-import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableAutoFillValidator;
+import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.springframework.security.access.AccessDeniedException;
@@ -169,7 +169,7 @@ public class ServiceTemplateManage {
                                          ServiceTemplateEntity serviceTemplate) {
         AvailabilityZoneSchemaValidator.validateServiceAvailability(
                 deployment.getServiceAvailability());
-        DeployVariableAutoFillValidator.validateDeployVariableAutoFill(deployment.getVariables());
+        DeployVariableSchemaValidator.validateDeployVariable(deployment.getVariables());
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
                         deployment.getVariables());

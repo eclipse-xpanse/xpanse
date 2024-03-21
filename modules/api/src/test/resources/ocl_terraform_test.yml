@@ -137,19 +137,6 @@ deployment:
       default     = "cn-southwest-2"
       description = "The region to deploy the service instance."
     }
-    
-    terraform {
-      required_providers {
-        huaweicloud = {
-          source  = "huaweicloud/huaweicloud"
-          version = "~> 1.61.0"
-        }
-      }
-    }
-    
-    provider "huaweicloud" {
-      region = var.region
-    }
 
     locals {
       admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd

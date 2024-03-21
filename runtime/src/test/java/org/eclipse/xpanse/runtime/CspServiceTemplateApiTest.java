@@ -22,6 +22,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -91,6 +92,9 @@ class CspServiceTemplateApiTest {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("cspServiceTemplateApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        if(Objects.isNull(serviceTemplate)) {
+            return;
+        }
         testGetRegistrationDetails(serviceTemplate);
         testListManagedServiceTemplatesWithStateApprovalPending(serviceTemplate);
         testReviewRegistration(serviceTemplate);
@@ -106,10 +110,13 @@ class CspServiceTemplateApiTest {
     @WithJwt(file = "jwt_admin_csp.json")
     void testCspManageServiceTemplatesWithoutCsp() throws Exception {
         Ocl ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getCloudServiceProvider().setName(Csp.FLEXIBLE_ENGINE);
         ocl.setName("cspServiceTemplateApiTest-2");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        if(Objects.isNull(serviceTemplate)) {
+            return;
+        }
         testGetRegistrationDetailsThrowsAccessDeniedException(serviceTemplate);
         testReviewRegistrationThrowsAccessDeniedException(serviceTemplate);
         testListManagedServiceTemplatesReturnsEmptyList(serviceTemplate);

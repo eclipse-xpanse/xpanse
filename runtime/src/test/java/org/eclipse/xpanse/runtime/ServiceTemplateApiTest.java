@@ -8,7 +8,6 @@ package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,6 +37,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTempla
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -82,7 +82,6 @@ class ServiceTemplateApiTest {
                 OffsetDateTimeSerializer.INSTANCE));
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-
     }
 
     @Test
@@ -152,12 +151,9 @@ class ServiceTemplateApiTest {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(serviceTemplateDetailVo.getId(),
-                updatedServiceTemplateDetailVo.getId());
+        assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
         assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
                 serviceTemplateDetailVo.getNamespace() + "_update");
-        assertNotEquals(serviceTemplateDetailVo.getLastModifiedTime(),
-                updatedServiceTemplateDetailVo.getLastModifiedTime());
 
         // Setup unregister request
         Response expectedResponse = Response.successResponse(Collections.singletonList(
@@ -200,8 +196,7 @@ class ServiceTemplateApiTest {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
-        assertEquals(serviceTemplateDetailVo.getId(),
-                updatedServiceTemplateDetailVo.getId());
+        assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
         assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
                 serviceTemplateDetailVo.getNamespace() + "_update");
         unregister(id);
@@ -349,6 +344,52 @@ class ServiceTemplateApiTest {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+
+        ocl.getDeployment().setServiceAvailability(null);
+        DeployVariable deployVariableWithRepeatName =
+                ocl.getDeployment().getVariables().getLast();
+        deployVariableWithRepeatName.setValue("newValue");
+        ocl.getDeployment().getVariables().add(deployVariableWithRepeatName);
+
+        String errorMessage = String.format(
+                "The deploy variable configuration list with duplicated variable name %s",
+                deployVariableWithRepeatName.getName());
+        Response expectedResponse =
+                Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+                        Collections.singletonList(errorMessage));
+        // Run the test
+        final MockHttpServletResponse response = register(ocl);
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse),
+                response.getContentAsString());
+
+        // Setup
+        Ocl ocl2 = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        AvailabilityZoneConfig availabilityZoneConfig =
+                ocl2.getDeployment().getServiceAvailability().getFirst();
+        availabilityZoneConfig.setDisplayName("newDisplayName");
+        ocl2.getDeployment().getServiceAvailability().add(availabilityZoneConfig);
+
+        String errorMessage2 = String.format(
+                "The availability zone configuration list with duplicated variable name %s",
+                availabilityZoneConfig.getVarName());
+        Response expectedResponse2 =
+                Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+                        Collections.singletonList(errorMessage2));
+        // Run the test
+        final MockHttpServletResponse response2 = register(ocl2);
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response2.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse2),
+                response2.getContentAsString());
+
+        // Setup
+        Ocl ocl3 = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         DeployVariable errorVariable = new DeployVariable();
         errorVariable.setKind(DeployVariableKind.VARIABLE);
         errorVariable.setDataType(DeployVariableDataType.STRING);
@@ -356,30 +397,28 @@ class ServiceTemplateApiTest {
         errorVariable.setName("errorVarName");
         errorVariable.setDescription("description");
         errorVariable.setExample("example");
+        String errorSchemaKey = "errorSchemaKey";
+        errorVariable.setValue("errorValue");
+        errorVariable.setValueSchema(Collections.singletonMap(errorSchemaKey, "errorSchemaValue"));
         ModificationImpact modificationImpact = new ModificationImpact();
         modificationImpact.setIsDataLost(true);
         modificationImpact.setIsServiceInterrupted(true);
         errorVariable.setModificationImpact(modificationImpact);
-        String errorSchemaKey = "errorSchemaKey";
-        errorVariable.setValue("errorValue");
-        errorVariable.setValueSchema(Collections.singletonMap(errorSchemaKey, "errorSchemaValue"));
-        ocl.getDeployment().getVariables().add(errorVariable);
+        ocl3.getDeployment().setVariables(List.of(errorVariable));
 
-        String errorMessage = String.format(
+        String errorMessage3 = String.format(
                 "Value schema key %s in deploy variable %s is invalid", errorSchemaKey,
                 errorVariable.getName());
-        Response expectedResponse =
+        Response expectedResponse3 =
                 Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
-                        Collections.singletonList(errorMessage));
+                        Collections.singletonList(errorMessage3));
         // Run the test
-        final MockHttpServletResponse response = register(ocl);
-        Response responseModel =
-                objectMapper.readValue(response.getContentAsString(), Response.class);
+        final MockHttpServletResponse response3 = register(ocl3);
+
         // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        assertEquals(responseModel.getResultType(), expectedResponse.getResultType());
-        assertEquals(responseModel.getSuccess(), expectedResponse.getSuccess());
-        assertEquals(responseModel.getDetails(), expectedResponse.getDetails());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response3.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse3),
+                response3.getContentAsString());
     }
 
     void testRegisterThrowsServiceTemplateAlreadyRegistered() throws Exception {

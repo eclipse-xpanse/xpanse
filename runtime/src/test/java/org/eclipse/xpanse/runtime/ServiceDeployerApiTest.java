@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
@@ -230,31 +231,7 @@ class ServiceDeployerApiTest {
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceDeployApiTest-1");
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        approvedServiceTemplateRegistration(serviceTemplate.getId());
-        setMockPoliciesValidateApi();
-        UserPolicyCreateRequest userPolicyCreateRequest =  new UserPolicyCreateRequest();
-        userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
-        userPolicyCreateRequest.setPolicy("userPolicy-1");
-        UserPolicy userPolicy = addUserPolicy(userPolicyCreateRequest);
-        addServicePolicies(serviceTemplate);
-        addCredential();
-        mockPolicyEvaluationResult(true);
-
-        UUID serviceId = testDeploy(serviceTemplate);
-        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
-            listDeployedServices();
-        }
-        testListDeployedServices();
-        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
-            testDestroy(serviceId);
-
-        }
-        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
-            testPurge(serviceId);
-        }
-        unregisterServiceTemplate(serviceTemplate.getId());
-        deleteUserPolicy(userPolicy.getId());
+        testDeployerWithOclAndPolicy(ocl, "userPolicy-1");
     }
 
     @Test
@@ -264,16 +241,24 @@ class ServiceDeployerApiTest {
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
         ocl.setName("serviceDeployApiTest-2");
+        testDeployerWithOclAndPolicy(ocl, "userPolicy-2");
+    }
+
+    void testDeployerWithOclAndPolicy(Ocl ocl, String policy) throws Exception {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        if (Objects.isNull(serviceTemplate)) {
+            return;
+        }
         approvedServiceTemplateRegistration(serviceTemplate.getId());
         setMockPoliciesValidateApi();
-        UserPolicyCreateRequest userPolicyCreateRequest =  new UserPolicyCreateRequest();
+        UserPolicyCreateRequest userPolicyCreateRequest = new UserPolicyCreateRequest();
         userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
-        userPolicyCreateRequest.setPolicy("userPolicy-2");
+        userPolicyCreateRequest.setPolicy(policy);
         UserPolicy userPolicy = addUserPolicy(userPolicyCreateRequest);
         addServicePolicies(serviceTemplate);
         addCredential();
         mockPolicyEvaluationResult(true);
+
         UUID serviceId = testDeploy(serviceTemplate);
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             listDeployedServices();
@@ -290,19 +275,22 @@ class ServiceDeployerApiTest {
         deleteUserPolicy(userPolicy.getId());
     }
 
+
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testDeployApisThrowsException() throws Exception {
+        testDeployThrowsServiceTemplateNotRegistered();
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceDeployApiTest-3");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        testDeployThrowsServiceTemplateNotRegistered();
-        testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
-        testGetServiceDetailsThrowsException();
-        testDestroyThrowsException();
-        testPurgeThrowsException();
-        unregisterServiceTemplate(serviceTemplate.getId());
+        if (Objects.nonNull(serviceTemplate)) {
+            testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
+            testGetServiceDetailsThrowsException();
+            testDestroyThrowsException();
+            testPurgeThrowsException();
+            unregisterServiceTemplate(serviceTemplate.getId());
+        }
     }
 
     @Test
@@ -312,7 +300,9 @@ class ServiceDeployerApiTest {
                 URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
         ocl.setName("serviceDeployApiTest-4");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        testDeployThrowsPolicyEvaluationFailedException(serviceTemplate);
+        if (Objects.nonNull(serviceTemplate)) {
+            testDeployThrowsPolicyEvaluationFailedException(serviceTemplate);
+        }
     }
 
     @Test
@@ -322,7 +312,80 @@ class ServiceDeployerApiTest {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceDeployApiTest-5");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        testDeployThrowsPolicyEvaluationFailedException(serviceTemplate);
+        if (Objects.nonNull(serviceTemplate)) {
+            testDeployThrowsPolicyEvaluationFailedException(serviceTemplate);
+        }
+    }
+
+    @Test
+    @WithJwt(file = "jwt_all_roles.json")
+    void testDeployApiFailedWithVariableInvalidException() throws Exception {
+        // Setup
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceDeployApiTest-6");
+        ocl.getDeployment().getVariables().getLast().setMandatory(true);
+        AvailabilityZoneConfig zoneConfig = new AvailabilityZoneConfig();
+        zoneConfig.setDisplayName("Primary AZ");
+        zoneConfig.setVarName("primary_az");
+        zoneConfig.setMandatory(true);
+        AvailabilityZoneConfig zoneConfig2 = new AvailabilityZoneConfig();
+        zoneConfig2.setDisplayName("Secondary AZ");
+        zoneConfig2.setVarName("secondary_az");
+        zoneConfig2.setMandatory(true);
+        List<AvailabilityZoneConfig> zoneConfigs = List.of(zoneConfig, zoneConfig2);
+        ocl.getDeployment().setServiceAvailability(zoneConfigs);
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        approvedServiceTemplateRegistration(serviceTemplate.getId());
+        // Run the test
+        DeployRequest deployRequest1 = getDeployRequest(serviceTemplate);
+        deployRequest1.getServiceRequestProperties().clear();
+        // SetUp
+        String refuseMsg1 = String.format("Variable validation failed:"
+                        + " [required property '%s' not found]",
+                ocl.getDeployment().getVariables().getLast().getName());
+        Response response1 = Response.errorResponse(ResultType.VARIABLE_VALIDATION_FAILED,
+                Collections.singletonList(refuseMsg1));
+        String result1 = objectMapper.writeValueAsString(response1);
+
+        final MockHttpServletResponse deployResponse1 =
+                mockMvc.perform(post("/xpanse/services")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(deployRequest1)))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse1.getStatus());
+        assertEquals(result1, deployResponse1.getContentAsString());
+
+
+        // Setup
+        DeployRequest deployRequest2 = getDeployRequest(serviceTemplate);
+        deployRequest2.getAvailabilityZones().clear();
+        List<String> requiredZoneVarNames =
+                zoneConfigs.stream().filter(AvailabilityZoneConfig::getMandatory)
+                        .map(AvailabilityZoneConfig::getVarName).toList();
+        List<String> errorMessages = new ArrayList<>();
+        requiredZoneVarNames.forEach(varName -> errorMessages.add(
+                String.format("required availability zone property '%s' not found", varName)));
+        String refuseMsg2 = String.format("Variable validation failed: %s",
+                StringUtils.join(errorMessages));
+        Response response2 = Response.errorResponse(ResultType.VARIABLE_VALIDATION_FAILED,
+                List.of(refuseMsg2));
+        String result2 = objectMapper.writeValueAsString(response2);
+
+        final MockHttpServletResponse deployResponse2 =
+                mockMvc.perform(post("/xpanse/services")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(deployRequest2)))
+                        .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse2.getStatus());
+        assertEquals(result2, deployResponse2.getContentAsString());
+        unregisterServiceTemplate(serviceTemplate.getId());
     }
 
     boolean waitUntilExceptedState(UUID id, ServiceDeploymentState targetState) throws Exception {
@@ -417,7 +480,7 @@ class ServiceDeployerApiTest {
             throws Exception {
         approvedServiceTemplateRegistration(serviceTemplate.getId());
         setMockPoliciesValidateApi();
-        UserPolicyCreateRequest userPolicyCreateRequest =  new UserPolicyCreateRequest();
+        UserPolicyCreateRequest userPolicyCreateRequest = new UserPolicyCreateRequest();
         userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
         userPolicyCreateRequest.setPolicy("userPolicy-3");
         UserPolicy userPolicy = addUserPolicy(userPolicyCreateRequest);
@@ -590,16 +653,16 @@ class ServiceDeployerApiTest {
         deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
 
         Map<String, Object> serviceRequestProperties = new HashMap<>();
+        serviceTemplate.getVariables().forEach(deployVariable ->
+                serviceRequestProperties.put(deployVariable.getName(),
+                        deployVariable.getExample()));
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
-        List<AvailabilityZoneConfig> availabilityZoneConfigs =
-                serviceTemplate.getDeployment().getServiceAvailability();
         Map<String, String> availabilityZones = new HashMap<>();
-        availabilityZoneConfigs.forEach(availabilityZoneConfig -> {
-            availabilityZones.put(availabilityZoneConfig.getVarName(),
-                    availabilityZoneConfig.getDisplayName());
-        });
+        serviceTemplate.getDeployment().getServiceAvailability().forEach(availabilityZoneConfig ->
+                availabilityZones.put(availabilityZoneConfig.getVarName(),
+                        availabilityZoneConfig.getDisplayName()));
         deployRequest.setAvailabilityZones(availabilityZones);
         return deployRequest;
     }
