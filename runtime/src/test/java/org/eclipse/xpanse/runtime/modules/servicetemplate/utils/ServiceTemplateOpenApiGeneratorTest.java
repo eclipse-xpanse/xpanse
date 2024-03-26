@@ -70,7 +70,7 @@ class ServiceTemplateOpenApiGeneratorTest {
     @Order(2)
     void updateServiceApi_test() throws Exception {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
-                URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL());
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         Assertions.assertDoesNotThrow(
                 () -> openApiGenerator.updateServiceApi(serviceTemplateEntity));
     }

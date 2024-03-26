@@ -10,10 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +28,7 @@ import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthChec
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,7 +37,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -49,11 +47,8 @@ import org.springframework.util.CollectionUtils;
 @SpringBootTest(properties = {"spring.profiles.active="
         + "oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
 @AutoConfigureMockMvc
-class AdminServicesApiTest {
+class AdminServicesApiTest extends ApisTestCommon {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    @Resource
-    private MockMvc mockMvc;
     @Resource
     private PluginManager pluginManager;
     @Resource

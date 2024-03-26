@@ -7,7 +7,7 @@ name: terraform-test
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an ehanced compute services by ISV-A.
+description: terraform test with local script.
 namespace: ISV-A
 # Icon for the service.
 icon: |
@@ -112,11 +112,13 @@ deployment:
   deployer: |
     variable "region" {
       type        = string
+      default     = "cn-north-4"
       description = "The region to deploy the service instance."
     }
     
     variable "flavor_id" {
       type        = string
+      default     = "s6.large.2"
       description = "The flavor id of the service instance."
     }
     

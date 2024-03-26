@@ -28,8 +28,8 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
-import org.eclipse.xpanse.plugins.openstack.manage.OpenStackResourceManager;
-import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
+import org.eclipse.xpanse.plugins.openstack.manage.OpenstackResourceManager;
+import org.eclipse.xpanse.plugins.openstack.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
 import org.springframework.stereotype.Component;
@@ -46,9 +46,9 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Resource
     private MetricsManager metricsManager;
     @Resource
-    private ServersManager serversManager;
+    private OpenstackServersManager openstackServersManager;
     @Resource
-    private OpenStackResourceManager openStackResourceManager;
+    private OpenstackResourceManager openStackResourceManager;
 
     /**
      * Get the resource handlers for OpenStack.
@@ -157,16 +157,16 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
-        return serversManager.startService(serviceStateManageRequest);
+        return openstackServersManager.startService(serviceStateManageRequest);
     }
 
     @Override
     public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
-        return serversManager.stopService(serviceStateManageRequest);
+        return openstackServersManager.stopService(serviceStateManageRequest);
     }
 
     @Override
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
-        return serversManager.restartService(serviceStateManageRequest);
+        return openstackServersManager.restartService(serviceStateManageRequest);
     }
 }

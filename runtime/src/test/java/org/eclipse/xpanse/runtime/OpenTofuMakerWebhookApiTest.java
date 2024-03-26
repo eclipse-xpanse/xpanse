@@ -23,14 +23,15 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
@@ -54,46 +55,46 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
-@SpringBootTest(properties =
-        {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot"})
+@SpringBootTest(properties = {
+        "spring.profiles.active=oauth,zitadel,zitadel-testbed,tofu-maker"})
 @AutoConfigureMockMvc
-public class TerraformBootWebhookApiTest extends ApisTestCommon {
+public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
     @Resource
     private DatabaseDeployServiceStorage deployServiceStorage;
     @MockBean
-    private TerraformFromScriptsApi mockTerraformFromScriptsApi;
+    private OpenTofuFromScriptsApi mockOpenTofuFromScriptsApi;
     @MockBean
-    private TerraformFromGitRepoApi mockTerraformFromGitRepoApi;
+    private OpenTofuFromGitRepoApi mockOpenTofuFromGitRepoApi;
 
-    void mockTerraformBootServices() {
-        TerraformValidationResult validationResult = new TerraformValidationResult();
+    void mockOpenTofuMakerServices() {
+        OpenTofuValidationResult validationResult = new OpenTofuValidationResult();
         validationResult.setValid(true);
-        when(mockTerraformFromScriptsApi.validateWithScripts(any(), any()))
+        when(mockOpenTofuFromScriptsApi.validateWithScripts(any(), any()))
                 .thenReturn(validationResult);
-        doNothing().when(mockTerraformFromScriptsApi).asyncDeployWithScripts(any(), any());
+        doNothing().when(mockOpenTofuFromScriptsApi).asyncDeployWithScripts(any(), any());
 
-        when(mockTerraformFromGitRepoApi.validateScriptsFromGitRepo(any(), any()))
+        when(mockOpenTofuFromGitRepoApi.validateScriptsFromGitRepo(any(), any()))
                 .thenReturn(validationResult);
-        doNothing().when(mockTerraformFromGitRepoApi).asyncDeployFromGitRepo(any(), any());
+        doNothing().when(mockOpenTofuFromGitRepoApi).asyncDeployFromGitRepo(any(), any());
     }
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
-    void testTerraformBootWebhookApis() throws Exception {
-        testTerraformBootWebhookApisThrowsException();
-        testTerraformBootWebhookApisWell();
+    void testOpenTofuBootWebhookApis() throws Exception {
+        testOpenTofuBootWebhookApisThrowsException();
+        testOpenTofuBootWebhookApisWell();
     }
 
-    void testTerraformBootWebhookApisThrowsException() throws Exception {
+    void testOpenTofuBootWebhookApisThrowsException() throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
-        TerraformResult deployResult = getTerraformResultByFile("deploy_success_callback.json");
+        OpenTofuResult deployResult = getOpenTofuResultByFile("deploy_success_callback.json");
         Response deployCallbackResult = Response.errorResponse(
                 ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
         final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/deploy/{task_id}", uuid)
+                        post("/webhook/tofu-maker/deploy/{task_id}", uuid)
                                 .content(objectMapper.writeValueAsString(deployResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -105,13 +106,13 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
 
 
         // Setup
-        TerraformResult destroyResult = getTerraformResultByFile("destroy_success_callback.json");
+        OpenTofuResult destroyResult = getOpenTofuResultByFile("destroy_success_callback.json");
         Response destroyCallbackResult = Response.errorResponse(
                 ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
         final MockHttpServletResponse destroyCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/destroy/{task_id}", uuid)
+                        post("/webhook/tofu-maker/destroy/{task_id}", uuid)
                                 .content(objectMapper.writeValueAsString(destroyResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -122,17 +123,19 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                 destroyCallbackResponse.getContentAsString());
     }
 
-    void testTerraformBootWebhookApisWell() throws Exception {
+    void testOpenTofuBootWebhookApisWell() throws Exception {
         // Setup
-        mockTerraformBootServices();
+        mockOpenTofuMakerServices();
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("TerraformBootWebhookApiTest-1");
+        ocl.setName("OpenTofuMakerWebhookApiTest-1");
+        ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
         testCallbackApiWithOcl(ocl);
 
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
-        oclFromGit.setName("TerraformBootWebhookApiTest-2");
+        oclFromGit.setName("OpenTofuMakerWebhookApiTest-2");
+        oclFromGit.getDeployment().setKind(DeployerKind.OPEN_TOFU);
         testCallbackApiWithOcl(oclFromGit);
     }
 
@@ -154,10 +157,10 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                         .andReturn().getResponse();
         UUID taskId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
         // callback with deploy result
-        TerraformResult deployResult = getTerraformResultByFile("deploy_success_callback.json");
+        OpenTofuResult deployResult = getOpenTofuResultByFile("deploy_success_callback.json");
         // Run the test
         final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/deploy/{task_id}",
+                        post("/webhook/tofu-maker/deploy/{task_id}",
                                 taskId)
                                 .content(objectMapper.writeValueAsString(deployResult))
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -175,10 +178,10 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
         assertThat(destroyResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
 
         // callback with destroy result
-        TerraformResult destroyResult = getTerraformResultByFile("destroy_success_callback.json");
+        OpenTofuResult destroyResult = getOpenTofuResultByFile("destroy_success_callback.json");
         // Run the test
         final MockHttpServletResponse destroyCallBackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/destroy/{task_id}",
+                        post("/webhook/tofu-maker/destroy/{task_id}",
                                 taskId)
                                 .content(objectMapper.writeValueAsString(destroyResult))
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -190,12 +193,13 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
         unregisterServiceTemplate(serviceTemplate.getId());
         deployServiceStorage.deleteDeployService(
                 deployServiceStorage.findDeployServiceById(taskId));
+
     }
 
-    TerraformResult getTerraformResultByFile(String resourceFileName) throws Exception {
+    OpenTofuResult getOpenTofuResultByFile(String resourceFileName) throws Exception {
         ClassPathResource resource = new ClassPathResource(resourceFileName);
         // Read the JSON content
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(resource.getInputStream(), TerraformResult.class);
+        return objectMapper.readValue(resource.getInputStream(), OpenTofuResult.class);
     }
 }

@@ -36,6 +36,7 @@ import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolicyList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidateResponse;
+import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,22 +58,10 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class UserPolicyManageApiTest {
+class UserPolicyManageApiTest extends ApisTestCommon {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    @Resource
-    private MockMvc mockMvc;
     @MockBean
     private PoliciesValidateApi mockPoliciesValidateApi;
-
-    @BeforeAll
-    static void configureObjectMapper() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new SimpleModule().addSerializer(OffsetDateTime.class,
-                OffsetDateTimeSerializer.INSTANCE));
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-    }
 
     void mockPoliciesValidateRequest(boolean valid) {
         ValidateResponse validateResponse = new ValidateResponse();
@@ -120,9 +109,9 @@ class UserPolicyManageApiTest {
         // Run the test
         final MockHttpServletResponse response =
                 mockMvc.perform(post("/xpanse/policies")
-                        .content(requestBody).contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+                                .content(requestBody).contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
         UserPolicy userPolicy =
                 objectMapper.readValue(response.getContentAsString(), UserPolicy.class);
 
@@ -271,7 +260,7 @@ class UserPolicyManageApiTest {
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
-        Assertions.assertEquals(updatedUserPolicy.getId(),userPolicy.getId());
+        Assertions.assertEquals(updatedUserPolicy.getId(), userPolicy.getId());
         Assertions.assertEquals(updatedUserPolicy.getCsp(), Csp.SCS);
         Assertions.assertEquals(updatedUserPolicy.getPolicy(), "userPolicyUpdate");
         Assertions.assertTrue(updatedUserPolicy.getEnabled());

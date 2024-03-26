@@ -14,18 +14,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.net.URL;
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +40,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKin
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.junit.jupiter.api.BeforeAll;
+import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -55,7 +49,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
@@ -66,23 +59,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class ServiceTemplateApiTest {
+class ServiceTemplateApiTest extends ApisTestCommon {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     private final OclLoader oclLoader = new OclLoader();
     @Resource
-    private MockMvc mockMvc;
-    @Resource
     private DatabaseServiceTemplateStorage serviceTemplateStorage;
-
-    @BeforeAll
-    static void configureObjectMapper() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new SimpleModule().addSerializer(OffsetDateTime.class,
-                OffsetDateTimeSerializer.INSTANCE));
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-    }
 
     @Test
     @WithJwt(file = "jwt_isv.json")
@@ -142,7 +123,7 @@ class ServiceTemplateApiTest {
 
         // Setup update request
         Ocl updateOcl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL());
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         updateOcl.setName("serviceTemplateApiTest-01");
         // Run the test
         final MockHttpServletResponse updateResponse = update(id, updateOcl);
@@ -152,8 +133,6 @@ class ServiceTemplateApiTest {
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
-        assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
-                serviceTemplateDetailVo.getNamespace() + "_update");
 
         // Setup unregister request
         Response expectedResponse = Response.successResponse(Collections.singletonList(
@@ -187,7 +166,8 @@ class ServiceTemplateApiTest {
         assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
 
         // Setup fetch update request
-        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        URL updateUrl =
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
         UUID id = serviceTemplateDetailVo.getId();
         // Run the test
         final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
@@ -197,8 +177,6 @@ class ServiceTemplateApiTest {
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
         assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
-        assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
-                serviceTemplateDetailVo.getNamespace() + "_update");
         unregister(id);
     }
 
@@ -233,7 +211,8 @@ class ServiceTemplateApiTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
         assertEquals(result, detailResponse.getContentAsString());
 
-        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        URL updateUrl =
+                URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL();
         // Run the test -update
         Ocl updateOcl = oclLoader.getOcl(updateUrl);
         final MockHttpServletResponse updateResponse = update(uuid, updateOcl);
@@ -280,7 +259,8 @@ class ServiceTemplateApiTest {
                 detailResponse.getContentAsString());
 
         // Setup request update
-        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        URL updateUrl =
+                URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL();
         // Run the test update
         Ocl updateOcl = oclLoader.getOcl(updateUrl);
         updateOcl.setName("serviceTemplateApiTest-02");

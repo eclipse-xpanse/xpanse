@@ -9,7 +9,6 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformProviderNotFoundException;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ActivitiTaskNotFoundException;
@@ -82,18 +81,6 @@ public class DeploymentExceptionHandler {
     public Response handleDeployerNotFoundException(
             DeployerNotFoundException ex) {
         return Response.errorResponse(ResultType.DEPLOYER_NOT_FOUND,
-                Collections.singletonList(ex.getMessage()));
-    }
-
-    /**
-     * Exception handler for handleTerraformProviderNotFoundException.
-     */
-    @ExceptionHandler({TerraformProviderNotFoundException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public Response handleTerraformProviderNotFoundException(
-            TerraformProviderNotFoundException ex) {
-        return Response.errorResponse(ResultType.TERRAFORM_PROVIDER_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 

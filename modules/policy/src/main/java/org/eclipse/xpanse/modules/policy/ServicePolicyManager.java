@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.policy;
 
 import jakarta.annotation.Resource;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -62,6 +63,9 @@ public class ServicePolicyManager {
     public List<ServicePolicy> listServicePolicies(String serviceTemplateId) {
         ServiceTemplateEntity existingServiceTemplate =
                 getServiceTemplateEntity(UUID.fromString(serviceTemplateId));
+        if (CollectionUtils.isEmpty(existingServiceTemplate.getServicePolicyList())) {
+            return Collections.emptyList();
+        }
         return existingServiceTemplate.getServicePolicyList().stream()
                 .map(this::conventToServicePolicy).toList();
     }

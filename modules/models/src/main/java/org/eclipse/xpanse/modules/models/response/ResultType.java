@@ -28,7 +28,6 @@ public enum ResultType {
     TERRAFORM_EXECUTION_FAILED("Terraform Execution Failed"),
     PLUGIN_NOT_FOUND("Plugin Not Found"),
     DEPLOYER_NOT_FOUND("Deployer Not Found"),
-    TERRAFORM_PROVIDER_NOT_FOUND("Terraform Provider Not Found"),
     CREDENTIAL_DEFINITIONS_NOT_AVAILABLE("No Credential Definition Available"),
     SERVICE_STATE_INVALID("Invalid Service State"),
     RESOURCE_TYPE_INVALID_FOR_MONITORING("Resource Invalid For Monitoring"),
@@ -60,6 +59,7 @@ public enum ResultType {
     SERVICE_DETAILS_NOT_ACCESSIBLE("Service Details No Accessible"),
     ACTIVITI_TASK_NOT_FOUND("Migrating activiti Task Not Found"),
     SERVICE_MIGRATION_FAILED_EXCEPTION("Service Migration Failed Exception"),
+    SERVICE_MIGRATION_NOT_FOUND("Service Migration Not Found"),
     INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details");
 
     private final String value;

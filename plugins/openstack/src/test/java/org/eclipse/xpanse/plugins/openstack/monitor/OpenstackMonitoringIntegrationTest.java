@@ -47,8 +47,8 @@ import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.eclipse.xpanse.plugins.openstack.OpenstackOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.common.keystone.KeystoneManager;
-import org.eclipse.xpanse.plugins.openstack.manage.OpenStackResourceManager;
-import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
+import org.eclipse.xpanse.plugins.openstack.manage.OpenstackResourceManager;
+import org.eclipse.xpanse.plugins.openstack.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.AggregationService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.ResourcesService;
@@ -74,7 +74,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class,
         CredentialCenter.class, ServiceMetricsStore.class, OpenstackTerraformResourceHandler.class,
         DeployEnvironments.class, AesUtil.class, PluginManager.class,ServiceTemplateStorage.class
-        , OpenStackResourceManager.class})
+        , OpenstackResourceManager.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpenstackMonitoringIntegrationTest {
 
@@ -94,7 +94,7 @@ class OpenstackMonitoringIntegrationTest {
     @MockBean
     ServiceMetricsStore serviceMetricsStore;
     @MockBean
-    ServersManager serversManager;
+    OpenstackServersManager openstackServersManager;
     @MockBean
     private DatabaseDeployServiceStorage databaseDeployServiceStorage;
     @MockBean
