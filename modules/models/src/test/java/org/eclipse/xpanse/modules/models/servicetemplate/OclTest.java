@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,13 +32,13 @@ class OclTest {
     private static final String description = "description";
     private static final String namespace = "nameSpace";
     private static final String icon = "icon";
+    private static final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private static CloudServiceProvider cloudServiceProvider;
     private static Deployment deployment;
     private static List<Flavor> flavors;
     private static Billing billing;
     private static Ocl ocl;
-    private static  ServiceProviderContactDetails serviceProviderContactDetails;
-    private static final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
+    private static ServiceProviderContactDetails serviceProviderContactDetails;
 
     @BeforeEach
     void setUp() {
@@ -58,7 +59,7 @@ class OclTest {
         flavors = List.of(flavor);
 
         billing = new Billing();
-        billing.setModel("model");
+        billing.setBillingModel(BillingModel.MONTHLY);
 
         ocl = new Ocl();
         ocl.setCategory(category);
@@ -107,7 +108,8 @@ class OclTest {
         assertNotSame(ocl.getDeployment(), aCopy.getDeployment());
         assertEquals(ocl.getDeployment().getKind(), aCopy.getDeployment().getKind());
         assertEquals(ocl.getServiceHostingType(), aCopy.getServiceHostingType());
-        assertEquals(ocl.getServiceProviderContactDetails(), aCopy.getServiceProviderContactDetails());
+        assertEquals(ocl.getServiceProviderContactDetails(),
+                aCopy.getServiceProviderContactDetails());
     }
 
     @Test
@@ -212,7 +214,7 @@ class OclTest {
                 ", flavors=" + flavors +
                 ", billing=" + billing +
                 ", serviceHostingType=" + serviceHostingType +
-                ", serviceProviderContactDetails=" +  serviceProviderContactDetails +
+                ", serviceProviderContactDetails=" + serviceProviderContactDetails +
                 ")";
 
         assertEquals(expectedString, ocl.toString());

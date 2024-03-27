@@ -1,13 +1,13 @@
 # The version of the Xpanse description language
 version: 1.0
 # The category of the service.
-category: middleware
+category: compute
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: kafka-cluster
+name: openstack-ecs
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an enhanced Kafka cluster services by ISV-A.
+description: This is an ehanced compute services by ISV-A.
 namespace: ISV-A
 # Icon for the service.
 icon: |
@@ -26,46 +26,25 @@ billing:
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 1-zookeeper-with-3-worker-nodes-normal
+  - name: flavor-error-test
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
+    fixedPrice: 10
     # Properties for the service, which can be used by the deployment.
     properties:
-      worker_nodes_count: 3
+      flavor_id: cirros128
+  - name: 1vCPUs-1GB-normal
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 20
+    # Properties for the service, which can be used by the deployment.
+    properties:
       flavor_id: cirros256
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-3-worker-nodes-performance
+  - name: 1vCPUs-2GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
+    fixedPrice: 30
     # Properties for the service, which can be used by the deployment.
     properties:
-      worker_nodes_count: 3
       flavor_id: cirros512
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-5-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: cirros256
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-5-worker-nodes-performance
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 80
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: cirros512
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
+
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test@test.com"]
@@ -97,11 +76,8 @@ deployment:
       sensitiveScope: none
       # this is an example test instance of openstack
       value: "http://119.8.215.244/identity/v3"
-      modificationImpact:
-        isDataLost: true
-        isServiceInterrupted: true
     - name: admin_passwd
-      description: The admin password of all nodes in the Kafka cluster instance. If the value is empty, will create a random password.
+      description: The admin password of the compute instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
       mandatory: false
@@ -109,85 +85,80 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
-      modificationImpact:
-        isDataLost: true
-        isServiceInterrupted: true
+    - name: image_name
+      description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
+      kind: variable
+      dataType: string
+      example: "cirros-0.5.2-x86_64-disk"
+      mandatory: false
+      value: "cirros-0.5.2-x86_64-disk"
     - name: vpc_name
-      description: The vpc name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create VPC.
+      description: The vpc name of the compute instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
       dataType: string
-      example: "kafka-vpc-default"
+      example: "ecs-vpc-default"
       mandatory: false
-      value: "kafka-vpc-default"
-      modificationImpact:
-        isDataLost: true
-        isServiceInterrupted: true
+      value: "ecs-vpc-default"
     - name: subnet_name
-      description: The sub network name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create subnet.
+      description: The sub network name of the compute instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
       dataType: string
-      example: "kafka-subnet-default"
+      example: "ecs-subnet-default"
       mandatory: false
-      value: "kafka-subnet-default"
-      modificationImpact:
-        isDataLost: true
-        isServiceInterrupted: true
+      value: "ecs-subnet-default"
     - name: secgroup_name
-      description: The security group name of all nodes in the Kafka cluster instance. If the value is empty, will use the default value to find or create security group.
+      description: The security group name of the compute instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
       dataType: string
-      example: "kafka-secgroup-default"
+      example: "ecs-secgroup-default"
       mandatory: false
-      value: "kafka-secgroup-default"
-      modificationImpact:
-        isDataLost: true
-        isServiceInterrupted: true
+      value: "ecs-secgroup-default"
   deployer: |
     variable "region" {
       type        = string
-      description = "The region to deploy the Kafka cluster instance."
+      description = "The region to deploy the compute instance."
     }
     
     variable "availability_zone" {
       type        = string
       default     = ""
-      description = "The availability zone to deploy the Kafka cluster instance."
+      description = "The availability zone to deploy the compute instance."
     }
     
     variable "flavor_id" {
       type        = string
       default     = "cirros256"
-      description = "The flavor_id of all nodes in the Kafka cluster instance."
+      description = "The flavor_id of the compute instance."
     }
-
-    variable "worker_nodes_count" {
+    
+    variable "image_name" {
       type        = string
-      default     = 3
-      description = "The worker nodes count in the Kafka cluster instance."
+      default     = "cirros-0.5.2-x86_64-disk"
+      description = "The image name of the compute instance."
     }
-
+    
     variable "admin_passwd" {
-      type= string
-      default = ""
-      description = "The root password of all nodes in the Kafka cluster instance."
+      type        = string
+      default     = ""
+      description = "The root password of the compute instance."
     }
 
     variable "vpc_name" {
       type        = string
-      default     = "kafka-vpc-default"
-      description = "The vpc name of all nodes in the Kafka cluster instance."
+      default     = "ecs-vpc-default"
+      description = "The vpc name of the compute instance."
     }
-
+    
     variable "subnet_name" {
       type        = string
-      default     = "kafka-subnet-default"
-      description = "The subnet name of all nodes in the Kafka cluster instance."
+      default     = "ecs-subnet-default"
+      description = "The subnet name of the compute instance."
     }
 
     variable "secgroup_name" {
       type        = string
-      default     = "kafka-secgroup-default"
-      description = "The security group name of all nodes in the Kafka cluster instance."
+      default     = "ecs-secgroup-default"
+      description = "The security group name of the compute instance."
     }
     
     terraform {
@@ -245,7 +216,7 @@ deployment:
     resource "openstack_networking_secgroup_v2" "new" {
       count       = length(data.openstack_networking_secgroup_v2.existing) == 0 ? 1 : 0
       name        = "${var.secgroup_name}-${random_id.new.hex}"
-      description = "Kafka cluster security group"
+      description = "Compute security group"
     }
 
     resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_0" {
@@ -264,8 +235,8 @@ deployment:
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
-      port_range_min    = 2181
-      port_range_max    = 2181
+      port_range_min    = 8080
+      port_range_max    = 8088
       remote_ip_prefix  = "121.37.117.211/32"
       security_group_id = local.secgroup_id
     }
@@ -275,8 +246,8 @@ deployment:
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
-      port_range_min    = 9092
-      port_range_max    = 9093
+      port_range_min    = 9090
+      port_range_max    = 9099
       remote_ip_prefix  = "121.37.117.211/32"
       security_group_id = local.secgroup_id
     }
@@ -296,59 +267,55 @@ deployment:
     }
 
     resource "openstack_compute_keypair_v2" "keypair" {
-      name = "keypair-k8s-${random_id.new.hex}"
+      name = "keypair-ecs-${random_id.new.hex}"
     }
 
     data "openstack_images_image_v2" "image" {
-      name        = "cirros-0.5.2-x86_64-disk"
+      name_regex  = "^${var.image_name}"
       most_recent = true
     }
 
-    resource "openstack_compute_instance_v2" "zookeeper" {
+    resource "openstack_compute_instance_v2" "ecs-tf" {
       availability_zone  = local.availability_zone
-      name               = "kafka-zookeeper-${random_id.new.hex}"
-      flavor_name        = var.flavor_id
+      name               = "ecs-tf-${random_id.new.hex}"
+      flavor_id          = var.flavor_id
       security_groups    = [ local.secgroup_name ]
       image_id           = data.openstack_images_image_v2.image.id
       key_pair           = openstack_compute_keypair_v2.keypair.name
+      admin_pass         = local.admin_passwd
       network {
         uuid = local.vpc_id
       }
-      user_data = <<EOF
-        #!bin/bash
-        echo root:${local.admin_passwd} | sudo chpasswd
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        sudo docker run -d --name zookeeper-server --privileged=true -p 2181:2181 -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper:3.8.1
-      EOF
+    }
+    
+    resource "openstack_blockstorage_volume_v3" "volume" {
+      name              = "volume-tf-${random_id.new.hex}"
+      description       = "my volume"
+      size              = 40
+      availability_zone = local.availability_zone
+    }
+    
+    resource "openstack_compute_volume_attach_v2" "attached" {
+      instance_id = openstack_compute_instance_v2.ecs-tf.id
+      volume_id   = openstack_blockstorage_volume_v3.volume.id
+    }
+    
+    resource "openstack_networking_floatingip_v2" "myip" {
+      pool = "my_pool"
     }
 
-    resource "openstack_compute_instance_v2" "kafka-broker" {
-      count              = var.worker_nodes_count
-      availability_zone  = local.availability_zone
-      name               = "kafka-broker-${count.index}-${random_id.new.hex}"
-      flavor_name        = var.flavor_id
-      security_groups    = [ local.secgroup_name ]
-      image_id           = data.openstack_images_image_v2.image.id
-      key_pair           = openstack_compute_keypair_v2.keypair.name
-      network {
-        uuid = local.vpc_id
-      }
-      user_data = <<EOF
-        #!bin/bash
-        echo root:${local.admin_passwd} | sudo chpasswd
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        private_ip=$(ifconfig | grep -A1 "eth0" | grep 'inet' | awk -F ' ' ' {print $2}'|awk ' {print $1}')
-        sudo docker run -d --name kafka-server --restart always -p 9092:9092 -p 9093:9093  -e KAFKA_BROKER_ID=${count.index}  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://$private_ip:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=${openstack_compute_instance_v2.zookeeper.access_ip_v4}:2181 bitnami/kafka:3.3.2
-      EOF
-      depends_on = [
-        openstack_compute_instance_v2.zookeeper
-      ]
+    resource "openstack_compute_floatingip_associate_v2" "myip" {
+      floating_ip = openstack_networking_floatingip_v2.myip.address
+      instance_id = openstack_compute_instance_v2.ecs-tf.id
+      fixed_ip    = openstack_compute_instance_v2.ecs-tf.network.1.fixed_ip_v4
     }
 
-    output "zookeeper_server" {
-      value = "${openstack_compute_instance_v2.zookeeper.access_ip_v4}:2181"
+    output "ecs-host" {
+      value = openstack_compute_instance_v2.ecs-tf.access_ip_v4
+    }
+    
+    output "ecs-public-ip" {
+      value = openstack_networking_floatingip_v2.myip.address
     }
 
     output "admin_passwd" {

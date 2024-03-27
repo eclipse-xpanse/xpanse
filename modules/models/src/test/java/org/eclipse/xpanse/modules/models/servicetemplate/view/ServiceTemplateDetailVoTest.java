@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +70,7 @@ class ServiceTemplateDetailVoTest {
         flavors = List.of(flavor);
 
         billing = new Billing();
-        billing.setModel("model");
+        billing.setBillingModel(BillingModel.MONTHLY);
 
         serviceTemplateDetailVo = new ServiceTemplateDetailVo();
         serviceTemplateDetailVo.setId(uuid);
