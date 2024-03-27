@@ -21,12 +21,8 @@ cloudServiceProvider:
     - name: eu-west-1
       area: Western Europe
 billing:
-  # The business model(`flat`, `exponential`, ...)
-  model: flat
-  # The rental period (`daily`, `weekly`, `monthly`, `yearly`)
-  period: monthly
-  # The billing currency (`euro`, `usd`, ...)
-  currency: euro
+  # The model of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
+  billingModel: monthly
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:

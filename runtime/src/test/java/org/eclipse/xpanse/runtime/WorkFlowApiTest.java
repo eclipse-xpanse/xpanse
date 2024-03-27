@@ -38,6 +38,29 @@ class WorkFlowApiTest extends ApisTestCommon {
     @Test
     @WithJwt("jwt_user.json")
     void testQueryTasksWithStatus() throws Exception {
+        testQueryTasks();
+        testManageFailedOrder();
+        testCompleteTask();
+    }
+
+    WorkFlowTask getTaskWithStatus(TaskStatus status) {
+        String processInstanceId = UUID.randomUUID().toString();
+        String processDefinitionKey = "migrate";
+        WorkFlowTask task = new WorkFlowTask();
+        task.setProcessInstanceId(processInstanceId);
+        task.setProcessDefinitionId(processDefinitionKey);
+        task.setProcessDefinitionName(processDefinitionKey);
+        String taskId = UUID.randomUUID().toString();
+        task.setStatus(status);
+        task.setTaskId(taskId);
+        task.setExecutionId(taskId);
+        task.setTaskName("ExportData");
+        task.setBusinessKey(processInstanceId);
+        task.setCreateTime(OffsetDateTime.now());
+        return task;
+    }
+
+    void testQueryTasks() throws Exception {
         String userId = "1234566";
         WorkFlowTask todoTask = getTaskWithStatus(TaskStatus.FAILED);
         WorkFlowTask doneTask = getTaskWithStatus(TaskStatus.DONE);
@@ -79,35 +102,17 @@ class WorkFlowApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(List.of(doneTask, todoTask)));
     }
 
-    WorkFlowTask getTaskWithStatus(TaskStatus status) {
-        String processInstanceId = UUID.randomUUID().toString();
-        String processDefinitionKey = "migrate";
-        WorkFlowTask task = new WorkFlowTask();
-        task.setProcessInstanceId(processInstanceId);
-        task.setProcessDefinitionId(processDefinitionKey);
-        task.setProcessDefinitionName(processDefinitionKey);
-        String taskId = UUID.randomUUID().toString();
-        task.setStatus(status);
-        task.setTaskId(taskId);
-        task.setExecutionId(taskId);
-        task.setTaskName("ExportData");
-        task.setBusinessKey(processInstanceId);
-        task.setCreateTime(OffsetDateTime.now());
-        return task;
-    }
-
-    @Test
-    @WithJwt("jwt_user.json")
     void testCompleteTask() throws Exception {
         // Setup
         String taskId = UUID.randomUUID().toString();
         Map<String, Object> variables = Map.ofEntries(Map.entry("key", "value"));
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                put("/xpanse/workflow/task/{id}", taskId)
-                        .content(objectMapper.writeValueAsString(variables))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(put("/xpanse/workflow/complete/task/{id}", taskId)
+                                .content(objectMapper.writeValueAsString(variables))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -115,20 +120,20 @@ class WorkFlowApiTest extends ApisTestCommon {
         verify(mockWorkflowUtils).completeTask(taskId, variables);
     }
 
-    @Test
-    @WithJwt("jwt_user.json")
     void testManageFailedOrder() throws Exception {
         // Setup
         String taskId = UUID.randomUUID().toString();
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(put("/xpanse/workflow/task/{id}/{retryOrder}", taskId, false)
+                mockMvc.perform(put("/xpanse/workflow/task/{id}", taskId)
+                        .param("retryOrder", "true")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo("");
         verify(mockWorkflowUtils).completeTask(taskId,
-                Map.ofEntries(Map.entry(IS_RETRY_TASK, false)));
+                Map.ofEntries(Map.entry(IS_RETRY_TASK, true)));
     }
 }
