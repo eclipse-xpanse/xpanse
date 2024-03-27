@@ -51,8 +51,7 @@ public class ServiceStateManager {
      * @return deployedService.
      */
     public DeployedService startService(UUID id) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(id);
+        DeployServiceEntity deployServiceEntity = getDeployedServiceEntityAndValidate(id);
         try {
             validateStartDeployServiceEntity(deployServiceEntity);
             deployServiceEntity.setServiceState(ServiceState.STARTING);
@@ -83,8 +82,7 @@ public class ServiceStateManager {
      * @return deployedService.
      */
     public DeployedService stopService(UUID id) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(id);
+        DeployServiceEntity deployServiceEntity = getDeployedServiceEntityAndValidate(id);
         try {
             validateStopDeployServiceEntity(deployServiceEntity);
             deployServiceEntity.setServiceState(ServiceState.STOPPING);
@@ -115,10 +113,8 @@ public class ServiceStateManager {
      * @return deployedService.
      */
     public DeployedService restartService(UUID id) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(id);
+        DeployServiceEntity deployServiceEntity = getDeployedServiceEntityAndValidate(id);
         try {
-            validateDeployServiceEntity(deployServiceEntity);
             deployServiceEntity.setServiceState(ServiceState.STARTING);
             deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
             if (restart(deployServiceEntity)) {
@@ -138,6 +134,13 @@ public class ServiceStateManager {
         deployedService.setServiceHostingType(deployServiceEntity.getDeployRequest()
                 .getServiceHostingType());
         return deployedService;
+    }
+
+    private DeployServiceEntity getDeployedServiceEntityAndValidate(UUID id) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceEntityHandler.getDeployServiceEntity(id);
+        validateDeployServiceEntity(deployServiceEntity);
+        return deployServiceEntity;
     }
 
     private boolean start(DeployServiceEntity deployServiceEntity) {
@@ -177,7 +180,6 @@ public class ServiceStateManager {
     }
 
     private void validateStartDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
-        validateDeployServiceEntity(deployServiceEntity);
         if (deployServiceEntity.getServiceState() == ServiceState.RUNNING
                 || deployServiceEntity.getServiceState() == ServiceState.STOPPING_FAILED) {
             return;
@@ -191,7 +193,6 @@ public class ServiceStateManager {
     }
 
     private void validateStopDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
-        validateDeployServiceEntity(deployServiceEntity);
         if (deployServiceEntity.getServiceState() == ServiceState.STOPPED
                 || deployServiceEntity.getServiceState() == ServiceState.STARTING_FAILED) {
             return;
@@ -205,21 +206,20 @@ public class ServiceStateManager {
     }
 
     private void validateDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
+        if (deployServiceEntity.getDeployRequest().getServiceHostingType()
+                == ServiceHostingType.SELF) {
+            Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+            if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+                throw new AccessDeniedException(
+                        "No permissions to manage status of the service belonging to other users.");
+            }
+        }
         ServiceDeploymentState serviceDeploymentState =
                 deployServiceEntity.getServiceDeploymentState();
         if (!(serviceDeploymentState == ServiceDeploymentState.DEPLOY_SUCCESS
                 || serviceDeploymentState == ServiceDeploymentState.DESTROY_FAILED)) {
             throw new InvalidServiceStateException(String.format("Service with id %s is %s.",
                     deployServiceEntity.getId(), serviceDeploymentState));
-        }
-        if (deployServiceEntity.getDeployRequest().getServiceHostingType()
-                == ServiceHostingType.SERVICE_VENDOR) {
-            return;
-        }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
-            throw new AccessDeniedException(
-                    "No permissions to start service belonging to other users.");
         }
     }
 
@@ -240,7 +240,7 @@ public class ServiceStateManager {
             serviceStateManageRequest.setUserId(userId);
         }
         serviceStateManageRequest.setRegionName(
-                deployResourceList.get(0).getProperties().get("region"));
+                deployResourceList.getFirst().getProperties().get("region"));
         return serviceStateManageRequest;
     }
 }

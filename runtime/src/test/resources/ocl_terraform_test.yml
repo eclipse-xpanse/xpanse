@@ -7,7 +7,7 @@ name: terraform-test
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an ehanced compute services by ISV-A.
+description: terraform test with local script.
 namespace: ISV-A
 # Icon for the service.
 icon: |
@@ -56,7 +56,7 @@ deployment:
   serviceAvailability:
     - displayName: Availability Zone
       varName: availability_zone
-      mandatory: true
+      mandatory: false
       description: The availability zone to deploy the service instance. If the value is empty, the service instance will be deployed in a random availability zone.
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
@@ -112,11 +112,13 @@ deployment:
   deployer: |
     variable "region" {
       type        = string
+      default     = "cn-north-4"
       description = "The region to deploy the service instance."
     }
     
     variable "flavor_id" {
       type        = string
+      default     = "s6.large.2"
       description = "The flavor id of the service instance."
     }
     
@@ -148,19 +150,6 @@ deployment:
       type        = string
       default     = "secgroup-default"
       description = "The security group name of the service instance."
-    }
-    
-    terraform {
-      required_providers {
-        huaweicloud = {
-          source  = "huaweicloud/huaweicloud"
-          version = "~> 1.61.0"
-        }
-      }
-    }
-    
-    provider "huaweicloud" {
-      region = var.region
     }
 
     locals {

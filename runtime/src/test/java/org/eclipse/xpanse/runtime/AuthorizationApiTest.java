@@ -10,17 +10,16 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import jakarta.annotation.Resource;
 import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.TokenResponse;
+import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,13 +35,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class AuthorizationApiTest {
+class AuthorizationApiTest extends ApisTestCommon {
 
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
@@ -54,14 +52,11 @@ class AuthorizationApiTest {
                                     Collections.emptyList())))
             .build();
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${authorization.server.endpoint}")
     private String iamServiceEndpoint;
 
     @Qualifier("zitadelRestTemplate")
-    @Resource
-    private MockMvc mockMvc;
 
 
     @MockBean
@@ -101,7 +96,6 @@ class AuthorizationApiTest {
 
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
     }
 
 

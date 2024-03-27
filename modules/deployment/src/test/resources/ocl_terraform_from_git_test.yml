@@ -3,11 +3,11 @@ version: 1.0
 # The category of the service.
 category: others
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: opentofu-test
+name: terraform-test
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: v1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
-description: This is an ehanced compute services by ISV-A.
+description: terraform test with script from git repo.
 namespace: ISV-A
 # Icon for the service.
 icon: |
@@ -36,17 +36,28 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: s6.large.2
+    modificationImpact:
+      isDataLost: true
+      isServiceInterrupted: true
   - name: 2vCPUs-8GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 30
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: s6.large.4
+    modificationImpact:
+      isDataLost: true
+      isServiceInterrupted: true
 serviceProviderContactDetails:
   email: [ "test@test.com" ]
 deployment:
-  # kind, Supported values are opentofu, opentofu.
-  kind: opentofu
+  # kind, Supported values are terraform, opentofu.
+  kind: terraform
+  serviceAvailability:
+    - displayName: Availability Zone
+      varName: availability_zone
+      mandatory: true
+      description: The availability zone to deploy the service instance. If the value is empty, the service instance will be deployed in a random availability zone.
   # Context for deployment: the context including some kind of parameters for the deployment, such as fix_env, fix_variable, env, variable, env_env, env_variable.
   # - fix_env: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as environment variables. This variable is not visible to the end user.
   # - fix_variable: Values for variable of this type are defined by the managed service provider in the OCL template. Runtime will inject it to deployer as usual variables. This variable is not visible to the end user.
@@ -65,6 +76,9 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: vpc_name
       description: The vpc name of the service instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
@@ -72,6 +86,9 @@ deployment:
       example: "vpc-default"
       mandatory: false
       value: "vpc-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: subnet_name
       description: The sub network name of the service instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
@@ -79,6 +96,9 @@ deployment:
       example: "subnet-default"
       mandatory: false
       value: "subnet-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: secgroup_name
       description: The security group name of the service instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
@@ -86,90 +106,10 @@ deployment:
       example: "secgroup-default"
       mandatory: false
       value: "secgroup-default"
-  deployer: |
-    variable "flavor_id" {
-      type        = string
-      default     = "s6.large.2"
-      description = "The flavor id of the service instance."
-    }
-
-    variable "admin_passwd" {
-      type        = string
-      default     = ""
-      description = "The root password of the service instance."
-    }
-
-    variable "vpc_name" {
-      type        = string
-      default     = "vpc-default"
-      description = "The vpc name of the service instance."
-    }
-
-    variable "subnet_name" {
-      type        = string
-      default     = "subnet-default"
-      description = "The subnet name of the service instance."
-    }
-
-    variable "secgroup_name" {
-      type        = string
-      default     = "secgroup-default"
-      description = "The security group name of the service instance."
-    }
-    
-    variable "region" {
-      type        = string
-      default     = "cn-southwest-2"
-      description = "The region to deploy the service instance."
-    }
-    
-    terraform {
-      required_providers {
-        huaweicloud = {
-          source  = "huaweicloud/huaweicloud"
-          version = "~> 1.61.0"
-        }
-      }
-    }
-    
-    provider "huaweicloud" {
-      region = var.region
-    }
-
-    locals {
-      admin_passwd = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
-    }
-
-    resource "random_password" "password" {
-      length           = 12
-      upper            = true
-      lower            = true
-      numeric          = true
-      special          = true
-      min_special      = 1
-      override_special = "#%@"
-    }
-
-    output "flavor_id" {
-      value = var.flavor_id
-    }
-
-    output "vpc_name" {
-      value = var.vpc_name
-    }
-
-    output "subnet_name" {
-      value = var.subnet_name
-    }
-
-    output "secgroup_name" {
-      value = var.secgroup_name
-    }
-
-    output "region_name" {
-      value = var.region
-    }
-
-    output "admin_passwd" {
-      value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
-    }
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
+  scriptsRepo:
+    repoUrl: https://github.com/baixinsui/xpanse-samples.git
+    branch: main
+    scriptsPath: huaweicloud/test

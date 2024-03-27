@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class ServersManager {
+public class OpenstackServersManager {
 
     private final KeystoneManager keystoneManager;
 
@@ -41,7 +41,8 @@ public class ServersManager {
      * @param credentialCenter credentialCenter bean.
      */
     @Autowired
-    public ServersManager(KeystoneManager keystoneManager, CredentialCenter credentialCenter) {
+    public OpenstackServersManager(KeystoneManager keystoneManager,
+                                   CredentialCenter credentialCenter) {
         this.keystoneManager = keystoneManager;
         this.credentialCenter = credentialCenter;
     }

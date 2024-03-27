@@ -9,6 +9,7 @@ package org.eclipse.xpanse.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import jakarta.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,15 +22,16 @@ import org.eclipse.xpanse.modules.monitor.ServiceMetricsAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test for MonitorApiTest.
  */
+@Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {XpanseApplication.class, ServiceMetricsApi.class},
         properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
@@ -44,7 +46,7 @@ class ServiceMetricsApiTest {
 
     private final String resourceId = "e034af0c-be03-453e-92cd-fd69acbfe526";
 
-    @Mock
+    @MockBean
     private ServiceMetricsAdapter mockServiceMetricsAdapter;
 
     private ServiceMetricsApi serviceMetricsApiUnderTest;

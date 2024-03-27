@@ -20,7 +20,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
-import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableAutoFillValidator;
+import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +43,7 @@ class ServiceTemplateOpenApiGeneratorTest {
 
     @BeforeEach
     void init() {
-        String openApiPath = "openapi/" ;
+        String openApiPath = "openapi/";
         Integer serverPort = 8080;
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(openApiPath, serverPort);
         String clientDownloadURL = "https://repo1.maven.org/maven2/org/"
@@ -60,7 +60,6 @@ class ServiceTemplateOpenApiGeneratorTest {
     void createServiceApi_test() throws Exception {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-
         openApiGenerator.createServiceApi(serviceTemplateEntity);
         String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");
@@ -72,7 +71,6 @@ class ServiceTemplateOpenApiGeneratorTest {
     void updateServiceApi_test() throws Exception {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-
         Assertions.assertDoesNotThrow(
                 () -> openApiGenerator.updateServiceApi(serviceTemplateEntity));
     }
@@ -91,7 +89,7 @@ class ServiceTemplateOpenApiGeneratorTest {
         Ocl ocl = oclLoader.getOcl(url);
         AvailabilityZoneSchemaValidator.validateServiceAvailability(
                 ocl.getDeployment().getServiceAvailability());
-        DeployVariableAutoFillValidator.validateDeployVariableAutoFill(
+        DeployVariableSchemaValidator.validateDeployVariable(
                 ocl.getDeployment().getVariables());
         ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
                 new ServiceVariablesJsonSchemaGenerator();

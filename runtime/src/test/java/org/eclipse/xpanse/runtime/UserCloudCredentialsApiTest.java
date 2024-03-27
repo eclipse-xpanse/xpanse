@@ -12,24 +12,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,8 +34,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Test for UserCloudCredentialsApi.
@@ -51,133 +43,48 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserCloudCredentialsApiTest {
+class UserCloudCredentialsApiTest extends ApisTestCommon {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    @Resource
-    private MockMvc mockMvc;
+    private final Csp csp = Csp.HUAWEI;
+    private final CredentialType credentialType = CredentialType.VARIABLES;
 
     @Test
     @WithJwt(file = "jwt_user.json")
-    void testListCredentialTypes() throws Exception {
-        // Setup
-        List<CredentialType> types = Arrays.asList(CredentialType.values());
-        String result = objectMapper.writeValueAsString(types);
-
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/credential_types")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
+    void testUserCloudCredentialApis() throws Exception {
+        testAddCredentialWithSensitiveIsFalse();
+        testAddCredentialWithSensitiveIsTrue();
+        testGetCredentialOpenApi();
+        testUpdateCredential();
+        testDeleteCredential();
+        testListCredentials_CredentialCenterReturnsNoItems();
     }
 
-    @Test
-    @WithJwt(file = "jwt_user.json")
-    void testListCredentialTypes_WithCsp() throws Exception {
-        // Setup
-        List<CredentialType> types = List.of(CredentialType.VARIABLES);
-        String result = objectMapper.writeValueAsString(types);
-
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/credential_types")
-                                .param("cspName", "huawei")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
-    }
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
-    void testListCredentialTypes_PluginNotFoundException() throws Exception {
-        // Setup
-        Response responseModel = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
-                Collections.singletonList("Can't find suitable plugin for the Csp AWS"));
-        String result = objectMapper.writeValueAsString(responseModel);
-
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/credential_types")
-                                .param("cspName", "aws")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
-    }
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
-    void testListCredentialCapabilities() throws Exception {
-        // Setup
+    private CreateCredential getCreateCredential(boolean isSensitive) {
+        final CreateCredential createCredential = new CreateCredential();
+        createCredential.setCsp(csp);
+        createCredential.setType(credentialType);
+        createCredential.setName("AK_SK");
+        createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true));
+                        "The access key.", true, isSensitive, "AK_VALUE"));
         credentialVariables.add(
                 new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true));
-        CredentialVariables accessKey = new CredentialVariables(
-                Csp.HUAWEI, CredentialType.VARIABLES, HuaweiCloudMonitorConstants.IAM,
-                "Using The access key and security key authentication.", null
-                , credentialVariables);
-
-        accessKey.getVariables().forEach(credentialVariable -> credentialVariable.setValue(
-                "value to be provided by creating credential or adding environment variables."));
-        List<AbstractCredentialInfo> responseModel = List.of(accessKey);
-        String result = objectMapper.writeValueAsString(responseModel);
-
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/credentials/capabilities")
-                                .param("cspName", "huawei")
-                                .param("type", "VARIABLES")
-                                .param("name", "AK_SK")
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
+                        "The security key.", true, isSensitive, "SK_VALUE"));
+        createCredential.setVariables(credentialVariables);
+        createCredential.setTimeToLive(300);
+        return createCredential;
     }
 
-    @Test
-    @WithJwt(file = "jwt_user.json")
-    void testListCredentialCapabilities_CredentialCenterReturnsNoItems() throws Exception {
-        // Setup
-        String result = "[]";
-
-        // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/credentials/capabilities")
-                                .param("cspName", "huawei")
-                                .param("type", "VARIABLES")
-                                .param("name", "name")
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
-    }
-
-    @Test
-    @Order(1)
-    @WithJwt(file = "jwt_user_unique.json")
     void testListCredentials_CredentialCenterReturnsNoItems() throws Exception {
         // Setup
         String result = "[]";
         // Run the test
         final MockHttpServletResponse response =
                 mockMvc.perform(get("/xpanse/user/credentials")
+                                .param("cspName", csp.toValue())
+                                .param("type", credentialType.toValue())
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -186,25 +93,9 @@ class UserCloudCredentialsApiTest {
         Assertions.assertEquals(result, response.getContentAsString());
     }
 
-    @Test
-    @Order(2)
-    @WithJwt(file = "jwt_user.json")
     void testAddCredentialWithSensitiveIsFalse() throws Exception {
         // Setup
-        final CreateCredential createCredential = new CreateCredential();
-        createCredential.setCsp(Csp.HUAWEI);
-        createCredential.setType(CredentialType.VARIABLES);
-        createCredential.setName("AK_SK");
-        createCredential.setDescription("description");
-        List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true, false, "AK_VALUE"));
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true, false, "SK_VALUE"));
-        createCredential.setVariables(credentialVariables);
-        createCredential.setTimeToLive(3000);
+        final CreateCredential createCredential = getCreateCredential(false);
         String requestBody = objectMapper.writeValueAsString(createCredential);
 
         String addResult = "";
@@ -220,6 +111,8 @@ class UserCloudCredentialsApiTest {
 
         final MockHttpServletResponse queryResponse =
                 mockMvc.perform(get("/xpanse/user/credentials")
+                                .param("cspName", csp.toValue())
+                                .param("type", credentialType.toValue())
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -231,27 +124,10 @@ class UserCloudCredentialsApiTest {
         Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
     }
 
-    @Test
-    @Order(3)
-    @WithJwt(file = "jwt_user.json")
     void testAddCredentialWithSensitiveIsTrue() throws Exception {
         // Setup
-        final CreateCredential createCredential = new CreateCredential();
-        createCredential.setCsp(Csp.HUAWEI);
-        createCredential.setType(CredentialType.VARIABLES);
-        createCredential.setName("AK_SK");
-        createCredential.setDescription("description");
-        List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true, true, "AK_VALUE"));
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true, true, "SK_VALUE"));
-        createCredential.setVariables(credentialVariables);
-        createCredential.setTimeToLive(3000);
+        final CreateCredential createCredential = getCreateCredential(true);
         String requestBody = objectMapper.writeValueAsString(createCredential);
-
         String addResult = "";
         createCredential.setUserId("userId");
         CredentialVariables credentialVariables1 = new CredentialVariables(createCredential);
@@ -265,6 +141,8 @@ class UserCloudCredentialsApiTest {
 
         final MockHttpServletResponse queryResponse =
                 mockMvc.perform(get("/xpanse/user/credentials")
+                                .param("cspName", csp.toValue())
+                                .param("type", credentialType.toValue())
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -276,28 +154,6 @@ class UserCloudCredentialsApiTest {
         Assertions.assertNotEquals(queryResult, queryResponse.getContentAsString());
     }
 
-    @Test
-    @Order(4)
-    @WithJwt(file = "jwt_user_unique.json")
-    void testGetCredentials_CredentialCenterReturnsNoItems() throws Exception {
-        // Setup
-        String result = "[]";
-
-        // Run the test
-        final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/user/credentials")
-                                .param("cspName", "huawei")
-                                .param("type", "VARIABLES")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
-        Assertions.assertEquals(result, response.getContentAsString());
-    }
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testGetCredentialOpenApi() throws Exception {
         // Setup
         Link link = Link.of("http://localhost/openapi/huawei_variables_credentialApi.html",
@@ -317,25 +173,9 @@ class UserCloudCredentialsApiTest {
     }
 
 
-    @Test
-    @Order(5)
-    @WithJwt(file = "jwt_user.json")
     void testUpdateCredential() throws Exception {
         // Setup
-        final CreateCredential updateCredential = new CreateCredential();
-        updateCredential.setCsp(Csp.HUAWEI);
-        updateCredential.setType(CredentialType.VARIABLES);
-        updateCredential.setName("AK_SK");
-        updateCredential.setDescription("description");
-        List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true, false, "AK_VALUE_2"));
-        credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true, false, "SK_VALUE_2"));
-        updateCredential.setVariables(credentialVariables);
-        updateCredential.setTimeToLive(3000);
+        final CreateCredential updateCredential = getCreateCredential(false);
 
         String requestBody = objectMapper.writeValueAsString(updateCredential);
         String updateResult = "";
@@ -353,6 +193,8 @@ class UserCloudCredentialsApiTest {
 
         final MockHttpServletResponse queryResponse =
                 mockMvc.perform(get("/xpanse/user/credentials")
+                                .param("cspName", csp.toValue())
+                                .param("type", credentialType.toValue())
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -364,9 +206,6 @@ class UserCloudCredentialsApiTest {
         Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
     }
 
-    @Test
-    @Order(6)
-    @WithJwt(file = "jwt_user.json")
     void testDeleteCredential() throws Exception {
         // Setup
         String deleteResult = "";
@@ -375,16 +214,16 @@ class UserCloudCredentialsApiTest {
         // Run the test
         final MockHttpServletResponse deleteResponse =
                 mockMvc.perform(delete("/xpanse/user/credentials")
-                                .param("cspName", "huawei")
-                                .param("type", "VARIABLES")
+                                .param("cspName", csp.toValue())
+                                .param("type", credentialType.toValue())
                                 .param("name", "AK_SK")
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/user/credentials", Csp.HUAWEI)
-                                .param("type", "VARIABLES")
-                                .param("name", "AK_SK")
+                mockMvc.perform(get("/xpanse/user/credentials")
+                                .param("cspName", csp.toValue())
+                                .param("type", credentialType.toValue())
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 

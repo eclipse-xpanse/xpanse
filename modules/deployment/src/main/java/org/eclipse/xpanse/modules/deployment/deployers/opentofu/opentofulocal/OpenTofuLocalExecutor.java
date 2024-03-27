@@ -51,10 +51,10 @@ public class OpenTofuLocalExecutor {
      * @param variables variables for the open tofu command line.
      * @param workspace workspace for the open tofu command line.
      */
-    OpenTofuLocalExecutor(Map<String, String> env, 
-                           Map<String, Object> variables,
-                           String workspace,
-                           @Nullable String subDirectory) {
+    OpenTofuLocalExecutor(Map<String, String> env,
+                          Map<String, Object> variables,
+                          String workspace,
+                          @Nullable String subDirectory) {
         this.env = env;
         this.variables = variables;
         this.workspace =
@@ -277,12 +277,21 @@ public class OpenTofuLocalExecutor {
             throw new OpenTofuExecutorException("OpenTofuExecutor.tfInit failed.",
                     initResult.getCommandStdError());
         }
-        SystemCmdResult systemCmdResult = execute("tofu validate -json -no-color");
+        SystemCmdResult validateResult = execute("tofu validate -json -no-color");
+
+        if (!validateResult.isCommandSuccessful()) {
+            log.error("OpenTofuExecutor get validate json failed.");
+            throw new OpenTofuExecutorException("OpenTofuExecutor get validate json failed.",
+                    validateResult.getCommandStdError());
+        }
         try {
-            return new ObjectMapper().readValue(systemCmdResult.getCommandStdOutput(),
+            String commandStdOutput = validateResult.getCommandStdOutput();
+            String cleanedJson = commandStdOutput.substring(commandStdOutput.indexOf('{'));
+            return new ObjectMapper().readValue(cleanedJson,
                     DeploymentScriptValidationResult.class);
         } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("Serialising string to object failed.", ex);
+            throw new IllegalStateException(
+                    "Serialising command output to validate result object failed.", ex);
         }
     }
 

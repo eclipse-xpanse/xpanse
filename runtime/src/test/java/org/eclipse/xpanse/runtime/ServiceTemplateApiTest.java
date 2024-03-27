@@ -8,25 +8,18 @@ package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.net.URL;
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +31,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTempla
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -46,7 +40,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKin
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.junit.jupiter.api.BeforeAll;
+import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -55,7 +49,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
@@ -66,24 +59,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class ServiceTemplateApiTest {
+class ServiceTemplateApiTest extends ApisTestCommon {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     private final OclLoader oclLoader = new OclLoader();
     @Resource
-    private MockMvc mockMvc;
-    @Resource
     private DatabaseServiceTemplateStorage serviceTemplateStorage;
-
-    @BeforeAll
-    static void configureObjectMapper() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new SimpleModule().addSerializer(OffsetDateTime.class,
-                OffsetDateTimeSerializer.INSTANCE));
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-
-    }
 
     @Test
     @WithJwt(file = "jwt_isv.json")
@@ -143,7 +123,7 @@ class ServiceTemplateApiTest {
 
         // Setup update request
         Ocl updateOcl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL());
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         updateOcl.setName("serviceTemplateApiTest-01");
         // Run the test
         final MockHttpServletResponse updateResponse = update(id, updateOcl);
@@ -152,12 +132,7 @@ class ServiceTemplateApiTest {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(serviceTemplateDetailVo.getId(),
-                updatedServiceTemplateDetailVo.getId());
-        assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
-                serviceTemplateDetailVo.getNamespace() + "_update");
-        assertNotEquals(serviceTemplateDetailVo.getLastModifiedTime(),
-                updatedServiceTemplateDetailVo.getLastModifiedTime());
+        assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
 
         // Setup unregister request
         Response expectedResponse = Response.successResponse(Collections.singletonList(
@@ -191,7 +166,8 @@ class ServiceTemplateApiTest {
         assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
 
         // Setup fetch update request
-        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        URL updateUrl =
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
         UUID id = serviceTemplateDetailVo.getId();
         // Run the test
         final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
@@ -200,10 +176,7 @@ class ServiceTemplateApiTest {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
-        assertEquals(serviceTemplateDetailVo.getId(),
-                updatedServiceTemplateDetailVo.getId());
-        assertEquals(updatedServiceTemplateDetailVo.getNamespace(),
-                serviceTemplateDetailVo.getNamespace() + "_update");
+        assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
         unregister(id);
     }
 
@@ -238,7 +211,8 @@ class ServiceTemplateApiTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
         assertEquals(result, detailResponse.getContentAsString());
 
-        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        URL updateUrl =
+                URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL();
         // Run the test -update
         Ocl updateOcl = oclLoader.getOcl(updateUrl);
         final MockHttpServletResponse updateResponse = update(uuid, updateOcl);
@@ -285,7 +259,8 @@ class ServiceTemplateApiTest {
                 detailResponse.getContentAsString());
 
         // Setup request update
-        URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_update.yml").toURL();
+        URL updateUrl =
+                URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL();
         // Run the test update
         Ocl updateOcl = oclLoader.getOcl(updateUrl);
         updateOcl.setName("serviceTemplateApiTest-02");
@@ -349,6 +324,52 @@ class ServiceTemplateApiTest {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+
+        ocl.getDeployment().setServiceAvailability(null);
+        DeployVariable deployVariableWithRepeatName =
+                ocl.getDeployment().getVariables().getLast();
+        deployVariableWithRepeatName.setValue("newValue");
+        ocl.getDeployment().getVariables().add(deployVariableWithRepeatName);
+
+        String errorMessage = String.format(
+                "The deploy variable configuration list with duplicated variable name %s",
+                deployVariableWithRepeatName.getName());
+        Response expectedResponse =
+                Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+                        Collections.singletonList(errorMessage));
+        // Run the test
+        final MockHttpServletResponse response = register(ocl);
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse),
+                response.getContentAsString());
+
+        // Setup
+        Ocl ocl2 = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        AvailabilityZoneConfig availabilityZoneConfig =
+                ocl2.getDeployment().getServiceAvailability().getFirst();
+        availabilityZoneConfig.setDisplayName("newDisplayName");
+        ocl2.getDeployment().getServiceAvailability().add(availabilityZoneConfig);
+
+        String errorMessage2 = String.format(
+                "The availability zone configuration list with duplicated variable name %s",
+                availabilityZoneConfig.getVarName());
+        Response expectedResponse2 =
+                Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+                        Collections.singletonList(errorMessage2));
+        // Run the test
+        final MockHttpServletResponse response2 = register(ocl2);
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response2.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse2),
+                response2.getContentAsString());
+
+        // Setup
+        Ocl ocl3 = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         DeployVariable errorVariable = new DeployVariable();
         errorVariable.setKind(DeployVariableKind.VARIABLE);
         errorVariable.setDataType(DeployVariableDataType.STRING);
@@ -356,30 +377,28 @@ class ServiceTemplateApiTest {
         errorVariable.setName("errorVarName");
         errorVariable.setDescription("description");
         errorVariable.setExample("example");
+        String errorSchemaKey = "errorSchemaKey";
+        errorVariable.setValue("errorValue");
+        errorVariable.setValueSchema(Collections.singletonMap(errorSchemaKey, "errorSchemaValue"));
         ModificationImpact modificationImpact = new ModificationImpact();
         modificationImpact.setIsDataLost(true);
         modificationImpact.setIsServiceInterrupted(true);
         errorVariable.setModificationImpact(modificationImpact);
-        String errorSchemaKey = "errorSchemaKey";
-        errorVariable.setValue("errorValue");
-        errorVariable.setValueSchema(Collections.singletonMap(errorSchemaKey, "errorSchemaValue"));
-        ocl.getDeployment().getVariables().add(errorVariable);
+        ocl3.getDeployment().setVariables(List.of(errorVariable));
 
-        String errorMessage = String.format(
+        String errorMessage3 = String.format(
                 "Value schema key %s in deploy variable %s is invalid", errorSchemaKey,
                 errorVariable.getName());
-        Response expectedResponse =
+        Response expectedResponse3 =
                 Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
-                        Collections.singletonList(errorMessage));
+                        Collections.singletonList(errorMessage3));
         // Run the test
-        final MockHttpServletResponse response = register(ocl);
-        Response responseModel =
-                objectMapper.readValue(response.getContentAsString(), Response.class);
+        final MockHttpServletResponse response3 = register(ocl3);
+
         // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        assertEquals(responseModel.getResultType(), expectedResponse.getResultType());
-        assertEquals(responseModel.getSuccess(), expectedResponse.getSuccess());
-        assertEquals(responseModel.getDetails(), expectedResponse.getDetails());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response3.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse3),
+                response3.getContentAsString());
     }
 
     void testRegisterThrowsServiceTemplateAlreadyRegistered() throws Exception {

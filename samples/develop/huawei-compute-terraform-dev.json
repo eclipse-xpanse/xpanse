@@ -4,7 +4,10 @@
   "csp": "huawei",
   "category": "compute",
   "flavor": "2vCPUs-4GB-normal",
-  "region": "cn-southwest-2",
+  "region": {
+    "area": "Asia China",
+    "name": "cn-southwest-2"
+  },
   "customerServiceName": "default-terraform-ecs",
   "serviceHostingType": "self",
   "serviceRequestProperties": {}

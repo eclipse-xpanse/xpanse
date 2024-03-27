@@ -35,6 +35,8 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
+import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -50,12 +52,12 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class ServiceTemplateOpenApiGenerator {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String OPENAPI_FILE_EXTENSION = ".html";
     private static final String OPENAPI_EXAMPLE_KEYWORD = "example";
     private static final String OPENAPI_DESCRIPTION_KEYWORD = "description";
     private static final String OPENAPI_TYPE_KEYWORD = "type";
     private static final String JSON_SCHEMA_DEF_EXAMPLE_KEYWORD = "examples";
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final OpenApiUrlManage openApiUrlManage;
     private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
 
@@ -113,9 +115,8 @@ public class ServiceTemplateOpenApiGenerator {
      */
     @Async(TaskConfiguration.ASYNC_EXECUTOR_NAME)
     public void updateServiceApi(ServiceTemplateEntity registerService) {
-        File file =
-                new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
-                        registerService.getId() + OPENAPI_FILE_EXTENSION);
+        File file = new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
+                registerService.getId() + OPENAPI_FILE_EXTENSION);
         if (file.exists()) {
             log.info("Delete old openApi file:{}, success:{}", file.getName(), file.delete());
         }
@@ -161,8 +162,8 @@ public class ServiceTemplateOpenApiGenerator {
             }
             File jarPath = getJarPath();
             if (yamlFile.exists() && jarPath.exists()) {
-                String comm = String.format("java -jar %s generate -g html2 "
-                        + "-i %s -o %s", jarPath.getPath(), yamlFile.getPath(), openApiDir);
+                String comm = String.format("java -jar %s generate -g html2 " + "-i %s -o %s",
+                        jarPath.getPath(), yamlFile.getPath(), openApiDir);
                 Process exec = Runtime.getRuntime().exec(comm.split("\\s+"));
                 StringBuilder stdErrOut = new StringBuilder();
                 BufferedReader outputReader =
@@ -214,8 +215,7 @@ public class ServiceTemplateOpenApiGenerator {
      *
      * @return File The openapi-generator-cli.jar path.
      */
-    private File getJarPath()
-            throws IOException {
+    private File getJarPath() throws IOException {
         return this.openApiGeneratorJarManage.getCliFile();
     }
 
@@ -236,10 +236,22 @@ public class ServiceTemplateOpenApiGenerator {
         String serviceName = registerService.getName();
         // version of registered service.
         String serviceVersion = registerService.getVersion();
+        // example value of name of region.
+        String regionNameExample = null;
+        // list all values of names of all regions.
+        String regionNamesStr = null;
+        // example value of area of region.
+        String regionAreaExample = null;
+        // list all values of areas of all regions.
+        String regionAreasStr = null;
         // csp value of registered service.
         String csp = registerService.getCsp().toValue();
         // string of csp values list.
         String cspValuesStr = null;
+        // example value of flavor.
+        String flavorNameExample = null;
+        // list all values of all flavors.
+        String flavorNamesStr = null;
         // serviceHostingType value of registered service.
         String serviceHostingType = registerService.getServiceHostingType().toValue();
         // string of csp serviceHostingType list.
@@ -255,12 +267,21 @@ public class ServiceTemplateOpenApiGenerator {
 
         try {
             createRequiredStr = mapper.writeValueAsString(getRequiredFields(new DeployRequest()));
-            propertiesStr = objectMapper.writeValueAsString(
-                    convertJsonSchemaSpecToOpenApiSpec(
-                            registerService.getJsonObjectSchema().getProperties()));
-            propertiesRequiredStr =
-                    objectMapper.writeValueAsString(
-                            registerService.getJsonObjectSchema().getRequired());
+            propertiesStr = objectMapper.writeValueAsString(convertJsonSchemaSpecToOpenApiSpec(
+                    registerService.getJsonObjectSchema().getProperties()));
+            propertiesRequiredStr = objectMapper.writeValueAsString(
+                    registerService.getJsonObjectSchema().getRequired());
+            List<Region> regions = registerService.getOcl().getCloudServiceProvider().getRegions();
+            regionNameExample = regions.getFirst().getName();
+            regionNamesStr = mapper.writeValueAsString(
+                    regions.stream().map(Region::getName).toList());
+            regionAreaExample = regions.getFirst().getArea();
+            regionAreasStr = mapper.writeValueAsString(
+                    regions.stream().map(Region::getArea).toList());
+            List<Flavor> flavors = registerService.getOcl().getFlavors();
+            flavorNameExample = flavors.getFirst().getName();
+            flavorNamesStr = mapper.writeValueAsString(
+                    flavors.stream().map(Flavor::getName).toList());
             cspValuesStr = mapper.writeValueAsString(getActiveCspValues());
             categoryValuesStr = mapper.writeValueAsString(getCategoryValues());
             serviceHostingTypesStr = mapper.writeValueAsString(getServiceHostingTypeValues());
@@ -397,27 +418,60 @@ public class ServiceTemplateOpenApiGenerator {
                             "components": {
                                 "schemas": {
                                     "Response": {
-                                       "required": [
-                                           "code",
-                                           "message",
-                                           "success"
-                                       ],
-                                       "type": "object",
-                                       "properties": {
-                                           "code": {
-                                               "type": "string",
-                                               "description": "The result code of response."
-                                           },
-                                           "message": {
-                                               "type": "string",
-                                               "description": "The result message of response."
-                                           },
-                                           "success": {
-                                               "type": "boolean",
-                                               "description": "The success boolean of response."
-                                           }
-                                       }
-                                   },
+                                        "required": [
+                                            "details",
+                                            "resultType",
+                                            "success"
+                                        ],
+                                        "type": "object",
+                                        "properties": {
+                                            "details": {
+                                                "description": "Details of the errors occurred",
+                                                "items": {
+                                                    "description": "Details of the errors occurred",
+                                                    "type": "string"
+                                                },
+                                                "type": "array"
+                                            },
+                                            "resultType": {
+                                                "description": "The result code of response.",
+                                                "enum": [
+                                                    "Success",
+                                                    "Runtime Error",
+                                                    "Parameters Invalid",
+                                                    "Terraform Script Invalid",
+                                                    "Unprocessable Entity",
+                                                    "Response Not Valid",
+                                                    "Credentials Not Found",
+                                                    "Credential Variables Not Complete",
+                                                    "Flavor Invalid",
+                                                    "Terraform Execution Failed",
+                                                    "Plugin Not Found",
+                                                    "Deployer Not Found",
+                                                    "Unhandled Exception",
+                                                    "Service Template Not Registered",
+                                                    "Service Template Not Approved",
+                                                    "Deployment Variable Invalid",
+                                                    "Unauthorized",
+                                                    "Access Denied",
+                                                    "Sensitive Field Encryption Or Decryption Failed Exception",
+                                                    "Unsupported Enum Value",
+                                                    "Terraform Boot Request Failed",
+                                                    "Tofu Maker Request Failed",
+                                                    "Variable Validation Failed",
+                                                    "Policy Validation Failed",
+                                                    "Policy Evaluation Failed",
+                                                    "Current Login User No Found",
+                                                    "Invalid Git Repo Details"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "success": {
+                                                "description": "Describes if the request is successful",
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    },
                                     "DeployRequest": {
                                         "required": %s,
                                         "type": "object",
@@ -443,8 +497,26 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "description": "The version of service"
                                             },
                                             "region": {
-                                                "type": "string",
-                                                "description": "The region of the provider."
+                                               "required": [
+                                                   "area",
+                                                   "name"
+                                               ],
+                                               "type": "object",
+                                               "properties": {
+                                                   "name": {
+                                                       "example": "%s",
+                                                       "type": "string",
+                                                       "description": "The name of the Region",
+                                                       "enum": %s
+                                                   },
+                                                   "area": {
+                                                       "example": "%s",
+                                                       "type": "string",
+                                                       "description": "The area which the region belongs to, such as Asia, Europe, Africa",
+                                                       "enum": %s
+                                                   }
+                                               },
+                                               "description": "The regions of the Cloud Service Provider"
                                             },
                                             "csp": {
                                                 "default": "%s",
@@ -453,8 +525,10 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "enum": %s
                                             },
                                             "flavor": {
+                                                "example": "%s",
                                                 "type": "string",
-                                                "description": "The flavor of the Service."
+                                                "description": "The flavor of the Service.",
+                                                "enum": %s
                                             },
                                             "serviceHostingType": {
                                                 "default": "%s",
@@ -467,10 +541,9 @@ public class ServiceTemplateOpenApiGenerator {
                                                  "description": "The variables to deploy the service instance.",
                                                  "type": "object",
                                                  "properties": %s
-                                            }        \s
-                                            %s                           \s
+                                            }%s                          \s
                                         }
-                                    }                                                           \s
+                                    }                                                       \s
                                 },
                                 "securitySchemes": {
                                     "OAuth2Flow": {
@@ -491,11 +564,11 @@ public class ServiceTemplateOpenApiGenerator {
                                 }
                             }
                         }
-                        """,
-                serviceVersion, serviceUrl, createRequiredStr, category, categoryValuesStr,
-                serviceName, serviceVersion, csp, cspValuesStr, serviceHostingType,
-                serviceHostingTypesStr, propertiesRequiredStr, propertiesStr,
-                availabilityZonesSchemaStr);
+                        """, serviceVersion, serviceUrl, createRequiredStr, category,
+                categoryValuesStr, serviceName, serviceVersion, regionNameExample, regionNamesStr,
+                regionAreaExample, regionAreasStr, csp, cspValuesStr, flavorNameExample,
+                flavorNamesStr, serviceHostingType, serviceHostingTypesStr, propertiesRequiredStr,
+                propertiesStr, availabilityZonesSchemaStr);
     }
 
     private List<String> getRequiredFields(Object object) {
@@ -528,13 +601,12 @@ public class ServiceTemplateOpenApiGenerator {
     private Map<String, Map<String, Object>> convertJsonSchemaSpecToOpenApiSpec(
             Map<String, Map<String, Object>> properties) {
         properties.forEach((key, value) -> {
-                    String exampleValue = (String) value.get(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
-                    if (Objects.nonNull(exampleValue)) {
-                        value.remove(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
-                        value.put(OPENAPI_EXAMPLE_KEYWORD, exampleValue);
-                    }
-                }
-        );
+            String exampleValue = (String) value.get(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
+            if (Objects.nonNull(exampleValue)) {
+                value.remove(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
+                value.put(OPENAPI_EXAMPLE_KEYWORD, exampleValue);
+            }
+        });
         return properties;
     }
 
@@ -544,13 +616,13 @@ public class ServiceTemplateOpenApiGenerator {
         try {
             if (!CollectionUtils.isEmpty(availabilityZones)) {
                 availabilityZonesSchemaStr = String.format("""
-                                ,
-                                "availabilityZones": {
-                                   "required": %s,
-                                   "description": "The availability zones to deploy the service instance.",
-                                   "type": "object",
-                                   "properties": %s
-                                }
+                                                   ,
+                                                   "availabilityZones": {
+                                                       "required": %s,
+                                                       "description": "The availability zones to deploy the service instance.",
+                                                       "type": "object",
+                                                       "properties": %s
+                                                   }
                                 """,
                         mapper.writeValueAsString(getRequiredAvailabilityZones(availabilityZones)),
                         mapper.writeValueAsString(
@@ -571,9 +643,15 @@ public class ServiceTemplateOpenApiGenerator {
     private Map<String, Map<String, Object>> convertAvailabilityZonesToOpenApiSpec(
             List<AvailabilityZoneConfig> availabilityZones) {
         Map<String, Map<String, Object>> availabilityZonesExample = new HashMap<>();
-        availabilityZones.forEach(azc -> availabilityZonesExample.put(azc.getVarName(),
-                Map.of(OPENAPI_EXAMPLE_KEYWORD, "valid zone", OPENAPI_DESCRIPTION_KEYWORD,
-                        azc.getDescription(), OPENAPI_TYPE_KEYWORD, "string")));
+        for (AvailabilityZoneConfig availabilityZone : availabilityZones) {
+            Map<String, Object> zoneConfigMap = new HashMap<>();
+            zoneConfigMap.put(OPENAPI_TYPE_KEYWORD, "string");
+            zoneConfigMap.put(OPENAPI_EXAMPLE_KEYWORD, OPENAPI_EXAMPLE_KEYWORD);
+            if (StringUtils.isNotBlank(availabilityZone.getDescription())) {
+                zoneConfigMap.put(OPENAPI_DESCRIPTION_KEYWORD, availabilityZone.getDescription());
+            }
+            availabilityZonesExample.put(availabilityZone.getVarName(), zoneConfigMap);
+        }
         return availabilityZonesExample;
     }
 }

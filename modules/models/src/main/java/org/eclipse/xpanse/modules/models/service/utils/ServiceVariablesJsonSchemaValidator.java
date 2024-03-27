@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
@@ -43,29 +44,31 @@ public class ServiceVariablesJsonSchemaValidator {
     public void validateDeployVariables(List<DeployVariable> deployVariables,
                                         Map<String, Object> deployProperty,
                                         JsonObjectSchema jsonObjectSchema) {
-        if (!CollectionUtils.isEmpty(deployVariables) && !CollectionUtils.isEmpty(deployProperty)) {
-            try {
-                String jsonObjectSchemaString = jsonMapper.writeValueAsString(jsonObjectSchema);
-                Locale.setDefault(Locale.ENGLISH);
-                JsonSchemaFactory factory =
-                        JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012);
-                JsonSchema schema = factory.getSchema(jsonObjectSchemaString);
-                String propertyJson = jsonMapper.writeValueAsString(deployProperty);
-                JsonNode jsonNode = jsonMapper.readTree(propertyJson);
-                Set<ValidationMessage> validate = schema.validate(jsonNode);
 
-                if (!validate.isEmpty()) {
-                    List<String> errors = new ArrayList<>();
-                    for (ValidationMessage validationMessage : validate) {
-                        errors.add(validationMessage.getMessage().substring(2));
-                    }
-                    throw new VariableInvalidException(errors);
-                }
-            } catch (JsonProcessingException e) {
+        if (CollectionUtils.isEmpty(deployVariables) || Objects.isNull(jsonObjectSchema)) {
+            return;
+        }
+        try {
+            String jsonObjectSchemaString = jsonMapper.writeValueAsString(jsonObjectSchema);
+            Locale.setDefault(Locale.ENGLISH);
+            JsonSchemaFactory factory =
+                    JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012);
+            JsonSchema schema = factory.getSchema(jsonObjectSchemaString);
+            String propertyJson = jsonMapper.writeValueAsString(deployProperty);
+            JsonNode jsonNode = jsonMapper.readTree(propertyJson);
+            Set<ValidationMessage> validate = schema.validate(jsonNode);
+
+            if (!validate.isEmpty()) {
                 List<String> errors = new ArrayList<>();
-                errors.add(e.getMessage());
+                for (ValidationMessage validationMessage : validate) {
+                    errors.add(validationMessage.getMessage().substring(3));
+                }
                 throw new VariableInvalidException(errors);
             }
+        } catch (JsonProcessingException e) {
+            List<String> errors = new ArrayList<>();
+            errors.add(e.getMessage());
+            throw new VariableInvalidException(errors);
         }
     }
 }

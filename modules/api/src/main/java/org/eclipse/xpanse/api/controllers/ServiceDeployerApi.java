@@ -8,6 +8,8 @@ package org.eclipse.xpanse.api.controllers;
 
 
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -134,7 +136,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-                    ServiceDeploymentState serviceState) {
+            ServiceDeploymentState serviceState) {
         return this.serviceDetailsViewManager.listDeployedServices(
                 category, csp, serviceName, serviceVersion, serviceState);
     }
@@ -160,7 +162,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-                    ServiceDeploymentState serviceState) {
+            ServiceDeploymentState serviceState) {
         // return type is DeployedService but actually returns one of the child types
         // VendorHostedDeployedServiceDetails or DeployedServiceDetails
         return this.serviceDetailsViewManager.listDeployedServicesDetails(
@@ -259,11 +261,13 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/csp/region/azs",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
     public List<String> getAvailabilityZones(
             @Parameter(name = "cspName", description = "name of the cloud service provider")
             @RequestParam(name = "cspName") Csp csp,
             @Parameter(name = "regionName", description = "name of the region")
             @RequestParam(name = "regionName") String regionName) {
+
         Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
         if (userIdOptional.isPresent()) {
             OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);

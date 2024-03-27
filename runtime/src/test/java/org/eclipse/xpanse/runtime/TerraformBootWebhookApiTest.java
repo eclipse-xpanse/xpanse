@@ -6,41 +6,45 @@
 
 package org.eclipse.xpanse.runtime;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import jakarta.annotation.Resource;
-import java.time.OffsetDateTime;
+import java.net.URI;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 
@@ -50,228 +54,148 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot"})
+@SpringBootTest(properties =
+        {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot"})
 @AutoConfigureMockMvc
-public class TerraformBootWebhookApiTest {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String taskId = "bfdbc175-9f27-4679-8a4d-1f6b8c91386b";
-    private static DeployedServiceDetails deployedServiceDetails;
-    private static ServiceDeploymentState state;
-    @Value("${webhook.terraform-boot.deployCallbackUri}")
-    private String deployCallbackUri;
-    @Value("${webhook.terraform-boot.destroyCallbackUri}")
-    private String destroyCallbackUri;
+public class TerraformBootWebhookApiTest extends ApisTestCommon {
     @Resource
-    private DeployService deployService;
-    @Resource
-    private MockMvc mockMvc;
+    private DatabaseDeployServiceStorage deployServiceStorage;
+    @MockBean
+    private TerraformFromScriptsApi mockTerraformFromScriptsApi;
+    @MockBean
+    private TerraformFromGitRepoApi mockTerraformFromGitRepoApi;
 
-    @BeforeAll
-    static void configureObjectMapper() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new SimpleModule().addSerializer(OffsetDateTime.class,
-                OffsetDateTimeSerializer.INSTANCE));
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-    }
+    void mockTerraformBootServices() {
+        TerraformValidationResult validationResult = new TerraformValidationResult();
+        validationResult.setValid(true);
+        when(mockTerraformFromScriptsApi.validateWithScripts(any(), any()))
+                .thenReturn(validationResult);
+        doNothing().when(mockTerraformFromScriptsApi).asyncDeployWithScripts(any(), any());
 
-    @Test
-    @WithJwt(file = "jwt_admin.json")
-    void testDeployCallbackSuccess() throws Exception {
-        testDeployCallback();
-        deployCallbackSuccess(UUID.fromString(taskId));
-    }
-
-    @Test
-    @WithJwt(file = "jwt_admin.json")
-    void testDeployCallbackSuccessThrowsException() throws Exception {
-        deployCallbackThrowsException();
-        testGetServiceDetailsThrowsException();
+        when(mockTerraformFromGitRepoApi.validateScriptsFromGitRepo(any(), any()))
+                .thenReturn(validationResult);
+        doNothing().when(mockTerraformFromGitRepoApi).asyncDeployFromGitRepo(any(), any());
     }
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
-    void testDestroyCallbackSuccess() throws Exception {
-        testDestroyCallback();
-        destroyCallbackSuccess(UUID.fromString(taskId));
+    void testTerraformBootWebhookApis() throws Exception {
+        testTerraformBootWebhookApisThrowsException();
+        testTerraformBootWebhookApisWell();
     }
 
-    @Test
-    @WithJwt(file = "jwt_all_roles.json")
-    void testDestroyCallbackSuccessThrowsException() throws Exception {
-        destroyCallbackThrowsException();
-        testGetServiceDetailsThrowsException();
-    }
-
-    void testDeployCallback() throws Exception {
+    void testTerraformBootWebhookApisThrowsException() throws Exception {
         // Setup
-        TerraformResult result = new TerraformResult();
-        result.setCommandStdOutput("commandStdOutput");
-        result.setCommandSuccessful(true);
-        result.setTerraformState("terraformState");
-        result.setCommandStdError("commandStdError");
-        Map<String, String> importantFileContentMap = new HashMap<>();
-        result.setImportantFileContentMap(importantFileContentMap);
-        String requestBody = objectMapper.writeValueAsString(result);
-
-        // Run the test
-        final MockHttpServletResponse deployCallbackResponse =
-                mockMvc.perform(post(deployCallbackUri + "/" + taskId)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .accept(MediaType.APPLICATION_JSON_VALUE)
-                                .content(requestBody))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), deployCallbackResponse.getStatus());
-    }
-
-    boolean deployCallbackSuccess(UUID id) throws Exception {
-        long start = System.currentTimeMillis();
-        boolean deployCallbackSuccess = false;
-        while (!deployCallbackSuccess) {
-            Thread.sleep(5000);
-            if (System.currentTimeMillis() - start > 60000) {
-                break;
-            }
-            final MockHttpServletResponse detailResponse =
-                    mockMvc.perform(get("/xpanse/services/details/vendor_hosted/{id}", id))
-                            .andReturn().getResponse();
-            if (HttpStatus.OK.value() == detailResponse.getStatus()) {
-                deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
-                        DeployedServiceDetails.class);
-                state = deployedServiceDetails.getServiceDeploymentState();
-                if (ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED == state) {
-                    deployCallbackSuccess = true;
-                } else if (ServiceDeploymentState.DEPLOY_FAILED == state) {
-                    return false;
-                }
-            }
-        }
-        return deployCallbackSuccess;
-
-    }
-
-    void deployCallbackThrowsException() throws Exception {
-        Response expectedResponse = Response.errorResponse(
-                ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
-                Collections.singletonList("Service template not found."));
-        TerraformResult createRequest = new TerraformResult();
-        createRequest.setCommandStdOutput("commandStdOutput");
-        createRequest.setCommandSuccessful(true);
-        createRequest.setTerraformState("terraformState");
-        createRequest.setCommandStdError("commandStdError");
-        Map<String, String> importantFileContentMap = new HashMap<>();
-        createRequest.setImportantFileContentMap(importantFileContentMap);
-        String requestBody = objectMapper.writeValueAsString(createRequest);
-
-        // Run the test
-        final MockHttpServletResponse deployCallbackResponse =
-                mockMvc.perform(post(destroyCallbackUri + "/" + taskId)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .content(requestBody))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), deployCallbackResponse.getStatus());
-    }
-
-    void testGetServiceDetailsThrowsException() throws Exception {
-        String uuid = UUID.randomUUID().toString();
-        Response expectedResponse = Response.errorResponse(
+        UUID uuid = UUID.randomUUID();
+        TerraformResult deployResult = getTerraformResultByFile("deploy_success_callback.json");
+        Response deployCallbackResult = Response.errorResponse(
                 ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(
-                        String.format("Service with id %s not found.", uuid)));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-
+                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
-        final MockHttpServletResponse detailResponse =
-                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", uuid))
-                        .andReturn().getResponse();
-
-
+        final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
+                        post("/webhook/terraform-boot/deploy/{task_id}", uuid)
+                                .content(objectMapper.writeValueAsString(deployResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
-        Assertions.assertEquals(result, detailResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deployCallbackResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(deployCallbackResult),
+                deployCallbackResponse.getContentAsString());
 
 
-    }
-
-    void testDestroyCallback() throws Exception {
         // Setup
-        TerraformResult result = new TerraformResult();
-        result.setCommandStdOutput("commandStdOutput");
-        result.setCommandSuccessful(true);
-        result.setTerraformState("terraformState");
-        result.setCommandStdError("commandStdError");
-        Map<String, String> importantFileContentMap = new HashMap<>();
-        result.setImportantFileContentMap(importantFileContentMap);
-        String requestBody = objectMapper.writeValueAsString(result);
-
-        // Run the test
-        final MockHttpServletResponse destroyCallbackResponse =
-                mockMvc.perform(post(destroyCallbackUri + "/" + taskId)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .content(requestBody))
-                        .andReturn().getResponse();
-
-        // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(),
-                destroyCallbackResponse.getStatus());
-    }
-
-    boolean destroyCallbackSuccess(UUID id) throws Exception {
-        long start = System.currentTimeMillis();
-        boolean deployCallbackSuccess = false;
-        while (!deployCallbackSuccess) {
-            Thread.sleep(5000);
-            if (System.currentTimeMillis() - start > 60000) {
-                break;
-            }
-            final MockHttpServletResponse detailResponse =
-                    mockMvc.perform(get("/xpanse/services/details/vendor_hosted/{id}", id))
-                            .andReturn().getResponse();
-            if (HttpStatus.OK.value() == detailResponse.getStatus()) {
-                deployedServiceDetails = objectMapper.readValue(detailResponse.getContentAsString(),
-                        DeployedServiceDetails.class);
-                state = deployedServiceDetails.getServiceDeploymentState();
-                if (ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED == state) {
-                    deployCallbackSuccess = true;
-                } else if (ServiceDeploymentState.DEPLOY_FAILED == state) {
-                    return false;
-                }
-            }
-        }
-        return deployCallbackSuccess;
-
-    }
-
-    void destroyCallbackThrowsException() throws Exception {
-        Response expectedResponse = Response.errorResponse(
+        TerraformResult destroyResult = getTerraformResultByFile("destroy_success_callback.json");
+        Response destroyCallbackResult = Response.errorResponse(
                 ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList("Service template not found."));
-        TerraformResult createRequest = new TerraformResult();
-        createRequest.setCommandStdOutput("commandStdOutput");
-        createRequest.setCommandSuccessful(true);
-        createRequest.setTerraformState("terraformState");
-        createRequest.setCommandStdError("commandStdError");
-        Map<String, String> importantFileContentMap = new HashMap<>();
-        createRequest.setImportantFileContentMap(importantFileContentMap);
-        String requestBody = objectMapper.writeValueAsString(createRequest);
-
+                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
-        final MockHttpServletResponse destroyCallbackResponse =
-                mockMvc.perform(post(destroyCallbackUri + "/" + taskId)
+        final MockHttpServletResponse destroyCallbackResponse = mockMvc.perform(
+                        post("/webhook/terraform-boot/destroy/{task_id}", uuid)
+                                .content(objectMapper.writeValueAsString(destroyResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), destroyCallbackResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
+                destroyCallbackResponse.getContentAsString());
+    }
+
+    void testTerraformBootWebhookApisWell() throws Exception {
+        // Setup
+        mockTerraformBootServices();
+        Ocl ocl = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("TerraformBootWebhookApiTest-1");
+        testCallbackApiWithOcl(ocl);
+
+        Ocl oclFromGit = new OclLoader().getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
+        oclFromGit.setName("TerraformBootWebhookApiTest-2");
+        testCallbackApiWithOcl(oclFromGit);
+    }
+
+    void testCallbackApiWithOcl(Ocl ocl) throws Exception {
+        // Setup
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        if (Objects.isNull(serviceTemplate)) {
+            Assertions.fail("Failed to register service template.");
+        }
+        approveServiceTemplateRegistration(serviceTemplate.getId());
+
+        // deploy a service
+        DeployRequest deployRequest = getDeployRequest(serviceTemplate);
+        final MockHttpServletResponse deployResponse =
+                mockMvc.perform(post("/xpanse/services")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .content(requestBody))
+                                .content(objectMapper.writeValueAsString(deployRequest)))
                         .andReturn().getResponse();
-
+        UUID taskId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
+        // callback with deploy result
+        TerraformResult deployResult = getTerraformResultByFile("deploy_success_callback.json");
+        // Run the test
+        final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
+                        post("/webhook/terraform-boot/deploy/{task_id}",
+                                taskId)
+                                .content(objectMapper.writeValueAsString(deployResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
         // Verify the results
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(),
-                destroyCallbackResponse.getStatus());
+        assertThat(deployCallbackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
+        // destroy the service
+        final MockHttpServletResponse destroyResponse =
+                mockMvc.perform(delete("/xpanse/services/{id}", taskId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+        assertThat(destroyResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
+
+        // callback with destroy result
+        TerraformResult destroyResult = getTerraformResultByFile("destroy_success_callback.json");
+        // Run the test
+        final MockHttpServletResponse destroyCallBackResponse = mockMvc.perform(
+                        post("/webhook/terraform-boot/destroy/{task_id}",
+                                taskId)
+                                .content(objectMapper.writeValueAsString(destroyResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertThat(destroyCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        unregisterServiceTemplate(serviceTemplate.getId());
+        deployServiceStorage.deleteDeployService(
+                deployServiceStorage.findDeployServiceById(taskId));
+    }
+
+    TerraformResult getTerraformResultByFile(String resourceFileName) throws Exception {
+        ClassPathResource resource = new ClassPathResource(resourceFileName);
+        // Read the JSON content
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(resource.getInputStream(), TerraformResult.class);
     }
 }

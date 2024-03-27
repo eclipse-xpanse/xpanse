@@ -10,11 +10,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValue
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class DeployVariableAutoFillValidatorTest {
+class DeployVariableSchemaValidatorTest {
 
 
     @Test
-    void testValidateDeployVariableAutoFill() {
+    void testValidateDeployVariable() {
         // Setup
         final DeployVariable deployVariable = new DeployVariable();
         deployVariable.setName("name");
@@ -29,11 +29,11 @@ class DeployVariableAutoFillValidatorTest {
 
         // Run the test
         Assertions.assertDoesNotThrow(() ->
-                DeployVariableAutoFillValidator.validateDeployVariableAutoFill(deployVariables));
+                DeployVariableSchemaValidator.validateDeployVariable(deployVariables));
     }
 
     @Test
-    void testValidateDeployVariableAutoFillThrowsException() {
+    void testValidateDeployVariableWithInvalidAutoFill() {
         // Setup
         final DeployVariable deployVariable = new DeployVariable();
         deployVariable.setName("name");
@@ -48,7 +48,30 @@ class DeployVariableAutoFillValidatorTest {
 
         // Run the test
         Assertions.assertThrows(InvalidValueSchemaException.class, () ->
-                DeployVariableAutoFillValidator.validateDeployVariableAutoFill(
+                DeployVariableSchemaValidator.validateDeployVariable(
+                        deployVariables));
+    }
+
+    @Test
+    void testValidateDeployVariableWithDuplicateNames() {
+        // Setup
+        final DeployVariable deployVariable = new DeployVariable();
+        deployVariable.setName("name");
+        deployVariable.setKind(DeployVariableKind.FIX_ENV);
+        deployVariable.setDataType(DeployVariableDataType.STRING);
+        deployVariable.setExample("example");
+        deployVariable.setMandatory(true);
+        final DeployVariable deployVariable1 = new DeployVariable();
+        deployVariable1.setName("name");
+        deployVariable1.setKind(DeployVariableKind.ENV);
+        deployVariable1.setDataType(DeployVariableDataType.BOOLEAN);
+        deployVariable1.setExample("example1");
+        deployVariable1.setMandatory(true);
+        final List<DeployVariable> deployVariables = List.of(deployVariable, deployVariable1);
+
+        // Run the test
+        Assertions.assertThrows(InvalidValueSchemaException.class, () ->
+                DeployVariableSchemaValidator.validateDeployVariable(
                         deployVariables));
     }
 }

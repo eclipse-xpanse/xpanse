@@ -22,8 +22,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
-import org.eclipse.xpanse.plugins.openstack.manage.OpenStackResourceManager;
-import org.eclipse.xpanse.plugins.openstack.manage.ServersManager;
+import org.eclipse.xpanse.plugins.openstack.manage.OpenstackResourceManager;
+import org.eclipse.xpanse.plugins.openstack.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
 import org.junit.jupiter.api.Test;
@@ -39,9 +39,9 @@ class OpenstackOrchestratorPluginTest {
     @Mock
     private MetricsManager mockMetricsManager;
     @Mock
-    private ServersManager mockServersManager;
+    private OpenstackServersManager mockOpenstackServersManager;
     @Mock
-    private OpenStackResourceManager mockOpenStackResourceManager;
+    private OpenstackResourceManager mockOpenstackResourceManager;
 
     @InjectMocks
     private OpenstackOrchestratorPlugin plugin;
@@ -262,7 +262,7 @@ class OpenstackOrchestratorPluginTest {
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.startService(serviceStateManageRequest1)).thenReturn(false);
+        when(mockOpenstackServersManager.startService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
         final boolean result =
@@ -292,7 +292,7 @@ class OpenstackOrchestratorPluginTest {
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.startService(serviceStateManageRequest1)).thenReturn(true);
+        when(mockOpenstackServersManager.startService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
         final boolean result =
@@ -322,7 +322,7 @@ class OpenstackOrchestratorPluginTest {
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.stopService(serviceStateManageRequest1)).thenReturn(false);
+        when(mockOpenstackServersManager.stopService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
         final boolean result =
@@ -352,7 +352,7 @@ class OpenstackOrchestratorPluginTest {
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.stopService(serviceStateManageRequest1)).thenReturn(true);
+        when(mockOpenstackServersManager.stopService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
         final boolean result =
@@ -382,7 +382,7 @@ class OpenstackOrchestratorPluginTest {
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.restartService(serviceStateManageRequest1)).thenReturn(false);
+        when(mockOpenstackServersManager.restartService(serviceStateManageRequest1)).thenReturn(false);
 
         // Run the test
         final boolean result =
@@ -412,7 +412,7 @@ class OpenstackOrchestratorPluginTest {
         deployResourceEntity1.setId(UUID.fromString("9c4f31a3-8673-47ae-ad66-fa02684748cf"));
         deployResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
-        when(mockServersManager.restartService(serviceStateManageRequest1)).thenReturn(true);
+        when(mockOpenstackServersManager.restartService(serviceStateManageRequest1)).thenReturn(true);
 
         // Run the test
         final boolean result =

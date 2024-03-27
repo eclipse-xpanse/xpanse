@@ -15,13 +15,13 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 
 /**
- * Validate the availability of deployment variables.
+ * Defines method to validate the availability zone configuration list of deployment.
  */
 @Slf4j
 public class AvailabilityZoneSchemaValidator {
 
     /**
-     * Define a method to verify automatic filling of deployment variables.
+     * Validate the availability zone configuration list of deployment.
      *
      * @param availabilityZones The availability zone config list.
      */

@@ -40,8 +40,6 @@ class ResultTypeTest {
                 ResultType.TERRAFORM_EXECUTION_FAILED.toValue());
         assertEquals("Plugin Not Found", ResultType.PLUGIN_NOT_FOUND.toValue());
         assertEquals("Deployer Not Found", ResultType.DEPLOYER_NOT_FOUND.toValue());
-        assertEquals("Terraform Provider Not Found",
-                ResultType.TERRAFORM_PROVIDER_NOT_FOUND.toValue());
         assertEquals("No Credential Definition Available",
                 ResultType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE.toValue());
         assertEquals("Invalid Service State", ResultType.SERVICE_STATE_INVALID.toValue());
@@ -88,8 +86,6 @@ class ResultTypeTest {
                 ResultType.getResultTypeByValue("Plugin Not Found"));
         assertEquals(ResultType.DEPLOYER_NOT_FOUND,
                 ResultType.getResultTypeByValue("Deployer Not Found"));
-        assertEquals(ResultType.TERRAFORM_PROVIDER_NOT_FOUND,
-                ResultType.getResultTypeByValue("Terraform Provider Not Found"));
         assertEquals(ResultType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
                 ResultType.getResultTypeByValue("No Credential Definition Available"));
         assertEquals(ResultType.SERVICE_STATE_INVALID,
@@ -142,8 +138,6 @@ class ResultTypeTest {
                 test.getByValue("Plugin Not Found"));
         assertEquals(ResultType.DEPLOYER_NOT_FOUND,
                 test.getByValue("Deployer Not Found"));
-        assertEquals(ResultType.TERRAFORM_PROVIDER_NOT_FOUND,
-                test.getByValue("Terraform Provider Not Found"));
         assertEquals(ResultType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
                 test.getByValue("No Credential Definition Available"));
         assertEquals(ResultType.SERVICE_STATE_INVALID,

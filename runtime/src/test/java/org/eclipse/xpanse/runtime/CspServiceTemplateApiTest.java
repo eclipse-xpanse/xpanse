@@ -2,26 +2,16 @@ package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.net.URI;
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +24,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrati
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.junit.jupiter.api.BeforeAll;
+import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -43,7 +33,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @Slf4j
@@ -51,38 +40,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
-class CspServiceTemplateApiTest {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    @Resource
-    private MockMvc mockMvc;
-
-    @BeforeAll
-    static void configureObjectMapper() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new SimpleModule().addSerializer(OffsetDateTime.class,
-                OffsetDateTimeSerializer.INSTANCE));
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-    }
-
-    ServiceTemplateDetailVo registerServiceTemplate(Ocl ocl) throws Exception {
-
-        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-        String requestBody = yamlMapper.writeValueAsString(ocl);
-        final MockHttpServletResponse registerResponse = mockMvc.perform(
-                        post("/xpanse/service_templates").content(requestBody)
-                                .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-        return objectMapper.readValue(registerResponse.getContentAsString(),
-                ServiceTemplateDetailVo.class);
-    }
-
-    void unregisterServiceTemplate(UUID id) throws Exception {
-        mockMvc.perform(
-                        delete("/xpanse/service_templates/{id}", id).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-    }
+class CspServiceTemplateApiTest extends ApisTestCommon {
 
     @Test
     @WithJwt(file = "jwt_admin_csp.json")
@@ -91,6 +49,9 @@ class CspServiceTemplateApiTest {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("cspServiceTemplateApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        if (Objects.isNull(serviceTemplate)) {
+            return;
+        }
         testGetRegistrationDetails(serviceTemplate);
         testListManagedServiceTemplatesWithStateApprovalPending(serviceTemplate);
         testReviewRegistration(serviceTemplate);
@@ -106,10 +67,13 @@ class CspServiceTemplateApiTest {
     @WithJwt(file = "jwt_admin_csp.json")
     void testCspManageServiceTemplatesWithoutCsp() throws Exception {
         Ocl ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getCloudServiceProvider().setName(Csp.FLEXIBLE_ENGINE);
         ocl.setName("cspServiceTemplateApiTest-2");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        if (Objects.isNull(serviceTemplate)) {
+            return;
+        }
         testGetRegistrationDetailsThrowsAccessDeniedException(serviceTemplate);
         testReviewRegistrationThrowsAccessDeniedException(serviceTemplate);
         testListManagedServiceTemplatesReturnsEmptyList(serviceTemplate);

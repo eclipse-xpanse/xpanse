@@ -51,7 +51,7 @@ public class ServicePolicyEntity extends CreateModifiedTime {
      * The registered service template we belonged to.
      */
     @ManyToOne
-    @JoinColumn(name = "SERVICE_TEMPLATE_ID")
+    @JoinColumn(name = "SERVICE_TEMPLATE_ID", nullable = false)
     @JsonIgnoreProperties({"servicePolicyEntity"})
     private ServiceTemplateEntity serviceTemplate;
 

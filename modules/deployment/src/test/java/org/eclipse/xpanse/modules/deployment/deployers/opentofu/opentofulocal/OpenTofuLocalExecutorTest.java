@@ -16,6 +16,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.resources.TfState;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,9 +42,9 @@ class OpenTofuLocalExecutorTest {
     @BeforeAll
     static void initWorkSpace() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl =
-                oclLoader.getOcl(
-                        URI.create("file:src/test/resources/ocl_opentofu_test.yml").toURL());
+        Ocl ocl = oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
         String script = ocl.getDeployment().getDeployer();
         File ws = new File(workspace + "/" + UUID.randomUUID());
         ws.mkdirs();

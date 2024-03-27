@@ -10,14 +10,18 @@ import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationQueryModel;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceMigrationNotFoundException;
 import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
 import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -92,7 +96,7 @@ public class MigrationService {
         if (CollectionUtils.isEmpty(serviceMigrationEntities)) {
             return null;
         }
-        return serviceMigrationEntities.get(0);
+        return serviceMigrationEntities.getFirst();
     }
 
     /**
@@ -102,15 +106,18 @@ public class MigrationService {
      * @return serviceMigrationEntity.
      */
     public ServiceMigrationDetails getMigrationOrderDetails(UUID migrationId, String userId) {
-        ServiceMigrationQueryModel queryModel = new ServiceMigrationQueryModel();
-        queryModel.setMigrationId(migrationId);
-        queryModel.setUserId(userId);
-        List<ServiceMigrationEntity> serviceMigrationEntities =
-                serviceMigrationStorage.listServiceMigrations(queryModel);
-        if (CollectionUtils.isEmpty(serviceMigrationEntities)) {
-            return new ServiceMigrationDetails();
+        ServiceMigrationEntity serviceMigration =
+                serviceMigrationStorage.findServiceMigrationById(migrationId);
+        if (Objects.isNull(serviceMigration)) {
+            String errorMsg = String.format("Service migration with id %s not found.", migrationId);
+            throw new ServiceMigrationNotFoundException(errorMsg);
         }
-        return EntityTransUtils.transServiceMigrationDetails(serviceMigrationEntities.get(0));
+
+        if (!StringUtils.equals(userId, serviceMigration.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to view service migration belonging to other users.");
+        }
+        return EntityTransUtils.transServiceMigrationDetails(serviceMigration);
     }
 
     /**
@@ -123,7 +130,9 @@ public class MigrationService {
      * @return list of all services deployed by a user.
      */
     public List<ServiceMigrationDetails> listServiceMigrations(UUID migrationId, UUID newServiceId,
-            UUID oldServiceId, MigrationStatus migrationStatus, String userId) {
+                                                               UUID oldServiceId,
+                                                               MigrationStatus migrationStatus,
+                                                               String userId) {
         ServiceMigrationQueryModel queryModel = new ServiceMigrationQueryModel();
         queryModel.setMigrationId(migrationId);
         queryModel.setNewServiceId(newServiceId);

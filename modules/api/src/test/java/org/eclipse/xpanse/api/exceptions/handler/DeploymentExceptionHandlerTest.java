@@ -20,7 +20,6 @@ import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformProviderNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
@@ -112,16 +111,6 @@ class DeploymentExceptionHandlerTest {
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Deployer Not Found"))
-                .andExpect(jsonPath("$.details[0]").value("test error"));
-    }
-
-    @Test
-    void testTerraformProviderNotFoundException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new TerraformProviderNotFoundException("test error"));
-
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Terraform Provider Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 

@@ -89,6 +89,9 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: image_name
       description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
       kind: variable
@@ -96,6 +99,9 @@ deployment:
       example: "OBS Ubuntu 22.04"
       mandatory: false
       value: "OBS Ubuntu 22.04"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: vpc_name
       description: The vpc name of the compute instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
@@ -103,6 +109,9 @@ deployment:
       example: "ecs-vpc-default"
       mandatory: false
       value: "ecs-vpc-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: subnet_name
       description: The sub network name of the compute instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
@@ -110,6 +119,9 @@ deployment:
       example: "ecs-subnet-default"
       mandatory: false
       value: "ecs-subnet-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
     - name: secgroup_name
       description: The security group name of the compute instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
@@ -117,6 +129,9 @@ deployment:
       example: "ecs-secgroup-default"
       mandatory: false
       value: "ecs-secgroup-default"
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
   deployer: |
     variable "region" {
       type        = string
