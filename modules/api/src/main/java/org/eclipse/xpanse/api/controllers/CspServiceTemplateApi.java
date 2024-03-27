@@ -70,7 +70,7 @@ public class CspServiceTemplateApi {
      * @param serviceRegistrationState state of the service registration.
      * @return service templates
      */
-    @Tag(name = "Cloud Service Provider",
+    @Tag(name = "CloudServiceProvider",
             description = "APIs for cloud service provider to manage service templates.")
     @Operation(description = "List managed service templates with query params.")
     @GetMapping(value = "/csp/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -108,7 +108,7 @@ public class CspServiceTemplateApi {
      * @param id id of service template.
      * @return service template details.
      */
-    @Tag(name = "Cloud Service Provider",
+    @Tag(name = "CloudServiceProvider",
             description = "APIs for cloud service provider to manage service templates.")
     @Operation(description = "view service template by id.")
     @GetMapping(value = "/csp/service_templates/{id}", produces =
@@ -128,7 +128,7 @@ public class CspServiceTemplateApi {
      * @param id                        id of service template.
      * @param reviewRegistrationRequest review request for service template registration.
      */
-    @Tag(name = "Cloud Service Provider",
+    @Tag(name = "CloudServiceProvider",
             description = "APIs for cloud service provider to manage service templates.")
     @Operation(description = "Review service template registration.")
     @PutMapping(value = "/service_templates/review/{id}", produces =

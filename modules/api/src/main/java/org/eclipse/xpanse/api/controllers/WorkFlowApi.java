@@ -71,7 +71,7 @@ public class WorkFlowApi {
      */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Complete tasks by task ID and set global process variables .")
-    @PutMapping(value = "/workflow/task/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/workflow/complete/task/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void completeTask(
             @Parameter(name = "id",
@@ -86,7 +86,7 @@ public class WorkFlowApi {
      */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Manage failed task orders.")
-    @PutMapping(value = "/workflow/task/{id}/{retryOrder}", produces =
+    @PutMapping(value = "/workflow/task/{id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void manageFailedOrder(
@@ -95,7 +95,7 @@ public class WorkFlowApi {
             @PathVariable("id") String taskId,
             @Parameter(name = "retryOrder",
                     description = "Controls if the order must be retried again or simply closed.")
-            @PathVariable boolean retryOrder) {
+            @RequestParam(name = "retryOrder") boolean retryOrder) {
         Map<String, Object> variables = new HashMap<>();
         variables.put(MigrateConstants.IS_RETRY_TASK, retryOrder);
         workflowUtils.completeTask(taskId, variables);

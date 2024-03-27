@@ -64,7 +64,7 @@ public class ServiceCatalogApi {
      * @param serviceHostingType type of the service hosting.
      * @return service templates
      */
-    @Tag(name = "Service Catalog", description =
+    @Tag(name = "ServiceCatalog", description =
             "APIs to query the services which are available for the user to order.")
     @Operation(description =
             "List of all approved services which are available for user to order.")
@@ -103,7 +103,7 @@ public class ServiceCatalogApi {
      * @param id The id of deployable service.
      * @return userOrderableServiceVo
      */
-    @Tag(name = "Service Catalog",
+    @Tag(name = "ServiceCatalog",
             description = "APIs to query the services which are available for the user to order.")
     @Operation(description = "Get deployable service by id.")
     @GetMapping(value = "/catalog/services/{id}",
@@ -130,7 +130,7 @@ public class ServiceCatalogApi {
      *
      * @param id The id of deployable service.
      */
-    @Tag(name = "Service Catalog",
+    @Tag(name = "ServiceCatalog",
             description = "APIs to query the services which are available for the user to order.")
     @GetMapping(value = "/catalog/services/{id}/openapi",
             produces = MediaType.APPLICATION_JSON_VALUE)

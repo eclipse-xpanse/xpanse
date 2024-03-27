@@ -72,7 +72,7 @@ public class OpenApiOauth2Config {
         SecurityRequirement securityRequirement = new SecurityRequirement();
         securityRequirement.addList(securityName);
 
-        Info info = new Info().title("Xpanse API").version(appVersion)
+        Info info = new Info().title("XpanseAPI").version(appVersion)
                 .description("RESTful Services to interact with Xpanse runtime.");
 
         return new OpenAPI().info(info).components(components).addSecurityItem(securityRequirement);

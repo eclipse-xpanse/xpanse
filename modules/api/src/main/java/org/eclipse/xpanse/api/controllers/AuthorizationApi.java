@@ -37,7 +37,7 @@ public class AuthorizationApi {
     @Resource
     private IdentityProviderManager identityProviderManager;
 
-    @Tag(name = "Auth Management",
+    @Tag(name = "AuthManagement",
             description = "APIs for user authentication and authorization.")
     @Operation(description = "Get and redirect authorization url for user to authenticate.")
     @ResponseStatus(HttpStatus.OK)
@@ -58,7 +58,7 @@ public class AuthorizationApi {
 
     }
 
-    @Tag(name = "Auth Management",
+    @Tag(name = "AuthManagement",
             description = "APIs for user authentication and authorization.")
     @Operation(description = "Get token info by authorization code.")
     @ResponseStatus(HttpStatus.OK)

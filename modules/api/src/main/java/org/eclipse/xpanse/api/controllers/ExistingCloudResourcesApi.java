@@ -52,7 +52,7 @@ public class ExistingCloudResourcesApi {
     /**
      * List existing cloud resources based on type.
      */
-    @Tag(name = "Cloud Resources",
+    @Tag(name = "CloudResources",
             description = "API to view cloud resources by type")
     @GetMapping(value = "/csp/resources/{deployResourceKind}",
             produces = MediaType.APPLICATION_JSON_VALUE)

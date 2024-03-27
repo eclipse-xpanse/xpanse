@@ -72,10 +72,9 @@ public class ServiceTemplateApi {
      * @param ocl model of Ocl.
      * @return response
      */
-    @Tag(name = "Service Vendor", description = "APIs to manage service templates.")
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Register new service template using ocl model.")
-    @PostMapping(value = "/service_templates", consumes = {"application/x-yaml", "application/yml",
-            "application/yaml"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public ServiceTemplateDetailVo register(@Valid @RequestBody Ocl ocl) {
@@ -92,10 +91,9 @@ public class ServiceTemplateApi {
      * @param ocl model of Ocl.
      * @return response
      */
-    @Tag(name = "Service Vendor", description = "APIs to manage service templates.")
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Update service template using id and ocl model.")
-    @PutMapping(value = "/service_templates/{id}", consumes = {"application/x-yaml",
-            "application/yml", "application/yaml"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/service_templates/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     public ServiceTemplateDetailVo update(
@@ -114,7 +112,7 @@ public class ServiceTemplateApi {
      * @param oclLocation URL of Ocl file.
      * @return response
      */
-    @Tag(name = "Service Vendor", description = "APIs to manage service templates.")
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Register new service template using URL of Ocl file.")
     @PostMapping(value = "/service_templates/file", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -138,7 +136,7 @@ public class ServiceTemplateApi {
      * @param oclLocation URL of new Ocl.
      * @return response
      */
-    @Tag(name = "Service Vendor", description = "APIs to manage service templates.")
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Update service template using id and URL of Ocl file.")
     @PutMapping(value = "/service_templates/file/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -164,7 +162,7 @@ public class ServiceTemplateApi {
      * @param id id of service template.
      * @return response
      */
-    @Tag(name = "Service Vendor", description = "APIs to manage service templates.")
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Delete service template using id.")
     @DeleteMapping("/service_templates/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -190,7 +188,7 @@ public class ServiceTemplateApi {
      * @param serviceRegistrationState state of the service registration.
      * @return service templates
      */
-    @Tag(name = "Service Vendor", description = "APIs to manage service templates.")
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "List service templates with query params.")
     @GetMapping(value = "/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -228,7 +226,7 @@ public class ServiceTemplateApi {
      * @param id id of service template.
      * @return response
      */
-    @Tag(name = "Service Vendor", description = "APIs to manage service templates.")
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Get service template using id.")
     @GetMapping(value = "/service_templates/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
