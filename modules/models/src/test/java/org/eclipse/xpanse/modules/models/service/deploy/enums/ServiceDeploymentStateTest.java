@@ -41,6 +41,12 @@ class ServiceDeploymentStateTest {
                 ServiceDeploymentState.getByValue("manual cleanup required"));
         assertEquals(ServiceDeploymentState.ROLLBACK_FAILED,
                 ServiceDeploymentState.getByValue("rollback failed"));
+        assertEquals(ServiceDeploymentState.MODIFYING,
+                ServiceDeploymentState.getByValue("modifying"));
+        assertEquals(ServiceDeploymentState.MODIFYING_FAILED,
+                ServiceDeploymentState.getByValue("modifying failed"));
+        assertEquals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL,
+                ServiceDeploymentState.getByValue("modification successful"));
         assertThrows(UnsupportedEnumValueException.class,
                 () -> ServiceDeploymentState.getByValue("unavailable"));
     }
@@ -59,6 +65,9 @@ class ServiceDeploymentStateTest {
         assertEquals("manual cleanup required",
                 ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED.toValue());
         assertEquals("rollback failed", ServiceDeploymentState.ROLLBACK_FAILED.toValue());
+        assertEquals("modifying", ServiceDeploymentState.MODIFYING.toValue());
+        assertEquals("modifying failed", ServiceDeploymentState.MODIFYING_FAILED.toValue());
+        assertEquals("modification successful", ServiceDeploymentState.MODIFICATION_SUCCESSFUL.toValue());
     }
 
 }

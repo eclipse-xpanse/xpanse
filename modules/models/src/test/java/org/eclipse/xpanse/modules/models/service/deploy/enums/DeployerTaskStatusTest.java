@@ -32,6 +32,12 @@ class DeployerTaskStatusTest {
                 DeployerTaskStatus.getByValue("rollback_success"));
         assertEquals(DeployerTaskStatus.ROLLBACK_FAILED,
                 DeployerTaskStatus.getByValue("rollback_failed"));
+        assertEquals(DeployerTaskStatus.MODIFYING,
+                DeployerTaskStatus.getByValue("modifying"));
+        assertEquals(DeployerTaskStatus.MODIFYING_FAILED,
+                DeployerTaskStatus.getByValue("modifying_failed"));
+        assertEquals(DeployerTaskStatus.MODIFICATION_SUCCESSFUL,
+                DeployerTaskStatus.getByValue("modification_successful"));
         assertThrows(UnsupportedEnumValueException.class,
                 () -> DeployerTaskStatus.getByValue("unavailable"));
     }
@@ -45,6 +51,9 @@ class DeployerTaskStatusTest {
         assertEquals("destroy_failed", DeployerTaskStatus.DESTROY_FAILED.toValue());
         assertEquals("rollback_success", DeployerTaskStatus.ROLLBACK_SUCCESS.toValue());
         assertEquals("rollback_failed", DeployerTaskStatus.ROLLBACK_FAILED.toValue());
+        assertEquals("modifying", DeployerTaskStatus.MODIFYING.toValue());
+        assertEquals("modifying_failed", DeployerTaskStatus.MODIFYING_FAILED.toValue());
+        assertEquals("modification_successful", DeployerTaskStatus.MODIFICATION_SUCCESSFUL.toValue());
     }
 
 }
