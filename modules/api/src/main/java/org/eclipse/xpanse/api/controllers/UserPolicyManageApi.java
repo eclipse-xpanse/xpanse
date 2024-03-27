@@ -59,7 +59,7 @@ public class UserPolicyManageApi {
      * @param enabled Is the policy enabled.
      * @return Returns list of the policies created by the user.
      */
-    @Tag(name = "User Policies Management",
+    @Tag(name = "UserPoliciesManagement",
             description = "APIs for managing user's infra policies.")
     @GetMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -81,7 +81,7 @@ public class UserPolicyManageApi {
      * @param id The id of the policy.
      * @return Returns list of the policies defined by the user.
      */
-    @Tag(name = "User Policies Management",
+    @Tag(name = "UserPoliciesManagement",
             description = "APIs for managing user's infra policies.")
     @GetMapping(value = "/policies/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -97,7 +97,7 @@ public class UserPolicyManageApi {
      *
      * @param userPolicyCreateRequest The policy to be created.
      */
-    @Tag(name = "User Policies Management",
+    @Tag(name = "UserPoliciesManagement",
             description = "APIs for managing user's infra policies.")
     @PostMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -112,7 +112,7 @@ public class UserPolicyManageApi {
      *
      * @param updateRequest The policy to be updated.
      */
-    @Tag(name = "User Policies Management",
+    @Tag(name = "UserPoliciesManagement",
             description = "APIs for managing user's infra policies.")
     @PutMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -127,7 +127,7 @@ public class UserPolicyManageApi {
      *
      * @param id The id of policy.
      */
-    @Tag(name = "User Policies Management",
+    @Tag(name = "UserPoliciesManagement",
             description = "APIs for managing user's infra policies.")
     @DeleteMapping(value = "/policies/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)

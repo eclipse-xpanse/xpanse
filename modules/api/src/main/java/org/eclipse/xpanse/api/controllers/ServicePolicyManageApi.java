@@ -55,7 +55,7 @@ public class ServicePolicyManageApi {
      * @param serviceTemplateId the id of registered service template which the policy belongs to.
      * @return Returns list of the policies belongs to the registered service template.
      */
-    @Tag(name = "Service Policies Management",
+    @Tag(name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
     @GetMapping(value = "/service/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,7 +74,7 @@ public class ServicePolicyManageApi {
      * @param id The id of the policy.
      * @return Returns list of the policies defined by the service.
      */
-    @Tag(name = "Service Policies Management",
+    @Tag(name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
     @GetMapping(value = "/service/policies/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -90,7 +90,7 @@ public class ServicePolicyManageApi {
      *
      * @param servicePolicyCreateRequest The policy to be created.
      */
-    @Tag(name = "Service Policies Management",
+    @Tag(name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
     @PostMapping(value = "/service/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -105,7 +105,7 @@ public class ServicePolicyManageApi {
      *
      * @param updateRequest The policy to be updated.
      */
-    @Tag(name = "Service Policies Management",
+    @Tag(name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
     @PutMapping(value = "/service/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -120,7 +120,7 @@ public class ServicePolicyManageApi {
      *
      * @param id The id of policy.
      */
-    @Tag(name = "Service Policies Management",
+    @Tag(name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
     @DeleteMapping(value = "/service/policies/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
