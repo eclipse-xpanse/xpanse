@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationReque
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
@@ -43,8 +44,11 @@ import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaVa
 import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
+import org.semver4j.Semver;
+import org.semver4j.SemverException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Implement Interface to manage service template newTemplate in database.
@@ -75,7 +79,7 @@ public class ServiceTemplateManage {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
         iconUpdate(existingTemplate, ocl);
         checkParams(existingTemplate, ocl);
-        validateServiceTemplate(ocl.getDeployment(), existingTemplate);
+        validateServiceDeployment(ocl.getDeployment(), existingTemplate);
         existingTemplate.setOcl(ocl);
         existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         ServiceTemplateEntity updatedServiceTemplate = storage.storeAndFlush(existingTemplate);
@@ -94,7 +98,7 @@ public class ServiceTemplateManage {
         compare(oldName, newName, "service name");
 
         String oldVersion = existingTemplate.getVersion();
-        String newVersion = ocl.getServiceVersion();
+        String newVersion = getSemverVersion(ocl.getServiceVersion()).getVersion();
         compare(oldVersion, newVersion, "service version");
 
         String oldCsp = existingTemplate.getCsp().name();
@@ -119,7 +123,7 @@ public class ServiceTemplateManage {
     private ServiceTemplateEntity getNewServiceTemplateEntity(Ocl ocl) {
         ServiceTemplateEntity newTemplate = new ServiceTemplateEntity();
         newTemplate.setName(StringUtils.lowerCase(ocl.getName()));
-        newTemplate.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
+        newTemplate.setVersion(getSemverVersion(ocl.getServiceVersion()).getVersion());
         newTemplate.setCsp(ocl.getCloudServiceProvider().getName());
         newTemplate.setCategory(ocl.getCategory());
         newTemplate.setServiceHostingType(ocl.getServiceHostingType());
@@ -127,6 +131,37 @@ public class ServiceTemplateManage {
         newTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         newTemplate.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
         return newTemplate;
+    }
+
+
+    private Semver getSemverVersion(String serviceVersion) {
+        try {
+            return new Semver(serviceVersion);
+        } catch (SemverException e) {
+            String errorMsg = String.format("The service version %s is a invalid semver version.",
+                    serviceVersion);
+            throw new InvalidServiceVersionException(errorMsg);
+        }
+    }
+
+    private void validateServiceVersion(Ocl ocl) {
+        Semver newSemver = getSemverVersion(ocl.getServiceVersion());
+        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel(ocl.getCategory(),
+                ocl.getCloudServiceProvider().getName(), ocl.getName(), null,
+                ocl.getServiceHostingType(), null, false);
+        List<ServiceTemplateEntity> templates = storage.listServiceTemplates(query);
+        if (!CollectionUtils.isEmpty(templates)) {
+            Semver highestVersion = templates.stream()
+                    .map(serviceTemplate -> new Semver(serviceTemplate.getVersion())).sorted()
+                    .toList().reversed().getFirst();
+            if (!newSemver.isGreaterThan(highestVersion)) {
+                String errorMsg = String.format("The version %s of service must be higher than the"
+                                + " highest version %s of the registered services with same name",
+                        newSemver, highestVersion);
+                log.error(errorMsg);
+                throw new InvalidServiceVersionException(errorMsg);
+            }
+        }
     }
 
     private void iconUpdate(ServiceTemplateEntity serviceTemplateEntity, Ocl ocl) {
@@ -152,8 +187,9 @@ public class ServiceTemplateManage {
             log.error(errorMsg);
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
+        validateServiceVersion(ocl);
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
-        validateServiceTemplate(ocl.getDeployment(), newTemplate);
+        validateServiceDeployment(ocl.getDeployment(), newTemplate);
         Optional<String> namespace = identityProviderManager.getUserNamespace();
         if (namespace.isPresent()) {
             newTemplate.setNamespace(namespace.get());
@@ -165,8 +201,8 @@ public class ServiceTemplateManage {
         return storedServiceTemplate;
     }
 
-    private void validateServiceTemplate(Deployment deployment,
-                                         ServiceTemplateEntity serviceTemplate) {
+    private void validateServiceDeployment(Deployment deployment,
+                                           ServiceTemplateEntity serviceTemplate) {
         AvailabilityZoneSchemaValidator.validateServiceAvailability(
                 deployment.getServiceAvailability());
         DeployVariableSchemaValidator.validateDeployVariable(deployment.getVariables());

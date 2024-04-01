@@ -36,7 +36,7 @@ class ServiceTemplateDetailVoTest {
     private static final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
     private static final Category category = Category.COMPUTE;
     private static final String name = "kafka";
-    private static final String version = "v1.0.0";
+    private static final String version = "1.0.0";
     private static final Csp csp = Csp.AWS;
     private static final String description = "description";
     private static final String namespace = "namespace";

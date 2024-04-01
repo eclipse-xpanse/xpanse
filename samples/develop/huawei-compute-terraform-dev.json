@@ -1,6 +1,6 @@
 {
   "serviceName": "terraform-ecs",
-  "version": "v1.0.0",
+  "version": "1.0.0",
   "csp": "huawei",
   "category": "compute",
   "flavor": "2vCPUs-4GB-normal",

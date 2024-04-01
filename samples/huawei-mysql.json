@@ -1,6 +1,6 @@
 {
   "serviceName": "RDS-MySQL",
-  "version": "v1.0.0",
+  "version": "1.0.0",
   "csp": "huawei",
   "category": "database",
   "flavor": "2vCPUs-4GB-general",

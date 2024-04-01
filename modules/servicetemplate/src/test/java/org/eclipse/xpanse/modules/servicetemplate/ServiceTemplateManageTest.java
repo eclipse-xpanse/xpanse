@@ -38,6 +38,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
@@ -112,7 +113,6 @@ class ServiceTemplateManageTest {
     @Test
     void testUpdateServiceTemplate() throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ocl.setVersion("2.1");
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(mockStorage.storeAndFlush(any())).thenReturn(serviceTemplateEntity);
@@ -133,7 +133,7 @@ class ServiceTemplateManageTest {
     @Test
     void testUpdateThrowsServiceTemplateUpdateNotAllowedException() throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ocl.setServiceVersion("1.0");
+        ocl.setServiceVersion("1.0.1");
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
@@ -200,6 +200,17 @@ class ServiceTemplateManageTest {
         when(mockStorage.findServiceTemplate(entity)).thenReturn(existedServiceTemplateEntity);
 
         Assertions.assertThrows(ServiceTemplateAlreadyRegistered.class,
+                () -> serviceTemplateManageTest.registerServiceTemplate(ocl));
+    }
+
+    @Test
+    void testRegisterThrowsInvalidServiceVersionException() throws Exception {
+        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
+        ocl.setServiceVersion("ErrorVersion");
+        Assertions.assertThrows(InvalidServiceVersionException.class,
+                () -> serviceTemplateManageTest.registerServiceTemplate(ocl));
+        ocl.setVersion("0.0.1");
+        Assertions.assertThrows(InvalidServiceVersionException.class,
                 () -> serviceTemplateManageTest.registerServiceTemplate(ocl));
     }
 

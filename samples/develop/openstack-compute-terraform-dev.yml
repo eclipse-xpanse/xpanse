@@ -32,19 +32,27 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: cirros128
+    modificationImpact:
+      isDataLost: false
+      isServiceInterrupted: true
   - name: 1vCPUs-1GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 20
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: cirros256
+    modificationImpact:
+      isDataLost: false
+      isServiceInterrupted: true
   - name: 1vCPUs-2GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 30
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: cirros512
-
+    modificationImpact:
+      isDataLost: false
+      isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test@test.com"]

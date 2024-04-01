@@ -25,7 +25,7 @@ class ServiceTemplateQueryModelTest {
     private final Category category = Category.COMPUTE;
     private final Csp csp = Csp.HUAWEI;
     private final String serviceName = "kafka";
-    private final String serviceVersion = "v1.0.0";
+    private final String serviceVersion = "1.0.0";
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final ServiceRegistrationState serviceRegistrationState =
             ServiceRegistrationState.APPROVED;
