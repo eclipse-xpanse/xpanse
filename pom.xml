@@ -81,6 +81,7 @@
         <eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
         <java.uuid.generator.version>5.0.0</java.uuid.generator.version>
         <jgit.version>6.9.0.202403050737-r</jgit.version>
+        <semver4j.version>5.2.2</semver4j.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>

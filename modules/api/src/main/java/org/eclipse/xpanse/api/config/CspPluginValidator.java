@@ -20,7 +20,6 @@ import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
@@ -42,10 +41,7 @@ public class CspPluginValidator {
 
     private void validatePluginForCspIsActive(Csp csp) {
         if (Objects.nonNull(csp)) {
-            if (Objects.isNull(pluginManager.getOrchestratorPlugin(csp))) {
-                throw new PluginNotFoundException(
-                        String.format("Plugin for %s is not enabled", csp.name()));
-            }
+            pluginManager.getOrchestratorPlugin(csp);
         }
     }
 
@@ -101,14 +97,13 @@ public class CspPluginValidator {
         } catch (NoSuchMethodException e) {
             log.error("Failed to get fetch or fetchUpdate method name", e);
         }
-        if (StringUtils.isNotBlank(fetchMethodName) && fetchMethodName.equals(methodName)) {
+        if (StringUtils.equals(fetchMethodName, methodName)) {
             Object[] args = joinPoint.getArgs();
             String oclLocation = (String) args[0];
             Ocl ocl = getOclByLocation(oclLocation);
             validatePluginForCspIsActive(ocl.getCloudServiceProvider().getName());
         }
-        if (StringUtils.isNotBlank(fetchUpdateMethodName)
-                && fetchUpdateMethodName.equals(methodName)) {
+        if (StringUtils.equals(fetchUpdateMethodName, methodName)) {
             Object[] args = joinPoint.getArgs();
             String oclLocation = (String) args[1];
             Ocl ocl = getOclByLocation(oclLocation);

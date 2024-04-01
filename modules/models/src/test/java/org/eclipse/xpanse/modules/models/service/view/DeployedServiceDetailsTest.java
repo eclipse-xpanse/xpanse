@@ -32,7 +32,7 @@ class DeployedServiceDetailsTest {
     private static final String userId = "userId";
     private static final Category category = Category.COMPUTE;
     private static final String serviceName = "serviceName";
-    private static final String version = "v1.0.0";
+    private static final String version = "1.0.0";
     private static final String regionName = "us-east-1";
     private static final String areaName = "Asia China";
     private static final Csp csp = Csp.AWS;

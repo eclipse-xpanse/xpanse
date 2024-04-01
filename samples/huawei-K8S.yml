@@ -5,7 +5,7 @@ category: container
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: K8S-cluster
 # The version of the service, the end-user can select the version they want to deploy.
-serviceVersion: v1.0.0
+serviceVersion: 1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
 description: This is an enhanced K8S cluster services by ISV-A.
 namespace: ISV-A

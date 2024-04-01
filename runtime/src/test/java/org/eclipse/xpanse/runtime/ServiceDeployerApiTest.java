@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesResponse;
@@ -465,10 +464,15 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     void testListDeployedServices() throws Exception {
         // Run the test
         List<DeployedService> result = listDeployedServices();
+        List<DeployedServiceDetails> detailsResult = listDeployedServicesDetails();
 
         // Verify the results
         Assertions.assertFalse(result.isEmpty());
         assertEquals(result.getFirst().getServiceDeploymentState(),
+                ServiceDeploymentState.DEPLOY_SUCCESS);
+
+        Assertions.assertFalse(detailsResult.isEmpty());
+        assertEquals(detailsResult.getFirst().getServiceDeploymentState(),
                 ServiceDeploymentState.DEPLOY_SUCCESS);
     }
 
@@ -574,11 +578,22 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
         final MockHttpServletResponse listResponse = mockMvc.perform(
                         get("/xpanse/services").contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON).param("page", "0"))
+                                .accept(MediaType.APPLICATION_JSON))
 
                 .andReturn().getResponse();
         return objectMapper.readValue(listResponse.getContentAsString(), new TypeReference<>() {
         });
+    }
+
+    List<DeployedServiceDetails> listDeployedServicesDetails() throws Exception {
+
+        final MockHttpServletResponse listResponse = mockMvc.perform(
+                        get("/xpanse/services/details").contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        return objectMapper.readValue(listResponse.getContentAsString(),
+                new TypeReference<>() {
+                });
     }
 
     void testDeployThrowsServiceTemplateNotRegistered() throws Exception {
@@ -590,7 +605,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         DeployRequest deployRequest = new DeployRequest();
 
         deployRequest.setServiceName("redis");
-        deployRequest.setVersion("v1.0.0");
+        deployRequest.setVersion("1.0.0");
         deployRequest.setCsp(Csp.HUAWEI);
         deployRequest.setCategory(Category.AI);
         deployRequest.setFlavor("flavor2");
