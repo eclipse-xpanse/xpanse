@@ -5,7 +5,7 @@ category: compute
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: terraform-ecs
 # The version of the service, the end-user can select the version they want to deploy.
-serviceVersion: 0.0.1
+serviceVersion: 1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
 description: This is an ehanced compute services by ISV-A.
 namespace: ISV-A

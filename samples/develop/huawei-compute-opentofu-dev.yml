@@ -41,6 +41,9 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: s6.large.2
+    modificationImpact:
+      isDataLost: true
+      isServiceInterrupted: true
   - name: 2vCPUs-8GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 30

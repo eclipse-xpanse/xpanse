@@ -48,6 +48,9 @@ public class OpenApiOauth2Config {
     @Value("${authorization.metadata.scope}")
     private String metadataScope;
 
+    @Value("${enable.role.protection:false}")
+    private Boolean roleProtectionIsEnabled;
+
     /**
      * Config open api.
      *
@@ -58,10 +61,7 @@ public class OpenApiOauth2Config {
 
         OAuthFlows oauthFlows = new OAuthFlows();
         OAuthFlow oauthFlow = new OAuthFlow().authorizationUrl(authorizationUrl).tokenUrl(tokenUrl)
-                .scopes(new Scopes().addString(openidScope, "mandatory must be selected.")
-                        .addString(profileScope, "mandatory must be selected.")
-                        .addString(rolesScope, "mandatory must be selected.")
-                        .addString(metadataScope, "mandatory must be selected."));
+                .scopes(getScopes());
         oauthFlows.authorizationCode(oauthFlow);
 
         SecurityScheme securityScheme = new SecurityScheme();
@@ -76,5 +76,16 @@ public class OpenApiOauth2Config {
                 .description("RESTful Services to interact with Xpanse runtime.");
 
         return new OpenAPI().info(info).components(components).addSecurityItem(securityRequirement);
+    }
+
+    private Scopes getScopes() {
+        Scopes scopes = new Scopes();
+        if (roleProtectionIsEnabled) {
+            scopes.addString(rolesScope, "mandatory must be selected.");
+        }
+        scopes.addString(openidScope, "mandatory must be selected.");
+        scopes.addString(profileScope, "mandatory must be selected.");
+        scopes.addString(metadataScope, "mandatory must be selected.");
+        return scopes;
     }
 }
