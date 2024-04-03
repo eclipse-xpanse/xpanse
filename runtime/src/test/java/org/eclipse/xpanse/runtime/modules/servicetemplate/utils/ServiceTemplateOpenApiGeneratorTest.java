@@ -24,21 +24,20 @@ import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaVali
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.mockito.InjectMocks;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Test for OpenApiUtilTest.
  */
 @Slf4j
-@TestMethodOrder(OrderAnnotation.class)
 class ServiceTemplateOpenApiGeneratorTest {
 
     private final String ID = "488adf44-b48f-43fb-9b7f-61e79f40016a";
     private final UUID RANDOM_UUID = UUID.fromString(ID);
     private OpenApiGeneratorJarManage openApiGeneratorJarManage;
+    @InjectMocks
     private ServiceTemplateOpenApiGenerator openApiGenerator;
 
     @BeforeEach
@@ -55,9 +54,40 @@ class ServiceTemplateOpenApiGeneratorTest {
                 openApiUrlManage, openApiGeneratorJarManage, pluginManager);
     }
 
+    void setConfiguration(Boolean webSecurityIsEnabled, Boolean roleProtectionIsEnabled) {
+
+        ReflectionTestUtils.setField(openApiGenerator, "webSecurityIsEnabled",
+                webSecurityIsEnabled);
+        ReflectionTestUtils.setField(openApiGenerator, "roleProtectionIsEnabled",
+                roleProtectionIsEnabled);
+    }
+
     @Test
-    @Order(1)
-    void createServiceApi_test() throws Exception {
+    void openApiGeneratorTestWithOauthIsDisabled() throws Exception {
+        setConfiguration(false, false);
+        createServiceApi();
+        updateServiceApi();
+        deleteServiceApi();
+    }
+
+    @Test
+    void openApiGeneratorTestWithRoleProtectionIsEnabled() throws Exception {
+        setConfiguration(true, true);
+        createServiceApi();
+        updateServiceApi();
+        deleteServiceApi();
+    }
+
+    @Test
+    void openApiGeneratorTestWithRoleProtectionIsDisabled() throws Exception {
+        setConfiguration(true, false);
+        createServiceApi();
+        updateServiceApi();
+        deleteServiceApi();
+    }
+
+
+    void createServiceApi() throws Exception {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         openApiGenerator.createServiceApi(serviceTemplateEntity);
@@ -66,18 +96,14 @@ class ServiceTemplateOpenApiGeneratorTest {
         Assertions.assertTrue(htmlFile.exists());
     }
 
-    @Test
-    @Order(2)
-    void updateServiceApi_test() throws Exception {
+    void updateServiceApi() throws Exception {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         Assertions.assertDoesNotThrow(
                 () -> openApiGenerator.updateServiceApi(serviceTemplateEntity));
     }
 
-    @Test
-    @Order(3)
-    void deleteServiceApi_test() {
+    void deleteServiceApi() {
         openApiGenerator.deleteServiceApi(ID);
         String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, ID + ".html");

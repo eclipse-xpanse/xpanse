@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfoHolder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -35,11 +36,19 @@ public class IdentityProviderManager {
     @Resource
     private ApplicationContext applicationContext;
 
+    @Value("${enable.web.security:false}")
+    private Boolean webSecurityIsEnabled;
+
     /**
      * Instantiates active IdentityProviderService.
      */
     @Bean
     public void loadActiveIdentityProviderServices() {
+        if (!webSecurityIsEnabled) {
+            log.info("Web security is disabled.");
+            activeIdentityProviderService = null;
+            return;
+        }
         List<IdentityProviderService> identityProviderServices =
                 applicationContext.getBeansOfType(IdentityProviderService.class)
                         .values().stream().toList();

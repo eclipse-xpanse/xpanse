@@ -41,6 +41,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -60,8 +61,11 @@ public class ServiceTemplateOpenApiGenerator {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final OpenApiUrlManage openApiUrlManage;
     private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
-
     private final PluginManager pluginManager;
+    @Value("${enable.web.security:false}")
+    private Boolean webSecurityIsEnabled;
+    @Value("${enable.role.protection:false}")
+    private Boolean roleProtectionIsEnabled;
 
     /**
      * Constructor to instantiate ServiceTemplateOpenApiGenerator bean.
@@ -224,8 +228,14 @@ public class ServiceTemplateOpenApiGenerator {
         if (Objects.isNull(registerService)) {
             return StringUtils.EMPTY;
         }
+        // version of registered service.
+        String serviceVersion = registerService.getVersion();
         // service url.
         String serviceUrl = this.openApiUrlManage.getServiceUrl();
+        // security of service.
+        String securityConfigList = getSecurityConfigList();
+        // required roles in description of the API.
+        String requiredRolesDesc = getRequiredRolesDesc();
         // string of required fields list.
         String createRequiredStr = null;
         // category value of registered service.
@@ -234,8 +244,6 @@ public class ServiceTemplateOpenApiGenerator {
         String categoryValuesStr = null;
         // name of registered service.
         String serviceName = registerService.getName();
-        // version of registered service.
-        String serviceVersion = registerService.getVersion();
         // example value of name of region.
         String regionNameExample = null;
         // list all values of names of all regions.
@@ -273,15 +281,15 @@ public class ServiceTemplateOpenApiGenerator {
                     registerService.getJsonObjectSchema().getRequired());
             List<Region> regions = registerService.getOcl().getCloudServiceProvider().getRegions();
             regionNameExample = regions.getFirst().getName();
-            regionNamesStr = mapper.writeValueAsString(
-                    regions.stream().map(Region::getName).toList());
+            regionNamesStr =
+                    mapper.writeValueAsString(regions.stream().map(Region::getName).toList());
             regionAreaExample = regions.getFirst().getArea();
-            regionAreasStr = mapper.writeValueAsString(
-                    regions.stream().map(Region::getArea).toList());
+            regionAreasStr =
+                    mapper.writeValueAsString(regions.stream().map(Region::getArea).toList());
             List<Flavor> flavors = registerService.getOcl().getFlavors();
             flavorNameExample = flavors.getFirst().getName();
-            flavorNamesStr = mapper.writeValueAsString(
-                    flavors.stream().map(Flavor::getName).toList());
+            flavorNamesStr =
+                    mapper.writeValueAsString(flavors.stream().map(Flavor::getName).toList());
             cspValuesStr = mapper.writeValueAsString(getActiveCspValues());
             categoryValuesStr = mapper.writeValueAsString(getCategoryValues());
             serviceHostingTypesStr = mapper.writeValueAsString(getServiceHostingTypeValues());
@@ -305,16 +313,7 @@ public class ServiceTemplateOpenApiGenerator {
                                     "description": "Generated server url"
                                 }
                             ],
-                            "security": [
-                                {
-                                    "OAuth2Flow": [
-                                        "openid",
-                                        "profile",
-                                        "urn:zitadel:iam:org:project:roles",
-                                        "urn:zitadel:iam:user:metadata"
-                                    ]
-                                }
-                            ],
+                            %s
                             "tags": [
                                 {
                                     "name": "Service",
@@ -327,7 +326,7 @@ public class ServiceTemplateOpenApiGenerator {
                                         "tags": [
                                             "Service"
                                         ],
-                                        "description": "Start a task to deploy service using registered service template.<br>Required role:<b> admin</b> or <b>user</b>",
+                                        "description": "Start a task to deploy service using registered service template.%s",
                                         "operationId": "deploy",
                                         "requestBody": {
                                             "content": {
@@ -564,11 +563,40 @@ public class ServiceTemplateOpenApiGenerator {
                                 }
                             }
                         }
-                        """, serviceVersion, serviceUrl, createRequiredStr, category,
-                categoryValuesStr, serviceName, serviceVersion, regionNameExample, regionNamesStr,
-                regionAreaExample, regionAreasStr, csp, cspValuesStr, flavorNameExample,
-                flavorNamesStr, serviceHostingType, serviceHostingTypesStr, propertiesRequiredStr,
+                        """, serviceVersion, serviceUrl, securityConfigList, requiredRolesDesc,
+                createRequiredStr, category, categoryValuesStr, serviceName, serviceVersion,
+                regionNameExample, regionNamesStr, regionAreaExample, regionAreasStr,
+                csp, cspValuesStr, flavorNameExample, flavorNamesStr,
+                serviceHostingType, serviceHostingTypesStr, propertiesRequiredStr,
                 propertiesStr, availabilityZonesSchemaStr);
+    }
+
+    private String getSecurityConfigList() {
+        if (webSecurityIsEnabled) {
+            String roleScopeStr =
+                    roleProtectionIsEnabled ? "\"urn:zitadel:iam:org:project:roles\"," : "";
+            return String.format("""
+                    "security": [
+                                {
+                                    "OAuth2Flow": [
+                                        "openid",
+                                        "profile",
+                                        %s
+                                        "urn:zitadel:iam:user:metadata"
+                                    ]
+                                }
+                            ],
+                    """, roleScopeStr);
+        }
+        return "";
+    }
+
+
+    private String getRequiredRolesDesc() {
+        if (webSecurityIsEnabled && roleProtectionIsEnabled) {
+            return "<br>Required role:<b> admin</b> or <b>user</b>";
+        }
+        return "";
     }
 
     private List<String> getRequiredFields(Object object) {
