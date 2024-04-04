@@ -43,7 +43,7 @@
         <wiremock.version>3.5.2</wiremock.version>
         <instancio.version>4.5.0</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
-        <jacoco.version>0.8.11</jacoco.version>
+        <jacoco.version>0.8.12</jacoco.version>
         <springdoc.version>2.5.0</springdoc.version>
         <slf4j-api.version>2.0.12</slf4j-api.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
