@@ -45,6 +45,9 @@ flavors:
       worker_nodes_count: 3
       flavor_name: SCS-4V:8:20
       image_name: Ubuntu 20.04
+    modificationImpact:
+      isDataLost: true
+      isServiceInterrupted: true
   - name: 1-zookeeper-with-5-worker-nodes-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 60

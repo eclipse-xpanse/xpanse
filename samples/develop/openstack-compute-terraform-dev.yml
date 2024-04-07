@@ -82,6 +82,9 @@ deployment:
         minLength: 1
         maxLength: 256
       sensitiveScope: none
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
       # this is an example test instance of openstack
       value: "http://119.8.215.244/identity/v3"
     - name: admin_passwd
@@ -93,6 +96,9 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
     - name: image_name
       description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
       kind: variable
@@ -100,6 +106,9 @@ deployment:
       example: "cirros-0.5.2-x86_64-disk"
       mandatory: false
       value: "cirros-0.5.2-x86_64-disk"
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
     - name: vpc_name
       description: The vpc name of the compute instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
@@ -107,6 +116,9 @@ deployment:
       example: "ecs-vpc-default"
       mandatory: false
       value: "ecs-vpc-default"
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
     - name: subnet_name
       description: The sub network name of the compute instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
@@ -114,6 +126,9 @@ deployment:
       example: "ecs-subnet-default"
       mandatory: false
       value: "ecs-subnet-default"
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
     - name: secgroup_name
       description: The security group name of the compute instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
@@ -121,6 +136,9 @@ deployment:
       example: "ecs-secgroup-default"
       mandatory: false
       value: "ecs-secgroup-default"
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
   deployer: |
     variable "region" {
       type        = string
@@ -279,8 +297,8 @@ deployment:
     }
 
     data "openstack_images_image_v2" "image" {
-      name_regex  = "^${var.image_name}"
-      most_recent = true
+      name                  = var.image_name
+      most_recent           = true
     }
 
     resource "openstack_compute_instance_v2" "ecs-tf" {
