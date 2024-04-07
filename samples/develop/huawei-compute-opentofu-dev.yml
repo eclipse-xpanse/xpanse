@@ -33,7 +33,7 @@ flavors:
     properties:
       flavor_id: s7.small.1
     modificationImpact:
-      isDataLost: true
+      isDataLost: false
       isServiceInterrupted: true
   - name: 2vCPUs-4GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
@@ -42,7 +42,7 @@ flavors:
     properties:
       flavor_id: s6.large.2
     modificationImpact:
-      isDataLost: true
+      isDataLost: false
       isServiceInterrupted: true
   - name: 2vCPUs-8GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
@@ -51,7 +51,7 @@ flavors:
     properties:
       flavor_id: s6.large.4
     modificationImpact:
-      isDataLost: true
+      isDataLost: false
       isServiceInterrupted: true
   - name: 4vCPUs-8GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
@@ -60,7 +60,7 @@ flavors:
     properties:
       flavor_id: s6.xlarge.2
     modificationImpact:
-      isDataLost: true
+      isDataLost: false
       isServiceInterrupted: true
   - name: 4vCPUs-16GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
@@ -69,7 +69,7 @@ flavors:
     properties:
       flavor_id: s6.xlarge.4
     modificationImpact:
-      isDataLost: true
+      isDataLost: false
       isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
@@ -101,7 +101,7 @@ deployment:
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
       modificationImpact:
-        isDataLost: true
+        isDataLost: false
         isServiceInterrupted: true
     - name: image_name
       description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
@@ -111,7 +111,7 @@ deployment:
       mandatory: false
       value: "Ubuntu 22.04 server 64bit"
       modificationImpact:
-        isDataLost: true
+        isDataLost: false
         isServiceInterrupted: true
     - name: vpc_name
       description: The vpc name of the compute instance. If the value is empty, will use the default value to find or create VPC.
@@ -121,7 +121,7 @@ deployment:
       mandatory: false
       value: "ecs-vpc-default"
       modificationImpact:
-        isDataLost: true
+        isDataLost: false
         isServiceInterrupted: true
     - name: subnet_name
       description: The sub network name of the compute instance. If the value is empty, will use the default value to find or create subnet.
@@ -131,7 +131,7 @@ deployment:
       mandatory: false
       value: "ecs-subnet-default"
       modificationImpact:
-        isDataLost: true
+        isDataLost: false
         isServiceInterrupted: true
     - name: secgroup_name
       description: The security group name of the compute instance. If the value is empty, will use the default value to find or create security group.
@@ -141,7 +141,7 @@ deployment:
       mandatory: false
       value: "ecs-secgroup-default"
       modificationImpact:
-        isDataLost: true
+        isDataLost: false
         isServiceInterrupted: true
   deployer: |
     variable "region" {
@@ -299,8 +299,9 @@ deployment:
     }
 
     data "huaweicloud_images_image" "image" {
-      name_regex        = "^${var.image_name}"
-      most_recent = true
+      name                  = var.image_name
+      most_recent           = true
+      enterprise_project_id = "0"
     }
 
     resource "huaweicloud_compute_instance" "ecs-tofu" {

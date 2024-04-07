@@ -272,8 +272,9 @@ deployment:
     }
 
     data "huaweicloud_images_image" "image" {
-      name        = "K8S-v1.26.2_Centos-7.9"
-      most_recent = true
+      name                  = "K8S-v1.26.2_Centos-7.9"
+      most_recent           = true
+      enterprise_project_id = "0"
     }
 
     resource "huaweicloud_compute_instance" "k8s-master" {
