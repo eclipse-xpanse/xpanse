@@ -28,7 +28,7 @@ class OclTest {
     private static final Category category = Category.COMPUTE;
     private static final String version = "2.0";
     private static final String name = "kafka";
-    private static final String serviceVersion = "v1.0.0";
+    private static final String serviceVersion = "1.0.0";
     private static final String description = "description";
     private static final String namespace = "nameSpace";
     private static final String icon = "icon";

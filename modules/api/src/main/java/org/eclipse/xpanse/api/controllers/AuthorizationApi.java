@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.security.TokenResponse;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
  * REST interface methods for authentication.
  */
 @Slf4j
-@RestController
+@Profile("oauth")
 @CrossOrigin
+@RestController
 public class AuthorizationApi {
 
     @Resource
@@ -65,9 +67,9 @@ public class AuthorizationApi {
     @GetMapping(value = "/auth/token")
     TokenResponse getAccessToken(
             @Parameter(name = "code", required = true, description = "The authorization code.")
-                    String code,
+            String code,
             @Parameter(name = "state", description = "Opaque value used to maintain state.")
-                    String state) {
+            String state) {
         IdentityProviderService identityProviderService =
                 identityProviderManager.getActiveIdentityProviderService();
         if (Objects.nonNull(identityProviderService)) {

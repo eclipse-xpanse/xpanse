@@ -23,7 +23,7 @@ class ServiceQueryModelTest {
     private static final Csp csp = Csp.HUAWEI;
     private static final Category category = Category.COMPUTE;
     private static final String serviceName = "kafka";
-    private static final String serviceVersion = "v1.0.0";
+    private static final String serviceVersion = "1.0.0";
     private static final ServiceDeploymentState serviceState =
             ServiceDeploymentState.DEPLOY_SUCCESS;
     private static final String userId = "defaultUserId";
@@ -109,7 +109,7 @@ class ServiceQueryModelTest {
     @Test
     void testToString() {
         String expectedString = "ServiceQueryModel(csp=HUAWEI, category=COMPUTE, serviceName=kafka,"
-                + " serviceVersion=v1.0.0, serviceState=DEPLOY_SUCCESS, userId=defaultUserId)";
+                + " serviceVersion=1.0.0, serviceState=DEPLOY_SUCCESS, userId=defaultUserId)";
         assertEquals(expectedString, serviceQueryTest.toString());
     }
 

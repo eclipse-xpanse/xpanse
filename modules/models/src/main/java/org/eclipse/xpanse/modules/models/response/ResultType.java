@@ -37,6 +37,7 @@ public enum ResultType {
     SERVICE_TEMPLATE_NOT_REGISTERED("Service Template Not Registered"),
     SERVICE_TEMPLATE_NOT_APPROVED("Service Template Not Approved"),
     SERVICE_TEMPLATE_ALREADY_REVIEWED("Service Template Already Reviewed"),
+    INVALID_SERVICE_VERSION("Invalid Service Version"),
     SERVICE_DEPLOYMENT_NOT_FOUND("Service Deployment Not Found"),
     RESOURCE_NOT_FOUND("Resource Not Found"),
     DEPLOYMENT_VARIABLE_INVALID("Deployment Variable Invalid"),

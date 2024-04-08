@@ -5,7 +5,7 @@ category: compute
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: openstack-ecs
 # The version of the service, the end-user can select the version they want to deploy.
-serviceVersion: v1.0.0
+serviceVersion: 1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
 description: This is an ehanced compute services by ISV-A.
 namespace: ISV-A
@@ -32,19 +32,27 @@ flavors:
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: cirros128
+    modificationImpact:
+      isDataLost: false
+      isServiceInterrupted: true
   - name: 1vCPUs-1GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 20
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: cirros256
+    modificationImpact:
+      isDataLost: false
+      isServiceInterrupted: true
   - name: 1vCPUs-2GB-normal
     # The fixed price during the period (the price applied one shot whatever is the service use)
     fixedPrice: 30
     # Properties for the service, which can be used by the deployment.
     properties:
       flavor_id: cirros512
-
+    modificationImpact:
+      isDataLost: false
+      isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test@test.com"]
@@ -74,6 +82,9 @@ deployment:
         minLength: 1
         maxLength: 256
       sensitiveScope: none
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
       # this is an example test instance of openstack
       value: "http://119.8.215.244/identity/v3"
     - name: admin_passwd
@@ -85,6 +96,9 @@ deployment:
         minLength: 8
         maxLength: 16
         pattern: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
     - name: image_name
       description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
       kind: variable
@@ -92,6 +106,9 @@ deployment:
       example: "cirros-0.5.2-x86_64-disk"
       mandatory: false
       value: "cirros-0.5.2-x86_64-disk"
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
     - name: vpc_name
       description: The vpc name of the compute instance. If the value is empty, will use the default value to find or create VPC.
       kind: variable
@@ -99,6 +116,9 @@ deployment:
       example: "ecs-vpc-default"
       mandatory: false
       value: "ecs-vpc-default"
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
     - name: subnet_name
       description: The sub network name of the compute instance. If the value is empty, will use the default value to find or create subnet.
       kind: variable
@@ -106,6 +126,9 @@ deployment:
       example: "ecs-subnet-default"
       mandatory: false
       value: "ecs-subnet-default"
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
     - name: secgroup_name
       description: The security group name of the compute instance. If the value is empty, will use the default value to find or create security group.
       kind: variable
@@ -113,6 +136,9 @@ deployment:
       example: "ecs-secgroup-default"
       mandatory: false
       value: "ecs-secgroup-default"
+      modificationImpact:
+        isDataLost: false
+        isServiceInterrupted: true
   deployer: |
     variable "region" {
       type        = string
@@ -271,8 +297,8 @@ deployment:
     }
 
     data "openstack_images_image_v2" "image" {
-      name_regex  = "^${var.image_name}"
-      most_recent = true
+      name                  = var.image_name
+      most_recent           = true
     }
 
     resource "openstack_compute_instance_v2" "ecs-tf" {

@@ -1,6 +1,6 @@
 {
   "serviceName": "Kafka-cluster",
-  "version": "v1.0.0",
+  "version": "1.0.0",
   "csp": "flexibleEngine",
   "category": "middleware",
   "flavor": "1-zookeeper-with-3-worker-nodes-normal",

@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDet
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.semver4j.Semver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,7 +49,8 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         Assertions.assertTrue(Objects.nonNull(registeredServiceTemplate));
         Assertions.assertEquals(ocl.getCategory(), registeredServiceTemplate.getCategory());
         Assertions.assertEquals(ocl.getName(), registeredServiceTemplate.getName());
-        Assertions.assertEquals(ocl.getServiceVersion(), registeredServiceTemplate.getVersion());
+        Assertions.assertEquals(new Semver(ocl.getServiceVersion()).getVersion(),
+                registeredServiceTemplate.getVersion());
         Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
                 registeredServiceTemplate.getCsp());
         Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,

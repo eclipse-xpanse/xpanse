@@ -9,16 +9,18 @@ package org.eclipse.xpanse.modules.security;
 import io.swagger.v3.oas.models.Operation;
 import java.util.Objects;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 
 /**
  * Customizer for appending required role to description of Swagger Annotation operation.
  */
 @Profile("oauth")
-@Component
+@Configuration
+@ConditionalOnProperty(name = "enable.role.protection", havingValue = "true", matchIfMissing = true)
 public class RequiredRoleDescriptionCustomizer implements OperationCustomizer {
 
     @Override

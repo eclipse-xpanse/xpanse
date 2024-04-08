@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse.xpanse</groupId>
     <artifactId>xpanse-parent</artifactId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>xpanse</name>
     <description>Xpanse is here to make native cloud services configurable and portable.</description>
@@ -40,11 +40,11 @@
         <lombok.version>1.18.32</lombok.version>
         <checkstyle-maven-plugin.version>3.3.1</checkstyle-maven-plugin.version>
         <logbook.version>3.7.2</logbook.version>
-        <wiremock.version>3.5.1</wiremock.version>
+        <wiremock.version>3.5.2</wiremock.version>
         <instancio.version>4.5.0</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
-        <jacoco.version>0.8.11</jacoco.version>
-        <springdoc.version>2.4.0</springdoc.version>
+        <jacoco.version>0.8.12</jacoco.version>
+        <springdoc.version>2.5.0</springdoc.version>
         <slf4j-api.version>2.0.12</slf4j-api.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hypersistence-utils-hibernate.version>3.7.3</hypersistence-utils-hibernate.version>
@@ -62,11 +62,11 @@
         <openstack4j.version>3.11</openstack4j.version>
         <huawei.apigateway.version>3.1.2</huawei.apigateway.version>
         <jackson.databind.version>2.15.2</jackson.databind.version>
-        <huaweicloud.sdk.version>3.1.88</huaweicloud.sdk.version>
+        <huaweicloud.sdk.version>3.1.90</huaweicloud.sdk.version>
         <maven.clean.plugin.version>3.3.2</maven.clean.plugin.version>
         <maven.compile.plugin.version>3.13.0</maven.compile.plugin.version>
         <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
-        <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
+        <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
         <maven.dependency.plugin.version>3.6.1</maven.dependency.plugin.version>
         <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
@@ -81,6 +81,7 @@
         <eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
         <java.uuid.generator.version>5.0.0</java.uuid.generator.version>
         <jgit.version>6.9.0.202403050737-r</jgit.version>
+        <semver4j.version>5.2.2</semver4j.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
@@ -101,6 +102,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${maven.javadoc.plugin.version}</version>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadoc</id>

@@ -1,6 +1,6 @@
 {
   "serviceName": "K8S-cluster",
-  "version": "v1.0.0",
+  "version": "1.0.0",
   "csp": "flexibleEngine",
   "category": "container",
   "flavor": "1-master-with-3-worker-nodes-normal",
