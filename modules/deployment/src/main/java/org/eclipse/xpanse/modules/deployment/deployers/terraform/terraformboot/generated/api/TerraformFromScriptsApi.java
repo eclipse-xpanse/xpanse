@@ -5,8 +5,10 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.Response;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncModifyFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDeployWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDestroyWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformModifyWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlan;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlanWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
@@ -34,7 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi")
 public class TerraformFromScriptsApi {
     private ApiClient apiClient;
@@ -59,11 +61,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -75,11 +77,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * async deploy resources via Terraform
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
@@ -119,11 +121,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -135,11 +137,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * Async destroy the Terraform modules
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
@@ -178,12 +180,72 @@ public class TerraformFromScriptsApi {
     }
     /**
      * 
-     * Deploy resources via Terraform
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
+     * async modify resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
+     * @param terraformAsyncModifyFromScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public void asyncModifyWithScripts(TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+        asyncModifyWithScriptsWithHttpInfo(terraformAsyncModifyFromScriptsRequest, xCustomRequestId);
+    }
+
+    /**
+     * 
+     * async modify resources via Terraform
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
+     * @param terraformAsyncModifyFromScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return ResponseEntity&lt;Void&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<Void> asyncModifyWithScriptsWithHttpInfo(TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+        Object localVarPostBody = terraformAsyncModifyFromScriptsRequest;
+        
+        // verify the required parameter 'terraformAsyncModifyFromScriptsRequest' is set
+        if (terraformAsyncModifyFromScriptsRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformAsyncModifyFromScriptsRequest' when calling asyncModifyWithScripts");
+        }
+        
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
+
+        final String[] localVarAccepts = { 
+            "*/*"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
+
+        ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
+        return apiClient.invokeAPI("/terraform-boot/scripts/modify/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Deploy resources via Terraform
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return TerraformResult
@@ -196,11 +258,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
@@ -224,7 +286,7 @@ public class TerraformFromScriptsApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -240,11 +302,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return TerraformResult
@@ -257,11 +319,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * Destroy resources via Terraform
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
@@ -285,7 +347,7 @@ public class TerraformFromScriptsApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -300,12 +362,73 @@ public class TerraformFromScriptsApi {
     }
     /**
      * 
-     * Get Terraform Plan as JSON string from the list of script files provided
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
+     * Modify resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
+     * @param terraformModifyWithScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return TerraformResult
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public TerraformResult modifyWithScripts(TerraformModifyWithScriptsRequest terraformModifyWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+        return modifyWithScriptsWithHttpInfo(terraformModifyWithScriptsRequest, xCustomRequestId).getBody();
+    }
+
+    /**
+     * 
+     * Modify resources via Terraform
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
+     * @param terraformModifyWithScriptsRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return ResponseEntity&lt;TerraformResult&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<TerraformResult> modifyWithScriptsWithHttpInfo(TerraformModifyWithScriptsRequest terraformModifyWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+        Object localVarPostBody = terraformModifyWithScriptsRequest;
+        
+        // verify the required parameter 'terraformModifyWithScriptsRequest' is set
+        if (terraformModifyWithScriptsRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformModifyWithScriptsRequest' when calling modifyWithScripts");
+        }
+        
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
+
+        final String[] localVarAccepts = { 
+            "*/*", "application/json"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
+
+        ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
+        return apiClient.invokeAPI("/terraform-boot/scripts/modify", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Get Terraform Plan as JSON string from the list of script files provided
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param terraformPlanWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return TerraformPlan
@@ -318,11 +441,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param terraformPlanWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformPlan&gt;
@@ -346,7 +469,7 @@ public class TerraformFromScriptsApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -362,11 +485,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return TerraformValidationResult
@@ -379,11 +502,11 @@ public class TerraformFromScriptsApi {
     /**
      * 
      * Deploy resources via Terraform
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
@@ -407,7 +530,7 @@ public class TerraformFromScriptsApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 

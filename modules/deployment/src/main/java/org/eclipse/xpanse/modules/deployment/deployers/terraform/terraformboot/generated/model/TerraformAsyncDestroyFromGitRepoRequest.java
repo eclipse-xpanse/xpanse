@@ -31,19 +31,23 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * TerraformAsyncDestroyFromGitRepoRequest
  */
 @JsonPropertyOrder({
-  TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_DESTROY_SCENARIO,
+  TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
   TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
   TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
   TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_TF_STATE,
   TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformAsyncDestroyFromGitRepoRequest {
   /**
-   * The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.
+   * The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.
    */
-  public enum DestroyScenarioEnum {
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
     DESTROY("destroy"),
     
     ROLLBACK("rollback"),
@@ -52,7 +56,7 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
 
     private String value;
 
-    DestroyScenarioEnum(String value) {
+    DeploymentScenarioEnum(String value) {
       this.value = value;
     }
 
@@ -67,8 +71,8 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     }
 
     @JsonCreator
-    public static DestroyScenarioEnum fromValue(String value) {
-      for (DestroyScenarioEnum b : DestroyScenarioEnum.values()) {
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
         if (b.value.equals(value)) {
           return b;
         }
@@ -77,8 +81,8 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     }
   }
 
-  public static final String JSON_PROPERTY_DESTROY_SCENARIO = "destroyScenario";
-  private DestroyScenarioEnum destroyScenario;
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
@@ -98,29 +102,29 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
   public TerraformAsyncDestroyFromGitRepoRequest() {
   }
 
-  public TerraformAsyncDestroyFromGitRepoRequest destroyScenario(DestroyScenarioEnum destroyScenario) {
+  public TerraformAsyncDestroyFromGitRepoRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
-    this.destroyScenario = destroyScenario;
+    this.deploymentScenario = deploymentScenario;
     return this;
   }
 
    /**
-   * The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.
-   * @return destroyScenario
+   * The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.
+   * @return deploymentScenario
   **/
   @jakarta.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public DestroyScenarioEnum getDestroyScenario() {
-    return destroyScenario;
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
   }
 
 
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDestroyScenario(DestroyScenarioEnum destroyScenario) {
-    this.destroyScenario = destroyScenario;
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -275,7 +279,7 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
       return false;
     }
     TerraformAsyncDestroyFromGitRepoRequest terraformAsyncDestroyFromGitRepoRequest = (TerraformAsyncDestroyFromGitRepoRequest) o;
-    return Objects.equals(this.destroyScenario, terraformAsyncDestroyFromGitRepoRequest.destroyScenario) &&
+    return Objects.equals(this.deploymentScenario, terraformAsyncDestroyFromGitRepoRequest.deploymentScenario) &&
         Objects.equals(this.variables, terraformAsyncDestroyFromGitRepoRequest.variables) &&
         Objects.equals(this.envVariables, terraformAsyncDestroyFromGitRepoRequest.envVariables) &&
         Objects.equals(this.gitRepoDetails, terraformAsyncDestroyFromGitRepoRequest.gitRepoDetails) &&
@@ -285,14 +289,14 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(destroyScenario, variables, envVariables, gitRepoDetails, tfState, webhookConfig);
+    return Objects.hash(deploymentScenario, variables, envVariables, gitRepoDetails, tfState, webhookConfig);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TerraformAsyncDestroyFromGitRepoRequest {\n");
-    sb.append("    destroyScenario: ").append(toIndentedString(destroyScenario)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
     sb.append("    gitRepoDetails: ").append(toIndentedString(gitRepoDetails)).append("\n");

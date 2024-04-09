@@ -128,12 +128,34 @@ public class OpenTofuDeploymentResultCallbackManager {
         }
     }
 
+    /**
+     * Callback method after the service is modified.
+     */
+    public void modifyCallback(UUID taskId, OpenTofuResult result) {
+        log.info("Update database entity with id:{} with terraform modify callback result.",
+                taskId);
+        DeployServiceEntity deployServiceEntity =
+                deployServiceEntityHandler.getDeployServiceEntity(taskId);
+        DeployResult deployResult = handlerCallbackOpenTofuResult(result);
+        deployResult.setId(taskId);
+        if (StringUtils.isNotBlank(result.getTerraformState())) {
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            deployServiceEntity.getServiceTemplateId());
+            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
+                    serviceTemplateEntity.getOcl()
+                            .getDeployment().getKind()).handler(deployResult);
+        }
+        deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
+                deployServiceEntity);
+    }
+
     private DeployResult handlerCallbackOpenTofuResult(OpenTofuResult result) {
         DeployResult deployResult = new DeployResult();
         if (Boolean.FALSE.equals(result.getCommandSuccessful())) {
             deployResult.setMessage(result.getCommandStdError());
         }
-        deployResult.setState(getDeployerTaskStatus(result.getDestroyScenario(),
+        deployResult.setState(getDeployerTaskStatus(result.getDeploymentScenario(),
                 Boolean.TRUE.equals(result.getCommandSuccessful())));
         deployResult.getPrivateProperties()
                 .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
@@ -144,13 +166,13 @@ public class OpenTofuDeploymentResultCallbackManager {
     }
 
     private DeployerTaskStatus getDeployerTaskStatus(
-            OpenTofuResult.DestroyScenarioEnum destroyScenario,
+            OpenTofuResult.DeploymentScenarioEnum deploymentScenario,
             boolean isCommandSuccessful) {
-        if (Objects.isNull(destroyScenario)) {
-            return isCommandSuccessful ? DeployerTaskStatus.DEPLOY_SUCCESS
+        return switch (deploymentScenario) {
+            case DEPLOY -> isCommandSuccessful ? DeployerTaskStatus.DEPLOY_SUCCESS
                     : DeployerTaskStatus.DEPLOY_FAILED;
-        }
-        return switch (destroyScenario) {
+            case MODIFY -> isCommandSuccessful ? DeployerTaskStatus.MODIFICATION_SUCCESSFUL
+                    : DeployerTaskStatus.MODIFYING_FAILED;
             case DESTROY -> isCommandSuccessful ? DeployerTaskStatus.DESTROY_SUCCESS
                     : DeployerTaskStatus.DESTROY_FAILED;
             case ROLLBACK -> isCommandSuccessful ? DeployerTaskStatus.ROLLBACK_SUCCESS

@@ -14,11 +14,18 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidateDiagnostics;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * OpenTofuValidationResult
@@ -27,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
   OpenTofuValidationResult.JSON_PROPERTY_VALID,
   OpenTofuValidationResult.JSON_PROPERTY_DIAGNOSTICS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class OpenTofuValidationResult {
   public static final String JSON_PROPERTY_VALID = "valid";
   private Boolean valid;

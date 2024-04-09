@@ -14,11 +14,14 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * Configuration information of webhook.
@@ -27,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
   WebhookConfig.JSON_PROPERTY_URL,
   WebhookConfig.JSON_PROPERTY_AUTH_TYPE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class WebhookConfig {
   public static final String JSON_PROPERTY_URL = "url";
   private String url;

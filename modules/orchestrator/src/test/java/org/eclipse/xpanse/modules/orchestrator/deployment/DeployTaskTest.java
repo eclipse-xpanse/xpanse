@@ -20,7 +20,7 @@ class DeployTaskTest {
     @Mock
     private Ocl mockOcl;
     @Mock
-    private DestroyScenario mockDestroyScenario;
+    private DeploymentScenario mockDeploymentScenario;
     private DeployTask deployTaskUnderTest;
 
     @BeforeEach
@@ -29,7 +29,7 @@ class DeployTaskTest {
         deployTaskUnderTest.setId(id);
         deployTaskUnderTest.setDeployRequest(mockDeployRequest);
         deployTaskUnderTest.setOcl(mockOcl);
-        deployTaskUnderTest.setDestroyScenario(mockDestroyScenario);
+        deployTaskUnderTest.setDeploymentScenario(mockDeploymentScenario);
     }
 
     @Test
@@ -44,7 +44,7 @@ class DeployTaskTest {
         final UUID serviceTemplateId = UUID.fromString("42185b7f-c328-4d2c-b53e-18fb7a9db3b7");
         deployTaskUnderTest.setServiceTemplateId(serviceTemplateId);
         assertThat(deployTaskUnderTest.getServiceTemplateId()).isEqualTo(serviceTemplateId);
-        assertThat(deployTaskUnderTest.getDestroyScenario()).isEqualTo(mockDestroyScenario);
+        assertThat(deployTaskUnderTest.getDeploymentScenario()).isEqualTo(mockDeploymentScenario);
     }
 
     @Test
@@ -65,8 +65,8 @@ class DeployTaskTest {
     @Test
     void testToString() {
         String exceptedString = String.format("DeployTask(id=%s, namespace=null, "
-                        + "deployRequest=mockDeployRequest, ocl=mockOcl, serviceTemplateId=null,"
-                        + " destroyScenario=mockDestroyScenario)", id);
+                + "deployRequest=mockDeployRequest, ocl=mockOcl, serviceTemplateId=null, "
+                + "deploymentScenario=mockDeploymentScenario)", id);
         assertThat(deployTaskUnderTest.toString()).isEqualTo(exceptedString);
     }
 }

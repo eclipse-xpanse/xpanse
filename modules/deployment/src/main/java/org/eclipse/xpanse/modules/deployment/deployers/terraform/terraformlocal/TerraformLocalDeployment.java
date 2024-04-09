@@ -37,6 +37,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -68,7 +69,7 @@ public class TerraformLocalDeployment implements Deployer {
                                     TerraformLocalConfig terraformLocalConfig,
                                     @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
                                     TerraformDeploymentResultCallbackManager
-                                                terraformDeploymentResultCallbackManager,
+                                            terraformDeploymentResultCallbackManager,
                                     DeployServiceEntityHandler deployServiceEntityHandler,
                                     ScriptsGitRepoManage scriptsGitRepoManage) {
         this.deployEnvironments = deployEnvironments;
@@ -88,6 +89,7 @@ public class TerraformLocalDeployment implements Deployer {
     public DeployResult deploy(DeployTask task) {
         DeployResult deployResult = new DeployResult();
         deployResult.setId(task.getId());
+        task.setDeploymentScenario(DeploymentScenario.DEPLOY);
         asyncExecDeploy(task);
         return deployResult;
     }
@@ -100,6 +102,8 @@ public class TerraformLocalDeployment implements Deployer {
      */
     @Override
     public DeployResult destroy(DeployTask task) {
+
+
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(task.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
@@ -109,10 +113,33 @@ public class TerraformLocalDeployment implements Deployer {
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
+
         DeployResult destroyResult = new DeployResult();
         destroyResult.setId(task.getId());
         asyncExecDestroy(task, resourceState);
         return destroyResult;
+    }
+
+    /**
+     * Modify the DeployTask.
+     *
+     * @param task the task for the deployment.
+     */
+    @Override
+    public DeployResult modify(DeployTask task) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+        String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
+        if (StringUtils.isBlank(resourceState)) {
+            String errorMsg = String.format("tfState of deployed service with id %s not found.",
+                    task.getId());
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
+        DeployResult modifyResult = new DeployResult();
+        modifyResult.setId(task.getId());
+        asyncExecModify(task, resourceState);
+        return modifyResult;
     }
 
     private void asyncExecDeploy(DeployTask task) {
@@ -124,6 +151,8 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
+            terraformResult.setDeploymentScenario(TerraformResult.DeploymentScenarioEnum.fromValue(
+                    task.getDeploymentScenario().toValue()));
             try {
                 executor.deploy();
                 terraformResult.setCommandSuccessful(true);
@@ -145,8 +174,8 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setDestroyScenario(TerraformResult.DestroyScenarioEnum.fromValue(
-                    task.getDestroyScenario().toValue()));
+            terraformResult.setDeploymentScenario(TerraformResult.DeploymentScenarioEnum.fromValue(
+                    task.getDeploymentScenario().toValue()));
             try {
                 executor.destroy();
                 terraformResult.setCommandSuccessful(true);
@@ -158,6 +187,30 @@ public class TerraformLocalDeployment implements Deployer {
             terraformResult.setTerraformState(executor.getTerraformState());
             terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
             terraformDeploymentResultCallbackManager.destroyCallback(task.getId(), terraformResult);
+        });
+    }
+
+    private void asyncExecModify(DeployTask task, String tfState) {
+        String workspace = getWorkspacePath(task.getId());
+        prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
+        prepareDeployWorkspaceWithScripts(task, workspace);
+        TerraformLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
+        // Execute the terraform command asynchronously.
+        taskExecutor.execute(() -> {
+            TerraformResult terraformResult = new TerraformResult();
+            terraformResult.setDeploymentScenario(TerraformResult.DeploymentScenarioEnum.fromValue(
+                    task.getDeploymentScenario().toValue()));
+            try {
+                executor.deploy();
+                terraformResult.setCommandSuccessful(true);
+            } catch (RuntimeException tfEx) {
+                log.error("Execute terraform modify script failed. {}", tfEx.getMessage());
+                terraformResult.setCommandSuccessful(false);
+                terraformResult.setCommandStdError(tfEx.getMessage());
+            }
+            terraformResult.setTerraformState(executor.getTerraformState());
+            terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            terraformDeploymentResultCallbackManager.modifyCallback(task.getId(), terraformResult);
         });
     }
 
@@ -350,7 +403,8 @@ public class TerraformLocalDeployment implements Deployer {
         return executor.tfValidate();
     }
 
-    private @Nullable String getSubDirectory(Deployment deployment) {
+    @Nullable
+    private String getSubDirectory(Deployment deployment) {
         if (Objects.nonNull(deployment.getDeployer())) {
             return null;
         } else if (Objects.nonNull(deployment.getScriptsRepo())) {

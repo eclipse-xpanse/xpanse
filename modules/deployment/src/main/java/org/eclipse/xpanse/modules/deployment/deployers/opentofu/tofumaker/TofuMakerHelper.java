@@ -112,6 +112,19 @@ public class TofuMakerHelper {
         return webhookConfig;
     }
 
+    /**
+     * generates webhook config.
+     */
+    public WebhookConfig getModifyWebhookConfig(DeployTask deployTask) {
+        WebhookConfig webhookConfig = new WebhookConfig();
+        String callbackUrl = getClientRequestBaseUrl(port)
+                + tofuMakerConfig.getModifyCallbackUri();
+        webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getId());
+        webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
+        return webhookConfig;
+    }
+
+
     private String getClientRequestBaseUrl(String port) {
         try {
             String clientBaseUri = tofuMakerConfig.getClientBaseUri();

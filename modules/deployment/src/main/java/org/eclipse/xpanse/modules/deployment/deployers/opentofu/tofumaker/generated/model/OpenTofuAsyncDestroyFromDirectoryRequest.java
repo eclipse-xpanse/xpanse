@@ -14,29 +14,37 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.WebhookConfig;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * OpenTofuAsyncDestroyFromDirectoryRequest
  */
 @JsonPropertyOrder({
-  OpenTofuAsyncDestroyFromDirectoryRequest.JSON_PROPERTY_DESTROY_SCENARIO,
+  OpenTofuAsyncDestroyFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   OpenTofuAsyncDestroyFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
   OpenTofuAsyncDestroyFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
   OpenTofuAsyncDestroyFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class OpenTofuAsyncDestroyFromDirectoryRequest {
   /**
-   * The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.
+   * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
    */
-  public enum DestroyScenarioEnum {
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
     DESTROY("destroy"),
     
     ROLLBACK("rollback"),
@@ -45,7 +53,7 @@ public class OpenTofuAsyncDestroyFromDirectoryRequest {
 
     private String value;
 
-    DestroyScenarioEnum(String value) {
+    DeploymentScenarioEnum(String value) {
       this.value = value;
     }
 
@@ -60,8 +68,8 @@ public class OpenTofuAsyncDestroyFromDirectoryRequest {
     }
 
     @JsonCreator
-    public static DestroyScenarioEnum fromValue(String value) {
-      for (DestroyScenarioEnum b : DestroyScenarioEnum.values()) {
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
         if (b.value.equals(value)) {
           return b;
         }
@@ -70,8 +78,8 @@ public class OpenTofuAsyncDestroyFromDirectoryRequest {
     }
   }
 
-  public static final String JSON_PROPERTY_DESTROY_SCENARIO = "destroyScenario";
-  private DestroyScenarioEnum destroyScenario;
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
@@ -85,29 +93,29 @@ public class OpenTofuAsyncDestroyFromDirectoryRequest {
   public OpenTofuAsyncDestroyFromDirectoryRequest() {
   }
 
-  public OpenTofuAsyncDestroyFromDirectoryRequest destroyScenario(DestroyScenarioEnum destroyScenario) {
+  public OpenTofuAsyncDestroyFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
-    this.destroyScenario = destroyScenario;
+    this.deploymentScenario = deploymentScenario;
     return this;
   }
 
    /**
-   * The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.
-   * @return destroyScenario
+   * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
+   * @return deploymentScenario
   **/
   @jakarta.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public DestroyScenarioEnum getDestroyScenario() {
-    return destroyScenario;
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
   }
 
 
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDestroyScenario(DestroyScenarioEnum destroyScenario) {
-    this.destroyScenario = destroyScenario;
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -210,7 +218,7 @@ public class OpenTofuAsyncDestroyFromDirectoryRequest {
       return false;
     }
     OpenTofuAsyncDestroyFromDirectoryRequest openTofuAsyncDestroyFromDirectoryRequest = (OpenTofuAsyncDestroyFromDirectoryRequest) o;
-    return Objects.equals(this.destroyScenario, openTofuAsyncDestroyFromDirectoryRequest.destroyScenario) &&
+    return Objects.equals(this.deploymentScenario, openTofuAsyncDestroyFromDirectoryRequest.deploymentScenario) &&
         Objects.equals(this.variables, openTofuAsyncDestroyFromDirectoryRequest.variables) &&
         Objects.equals(this.envVariables, openTofuAsyncDestroyFromDirectoryRequest.envVariables) &&
         Objects.equals(this.webhookConfig, openTofuAsyncDestroyFromDirectoryRequest.webhookConfig);
@@ -218,14 +226,14 @@ public class OpenTofuAsyncDestroyFromDirectoryRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(destroyScenario, variables, envVariables, webhookConfig);
+    return Objects.hash(deploymentScenario, variables, envVariables, webhookConfig);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class OpenTofuAsyncDestroyFromDirectoryRequest {\n");
-    sb.append("    destroyScenario: ").append(toIndentedString(destroyScenario)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
     sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");

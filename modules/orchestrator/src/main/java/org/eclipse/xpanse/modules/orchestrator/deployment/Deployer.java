@@ -25,6 +25,14 @@ public interface Deployer {
      */
     DeployResult destroy(DeployTask task);
 
+    /**
+     * Method to modify the service.
+     *
+     * @param task task to be executed.
+     * @return result of modify task.
+     */
+    DeployResult modify(DeployTask task);
+
     void deleteTaskWorkspace(UUID taskId);
 
     DeployerKind getDeployerKind();

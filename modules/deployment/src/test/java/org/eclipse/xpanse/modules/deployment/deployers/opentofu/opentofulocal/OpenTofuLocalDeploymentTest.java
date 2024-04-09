@@ -34,7 +34,6 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTo
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
@@ -47,8 +46,8 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DestroyScenario;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -166,6 +165,7 @@ class OpenTofuLocalDeploymentTest {
     @Test
     void testDeploy() {
         DeployTask deployTask = getDeployTask(ocl);
+        deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         DeployResult deployResult = openTofuLocalDeployment.deploy(deployTask);
         String tfState = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
         Assertions.assertNotNull(deployResult);
@@ -188,6 +188,36 @@ class OpenTofuLocalDeploymentTest {
     }
 
     @Test
+    void testModify() {
+        DeployTask deployTask = getDeployTask(ocl);
+        String tfState = getFileContent(STATE_FILE_NAME);
+        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
+                deployServiceEntity);
+
+        deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
+
+        DeployResult deployResult = openTofuLocalDeployment.modify(deployTask);
+        Assertions.assertNotNull(deployResult);
+        Assertions.assertNotNull(deployResult.getPrivateProperties());
+        Assertions.assertNull(deployResult.getState());
+
+        try {
+            DeployTask deployTask1 = getDeployTask(oclWithGitScripts);
+            DeployResult deployResult1 = openTofuLocalDeployment.modify(deployTask1);
+            Assertions.assertNotNull(deployResult1);
+            Assertions.assertNotNull(deployResult1.getPrivateProperties());
+            String tfState1 = deployResult1.getPrivateProperties().get(STATE_FILE_NAME);
+            Assertions.assertNull(tfState1);
+            Assertions.assertNull(deployResult1.getState());
+        } catch (Exception e) {
+            log.error("testDeploy throw unexpected exception.", e);
+        }
+
+    }
+
+    @Test
     void testDestroy() {
         String tfState = getFileContent(STATE_FILE_NAME);
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
@@ -197,14 +227,14 @@ class OpenTofuLocalDeploymentTest {
 
 
         DeployTask deployTask = getDeployTask(ocl);
-        deployTask.setDestroyScenario(DestroyScenario.DESTROY);
+        deployTask.setDeploymentScenario(DeploymentScenario.DESTROY);
         DeployResult destroyResult = openTofuLocalDeployment.destroy(deployTask);
         Assertions.assertNotNull(destroyResult);
         Assertions.assertNotNull(destroyResult.getPrivateProperties());
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts);
-            deployTask1.setDestroyScenario(DestroyScenario.DESTROY);
+            deployTask1.setDeploymentScenario(DeploymentScenario.DESTROY);
             DeployResult destroyResult1 = openTofuLocalDeployment.destroy(deployTask1);
             Assertions.assertNotNull(destroyResult1);
             Assertions.assertNotNull(destroyResult1.getPrivateProperties());
@@ -230,6 +260,26 @@ class OpenTofuLocalDeploymentTest {
         Assertions.assertNotEquals(DeployerTaskStatus.DEPLOY_SUCCESS.toValue(),
                 deployResult.getMessage());
 
+    }
+
+    @Test
+    void testModify_FailedCausedByOpenTofuExecutorException() {
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
+                TfResourceTransUtils.class)) {
+            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+                    .thenReturn("Test");
+            String tfState = getFileContent(STATE_FILE_NAME);
+            DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+            deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+            when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
+                    deployServiceEntity);
+            ocl.getDeployment().setDeployer(errorDeployer);
+            DeployTask deployTask = getDeployTask(ocl);
+            DeployResult deployResult = this.openTofuLocalDeployment.modify(deployTask);
+            Assertions.assertNull(deployResult.getState());
+            Assertions.assertNotEquals(DeployerTaskStatus.MODIFICATION_SUCCESSFUL.toValue(),
+                    deployResult.getMessage());
+        }
     }
 
     @Test
@@ -312,7 +362,8 @@ class OpenTofuLocalDeploymentTest {
         expectedResult.setValid(false);
         DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
         diagnostics.setDetail(
-                "A managed resource \"random_id_2\" \"new\" has not been declared in the root module.");
+                "A managed resource \"random_id_2\" \"new\" has not been declared in the root " +
+                        "module.");
         expectedResult.setDiagnostics(List.of(diagnostics));
 
         // Run the test

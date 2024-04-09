@@ -30,13 +30,58 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonPropertyOrder({
   TerraformDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  TerraformDeployFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   TerraformDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
   TerraformDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
   private Boolean isPlanOnly;
+
+  /**
+   * The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.
+   */
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
+    DESTROY("destroy"),
+    
+    ROLLBACK("rollback"),
+    
+    PURGE("purge");
+
+    private String value;
+
+    DeploymentScenarioEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
@@ -70,6 +115,32 @@ public class TerraformDeployFromDirectoryRequest {
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setIsPlanOnly(Boolean isPlanOnly) {
     this.isPlanOnly = isPlanOnly;
+  }
+
+
+  public TerraformDeployFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    
+    this.deploymentScenario = deploymentScenario;
+    return this;
+  }
+
+   /**
+   * The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.
+   * @return deploymentScenario
+  **/
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -147,13 +218,14 @@ public class TerraformDeployFromDirectoryRequest {
     }
     TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest = (TerraformDeployFromDirectoryRequest) o;
     return Objects.equals(this.isPlanOnly, terraformDeployFromDirectoryRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, terraformDeployFromDirectoryRequest.deploymentScenario) &&
         Objects.equals(this.variables, terraformDeployFromDirectoryRequest.variables) &&
         Objects.equals(this.envVariables, terraformDeployFromDirectoryRequest.envVariables);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(isPlanOnly, variables, envVariables);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables);
   }
 
   @Override
@@ -161,6 +233,7 @@ public class TerraformDeployFromDirectoryRequest {
     StringBuilder sb = new StringBuilder();
     sb.append("class TerraformDeployFromDirectoryRequest {\n");
     sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
     sb.append("}");

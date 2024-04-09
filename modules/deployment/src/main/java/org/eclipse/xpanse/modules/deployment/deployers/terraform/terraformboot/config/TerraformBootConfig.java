@@ -24,6 +24,9 @@ public class TerraformBootConfig {
     @Value("${webhook.terraform-boot.deployCallbackUri}")
     private String deployCallbackUri;
 
+    @Value("${webhook.terraform-boot.modifyCallbackUri}")
+    private String modifyCallbackUri;
+
     @Value("${webhook.terraform-boot.destroyCallbackUri}")
     private String destroyCallbackUri;
 

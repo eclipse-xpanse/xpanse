@@ -116,6 +116,29 @@ public class OpenTofuLocalDeployment implements Deployer {
         return destroyResult;
     }
 
+    /**
+     * Modify the DeployTask.
+     *
+     * @param task the task for the deployment.
+     */
+    @Override
+    public DeployResult modify(DeployTask task) {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+        String resourceState = TfResourceTransUtils.getStoredStateContent(
+                deployServiceEntity);
+        if (StringUtils.isBlank(resourceState)) {
+            String errorMsg = String.format("tfState of deployed service with id %s not found.",
+                    task.getId());
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
+        DeployResult modifyResult = new DeployResult();
+        modifyResult.setId(task.getId());
+        asyncExecModify(task, resourceState);
+        return modifyResult;
+    }
+
     private void asyncExecDeploy(DeployTask task) {
         String workspace = getWorkspacePath(task.getId());
         // Create the workspace.
@@ -125,6 +148,8 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
+            openTofuResult.setDeploymentScenario(OpenTofuResult.DeploymentScenarioEnum.fromValue(
+                    task.getDeploymentScenario().toValue()));
             try {
                 executor.deploy();
                 openTofuResult.setCommandSuccessful(true);
@@ -146,8 +171,8 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
-            openTofuResult.setDestroyScenario(OpenTofuResult.DestroyScenarioEnum.fromValue(
-                    task.getDestroyScenario().toValue()));
+            openTofuResult.setDeploymentScenario(OpenTofuResult.DeploymentScenarioEnum.fromValue(
+                    task.getDeploymentScenario().toValue()));
             try {
                 executor.destroy();
                 openTofuResult.setCommandSuccessful(true);
@@ -159,6 +184,30 @@ public class OpenTofuLocalDeployment implements Deployer {
             openTofuResult.setTerraformState(executor.getTerraformState());
             openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
             openTofuDeploymentResultCallbackManager.destroyCallback(task.getId(), openTofuResult);
+        });
+    }
+
+    private void asyncExecModify(DeployTask task, String tfState) {
+        String workspace = getWorkspacePath(task.getId());
+        prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
+        prepareDeployWorkspaceWithScripts(task, workspace);
+        OpenTofuLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
+        // Execute the terraform command asynchronously.
+        taskExecutor.execute(() -> {
+            OpenTofuResult openTofuResult = new OpenTofuResult();
+            openTofuResult.setDeploymentScenario(OpenTofuResult.DeploymentScenarioEnum.fromValue(
+                    task.getDeploymentScenario().toValue()));
+            try {
+                executor.deploy();
+                openTofuResult.setCommandSuccessful(true);
+            } catch (RuntimeException tfEx) {
+                log.error("Execute terraform modify script failed. {}", tfEx.getMessage());
+                openTofuResult.setCommandSuccessful(false);
+                openTofuResult.setCommandStdError(tfEx.getMessage());
+            }
+            openTofuResult.setTerraformState(executor.getTerraformState());
+            openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            openTofuDeploymentResultCallbackManager.modifyCallback(task.getId(), openTofuResult);
         });
     }
 
@@ -351,7 +400,8 @@ public class OpenTofuLocalDeployment implements Deployer {
         return executor.tfValidate();
     }
 
-    private @Nullable String getSubDirectory(Deployment deployment) {
+    @Nullable
+    private String getSubDirectory(Deployment deployment) {
         if (Objects.nonNull(deployment.getDeployer())) {
             return null;
         } else if (Objects.nonNull(deployment.getScriptsRepo())) {

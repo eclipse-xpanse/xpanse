@@ -4,16 +4,23 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromGitRepoRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncModifyFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDestroyFromGitRepoRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuModifyFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlan;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlanFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.Response;
 import java.util.UUID;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,14 +29,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
-@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api.OpenTofuFromGitRepoApi")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
+@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi")
 public class OpenTofuFromGitRepoApi {
     private ApiClient apiClient;
 
@@ -53,11 +61,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * async deploy resources via OpenTofu
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
      * @param openTofuAsyncDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -69,11 +77,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * async deploy resources via OpenTofu
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
      * @param openTofuAsyncDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
@@ -113,11 +121,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * Async destroy the OpenTofu modules
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
      * @param openTofuAsyncDestroyFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -129,11 +137,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * Async destroy the OpenTofu modules
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
      * @param openTofuAsyncDestroyFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
@@ -172,12 +180,72 @@ public class OpenTofuFromGitRepoApi {
     }
     /**
      * 
-     * Deploy resources via OpenTofu
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
+     * async modify resources via OpenTofu
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
+     * @param openTofuAsyncModifyFromGitRepoRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public void asyncModifyFromGitRepo(OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+        asyncModifyFromGitRepoWithHttpInfo(openTofuAsyncModifyFromGitRepoRequest, xCustomRequestId);
+    }
+
+    /**
+     * 
+     * async modify resources via OpenTofu
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
+     * @param openTofuAsyncModifyFromGitRepoRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return ResponseEntity&lt;Void&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<Void> asyncModifyFromGitRepoWithHttpInfo(OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+        Object localVarPostBody = openTofuAsyncModifyFromGitRepoRequest;
+        
+        // verify the required parameter 'openTofuAsyncModifyFromGitRepoRequest' is set
+        if (openTofuAsyncModifyFromGitRepoRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'openTofuAsyncModifyFromGitRepoRequest' when calling asyncModifyFromGitRepo");
+        }
+        
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
+
+        final String[] localVarAccepts = { 
+            "*/*"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
+
+        ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
+        return apiClient.invokeAPI("/tofu-maker/git/modify/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Deploy resources via OpenTofu
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param openTofuDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return OpenTofuResult
@@ -190,11 +258,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * Deploy resources via OpenTofu
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param openTofuDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
@@ -218,7 +286,7 @@ public class OpenTofuFromGitRepoApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -234,11 +302,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * Destroy resources via OpenTofu
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param openTofuDestroyFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return OpenTofuResult
@@ -251,11 +319,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * Destroy resources via OpenTofu
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param openTofuDestroyFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
@@ -279,7 +347,7 @@ public class OpenTofuFromGitRepoApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -294,12 +362,73 @@ public class OpenTofuFromGitRepoApi {
     }
     /**
      * 
-     * Get OpenTofu Plan as JSON string from the list of script files provided
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
+     * Modify resources via OpenTofu
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
+     * @param openTofuModifyFromGitRepoRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return OpenTofuResult
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public OpenTofuResult modifyFromGitRepo(OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+        return modifyFromGitRepoWithHttpInfo(openTofuModifyFromGitRepoRequest, xCustomRequestId).getBody();
+    }
+
+    /**
+     * 
+     * Modify resources via OpenTofu
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
+     * @param openTofuModifyFromGitRepoRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return ResponseEntity&lt;OpenTofuResult&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<OpenTofuResult> modifyFromGitRepoWithHttpInfo(OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+        Object localVarPostBody = openTofuModifyFromGitRepoRequest;
+        
+        // verify the required parameter 'openTofuModifyFromGitRepoRequest' is set
+        if (openTofuModifyFromGitRepoRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'openTofuModifyFromGitRepoRequest' when calling modifyFromGitRepo");
+        }
+        
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
+
+        final String[] localVarAccepts = { 
+            "*/*", "application/json"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
+
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {};
+        return apiClient.invokeAPI("/tofu-maker/git/modify", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Get OpenTofu Plan as JSON string from the list of script files provided
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param openTofuPlanFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return OpenTofuPlan
@@ -312,11 +441,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * Get OpenTofu Plan as JSON string from the list of script files provided
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param openTofuPlanFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;OpenTofuPlan&gt;
@@ -340,7 +469,7 @@ public class OpenTofuFromGitRepoApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -356,11 +485,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * Deploy resources via OpenTofu
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param openTofuDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return OpenTofuValidationResult
@@ -373,11 +502,11 @@ public class OpenTofuFromGitRepoApi {
     /**
      * 
      * Deploy resources via OpenTofu
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param openTofuDeployFromGitRepoRequest  (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;OpenTofuValidationResult&gt;
@@ -401,7 +530,7 @@ public class OpenTofuFromGitRepoApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 

@@ -23,6 +23,8 @@ class TerraformBootConfigTest {
                 "http://localhost:9090");
         ReflectionTestUtils.setField(terraformBootConfigUnderTest, "deployCallbackUri",
                 "/webhook/deploy/");
+        ReflectionTestUtils.setField(terraformBootConfigUnderTest, "modifyCallbackUri",
+                "/webhook/modify/");
         ReflectionTestUtils.setField(terraformBootConfigUnderTest, "destroyCallbackUri",
                 "/webhook/destroy/");
     }
@@ -37,6 +39,12 @@ class TerraformBootConfigTest {
     void testGetDeployCallbackUri() {
         assertThat(terraformBootConfigUnderTest.getDeployCallbackUri())
                 .isEqualTo("/webhook/deploy/");
+    }
+
+    @Test
+    void testGetModifyCallbackUri() {
+        assertThat(terraformBootConfigUnderTest.getModifyCallbackUri())
+                .isEqualTo("/webhook/modify/");
     }
 
     @Test
