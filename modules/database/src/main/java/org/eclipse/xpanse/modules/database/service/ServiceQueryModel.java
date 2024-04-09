@@ -29,4 +29,6 @@ public class ServiceQueryModel {
 
     private String userId;
 
+    private String namespace;
+
 }

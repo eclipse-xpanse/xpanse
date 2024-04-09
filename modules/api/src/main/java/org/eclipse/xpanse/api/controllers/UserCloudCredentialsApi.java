@@ -12,18 +12,16 @@ import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -49,15 +47,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Secured({ROLE_ADMIN, ROLE_USER})
 public class UserCloudCredentialsApi {
 
-    private final CredentialCenter credentialCenter;
-    private final IdentityProviderManager identityProviderManager;
 
-    @Autowired
-    public UserCloudCredentialsApi(CredentialCenter credentialCenter,
-            IdentityProviderManager identityProviderManager) {
-        this.credentialCenter = credentialCenter;
-        this.identityProviderManager = identityProviderManager;
-    }
+    @Resource
+    private CredentialCenter credentialCenter;
+
+    @Resource
+    private UserServiceHelper userServiceHelper;
+
 
     /**
      * Get all cloud provider credentials added by the user for a cloud service provider.
@@ -141,11 +137,7 @@ public class UserCloudCredentialsApi {
     }
 
     private String getUserId() {
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (userIdOptional.isEmpty()) {
-            throw new UserNotLoggedInException("Unable to get current login information");
-        }
-        return userIdOptional.get();
+        return userServiceHelper.getCurrentUserId();
     }
 
 }

@@ -16,12 +16,11 @@ import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.models.workflow.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,7 +49,7 @@ public class WorkFlowApi {
     private WorkflowUtils workflowUtils;
 
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
 
     /**
      * Query tasks of the given user by status.
@@ -62,8 +61,8 @@ public class WorkFlowApi {
     public List<WorkFlowTask> queryTasks(
             @Parameter(name = "status", description = "the status of task")
             @RequestParam(name = "status", required = false) TaskStatus status) {
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        return workflowUtils.queryAllTasks(status, userIdOptional.orElse(null));
+        String currentUserId = userServiceHelper.getCurrentUserId();
+        return workflowUtils.queryAllTasks(status, currentUserId);
     }
 
     /**

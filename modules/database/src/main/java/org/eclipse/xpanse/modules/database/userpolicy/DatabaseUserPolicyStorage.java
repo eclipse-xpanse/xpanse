@@ -61,8 +61,11 @@ public class DatabaseUserPolicyStorage implements UserPolicyStorage {
                                 queryModel.getPolicy()));
 
                     }
-                    predicateList.add(criteriaBuilder.equal(root.get("userId"),
-                            queryModel.getUserId()));
+
+                    if (Objects.nonNull(queryModel.getUserId())) {
+                        predicateList.add(criteriaBuilder.equal(root.get("userId"),
+                                queryModel.getUserId()));
+                    }
 
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();

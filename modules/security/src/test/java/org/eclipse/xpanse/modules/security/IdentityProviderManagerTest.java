@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class IdentityProviderManagerTest {
@@ -26,82 +26,53 @@ class IdentityProviderManagerTest {
     @InjectMocks
     private IdentityProviderManager identityProviderManagerUnderTest;
 
-    void mockCurrentUserInfoWithCspAndNamespace(String csp, String namespace) {
-        when(mockActiveIdentityProviderService.getCurrentUserInfo()).thenReturn(
-                getCurrentUserInfo(csp, namespace));
+    void setUpSecurityConfig(boolean webSecurityIsEnabled) {
+        ReflectionTestUtils.setField(identityProviderManagerUnderTest, "webSecurityIsEnabled",
+                webSecurityIsEnabled);
     }
 
-    CurrentUserInfo getCurrentUserInfo(String csp, String namespace) {
+    CurrentUserInfo getMockCurrentUserInfo() {
+        final String userId = "userId";
+        final String namespace = "namespace";
+        final Csp csp = Csp.HUAWEI;
+        final List<String> roles = List.of("admin", "csp", "isv", "user");
         final CurrentUserInfo currentUserInfo = new CurrentUserInfo();
-        currentUserInfo.setUserId("userId");
-        currentUserInfo.setUserName("userName");
-        currentUserInfo.setRoles(List.of("admin", "csp", "isv"));
-        currentUserInfo.setMetadata(Map.of("namespace", namespace, "csp", csp));
+        currentUserInfo.setUserId(userId);
+        currentUserInfo.setRoles(roles);
+        currentUserInfo.setMetadata(Map.of(namespace, namespace, "csp", csp.toValue()));
         currentUserInfo.setNamespace(namespace);
-        currentUserInfo.setCsp(csp);
+        currentUserInfo.setCsp(csp.toValue());
         return currentUserInfo;
     }
 
+    @Test
+    void testLoadActiveIdentityProviderServices() {
+        // Setup without auth
+        setUpSecurityConfig(false);
+        // Run the test
+        identityProviderManagerUnderTest.loadActiveIdentityProviderServices();
+        assertThat(identityProviderManagerUnderTest.getActiveIdentityProviderService()).isNull();
+
+        setUpSecurityConfig(true);
+        when(mockApplicationContext.getBeansOfType(IdentityProviderService.class))
+                .thenReturn(Map.of("identityProviderService", mockActiveIdentityProviderService));
+        // Run the test
+        identityProviderManagerUnderTest.loadActiveIdentityProviderServices();
+        assertThat(identityProviderManagerUnderTest.getActiveIdentityProviderService())
+                .isEqualTo(mockActiveIdentityProviderService);
+    }
 
     @Test
     void testGetCurrentUserInfo() {
         // Setup
-        final CurrentUserInfo expectedResult = getCurrentUserInfo("huawei", "ISV-A");
+        final CurrentUserInfo expectedResult = getMockCurrentUserInfo();
         // Configure IdentityProviderService.getCurrentUserInfo(...).
-        mockCurrentUserInfoWithCspAndNamespace("huawei", "ISV-A");
+        when(mockActiveIdentityProviderService.getCurrentUserInfo()).thenReturn(
+                getMockCurrentUserInfo());
         // Run the test
         final CurrentUserInfo result = identityProviderManagerUnderTest.getCurrentUserInfo();
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
-
-        // Run the test
-        final Optional<String> idResult = identityProviderManagerUnderTest.getCurrentLoginUserId();
-        // Verify the results
-        assertThat(idResult).isEqualTo(Optional.of("userId"));
-    }
-
-    @Test
-    void testGetUserNamespace() {
-        // Setup
-        final String expectedResult = "ISV-A";
-        // Configure IdentityProviderService.getCurrentUserInfo(...).
-        mockCurrentUserInfoWithCspAndNamespace("huawei", "ISV-A");
-        // Run the test
-        final Optional<String> result = identityProviderManagerUnderTest.getUserNamespace();
-        // Verify the results
-        assertThat(result).isEqualTo(Optional.of(expectedResult));
-
-        // Setup
-        final String expectedResult2 = "userId";
-        // Configure IdentityProviderService.getCurrentUserInfo(...).
-        mockCurrentUserInfoWithCspAndNamespace("huawei", "");
-        // Run the test
-        final Optional<String> result2 = identityProviderManagerUnderTest.getUserNamespace();
-        // Verify the results
-        assertThat(result2).isEqualTo(Optional.of(expectedResult2));
-    }
-
-    @Test
-    void testGetCspFromMetadata() {
-        // Setup
-        final Optional<Csp> expectedResult = Optional.of(Csp.HUAWEI);
-        // Configure IdentityProviderService.getCurrentUserInfo(...).
-        mockCurrentUserInfoWithCspAndNamespace("huawei", "ISV-A");
-        // Run the test
-        final Optional<Csp> result = identityProviderManagerUnderTest.getCspFromMetadata();
-        // Verify the results
-        assertThat(result).isEqualTo((expectedResult));
-
-
-        // Setup
-        final Optional<Csp> expectedResult2 = Optional.empty();
-        // Configure IdentityProviderService.getCurrentUserInfo(...).
-        mockCurrentUserInfoWithCspAndNamespace("errorValue", "ISV-A");
-
-        // Run the test
-        final Optional<Csp> result2 = identityProviderManagerUnderTest.getCspFromMetadata();
-        // Verify the results
-        assertThat(result2).isEqualTo(expectedResult2);
     }
 
     @Test

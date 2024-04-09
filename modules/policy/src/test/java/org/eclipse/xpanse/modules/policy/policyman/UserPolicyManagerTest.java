@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
@@ -23,7 +22,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryReques
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.policy.UserPolicyManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,7 +38,7 @@ class UserPolicyManagerTest {
     @Mock
     private PolicyManager mockPolicyManager;
     @Mock
-    private IdentityProviderManager mockIdentityProviderManager;
+    private UserServiceHelper mockUserServiceHelper;
     @Mock
     private DatabaseUserPolicyStorage mockUserPolicyStorage;
     @InjectMocks
@@ -117,7 +116,7 @@ class UserPolicyManagerTest {
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(mockUserServiceHelper.getCurrentUserId()).thenReturn(userId);
 
         // Configure DatabaseUserPolicyStorage.listPolicies(...).
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
@@ -135,7 +134,8 @@ class UserPolicyManagerTest {
         userPolicyEntity1.setCsp(Csp.HUAWEI);
         userPolicyEntity1.setEnabled(true);
 
-        when(mockUserPolicyStorage.store(any(UserPolicyEntity.class))).thenReturn(userPolicyEntity1);
+        when(mockUserPolicyStorage.store(any(UserPolicyEntity.class))).thenReturn(
+                userPolicyEntity1);
 
         // Run the test
         final UserPolicy result = userPolicyManagerUnderTest.addUserPolicy(createRequest);
@@ -153,7 +153,7 @@ class UserPolicyManagerTest {
         createRequest.setPolicy("policy");
         createRequest.setEnabled(true);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(mockUserServiceHelper.getCurrentUserId()).thenReturn(userId);
 
         // Configure DatabaseUserPolicyStorage.listPolicies(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
@@ -219,7 +219,8 @@ class UserPolicyManagerTest {
         userPolicyEntity.setEnabled(true);
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(mockUserServiceHelper.getCurrentUserId()).thenReturn(userId);
+        when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
         // Configure DatabaseUserPolicyStorage.listPolicies(...).
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
@@ -267,7 +268,7 @@ class UserPolicyManagerTest {
         userPolicyEntity.setEnabled(true);
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
         // Configure DatabaseUserPolicyStorage.listPolicies(...).
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
@@ -324,8 +325,7 @@ class UserPolicyManagerTest {
         userPolicyEntity.setEnabled(true);
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(
-                Optional.of("userId2"));
+        when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(updateRequest))
@@ -359,7 +359,9 @@ class UserPolicyManagerTest {
 
         when(mockUserPolicyStorage.findPolicyById(id1)).thenReturn(userPolicyEntity);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(mockUserServiceHelper.getCurrentUserId()).thenReturn(userId);
+
+        when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
 
@@ -392,7 +394,7 @@ class UserPolicyManagerTest {
         userPolicyEntity.setEnabled(true);
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
         // Run the test
         final UserPolicy result = userPolicyManagerUnderTest.getUserPolicyDetails(policyId);
@@ -436,8 +438,7 @@ class UserPolicyManagerTest {
         userPolicyEntity.setEnabled(true);
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(
-                Optional.of("userId2"));
+        when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> userPolicyManagerUnderTest.getUserPolicyDetails(policyId))
@@ -456,7 +457,7 @@ class UserPolicyManagerTest {
         userPolicyEntity.setEnabled(true);
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
         // Run the test
         userPolicyManagerUnderTest.deleteUserPolicy(policyId);
@@ -477,8 +478,7 @@ class UserPolicyManagerTest {
         userPolicyEntity.setEnabled(true);
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
 
-        when(mockIdentityProviderManager.getCurrentLoginUserId()).thenReturn(
-                Optional.of("userId2"));
+        when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> userPolicyManagerUnderTest.deleteUserPolicy(policyId))

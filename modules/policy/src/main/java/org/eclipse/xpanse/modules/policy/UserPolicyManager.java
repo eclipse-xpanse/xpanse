@@ -10,7 +10,6 @@ import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +22,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -38,8 +37,9 @@ public class UserPolicyManager {
 
     @Resource
     private PolicyManager policyManager;
+
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
     @Resource
     private DatabaseUserPolicyStorage userPolicyStorage;
 
@@ -58,8 +58,8 @@ public class UserPolicyManager {
         if (Objects.nonNull(enabled)) {
             userPolicyQueryRequest.setEnabled(enabled);
         }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        userPolicyQueryRequest.setUserId(userIdOptional.orElse(null));
+        String currentUserId = userServiceHelper.getCurrentUserId();
+        userPolicyQueryRequest.setUserId(currentUserId);
         return userPolicyQueryRequest;
     }
 
@@ -104,8 +104,9 @@ public class UserPolicyManager {
             throw new PolicyNotFoundException(errorMsg);
         }
 
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
+        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(
+                existingEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view or manage policy belonging to other users.");
         }
@@ -128,8 +129,9 @@ public class UserPolicyManager {
             String errorMsg = String.format("The policy with id %s not found.", id);
             throw new PolicyNotFoundException(errorMsg);
         }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(existingEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view or manage policy belonging to other users.");
         }
@@ -148,8 +150,9 @@ public class UserPolicyManager {
             String errorMsg = String.format("The policy with id %s not found.", id);
             throw new PolicyNotFoundException(errorMsg);
         }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), existingEntity.getUserId())) {
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(existingEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view or manage policy belonging to other users.");
         }
@@ -159,13 +162,13 @@ public class UserPolicyManager {
     private void checkIfUserPolicyIsDuplicate(Csp csp, String policy) {
 
         UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        queryModel.setUserId(userIdOptional.orElse(null));
+        String currentUserId = userServiceHelper.getCurrentUserId();
+        queryModel.setUserId(currentUserId);
         queryModel.setCsp(csp);
         queryModel.setPolicy(policy);
         List<UserPolicyEntity> userPolicyEntityList = userPolicyStorage.listPolicies(queryModel);
         if (!CollectionUtils.isEmpty(userPolicyEntityList)) {
-            String policyKey = userPolicyEntityList.get(0).getId().toString();
+            String policyKey = userPolicyEntityList.getFirst().getId().toString();
             String errMsg = String.format("The same policy already exists for Csp: %s."
                     + " with id: %s", csp, policyKey);
             throw new PolicyDuplicateException(errMsg);
@@ -187,8 +190,8 @@ public class UserPolicyManager {
             UserPolicyCreateRequest userPolicyCreateRequest) {
         UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         BeanUtils.copyProperties(userPolicyCreateRequest, userPolicyEntity);
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        userPolicyEntity.setUserId(userIdOptional.orElse(null));
+        String currentUserId = userServiceHelper.getCurrentUserId();
+        userPolicyEntity.setUserId(currentUserId);
         return userPolicyEntity;
     }
 

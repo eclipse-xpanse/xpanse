@@ -18,7 +18,6 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -30,7 +29,7 @@ import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
 import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -61,7 +60,7 @@ public class ServiceMigrationApi {
     private DeployServiceEntityHandler deployServiceEntityHandler;
 
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
 
     @Resource
     private WorkflowUtils workflowUtils;
@@ -140,13 +139,7 @@ public class ServiceMigrationApi {
     }
 
     private String getUserId() {
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        String userId = userIdOptional.orElse(null);
-        if (StringUtils.isBlank(userId)) {
-            throw new AccessDeniedException(
-                    "No permissions to migrate services belonging to other users.");
-        }
-        return userId;
+        return userServiceHelper.getCurrentUserId();
     }
 
     private Map<String, Object> getMigrateProcessVariable(MigrateRequest migrateRequest,

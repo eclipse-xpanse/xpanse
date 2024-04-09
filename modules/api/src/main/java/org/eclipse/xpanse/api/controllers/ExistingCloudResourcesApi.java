@@ -13,16 +13,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,7 +45,7 @@ public class ExistingCloudResourcesApi {
     private PluginManager pluginManager;
 
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
 
     /**
      * List existing cloud resources based on type.
@@ -66,13 +64,9 @@ public class ExistingCloudResourcesApi {
             @Parameter(name = "deployResourceKind", description = "kind of the CloudResource")
             @PathVariable("deployResourceKind") DeployResourceKind deployResourceKind) {
 
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (userIdOptional.isEmpty()) {
-            throw new AccessDeniedException(
-                    "No permissions to view resources of services belonging to other users.");
-        }
+        String userId = userServiceHelper.getCurrentUserId();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        return orchestratorPlugin.getExistingResourceNamesWithKind(userIdOptional.get(), region,
+        return orchestratorPlugin.getExistingResourceNamesWithKind(userId, region,
                 deployResourceKind);
     }
 }

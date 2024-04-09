@@ -13,6 +13,7 @@ import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +32,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderService;
-import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -52,30 +53,29 @@ import org.springframework.web.bind.annotation.RestController;
 @Secured({ROLE_ADMIN})
 public class AdminServicesApi {
 
-    private final IdentityProviderManager identityProviderManager;
-    private final PluginManager pluginManager;
-    private final DatabaseManager databaseManager;
     private final TerraformBootManager terraformBootManager;
     private final TofuMakerManager tofuMakerManager;
-    private final PolicyManager policyManager;
-    private final OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
+    @Resource
+    private IdentityProviderManager identityProviderManager;
+    @Resource
+    private PluginManager pluginManager;
+    @Resource
+    private DatabaseManager databaseManager;
+    @Resource
+    private PolicyManager policyManager;
+    @Resource
+    private OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
+    @Resource
+    private UserServiceHelper userServiceHelper;
 
     /**
      * Constructor for AdminServicesApi bean.
      */
-    public AdminServicesApi(IdentityProviderManager identityProviderManager,
-                            PluginManager pluginManager, DatabaseManager databaseManager,
-                            @Nullable TerraformBootManager terraformBootManager,
-                            @Nullable TofuMakerManager tofuMakerManager,
-                            PolicyManager policyManager,
-                            OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck) {
-        this.identityProviderManager = identityProviderManager;
-        this.pluginManager = pluginManager;
-        this.databaseManager = databaseManager;
+    public AdminServicesApi(
+            @Nullable TerraformBootManager terraformBootManager,
+            @Nullable TofuMakerManager tofuMakerManager) {
         this.terraformBootManager = terraformBootManager;
         this.tofuMakerManager = tofuMakerManager;
-        this.policyManager = policyManager;
-        this.openTelemetryHealthCheck = openTelemetryHealthCheck;
     }
 
 
@@ -179,14 +179,11 @@ public class AdminServicesApi {
     }
 
     private void processShownFields(BackendSystemStatus backendSystemStatus) {
-        CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-        boolean allFieldsShown = Objects.nonNull(currentUserInfo) && !CollectionUtils.isEmpty(
-                currentUserInfo.getRoles()) && currentUserInfo.getRoles().contains(ROLE_ADMIN);
-        if (!allFieldsShown) {
+        boolean userHasRoleAdmin = userServiceHelper.currentUserHasRole(ROLE_ADMIN);
+        if (!userHasRoleAdmin) {
             backendSystemStatus.setEndpoint(null);
             backendSystemStatus.setDetails(null);
         }
-
     }
 
 }

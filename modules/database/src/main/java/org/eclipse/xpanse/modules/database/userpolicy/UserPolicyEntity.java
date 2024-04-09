@@ -43,24 +43,26 @@ public class UserPolicyEntity extends CreateModifiedTime {
     /**
      * The id of user who created the policy.
      */
+    @Column(name = "USER_ID", nullable = false)
     private String userId;
 
     /**
      * The valid policy created by the user.
      */
-    @Column(name = "POLICY", length = Integer.MAX_VALUE)
+    @Column(name = "POLICY", length = Integer.MAX_VALUE, nullable = false)
     private String policy;
 
     /**
      * The csp which the policy belongs to.
      */
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Csp csp;
 
     /**
      * Is the policy enabled.
      */
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "boolean default true", nullable = false)
     private Boolean enabled;
 
 }

@@ -16,7 +16,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +42,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -78,7 +77,7 @@ class ServiceTemplateManageTest {
     @Mock
     private DeployerKindManager deployerKindManager;
     @Mock
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
     @Mock
     private TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
     @Mock
@@ -122,7 +121,7 @@ class ServiceTemplateManageTest {
                         terraformDeploymentResultCallbackManager, deployServiceEntityHandler,
                         scriptsGitRepoManage);
         doReturn(deployment).when(deployerKindManager).getDeployment(any());
-        when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
+        when(userServiceHelper.currentUserCanManageNamespace(any())).thenReturn(true);
         ServiceTemplateEntity updateServiceTemplateEntity =
                 serviceTemplateManageTest.updateServiceTemplate(uuid, ocl);
         Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
@@ -136,7 +135,7 @@ class ServiceTemplateManageTest {
         ocl.setServiceVersion("1.0.1");
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
-        when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
+        when(userServiceHelper.currentUserCanManageNamespace(any())).thenReturn(true);
         Assertions.assertThrows(ServiceTemplateUpdateNotAllowed.class,
                 () -> serviceTemplateManageTest.updateServiceTemplate(uuid, ocl));
     }
@@ -148,7 +147,7 @@ class ServiceTemplateManageTest {
         serviceTemplateEntity.setNamespace("ISV-A");
         serviceTemplateEntity.setOcl(oclRegister);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
-        when(identityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
+        when(userServiceHelper.currentUserCanManageNamespace(any())).thenReturn(false);
         Assertions.assertThrows(AccessDeniedException.class,
                 () -> serviceTemplateManageTest.updateServiceTemplate(uuid,
                         oclRegister));
@@ -227,10 +226,10 @@ class ServiceTemplateManageTest {
     @Test
     void testGetServiceTemplateDetails() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        when(identityProviderManager.getUserNamespace()).thenReturn(
-                Optional.of(serviceTemplateEntity.getNamespace()));
-        when(identityProviderManager.getCspFromMetadata()).thenReturn(
-                Optional.of(serviceTemplateEntity.getCsp()));
+        when(userServiceHelper.currentUserCanManageNamespace(
+                serviceTemplateEntity.getNamespace())).thenReturn(true);
+        when(userServiceHelper.currentUserCanManageCsp(
+                serviceTemplateEntity.getCsp())).thenReturn(true);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         ServiceTemplateEntity serviceTemplate =
                 serviceTemplateManageTest.getServiceTemplateDetails(uuid, true, true);
@@ -240,7 +239,8 @@ class ServiceTemplateManageTest {
     @Test
     void testGetServiceTemplateDetailsWithoutNamespace() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        when(identityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
+        when(userServiceHelper.currentUserCanManageNamespace(
+                serviceTemplateEntity.getNamespace())).thenReturn(false);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         Assertions.assertThrows(AccessDeniedException.class,
                 () -> serviceTemplateManageTest.getServiceTemplateDetails(uuid, true, false));
@@ -249,7 +249,6 @@ class ServiceTemplateManageTest {
     @Test
     void testGetServiceTemplateDetailsWithoutCsp() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
-        when(identityProviderManager.getCspFromMetadata()).thenReturn(Optional.empty());
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         Assertions.assertThrows(AccessDeniedException.class,
                 () -> serviceTemplateManageTest.getServiceTemplateDetails(uuid, false, true));
@@ -259,8 +258,8 @@ class ServiceTemplateManageTest {
     void testReviewServiceTemplateRegistration() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
-        when(identityProviderManager.getCspFromMetadata()).thenReturn(
-                Optional.of(serviceTemplateEntity.getCsp()));
+        when(userServiceHelper.currentUserCanManageCsp(
+                serviceTemplateEntity.getCsp())).thenReturn(true);
         ServiceTemplateEntity serviceTemplate =
                 serviceTemplateManageTest.getServiceTemplateDetails(uuid, false, true);
         Assertions.assertEquals(serviceTemplateEntity, serviceTemplate);
@@ -310,7 +309,8 @@ class ServiceTemplateManageTest {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(serviceTemplateEntity.getId())).thenReturn(
                 serviceTemplateEntity);
-        when(identityProviderManager.getUserNamespace()).thenReturn(Optional.of("ISV-A"));
+        when(userServiceHelper.currentUserCanManageNamespace(
+                serviceTemplateEntity.getNamespace())).thenReturn(true);
         serviceTemplateManageTest.unregisterServiceTemplate(serviceTemplateEntity.getId());
         verify(mockStorage).removeById(serviceTemplateEntity.getId());
         verify(serviceTemplateOpenApiGenerator).deleteServiceApi(

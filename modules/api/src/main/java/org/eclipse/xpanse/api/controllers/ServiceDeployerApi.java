@@ -19,10 +19,8 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
@@ -38,7 +36,7 @@ import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServic
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -69,7 +67,7 @@ public class ServiceDeployerApi {
     private DeployService deployService;
 
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
 
     @Resource
     private ServiceDetailsViewManager serviceDetailsViewManager;
@@ -184,8 +182,8 @@ public class ServiceDeployerApi {
                 deployRequest.getServiceName(),
                 deployRequest.getVersion(), deployRequest.getCsp());
 
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        deployRequest.setUserId(userIdOptional.orElse(null));
+        String currentUserId = this.userServiceHelper.getCurrentUserId();
+        deployRequest.setUserId(currentUserId);
         DeployTask deployTask = this.deployService.createNewDeployTask(deployRequest);
         this.deployService.deployService(deployTask);
         String successMsg = String.format(
@@ -213,8 +211,9 @@ public class ServiceDeployerApi {
         log.info("Stopping managed service with id {}", id);
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+        boolean currentUserIsOwner =
+                this.userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to destroy services belonging to other users.");
         }
@@ -239,8 +238,9 @@ public class ServiceDeployerApi {
         log.info("Purging managed service with id {}", id);
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+        boolean currentUserIsOwner = this.userServiceHelper.currentUserIsOwner(
+                deployServiceEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to purge services belonging to other users.");
         }
@@ -268,13 +268,10 @@ public class ServiceDeployerApi {
             @Parameter(name = "regionName", description = "name of the region")
             @RequestParam(name = "regionName") String regionName) {
 
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (userIdOptional.isPresent()) {
-            OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-            return orchestratorPlugin.getAvailabilityZonesOfRegion(
-                    userIdOptional.get(), regionName);
-        }
-        return Collections.emptyList();
+        String currentUserId = this.userServiceHelper.getCurrentUserId();
+        OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
+        return orchestratorPlugin.getAvailabilityZonesOfRegion(
+                currentUserId, regionName);
     }
 
 }

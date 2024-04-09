@@ -6,13 +6,8 @@ import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.Operation;
 import java.util.List;
 import org.eclipse.xpanse.api.controllers.AdminServicesApi;
-import org.eclipse.xpanse.modules.database.DatabaseManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
-import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthCheck;
-import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.policy.PolicyManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.RequiredRoleDescriptionCustomizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +18,7 @@ import org.springframework.web.method.HandlerMethod;
 @ExtendWith(SpringExtension.class)
 class RequiredRoleDescriptionCustomizerTest {
 
-    private RequiredRoleDescriptionCustomizer
-            requiredRoleDescriptionCustomizerUnderTest;
+    private RequiredRoleDescriptionCustomizer requiredRoleDescriptionCustomizerUnderTest;
 
     @BeforeEach
     void setUp() {
@@ -43,10 +37,7 @@ class RequiredRoleDescriptionCustomizerTest {
         operation.externalDocs(externalDocs);
 
         final AdminServicesApi adminServicesApi = new AdminServicesApi(
-                new IdentityProviderManager(), new PluginManager(),
-                new DatabaseManager(), new TerraformBootManager(),
-                new TofuMakerManager(), new PolicyManager(),
-                new OpenTelemetryCollectorHealthCheck());
+                new TerraformBootManager(), new TofuMakerManager());
 
         final HandlerMethod handlerMethod =
                 new HandlerMethod(adminServicesApi, "healthCheck", null);

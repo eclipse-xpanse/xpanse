@@ -328,7 +328,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             listDeployedServices();
         }
-        testListDeployedServices();
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             testDestroy(serviceId);
         }
