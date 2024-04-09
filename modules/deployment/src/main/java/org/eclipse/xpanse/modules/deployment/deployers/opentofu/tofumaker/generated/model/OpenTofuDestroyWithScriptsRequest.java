@@ -14,32 +14,40 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * OpenTofuDestroyWithScriptsRequest
  */
 @JsonPropertyOrder({
-  OpenTofuDestroyWithScriptsRequest.JSON_PROPERTY_DESTROY_SCENARIO,
+  OpenTofuDestroyWithScriptsRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   OpenTofuDestroyWithScriptsRequest.JSON_PROPERTY_VARIABLES,
   OpenTofuDestroyWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
   OpenTofuDestroyWithScriptsRequest.JSON_PROPERTY_SCRIPTS,
   OpenTofuDestroyWithScriptsRequest.JSON_PROPERTY_TF_STATE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class OpenTofuDestroyWithScriptsRequest {
   /**
-   * The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.
+   * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
    */
-  public enum DestroyScenarioEnum {
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
     DESTROY("destroy"),
     
     ROLLBACK("rollback"),
@@ -48,7 +56,7 @@ public class OpenTofuDestroyWithScriptsRequest {
 
     private String value;
 
-    DestroyScenarioEnum(String value) {
+    DeploymentScenarioEnum(String value) {
       this.value = value;
     }
 
@@ -63,8 +71,8 @@ public class OpenTofuDestroyWithScriptsRequest {
     }
 
     @JsonCreator
-    public static DestroyScenarioEnum fromValue(String value) {
-      for (DestroyScenarioEnum b : DestroyScenarioEnum.values()) {
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
         if (b.value.equals(value)) {
           return b;
         }
@@ -73,8 +81,8 @@ public class OpenTofuDestroyWithScriptsRequest {
     }
   }
 
-  public static final String JSON_PROPERTY_DESTROY_SCENARIO = "destroyScenario";
-  private DestroyScenarioEnum destroyScenario;
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
@@ -91,29 +99,29 @@ public class OpenTofuDestroyWithScriptsRequest {
   public OpenTofuDestroyWithScriptsRequest() {
   }
 
-  public OpenTofuDestroyWithScriptsRequest destroyScenario(DestroyScenarioEnum destroyScenario) {
+  public OpenTofuDestroyWithScriptsRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
-    this.destroyScenario = destroyScenario;
+    this.deploymentScenario = deploymentScenario;
     return this;
   }
 
    /**
-   * The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.
-   * @return destroyScenario
+   * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
+   * @return deploymentScenario
   **/
   @jakarta.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public DestroyScenarioEnum getDestroyScenario() {
-    return destroyScenario;
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
   }
 
 
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDestroyScenario(DestroyScenarioEnum destroyScenario) {
-    this.destroyScenario = destroyScenario;
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -250,7 +258,7 @@ public class OpenTofuDestroyWithScriptsRequest {
       return false;
     }
     OpenTofuDestroyWithScriptsRequest openTofuDestroyWithScriptsRequest = (OpenTofuDestroyWithScriptsRequest) o;
-    return Objects.equals(this.destroyScenario, openTofuDestroyWithScriptsRequest.destroyScenario) &&
+    return Objects.equals(this.deploymentScenario, openTofuDestroyWithScriptsRequest.deploymentScenario) &&
         Objects.equals(this.variables, openTofuDestroyWithScriptsRequest.variables) &&
         Objects.equals(this.envVariables, openTofuDestroyWithScriptsRequest.envVariables) &&
         Objects.equals(this.scripts, openTofuDestroyWithScriptsRequest.scripts) &&
@@ -259,14 +267,14 @@ public class OpenTofuDestroyWithScriptsRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(destroyScenario, variables, envVariables, scripts, tfState);
+    return Objects.hash(deploymentScenario, variables, envVariables, scripts, tfState);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class OpenTofuDestroyWithScriptsRequest {\n");
-    sb.append("    destroyScenario: ").append(toIndentedString(destroyScenario)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
     sb.append("    scripts: ").append(toIndentedString(scripts)).append("\n");

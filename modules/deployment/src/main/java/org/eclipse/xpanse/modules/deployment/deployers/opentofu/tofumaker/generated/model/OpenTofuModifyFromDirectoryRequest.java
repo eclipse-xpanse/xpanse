@@ -26,15 +26,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * OpenTofuDestroyFromDirectoryRequest
+ * OpenTofuModifyFromDirectoryRequest
  */
 @JsonPropertyOrder({
-  OpenTofuDestroyFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
-  OpenTofuDestroyFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-  OpenTofuDestroyFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
+  OpenTofuModifyFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  OpenTofuModifyFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
+  OpenTofuModifyFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
+  OpenTofuModifyFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
-public class OpenTofuDestroyFromDirectoryRequest {
+public class OpenTofuModifyFromDirectoryRequest {
+  public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
+  private Boolean isPlanOnly;
+
   /**
    * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
    */
@@ -85,10 +89,36 @@ public class OpenTofuDestroyFromDirectoryRequest {
   public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
   private Map<String, String> envVariables = new HashMap<>();
 
-  public OpenTofuDestroyFromDirectoryRequest() {
+  public OpenTofuModifyFromDirectoryRequest() {
   }
 
-  public OpenTofuDestroyFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+  public OpenTofuModifyFromDirectoryRequest isPlanOnly(Boolean isPlanOnly) {
+    
+    this.isPlanOnly = isPlanOnly;
+    return this;
+  }
+
+   /**
+   * Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes.
+   * @return isPlanOnly
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public Boolean getIsPlanOnly() {
+    return isPlanOnly;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setIsPlanOnly(Boolean isPlanOnly) {
+    this.isPlanOnly = isPlanOnly;
+  }
+
+
+  public OpenTofuModifyFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
     this.deploymentScenario = deploymentScenario;
     return this;
@@ -114,19 +144,19 @@ public class OpenTofuDestroyFromDirectoryRequest {
   }
 
 
-  public OpenTofuDestroyFromDirectoryRequest variables(Map<String, Object> variables) {
+  public OpenTofuModifyFromDirectoryRequest variables(Map<String, Object> variables) {
     
     this.variables = variables;
     return this;
   }
 
-  public OpenTofuDestroyFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+  public OpenTofuModifyFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
     this.variables.put(key, variablesItem);
     return this;
   }
 
    /**
-   * Key-value pairs of regular variables that must be used to execute the OpenTofu request.
+   * Key-value pairs of variables that must be used to execute the OpenTofu request.
    * @return variables
   **/
   @jakarta.annotation.Nonnull
@@ -145,13 +175,13 @@ public class OpenTofuDestroyFromDirectoryRequest {
   }
 
 
-  public OpenTofuDestroyFromDirectoryRequest envVariables(Map<String, String> envVariables) {
+  public OpenTofuModifyFromDirectoryRequest envVariables(Map<String, String> envVariables) {
     
     this.envVariables = envVariables;
     return this;
   }
 
-  public OpenTofuDestroyFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+  public OpenTofuModifyFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
     if (this.envVariables == null) {
       this.envVariables = new HashMap<>();
     }
@@ -186,21 +216,23 @@ public class OpenTofuDestroyFromDirectoryRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    OpenTofuDestroyFromDirectoryRequest openTofuDestroyFromDirectoryRequest = (OpenTofuDestroyFromDirectoryRequest) o;
-    return Objects.equals(this.deploymentScenario, openTofuDestroyFromDirectoryRequest.deploymentScenario) &&
-        Objects.equals(this.variables, openTofuDestroyFromDirectoryRequest.variables) &&
-        Objects.equals(this.envVariables, openTofuDestroyFromDirectoryRequest.envVariables);
+    OpenTofuModifyFromDirectoryRequest openTofuModifyFromDirectoryRequest = (OpenTofuModifyFromDirectoryRequest) o;
+    return Objects.equals(this.isPlanOnly, openTofuModifyFromDirectoryRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, openTofuModifyFromDirectoryRequest.deploymentScenario) &&
+        Objects.equals(this.variables, openTofuModifyFromDirectoryRequest.variables) &&
+        Objects.equals(this.envVariables, openTofuModifyFromDirectoryRequest.envVariables);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(deploymentScenario, variables, envVariables);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OpenTofuDestroyFromDirectoryRequest {\n");
+    sb.append("class OpenTofuModifyFromDirectoryRequest {\n");
+    sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
     sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");

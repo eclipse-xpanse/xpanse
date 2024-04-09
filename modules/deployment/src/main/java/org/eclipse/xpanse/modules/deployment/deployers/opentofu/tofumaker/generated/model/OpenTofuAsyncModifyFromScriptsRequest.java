@@ -20,22 +20,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.WebhookConfig;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * OpenTofuDeployFromDirectoryRequest
+ * OpenTofuAsyncModifyFromScriptsRequest
  */
 @JsonPropertyOrder({
-  OpenTofuDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-  OpenTofuDeployFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
-  OpenTofuDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-  OpenTofuDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
+  OpenTofuAsyncModifyFromScriptsRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  OpenTofuAsyncModifyFromScriptsRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
+  OpenTofuAsyncModifyFromScriptsRequest.JSON_PROPERTY_VARIABLES,
+  OpenTofuAsyncModifyFromScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
+  OpenTofuAsyncModifyFromScriptsRequest.JSON_PROPERTY_SCRIPTS,
+  OpenTofuAsyncModifyFromScriptsRequest.JSON_PROPERTY_TF_STATE,
+  OpenTofuAsyncModifyFromScriptsRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
-public class OpenTofuDeployFromDirectoryRequest {
+public class OpenTofuAsyncModifyFromScriptsRequest {
   public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
   private Boolean isPlanOnly;
 
@@ -89,10 +96,19 @@ public class OpenTofuDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
   private Map<String, String> envVariables = new HashMap<>();
 
-  public OpenTofuDeployFromDirectoryRequest() {
+  public static final String JSON_PROPERTY_SCRIPTS = "scripts";
+  private List<String> scripts = new ArrayList<>();
+
+  public static final String JSON_PROPERTY_TF_STATE = "tfState";
+  private String tfState;
+
+  public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
+  private WebhookConfig webhookConfig;
+
+  public OpenTofuAsyncModifyFromScriptsRequest() {
   }
 
-  public OpenTofuDeployFromDirectoryRequest isPlanOnly(Boolean isPlanOnly) {
+  public OpenTofuAsyncModifyFromScriptsRequest isPlanOnly(Boolean isPlanOnly) {
     
     this.isPlanOnly = isPlanOnly;
     return this;
@@ -118,7 +134,7 @@ public class OpenTofuDeployFromDirectoryRequest {
   }
 
 
-  public OpenTofuDeployFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+  public OpenTofuAsyncModifyFromScriptsRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
     this.deploymentScenario = deploymentScenario;
     return this;
@@ -144,13 +160,13 @@ public class OpenTofuDeployFromDirectoryRequest {
   }
 
 
-  public OpenTofuDeployFromDirectoryRequest variables(Map<String, Object> variables) {
+  public OpenTofuAsyncModifyFromScriptsRequest variables(Map<String, Object> variables) {
     
     this.variables = variables;
     return this;
   }
 
-  public OpenTofuDeployFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+  public OpenTofuAsyncModifyFromScriptsRequest putVariablesItem(String key, Object variablesItem) {
     this.variables.put(key, variablesItem);
     return this;
   }
@@ -175,13 +191,13 @@ public class OpenTofuDeployFromDirectoryRequest {
   }
 
 
-  public OpenTofuDeployFromDirectoryRequest envVariables(Map<String, String> envVariables) {
+  public OpenTofuAsyncModifyFromScriptsRequest envVariables(Map<String, String> envVariables) {
     
     this.envVariables = envVariables;
     return this;
   }
 
-  public OpenTofuDeployFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+  public OpenTofuAsyncModifyFromScriptsRequest putEnvVariablesItem(String key, String envVariablesItem) {
     if (this.envVariables == null) {
       this.envVariables = new HashMap<>();
     }
@@ -208,6 +224,92 @@ public class OpenTofuDeployFromDirectoryRequest {
     this.envVariables = envVariables;
   }
 
+
+  public OpenTofuAsyncModifyFromScriptsRequest scripts(List<String> scripts) {
+    
+    this.scripts = scripts;
+    return this;
+  }
+
+  public OpenTofuAsyncModifyFromScriptsRequest addScriptsItem(String scriptsItem) {
+    if (this.scripts == null) {
+      this.scripts = new ArrayList<>();
+    }
+    this.scripts.add(scriptsItem);
+    return this;
+  }
+
+   /**
+   * List of script files for modify requests deployed via scripts
+   * @return scripts
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_SCRIPTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public List<String> getScripts() {
+    return scripts;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_SCRIPTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setScripts(List<String> scripts) {
+    this.scripts = scripts;
+  }
+
+
+  public OpenTofuAsyncModifyFromScriptsRequest tfState(String tfState) {
+    
+    this.tfState = tfState;
+    return this;
+  }
+
+   /**
+   * The .tfState file content after deployment
+   * @return tfState
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_TF_STATE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public String getTfState() {
+    return tfState;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TF_STATE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setTfState(String tfState) {
+    this.tfState = tfState;
+  }
+
+
+  public OpenTofuAsyncModifyFromScriptsRequest webhookConfig(WebhookConfig webhookConfig) {
+    
+    this.webhookConfig = webhookConfig;
+    return this;
+  }
+
+   /**
+   * Get webhookConfig
+   * @return webhookConfig
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public WebhookConfig getWebhookConfig() {
+    return webhookConfig;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setWebhookConfig(WebhookConfig webhookConfig) {
+    this.webhookConfig = webhookConfig;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -216,26 +318,32 @@ public class OpenTofuDeployFromDirectoryRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    OpenTofuDeployFromDirectoryRequest openTofuDeployFromDirectoryRequest = (OpenTofuDeployFromDirectoryRequest) o;
-    return Objects.equals(this.isPlanOnly, openTofuDeployFromDirectoryRequest.isPlanOnly) &&
-        Objects.equals(this.deploymentScenario, openTofuDeployFromDirectoryRequest.deploymentScenario) &&
-        Objects.equals(this.variables, openTofuDeployFromDirectoryRequest.variables) &&
-        Objects.equals(this.envVariables, openTofuDeployFromDirectoryRequest.envVariables);
+    OpenTofuAsyncModifyFromScriptsRequest openTofuAsyncModifyFromScriptsRequest = (OpenTofuAsyncModifyFromScriptsRequest) o;
+    return Objects.equals(this.isPlanOnly, openTofuAsyncModifyFromScriptsRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, openTofuAsyncModifyFromScriptsRequest.deploymentScenario) &&
+        Objects.equals(this.variables, openTofuAsyncModifyFromScriptsRequest.variables) &&
+        Objects.equals(this.envVariables, openTofuAsyncModifyFromScriptsRequest.envVariables) &&
+        Objects.equals(this.scripts, openTofuAsyncModifyFromScriptsRequest.scripts) &&
+        Objects.equals(this.tfState, openTofuAsyncModifyFromScriptsRequest.tfState) &&
+        Objects.equals(this.webhookConfig, openTofuAsyncModifyFromScriptsRequest.webhookConfig);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables, scripts, tfState, webhookConfig);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OpenTofuDeployFromDirectoryRequest {\n");
+    sb.append("class OpenTofuAsyncModifyFromScriptsRequest {\n");
     sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
     sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
+    sb.append("    scripts: ").append(toIndentedString(scripts)).append("\n");
+    sb.append("    tfState: ").append(toIndentedString(tfState)).append("\n");
+    sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");
     sb.append("}");
     return sb.toString();
   }

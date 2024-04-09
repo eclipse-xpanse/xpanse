@@ -20,21 +20,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * OpenTofuDestroyFromDirectoryRequest
+ * OpenTofuModifyWithScriptsRequest
  */
 @JsonPropertyOrder({
-  OpenTofuDestroyFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
-  OpenTofuDestroyFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-  OpenTofuDestroyFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
+  OpenTofuModifyWithScriptsRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  OpenTofuModifyWithScriptsRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
+  OpenTofuModifyWithScriptsRequest.JSON_PROPERTY_VARIABLES,
+  OpenTofuModifyWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
+  OpenTofuModifyWithScriptsRequest.JSON_PROPERTY_SCRIPTS,
+  OpenTofuModifyWithScriptsRequest.JSON_PROPERTY_TF_STATE
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
-public class OpenTofuDestroyFromDirectoryRequest {
+public class OpenTofuModifyWithScriptsRequest {
+  public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
+  private Boolean isPlanOnly;
+
   /**
    * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
    */
@@ -85,10 +94,42 @@ public class OpenTofuDestroyFromDirectoryRequest {
   public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
   private Map<String, String> envVariables = new HashMap<>();
 
-  public OpenTofuDestroyFromDirectoryRequest() {
+  public static final String JSON_PROPERTY_SCRIPTS = "scripts";
+  private List<String> scripts = new ArrayList<>();
+
+  public static final String JSON_PROPERTY_TF_STATE = "tfState";
+  private String tfState;
+
+  public OpenTofuModifyWithScriptsRequest() {
   }
 
-  public OpenTofuDestroyFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+  public OpenTofuModifyWithScriptsRequest isPlanOnly(Boolean isPlanOnly) {
+    
+    this.isPlanOnly = isPlanOnly;
+    return this;
+  }
+
+   /**
+   * Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes.
+   * @return isPlanOnly
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public Boolean getIsPlanOnly() {
+    return isPlanOnly;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setIsPlanOnly(Boolean isPlanOnly) {
+    this.isPlanOnly = isPlanOnly;
+  }
+
+
+  public OpenTofuModifyWithScriptsRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
     this.deploymentScenario = deploymentScenario;
     return this;
@@ -114,19 +155,19 @@ public class OpenTofuDestroyFromDirectoryRequest {
   }
 
 
-  public OpenTofuDestroyFromDirectoryRequest variables(Map<String, Object> variables) {
+  public OpenTofuModifyWithScriptsRequest variables(Map<String, Object> variables) {
     
     this.variables = variables;
     return this;
   }
 
-  public OpenTofuDestroyFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+  public OpenTofuModifyWithScriptsRequest putVariablesItem(String key, Object variablesItem) {
     this.variables.put(key, variablesItem);
     return this;
   }
 
    /**
-   * Key-value pairs of regular variables that must be used to execute the OpenTofu request.
+   * Key-value pairs of variables that must be used to execute the OpenTofu request.
    * @return variables
   **/
   @jakarta.annotation.Nonnull
@@ -145,13 +186,13 @@ public class OpenTofuDestroyFromDirectoryRequest {
   }
 
 
-  public OpenTofuDestroyFromDirectoryRequest envVariables(Map<String, String> envVariables) {
+  public OpenTofuModifyWithScriptsRequest envVariables(Map<String, String> envVariables) {
     
     this.envVariables = envVariables;
     return this;
   }
 
-  public OpenTofuDestroyFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+  public OpenTofuModifyWithScriptsRequest putEnvVariablesItem(String key, String envVariablesItem) {
     if (this.envVariables == null) {
       this.envVariables = new HashMap<>();
     }
@@ -178,6 +219,66 @@ public class OpenTofuDestroyFromDirectoryRequest {
     this.envVariables = envVariables;
   }
 
+
+  public OpenTofuModifyWithScriptsRequest scripts(List<String> scripts) {
+    
+    this.scripts = scripts;
+    return this;
+  }
+
+  public OpenTofuModifyWithScriptsRequest addScriptsItem(String scriptsItem) {
+    if (this.scripts == null) {
+      this.scripts = new ArrayList<>();
+    }
+    this.scripts.add(scriptsItem);
+    return this;
+  }
+
+   /**
+   * List of script files for modify requests deployed via scripts
+   * @return scripts
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_SCRIPTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public List<String> getScripts() {
+    return scripts;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_SCRIPTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setScripts(List<String> scripts) {
+    this.scripts = scripts;
+  }
+
+
+  public OpenTofuModifyWithScriptsRequest tfState(String tfState) {
+    
+    this.tfState = tfState;
+    return this;
+  }
+
+   /**
+   * The .tfState file content after deployment
+   * @return tfState
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_TF_STATE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public String getTfState() {
+    return tfState;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TF_STATE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setTfState(String tfState) {
+    this.tfState = tfState;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -186,24 +287,30 @@ public class OpenTofuDestroyFromDirectoryRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    OpenTofuDestroyFromDirectoryRequest openTofuDestroyFromDirectoryRequest = (OpenTofuDestroyFromDirectoryRequest) o;
-    return Objects.equals(this.deploymentScenario, openTofuDestroyFromDirectoryRequest.deploymentScenario) &&
-        Objects.equals(this.variables, openTofuDestroyFromDirectoryRequest.variables) &&
-        Objects.equals(this.envVariables, openTofuDestroyFromDirectoryRequest.envVariables);
+    OpenTofuModifyWithScriptsRequest openTofuModifyWithScriptsRequest = (OpenTofuModifyWithScriptsRequest) o;
+    return Objects.equals(this.isPlanOnly, openTofuModifyWithScriptsRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, openTofuModifyWithScriptsRequest.deploymentScenario) &&
+        Objects.equals(this.variables, openTofuModifyWithScriptsRequest.variables) &&
+        Objects.equals(this.envVariables, openTofuModifyWithScriptsRequest.envVariables) &&
+        Objects.equals(this.scripts, openTofuModifyWithScriptsRequest.scripts) &&
+        Objects.equals(this.tfState, openTofuModifyWithScriptsRequest.tfState);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(deploymentScenario, variables, envVariables);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables, scripts, tfState);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OpenTofuDestroyFromDirectoryRequest {\n");
+    sb.append("class OpenTofuModifyWithScriptsRequest {\n");
+    sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
     sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
+    sb.append("    scripts: ").append(toIndentedString(scripts)).append("\n");
+    sb.append("    tfState: ").append(toIndentedString(tfState)).append("\n");
     sb.append("}");
     return sb.toString();
   }

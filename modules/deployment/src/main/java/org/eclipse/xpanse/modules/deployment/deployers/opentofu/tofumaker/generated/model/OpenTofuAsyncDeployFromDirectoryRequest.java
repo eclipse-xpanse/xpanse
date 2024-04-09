@@ -14,25 +14,76 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.WebhookConfig;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * OpenTofuAsyncDeployFromDirectoryRequest
  */
 @JsonPropertyOrder({
   OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
   OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
   OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class OpenTofuAsyncDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
   private Boolean isPlanOnly;
+
+  /**
+   * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
+   */
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
+    DESTROY("destroy"),
+    
+    ROLLBACK("rollback"),
+    
+    PURGE("purge");
+
+    private String value;
+
+    DeploymentScenarioEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
@@ -69,6 +120,32 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setIsPlanOnly(Boolean isPlanOnly) {
     this.isPlanOnly = isPlanOnly;
+  }
+
+
+  public OpenTofuAsyncDeployFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    
+    this.deploymentScenario = deploymentScenario;
+    return this;
+  }
+
+   /**
+   * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
+   * @return deploymentScenario
+  **/
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -172,6 +249,7 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
     }
     OpenTofuAsyncDeployFromDirectoryRequest openTofuAsyncDeployFromDirectoryRequest = (OpenTofuAsyncDeployFromDirectoryRequest) o;
     return Objects.equals(this.isPlanOnly, openTofuAsyncDeployFromDirectoryRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, openTofuAsyncDeployFromDirectoryRequest.deploymentScenario) &&
         Objects.equals(this.variables, openTofuAsyncDeployFromDirectoryRequest.variables) &&
         Objects.equals(this.envVariables, openTofuAsyncDeployFromDirectoryRequest.envVariables) &&
         Objects.equals(this.webhookConfig, openTofuAsyncDeployFromDirectoryRequest.webhookConfig);
@@ -179,7 +257,7 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(isPlanOnly, variables, envVariables, webhookConfig);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables, webhookConfig);
   }
 
   @Override
@@ -187,6 +265,7 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
     StringBuilder sb = new StringBuilder();
     sb.append("class OpenTofuAsyncDeployFromDirectoryRequest {\n");
     sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
     sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");

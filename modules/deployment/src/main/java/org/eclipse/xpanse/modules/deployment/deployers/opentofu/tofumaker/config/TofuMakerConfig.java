@@ -24,6 +24,9 @@ public class TofuMakerConfig {
     @Value("${webhook.tofu-maker.deployCallbackUri}")
     private String deployCallbackUri;
 
+    @Value("${webhook.tofu-maker.modifyCallbackUri}")
+    private String modifyCallbackUri;
+
     @Value("${webhook.tofu-maker.destroyCallbackUri}")
     private String destroyCallbackUri;
 

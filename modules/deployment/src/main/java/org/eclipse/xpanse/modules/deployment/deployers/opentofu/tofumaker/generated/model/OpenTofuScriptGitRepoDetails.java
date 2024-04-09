@@ -14,9 +14,14 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * GIT Repo details from where the scripts can be fetched.
@@ -26,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
   OpenTofuScriptGitRepoDetails.JSON_PROPERTY_BRANCH,
   OpenTofuScriptGitRepoDetails.JSON_PROPERTY_SCRIPT_PATH
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class OpenTofuScriptGitRepoDetails {
   public static final String JSON_PROPERTY_REPO_URL = "repoUrl";
   private String repoUrl;

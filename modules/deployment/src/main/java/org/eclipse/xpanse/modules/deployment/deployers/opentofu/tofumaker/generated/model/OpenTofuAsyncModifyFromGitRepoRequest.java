@@ -22,20 +22,25 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuScriptGitRepoDetails;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.WebhookConfig;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * OpenTofuDeployFromDirectoryRequest
+ * OpenTofuAsyncModifyFromGitRepoRequest
  */
 @JsonPropertyOrder({
-  OpenTofuDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-  OpenTofuDeployFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
-  OpenTofuDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-  OpenTofuDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
+  OpenTofuAsyncModifyFromGitRepoRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  OpenTofuAsyncModifyFromGitRepoRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
+  OpenTofuAsyncModifyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
+  OpenTofuAsyncModifyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
+  OpenTofuAsyncModifyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
+  OpenTofuAsyncModifyFromGitRepoRequest.JSON_PROPERTY_TF_STATE,
+  OpenTofuAsyncModifyFromGitRepoRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
-public class OpenTofuDeployFromDirectoryRequest {
+public class OpenTofuAsyncModifyFromGitRepoRequest {
   public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
   private Boolean isPlanOnly;
 
@@ -89,10 +94,19 @@ public class OpenTofuDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
   private Map<String, String> envVariables = new HashMap<>();
 
-  public OpenTofuDeployFromDirectoryRequest() {
+  public static final String JSON_PROPERTY_GIT_REPO_DETAILS = "gitRepoDetails";
+  private OpenTofuScriptGitRepoDetails gitRepoDetails;
+
+  public static final String JSON_PROPERTY_TF_STATE = "tfState";
+  private String tfState;
+
+  public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
+  private WebhookConfig webhookConfig;
+
+  public OpenTofuAsyncModifyFromGitRepoRequest() {
   }
 
-  public OpenTofuDeployFromDirectoryRequest isPlanOnly(Boolean isPlanOnly) {
+  public OpenTofuAsyncModifyFromGitRepoRequest isPlanOnly(Boolean isPlanOnly) {
     
     this.isPlanOnly = isPlanOnly;
     return this;
@@ -118,7 +132,7 @@ public class OpenTofuDeployFromDirectoryRequest {
   }
 
 
-  public OpenTofuDeployFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+  public OpenTofuAsyncModifyFromGitRepoRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
     this.deploymentScenario = deploymentScenario;
     return this;
@@ -144,13 +158,13 @@ public class OpenTofuDeployFromDirectoryRequest {
   }
 
 
-  public OpenTofuDeployFromDirectoryRequest variables(Map<String, Object> variables) {
+  public OpenTofuAsyncModifyFromGitRepoRequest variables(Map<String, Object> variables) {
     
     this.variables = variables;
     return this;
   }
 
-  public OpenTofuDeployFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+  public OpenTofuAsyncModifyFromGitRepoRequest putVariablesItem(String key, Object variablesItem) {
     this.variables.put(key, variablesItem);
     return this;
   }
@@ -175,13 +189,13 @@ public class OpenTofuDeployFromDirectoryRequest {
   }
 
 
-  public OpenTofuDeployFromDirectoryRequest envVariables(Map<String, String> envVariables) {
+  public OpenTofuAsyncModifyFromGitRepoRequest envVariables(Map<String, String> envVariables) {
     
     this.envVariables = envVariables;
     return this;
   }
 
-  public OpenTofuDeployFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+  public OpenTofuAsyncModifyFromGitRepoRequest putEnvVariablesItem(String key, String envVariablesItem) {
     if (this.envVariables == null) {
       this.envVariables = new HashMap<>();
     }
@@ -208,6 +222,84 @@ public class OpenTofuDeployFromDirectoryRequest {
     this.envVariables = envVariables;
   }
 
+
+  public OpenTofuAsyncModifyFromGitRepoRequest gitRepoDetails(OpenTofuScriptGitRepoDetails gitRepoDetails) {
+    
+    this.gitRepoDetails = gitRepoDetails;
+    return this;
+  }
+
+   /**
+   * Get gitRepoDetails
+   * @return gitRepoDetails
+  **/
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public OpenTofuScriptGitRepoDetails getGitRepoDetails() {
+    return gitRepoDetails;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setGitRepoDetails(OpenTofuScriptGitRepoDetails gitRepoDetails) {
+    this.gitRepoDetails = gitRepoDetails;
+  }
+
+
+  public OpenTofuAsyncModifyFromGitRepoRequest tfState(String tfState) {
+    
+    this.tfState = tfState;
+    return this;
+  }
+
+   /**
+   * The .tfState file content after deployment
+   * @return tfState
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_TF_STATE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public String getTfState() {
+    return tfState;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TF_STATE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setTfState(String tfState) {
+    this.tfState = tfState;
+  }
+
+
+  public OpenTofuAsyncModifyFromGitRepoRequest webhookConfig(WebhookConfig webhookConfig) {
+    
+    this.webhookConfig = webhookConfig;
+    return this;
+  }
+
+   /**
+   * Get webhookConfig
+   * @return webhookConfig
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+
+  public WebhookConfig getWebhookConfig() {
+    return webhookConfig;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setWebhookConfig(WebhookConfig webhookConfig) {
+    this.webhookConfig = webhookConfig;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -216,26 +308,32 @@ public class OpenTofuDeployFromDirectoryRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    OpenTofuDeployFromDirectoryRequest openTofuDeployFromDirectoryRequest = (OpenTofuDeployFromDirectoryRequest) o;
-    return Objects.equals(this.isPlanOnly, openTofuDeployFromDirectoryRequest.isPlanOnly) &&
-        Objects.equals(this.deploymentScenario, openTofuDeployFromDirectoryRequest.deploymentScenario) &&
-        Objects.equals(this.variables, openTofuDeployFromDirectoryRequest.variables) &&
-        Objects.equals(this.envVariables, openTofuDeployFromDirectoryRequest.envVariables);
+    OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest = (OpenTofuAsyncModifyFromGitRepoRequest) o;
+    return Objects.equals(this.isPlanOnly, openTofuAsyncModifyFromGitRepoRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, openTofuAsyncModifyFromGitRepoRequest.deploymentScenario) &&
+        Objects.equals(this.variables, openTofuAsyncModifyFromGitRepoRequest.variables) &&
+        Objects.equals(this.envVariables, openTofuAsyncModifyFromGitRepoRequest.envVariables) &&
+        Objects.equals(this.gitRepoDetails, openTofuAsyncModifyFromGitRepoRequest.gitRepoDetails) &&
+        Objects.equals(this.tfState, openTofuAsyncModifyFromGitRepoRequest.tfState) &&
+        Objects.equals(this.webhookConfig, openTofuAsyncModifyFromGitRepoRequest.webhookConfig);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables, gitRepoDetails, tfState, webhookConfig);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OpenTofuDeployFromDirectoryRequest {\n");
+    sb.append("class OpenTofuAsyncModifyFromGitRepoRequest {\n");
     sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
     sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
+    sb.append("    gitRepoDetails: ").append(toIndentedString(gitRepoDetails)).append("\n");
+    sb.append("    tfState: ").append(toIndentedString(tfState)).append("\n");
+    sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");
     sb.append("}");
     return sb.toString();
   }

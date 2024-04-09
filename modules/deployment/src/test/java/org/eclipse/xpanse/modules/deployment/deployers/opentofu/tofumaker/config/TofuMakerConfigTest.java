@@ -16,6 +16,8 @@ class TofuMakerConfigTest {
         ReflectionTestUtils.setField(tofuMakerConfigUnderTest, "clientBaseUri", "");
         ReflectionTestUtils.setField(tofuMakerConfigUnderTest, "deployCallbackUri",
                 "/webhook/tofu-maker/deploy");
+        ReflectionTestUtils.setField(tofuMakerConfigUnderTest, "modifyCallbackUri",
+                "/webhook/tofu-maker/modify");
         ReflectionTestUtils.setField(tofuMakerConfigUnderTest, "destroyCallbackUri",
                 "/webhook/tofu-maker/destroy");
     }
@@ -29,6 +31,12 @@ class TofuMakerConfigTest {
     void testGetDeployCallbackUri() {
         assertThat(tofuMakerConfigUnderTest.getDeployCallbackUri())
                 .isEqualTo("/webhook/tofu-maker/deploy");
+    }
+
+    @Test
+    void testGetModifyCallbackUri() {
+        assertThat(tofuMakerConfigUnderTest.getModifyCallbackUri())
+                .isEqualTo("/webhook/tofu-maker/modify");
     }
 
     @Test

@@ -63,6 +63,23 @@ public class OpenTofuMakerWebhookApi {
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result after openTofu executes the command "
             + "line.")
+    @PostMapping(value = "${webhook.tofu-maker.modifyCallbackUri}/{task_id}", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void modifyCallback(
+            @Parameter(name = "task_id", description = "task id")
+            @PathVariable("task_id") String taskId,
+            @Valid @RequestBody OpenTofuResult result) {
+
+        openTofuDeploymentResultCallbackManager.modifyCallback(UUID.fromString(taskId), result);
+    }
+
+    /**
+     * Webhook methods to receive openTofu execution result.
+     */
+    @Tag(name = "Webhook", description = "Webhook APIs")
+    @Operation(description = "Process the execution result after openTofu executes the command "
+            + "line.")
     @PostMapping(value = "${webhook.tofu-maker.destroyCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)

@@ -66,18 +66,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuValidationResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -86,8 +76,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -112,6 +102,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
                 }
               }
             }
@@ -148,18 +148,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuPlan"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -168,8 +158,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -197,6 +187,173 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/scripts/modify": {
+      "post": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "Modify resources via OpenTofu",
+        "operationId": "modifyWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuModifyWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/scripts/modify/async": {
+      "post": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "async modify resources via OpenTofu",
+        "operationId": "asyncModifyWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncModifyFromScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -230,18 +387,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -250,8 +397,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -276,6 +423,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
@@ -312,18 +469,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -332,8 +479,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -358,6 +505,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
@@ -394,11 +551,8 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -407,8 +561,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -436,6 +590,9 @@
                 }
               }
             }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -469,18 +626,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuValidationResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -489,8 +636,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -515,6 +662,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
                 }
               }
             }
@@ -551,18 +708,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuPlan"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -571,8 +718,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -600,6 +747,173 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/git/modify": {
+      "post": {
+        "tags": [
+          "OpenTofuFromGitRepo"
+        ],
+        "description": "Modify resources via OpenTofu",
+        "operationId": "modifyFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuModifyFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/git/modify/async": {
+      "post": {
+        "tags": [
+          "OpenTofuFromGitRepo"
+        ],
+        "description": "async modify resources via OpenTofu",
+        "operationId": "asyncModifyFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncModifyFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -633,18 +947,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -653,8 +957,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -679,6 +983,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
@@ -715,18 +1029,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -735,8 +1039,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -761,6 +1065,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
@@ -797,11 +1111,8 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -810,8 +1121,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -839,6 +1150,9 @@
                 }
               }
             }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -881,18 +1195,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuPlan"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -901,8 +1205,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -930,6 +1234,191 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/modify/{module_directory}": {
+      "post": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "Modify resources via OpenTofu from the given directory.",
+        "operationId": "modifyFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the OpenTofu module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuModifyFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/modify/async/{module_directory}": {
+      "post": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "async modify resources via OpenTofu from the given directory.",
+        "operationId": "asyncModifyFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the OpenTofu module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuAsyncModifyFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -972,18 +1461,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -992,8 +1471,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1018,6 +1497,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
@@ -1063,11 +1552,8 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1076,8 +1562,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1105,6 +1591,9 @@
                 }
               }
             }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -1117,18 +1606,8 @@
         "description": "Check health of OpenTofu Maker API service",
         "operationId": "healthCheck",
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuMakerSystemStatus"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1137,8 +1616,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1163,6 +1642,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuMakerSystemStatus"
                 }
               }
             }
@@ -1198,18 +1687,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuValidationResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1218,8 +1697,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1244,6 +1723,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
                 }
               }
             }
@@ -1280,11 +1769,8 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1293,8 +1779,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1322,6 +1808,9 @@
                 }
               }
             }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -1355,11 +1844,8 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1368,8 +1854,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1397,6 +1883,9 @@
                 }
               }
             }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -1439,18 +1928,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1459,8 +1938,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1485,6 +1964,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
@@ -1530,11 +2019,8 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1543,8 +2029,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1572,6 +2058,9 @@
                 }
               }
             }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -1625,6 +2114,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -1719,6 +2219,179 @@
           }
         }
       },
+      "OpenTofuModifyWithScriptsRequest": {
+        "required": [
+          "isPlanOnly",
+          "scripts",
+          "tfState",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for modify requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for modify requests deployed via scripts"
+            }
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          }
+        }
+      },
+      "OpenTofuResult": {
+        "type": "object",
+        "properties": {
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "commandStdOutput": {
+            "type": "string",
+            "description": "stdout of the command returned as string."
+          },
+          "commandStdError": {
+            "type": "string",
+            "description": "stderr of the command returned as string."
+          },
+          "terraformState": {
+            "type": "string",
+            "description": ".tfstate file contents returned as string."
+          },
+          "importantFileContentMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Data of all other files generated by the openTofu execution.The map key contains the file name and value is the file contents as string."
+            },
+            "description": "Data of all other files generated by the openTofu execution.The map key contains the file name and value is the file contents as string."
+          },
+          "commandSuccessful": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OpenTofuAsyncModifyFromScriptsRequest": {
+        "required": [
+          "isPlanOnly",
+          "scripts",
+          "tfState",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for modify requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for modify requests deployed via scripts"
+            }
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
+      "WebhookConfig": {
+        "required": [
+          "authType",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Callback address after deployment/destroy is completed."
+          },
+          "authType": {
+            "type": "string",
+            "description": "The permission type when calling back.",
+            "enum": [
+              "NONE",
+              "OAUTH2"
+            ]
+          }
+        },
+        "description": "Configuration information of webhook."
+      },
       "OpenTofuDestroyWithScriptsRequest": {
         "required": [
           "scripts",
@@ -1727,10 +2400,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -1766,43 +2441,6 @@
           }
         }
       },
-      "OpenTofuResult": {
-        "type": "object",
-        "properties": {
-          "destroyScenario": {
-            "type": "string",
-            "description": "This value is set only if the same is set in the request as well. This is useful only for the caller to differentiate what type of destroy it is. No difference in the way destroy will be executed.based on this flag. User may use this flag in case callback are used. So the calling application can know the result is for which specific destroy use case within the calling system.",
-            "enum": [
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
-          "commandStdOutput": {
-            "type": "string",
-            "description": "stdout of the command returned as string."
-          },
-          "commandStdError": {
-            "type": "string",
-            "description": "stderr of the command returned as string."
-          },
-          "terraformState": {
-            "type": "string",
-            "description": ".tfstate file contents returned as string."
-          },
-          "importantFileContentMap": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string",
-              "description": "Data of all other files generated by the openTofu execution.The map key contains the file name and value is the file contents as string."
-            },
-            "description": "Data of all other files generated by the openTofu execution.The map key contains the file name and value is the file contents as string."
-          },
-          "commandSuccessful": {
-            "type": "boolean"
-          }
-        }
-      },
       "OpenTofuAsyncDeployFromScriptsRequest": {
         "required": [
           "isPlanOnly",
@@ -1815,6 +2453,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -1845,28 +2494,6 @@
           }
         }
       },
-      "WebhookConfig": {
-        "required": [
-          "authType",
-          "url"
-        ],
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string",
-            "description": "Callback address after deployment/destroy is completed."
-          },
-          "authType": {
-            "type": "string",
-            "description": "The permission type when calling back.",
-            "enum": [
-              "NONE",
-              "OAUTH2"
-            ]
-          }
-        },
-        "description": "Configuration information of webhook."
-      },
       "OpenTofuDeployFromGitRepoRequest": {
         "required": [
           "gitRepoDetails",
@@ -1878,6 +2505,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -1949,6 +2587,106 @@
           }
         }
       },
+      "OpenTofuModifyFromGitRepoRequest": {
+        "required": [
+          "isPlanOnly",
+          "tfState",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails"
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          }
+        }
+      },
+      "OpenTofuAsyncModifyFromGitRepoRequest": {
+        "required": [
+          "isPlanOnly",
+          "tfState",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails"
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
       "OpenTofuDestroyFromGitRepoRequest": {
         "required": [
           "tfState",
@@ -1956,10 +2694,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -2002,6 +2742,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -2051,6 +2802,90 @@
           }
         }
       },
+      "OpenTofuModifyFromDirectoryRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          }
+        }
+      },
+      "OpenTofuAsyncModifyFromDirectoryRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+            },
+            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
       "OpenTofuDeployFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
@@ -2061,6 +2896,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -2091,6 +2937,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -2138,10 +2995,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -2188,10 +3047,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -2231,10 +3092,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -2265,10 +3128,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
