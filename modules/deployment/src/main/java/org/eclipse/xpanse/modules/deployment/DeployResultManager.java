@@ -117,6 +117,9 @@ public class DeployResultManager {
             case DESTROY_SUCCESS, PURGE_SUCCESS -> ServiceDeploymentState.DESTROY_SUCCESS;
             case DESTROY_FAILED -> ServiceDeploymentState.DESTROY_FAILED;
             case ROLLBACK_FAILED -> ServiceDeploymentState.ROLLBACK_FAILED;
+            case MODIFYING -> ServiceDeploymentState.MODIFYING;
+            case MODIFYING_FAILED -> ServiceDeploymentState.MODIFYING_FAILED;
+            case MODIFICATION_SUCCESSFUL -> ServiceDeploymentState.MODIFICATION_SUCCESSFUL;
             case INIT, PURGE_FAILED -> ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED;
         };
     }

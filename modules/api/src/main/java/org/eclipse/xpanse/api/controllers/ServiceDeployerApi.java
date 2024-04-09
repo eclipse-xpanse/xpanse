@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -197,6 +199,37 @@ public class ServiceDeployerApi {
                 deployTask.getId());
         log.info(successMsg);
         return deployTask.getId();
+    }
+
+    /**
+     * Start a task to modify deployed service.
+     *
+     * @param modifyRequest the managed service to create.
+     * @return response
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Start a task to deploy service using registered service template.")
+    @PutMapping(value = "/services/modify/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public UUID modify(@Valid @RequestBody
+                               ModifyRequest modifyRequest, @Parameter(name = "id", description =
+            "The id of deployed service")
+                       @PathVariable("id") String id) {
+        log.info("Stopping managed service with id {}", id);
+        DeployServiceEntity deployServiceEntity =
+                this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
+        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
+        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+            throw new AccessDeniedException(
+                    "No permissions to modify services belonging to other users.");
+        }
+        DeployTask modifyTask = this.deployService.getModifyTask(modifyRequest,deployServiceEntity);
+
+        deployService.modifyService(modifyTask, deployServiceEntity);
+        String successMsg = String.format(
+                "Task for starting managed service started. UUID %s", id);
+        log.info(successMsg);
+        return UUID.fromString(id);
     }
 
     /**

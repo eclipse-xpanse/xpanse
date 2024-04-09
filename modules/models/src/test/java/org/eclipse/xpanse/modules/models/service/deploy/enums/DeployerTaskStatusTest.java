@@ -24,6 +24,10 @@ class DeployerTaskStatusTest {
                 DeployerTaskStatus.getByValue("success"));
         assertEquals(DeployerTaskStatus.DEPLOY_FAILED,
                 DeployerTaskStatus.getByValue("failed"));
+        assertEquals(DeployerTaskStatus.MODIFICATION_SUCCESSFUL,
+                DeployerTaskStatus.getByValue("modification_successful"));
+        assertEquals(DeployerTaskStatus.MODIFYING_FAILED,
+                DeployerTaskStatus.getByValue("modifying_failed"));
         assertEquals(DeployerTaskStatus.DESTROY_SUCCESS,
                 DeployerTaskStatus.getByValue("destroy_success"));
         assertEquals(DeployerTaskStatus.DESTROY_FAILED,
@@ -45,6 +49,9 @@ class DeployerTaskStatusTest {
         assertEquals("destroy_failed", DeployerTaskStatus.DESTROY_FAILED.toValue());
         assertEquals("rollback_success", DeployerTaskStatus.ROLLBACK_SUCCESS.toValue());
         assertEquals("rollback_failed", DeployerTaskStatus.ROLLBACK_FAILED.toValue());
+        assertEquals("modifying_failed", DeployerTaskStatus.MODIFYING_FAILED.toValue());
+        assertEquals("modification_successful",
+                DeployerTaskStatus.MODIFICATION_SUCCESSFUL.toValue());
     }
 
 }

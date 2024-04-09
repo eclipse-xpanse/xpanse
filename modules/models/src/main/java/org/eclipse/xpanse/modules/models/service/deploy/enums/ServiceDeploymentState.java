@@ -25,7 +25,10 @@ public enum ServiceDeploymentState {
     MIGRATION_SUCCESS("migration successful"),
     MIGRATION_FAILED("migration failed"),
     MANUAL_CLEANUP_REQUIRED("manual cleanup required"),
-    ROLLBACK_FAILED("rollback failed");
+    ROLLBACK_FAILED("rollback failed"),
+    MODIFYING("modifying"),
+    MODIFYING_FAILED("modifying failed"),
+    MODIFICATION_SUCCESSFUL("modification successful");
 
 
     private final String state;
