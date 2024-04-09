@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/processdef">
   <process id="migrate" name="migrate" isExecutable="true">
     <documentation>Service Migrate Process</documentation>
     <startEvent id="sid-448fe061-da08-4592-b466-33ba353d38f0"/>
@@ -39,7 +47,7 @@
         <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.migration.steps.DeployFailedManualHandlerListener" event="end"/>
       </extensionElements>
     </userTask>
-    <parallelGateway id="sid-65dfefba-0b74-4484-84d1-d755265b6763"/>
+    <exclusiveGateway id="sid-65dfefba-0b74-4484-84d1-d755265b6763"/>
     <sequenceFlow id="sid-1806d646-ad80-4146-8263-f92711dd33b2" sourceRef="sid-ccf32734-7f92-4c34-a306-8a832ecdcd44" targetRef="sid-383c2c42-e7b4-496b-9f83-a75507b6c8b3">
       <conditionExpression xsi:type="tFormalExpression">${isDeploySuccess==false &amp;&amp; deployRetryNum&gt;1}</conditionExpression>
     </sequenceFlow>
@@ -49,7 +57,7 @@
         <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.migration.steps.DestroyFailedManualHandlerListener" event="end"/>
       </extensionElements>
     </userTask>
-    <parallelGateway id="sid-6c1a98d6-76ee-46cb-9734-de529dc71096"/>
+    <exclusiveGateway id="sid-6c1a98d6-76ee-46cb-9734-de529dc71096"/>
     <sequenceFlow id="sid-83421b5c-186b-4802-92bb-bb62612fcae0" sourceRef="sid-65dfefba-0b74-4484-84d1-d755265b6763" targetRef="sid-f520a0a3-9f94-41fd-bd1d-c55500e8fd35">
       <conditionExpression xsi:type="tFormalExpression">${isRetryTask==false}</conditionExpression>
     </sequenceFlow>
