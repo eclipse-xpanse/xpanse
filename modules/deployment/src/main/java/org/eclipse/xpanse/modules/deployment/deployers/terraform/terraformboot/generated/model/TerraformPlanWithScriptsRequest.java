@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   TerraformPlanWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
   TerraformPlanWithScriptsRequest.JSON_PROPERTY_SCRIPTS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformPlanWithScriptsRequest {
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();

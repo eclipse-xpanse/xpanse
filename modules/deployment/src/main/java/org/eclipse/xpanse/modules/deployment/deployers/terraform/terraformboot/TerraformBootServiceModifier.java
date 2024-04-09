@@ -13,6 +13,8 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncModifyFromGitRepoRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncModifyFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -21,12 +23,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
 /**
- * Bean to manage service destroy via terraform-boot.
+ * Bean to manage service modify via terraform-boot.
  */
 @Slf4j
 @Component
 @Profile("terraform-boot")
-public class TerraformBootServiceDestroyer {
+public class TerraformBootServiceModifier {
 
     private final TerraformFromScriptsApi terraformFromScriptsApi;
     private final TerraformFromGitRepoApi terraformFromGitRepoApi;
@@ -36,7 +38,7 @@ public class TerraformBootServiceDestroyer {
     /**
      * Constructor for TerraformBootServiceDestroyer bean.
      */
-    public TerraformBootServiceDestroyer(TerraformFromScriptsApi terraformFromScriptsApi,
+    public TerraformBootServiceModifier(TerraformFromScriptsApi terraformFromScriptsApi,
                                          TerraformFromGitRepoApi terraformFromGitRepoApi,
                                          TerraformBootHelper terraformBootHelper,
                                          DeployServiceEntityHandler deployServiceEntityHandler) {
@@ -47,79 +49,78 @@ public class TerraformBootServiceDestroyer {
     }
 
     /**
-     * method to perform service destroy using scripts provided in OCL.
+     * method to perform service modify using scripts provided in OCL.
      */
-    public DeployResult destroyFromScripts(DeployTask deployTask) {
+    public DeployResult modifyFromScripts(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
-        TerraformAsyncDestroyFromScriptsRequest request =
-                getDestroyFromScriptsRequest(deployTask, resourceState);
+        TerraformAsyncModifyFromScriptsRequest request =
+                getModifyFromScriptsRequest(deployTask, resourceState);
         try {
-            terraformFromScriptsApi.asyncDestroyWithScripts(request, deployTask.getId());
+            terraformFromScriptsApi.asyncModifyWithScripts(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot destroy service failed. service id: {} , error:{} ",
+            log.error("terraform-boot modify service failed. service id: {} , error:{} ",
                     deployTask.getId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
 
     /**
-     * method to perform service destroy using scripts form GIT repo.
+     * method to perform service modify using scripts form GIT repo.
      */
-    public DeployResult destroyFromGitRepo(DeployTask deployTask) {
+    public DeployResult modifyFromGitRepo(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
-        TerraformAsyncDestroyFromGitRepoRequest request =
-                getDestroyFromGitRepoRequest(deployTask, resourceState);
+        TerraformAsyncModifyFromGitRepoRequest request =
+                getModifyFromGitRepoRequest(deployTask, resourceState);
         try {
-            terraformFromGitRepoApi.asyncDestroyFromGitRepo(request, deployTask.getId());
+            terraformFromGitRepoApi.asyncModifyFromGitRepo(request, deployTask.getId());
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
+            log.error("terraform-boot modify service failed. service id: {} , error:{} ",
                     deployTask.getId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
 
-    private TerraformAsyncDestroyFromScriptsRequest getDestroyFromScriptsRequest(DeployTask task,
+    private TerraformAsyncModifyFromScriptsRequest getModifyFromScriptsRequest(DeployTask task,
                                                                                  String stateFile)
             throws TerraformBootRequestFailedException {
-        TerraformAsyncDestroyFromScriptsRequest request =
-                new TerraformAsyncDestroyFromScriptsRequest();
+        TerraformAsyncModifyFromScriptsRequest request =
+                new TerraformAsyncModifyFromScriptsRequest();
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
-        request.setWebhookConfig(terraformBootHelper.getWebhookConfig(task, true));
+        request.setWebhookConfig(terraformBootHelper.getModifyWebhookConfig(task));
         request.setDeploymentScenario(
-                TerraformAsyncDestroyFromScriptsRequest.DeploymentScenarioEnum.fromValue(
+                TerraformAsyncModifyFromScriptsRequest.DeploymentScenarioEnum.fromValue(
                         task.getDeploymentScenario().toValue()));
         return request;
     }
 
-    private TerraformAsyncDestroyFromGitRepoRequest getDestroyFromGitRepoRequest(DeployTask task,
+    private TerraformAsyncModifyFromGitRepoRequest getModifyFromGitRepoRequest(DeployTask task,
                                                                                  String stateFile)
             throws TerraformBootRequestFailedException {
-        TerraformAsyncDestroyFromGitRepoRequest request =
-                new TerraformAsyncDestroyFromGitRepoRequest();
+        TerraformAsyncModifyFromGitRepoRequest request =
+                new TerraformAsyncModifyFromGitRepoRequest();
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
-        request.setWebhookConfig(terraformBootHelper.getWebhookConfig(task, true));
+        request.setWebhookConfig(terraformBootHelper.getModifyWebhookConfig(task));
         request.setDeploymentScenario(
-                TerraformAsyncDestroyFromGitRepoRequest.DeploymentScenarioEnum.fromValue(
+                TerraformAsyncModifyFromGitRepoRequest.DeploymentScenarioEnum.fromValue(
                         task.getDeploymentScenario().toValue()));
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }
-
 }

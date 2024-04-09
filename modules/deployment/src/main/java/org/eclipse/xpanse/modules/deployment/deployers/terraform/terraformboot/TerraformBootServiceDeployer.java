@@ -11,6 +11,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromScriptsRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.context.annotation.Profile;
@@ -82,6 +83,9 @@ public class TerraformBootServiceDeployer {
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
         request.setWebhookConfig(terraformBootHelper.getWebhookConfig(task, false));
+        request.setDeploymentScenario(
+                TerraformAsyncDeployFromScriptsRequest.DeploymentScenarioEnum.fromValue(
+                        task.getDeploymentScenario().toValue()));
         return request;
     }
 
@@ -96,6 +100,9 @@ public class TerraformBootServiceDeployer {
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo())
         );
+        request.setDeploymentScenario(
+                TerraformAsyncDeployFromGitRepoRequest.DeploymentScenarioEnum.fromValue(
+                        task.getDeploymentScenario().toValue()));
         return request;
     }
 }

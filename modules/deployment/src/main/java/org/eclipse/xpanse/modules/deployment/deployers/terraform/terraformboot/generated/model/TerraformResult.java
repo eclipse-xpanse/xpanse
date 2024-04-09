@@ -29,19 +29,23 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * TerraformResult
  */
 @JsonPropertyOrder({
-  TerraformResult.JSON_PROPERTY_DESTROY_SCENARIO,
+  TerraformResult.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   TerraformResult.JSON_PROPERTY_COMMAND_STD_OUTPUT,
   TerraformResult.JSON_PROPERTY_COMMAND_STD_ERROR,
   TerraformResult.JSON_PROPERTY_TERRAFORM_STATE,
   TerraformResult.JSON_PROPERTY_IMPORTANT_FILE_CONTENT_MAP,
   TerraformResult.JSON_PROPERTY_COMMAND_SUCCESSFUL
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformResult {
   /**
    * This value is set only if the same is set in the request as well. This is useful only for the caller to differentiate what type of destroy it is. No difference in the way destroy will be executed.based on this flag. User may use this flag in case callback are used. So the calling application can know the result is for which specific destroy use case within the calling system.
    */
-  public enum DestroyScenarioEnum {
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
     DESTROY("destroy"),
     
     ROLLBACK("rollback"),
@@ -50,7 +54,7 @@ public class TerraformResult {
 
     private String value;
 
-    DestroyScenarioEnum(String value) {
+    DeploymentScenarioEnum(String value) {
       this.value = value;
     }
 
@@ -65,8 +69,8 @@ public class TerraformResult {
     }
 
     @JsonCreator
-    public static DestroyScenarioEnum fromValue(String value) {
-      for (DestroyScenarioEnum b : DestroyScenarioEnum.values()) {
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
         if (b.value.equals(value)) {
           return b;
         }
@@ -75,8 +79,8 @@ public class TerraformResult {
     }
   }
 
-  public static final String JSON_PROPERTY_DESTROY_SCENARIO = "destroyScenario";
-  private DestroyScenarioEnum destroyScenario;
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_COMMAND_STD_OUTPUT = "commandStdOutput";
   private String commandStdOutput;
@@ -96,29 +100,29 @@ public class TerraformResult {
   public TerraformResult() {
   }
 
-  public TerraformResult destroyScenario(DestroyScenarioEnum destroyScenario) {
+  public TerraformResult deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
-    this.destroyScenario = destroyScenario;
+    this.deploymentScenario = deploymentScenario;
     return this;
   }
 
    /**
    * This value is set only if the same is set in the request as well. This is useful only for the caller to differentiate what type of destroy it is. No difference in the way destroy will be executed.based on this flag. User may use this flag in case callback are used. So the calling application can know the result is for which specific destroy use case within the calling system.
-   * @return destroyScenario
+   * @return deploymentScenario
   **/
   @jakarta.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public DestroyScenarioEnum getDestroyScenario() {
-    return destroyScenario;
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
   }
 
 
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDestroyScenario(DestroyScenarioEnum destroyScenario) {
-    this.destroyScenario = destroyScenario;
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -268,7 +272,7 @@ public class TerraformResult {
       return false;
     }
     TerraformResult terraformResult = (TerraformResult) o;
-    return Objects.equals(this.destroyScenario, terraformResult.destroyScenario) &&
+    return Objects.equals(this.deploymentScenario, terraformResult.deploymentScenario) &&
         Objects.equals(this.commandStdOutput, terraformResult.commandStdOutput) &&
         Objects.equals(this.commandStdError, terraformResult.commandStdError) &&
         Objects.equals(this.terraformState, terraformResult.terraformState) &&
@@ -278,14 +282,14 @@ public class TerraformResult {
 
   @Override
   public int hashCode() {
-    return Objects.hash(destroyScenario, commandStdOutput, commandStdError, terraformState, importantFileContentMap, commandSuccessful);
+    return Objects.hash(deploymentScenario, commandStdOutput, commandStdError, terraformState, importantFileContentMap, commandSuccessful);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TerraformResult {\n");
-    sb.append("    destroyScenario: ").append(toIndentedString(destroyScenario)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    commandStdOutput: ").append(toIndentedString(commandStdOutput)).append("\n");
     sb.append("    commandStdError: ").append(toIndentedString(commandStdError)).append("\n");
     sb.append("    terraformState: ").append(toIndentedString(terraformState)).append("\n");

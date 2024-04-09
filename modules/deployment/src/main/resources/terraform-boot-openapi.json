@@ -66,12 +66,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -86,8 +86,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -106,12 +106,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -148,12 +148,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -168,8 +168,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -188,6 +188,68 @@
               }
             }
           },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/scripts/modify": {
+      "post": {
+        "tags": [
+          "TerraformFromScripts"
+        ],
+        "description": "Modify resources via Terraform",
+        "operationId": "modifyWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformModifyWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -197,6 +259,101 @@
                 }
               }
             }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/scripts/modify/async": {
+      "post": {
+        "tags": [
+          "TerraformFromScripts"
+        ],
+        "description": "async modify resources via Terraform",
+        "operationId": "asyncModifyWithScripts",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformAsyncModifyFromScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -230,12 +387,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -250,8 +407,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -270,12 +427,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -312,12 +469,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -332,8 +489,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -352,12 +509,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -394,8 +551,15 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -407,8 +571,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -427,15 +591,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -469,12 +626,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -489,8 +646,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -509,12 +666,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -551,12 +708,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -571,8 +728,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -591,6 +748,68 @@
               }
             }
           },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/git/modify": {
+      "post": {
+        "tags": [
+          "TerraformFromGitRepo"
+        ],
+        "description": "Modify resources via Terraform",
+        "operationId": "modifyFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformModifyFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -600,6 +819,101 @@
                 }
               }
             }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/git/modify/async": {
+      "post": {
+        "tags": [
+          "TerraformFromGitRepo"
+        ],
+        "description": "async deploy resources via Terraform",
+        "operationId": "asyncModifyFromGitRepo",
+        "parameters": [
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformAsyncModifyFromGitRepoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -633,12 +947,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -653,8 +967,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -673,12 +987,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -715,12 +1029,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -735,8 +1049,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -755,12 +1069,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -797,8 +1111,15 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -810,8 +1131,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -830,15 +1151,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -881,12 +1195,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -901,8 +1215,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -921,6 +1235,77 @@
               }
             }
           },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/directory/modify/{module_directory}": {
+      "post": {
+        "tags": [
+          "TerraformFromDirectory"
+        ],
+        "description": "Modify resources via Terraform from the given directory.",
+        "operationId": "modifyFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the Terraform module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformModifyFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -930,6 +1315,110 @@
                 }
               }
             }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terraform-boot/directory/modify/async/{module_directory}": {
+      "post": {
+        "tags": [
+          "TerraformFromDirectory"
+        ],
+        "description": "async modify resources via Terraform from the given directory.",
+        "operationId": "asyncModifyFromDirectory",
+        "parameters": [
+          {
+            "name": "module_directory",
+            "in": "path",
+            "description": "directory name where the Terraform module files exist.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Custom-RequestId",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformAsyncModifyFromDirectoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -972,12 +1461,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -992,8 +1481,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1012,12 +1501,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -1063,8 +1552,15 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -1076,8 +1572,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1096,15 +1592,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -1117,12 +1606,12 @@
         "description": "Check health of Terraform Boot API service",
         "operationId": "healthCheck",
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformBootSystemStatus"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1137,8 +1626,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1157,12 +1646,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformBootSystemStatus"
                 }
               }
             }
@@ -1198,12 +1687,12 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1218,8 +1707,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1238,12 +1727,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -1280,8 +1769,15 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -1293,8 +1789,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1313,15 +1809,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -1355,8 +1844,15 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -1368,8 +1864,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1388,15 +1884,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -1439,12 +1928,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1459,8 +1948,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1479,12 +1968,12 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -1530,8 +2019,15 @@
           "required": true
         },
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -1543,8 +2039,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1563,15 +2059,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
+          "202": {
+            "description": "Accepted"
           }
         }
       }
@@ -1625,6 +2114,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -1719,18 +2219,25 @@
           }
         }
       },
-      "TerraformDestroyWithScriptsRequest": {
+      "TerraformModifyWithScriptsRequest": {
         "required": [
+          "isPlanOnly",
           "scripts",
           "tfState",
           "variables"
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -1769,10 +2276,12 @@
       "TerraformResult": {
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
             "description": "This value is set only if the same is set in the request as well. This is useful only for the caller to differentiate what type of destroy it is. No difference in the way destroy will be executed.based on this flag. User may use this flag in case callback are used. So the calling application can know the result is for which specific destroy use case within the calling system.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -1803,6 +2312,135 @@
           }
         }
       },
+      "TerraformAsyncModifyFromScriptsRequest": {
+        "required": [
+          "isPlanOnly",
+          "scripts",
+          "tfState",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for destroy requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for destroy requests deployed via scripts"
+            }
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
+      "WebhookConfig": {
+        "required": [
+          "authType",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Callback address after deployment/destroy is completed."
+          },
+          "authType": {
+            "type": "string",
+            "description": "The permission type when calling back.",
+            "enum": [
+              "NONE",
+              "OAUTH2"
+            ]
+          }
+        },
+        "description": "Configuration information of webhook."
+      },
+      "TerraformDestroyWithScriptsRequest": {
+        "required": [
+          "scripts",
+          "tfState",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "scripts": {
+            "type": "array",
+            "description": "List of script files for destroy requests deployed via scripts",
+            "items": {
+              "type": "string",
+              "description": "List of script files for destroy requests deployed via scripts"
+            }
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          }
+        }
+      },
       "TerraformAsyncDeployFromScriptsRequest": {
         "required": [
           "isPlanOnly",
@@ -1815,6 +2453,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -1845,28 +2494,6 @@
           }
         }
       },
-      "WebhookConfig": {
-        "required": [
-          "authType",
-          "url"
-        ],
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string",
-            "description": "Callback address after deployment/destroy is completed."
-          },
-          "authType": {
-            "type": "string",
-            "description": "The permission type when calling back.",
-            "enum": [
-              "NONE",
-              "OAUTH2"
-            ]
-          }
-        },
-        "description": "Configuration information of webhook."
-      },
       "TerraformDeployFromGitRepoRequest": {
         "required": [
           "gitRepoDetails",
@@ -1878,6 +2505,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -1949,6 +2587,106 @@
           }
         }
       },
+      "TerraformModifyFromGitRepoRequest": {
+        "required": [
+          "isPlanOnly",
+          "tfState",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails"
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          }
+        }
+      },
+      "TerraformAsyncModifyFromGitRepoRequest": {
+        "required": [
+          "isPlanOnly",
+          "tfState",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "gitRepoDetails": {
+            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails"
+          },
+          "tfState": {
+            "type": "string",
+            "description": "The .tfState file content after deployment"
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
       "TerraformDestroyFromGitRepoRequest": {
         "required": [
           "tfState",
@@ -1956,10 +2694,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -2002,6 +2742,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -2051,6 +2802,90 @@
           }
         }
       },
+      "TerraformModifyFromDirectoryRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          }
+        }
+      },
+      "TerraformAsyncModifyFromDirectoryRequest": {
+        "required": [
+          "isPlanOnly",
+          "variables",
+          "webhookConfig"
+        ],
+        "type": "object",
+        "properties": {
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
+          },
+          "variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            },
+            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+          },
+          "envVariables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            },
+            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "webhookConfig": {
+            "$ref": "#/components/schemas/WebhookConfig"
+          }
+        }
+      },
       "TerraformDeployFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
@@ -2061,6 +2896,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -2091,6 +2937,17 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
+          "deploymentScenario": {
+            "type": "string",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
+            "enum": [
+              "deploy",
+              "modify",
+              "destroy",
+              "rollback",
+              "purge"
+            ]
           },
           "variables": {
             "type": "object",
@@ -2138,10 +2995,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -2188,10 +3047,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -2231,10 +3092,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"
@@ -2265,10 +3128,12 @@
         ],
         "type": "object",
         "properties": {
-          "destroyScenario": {
+          "deploymentScenario": {
             "type": "string",
-            "description": "The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.",
+            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
             "enum": [
+              "deploy",
+              "modify",
               "destroy",
               "rollback",
               "purge"

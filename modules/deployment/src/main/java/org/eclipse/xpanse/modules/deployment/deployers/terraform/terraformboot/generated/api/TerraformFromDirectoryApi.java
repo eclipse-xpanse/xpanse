@@ -5,8 +5,10 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.Response;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncModifyFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDeployFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformModifyFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlan;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlanFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
@@ -34,7 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromDirectoryApi")
 public class TerraformFromDirectoryApi {
     private ApiClient apiClient;
@@ -59,11 +61,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * async deploy resources via Terraform from the given directory.
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -76,11 +78,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * async deploy resources via Terraform from the given directory.
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -129,11 +131,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * async destroy resources via Terraform from the given directory.
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -146,11 +148,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * async destroy resources via Terraform from the given directory.
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -198,12 +200,82 @@ public class TerraformFromDirectoryApi {
     }
     /**
      * 
-     * Deploy resources via Terraform from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
+     * async modify resources via Terraform from the given directory.
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
+     * @param moduleDirectory directory name where the Terraform module files exist. (required)
+     * @param terraformAsyncModifyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public void asyncModifyFromDirectory(String moduleDirectory, TerraformAsyncModifyFromDirectoryRequest terraformAsyncModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        asyncModifyFromDirectoryWithHttpInfo(moduleDirectory, terraformAsyncModifyFromDirectoryRequest, xCustomRequestId);
+    }
+
+    /**
+     * 
+     * async modify resources via Terraform from the given directory.
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>202</b> - Accepted
+     * @param moduleDirectory directory name where the Terraform module files exist. (required)
+     * @param terraformAsyncModifyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return ResponseEntity&lt;Void&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<Void> asyncModifyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformAsyncModifyFromDirectoryRequest terraformAsyncModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        Object localVarPostBody = terraformAsyncModifyFromDirectoryRequest;
+        
+        // verify the required parameter 'moduleDirectory' is set
+        if (moduleDirectory == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling asyncModifyFromDirectory");
+        }
+        
+        // verify the required parameter 'terraformAsyncModifyFromDirectoryRequest' is set
+        if (terraformAsyncModifyFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformAsyncModifyFromDirectoryRequest' when calling asyncModifyFromDirectory");
+        }
+        
+        // create path and map variables
+        final Map<String, Object> uriVariables = new HashMap<String, Object>();
+        uriVariables.put("module_directory", moduleDirectory);
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
+
+        final String[] localVarAccepts = { 
+            "*/*"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
+
+        ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
+        return apiClient.invokeAPI("/terraform-boot/directory/modify/async/{module_directory}", HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Deploy resources via Terraform from the given directory.
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -217,11 +289,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * Deploy resources via Terraform from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -254,7 +326,7 @@ public class TerraformFromDirectoryApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -270,11 +342,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * Destroy the resources from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -288,11 +360,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * Destroy the resources from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -325,7 +397,7 @@ public class TerraformFromDirectoryApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -340,12 +412,83 @@ public class TerraformFromDirectoryApi {
     }
     /**
      * 
-     * Get Terraform Plan as JSON string from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
+     * Modify resources via Terraform from the given directory.
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
+     * @param moduleDirectory directory name where the Terraform module files exist. (required)
+     * @param terraformModifyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return TerraformResult
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public TerraformResult modifyFromDirectory(String moduleDirectory, TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        return modifyFromDirectoryWithHttpInfo(moduleDirectory, terraformModifyFromDirectoryRequest, xCustomRequestId).getBody();
+    }
+
+    /**
+     * 
+     * Modify resources via Terraform from the given directory.
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
+     * @param moduleDirectory directory name where the Terraform module files exist. (required)
+     * @param terraformModifyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return ResponseEntity&lt;TerraformResult&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<TerraformResult> modifyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        Object localVarPostBody = terraformModifyFromDirectoryRequest;
+        
+        // verify the required parameter 'moduleDirectory' is set
+        if (moduleDirectory == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling modifyFromDirectory");
+        }
+        
+        // verify the required parameter 'terraformModifyFromDirectoryRequest' is set
+        if (terraformModifyFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'terraformModifyFromDirectoryRequest' when calling modifyFromDirectory");
+        }
+        
+        // create path and map variables
+        final Map<String, Object> uriVariables = new HashMap<String, Object>();
+        uriVariables.put("module_directory", moduleDirectory);
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
+
+        final String[] localVarAccepts = { 
+            "*/*", "application/json"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
+
+        ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
+        return apiClient.invokeAPI("/terraform-boot/directory/modify/{module_directory}", HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Get Terraform Plan as JSON string from the given directory.
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformPlanFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -359,11 +502,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * Get Terraform Plan as JSON string from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformPlanFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -396,7 +539,7 @@ public class TerraformFromDirectoryApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -412,11 +555,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * Validate the Terraform modules in the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param xCustomRequestId  (optional)
      * @return TerraformValidationResult
@@ -429,11 +572,11 @@ public class TerraformFromDirectoryApi {
     /**
      * 
      * Validate the Terraform modules in the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
@@ -460,7 +603,7 @@ public class TerraformFromDirectoryApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {  };

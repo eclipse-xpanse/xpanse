@@ -22,22 +22,20 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.WebhookConfig;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * TerraformAsyncDeployFromDirectoryRequest
+ * TerraformModifyFromDirectoryRequest
  */
 @JsonPropertyOrder({
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+  TerraformModifyFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  TerraformModifyFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
+  TerraformModifyFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
+  TerraformModifyFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
-public class TerraformAsyncDeployFromDirectoryRequest {
+public class TerraformModifyFromDirectoryRequest {
   public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
   private Boolean isPlanOnly;
 
@@ -91,13 +89,10 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
   private Map<String, String> envVariables = new HashMap<>();
 
-  public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-  private WebhookConfig webhookConfig;
-
-  public TerraformAsyncDeployFromDirectoryRequest() {
+  public TerraformModifyFromDirectoryRequest() {
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest isPlanOnly(Boolean isPlanOnly) {
+  public TerraformModifyFromDirectoryRequest isPlanOnly(Boolean isPlanOnly) {
     
     this.isPlanOnly = isPlanOnly;
     return this;
@@ -123,7 +118,7 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+  public TerraformModifyFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
     this.deploymentScenario = deploymentScenario;
     return this;
@@ -149,19 +144,19 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest variables(Map<String, Object> variables) {
+  public TerraformModifyFromDirectoryRequest variables(Map<String, Object> variables) {
     
     this.variables = variables;
     return this;
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+  public TerraformModifyFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
     this.variables.put(key, variablesItem);
     return this;
   }
 
    /**
-   * Key-value pairs of variables that must be used to execute the Terraform request.
+   * Key-value pairs of regular variables that must be used to execute the Terraform request.
    * @return variables
   **/
   @jakarta.annotation.Nonnull
@@ -180,13 +175,13 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest envVariables(Map<String, String> envVariables) {
+  public TerraformModifyFromDirectoryRequest envVariables(Map<String, String> envVariables) {
     
     this.envVariables = envVariables;
     return this;
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+  public TerraformModifyFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
     if (this.envVariables == null) {
       this.envVariables = new HashMap<>();
     }
@@ -213,32 +208,6 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     this.envVariables = envVariables;
   }
 
-
-  public TerraformAsyncDeployFromDirectoryRequest webhookConfig(WebhookConfig webhookConfig) {
-    
-    this.webhookConfig = webhookConfig;
-    return this;
-  }
-
-   /**
-   * Get webhookConfig
-   * @return webhookConfig
-  **/
-  @jakarta.annotation.Nonnull
-  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
-  public WebhookConfig getWebhookConfig() {
-    return webhookConfig;
-  }
-
-
-  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
-  public void setWebhookConfig(WebhookConfig webhookConfig) {
-    this.webhookConfig = webhookConfig;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -247,28 +216,26 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest = (TerraformAsyncDeployFromDirectoryRequest) o;
-    return Objects.equals(this.isPlanOnly, terraformAsyncDeployFromDirectoryRequest.isPlanOnly) &&
-        Objects.equals(this.deploymentScenario, terraformAsyncDeployFromDirectoryRequest.deploymentScenario) &&
-        Objects.equals(this.variables, terraformAsyncDeployFromDirectoryRequest.variables) &&
-        Objects.equals(this.envVariables, terraformAsyncDeployFromDirectoryRequest.envVariables) &&
-        Objects.equals(this.webhookConfig, terraformAsyncDeployFromDirectoryRequest.webhookConfig);
+    TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest = (TerraformModifyFromDirectoryRequest) o;
+    return Objects.equals(this.isPlanOnly, terraformModifyFromDirectoryRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, terraformModifyFromDirectoryRequest.deploymentScenario) &&
+        Objects.equals(this.variables, terraformModifyFromDirectoryRequest.variables) &&
+        Objects.equals(this.envVariables, terraformModifyFromDirectoryRequest.envVariables);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables, webhookConfig);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TerraformAsyncDeployFromDirectoryRequest {\n");
+    sb.append("class TerraformModifyFromDirectoryRequest {\n");
     sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
     sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
-    sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");
     sb.append("}");
     return sb.toString();
   }

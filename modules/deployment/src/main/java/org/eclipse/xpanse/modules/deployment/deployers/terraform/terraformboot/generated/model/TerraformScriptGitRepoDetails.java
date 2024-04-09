@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   TerraformScriptGitRepoDetails.JSON_PROPERTY_BRANCH,
   TerraformScriptGitRepoDetails.JSON_PROPERTY_SCRIPT_PATH
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformScriptGitRepoDetails {
   public static final String JSON_PROPERTY_REPO_URL = "repoUrl";
   private String repoUrl;

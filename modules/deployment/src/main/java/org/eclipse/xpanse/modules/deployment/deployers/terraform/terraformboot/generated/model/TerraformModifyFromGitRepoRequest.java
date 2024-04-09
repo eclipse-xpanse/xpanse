@@ -22,22 +22,23 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.WebhookConfig;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformScriptGitRepoDetails;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * TerraformAsyncDeployFromDirectoryRequest
+ * TerraformModifyFromGitRepoRequest
  */
 @JsonPropertyOrder({
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
-  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+  TerraformModifyFromGitRepoRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  TerraformModifyFromGitRepoRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
+  TerraformModifyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
+  TerraformModifyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
+  TerraformModifyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
+  TerraformModifyFromGitRepoRequest.JSON_PROPERTY_TF_STATE
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
-public class TerraformAsyncDeployFromDirectoryRequest {
+public class TerraformModifyFromGitRepoRequest {
   public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
   private Boolean isPlanOnly;
 
@@ -91,13 +92,16 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
   private Map<String, String> envVariables = new HashMap<>();
 
-  public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-  private WebhookConfig webhookConfig;
+  public static final String JSON_PROPERTY_GIT_REPO_DETAILS = "gitRepoDetails";
+  private TerraformScriptGitRepoDetails gitRepoDetails;
 
-  public TerraformAsyncDeployFromDirectoryRequest() {
+  public static final String JSON_PROPERTY_TF_STATE = "tfState";
+  private String tfState;
+
+  public TerraformModifyFromGitRepoRequest() {
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest isPlanOnly(Boolean isPlanOnly) {
+  public TerraformModifyFromGitRepoRequest isPlanOnly(Boolean isPlanOnly) {
     
     this.isPlanOnly = isPlanOnly;
     return this;
@@ -123,7 +127,7 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+  public TerraformModifyFromGitRepoRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
     this.deploymentScenario = deploymentScenario;
     return this;
@@ -149,19 +153,19 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest variables(Map<String, Object> variables) {
+  public TerraformModifyFromGitRepoRequest variables(Map<String, Object> variables) {
     
     this.variables = variables;
     return this;
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+  public TerraformModifyFromGitRepoRequest putVariablesItem(String key, Object variablesItem) {
     this.variables.put(key, variablesItem);
     return this;
   }
 
    /**
-   * Key-value pairs of variables that must be used to execute the Terraform request.
+   * Key-value pairs of regular variables that must be used to execute the Terraform request.
    * @return variables
   **/
   @jakarta.annotation.Nonnull
@@ -180,13 +184,13 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest envVariables(Map<String, String> envVariables) {
+  public TerraformModifyFromGitRepoRequest envVariables(Map<String, String> envVariables) {
     
     this.envVariables = envVariables;
     return this;
   }
 
-  public TerraformAsyncDeployFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+  public TerraformModifyFromGitRepoRequest putEnvVariablesItem(String key, String envVariablesItem) {
     if (this.envVariables == null) {
       this.envVariables = new HashMap<>();
     }
@@ -214,29 +218,55 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   }
 
 
-  public TerraformAsyncDeployFromDirectoryRequest webhookConfig(WebhookConfig webhookConfig) {
+  public TerraformModifyFromGitRepoRequest gitRepoDetails(TerraformScriptGitRepoDetails gitRepoDetails) {
     
-    this.webhookConfig = webhookConfig;
+    this.gitRepoDetails = gitRepoDetails;
     return this;
   }
 
    /**
-   * Get webhookConfig
-   * @return webhookConfig
+   * Get gitRepoDetails
+   * @return gitRepoDetails
   **/
-  @jakarta.annotation.Nonnull
-  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
-  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public WebhookConfig getWebhookConfig() {
-    return webhookConfig;
+  public TerraformScriptGitRepoDetails getGitRepoDetails() {
+    return gitRepoDetails;
   }
 
 
-  @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
+  @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setGitRepoDetails(TerraformScriptGitRepoDetails gitRepoDetails) {
+    this.gitRepoDetails = gitRepoDetails;
+  }
+
+
+  public TerraformModifyFromGitRepoRequest tfState(String tfState) {
+    
+    this.tfState = tfState;
+    return this;
+  }
+
+   /**
+   * The .tfState file content after deployment
+   * @return tfState
+  **/
+  @jakarta.annotation.Nonnull
+  @JsonProperty(JSON_PROPERTY_TF_STATE)
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
-  public void setWebhookConfig(WebhookConfig webhookConfig) {
-    this.webhookConfig = webhookConfig;
+
+  public String getTfState() {
+    return tfState;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_TF_STATE)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
+  public void setTfState(String tfState) {
+    this.tfState = tfState;
   }
 
   @Override
@@ -247,28 +277,30 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest = (TerraformAsyncDeployFromDirectoryRequest) o;
-    return Objects.equals(this.isPlanOnly, terraformAsyncDeployFromDirectoryRequest.isPlanOnly) &&
-        Objects.equals(this.deploymentScenario, terraformAsyncDeployFromDirectoryRequest.deploymentScenario) &&
-        Objects.equals(this.variables, terraformAsyncDeployFromDirectoryRequest.variables) &&
-        Objects.equals(this.envVariables, terraformAsyncDeployFromDirectoryRequest.envVariables) &&
-        Objects.equals(this.webhookConfig, terraformAsyncDeployFromDirectoryRequest.webhookConfig);
+    TerraformModifyFromGitRepoRequest terraformModifyFromGitRepoRequest = (TerraformModifyFromGitRepoRequest) o;
+    return Objects.equals(this.isPlanOnly, terraformModifyFromGitRepoRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, terraformModifyFromGitRepoRequest.deploymentScenario) &&
+        Objects.equals(this.variables, terraformModifyFromGitRepoRequest.variables) &&
+        Objects.equals(this.envVariables, terraformModifyFromGitRepoRequest.envVariables) &&
+        Objects.equals(this.gitRepoDetails, terraformModifyFromGitRepoRequest.gitRepoDetails) &&
+        Objects.equals(this.tfState, terraformModifyFromGitRepoRequest.tfState);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables, webhookConfig);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables, gitRepoDetails, tfState);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TerraformAsyncDeployFromDirectoryRequest {\n");
+    sb.append("class TerraformModifyFromGitRepoRequest {\n");
     sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
     sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
-    sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");
+    sb.append("    gitRepoDetails: ").append(toIndentedString(gitRepoDetails)).append("\n");
+    sb.append("    tfState: ").append(toIndentedString(tfState)).append("\n");
     sb.append("}");
     return sb.toString();
   }

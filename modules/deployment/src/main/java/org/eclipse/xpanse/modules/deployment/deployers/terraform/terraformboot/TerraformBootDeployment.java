@@ -8,6 +8,10 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
@@ -30,6 +34,7 @@ public class TerraformBootDeployment implements Deployer {
     private final TerraformBootDeploymentPlanManage terraformBootDeploymentPlanManage;
     private final TerraformBootServiceDeployer terraformBootServiceDeployer;
     private final TerraformBootServiceDestroyer terraformBootServiceDestroyer;
+    private final TerraformBootServiceModifier terraformBootServiceModifier;
 
     /**
      * Initializes the TerraformBoot deployer.
@@ -39,11 +44,13 @@ public class TerraformBootDeployment implements Deployer {
             TerraformBootScriptValidator terraformBootScriptValidator,
             TerraformBootDeploymentPlanManage terraformBootDeploymentPlanManage,
             TerraformBootServiceDeployer terraformBootServiceDeployer,
-            TerraformBootServiceDestroyer terraformBootServiceDestroyer) {
+            TerraformBootServiceDestroyer terraformBootServiceDestroyer,
+            TerraformBootServiceModifier terraformBootServiceModifier) {
         this.terraformBootServiceDestroyer = terraformBootServiceDestroyer;
         this.terraformBootScriptValidator = terraformBootScriptValidator;
         this.terraformBootDeploymentPlanManage = terraformBootDeploymentPlanManage;
         this.terraformBootServiceDeployer = terraformBootServiceDeployer;
+        this.terraformBootServiceModifier = terraformBootServiceModifier;
     }
 
     @Override
@@ -52,6 +59,14 @@ public class TerraformBootDeployment implements Deployer {
             return terraformBootServiceDeployer.deployFromScripts(deployTask);
         }
         return terraformBootServiceDeployer.deployFromGitRepo(deployTask);
+    }
+
+    @Override
+    public DeployResult modify(DeployTask deployTask) {
+        if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
+            return terraformBootServiceModifier.modifyFromScripts(deployTask);
+        }
+        return terraformBootServiceModifier.modifyFromGitRepo(deployTask);
     }
 
     @Override
