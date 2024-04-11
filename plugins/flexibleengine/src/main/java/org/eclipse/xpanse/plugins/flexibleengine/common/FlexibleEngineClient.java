@@ -166,7 +166,7 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
                             .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
                             .invoke();
             if (Objects.nonNull(response) && CollectionUtils.isNotEmpty(response.getProjects())) {
-                projectId = response.getProjects().get(0).getId();
+                projectId = response.getProjects().getFirst().getId();
             }
         } catch (RuntimeException e) {
             String errorMsg =

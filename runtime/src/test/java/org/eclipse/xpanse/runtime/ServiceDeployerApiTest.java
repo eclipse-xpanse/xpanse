@@ -6,9 +6,10 @@
 
 package org.eclipse.xpanse.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.huaweicloud.sdk.core.invoker.SyncInvoker;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesResponse;
 import java.io.File;
@@ -170,7 +172,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         NovaListAvailabilityZonesResponse response =
                 new NovaListAvailabilityZonesResponse().withAvailabilityZoneInfo(List.of(azA, azD));
         response.setHttpStatusCode(200);
-        when(mockEcsClient.novaListAvailabilityZones(any())).thenReturn(response);
+        mockListAvailabilityZonesInvoker(response);
         // Run the test
         final MockHttpServletResponse listAzResponse =
                 getAvailabilityZones(Csp.HUAWEI, "cn-southwest-2");
@@ -183,6 +185,15 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         deleteCredential(Csp.HUAWEI, CredentialType.VARIABLES, "AK_SK");
     }
 
+    void mockListAvailabilityZonesInvoker(NovaListAvailabilityZonesResponse mockResponse) {
+        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        when(mockEcsClient.novaListAvailabilityZonesInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenReturn(mockResponse);
+    }
+
     void testGetAvailabilityZonesForFlexibleEngine() throws Exception {
         // Setup
         addCredentialForFlexibleEngine();
@@ -193,7 +204,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         NovaListAvailabilityZonesResponse response =
                 new NovaListAvailabilityZonesResponse().withAvailabilityZoneInfo(List.of(azA, azD));
         response.setHttpStatusCode(200);
-        when(mockEcsClient.novaListAvailabilityZones(any())).thenReturn(response);
+        mockListAvailabilityZonesInvoker(response);
         // Run the test
         final MockHttpServletResponse listAzResponse =
                 getAvailabilityZones(Csp.FLEXIBLE_ENGINE, "eu-west-0");
@@ -245,45 +256,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         Assertions.assertEquals(1, azNames.size());
         Assertions.assertEquals("nova", azNames.getFirst());
         deleteCredential(Csp.SCS, CredentialType.VARIABLES, "USERNAME_PASSWORD");
-    }
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
-    void testGetAvailabilityZonesReturnsEmptyList() throws Exception {
-        // Run the test
-        when(huaweiCloudClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
-        NovaListAvailabilityZonesResponse response = new NovaListAvailabilityZonesResponse();
-        response.setHttpStatusCode(500);
-        when(mockEcsClient.novaListAvailabilityZones(any())).thenReturn(response);
-        final MockHttpServletResponse listHuaweiResponse =
-                getAvailabilityZones(Csp.HUAWEI, "cn-test");
-        // Verify the results
-        assertThat(listHuaweiResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(listHuaweiResponse.getContentAsString()).isEqualTo("[]");
-
-        // Run the test
-        when(flexibleEngineClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
-        NovaListAvailabilityZonesResponse response1 = new NovaListAvailabilityZonesResponse();
-        response1.setHttpStatusCode(500);
-        when(mockEcsClient.novaListAvailabilityZones(any())).thenReturn(response1);
-        final MockHttpServletResponse listFlexibleEngineResponse =
-                getAvailabilityZones(Csp.HUAWEI, "eu-test");
-        // Verify the results
-        assertThat(listFlexibleEngineResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(listFlexibleEngineResponse.getContentAsString()).isEqualTo("[]");
-
-        // Run the test
-        final MockHttpServletResponse listOpenstackResponse =
-                getAvailabilityZones(Csp.OPENSTACK, "RegionOne");
-        // Verify the results
-        assertThat(listOpenstackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(listOpenstackResponse.getContentAsString()).isEqualTo("[]");
-
-        // Run the test
-        final MockHttpServletResponse listScsResponse = getAvailabilityZones(Csp.SCS, "RegionOne");
-        // Verify the results
-        assertThat(listScsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(listScsResponse.getContentAsString()).isEqualTo("[]");
     }
 
     MockHttpServletResponse getAvailabilityZones(Csp csp, String regionName) throws Exception {

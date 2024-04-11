@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.plugins.openstack.common.keystone.KeystoneManager;
 import org.openstack4j.api.OSClient;
@@ -41,7 +42,7 @@ public class OpenstackResourceManager {
      * List Openstack resource by the kind of ReusableCloudResource.
      */
     public List<String> getExistingResourceNamesWithKind(String userId,
-            String region, DeployResourceKind kind) {
+                                                         String region, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
             return getVpcList(userId, region);
         } else if (kind == DeployResourceKind.SUBNET) {
@@ -69,99 +70,132 @@ public class OpenstackResourceManager {
      * @return availability zones
      */
     public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
-        List<String> availabilityZones = new ArrayList<>();
+        List<String> availabilityZoneNames = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(userId, region);
-            osClient.networking().availabilityzone().list()
-                    .forEach(availabilityZone -> availabilityZones.add(availabilityZone.getName()));
-        } catch (RuntimeException e) {
-            log.error("Get Openstack availability zones of region:{} failed, error:{}", region,
-                    e.getMessage());
+            osClient.networking().availabilityzone().list().forEach(
+                    availabilityZone -> availabilityZoneNames.add(availabilityZone.getName()));
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "OpenstackClient listAvailabilityZones with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return availabilityZones;
+        return availabilityZoneNames;
     }
 
 
     private List<String> getVpcList(String userId, String region) {
-        List<String> vpcs = new ArrayList<>();
+        List<String> vpcNames = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(userId, region);
-            osClient.networking().network().list().forEach(network -> vpcs.add(network.getName()));
-        } catch (RuntimeException e) {
-            log.error("Get Openstack vpc resources failed, error:{}", e.getMessage());
+            osClient.networking().network().list()
+                    .forEach(network -> vpcNames.add(network.getName()));
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "OpenstackClient listVpcs with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return vpcs;
+        return vpcNames;
     }
 
     private List<String> getSubnetList(String userId, String region) {
-        List<String> subnets = new ArrayList<>();
+        List<String> subnetNames = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(userId, region);
-            osClient.networking().subnet().list().forEach(subnet -> subnets.add(subnet.getName()));
-        } catch (RuntimeException e) {
-            log.error("Get Openstack subnet resources failed, error:{}", e.getMessage());
+            osClient.networking().subnet().list()
+                    .forEach(subnet -> subnetNames.add(subnet.getName()));
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "OpenstackClient listSubnets with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return subnets;
+        return subnetNames;
     }
 
     private List<String> getSecurityGroupsList(String userId, String region) {
-        List<String> securityGroups = new ArrayList<>();
+        List<String> securityGroupNames = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(userId, region);
             osClient.networking().securitygroup().list()
-                    .forEach(securityGroup -> securityGroups.add(securityGroup.getName()));
-        } catch (RuntimeException e) {
-            log.error("Get Openstack SecurityGroup resources failed, error:{}", e.getMessage());
+                    .forEach(securityGroup -> securityGroupNames.add(securityGroup.getName()));
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "OpenstackClient listSecurityGroups with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return securityGroups;
+        return securityGroupNames;
     }
 
     private List<String> getSecurityGroupRuleList(String userId, String region) {
-        List<String> securityGroupRules = new ArrayList<>();
+        List<String> securityGroupRuleIds = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(userId, region);
             osClient.networking().securityrule().list().forEach(
-                    securityGroupRule -> securityGroupRules.add(securityGroupRule.getId()));
-        } catch (RuntimeException e) {
-            log.error("Get Openstack SecurityGroupRule resources failed, error:{}", e.getMessage());
+                    securityGroupRule -> securityGroupRuleIds.add(securityGroupRule.getId()));
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "OpenstackClient listSecurityGroupRules with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return securityGroupRules;
+        return securityGroupRuleIds;
     }
 
     private List<String> getPublicIpList(String userId, String region) {
-        List<String> publicIps = new ArrayList<>();
+        List<String> publicIpAddresses = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(userId, region);
-            osClient.networking().floatingip().list()
-                    .forEach(floatingIp -> publicIps.add(floatingIp.getFloatingIpAddress()));
-        } catch (RuntimeException e) {
-            log.error("Get Openstack publicIp resources failed, error:{}", e.getMessage());
+            osClient.networking().floatingip().list().forEach(
+                    floatingIp -> publicIpAddresses.add(floatingIp.getFloatingIpAddress()));
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "OpenstackClient listPublicIps with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return publicIps;
+        return publicIpAddresses;
     }
 
     private List<String> getVolumeList(String userId, String region) {
-        List<String> volumes = new ArrayList<>();
+        List<String> volumeNames = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(userId, region);
             osClient.blockStorage().volumes().list()
-                    .forEach(volume -> volumes.add(volume.getName()));
-        } catch (RuntimeException e) {
-            log.error("Get Openstack volume resources failed, error:{}", e.getMessage());
+                    .forEach(volume -> volumeNames.add(volume.getName()));
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "OpenstackClient listVolumes with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return volumes;
+        return volumeNames;
     }
 
     private List<String> getKeyPairsList(String userId, String region) {
-        List<String> keyPairs = new ArrayList<>();
+        List<String> keyPairNames = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(userId, region);
             osClient.compute().keypairs().list()
-                    .forEach(keyPair -> keyPairs.add(keyPair.getName()));
-        } catch (RuntimeException e) {
-            log.error("Get Openstack keyPair resources failed, error:{}", e.getMessage());
+                    .forEach(keyPair -> keyPairNames.add(keyPair.getName()));
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "OpenstackClient listKeyPairs with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return keyPairs;
+        return keyPairNames;
     }
 
     private OSClient.OSClientV3 getOsClient(String userId, String region) {
