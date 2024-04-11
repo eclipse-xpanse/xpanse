@@ -336,7 +336,8 @@ public class ApisTestCommon {
         deployRequest.setVersion(serviceTemplate.getVersion());
         deployRequest.setCsp(serviceTemplate.getCsp());
         deployRequest.setCategory(serviceTemplate.getCategory());
-        deployRequest.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
+        deployRequest.setFlavor(
+                serviceTemplate.getFlavors().getServiceFlavors().getFirst().getName());
         deployRequest.setRegion(serviceTemplate.getRegions().getFirst());
         deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
 

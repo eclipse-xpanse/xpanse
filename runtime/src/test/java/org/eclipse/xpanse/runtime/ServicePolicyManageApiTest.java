@@ -24,8 +24,8 @@ import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreat
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
@@ -80,7 +80,8 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
             throws Exception {
 
         List<String> flavorNames =
-                serviceTemplate.getFlavors().stream().map(Flavor::getName).toList();
+                serviceTemplate.getFlavors().getServiceFlavors().stream()
+                        .map(ServiceFlavor::getName).toList();
         testListServicePoliciesReturnsEmptyList(serviceTemplate.getId());
         ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
         createRequest.setFlavorNameList(flavorNames);
@@ -99,7 +100,8 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
             throws Exception {
 
         List<String> flavorNames =
-                serviceTemplate.getFlavors().stream().map(Flavor::getName).toList();
+                serviceTemplate.getFlavors().getServiceFlavors().stream()
+                        .map(ServiceFlavor::getName).toList();
         ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
         createRequest.setFlavorNameList(flavorNames);
         createRequest.setServiceTemplateId(serviceTemplate.getId());

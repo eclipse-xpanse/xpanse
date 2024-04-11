@@ -35,7 +35,7 @@ class OclTest {
     private static final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private static CloudServiceProvider cloudServiceProvider;
     private static Deployment deployment;
-    private static List<Flavor> flavors;
+    private static Flavors flavors;
     private static Billing billing;
     private static Ocl ocl;
     private static ServiceProviderContactDetails serviceProviderContactDetails;
@@ -54,9 +54,14 @@ class OclTest {
         deployment = new Deployment();
         deployment.setKind(DeployerKind.TERRAFORM);
 
-        Flavor flavor = new Flavor();
+        flavors = new Flavors();
+        ServiceFlavor flavor = new ServiceFlavor();
         flavor.setName("flavor");
-        flavors = List.of(flavor);
+        ModificationImpact modificationImpact = new ModificationImpact();
+        modificationImpact.setIsDataLost(false);
+        modificationImpact.setIsServiceInterrupted(false);
+        flavors.setServiceFlavors(List.of(flavor));
+        flavors.setModificationImpact(modificationImpact);
 
         billing = new Billing();
         billing.setBillingModel(BillingModel.MONTHLY);

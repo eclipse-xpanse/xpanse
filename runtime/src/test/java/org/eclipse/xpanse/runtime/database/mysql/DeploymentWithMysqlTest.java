@@ -156,7 +156,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequestBase.setVersion(serviceTemplate.getVersion());
         deployRequestBase.setCsp(serviceTemplate.getCsp());
         deployRequestBase.setCategory(serviceTemplate.getCategory());
-        deployRequestBase.setFlavor(serviceTemplate.getFlavors().getFirst().getName());
+        deployRequestBase.setFlavor(
+                serviceTemplate.getFlavors().getServiceFlavors().getFirst().getName());
         deployRequestBase.setRegion(serviceTemplate.getRegions().getFirst());
         deployRequestBase.setServiceHostingType(serviceTemplate.getServiceHostingType());
 

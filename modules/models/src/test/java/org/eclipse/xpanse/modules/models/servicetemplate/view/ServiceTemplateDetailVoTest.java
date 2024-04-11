@@ -18,8 +18,9 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.Flavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingModel;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -50,7 +51,7 @@ class ServiceTemplateDetailVoTest {
     private static ServiceProviderContactDetails serviceProviderContactDetails;
     private static List<@Valid Region> regions;
     private static List<@Valid DeployVariable> variables;
-    private static List<@Valid Flavor> flavors;
+    private static @Valid Flavors flavors;
     private static Billing billing;
     private static ServiceTemplateDetailVo serviceTemplateDetailVo;
 
@@ -65,9 +66,10 @@ class ServiceTemplateDetailVoTest {
         deployVariable.setName("HuaweiClouud AK");
         variables = List.of(deployVariable);
 
-        Flavor flavor = new Flavor();
+        flavors = new Flavors();
+        ServiceFlavor flavor = new ServiceFlavor();
         flavor.setName("flavor");
-        flavors = List.of(flavor);
+        flavors.setServiceFlavors(List.of(flavor));
 
         billing = new Billing();
         billing.setBillingModel(BillingModel.MONTHLY);

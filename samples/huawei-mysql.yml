@@ -26,24 +26,22 @@ billing:
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 2vCPUs-4GB-general
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: rds.mysql.n1.large.2.ha
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 2vCPUs-4GB-dedicated
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 80
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: rds.mysql.x1.large.2.ha
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
+  serviceFlavors:
+    - name: 2vCPUs-4GB-general
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 60
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        flavor_id: rds.mysql.n1.large.2.ha
+    - name: 2vCPUs-4GB-dedicated
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 80
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        flavor_id: rds.mysql.x1.large.2.ha
+  modificationImpact:
+    isDataLost: true
+    isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: [ "test@test.com" ]

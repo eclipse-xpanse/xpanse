@@ -20,8 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.servicetemplate.FlavorBasic;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
@@ -116,9 +116,9 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         UserOrderableServiceVo userOrderableServiceVo = new UserOrderableServiceVo();
         BeanUtils.copyProperties(serviceTemplateDetailVo, userOrderableServiceVo);
 
-        List<FlavorBasic> flavorBasics = serviceTemplateDetailVo.getFlavors()
-                .stream().map(flavor -> {
-                    FlavorBasic flavorBasic = new FlavorBasic();
+        List<ServiceFlavor> flavorBasics = serviceTemplateDetailVo.getFlavors()
+                .getServiceFlavors().stream().map(flavor -> {
+                    ServiceFlavor flavorBasic = new ServiceFlavor();
                     BeanUtils.copyProperties(flavor, flavorBasic);
                     return flavorBasic;
                 }).toList();

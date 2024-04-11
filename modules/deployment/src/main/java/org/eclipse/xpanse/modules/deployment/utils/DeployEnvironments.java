@@ -19,8 +19,8 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -81,10 +81,10 @@ public class DeployEnvironments {
      * Build environment variables for serviceRequestProperties and deployVariables.
      *
      * @param serviceRequestProperties variables passed by end user during ordering.
-     * @param deployVariables deploy variables defined in the service template.
+     * @param deployVariables          deploy variables defined in the service template.
      */
     private Map<String, String> getEnv(Map<String, Object> serviceRequestProperties,
-                                      List<DeployVariable> deployVariables) {
+                                       List<DeployVariable> deployVariables) {
         Map<String, String> variables = new HashMap<>();
         for (DeployVariable variable : deployVariables) {
             if (variable.getKind() == DeployVariableKind.ENV) {
@@ -94,8 +94,8 @@ public class DeployEnvironments {
                             !SensitiveScope.NONE.toValue()
                                     .equals(variable.getSensitiveScope().toValue())
                                     ? aesUtil.decode(
-                                            serviceRequestProperties.get(
-                                                    variable.getName()).toString())
+                                    serviceRequestProperties.get(
+                                            variable.getName()).toString())
                                     : serviceRequestProperties.get(variable.getName()).toString());
                 } else {
                     variables.put(variable.getName(), System.getenv(variable.getName()));
@@ -127,7 +127,7 @@ public class DeployEnvironments {
     }
 
     private Map<String, String> getFlavorVariables(Ocl ocl, String requestedFlavor) {
-        for (Flavor flavor : ocl.getFlavors()) {
+        for (ServiceFlavor flavor : ocl.getFlavors().getServiceFlavors()) {
             if (flavor.getName().equals(requestedFlavor)) {
                 return flavor.getProperties();
             }
@@ -183,8 +183,8 @@ public class DeployEnvironments {
      *                                 service. False if it is for any other use cases.
      */
     private Map<String, Object> getVariables(Map<String, Object> serviceRequestProperties,
-                                            List<DeployVariable> deployVariables,
-                                            boolean isDeployRequest) {
+                                             List<DeployVariable> deployVariables,
+                                             boolean isDeployRequest) {
         Map<String, Object> variables = new HashMap<>();
         for (DeployVariable variable : deployVariables) {
             if (variable.getKind() == DeployVariableKind.VARIABLE) {
@@ -219,9 +219,9 @@ public class DeployEnvironments {
      * Get credential variables By ServiceHostingType.
      *
      * @param serviceHostingType serviceHostingType of the service.
-     * @param credentialType credentialType used by the service.
-     * @param csp CSP of the service.
-     * @param userId ID of the user ordering the service.
+     * @param credentialType     credentialType used by the service.
+     * @param csp                CSP of the service.
+     * @param userId             ID of the user ordering the service.
      */
     public Map<String, String> getCredentialVariablesByHostingType(
             ServiceHostingType serviceHostingType,
@@ -261,8 +261,8 @@ public class DeployEnvironments {
      *
      * @param serviceRequestProperties variables provided by the end user.
      * @param deployVariables          variables configured in the service template.
-     * @param requestedFlavor Flavor of the service ordered.
-     * @param ocl OCL of the requested service template.
+     * @param requestedFlavor          Flavor of the service ordered.
+     * @param ocl                      OCL of the requested service template.
      */
     public Map<String, Object> getAllDeploymentVariablesForService(
             Map<String, Object> serviceRequestProperties,

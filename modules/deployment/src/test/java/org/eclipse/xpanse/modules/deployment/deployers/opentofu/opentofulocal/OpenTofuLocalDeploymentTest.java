@@ -34,7 +34,6 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTo
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
@@ -127,7 +126,7 @@ class OpenTofuLocalDeploymentTest {
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
-        deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
+        deployRequest.setFlavor(ocl.getFlavors().getServiceFlavors().getFirst().getName());
         Region region = ocl.getCloudServiceProvider().getRegions().getFirst();
         deployRequest.setRegion(region);
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
@@ -139,7 +138,8 @@ class OpenTofuLocalDeploymentTest {
                 variable -> serviceRequestProperties.put(variable.getName(),
                         variable.getExample()));
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        serviceRequestProperties.putAll(ocl.getFlavors().getFirst().getProperties());
+        serviceRequestProperties.putAll(
+                ocl.getFlavors().getServiceFlavors().getFirst().getProperties());
         serviceRequestProperties.put("region", region.getName());
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
@@ -312,7 +312,8 @@ class OpenTofuLocalDeploymentTest {
         expectedResult.setValid(false);
         DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
         diagnostics.setDetail(
-                "A managed resource \"random_id_2\" \"new\" has not been declared in the root module.");
+                "A managed resource \"random_id_2\" \"new\" has not been declared in the root " +
+                        "module.");
         expectedResult.setDiagnostics(List.of(diagnostics));
 
         // Run the test
