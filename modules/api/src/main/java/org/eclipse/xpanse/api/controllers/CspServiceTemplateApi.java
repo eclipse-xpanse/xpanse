@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
@@ -29,7 +28,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationReque
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,7 +57,7 @@ public class CspServiceTemplateApi {
     @Resource
     private ServiceTemplateManage serviceTemplateManage;
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
 
     /**
      * List service templates with query params.
@@ -88,10 +87,9 @@ public class CspServiceTemplateApi {
             @Parameter(name = "serviceRegistrationState", description = "state of registration")
             @RequestParam(name = "serviceRegistrationState", required = false)
             ServiceRegistrationState serviceRegistrationState) {
-        Optional<Csp> cspOptional = identityProviderManager.getCspFromMetadata();
-        Csp cspName = cspOptional.orElse(null);
+        Csp csp = userServiceHelper.getCurrentUserManageCsp();
         ServiceTemplateQueryModel queryRequest =
-                new ServiceTemplateQueryModel(categoryName, cspName, serviceName, serviceVersion,
+                new ServiceTemplateQueryModel(categoryName, csp, serviceName, serviceVersion,
                         serviceHostingType, serviceRegistrationState, false);
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);

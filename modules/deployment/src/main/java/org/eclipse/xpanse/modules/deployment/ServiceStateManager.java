@@ -9,11 +9,9 @@ package org.eclipse.xpanse.modules.deployment;
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
@@ -25,7 +23,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -42,7 +40,7 @@ public class ServiceStateManager {
     @Resource
     private PluginManager pluginManager;
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
 
     /**
      * Start the service by the deployed service id.
@@ -208,8 +206,9 @@ public class ServiceStateManager {
     private void validateDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
         if (deployServiceEntity.getDeployRequest().getServiceHostingType()
                 == ServiceHostingType.SELF) {
-            Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-            if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+            boolean currentUserIsOwner =
+                    userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+            if (!currentUserIsOwner) {
                 throw new AccessDeniedException(
                         "No permissions to manage status of the service belonging to other users.");
             }

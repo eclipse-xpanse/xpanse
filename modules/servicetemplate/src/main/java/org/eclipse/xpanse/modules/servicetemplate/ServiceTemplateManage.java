@@ -10,7 +10,6 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -38,8 +36,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScr
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
@@ -62,7 +59,7 @@ public class ServiceTemplateManage {
     @Resource
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
     @Resource
     private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @Resource
@@ -190,12 +187,9 @@ public class ServiceTemplateManage {
         validateServiceVersion(ocl);
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
         validateServiceDeployment(ocl.getDeployment(), newTemplate);
-        Optional<String> namespace = identityProviderManager.getUserNamespace();
-        if (namespace.isPresent()) {
-            newTemplate.setNamespace(namespace.get());
-        } else {
-            newTemplate.setNamespace(ocl.getNamespace());
-        }
+        String userManageNamespace =
+                userServiceHelper.getCurrentUserManageNamespace();
+        newTemplate.setNamespace(userManageNamespace);
         ServiceTemplateEntity storedServiceTemplate = storage.storeAndFlush(newTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
         return storedServiceTemplate;
@@ -225,17 +219,17 @@ public class ServiceTemplateManage {
                                                            boolean checkCsp) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateById(id);
         if (checkNamespace) {
-            Optional<String> namespace = identityProviderManager.getUserNamespace();
-            if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
-                    existingTemplate.getNamespace())) {
+            boolean hasManagePermissions = userServiceHelper.currentUserCanManageNamespace(
+                    existingTemplate.getNamespace());
+            if (!hasManagePermissions) {
                 throw new AccessDeniedException("No permissions to view or manage service template "
                         + "belonging to other namespaces.");
             }
         }
         if (checkCsp) {
-            Optional<Csp> cspOptional = identityProviderManager.getCspFromMetadata();
-            if (cspOptional.isEmpty() || !Objects.equals(cspOptional.get(),
-                    existingTemplate.getCsp())) {
+            boolean hasManagePermissions = userServiceHelper.currentUserCanManageCsp(
+                    existingTemplate.getCsp());
+            if (!hasManagePermissions) {
                 throw new AccessDeniedException("No permissions to review service template "
                         + "belonging to other cloud service providers.");
             }
@@ -345,13 +339,8 @@ public class ServiceTemplateManage {
 
     private void fillParamFromUserMetadata(ServiceTemplateQueryModel query) {
         if (query.isCheckNamespace()) {
-            CurrentUserInfo currentUserInfo = identityProviderManager.getCurrentUserInfo();
-            if (Objects.nonNull(currentUserInfo) && StringUtils.isNotEmpty(
-                    currentUserInfo.getNamespace())) {
-                query.setNamespace(currentUserInfo.getNamespace());
-                log.info("Add parameter namespace with value {} to search service templates",
-                        currentUserInfo.getNamespace());
-            }
+            String namespace = userServiceHelper.getCurrentUserManageNamespace();
+            query.setNamespace(namespace);
         }
     }
 

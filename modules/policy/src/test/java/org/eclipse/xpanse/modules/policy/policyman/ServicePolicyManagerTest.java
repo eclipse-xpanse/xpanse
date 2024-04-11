@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
@@ -30,7 +29,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.policy.ServicePolicyManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,7 +49,7 @@ class ServicePolicyManagerTest {
     @Mock
     private PolicyManager mockPolicyManager;
     @Mock
-    private IdentityProviderManager mockIdentityProviderManager;
+    private UserServiceHelper mockUserServiceHelper;
     @Mock
     private DatabaseServicePolicyStorage mockServicePolicyStorage;
     @Mock
@@ -82,7 +81,7 @@ class ServicePolicyManagerTest {
 
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
         final List<ServicePolicy> result =
@@ -118,7 +117,7 @@ class ServicePolicyManagerTest {
                 serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(
@@ -154,11 +153,10 @@ class ServicePolicyManagerTest {
         existingPolicy.setEnabled(false);
         existingPolicy.setServiceTemplate(serviceTemplateEntity);
         serviceTemplateEntity.setServicePolicyList(List.of(existingPolicy));
-        when(mockServiceTemplateStorage.getServiceTemplateById(
-                serviceTemplateId))
+        when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity newServicePolicy = new ServicePolicyEntity();
@@ -168,8 +166,8 @@ class ServicePolicyManagerTest {
         newServicePolicy.setCreateTime(createTime);
         newServicePolicy.setServiceTemplate(serviceTemplateEntity);
 
-        when(mockServicePolicyStorage.storeAndFlush(any()))
-                .thenReturn(newServicePolicy);
+        when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(newServicePolicy);
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
         final ServicePolicy result = servicePolicyManagerUnderTest.addServicePolicy(createRequest);
@@ -219,8 +217,6 @@ class ServicePolicyManagerTest {
                 serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
-
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity newServicePolicy = new ServicePolicyEntity();
         newServicePolicy.setId(newPolicyId);
@@ -230,8 +226,8 @@ class ServicePolicyManagerTest {
         newServicePolicy.setCreateTime(createTime);
         newServicePolicy.setServiceTemplate(serviceTemplateEntity);
 
-        when(mockServicePolicyStorage.storeAndFlush(any()))
-                .thenReturn(newServicePolicy);
+        when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(newServicePolicy);
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
         final ServicePolicy result = servicePolicyManagerUnderTest.addServicePolicy(createRequest);
@@ -265,7 +261,7 @@ class ServicePolicyManagerTest {
                 serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         assertThatThrownBy(
                 () -> servicePolicyManagerUnderTest.addServicePolicy(createRequest))
@@ -305,7 +301,7 @@ class ServicePolicyManagerTest {
                 serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(
@@ -328,7 +324,7 @@ class ServicePolicyManagerTest {
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         doThrow(new PoliciesValidationFailedException("test")).when(mockPolicyManager)
                 .validatePolicy("policy");
@@ -369,7 +365,7 @@ class ServicePolicyManagerTest {
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
         // Run the test
         assertThatThrownBy(
                 () -> servicePolicyManagerUnderTest.addServicePolicy(createRequest))
@@ -403,7 +399,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
@@ -417,7 +413,6 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
-
         // Run the test
         final ServicePolicy result =
                 servicePolicyManagerUnderTest.updateServicePolicy(updateRequest);
@@ -464,7 +459,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
@@ -480,7 +475,6 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
-
         // Run the test
         final ServicePolicy result =
                 servicePolicyManagerUnderTest.updateServicePolicy(updateRequest);
@@ -528,8 +522,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
-
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         assertThatThrownBy(
                 () -> servicePolicyManagerUnderTest.updateServicePolicy(updateRequest))
@@ -574,7 +567,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(
@@ -610,7 +603,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
         doThrow(new PoliciesValidationFailedException("error")).when(mockPolicyManager)
                 .validatePolicy(updatePolicy);
 
@@ -648,7 +641,7 @@ class ServicePolicyManagerTest {
         existingPolicy2.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy1);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
         assertThatThrownBy(
@@ -678,7 +671,7 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(servicePolicyEntity);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
         final ServicePolicy result =
@@ -710,7 +703,7 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(servicePolicyEntity);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> servicePolicyManagerUnderTest.getServicePolicyDetails(policyId))
@@ -741,7 +734,7 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(servicePolicyEntity);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.of(namespace));
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
         servicePolicyManagerUnderTest.deleteServicePolicy(policyId);
@@ -772,7 +765,7 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(servicePolicyEntity);
-        when(mockIdentityProviderManager.getUserNamespace()).thenReturn(Optional.empty());
+        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> servicePolicyManagerUnderTest.deleteServicePolicy(policyId))

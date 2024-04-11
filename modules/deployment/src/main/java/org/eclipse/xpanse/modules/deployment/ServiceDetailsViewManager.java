@@ -10,7 +10,6 @@ import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,14 +19,13 @@ import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -44,7 +42,7 @@ public class ServiceDetailsViewManager {
     private DeployServiceEntityHandler deployServiceEntityHandler;
 
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
 
     @Resource
     private DeployServiceStorage deployServiceStorage;
@@ -65,8 +63,9 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        Optional<String> namespace = identityProviderManager.getUserNamespace();
-        if (namespace.isEmpty() || !namespace.get().equals(deployServiceEntity.getNamespace())) {
+        boolean isManagedByCurrentUser = userServiceHelper.currentUserCanManageNamespace(
+                deployServiceEntity.getNamespace());
+        if (!isManagedByCurrentUser) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
@@ -88,15 +87,12 @@ public class ServiceDetailsViewManager {
                                                       String serviceName,
                                                       String serviceVersion,
                                                       ServiceDeploymentState state) {
-        ServiceQueryModel query = getServiceQueryModel(
-                category, csp, serviceName, serviceVersion, state);
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        query.setUserId(userIdOptional.orElse(null));
-        List<DeployServiceEntity> deployServices =
-                deployServiceStorage.listServices(query);
-        return deployServices.stream()
-                .map(this::convertToDeployedService).toList();
-
+        ServiceQueryModel query =
+                getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
+        String currentUserId = userServiceHelper.getCurrentUserId();
+        query.setUserId(currentUserId);
+        List<DeployServiceEntity> deployServices = deployServiceStorage.listServices(query);
+        return deployServices.stream().map(this::convertToDeployedService).toList();
     }
 
     /**
@@ -109,7 +105,9 @@ public class ServiceDetailsViewManager {
      * @return serviceVos
      */
     public List<DeployedService> listDeployedServicesDetails(Category category, Csp csp,
-            String serviceName, String serviceVersion, ServiceDeploymentState serviceState) {
+                                                             String serviceName,
+                                                             String serviceVersion,
+                                                             ServiceDeploymentState serviceState) {
         List<DeployedService> servicesDetails = new ArrayList<>();
         List<DeployedService> services =
                 listDeployedServices(category, csp, serviceName, serviceVersion, serviceState);
@@ -136,8 +134,9 @@ public class ServiceDetailsViewManager {
     public DeployedServiceDetails getSelfHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(
+                deployServiceEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
@@ -161,8 +160,9 @@ public class ServiceDetailsViewManager {
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), deployServiceEntity.getUserId())) {
+        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(
+                deployServiceEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
@@ -207,13 +207,13 @@ public class ServiceDetailsViewManager {
                                                            String serviceName,
                                                            String serviceVersion,
                                                            ServiceDeploymentState state) {
-        ServiceQueryModel query = getServiceQueryModel(
-                category, csp, serviceName, serviceVersion, state);
-        Optional<String> namespace = identityProviderManager.getUserNamespace();
-        return namespace.map(s -> deployServiceStorage.listServices(query).stream()
-                .filter(deployServiceEntity -> s
-                        .equals(deployServiceEntity.getNamespace()))
-                .map(this::convertToDeployedService).toList()).orElseGet(ArrayList::new);
+
+        ServiceQueryModel query =
+                getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
+        String namespace = userServiceHelper.getCurrentUserManageNamespace();
+        query.setNamespace(namespace);
+        List<DeployServiceEntity> deployServices = deployServiceStorage.listServices(query);
+        return deployServices.stream().map(this::convertToDeployedService).toList();
     }
 
     private ServiceQueryModel getServiceQueryModel(Category category,
@@ -237,11 +237,6 @@ public class ServiceDetailsViewManager {
         if (Objects.nonNull(state)) {
             query.setServiceState(state);
         }
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (userIdOptional.isEmpty()) {
-            throw new UserNotLoggedInException("Unable to get current login information");
-        }
-        query.setUserId(userIdOptional.get());
         return query;
     }
 

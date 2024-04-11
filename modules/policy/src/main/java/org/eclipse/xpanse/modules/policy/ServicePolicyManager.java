@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +26,7 @@ import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreat
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -45,7 +44,7 @@ public class ServicePolicyManager {
     private PolicyManager policyManager;
 
     @Resource
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
 
     @Resource
     private DatabaseServicePolicyStorage servicePolicyStorage;
@@ -95,9 +94,9 @@ public class ServicePolicyManager {
                     String.format("Service template with id %s not found.", serviceTemplateId);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
-        Optional<String> namespace = identityProviderManager.getUserNamespace();
-        if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
-                existedServiceTemplate.getNamespace())) {
+        boolean hasManagePermission = userServiceHelper.currentUserCanManageNamespace(
+                existedServiceTemplate.getNamespace());
+        if (!hasManagePermission) {
             throw new AccessDeniedException("No permissions to view or manage policy belonging to "
                     + "the service template belonging to other namespaces.");
         }
@@ -163,9 +162,10 @@ public class ServicePolicyManager {
             String errorMsg = String.format("The policy with id %s not found.", policyId);
             throw new PolicyNotFoundException(errorMsg);
         }
-        Optional<String> namespace = identityProviderManager.getUserNamespace();
-        if (namespace.isEmpty() || !StringUtils.equals(namespace.get(),
-                existingPolicy.getServiceTemplate().getNamespace())) {
+
+        boolean hasManagePermission = userServiceHelper.currentUserCanManageNamespace(
+                existingPolicy.getServiceTemplate().getNamespace());
+        if (!hasManagePermission) {
             throw new AccessDeniedException("No permissions to view or manage policy belonging to "
                     + "the service templates belonging to other namespaces.");
         }

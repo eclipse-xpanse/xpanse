@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
@@ -32,7 +31,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +42,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceMetricsAdapter.class, PluginManager.class,
-        DeployResourceStorage.class, DeployServiceStorage.class, IdentityProviderManager.class})
+        DeployResourceStorage.class, DeployServiceStorage.class, UserServiceHelper.class})
 class ServiceMetricsAdapterTest {
 
     private final String resourceId = "8d1495ae-8420-4172-93c1-746c09b4a005";
@@ -58,7 +57,7 @@ class ServiceMetricsAdapterTest {
     @MockBean
     private OrchestratorPlugin orchestratorPlugin;
     @MockBean
-    private IdentityProviderManager identityProviderManager;
+    private UserServiceHelper userServiceHelper;
     @Autowired
     private ServiceMetricsAdapter serviceMetricsAdapterUnderTest;
 
@@ -88,7 +87,7 @@ class ServiceMetricsAdapterTest {
         when(mockPluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(
                 getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(userServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
         // Run the test
         final List<Metric> result =
                 serviceMetricsAdapterUnderTest.getMetricsByServiceId(serviceId, null, null, null,
@@ -162,7 +161,7 @@ class ServiceMetricsAdapterTest {
         when(mockPluginManager.getOrchestratorPlugin(Csp.HUAWEI)).thenReturn(
                 getOrchestratorPlugin(Csp.HUAWEI, expectedResult));
         when(orchestratorPlugin.getMetricsForService(any())).thenReturn(expectedResult);
-        when(identityProviderManager.getCurrentLoginUserId()).thenReturn(Optional.of(userId));
+        when(userServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
         // Run the test
         final List<Metric> result =
                 serviceMetricsAdapterUnderTest.getMetricsByResourceId(resourceId, null, null, null,
@@ -239,7 +238,7 @@ class ServiceMetricsAdapterTest {
 
             @Override
             public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                           DeployResourceKind kind) {
+                                                                 DeployResourceKind kind) {
                 return new ArrayList<>();
             }
 

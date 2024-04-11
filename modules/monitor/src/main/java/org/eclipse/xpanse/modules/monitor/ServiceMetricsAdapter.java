@@ -6,13 +6,12 @@
 
 package org.eclipse.xpanse.modules.monitor;
 
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -29,9 +28,8 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -44,24 +42,14 @@ import org.springframework.util.CollectionUtils;
 public class ServiceMetricsAdapter {
 
     private static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
-    private final DeployServiceStorage deployServiceStorage;
-    private final DeployResourceStorage deployResourceStorage;
-    private final PluginManager pluginManager;
-    private final IdentityProviderManager identityProviderManager;
-
-    /**
-     * The constructor of Monitor.
-     */
-    @Autowired
-    public ServiceMetricsAdapter(DeployServiceStorage deployServiceStorage,
-                                 DeployResourceStorage deployResourceStorage,
-                                 PluginManager pluginManager,
-                                 IdentityProviderManager identityProviderManager) {
-        this.deployServiceStorage = deployServiceStorage;
-        this.deployResourceStorage = deployResourceStorage;
-        this.pluginManager = pluginManager;
-        this.identityProviderManager = identityProviderManager;
-    }
+    @Resource
+    private DeployServiceStorage deployServiceStorage;
+    @Resource
+    private DeployResourceStorage deployResourceStorage;
+    @Resource
+    private PluginManager pluginManager;
+    @Resource
+    private UserServiceHelper userServiceHelper;
 
     /**
      * Get metrics of the service instance.
@@ -85,8 +73,9 @@ public class ServiceMetricsAdapter {
             throw new ResourceNotFoundException("No resource found in the service.");
         }
 
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), serviceEntity.getUserId())) {
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(serviceEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view metrics of services belonging to other users.");
         }
@@ -128,8 +117,9 @@ public class ServiceMetricsAdapter {
         DeployServiceEntity serviceEntity = findDeployServiceEntity(
                 resourceEntity.getDeployService().getId());
 
-        Optional<String> userIdOptional = identityProviderManager.getCurrentLoginUserId();
-        if (!StringUtils.equals(userIdOptional.orElse(null), serviceEntity.getUserId())) {
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(serviceEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view metrics of services belonging to other users.");
         }

@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInval
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +46,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceDeployerApi.class, DeployService.class, WorkflowUtils.class,
-        DeploymentExceptionHandler.class, IdentityProviderManager.class, CspPluginValidator.class,
-        PluginManager.class})
+        DeploymentExceptionHandler.class, UserServiceHelper.class, IdentityProviderManager.class,
+        CspPluginValidator.class, PluginManager.class})
 @WebMvcTest
 class DeploymentExceptionHandlerTest {
     private MockMvc mockMvc;
