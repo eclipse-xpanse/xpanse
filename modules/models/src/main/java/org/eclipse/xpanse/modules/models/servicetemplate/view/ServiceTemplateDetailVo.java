@@ -24,7 +24,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.Flavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -90,7 +90,7 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
 
     @NotNull
     @Schema(description = "The flavors of the registered service.")
-    private List<@Valid Flavor> flavors;
+    private @Valid Flavors flavors;
 
     @NotNull
     @Schema(description = "The billing policy of the registered service.")

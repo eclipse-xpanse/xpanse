@@ -41,9 +41,9 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentS
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -116,7 +116,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
         ServicePolicyCreateRequest serviceFlavorPolicy = new ServicePolicyCreateRequest();
         serviceFlavorPolicy.setServiceTemplateId(serviceTemplate.getId());
-        List<String> flavors = serviceTemplate.getFlavors().stream().map(Flavor::getName).toList();
+        List<String> flavors = serviceTemplate.getFlavors().getServiceFlavors().stream().map(
+                ServiceFlavor::getName).toList();
         serviceFlavorPolicy.setFlavorNameList(flavors);
         serviceFlavorPolicy.setPolicy("serviceFlavorPolicy");
         serviceFlavorPolicy.setEnabled(true);

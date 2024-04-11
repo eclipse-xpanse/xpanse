@@ -124,8 +124,9 @@ public class ServicePolicyManager {
     private void validFlavorNames(List<String> flavorNameList,
                                   ServiceTemplateEntity existingServiceTemplate) {
         for (String flavorName : flavorNameList) {
-            boolean flavorExists = existingServiceTemplate.getOcl().getFlavors().stream()
-                    .anyMatch(flavor -> flavor.getName().equals(flavorName));
+            boolean flavorExists =
+                    existingServiceTemplate.getOcl().getFlavors().getServiceFlavors().stream()
+                            .anyMatch(flavor -> flavor.getName().equals(flavorName));
             if (!flavorExists) {
                 String errMsg = String.format(
                         "Flavor name %s is not valid for service template with id %s.", flavorName,

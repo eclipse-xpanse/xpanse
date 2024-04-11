@@ -35,8 +35,8 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -286,10 +286,11 @@ public class ServiceTemplateOpenApiGenerator {
             regionAreaExample = regions.getFirst().getArea();
             regionAreasStr =
                     mapper.writeValueAsString(regions.stream().map(Region::getArea).toList());
-            List<Flavor> flavors = registerService.getOcl().getFlavors();
+            List<ServiceFlavor> flavors = registerService.getOcl().getFlavors().getServiceFlavors();
             flavorNameExample = flavors.getFirst().getName();
             flavorNamesStr =
-                    mapper.writeValueAsString(flavors.stream().map(Flavor::getName).toList());
+                    mapper.writeValueAsString(
+                            flavors.stream().map(ServiceFlavor::getName).toList());
             cspValuesStr = mapper.writeValueAsString(getActiveCspValues());
             categoryValuesStr = mapper.writeValueAsString(getCategoryValues());
             serviceHostingTypesStr = mapper.writeValueAsString(getServiceHostingTypeValues());

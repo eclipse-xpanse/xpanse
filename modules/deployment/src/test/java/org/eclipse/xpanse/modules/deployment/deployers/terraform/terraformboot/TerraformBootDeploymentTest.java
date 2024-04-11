@@ -102,12 +102,13 @@ class TerraformBootDeploymentTest {
     void setUp() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
-        deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
+        deployRequest.setFlavor(ocl.getFlavors().getServiceFlavors().getFirst().getName());
         Region region = new Region();
         region.setName(ocl.getCloudServiceProvider().getRegions().getFirst().getName());
         region.setArea(ocl.getCloudServiceProvider().getRegions().getFirst().getArea());
@@ -235,7 +236,8 @@ class TerraformBootDeploymentTest {
         expectedResult.setValid(false);
         DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
         diagnostics.setDetail(
-                "A managed resource \"random_id_2\" \"new\" has not been declared in the root module.");
+                "A managed resource \"random_id_2\" \"new\" has not been declared in the root " +
+                        "module.");
         expectedResult.setDiagnostics(List.of(diagnostics));
 
         when(terraformBootScriptValidator.validateTerraformScripts(any())).thenReturn(

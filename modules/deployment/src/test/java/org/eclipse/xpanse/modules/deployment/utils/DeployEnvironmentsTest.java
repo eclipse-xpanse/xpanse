@@ -33,9 +33,10 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalid
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.Flavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -68,7 +69,7 @@ class DeployEnvironmentsTest {
 
     private static DeployTask task;
     private static DeployRequest deployRequest;
-    private static Flavor flavor;
+    private static Flavors flavors;
     private static DeployVariable deployVariable1;
     private static DeployVariable deployVariable2;
     private static DeployVariable deployVariable3;
@@ -126,16 +127,19 @@ class DeployEnvironmentsTest {
                 List.of(deployVariable1, deployVariable2, deployVariable3, deployVariable4));
         deployment.setCredentialType(CredentialType.VARIABLES);
 
-        flavor = new Flavor();
+        flavors = new Flavors();
+        ServiceFlavor flavor = new ServiceFlavor();
         flavor.setName("flavor");
         flavor.setProperties(Map.ofEntries(Map.entry("key", "value")));
+        flavors.setServiceFlavors(List.of(flavor));
 
         CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
         cloudServiceProvider.setName(Csp.HUAWEI);
 
         Ocl ocl = new Ocl();
+
         ocl.setDeployment(deployment);
-        ocl.setFlavors(List.of(flavor));
+        ocl.setFlavors(flavors);
         ocl.setCloudServiceProvider(cloudServiceProvider);
 
         task = new DeployTask();
@@ -172,7 +176,9 @@ class DeployEnvironmentsTest {
 
     @Test
     void testGetFlavorVariables_FlavorInvalidException() {
+        ServiceFlavor flavor = new ServiceFlavor();
         flavor.setName("name");
+        flavors.setServiceFlavors(List.of(flavor));
 
         // Verify the results
         assertThrows(FlavorInvalidException.class,
@@ -193,7 +199,8 @@ class DeployEnvironmentsTest {
         expectedResult.put("example", null);
         expectedResult.put("region", regionName);
 
-        final Map<String, Object> result = deployEnvironmentsUnderTest.getVariablesFromDeployTask(task, true);
+        final Map<String, Object> result =
+                deployEnvironmentsUnderTest.getVariablesFromDeployTask(task, true);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -291,14 +298,15 @@ class DeployEnvironmentsTest {
 
         OclLoader oclLoader = new OclLoader();
         Ocl ocl =
-                oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setCustomerServiceName("test");
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
         deployRequest.setVersion(ocl.getServiceVersion());
-        deployRequest.setFlavor(ocl.getFlavors().getFirst().getName());
+        deployRequest.setFlavor(ocl.getFlavors().getServiceFlavors().getFirst().getName());
 
         Map<String, Object> property = new HashMap<>();
         property.put("secgroup_id", "1234567890");
@@ -360,6 +368,7 @@ class DeployEnvironmentsTest {
             public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
                 return new ArrayList<>();
             }
+
             @Override
             public List<Metric> getMetricsForResource(
                     ResourceMetricsRequest resourceMetricRequest) {
@@ -373,7 +382,8 @@ class DeployEnvironmentsTest {
         };
         when(this.pluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(plugin);
         Map<String, String> variables =
-                deployEnvironmentsUnderTest.getPluginMandatoryVariables(xpanseDeployTask.getDeployRequest().getCsp());
+                deployEnvironmentsUnderTest.getPluginMandatoryVariables(
+                        xpanseDeployTask.getDeployRequest().getCsp());
 
         Assertions.assertNotNull(variables);
     }

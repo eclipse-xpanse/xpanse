@@ -26,51 +26,40 @@ billing:
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: flavor-error-test
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 10
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: s6.small.1
-    modificationImpact:
-      isDataLost: false
-      isServiceInterrupted: true
-  - name: 2vCPUs-4GB-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 20
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: s6.large.2
-    modificationImpact:
-      isDataLost: false
-      isServiceInterrupted: true
-  - name: 2vCPUs-8GB-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 30
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: s6.large.4
-    modificationImpact:
-      isDataLost: false
-      isServiceInterrupted: true
-  - name: 4vCPUs-8GB-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: s6.xlarge.2
-    modificationImpact:
-      isDataLost: false
-      isServiceInterrupted: true
-  - name: 4vCPUs-16GB-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 50
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      flavor_id: s6.xlarge.4
-    modificationImpact:
-      isDataLost: false
-      isServiceInterrupted: true
+  serviceFlavors:
+    - name: flavor-error-test
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 10
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        flavor_id: s6.small.1
+    - name: 2vCPUs-4GB-normal
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 20
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        flavor_id: s6.large.2
+    - name: 2vCPUs-8GB-normal
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 30
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        flavor_id: s6.large.4
+    - name: 4vCPUs-8GB-normal
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 40
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        flavor_id: s6.xlarge.2
+    - name: 4vCPUs-16GB-normal
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 50
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        flavor_id: s6.xlarge.4
+  modificationImpact:
+    isDataLost: false
+    isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: [ "test@test.com" ]

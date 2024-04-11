@@ -26,46 +26,38 @@ billing:
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 1-zookeeper-with-3-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 3
-      flavor_id: s6.large.4
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-3-worker-nodes-performance
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 3
-      flavor_id: s6.xlarge.4
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-5-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: s6.large.4
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-5-worker-nodes-performance
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 80
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: s6.xlarge.4
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
+  serviceFlavors:
+    - name: 1-zookeeper-with-3-worker-nodes-normal
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 40
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        worker_nodes_count: 3
+        flavor_id: s6.large.4
+    - name: 1-zookeeper-with-3-worker-nodes-performance
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 60
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        worker_nodes_count: 3
+        flavor_id: s6.xlarge.4
+    - name: 1-zookeeper-with-5-worker-nodes-normal
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 60
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        worker_nodes_count: 5
+        flavor_id: s6.large.4
+    - name: 1-zookeeper-with-5-worker-nodes-performance
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 80
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        worker_nodes_count: 5
+        flavor_id: s6.xlarge.4
+  modificationImpact:
+    isDataLost: true
+    isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test@test.com"]

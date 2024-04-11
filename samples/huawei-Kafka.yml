@@ -5,7 +5,7 @@ category: middleware
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: Kafka-cluster
 # The version of the service, the end-user can select the version they want to deploy.
-serviceVersion: 1.0.0
+serviceVersion: 1.0.3
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
 description: This is an enhanced Kafka cluster services by ISV-A.
 namespace: ISV-A
@@ -26,46 +26,38 @@ billing:
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
-  - name: 1-zookeeper-with-3-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 40
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 3
-      flavor_id: s6.large.4
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-3-worker-nodes-performance
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 3
-      flavor_id: s6.xlarge.4
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-5-worker-nodes-normal
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 60
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: s6.large.4
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-  - name: 1-zookeeper-with-5-worker-nodes-performance
-    # The fixed price during the period (the price applied one shot whatever is the service use)
-    fixedPrice: 80
-    # Properties for the service, which can be used by the deployment.
-    properties:
-      worker_nodes_count: 5
-      flavor_id: s6.xlarge.4
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
+  serviceFlavors:
+    - name: 1-zookeeper-with-3-worker-nodes-normal
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 40
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        worker_nodes_count: 3
+        flavor_id: s6.large.4
+    - name: 1-zookeeper-with-3-worker-nodes-performance
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 60
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        worker_nodes_count: 3
+        flavor_id: s6.xlarge.4
+    - name: 1-zookeeper-with-5-worker-nodes-normal
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 60
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        worker_nodes_count: 5
+        flavor_id: s6.large.4
+    - name: 1-zookeeper-with-5-worker-nodes-performance
+      # The fixed price during the period (the price applied one shot whatever is the service use)
+      fixedPrice: 80
+      # Properties for the service, which can be used by the deployment.
+      properties:
+        worker_nodes_count: 5
+        flavor_id: s6.xlarge.4
+  modificationImpact:
+    isDataLost: true
+    isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test30@test.com","test31@test.com"]
