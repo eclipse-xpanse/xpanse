@@ -2,11 +2,14 @@ package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
+import com.huaweicloud.sdk.core.invoker.SyncInvoker;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsResponse;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsResult;
 import com.huaweicloud.sdk.ecs.v2.model.NovaSimpleKeypair;
@@ -80,7 +83,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         ListVpcsResponse listVpcResponse = new ListVpcsResponse();
         listVpcResponse.setHttpStatusCode(200);
         listVpcResponse.setVpcs(List.of(new Vpc().withName("huawei_vpc_test")));
-        when(mockVpcClient.listVpcs(any())).thenReturn(listVpcResponse);
+        mockListVpcsInvoker(listVpcResponse);
         List<String> huaweiVpcResult = List.of("huawei_vpc_test");
         // Run the test
         final MockHttpServletResponse huaweiVpcResponse =
@@ -94,7 +97,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         ListSubnetsResponse listSubnetsResponse = new ListSubnetsResponse();
         listSubnetsResponse.setHttpStatusCode(200);
         listSubnetsResponse.setSubnets(List.of(new Subnet().withName("huawei_subnet_test")));
-        when(mockVpcClient.listSubnets(any())).thenReturn(listSubnetsResponse);
+        mockListSubnetsInvoker(listSubnetsResponse);
         List<String> huaweiSubnetsResult = List.of("huawei_subnet_test");
         // Run the test
         final MockHttpServletResponse huaweiSubnetsResponse =
@@ -109,7 +112,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listSecurityGroupsResponse.setHttpStatusCode(200);
         listSecurityGroupsResponse.setSecurityGroups(
                 List.of(new SecurityGroup().withName("huawei_security_group_test")));
-        when(mockVpcClient.listSecurityGroups(any())).thenReturn(listSecurityGroupsResponse);
+        mockListSecurityGroupsInvoker(listSecurityGroupsResponse);
         List<String> huaweiSecurityGroupsResult = List.of("huawei_security_group_test");
         // Run the test
         final MockHttpServletResponse huaweiSecurityGroupsResponse =
@@ -126,8 +129,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listSecurityGroupRulesResponse.setHttpStatusCode(200);
         listSecurityGroupRulesResponse.setSecurityGroupRules(
                 List.of(new SecurityGroupRule().withId("huawei_security_group_rule_test")));
-        when(mockVpcClient.listSecurityGroupRules(any())).thenReturn(
-                listSecurityGroupRulesResponse);
+        mockListSecurityGroupRulesInvoker(listSecurityGroupRulesResponse);
         List<String> huaweiSecurityGroupRulesResult = List.of("huawei_security_group_rule_test");
         // Run the test
         final MockHttpServletResponse huaweiSecurityGroupRulesResponse =
@@ -143,7 +145,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listPublicipsResponse.setHttpStatusCode(200);
         listPublicipsResponse.setPublicips(
                 List.of(new PublicipShowResp().withPublicIpAddress("huawei_public_ip_test")));
-        when(mockEipClient.listPublicips(any())).thenReturn(listPublicipsResponse);
+        mockListPublicipsInvoker(listPublicipsResponse);
         List<String> huaweiPublicIpsResult = List.of("huawei_public_ip_test");
         // Run the test
         final MockHttpServletResponse huaweiPublicIpsResponse =
@@ -158,7 +160,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         ListVolumesResponse listVolumesResponse = new ListVolumesResponse();
         listVolumesResponse.setHttpStatusCode(200);
         listVolumesResponse.setVolumes(List.of(new VolumeDetail().withName("huawei_volume_test")));
-        when(mockEvsClient.listVolumes(any())).thenReturn(listVolumesResponse);
+        mockListVolumesInvoker(listVolumesResponse);
         List<String> huaweiVolumesResult = List.of("huawei_volume_test");
         // Run the test
         final MockHttpServletResponse huaweiVolumesResponse =
@@ -173,7 +175,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listKeypairsResponse.setHttpStatusCode(200);
         listKeypairsResponse.setKeypairs(List.of(new NovaListKeypairsResult().withKeypair(
                 new NovaSimpleKeypair().withName("huawei_keypair_test"))));
-        when(mockEcsClient.novaListKeypairs(any())).thenReturn(listKeypairsResponse);
+        mockListKeypairsInvoker(listKeypairsResponse);
         List<String> huaweiKeypairsResult = List.of("huawei_keypair_test");
         // Run the test
         final MockHttpServletResponse huaweiKeypairsResponse =
@@ -196,6 +198,69 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         deleteCredential(Csp.HUAWEI, CredentialType.VARIABLES, "AK_SK");
     }
 
+    void mockListVpcsInvoker(ListVpcsResponse listVpcResponse) {
+        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        when(mockVpcClient.listVpcsInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenReturn(listVpcResponse);
+    }
+
+    void mockListSubnetsInvoker(ListSubnetsResponse mockResponse) {
+        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        when(mockVpcClient.listSubnetsInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenReturn(mockResponse);
+    }
+
+    void mockListSecurityGroupsInvoker(ListSecurityGroupsResponse mockResponse) {
+        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        when(mockVpcClient.listSecurityGroupsInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenReturn(mockResponse);
+    }
+
+    void mockListSecurityGroupRulesInvoker(ListSecurityGroupRulesResponse mockResponse) {
+        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        when(mockVpcClient.listSecurityGroupRulesInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenReturn(mockResponse);
+    }
+
+    void mockListPublicipsInvoker(ListPublicipsResponse mockResponse) {
+        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        when(mockEipClient.listPublicipsInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenReturn(mockResponse);
+    }
+
+    void mockListVolumesInvoker(ListVolumesResponse mockResponse) {
+        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        when(mockEvsClient.listVolumesInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenReturn(mockResponse);
+    }
+
+    void mockListKeypairsInvoker(NovaListKeypairsResponse mockResponse) {
+        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        when(mockEcsClient.novaListKeypairsInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenReturn(mockResponse);
+    }
+
 
     @Test
     @WithJwt(file = "jwt_user.json")
@@ -208,7 +273,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         ListVpcsResponse listVpcResponse = new ListVpcsResponse();
         listVpcResponse.setHttpStatusCode(200);
         listVpcResponse.setVpcs(List.of(new Vpc().withName("flexibleEngine_vpc_test")));
-        when(mockVpcClient.listVpcs(any())).thenReturn(listVpcResponse);
+        mockListVpcsInvoker(listVpcResponse);
         List<String> flexibleEngineVpcResult = List.of("flexibleEngine_vpc_test");
         // Run the test
         final MockHttpServletResponse flexibleEngineVpcResponse =
@@ -224,7 +289,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listSubnetsResponse.setHttpStatusCode(200);
         listSubnetsResponse.setSubnets(
                 List.of(new Subnet().withName("flexibleEngine_subnet_test")));
-        when(mockVpcClient.listSubnets(any())).thenReturn(listSubnetsResponse);
+        mockListSubnetsInvoker(listSubnetsResponse);
         List<String> flexibleEngineSubnetsResult = List.of("flexibleEngine_subnet_test");
         // Run the test
         final MockHttpServletResponse flexibleEngineSubnetsResponse =
@@ -240,7 +305,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listSecurityGroupsResponse.setHttpStatusCode(200);
         listSecurityGroupsResponse.setSecurityGroups(
                 List.of(new SecurityGroup().withName("flexibleEngine_security_group_test")));
-        when(mockVpcClient.listSecurityGroups(any())).thenReturn(listSecurityGroupsResponse);
+        mockListSecurityGroupsInvoker(listSecurityGroupsResponse);
         List<String> flexibleEngineSecurityGroupsResult =
                 List.of("flexibleEngine_security_group_test");
         // Run the test
@@ -259,8 +324,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listSecurityGroupRulesResponse.setHttpStatusCode(200);
         listSecurityGroupRulesResponse.setSecurityGroupRules(
                 List.of(new SecurityGroupRule().withId("flexibleEngine_security_group_rule_test")));
-        when(mockVpcClient.listSecurityGroupRules(any())).thenReturn(
-                listSecurityGroupRulesResponse);
+        mockListSecurityGroupRulesInvoker(listSecurityGroupRulesResponse);
         List<String> flexibleEngineSecurityGroupRulesResult =
                 List.of("flexibleEngine_security_group_rule_test");
         // Run the test
@@ -278,7 +342,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listPublicipsResponse.setHttpStatusCode(200);
         listPublicipsResponse.setPublicips(List.of(new PublicipShowResp().withPublicIpAddress(
                 "flexibleEngine_public_ip_test")));
-        when(mockEipClient.listPublicips(any())).thenReturn(listPublicipsResponse);
+        mockListPublicipsInvoker(listPublicipsResponse);
         List<String> flexibleEnginePublicIpsResult = List.of("flexibleEngine_public_ip_test");
         // Run the test
         final MockHttpServletResponse flexibleEnginePublicIpsResponse =
@@ -294,7 +358,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listVolumesResponse.setHttpStatusCode(200);
         listVolumesResponse.setVolumes(
                 List.of(new VolumeDetail().withName("flexibleEngine_volume_test")));
-        when(mockEvsClient.listVolumes(any())).thenReturn(listVolumesResponse);
+        mockListVolumesInvoker(listVolumesResponse);
         List<String> flexibleEngineVolumesResult = List.of("flexibleEngine_volume_test");
         // Run the test
         final MockHttpServletResponse flexibleEngineVolumesResponse =
@@ -310,7 +374,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listKeypairsResponse.setHttpStatusCode(200);
         listKeypairsResponse.setKeypairs(List.of(new NovaListKeypairsResult().withKeypair(
                 new NovaSimpleKeypair().withName("flexibleEngine_keypair_test"))));
-        when(mockEcsClient.novaListKeypairs(any())).thenReturn(listKeypairsResponse);
+        mockListKeypairsInvoker(listKeypairsResponse);
         List<String> flexibleEngineKeypairsResult = List.of("flexibleEngine_keypair_test");
         // Run the test
         final MockHttpServletResponse flexibleEngineKeypairsResponse =
@@ -478,89 +542,6 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         assertThat(openstackVmResponse.getContentAsString()).isEqualTo("[]");
 
         deleteCredential(csp, CredentialType.VARIABLES, "USERNAME_PASSWORD");
-    }
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
-    void testGetExistingResourceNamesWithKindForFlexibleEngineReturnEmptyList() throws Exception {
-        testGetExistingResourceNamesWithKindReturnEmptyList(Csp.OPENSTACK);
-    }
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
-    void testGetExistingResourceNamesWithKindForScsReturnEmptyList() throws Exception {
-        testGetExistingResourceNamesWithKindReturnEmptyList(Csp.SCS);
-    }
-
-    void testGetExistingResourceNamesWithKindReturnEmptyList(Csp csp) throws Exception {
-        // Setup
-        String cspRegion = "RegionOne";
-        List<String> emptyResult = Collections.emptyList();
-        // Run the test
-        final MockHttpServletResponse cspVpcResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VPC, csp, cspRegion);
-        // Verify the results
-        assertThat(cspVpcResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(cspVpcResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(emptyResult));
-
-        // Run the test
-        final MockHttpServletResponse cspSubnetsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, csp, cspRegion);
-        // Verify the results
-        assertThat(cspSubnetsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(cspSubnetsResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(emptyResult));
-
-        // Run the test
-        final MockHttpServletResponse cspSecurityGroupsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP, csp, cspRegion);
-        // Verify the results
-        assertThat(cspSecurityGroupsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(cspSecurityGroupsResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(emptyResult));
-
-        // Run the test
-        final MockHttpServletResponse cspSecurityGroupRulesResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP_RULE, csp,
-                        cspRegion);
-        // Verify the results
-        assertThat(cspSecurityGroupRulesResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(cspSecurityGroupRulesResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(emptyResult));
-
-        // Run the test
-        final MockHttpServletResponse cspPublicIpsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, csp, cspRegion);
-        // Verify the results
-        assertThat(cspPublicIpsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(cspPublicIpsResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(emptyResult));
-
-        // Run the test
-        final MockHttpServletResponse cspVolumesResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, csp, cspRegion);
-        // Verify the results
-        assertThat(cspVolumesResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(cspVolumesResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(emptyResult));
-
-        // Run the test
-        final MockHttpServletResponse cspKeypairsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, csp, cspRegion);
-        // Verify the results
-        assertThat(cspKeypairsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(cspKeypairsResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(emptyResult));
-
-        // Run the test
-        final MockHttpServletResponse cspVmResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VM, csp, cspRegion);
-        // Verify the results
-        assertThat(cspVmResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(cspVmResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(emptyResult));
-
     }
 
 

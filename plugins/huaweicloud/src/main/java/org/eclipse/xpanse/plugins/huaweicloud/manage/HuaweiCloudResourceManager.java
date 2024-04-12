@@ -5,8 +5,10 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.manage;
 
+import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS;
+import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.DEFAULT_RETRY_TIMES;
+
 import com.huaweicloud.sdk.core.auth.ICredential;
-import com.huaweicloud.sdk.core.exception.SdkException;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesRequest;
@@ -43,8 +45,10 @@ import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
+import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +74,7 @@ public class HuaweiCloudResourceManager {
      * List HuaweiCloud resource by the kind of ReusableCloudResource.
      */
     public List<String> getExistingResourceNamesWithKind(String userId,
-            String region, DeployResourceKind kind) {
+                                                         String region, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
             return getVpcList(userId, region);
         } else if (kind == DeployResourceKind.SUBNET) {
@@ -99,129 +103,195 @@ public class HuaweiCloudResourceManager {
      * @return availability zones
      */
     public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
-        List<String> availabilityZones = new ArrayList<>();
+        List<String> availabilityZoneNames = new ArrayList<>();
         try {
             EcsClient ecsClient = getEcsClient(userId, region);
+            NovaListAvailabilityZonesRequest request = new NovaListAvailabilityZonesRequest();
             NovaListAvailabilityZonesResponse response =
-                    ecsClient.novaListAvailabilityZones(new NovaListAvailabilityZonesRequest());
+                    ecsClient.novaListAvailabilityZonesInvoker(request)
+                            .retryTimes(DEFAULT_RETRY_TIMES)
+                            .retryCondition(huaweiCloudClient::matchRetryCondition)
+                            .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
-                availabilityZones = response.getAvailabilityZoneInfo().stream()
-                        .map(NovaAvailabilityZone::getZoneName).toList();
+                availabilityZoneNames = response.getAvailabilityZoneInfo()
+                        .stream().map(NovaAvailabilityZone::getZoneName).toList();
             }
-        } catch (SdkException e) {
-            log.error("Get HuaweiCloud availability zones of region:{} failed, error:{}", region,
-                    e.getMessage());
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "HuaweiCloudClient listAvailabilityZones with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return availabilityZones;
+        return availabilityZoneNames;
     }
 
     private List<String> getVpcList(String userId, String region) {
+        List<String> vpcNames = new ArrayList<>();
         try {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListVpcsRequest request = new ListVpcsRequest();
-            ListVpcsResponse response = vpcClient.listVpcs(request);
+            ListVpcsResponse response = vpcClient.listVpcsInvoker(request)
+                    .retryTimes(DEFAULT_RETRY_TIMES)
+                    .retryCondition(huaweiCloudClient::matchRetryCondition)
+                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .invoke();
             if (response.getHttpStatusCode() == 200) {
-                return response.getVpcs().stream().map(Vpc::getName).toList();
+                vpcNames = response.getVpcs().stream().map(Vpc::getName).toList();
             }
-        } catch (SdkException e) {
-            log.error("Get HuaweiCloud vpc resources failed, error:{}", e.getMessage());
-            return new ArrayList<>();
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "HuaweiCloudClient listVpcs with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return new ArrayList<>();
+        return vpcNames;
     }
 
     private List<String> getSubnetList(String userId, String region) {
+        List<String> subnetNames = new ArrayList<>();
         try {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListSubnetsRequest request = new ListSubnetsRequest();
-            ListSubnetsResponse response = vpcClient.listSubnets(request);
+            ListSubnetsResponse response = vpcClient.listSubnetsInvoker(request)
+                    .retryTimes(DEFAULT_RETRY_TIMES)
+                    .retryCondition(huaweiCloudClient::matchRetryCondition)
+                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .invoke();
             if (response.getHttpStatusCode() == 200) {
-                return response.getSubnets().stream().map(Subnet::getName).toList();
+                subnetNames = response.getSubnets().stream().map(Subnet::getName).toList();
             }
-        } catch (SdkException e) {
-            log.error("Get HuaweiCloud Subnet resources failed, error:{}", e.getMessage());
-            return new ArrayList<>();
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "HuaweiCloudClient listSubnets with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return new ArrayList<>();
+        return subnetNames;
     }
 
     private List<String> getSecurityGroupsList(String userId, String region) {
+        List<String> securityGroupNames = new ArrayList<>();
         try {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListSecurityGroupsRequest request = new ListSecurityGroupsRequest();
-            ListSecurityGroupsResponse response = vpcClient.listSecurityGroups(request);
+            ListSecurityGroupsResponse response = vpcClient.listSecurityGroupsInvoker(request)
+                    .retryTimes(DEFAULT_RETRY_TIMES)
+                    .retryCondition(huaweiCloudClient::matchRetryCondition)
+                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .invoke();
             if (response.getHttpStatusCode() == 200) {
-                return response.getSecurityGroups().stream().map(SecurityGroup::getName).toList();
+                securityGroupNames = response.getSecurityGroups()
+                        .stream().map(SecurityGroup::getName).toList();
             }
-        } catch (SdkException e) {
-            log.error("Get HuaweiCloud SecurityGroup resources failed, error:{}", e.getMessage());
-            return new ArrayList<>();
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "HuaweiCloudClient listSecurityGroups with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return new ArrayList<>();
+        return securityGroupNames;
     }
 
     private List<String> getSecurityGroupRuleList(String userId, String region) {
+        List<String> securityGroupRuleIds = new ArrayList<>();
         try {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListSecurityGroupRulesRequest request = new ListSecurityGroupRulesRequest();
-            ListSecurityGroupRulesResponse response = vpcClient.listSecurityGroupRules(request);
+            ListSecurityGroupRulesResponse response =
+                    vpcClient.listSecurityGroupRulesInvoker(request)
+                            .retryTimes(DEFAULT_RETRY_TIMES)
+                            .retryCondition(huaweiCloudClient::matchRetryCondition)
+                            .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
-                return response.getSecurityGroupRules().stream().map(SecurityGroupRule::getId)
-                        .toList();
+                securityGroupRuleIds = response.getSecurityGroupRules()
+                        .stream().map(SecurityGroupRule::getId).toList();
             }
-        } catch (SdkException e) {
-            log.error("Get HuaweiCloud SecurityGroupRule resources failed, error:{}",
-                    e.getMessage());
-            return new ArrayList<>();
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "HuaweiCloudClient listSecurityGroupRules with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return new ArrayList<>();
+        return securityGroupRuleIds;
     }
 
     private List<String> getPublicIpList(String userId, String region) {
+        List<String> publicIpAddresses = new ArrayList<>();
         try {
             EipClient eipClient = getEipClient(userId, region);
             ListPublicipsRequest request = new ListPublicipsRequest();
-            ListPublicipsResponse response = eipClient.listPublicips(request);
+            ListPublicipsResponse response = eipClient.listPublicipsInvoker(request)
+                    .retryTimes(DEFAULT_RETRY_TIMES)
+                    .retryCondition(huaweiCloudClient::matchRetryCondition)
+                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .invoke();
             if (response.getHttpStatusCode() == 200) {
-                return response.getPublicips().stream().map(PublicipShowResp::getPublicIpAddress)
-                        .toList();
+                publicIpAddresses = response.getPublicips()
+                        .stream().map(PublicipShowResp::getPublicIpAddress).toList();
             }
-        } catch (SdkException e) {
-            log.error("Get HuaweiCloud PublicIp resources failed, error:{}", e.getMessage());
-            return new ArrayList<>();
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "HuaweiCloudClient listPublicIps with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return new ArrayList<>();
+        return publicIpAddresses;
     }
 
     private List<String> getVolumeList(String userId, String region) {
+        List<String> volumeNames = new ArrayList<>();
         try {
             EvsClient evsClient = getEvsClient(userId, region);
             ListVolumesRequest request = new ListVolumesRequest();
-            ListVolumesResponse response = evsClient.listVolumes(request);
+            ListVolumesResponse response = evsClient.listVolumesInvoker(request)
+                    .retryTimes(DEFAULT_RETRY_TIMES)
+                    .retryCondition(huaweiCloudClient::matchRetryCondition)
+                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .invoke();
             if (response.getHttpStatusCode() == 200) {
-                return response.getVolumes().stream().map(VolumeDetail::getName).toList();
+                volumeNames = response.getVolumes().stream().map(VolumeDetail::getName).toList();
             }
-        } catch (SdkException e) {
-            log.error("Get HuaweiCloud VM resources failed, error:{}", e.getMessage());
-            return new ArrayList<>();
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "HuaweiCloudClient listVolumes with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return new ArrayList<>();
+        return volumeNames;
     }
 
     private List<String> getKeyPairsList(String userId, String region) {
+        List<String> keyPairNames = new ArrayList<>();
         try {
             EcsClient ecsClient = getEcsClient(userId, region);
             NovaListKeypairsRequest request = new NovaListKeypairsRequest();
-            NovaListKeypairsResponse response = ecsClient.novaListKeypairs(request);
+            NovaListKeypairsResponse response = ecsClient.novaListKeypairsInvoker(request)
+                    .retryTimes(DEFAULT_RETRY_TIMES)
+                    .retryCondition(huaweiCloudClient::matchRetryCondition)
+                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .invoke();
             if (response.getHttpStatusCode() == 200) {
-                return response.getKeypairs().stream().map(NovaListKeypairsResult::getKeypair)
+                keyPairNames = response.getKeypairs().stream()
+                        .map(NovaListKeypairsResult::getKeypair)
                         .map(NovaSimpleKeypair::getName).toList();
             }
-        } catch (SdkException e) {
-            log.error("Get HuaweiCloud KeyPairs resources failed, error:{}", e.getMessage());
-            return new ArrayList<>();
+        } catch (Exception e) {
+            String errorMsg = String.format(
+                    "HuaweiCloudClient listKeyPairs with region %s failed. %s",
+                    region, e.getMessage());
+            log.error(errorMsg, e);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return new ArrayList<>();
+        return keyPairNames;
     }
 
     private EcsClient getEcsClient(String userId, String regionName) {
