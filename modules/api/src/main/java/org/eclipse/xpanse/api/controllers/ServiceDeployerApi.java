@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
@@ -217,8 +216,9 @@ public class ServiceDeployerApi {
         log.info("Modifying service with id {}", id);
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
-        String currentUserId = this.userServiceHelper.getCurrentUserId();
-        if (!StringUtils.equals(currentUserId, deployServiceEntity.getUserId())) {
+        boolean currentUserIsOwner =
+                this.userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+        if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to modify services belonging to other users.");
         }
