@@ -28,7 +28,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceModify
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
@@ -136,9 +136,10 @@ public class DeployService {
                     existingServiceTemplate.getJsonObjectSchema());
         }
         if (Objects.nonNull(existingServiceTemplate.getOcl().getFlavors())) {
-            boolean containsName = existingServiceTemplate.getOcl().getFlavors().stream()
-                    .map(Flavor::getName)
-                    .anyMatch(name -> name.equals(deployRequest.getFlavor()));
+            boolean containsName =
+                    existingServiceTemplate.getOcl().getFlavors().getServiceFlavors().stream()
+                            .map(ServiceFlavor::getName)
+                            .anyMatch(name -> name.equals(deployRequest.getFlavor()));
             if (!containsName) {
                 throw new FlavorInvalidException(
                         String.format("flavor %s not found at flavor list.",
