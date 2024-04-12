@@ -7,6 +7,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -21,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -39,6 +41,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,13 +52,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
+import java.util.function.Supplier;
 import java.time.OffsetDateTime;
 
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.auth.Authentication;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.auth.OAuth;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
-@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.ApiClient")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
+@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient")
 public class ApiClient extends JavaTimeFormatter {
     public enum CollectionFormat {
         CSV(","), TSV("\t"), SSV(" "), PIPES("|"), MULTI(null);
@@ -149,7 +153,7 @@ public class ApiClient extends JavaTimeFormatter {
     /**
      * Set the max attempts for retry
      *
-     * @param getMaxAttemptsForRetry the max attempts for retry
+     * @param maxAttemptsForRetry the max attempts for retry
      * @return ApiClient this client
      */
     public ApiClient setMaxAttemptsForRetry(int maxAttemptsForRetry) {
@@ -646,20 +650,29 @@ public class ApiClient extends JavaTimeFormatter {
             try {
                 responseEntity = restTemplate.exchange(requestEntity, returnType);
                 break;
-            } catch (HttpServerErrorException ex) {
-                attempts++;
-                if (attempts < maxAttemptsForRetry) {
-                    try {
-                        Thread.sleep(waitTimeMillis);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+            } catch (HttpServerErrorException | HttpClientErrorException ex) {
+                if (ex instanceof HttpServerErrorException
+                        || ((HttpClientErrorException) ex)
+                        .getStatusCode()
+                        .equals(HttpStatus.TOO_MANY_REQUESTS)) {
+                    attempts++;
+                    if (attempts < maxAttemptsForRetry) {
+                        try {
+                            Thread.sleep(waitTimeMillis);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    } else {
+                        throw ex;
                     }
+                } else {
+                    throw ex;
                 }
             }
         }
 
         if (responseEntity == null) {
-            throw new RestClientException("API returned HttpServerErrorException");
+            throw new RestClientException("ResponseEntity is null");
         }
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {

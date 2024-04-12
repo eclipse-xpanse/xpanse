@@ -30,6 +30,7 @@ public class TofuMakerDeployment implements Deployer {
     private final TofuMakerDeploymentPlanManage tofuMakerDeploymentPlanManage;
     private final TofuMakerServiceDeployer tofuMakerServiceDeployer;
     private final TofuMakerServiceDestroyer tofuMakerServiceDestroyer;
+    private final TofuMakerServiceModifier tofuMakerServiceModifier;
 
     /**
      * Initializes the OpenTofuBoot deployer.
@@ -39,11 +40,13 @@ public class TofuMakerDeployment implements Deployer {
                                TofuMakerDeploymentPlanManage
                                        tofuMakerDeploymentPlanManage,
                                TofuMakerServiceDeployer tofuMakerServiceDeployer,
-                               TofuMakerServiceDestroyer tofuMakerServiceDestroyer) {
+                               TofuMakerServiceDestroyer tofuMakerServiceDestroyer,
+                               TofuMakerServiceModifier tofuMakerServiceModifier) {
         this.tofuMakerServiceDestroyer = tofuMakerServiceDestroyer;
         this.tofuMakerScriptValidator = tofuMakerScriptValidator;
         this.tofuMakerDeploymentPlanManage = tofuMakerDeploymentPlanManage;
         this.tofuMakerServiceDeployer = tofuMakerServiceDeployer;
+        this.tofuMakerServiceModifier = tofuMakerServiceModifier;
     }
 
     @Override
@@ -60,6 +63,14 @@ public class TofuMakerDeployment implements Deployer {
             return tofuMakerServiceDestroyer.destroyFromScripts(deployTask);
         }
         return tofuMakerServiceDestroyer.destroyFromGitRepo(deployTask);
+    }
+
+    @Override
+    public DeployResult modify(DeployTask deployTask) {
+        if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
+            return tofuMakerServiceModifier.modifyFromScripts(deployTask);
+        }
+        return tofuMakerServiceModifier.modifyFromGitRepo(deployTask);
     }
 
     /**

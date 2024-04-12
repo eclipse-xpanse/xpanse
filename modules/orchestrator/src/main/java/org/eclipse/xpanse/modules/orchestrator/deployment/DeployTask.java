@@ -43,8 +43,8 @@ public class DeployTask {
     private UUID serviceTemplateId;
 
     /**
-     * The action of the deployment task.
+     * The action of to the deployment task.
      */
-    private DestroyScenario destroyScenario;
+    private DeploymentScenario deploymentScenario;
 
 }

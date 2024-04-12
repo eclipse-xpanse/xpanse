@@ -4,17 +4,23 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDeployFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncModifyFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDeployFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDestroyFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuModifyFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlan;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlanFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.Response;
 import java.util.UUID;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,14 +29,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
-@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofumaker.generated.api.OpenTofuFromDirectoryApi")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
+@Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromDirectoryApi")
 public class OpenTofuFromDirectoryApi {
     private ApiClient apiClient;
 
@@ -54,11 +61,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * async deploy resources via OpenTofu from the given directory.
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -71,11 +78,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * async deploy resources via OpenTofu from the given directory.
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -124,11 +131,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * async destroy resources via OpenTofu from the given directory.
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -141,11 +148,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * async destroy resources via OpenTofu from the given directory.
-     * <p><b>202</b> - Accepted
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -193,12 +200,82 @@ public class OpenTofuFromDirectoryApi {
     }
     /**
      * 
-     * Deploy resources via OpenTofu from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
+     * async modify resources via OpenTofu from the given directory.
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
+     * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
+     * @param openTofuAsyncModifyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public void asyncModifyFromDirectory(String moduleDirectory, OpenTofuAsyncModifyFromDirectoryRequest openTofuAsyncModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        asyncModifyFromDirectoryWithHttpInfo(moduleDirectory, openTofuAsyncModifyFromDirectoryRequest, xCustomRequestId);
+    }
+
+    /**
+     * 
+     * async modify resources via OpenTofu from the given directory.
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>202</b> - Accepted
+     * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
+     * @param openTofuAsyncModifyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return ResponseEntity&lt;Void&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<Void> asyncModifyFromDirectoryWithHttpInfo(String moduleDirectory, OpenTofuAsyncModifyFromDirectoryRequest openTofuAsyncModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        Object localVarPostBody = openTofuAsyncModifyFromDirectoryRequest;
+        
+        // verify the required parameter 'moduleDirectory' is set
+        if (moduleDirectory == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling asyncModifyFromDirectory");
+        }
+        
+        // verify the required parameter 'openTofuAsyncModifyFromDirectoryRequest' is set
+        if (openTofuAsyncModifyFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'openTofuAsyncModifyFromDirectoryRequest' when calling asyncModifyFromDirectory");
+        }
+        
+        // create path and map variables
+        final Map<String, Object> uriVariables = new HashMap<String, Object>();
+        uriVariables.put("module_directory", moduleDirectory);
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
+
+        final String[] localVarAccepts = { 
+            "*/*"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
+
+        ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
+        return apiClient.invokeAPI("/tofu-maker/directory/modify/async/{module_directory}", HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Deploy resources via OpenTofu from the given directory.
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -212,11 +289,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * Deploy resources via OpenTofu from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuDeployFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -249,7 +326,7 @@ public class OpenTofuFromDirectoryApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -265,11 +342,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * Destroy the resources from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -283,11 +360,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * Destroy the resources from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuDestroyFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -320,7 +397,7 @@ public class OpenTofuFromDirectoryApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -335,12 +412,83 @@ public class OpenTofuFromDirectoryApi {
     }
     /**
      * 
-     * Get OpenTofu Plan as JSON string from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
+     * Modify resources via OpenTofu from the given directory.
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
+     * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
+     * @param openTofuModifyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return OpenTofuResult
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public OpenTofuResult modifyFromDirectory(String moduleDirectory, OpenTofuModifyFromDirectoryRequest openTofuModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        return modifyFromDirectoryWithHttpInfo(moduleDirectory, openTofuModifyFromDirectoryRequest, xCustomRequestId).getBody();
+    }
+
+    /**
+     * 
+     * Modify resources via OpenTofu from the given directory.
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
+     * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
+     * @param openTofuModifyFromDirectoryRequest  (required)
+     * @param xCustomRequestId  (optional)
+     * @return ResponseEntity&lt;OpenTofuResult&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<OpenTofuResult> modifyFromDirectoryWithHttpInfo(String moduleDirectory, OpenTofuModifyFromDirectoryRequest openTofuModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+        Object localVarPostBody = openTofuModifyFromDirectoryRequest;
+        
+        // verify the required parameter 'moduleDirectory' is set
+        if (moduleDirectory == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'moduleDirectory' when calling modifyFromDirectory");
+        }
+        
+        // verify the required parameter 'openTofuModifyFromDirectoryRequest' is set
+        if (openTofuModifyFromDirectoryRequest == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'openTofuModifyFromDirectoryRequest' when calling modifyFromDirectory");
+        }
+        
+        // create path and map variables
+        final Map<String, Object> uriVariables = new HashMap<String, Object>();
+        uriVariables.put("module_directory", moduleDirectory);
+
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
+
+        if (xCustomRequestId != null)
+        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
+
+        final String[] localVarAccepts = { 
+            "*/*", "application/json"
+         };
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = { 
+            "application/json"
+         };
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] { "OAuth2Flow" };
+
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {};
+        return apiClient.invokeAPI("/tofu-maker/directory/modify/{module_directory}", HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+    }
+    /**
+     * 
+     * Get OpenTofu Plan as JSON string from the given directory.
+     * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
+     * <p><b>502</b> - Bad Gateway
+     * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuPlanFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -354,11 +502,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * Get OpenTofu Plan as JSON string from the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuPlanFromDirectoryRequest  (required)
      * @param xCustomRequestId  (optional)
@@ -391,7 +539,7 @@ public class OpenTofuFromDirectoryApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = { 
@@ -407,11 +555,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * Validate the OpenTofu modules in the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param xCustomRequestId  (optional)
      * @return OpenTofuValidationResult
@@ -424,11 +572,11 @@ public class OpenTofuFromDirectoryApi {
     /**
      * 
      * Validate the OpenTofu modules in the given directory.
-     * <p><b>200</b> - OK
-     * <p><b>400</b> - Bad Request
      * <p><b>422</b> - Unprocessable Entity
+     * <p><b>400</b> - Bad Request
      * <p><b>502</b> - Bad Gateway
      * <p><b>503</b> - Service Unavailable
+     * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;OpenTofuValidationResult&gt;
@@ -455,7 +603,7 @@ public class OpenTofuFromDirectoryApi {
         localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
-            "application/json", "*/*"
+            "*/*", "application/json"
          };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {  };

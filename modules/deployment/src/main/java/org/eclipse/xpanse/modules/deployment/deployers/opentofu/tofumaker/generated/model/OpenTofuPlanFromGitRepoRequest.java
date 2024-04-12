@@ -14,11 +14,17 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuScriptGitRepoDetails;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * OpenTofuPlanFromGitRepoRequest
@@ -28,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
   OpenTofuPlanFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
   OpenTofuPlanFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class OpenTofuPlanFromGitRepoRequest {
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();

@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonPropertyOrder({
   TerraformPlan.JSON_PROPERTY_PLAN
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformPlan {
   public static final String JSON_PROPERTY_PLAN = "plan";
   private String plan;

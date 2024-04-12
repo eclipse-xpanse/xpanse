@@ -14,31 +14,38 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * OpenTofuResult
  */
 @JsonPropertyOrder({
-  OpenTofuResult.JSON_PROPERTY_DESTROY_SCENARIO,
+  OpenTofuResult.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   OpenTofuResult.JSON_PROPERTY_COMMAND_STD_OUTPUT,
   OpenTofuResult.JSON_PROPERTY_COMMAND_STD_ERROR,
   OpenTofuResult.JSON_PROPERTY_TERRAFORM_STATE,
   OpenTofuResult.JSON_PROPERTY_IMPORTANT_FILE_CONTENT_MAP,
   OpenTofuResult.JSON_PROPERTY_COMMAND_SUCCESSFUL
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class OpenTofuResult {
   /**
-   * This value is set only if the same is set in the request as well. This is useful only for the caller to differentiate what type of destroy it is. No difference in the way destroy will be executed.based on this flag. User may use this flag in case callback are used. So the calling application can know the result is for which specific destroy use case within the calling system.
+   * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
    */
-  public enum DestroyScenarioEnum {
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
     DESTROY("destroy"),
     
     ROLLBACK("rollback"),
@@ -47,7 +54,7 @@ public class OpenTofuResult {
 
     private String value;
 
-    DestroyScenarioEnum(String value) {
+    DeploymentScenarioEnum(String value) {
       this.value = value;
     }
 
@@ -62,8 +69,8 @@ public class OpenTofuResult {
     }
 
     @JsonCreator
-    public static DestroyScenarioEnum fromValue(String value) {
-      for (DestroyScenarioEnum b : DestroyScenarioEnum.values()) {
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
         if (b.value.equals(value)) {
           return b;
         }
@@ -72,8 +79,8 @@ public class OpenTofuResult {
     }
   }
 
-  public static final String JSON_PROPERTY_DESTROY_SCENARIO = "destroyScenario";
-  private DestroyScenarioEnum destroyScenario;
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_COMMAND_STD_OUTPUT = "commandStdOutput";
   private String commandStdOutput;
@@ -93,29 +100,29 @@ public class OpenTofuResult {
   public OpenTofuResult() {
   }
 
-  public OpenTofuResult destroyScenario(DestroyScenarioEnum destroyScenario) {
+  public OpenTofuResult deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
-    this.destroyScenario = destroyScenario;
+    this.deploymentScenario = deploymentScenario;
     return this;
   }
 
    /**
-   * This value is set only if the same is set in the request as well. This is useful only for the caller to differentiate what type of destroy it is. No difference in the way destroy will be executed.based on this flag. User may use this flag in case callback are used. So the calling application can know the result is for which specific destroy use case within the calling system.
-   * @return destroyScenario
+   * This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.
+   * @return deploymentScenario
   **/
   @jakarta.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public DestroyScenarioEnum getDestroyScenario() {
-    return destroyScenario;
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
   }
 
 
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDestroyScenario(DestroyScenarioEnum destroyScenario) {
-    this.destroyScenario = destroyScenario;
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -265,7 +272,7 @@ public class OpenTofuResult {
       return false;
     }
     OpenTofuResult openTofuResult = (OpenTofuResult) o;
-    return Objects.equals(this.destroyScenario, openTofuResult.destroyScenario) &&
+    return Objects.equals(this.deploymentScenario, openTofuResult.deploymentScenario) &&
         Objects.equals(this.commandStdOutput, openTofuResult.commandStdOutput) &&
         Objects.equals(this.commandStdError, openTofuResult.commandStdError) &&
         Objects.equals(this.terraformState, openTofuResult.terraformState) &&
@@ -275,14 +282,14 @@ public class OpenTofuResult {
 
   @Override
   public int hashCode() {
-    return Objects.hash(destroyScenario, commandStdOutput, commandStdError, terraformState, importantFileContentMap, commandSuccessful);
+    return Objects.hash(deploymentScenario, commandStdOutput, commandStdError, terraformState, importantFileContentMap, commandSuccessful);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class OpenTofuResult {\n");
-    sb.append("    destroyScenario: ").append(toIndentedString(destroyScenario)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    commandStdOutput: ").append(toIndentedString(commandStdOutput)).append("\n");
     sb.append("    commandStdError: ").append(toIndentedString(commandStdError)).append("\n");
     sb.append("    terraformState: ").append(toIndentedString(terraformState)).append("\n");

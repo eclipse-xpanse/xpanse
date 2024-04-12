@@ -33,19 +33,23 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * TerraformAsyncDestroyFromScriptsRequest
  */
 @JsonPropertyOrder({
-  TerraformAsyncDestroyFromScriptsRequest.JSON_PROPERTY_DESTROY_SCENARIO,
+  TerraformAsyncDestroyFromScriptsRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   TerraformAsyncDestroyFromScriptsRequest.JSON_PROPERTY_VARIABLES,
   TerraformAsyncDestroyFromScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
   TerraformAsyncDestroyFromScriptsRequest.JSON_PROPERTY_SCRIPTS,
   TerraformAsyncDestroyFromScriptsRequest.JSON_PROPERTY_TF_STATE,
   TerraformAsyncDestroyFromScriptsRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformAsyncDestroyFromScriptsRequest {
   /**
-   * The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.
+   * The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.
    */
-  public enum DestroyScenarioEnum {
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
     DESTROY("destroy"),
     
     ROLLBACK("rollback"),
@@ -54,7 +58,7 @@ public class TerraformAsyncDestroyFromScriptsRequest {
 
     private String value;
 
-    DestroyScenarioEnum(String value) {
+    DeploymentScenarioEnum(String value) {
       this.value = value;
     }
 
@@ -69,8 +73,8 @@ public class TerraformAsyncDestroyFromScriptsRequest {
     }
 
     @JsonCreator
-    public static DestroyScenarioEnum fromValue(String value) {
-      for (DestroyScenarioEnum b : DestroyScenarioEnum.values()) {
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
         if (b.value.equals(value)) {
           return b;
         }
@@ -79,8 +83,8 @@ public class TerraformAsyncDestroyFromScriptsRequest {
     }
   }
 
-  public static final String JSON_PROPERTY_DESTROY_SCENARIO = "destroyScenario";
-  private DestroyScenarioEnum destroyScenario;
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
@@ -100,29 +104,29 @@ public class TerraformAsyncDestroyFromScriptsRequest {
   public TerraformAsyncDestroyFromScriptsRequest() {
   }
 
-  public TerraformAsyncDestroyFromScriptsRequest destroyScenario(DestroyScenarioEnum destroyScenario) {
+  public TerraformAsyncDestroyFromScriptsRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
     
-    this.destroyScenario = destroyScenario;
+    this.deploymentScenario = deploymentScenario;
     return this;
   }
 
    /**
-   * The destroy scenario when the Xpanse client send the destroy request. Valid values: destroy,rollback,purge.
-   * @return destroyScenario
+   * The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.
+   * @return deploymentScenario
   **/
   @jakarta.annotation.Nullable
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public DestroyScenarioEnum getDestroyScenario() {
-    return destroyScenario;
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
   }
 
 
-  @JsonProperty(JSON_PROPERTY_DESTROY_SCENARIO)
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDestroyScenario(DestroyScenarioEnum destroyScenario) {
-    this.destroyScenario = destroyScenario;
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -285,7 +289,7 @@ public class TerraformAsyncDestroyFromScriptsRequest {
       return false;
     }
     TerraformAsyncDestroyFromScriptsRequest terraformAsyncDestroyFromScriptsRequest = (TerraformAsyncDestroyFromScriptsRequest) o;
-    return Objects.equals(this.destroyScenario, terraformAsyncDestroyFromScriptsRequest.destroyScenario) &&
+    return Objects.equals(this.deploymentScenario, terraformAsyncDestroyFromScriptsRequest.deploymentScenario) &&
         Objects.equals(this.variables, terraformAsyncDestroyFromScriptsRequest.variables) &&
         Objects.equals(this.envVariables, terraformAsyncDestroyFromScriptsRequest.envVariables) &&
         Objects.equals(this.scripts, terraformAsyncDestroyFromScriptsRequest.scripts) &&
@@ -295,14 +299,14 @@ public class TerraformAsyncDestroyFromScriptsRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(destroyScenario, variables, envVariables, scripts, tfState, webhookConfig);
+    return Objects.hash(deploymentScenario, variables, envVariables, scripts, tfState, webhookConfig);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TerraformAsyncDestroyFromScriptsRequest {\n");
-    sb.append("    destroyScenario: ").append(toIndentedString(destroyScenario)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
     sb.append("    scripts: ").append(toIndentedString(scripts)).append("\n");

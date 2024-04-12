@@ -31,14 +31,59 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonPropertyOrder({
   TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+  TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_DEPLOYMENT_SCENARIO,
   TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
   TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
   TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformAsyncDeployFromDirectoryRequest {
   public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
   private Boolean isPlanOnly;
+
+  /**
+   * The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.
+   */
+  public enum DeploymentScenarioEnum {
+    DEPLOY("deploy"),
+    
+    MODIFY("modify"),
+    
+    DESTROY("destroy"),
+    
+    ROLLBACK("rollback"),
+    
+    PURGE("purge");
+
+    private String value;
+
+    DeploymentScenarioEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static DeploymentScenarioEnum fromValue(String value) {
+      for (DeploymentScenarioEnum b : DeploymentScenarioEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  public static final String JSON_PROPERTY_DEPLOYMENT_SCENARIO = "deploymentScenario";
+  private DeploymentScenarioEnum deploymentScenario;
 
   public static final String JSON_PROPERTY_VARIABLES = "variables";
   private Map<String, Object> variables = new HashMap<>();
@@ -75,6 +120,32 @@ public class TerraformAsyncDeployFromDirectoryRequest {
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setIsPlanOnly(Boolean isPlanOnly) {
     this.isPlanOnly = isPlanOnly;
+  }
+
+
+  public TerraformAsyncDeployFromDirectoryRequest deploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    
+    this.deploymentScenario = deploymentScenario;
+    return this;
+  }
+
+   /**
+   * The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.
+   * @return deploymentScenario
+  **/
+  @jakarta.annotation.Nullable
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+
+  public DeploymentScenarioEnum getDeploymentScenario() {
+    return deploymentScenario;
+  }
+
+
+  @JsonProperty(JSON_PROPERTY_DEPLOYMENT_SCENARIO)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setDeploymentScenario(DeploymentScenarioEnum deploymentScenario) {
+    this.deploymentScenario = deploymentScenario;
   }
 
 
@@ -178,6 +249,7 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     }
     TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest = (TerraformAsyncDeployFromDirectoryRequest) o;
     return Objects.equals(this.isPlanOnly, terraformAsyncDeployFromDirectoryRequest.isPlanOnly) &&
+        Objects.equals(this.deploymentScenario, terraformAsyncDeployFromDirectoryRequest.deploymentScenario) &&
         Objects.equals(this.variables, terraformAsyncDeployFromDirectoryRequest.variables) &&
         Objects.equals(this.envVariables, terraformAsyncDeployFromDirectoryRequest.envVariables) &&
         Objects.equals(this.webhookConfig, terraformAsyncDeployFromDirectoryRequest.webhookConfig);
@@ -185,7 +257,7 @@ public class TerraformAsyncDeployFromDirectoryRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(isPlanOnly, variables, envVariables, webhookConfig);
+    return Objects.hash(isPlanOnly, deploymentScenario, variables, envVariables, webhookConfig);
   }
 
   @Override
@@ -193,6 +265,7 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     StringBuilder sb = new StringBuilder();
     sb.append("class TerraformAsyncDeployFromDirectoryRequest {\n");
     sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
+    sb.append("    deploymentScenario: ").append(toIndentedString(deploymentScenario)).append("\n");
     sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
     sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
     sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");

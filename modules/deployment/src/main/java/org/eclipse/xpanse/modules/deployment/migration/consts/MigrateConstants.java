@@ -26,4 +26,5 @@ public class MigrateConstants {
 
     public static final String MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID = "deployCallBack";
     public static final String MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID = "destroyCallBack";
+    public static final String MIGRATION_MODIFY_RECEIVE_TASK_ACTIVITY_ID = "modifyCallBack";
 }

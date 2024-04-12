@@ -34,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   Response.JSON_PROPERTY_DETAILS,
   Response.JSON_PROPERTY_SUCCESS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class Response {
   /**
    * The result code of response.

@@ -34,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
   TerraformValidationResult.JSON_PROPERTY_VALID,
   TerraformValidationResult.JSON_PROPERTY_DIAGNOSTICS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 public class TerraformValidationResult {
   public static final String JSON_PROPERTY_VALID = "valid";
   private Boolean valid;
