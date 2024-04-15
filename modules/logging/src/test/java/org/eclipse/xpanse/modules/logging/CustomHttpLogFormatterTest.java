@@ -17,7 +17,7 @@ import org.zalando.logbook.Precorrelation;
 
 class CustomHttpLogFormatterTest {
 
-    String baseUrl = "http://localhost:8080";
+    String baseUrl = "/xpanse";
     String requestId = "requestId";
     private CustomHttpLogFormatter customHttpLogFormatterUnderTest;
 
@@ -39,7 +39,7 @@ class CustomHttpLogFormatterTest {
         final String result = customHttpLogFormatterUnderTest.format(getPrecorrelation(), request);
 
         // Verify the results
-        assertThat(result).isEqualTo("Request: GET http://localhost:8080?id=1");
+        assertThat(result).isEqualTo("Request: GET /xpanse?id=1");
         customHttpLogWriterUnderTest.write(getPrecorrelation(), "request");
     }
 
@@ -65,7 +65,7 @@ class CustomHttpLogFormatterTest {
         return new HttpRequest() {
             @Override
             public String getRemote() {
-                return baseUrl;
+                return "http://localhost:8080";
             }
 
             @Override
@@ -80,7 +80,7 @@ class CustomHttpLogFormatterTest {
 
             @Override
             public String getHost() {
-                return "localHost";
+                return "localhost";
             }
 
             @Override
