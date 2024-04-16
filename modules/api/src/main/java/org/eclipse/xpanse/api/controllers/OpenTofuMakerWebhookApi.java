@@ -15,6 +15,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -88,7 +89,44 @@ public class OpenTofuMakerWebhookApi {
             @PathVariable("task_id") String taskId,
             @Valid @RequestBody OpenTofuResult result) {
 
-        openTofuDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result);
+        openTofuDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result,
+                DeploymentScenario.DESTROY);
+    }
+
+
+    /**
+     * Webhook methods to receive openTofu execution result.
+     */
+    @Tag(name = "Webhook", description = "Webhook APIs")
+    @Operation(description = "Process the execution result after openTofu executes the command "
+            + "line to rollback service deployment.")
+    @PostMapping(value = "${webhook.tofu-maker.rollbackCallbackUri}/{task_id}", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void rollbackCallback(
+            @Parameter(name = "task_id", description = "task id")
+            @PathVariable("task_id") String taskId,
+            @Valid @RequestBody OpenTofuResult result) {
+        openTofuDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result,
+                DeploymentScenario.ROLLBACK);
+    }
+
+
+    /**
+     * Webhook methods to receive openTofu execution result.
+     */
+    @Tag(name = "Webhook", description = "Webhook APIs")
+    @Operation(description = "Process the execution result after openTofu executes the command "
+            + "line to purge service.")
+    @PostMapping(value = "${webhook.tofu-maker.purgeCallbackUri}/{task_id}", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void purgeCallback(
+            @Parameter(name = "task_id", description = "task id")
+            @PathVariable("task_id") String taskId,
+            @Valid @RequestBody OpenTofuResult result) {
+        openTofuDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result,
+                DeploymentScenario.PURGE);
     }
 
 }

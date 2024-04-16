@@ -96,7 +96,7 @@ public class TofuMakerServiceModifier {
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
-        request.setWebhookConfig(tofuMakerHelper.getModifyWebhookConfig(task));
+        request.setWebhookConfig(tofuMakerHelper.getWebhookConfigWithTask(task));
         return request;
     }
 
@@ -108,7 +108,7 @@ public class TofuMakerServiceModifier {
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
-        request.setWebhookConfig(tofuMakerHelper.getModifyWebhookConfig(task));
+        request.setWebhookConfig(tofuMakerHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));

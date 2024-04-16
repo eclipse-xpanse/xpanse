@@ -21,13 +21,14 @@ import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityToDeployTaskConverter;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Component;
 
@@ -63,26 +64,11 @@ public class OpenTofuDeploymentResultCallbackManager {
     private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
-     * Callback method after deployment is complete.
+     * Callback method after the deployment task is completed.
      */
     public void deployCallback(UUID taskId, OpenTofuResult result) {
-        log.info("Update database entity with id:{} with open tofu deploy callback result.",
-                taskId);
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(taskId);
-        DeployResult deployResult = handlerCallbackOpenTofuResult(result);
-        deployResult.setId(taskId);
-        if (StringUtils.isNotBlank(result.getTerraformState())) {
-            ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            deployServiceEntity.getServiceTemplateId());
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    serviceTemplateEntity.getOcl()
-                            .getDeployment().getKind()).handler(deployResult);
-        }
         DeployServiceEntity updatedDeployServiceEntity =
-                deployResultManager.updateDeployServiceEntityWithDeployResult(
-                        deployResult, deployServiceEntity);
+                handleCallbackOpenTofuResult(taskId, result, DeploymentScenario.DEPLOY);
         if (ServiceDeploymentState.DEPLOY_FAILED
                 == updatedDeployServiceEntity.getServiceDeploymentState()) {
             DeployTask deployTask =
@@ -100,26 +86,17 @@ public class OpenTofuDeploymentResultCallbackManager {
     }
 
     /**
-     * Callback method after the service is destroyed.
+     * Callback method after the modification task is completed.
      */
-    public void destroyCallback(UUID taskId, OpenTofuResult result) {
-        log.info("Update database entity with id:{} with open tofu destroy callback result.",
-                taskId);
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(taskId);
-        DeployResult destroyResult = handlerCallbackOpenTofuResult(result);
-        destroyResult.setId(taskId);
-        if (StringUtils.isNotBlank(result.getTerraformState())) {
-            ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            deployServiceEntity.getServiceTemplateId());
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    serviceTemplateEntity.getOcl()
-                            .getDeployment().getKind()).handler(destroyResult);
-        }
-        deployResultManager.updateDeployServiceEntityWithDeployResult(destroyResult,
-                deployServiceEntity);
+    public void modifyCallback(UUID taskId, OpenTofuResult openTofuResult) {
+        handleCallbackOpenTofuResult(taskId, openTofuResult, DeploymentScenario.MODIFY);
+    }
 
+    /**
+     * Callback method after the destroy/rollback/purge task is completed.
+     */
+    public void destroyCallback(UUID taskId, OpenTofuResult result, DeploymentScenario scenario) {
+        handleCallbackOpenTofuResult(taskId, result, scenario);
         ServiceMigrationEntity serviceMigrationEntity =
                 migrationService.getServiceMigrationEntityByOldServiceId(taskId.toString());
         if (Objects.nonNull(serviceMigrationEntity)) {
@@ -128,47 +105,40 @@ public class OpenTofuDeploymentResultCallbackManager {
         }
     }
 
-    /**
-     * Callback method after the service is modified.
-     */
-    public void modifyCallback(UUID taskId, OpenTofuResult result) {
-        log.info("Update database entity with id:{} with terraform modify callback result.",
-                taskId);
+    private DeployServiceEntity handleCallbackOpenTofuResult(UUID taskId, OpenTofuResult result,
+                                                             DeploymentScenario scenario) {
+        log.info("Handle openTofu callback result of task with id:{} in scenario:{}. ", taskId,
+                scenario.toValue());
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(taskId);
-        DeployResult deployResult = handlerCallbackOpenTofuResult(result);
-        deployResult.setId(taskId);
-        if (StringUtils.isNotBlank(result.getTerraformState())) {
-            ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            deployServiceEntity.getServiceTemplateId());
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    serviceTemplateEntity.getOcl()
-                            .getDeployment().getKind()).handler(deployResult);
-        }
-        deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
-                deployServiceEntity);
-    }
 
-    private DeployResult handlerCallbackOpenTofuResult(OpenTofuResult result) {
         DeployResult deployResult = new DeployResult();
+        deployResult.setId(taskId);
         if (Boolean.FALSE.equals(result.getCommandSuccessful())) {
             deployResult.setMessage(result.getCommandStdError());
         }
-        deployResult.setState(getDeployerTaskStatus(result.getDeploymentScenario(),
-                Boolean.TRUE.equals(result.getCommandSuccessful())));
+        deployResult.setState(getDeployerTaskStatus(scenario, result.getCommandSuccessful()));
         deployResult.getPrivateProperties()
                 .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
         if (Objects.nonNull(result.getImportantFileContentMap())) {
             deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
         }
-        return deployResult;
+
+        if (StringUtils.isNotBlank(result.getTerraformState())) {
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            deployServiceEntity.getServiceTemplateId());
+            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
+                    serviceTemplateEntity.getOcl().getDeployment().getKind()).handler(deployResult);
+        }
+        return deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
+                deployServiceEntity);
+
     }
 
-    private DeployerTaskStatus getDeployerTaskStatus(
-            OpenTofuResult.DeploymentScenarioEnum deploymentScenario,
-            boolean isCommandSuccessful) {
-        return switch (deploymentScenario) {
+    private DeployerTaskStatus getDeployerTaskStatus(DeploymentScenario scenario,
+                                                     Boolean isCommandSuccessful) {
+        return switch (scenario) {
             case DEPLOY -> isCommandSuccessful ? DeployerTaskStatus.DEPLOY_SUCCESS
                     : DeployerTaskStatus.DEPLOY_FAILED;
             case MODIFY -> isCommandSuccessful ? DeployerTaskStatus.MODIFICATION_SUCCESSFUL

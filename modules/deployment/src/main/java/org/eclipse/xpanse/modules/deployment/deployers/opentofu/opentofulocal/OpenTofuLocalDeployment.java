@@ -148,8 +148,6 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
-            openTofuResult.setDeploymentScenario(OpenTofuResult.DeploymentScenarioEnum.fromValue(
-                    task.getDeploymentScenario().toValue()));
             try {
                 executor.deploy();
                 openTofuResult.setCommandSuccessful(true);
@@ -171,8 +169,6 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
-            openTofuResult.setDeploymentScenario(OpenTofuResult.DeploymentScenarioEnum.fromValue(
-                    task.getDeploymentScenario().toValue()));
             try {
                 executor.destroy();
                 openTofuResult.setCommandSuccessful(true);
@@ -183,7 +179,8 @@ public class OpenTofuLocalDeployment implements Deployer {
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
             openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
-            openTofuDeploymentResultCallbackManager.destroyCallback(task.getId(), openTofuResult);
+            openTofuDeploymentResultCallbackManager.destroyCallback(task.getId(), openTofuResult,
+                    task.getDeploymentScenario());
         });
     }
 
@@ -195,8 +192,6 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
-            openTofuResult.setDeploymentScenario(OpenTofuResult.DeploymentScenarioEnum.fromValue(
-                    task.getDeploymentScenario().toValue()));
             try {
                 executor.deploy();
                 openTofuResult.setCommandSuccessful(true);

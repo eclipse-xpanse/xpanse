@@ -30,4 +30,10 @@ public class TofuMakerConfig {
     @Value("${webhook.tofu-maker.destroyCallbackUri}")
     private String destroyCallbackUri;
 
+    @Value("${webhook.tofu-maker.rollbackCallbackUri}")
+    private String rollbackCallbackUri;
+
+    @Value("${webhook.tofu-maker.purgeCallbackUri}")
+    private String purgeCallbackUri;
+
 }

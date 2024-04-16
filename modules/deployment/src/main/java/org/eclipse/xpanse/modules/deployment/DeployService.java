@@ -402,6 +402,7 @@ public class DeployService {
         MDC.put(TASK_ID, newId.toString());
         log.info("Migrate workflow start deploy new service with id: {}", newId);
         DeployTask deployTask = createNewDeployTask(deployRequest);
+        deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         // override task id and user id.
         deployTask.setId(newId);
         deployTask.getDeployRequest().setUserId(userId);
