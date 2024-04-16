@@ -97,10 +97,7 @@ public class TerraformBootServiceDestroyer {
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
-        request.setWebhookConfig(terraformBootHelper.getWebhookConfig(task, true));
-        request.setDeploymentScenario(
-                TerraformAsyncDestroyFromScriptsRequest.DeploymentScenarioEnum.fromValue(
-                        task.getDeploymentScenario().toValue()));
+        request.setWebhookConfig(terraformBootHelper.getWebhookConfigWithTask(task));
         return request;
     }
 
@@ -112,10 +109,7 @@ public class TerraformBootServiceDestroyer {
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
-        request.setWebhookConfig(terraformBootHelper.getWebhookConfig(task, true));
-        request.setDeploymentScenario(
-                TerraformAsyncDestroyFromGitRepoRequest.DeploymentScenarioEnum.fromValue(
-                        task.getDeploymentScenario().toValue()));
+        request.setWebhookConfig(terraformBootHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));

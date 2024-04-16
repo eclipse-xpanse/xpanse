@@ -30,4 +30,10 @@ public class TerraformBootConfig {
     @Value("${webhook.terraform-boot.destroyCallbackUri}")
     private String destroyCallbackUri;
 
+    @Value("${webhook.terraform-boot.rollbackCallbackUri}")
+    private String rollbackCallbackUri;
+
+    @Value("${webhook.terraform-boot.purgeCallbackUri}")
+    private String purgeCallbackUri;
+
 }

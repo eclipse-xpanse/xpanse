@@ -24,8 +24,7 @@ public enum DeployerTaskStatus {
     ROLLBACK_FAILED("rollback_failed"),
     PURGE_SUCCESS("purge_success"),
     PURGE_FAILED("purge_failed"),
-    MODIFYING("modifying"),
-    MODIFYING_FAILED("modifying_failed"),
+    MODIFICATION_FAILED("modification_failed"),
     MODIFICATION_SUCCESSFUL("modification_successful");
 
     private final String status;

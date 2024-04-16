@@ -209,7 +209,7 @@ public class DeployService {
             log.info("Deploy service with id:{} failed.", deployTask.getId(), e);
             deployResult = new DeployResult();
             deployResult.setId(deployTask.getId());
-            deployResult.setState(getDeploymentTaskState(deployTask.getDeploymentScenario()));
+            deployResult.setState(getDeployerTaskFailedState(deployTask.getDeploymentScenario()));
             deployResult.setMessage(e.getMessage());
         }
         try {
@@ -258,7 +258,7 @@ public class DeployService {
         if (!deployServiceEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.DEPLOY_SUCCESS)
                 && !deployServiceEntity.getServiceDeploymentState()
-                .equals(ServiceDeploymentState.MODIFYING_FAILED)
+                .equals(ServiceDeploymentState.MODIFICATION_FAILED)
                 && !deployServiceEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL)) {
             throw new InvalidServiceStateException(
@@ -302,7 +302,7 @@ public class DeployService {
             log.info("Modify service with id:{} failed.", modifyTask.getId(), e);
             modifyResult = new DeployResult();
             modifyResult.setId(modifyTask.getId());
-            modifyResult.setState(getDeploymentTaskState(modifyTask.getDeploymentScenario()));
+            modifyResult.setState(getDeployerTaskFailedState(modifyTask.getDeploymentScenario()));
             modifyResult.setMessage(e.getMessage());
         }
         try {
@@ -340,7 +340,7 @@ public class DeployService {
             log.info("Destroy service with id:{} failed.", destroyTask.getId(), e);
             destroyResult = new DeployResult();
             destroyResult.setId(destroyTask.getId());
-            destroyResult.setState(getDeploymentTaskState(destroyTask.getDeploymentScenario()));
+            destroyResult.setState(getDeployerTaskFailedState(destroyTask.getDeploymentScenario()));
             destroyResult.setMessage(e.getMessage());
         }
         try {
@@ -357,13 +357,13 @@ public class DeployService {
         }
     }
 
-    private DeployerTaskStatus getDeploymentTaskState(DeploymentScenario deploymentScenario) {
+    private DeployerTaskStatus getDeployerTaskFailedState(DeploymentScenario deploymentScenario) {
         return switch (deploymentScenario) {
             case DEPLOY -> DeployerTaskStatus.DEPLOY_FAILED;
             case DESTROY -> DeployerTaskStatus.DESTROY_FAILED;
             case ROLLBACK -> DeployerTaskStatus.ROLLBACK_FAILED;
             case PURGE -> DeployerTaskStatus.PURGE_FAILED;
-            case MODIFY -> DeployerTaskStatus.MODIFYING_FAILED;
+            case MODIFY -> DeployerTaskStatus.MODIFICATION_FAILED;
         };
     }
 
@@ -454,7 +454,6 @@ public class DeployService {
         // Get state of service.
         ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
         if (!(state == ServiceDeploymentState.DEPLOY_FAILED
-                || state == ServiceDeploymentState.MODIFYING_FAILED
                 || state == ServiceDeploymentState.DESTROY_SUCCESS
                 || state == ServiceDeploymentState.DESTROY_FAILED
                 || state == ServiceDeploymentState.ROLLBACK_FAILED

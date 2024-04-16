@@ -81,10 +81,7 @@ public class TerraformBootServiceDeployer {
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
-        request.setWebhookConfig(terraformBootHelper.getWebhookConfig(task, false));
-        request.setDeploymentScenario(
-                TerraformAsyncDeployFromScriptsRequest.DeploymentScenarioEnum.fromValue(
-                        task.getDeploymentScenario().toValue()));
+        request.setWebhookConfig(terraformBootHelper.getWebhookConfigWithTask(task));
         return request;
     }
 
@@ -94,14 +91,11 @@ public class TerraformBootServiceDeployer {
         request.setIsPlanOnly(false);
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
-        request.setWebhookConfig(terraformBootHelper.getWebhookConfig(task, false));
+        request.setWebhookConfig(terraformBootHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo())
         );
-        request.setDeploymentScenario(
-                TerraformAsyncDeployFromGitRepoRequest.DeploymentScenarioEnum.fromValue(
-                        task.getDeploymentScenario().toValue()));
         return request;
     }
 }

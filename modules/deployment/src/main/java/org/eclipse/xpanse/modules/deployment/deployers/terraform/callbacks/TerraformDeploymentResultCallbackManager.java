@@ -27,11 +27,12 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * Bean for managing deployment and destroy callback functions.
+ * Bean for managing deployer terraform callback functions.
  */
 @Slf4j
 @Component
@@ -62,26 +63,11 @@ public class TerraformDeploymentResultCallbackManager {
     private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
-     * Callback method after deployment is complete.
+     * Callback method after the deployment task is completed.
      */
     public void deployCallback(UUID taskId, TerraformResult result) {
-        log.info("Update database entity with id:{} with terraform deploy callback result.",
-                taskId);
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(taskId);
-        DeployResult deployResult = handlerCallbackTerraformResult(result);
-        deployResult.setId(taskId);
-        if (StringUtils.isNotBlank(result.getTerraformState())) {
-            ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            deployServiceEntity.getServiceTemplateId());
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    serviceTemplateEntity.getOcl()
-                            .getDeployment().getKind()).handler(deployResult);
-        }
         DeployServiceEntity updatedDeployServiceEntity =
-                deployResultManager.updateDeployServiceEntityWithDeployResult(
-                        deployResult, deployServiceEntity);
+                handleCallbackTerraformResult(taskId, result, DeploymentScenario.DEPLOY);
         if (ServiceDeploymentState.DEPLOY_FAILED
                 == updatedDeployServiceEntity.getServiceDeploymentState()) {
             DeployTask deployTask =
@@ -99,26 +85,17 @@ public class TerraformDeploymentResultCallbackManager {
     }
 
     /**
-     * Callback method after the service is destroyed.
+     * Callback method after the modification task is completed.
      */
-    public void destroyCallback(UUID taskId, TerraformResult result) {
-        log.info("Update database entity with id:{} with terraform destroy callback result.",
-                taskId);
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(taskId);
-        DeployResult destroyResult = handlerCallbackTerraformResult(result);
-        destroyResult.setId(taskId);
-        if (StringUtils.isNotBlank(result.getTerraformState())) {
-            ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            deployServiceEntity.getServiceTemplateId());
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    serviceTemplateEntity.getOcl()
-                            .getDeployment().getKind()).handler(destroyResult);
-        }
-        deployResultManager.updateDeployServiceEntityWithDeployResult(destroyResult,
-                deployServiceEntity);
+    public void modifyCallback(UUID taskId, TerraformResult terraformResult) {
+        handleCallbackTerraformResult(taskId, terraformResult, DeploymentScenario.MODIFY);
+    }
 
+    /**
+     * Callback method after the destroy/rollback/purge task is completed.
+     */
+    public void destroyCallback(UUID taskId, TerraformResult result, DeploymentScenario scenario) {
+        handleCallbackTerraformResult(taskId, result, scenario);
         ServiceMigrationEntity serviceMigrationEntity =
                 migrationService.getServiceMigrationEntityByOldServiceId(taskId.toString());
         if (Objects.nonNull(serviceMigrationEntity)) {
@@ -127,51 +104,44 @@ public class TerraformDeploymentResultCallbackManager {
         }
     }
 
-    /**
-     * Callback method after the service is modified.
-     */
-    public void modifyCallback(UUID taskId, TerraformResult result) {
-        log.info("Update database entity with id:{} with terraform modify callback result.",
-                taskId);
+    private DeployServiceEntity handleCallbackTerraformResult(UUID taskId, TerraformResult result,
+                                                              DeploymentScenario scenario) {
+        log.info("Handle terraform callback result of task with id:{} in scenario:{}. ", taskId,
+                scenario.toValue());
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(taskId);
-        DeployResult deployResult = handlerCallbackTerraformResult(result);
-        deployResult.setId(taskId);
-        if (StringUtils.isNotBlank(result.getTerraformState())) {
-            ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            deployServiceEntity.getServiceTemplateId());
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    serviceTemplateEntity.getOcl()
-                            .getDeployment().getKind()).handler(deployResult);
-        }
-        deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
-                deployServiceEntity);
-    }
 
-    private DeployResult handlerCallbackTerraformResult(TerraformResult result) {
         DeployResult deployResult = new DeployResult();
+        deployResult.setId(taskId);
         if (Boolean.FALSE.equals(result.getCommandSuccessful())) {
             deployResult.setMessage(result.getCommandStdError());
         }
-        deployResult.setState(getDeployerTaskStatus(result.getDeploymentScenario(),
-                Boolean.TRUE.equals(result.getCommandSuccessful())));
+        deployResult.setState(getDeployerTaskStatus(scenario, result.getCommandSuccessful()));
         deployResult.getPrivateProperties()
                 .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
         if (Objects.nonNull(result.getImportantFileContentMap())) {
             deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
         }
-        return deployResult;
+
+        if (StringUtils.isNotBlank(result.getTerraformState())) {
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            deployServiceEntity.getServiceTemplateId());
+            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
+                    serviceTemplateEntity.getOcl().getDeployment().getKind()).handler(deployResult);
+        }
+        return deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
+                deployServiceEntity);
+
     }
 
-    private DeployerTaskStatus getDeployerTaskStatus(
-            TerraformResult.DeploymentScenarioEnum deploymentScenario,
-            boolean isCommandSuccessful) {
-        return switch (deploymentScenario) {
+    private DeployerTaskStatus getDeployerTaskStatus(DeploymentScenario scenario,
+                                                     Boolean isCommandSuccessful) {
+        return switch (scenario) {
             case DEPLOY -> isCommandSuccessful ? DeployerTaskStatus.DEPLOY_SUCCESS
                     : DeployerTaskStatus.DEPLOY_FAILED;
             case MODIFY -> isCommandSuccessful ? DeployerTaskStatus.MODIFICATION_SUCCESSFUL
-                    : DeployerTaskStatus.MODIFYING_FAILED;
+                    : DeployerTaskStatus.MODIFICATION_FAILED;
             case DESTROY -> isCommandSuccessful ? DeployerTaskStatus.DESTROY_SUCCESS
                     : DeployerTaskStatus.DESTROY_FAILED;
             case ROLLBACK -> isCommandSuccessful ? DeployerTaskStatus.ROLLBACK_SUCCESS

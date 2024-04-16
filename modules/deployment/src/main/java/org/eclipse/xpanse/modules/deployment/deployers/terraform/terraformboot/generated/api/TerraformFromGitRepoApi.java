@@ -1,8 +1,9 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;
-
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.Response;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncModifyFromGitRepoRequest;
@@ -13,28 +14,18 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlanFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
-import java.util.UUID;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi")
@@ -62,8 +53,8 @@ public class TerraformFromGitRepoApi {
      * 
      * async deploy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromGitRepoRequest  (required)
@@ -78,8 +69,8 @@ public class TerraformFromGitRepoApi {
      * 
      * async deploy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromGitRepoRequest  (required)
@@ -116,14 +107,17 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/deploy/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/deploy/async", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
      * Async destroy the Terraform modules
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromGitRepoRequest  (required)
@@ -138,8 +132,8 @@ public class TerraformFromGitRepoApi {
      * 
      * Async destroy the Terraform modules
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromGitRepoRequest  (required)
@@ -176,14 +170,17 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/destroy/async", HttpMethod.DELETE, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/destroy/async", HttpMethod.DELETE,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
      * async deploy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncModifyFromGitRepoRequest  (required)
@@ -198,8 +195,8 @@ public class TerraformFromGitRepoApi {
      * 
      * async deploy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncModifyFromGitRepoRequest  (required)
@@ -236,14 +233,17 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/modify/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/modify/async", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
      * Deploy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployFromGitRepoRequest  (required)
@@ -259,8 +259,8 @@ public class TerraformFromGitRepoApi {
      * 
      * Deploy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployFromGitRepoRequest  (required)
@@ -297,14 +297,17 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/deploy", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/deploy", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
      * Destroy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyFromGitRepoRequest  (required)
@@ -320,8 +323,8 @@ public class TerraformFromGitRepoApi {
      * 
      * Destroy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyFromGitRepoRequest  (required)
@@ -358,14 +361,17 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/destroy", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/destroy", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
      * Modify resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformModifyFromGitRepoRequest  (required)
@@ -381,8 +387,8 @@ public class TerraformFromGitRepoApi {
      * 
      * Modify resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformModifyFromGitRepoRequest  (required)
@@ -419,14 +425,17 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/modify", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/modify", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformPlanFromGitRepoRequest  (required)
@@ -442,8 +451,8 @@ public class TerraformFromGitRepoApi {
      * 
      * Get Terraform Plan as JSON string from the list of script files provided
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformPlanFromGitRepoRequest  (required)
@@ -480,14 +489,17 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformPlan> localReturnType = new ParameterizedTypeReference<TerraformPlan>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/plan", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/plan", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
      * Deploy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployFromGitRepoRequest  (required)
@@ -503,8 +515,8 @@ public class TerraformFromGitRepoApi {
      * 
      * Deploy resources via Terraform
      * <p><b>422</b> - Unprocessable Entity
-     * <p><b>503</b> - Service Unavailable
      * <p><b>400</b> - Bad Request
+     * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployFromGitRepoRequest  (required)
@@ -541,6 +553,9 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformValidationResult> localReturnType = new ParameterizedTypeReference<TerraformValidationResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/validate", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/validate", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
 }

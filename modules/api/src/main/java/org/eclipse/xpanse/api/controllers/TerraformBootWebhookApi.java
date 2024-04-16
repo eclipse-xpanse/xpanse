@@ -15,6 +15,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -79,7 +80,7 @@ public class TerraformBootWebhookApi {
      */
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result after terraform executes the command "
-            + "line.")
+            + "line to destroy service.")
     @PostMapping(value = "${webhook.terraform-boot.destroyCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -88,7 +89,44 @@ public class TerraformBootWebhookApi {
             @PathVariable("task_id") String taskId,
             @Valid @RequestBody TerraformResult result) {
 
-        terraformDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result);
+        terraformDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result,
+                DeploymentScenario.DESTROY);
+    }
+
+
+    /**
+     * Webhook methods to receive terraform execution result.
+     */
+    @Tag(name = "Webhook", description = "Webhook APIs")
+    @Operation(description = "Process the execution result after terraform executes the command "
+            + "line to rollback service deployment.")
+    @PostMapping(value = "${webhook.terraform-boot.rollbackCallbackUri}/{task_id}", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void rollbackCallback(
+            @Parameter(name = "task_id", description = "task id")
+            @PathVariable("task_id") String taskId,
+            @Valid @RequestBody TerraformResult result) {
+        terraformDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result,
+                DeploymentScenario.ROLLBACK);
+    }
+
+
+    /**
+     * Webhook methods to receive terraform execution result.
+     */
+    @Tag(name = "Webhook", description = "Webhook APIs")
+    @Operation(description = "Process the execution result after terraform executes the command "
+            + "line to purge service.")
+    @PostMapping(value = "${webhook.terraform-boot.purgeCallbackUri}/{task_id}", produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public void purgeCallback(
+            @Parameter(name = "task_id", description = "task id")
+            @PathVariable("task_id") String taskId,
+            @Valid @RequestBody TerraformResult result) {
+        terraformDeploymentResultCallbackManager.destroyCallback(UUID.fromString(taskId), result,
+                DeploymentScenario.PURGE);
     }
 
 }

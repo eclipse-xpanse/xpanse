@@ -27,7 +27,7 @@ public enum ServiceDeploymentState {
     MANUAL_CLEANUP_REQUIRED("manual cleanup required"),
     ROLLBACK_FAILED("rollback failed"),
     MODIFYING("modifying"),
-    MODIFYING_FAILED("modifying failed"),
+    MODIFICATION_FAILED("modification failed"),
     MODIFICATION_SUCCESSFUL("modification successful");
 
 
