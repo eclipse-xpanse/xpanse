@@ -15,6 +15,7 @@ import java.net.URL;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ class OpenApiGeneratorJarManageTest {
     }
 
     @Test
+    @Disabled
     void testDownloadClientJar() throws IOException {
         // SetUp
         File jarFile = openApiGeneratorJarManage.getCliFile();

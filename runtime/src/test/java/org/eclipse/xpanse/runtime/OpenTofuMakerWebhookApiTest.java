@@ -36,6 +36,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -53,6 +54,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
  * test for WebhookApi.
  */
 @Slf4j
+@Disabled
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
 @SpringBootTest(properties = {

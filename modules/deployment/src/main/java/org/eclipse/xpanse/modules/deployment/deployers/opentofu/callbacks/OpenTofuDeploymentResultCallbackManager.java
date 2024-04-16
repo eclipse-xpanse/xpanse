@@ -172,7 +172,7 @@ public class OpenTofuDeploymentResultCallbackManager {
             case DEPLOY -> isCommandSuccessful ? DeployerTaskStatus.DEPLOY_SUCCESS
                     : DeployerTaskStatus.DEPLOY_FAILED;
             case MODIFY -> isCommandSuccessful ? DeployerTaskStatus.MODIFICATION_SUCCESSFUL
-                    : DeployerTaskStatus.MODIFYING_FAILED;
+                    : DeployerTaskStatus.MODIFICATION_FAILED;
             case DESTROY -> isCommandSuccessful ? DeployerTaskStatus.DESTROY_SUCCESS
                     : DeployerTaskStatus.DESTROY_FAILED;
             case ROLLBACK -> isCommandSuccessful ? DeployerTaskStatus.ROLLBACK_SUCCESS

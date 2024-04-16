@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,7 +26,9 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
@@ -302,9 +306,18 @@ class ServiceDeployerApiTest extends ApisTestCommon {
             listDeployedServices();
         }
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
-            testDestroy(serviceId);
-        }
-        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
+            testModify(serviceId, serviceTemplate);
+            boolean modifySuccess = waitUntilExceptedState(serviceId,
+                    ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
+            boolean modifyFailed = waitUntilExceptedState(serviceId,
+                    ServiceDeploymentState.MODIFICATION_FAILED);
+            if (modifySuccess || modifyFailed) {
+                testDestroy(serviceId);
+                if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
+                    testPurge(serviceId);
+                }
+            }
+        } else {
             testPurge(serviceId);
         }
         unregisterServiceTemplate(serviceTemplate.getId());
@@ -433,19 +446,29 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         unregisterServiceTemplate(serviceTemplate.getId());
     }
 
-    void testListDeployedServices() throws Exception {
+
+    void testModify(UUID taskId, ServiceTemplateDetailVo serviceTemplate) throws Exception {
+        // SetUp
+        ModifyRequest modifyRequest = new ModifyRequest();
+        modifyRequest.setFlavor(
+                serviceTemplate.getFlavors().getServiceFlavors().getLast().getName());
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
+        serviceRequestProperties.put("admin_passwd", "2222222222@Qq");
+        modifyRequest.setServiceRequestProperties(serviceRequestProperties);
+
         // Run the test
-        List<DeployedService> result = listDeployedServices();
-        List<DeployedServiceDetails> detailsResult = listDeployedServicesDetails();
+        final MockHttpServletResponse modifyResponse = mockMvc.perform(
+                        put("/xpanse/services/modify/{id}", taskId)
+                                .content(objectMapper.writeValueAsString(modifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        UUID result = objectMapper.readValue(modifyResponse.getContentAsString(), UUID.class);
 
         // Verify the results
-        Assertions.assertFalse(result.isEmpty());
-        assertEquals(result.getFirst().getServiceDeploymentState(),
-                ServiceDeploymentState.DEPLOY_SUCCESS);
-
-        Assertions.assertFalse(detailsResult.isEmpty());
-        assertEquals(detailsResult.getFirst().getServiceDeploymentState(),
-                ServiceDeploymentState.DEPLOY_SUCCESS);
+        assertEquals(HttpStatus.ACCEPTED.value(), modifyResponse.getStatus());
+        // Verify the results
+        Assertions.assertEquals(taskId, result);
     }
 
     void testDestroy(UUID taskId) throws Exception {

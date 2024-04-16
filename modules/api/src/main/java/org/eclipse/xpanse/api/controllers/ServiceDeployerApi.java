@@ -136,7 +136,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-                    ServiceDeploymentState serviceState) {
+            ServiceDeploymentState serviceState) {
         return this.serviceDetailsViewManager.listDeployedServices(
                 category, csp, serviceName, serviceVersion, serviceState);
     }
@@ -162,7 +162,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-                    ServiceDeploymentState serviceState) {
+            ServiceDeploymentState serviceState) {
         // return type is DeployedService but actually returns one of the child types
         // VendorHostedDeployedServiceDetails or DeployedServiceDetails
         return this.serviceDetailsViewManager.listDeployedServicesDetails(
@@ -209,10 +209,10 @@ public class ServiceDeployerApi {
     @Operation(description = "Start a task to modify service using registered service template.")
     @PutMapping(value = "/services/modify/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public UUID modify(@Valid @RequestBody
-                               ModifyRequest modifyRequest, @Parameter(name = "id", description =
-            "The id of modify service")
-                       @PathVariable("id") String id) {
+    public UUID modify(@Parameter(name = "id", description = "The id of modify service")
+                       @PathVariable("id") String id,
+                       @Valid @RequestBody
+                       ModifyRequest modifyRequest) {
         log.info("Modifying service with id {}", id);
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));

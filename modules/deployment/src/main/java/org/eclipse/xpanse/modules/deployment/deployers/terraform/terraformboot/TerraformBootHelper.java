@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -103,23 +104,10 @@ public class TerraformBootHelper {
     /**
      * generates webhook config.
      */
-    public WebhookConfig getWebhookConfig(DeployTask deployTask, boolean isDestroyTask) {
+    public WebhookConfig getWebhookConfigWithTask(DeployTask deployTask) {
         WebhookConfig webhookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port)
-                + (isDestroyTask ? terraformBootConfig.getDestroyCallbackUri()
-                : terraformBootConfig.getDeployCallbackUri());
-        webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getId());
-        webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
-        return webhookConfig;
-    }
-
-    /**
-     * generates webhook config.
-     */
-    public WebhookConfig getModifyWebhookConfig(DeployTask deployTask) {
-        WebhookConfig webhookConfig = new WebhookConfig();
-        String callbackUrl = getClientRequestBaseUrl(port)
-                + terraformBootConfig.getModifyCallbackUri();
+                + getDeployerTaskCallbackUrl(deployTask.getDeploymentScenario());
         webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getId());
         webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
         return webhookConfig;
@@ -138,5 +126,16 @@ public class TerraformBootHelper {
             log.error(ResultType.TERRAFORM_BOOT_REQUEST_FAILED.toValue());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
+    }
+
+    private String getDeployerTaskCallbackUrl(DeploymentScenario deploymentScenario) {
+        return switch (deploymentScenario) {
+            case DEPLOY -> terraformBootConfig.getDeployCallbackUri();
+            case MODIFY -> terraformBootConfig.getModifyCallbackUri();
+            case DESTROY -> terraformBootConfig.getDestroyCallbackUri();
+            case ROLLBACK -> terraformBootConfig.getRollbackCallbackUri();
+            case PURGE -> terraformBootConfig.getPurgeCallbackUri();
+
+        };
     }
 }

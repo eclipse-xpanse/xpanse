@@ -3,7 +3,7 @@
   "info": {
     "title": "Terraform-Boot API",
     "description": "RESTful Services to interact with Terraform-Boot runtime",
-    "version": "1.0.5-SNAPSHOT"
+    "version": "1.0.6-SNAPSHOT"
   },
   "servers": [
     {
@@ -2115,17 +2115,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2232,17 +2221,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2261,10 +2239,10 @@
           },
           "scripts": {
             "type": "array",
-            "description": "List of script files for destroy requests deployed via scripts",
+            "description": "List of script files for modify requests deployed via scripts",
             "items": {
               "type": "string",
-              "description": "List of script files for destroy requests deployed via scripts"
+              "description": "List of script files for modify requests deployed via scripts"
             }
           },
           "tfState": {
@@ -2276,17 +2254,6 @@
       "TerraformResult": {
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value is set only if the same is set in the request as well. This is useful only for the caller to differentiate what type of destroy it is. No difference in the way destroy will be executed.based on this flag. User may use this flag in case callback are used. So the calling application can know the result is for which specific destroy use case within the calling system.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "commandStdOutput": {
             "type": "string",
             "description": "stdout of the command returned as string."
@@ -2326,17 +2293,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2355,10 +2311,10 @@
           },
           "scripts": {
             "type": "array",
-            "description": "List of script files for destroy requests deployed via scripts",
+            "description": "List of script files for modify requests deployed via scripts",
             "items": {
               "type": "string",
-              "description": "List of script files for destroy requests deployed via scripts"
+              "description": "List of script files for modify requests deployed via scripts"
             }
           },
           "tfState": {
@@ -2400,17 +2356,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2454,17 +2399,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2505,17 +2439,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2599,17 +2522,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2648,17 +2560,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2694,17 +2595,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2742,17 +2632,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2813,17 +2692,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2853,17 +2721,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2897,17 +2754,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2937,17 +2783,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2995,17 +2830,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -3047,17 +2871,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -3092,17 +2905,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -3128,17 +2930,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "The deployment scenario when the Xpanse client send the destroy request. Valid values: deploy,modify,destroy,rollback,purge.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {

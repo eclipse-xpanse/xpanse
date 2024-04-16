@@ -37,7 +37,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -89,7 +88,6 @@ public class TerraformLocalDeployment implements Deployer {
     public DeployResult deploy(DeployTask task) {
         DeployResult deployResult = new DeployResult();
         deployResult.setId(task.getId());
-        task.setDeploymentScenario(DeploymentScenario.DEPLOY);
         asyncExecDeploy(task);
         return deployResult;
     }
@@ -102,8 +100,6 @@ public class TerraformLocalDeployment implements Deployer {
      */
     @Override
     public DeployResult destroy(DeployTask task) {
-
-
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(task.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
@@ -151,8 +147,6 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setDeploymentScenario(TerraformResult.DeploymentScenarioEnum.fromValue(
-                    task.getDeploymentScenario().toValue()));
             try {
                 executor.deploy();
                 terraformResult.setCommandSuccessful(true);
@@ -174,8 +168,6 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setDeploymentScenario(TerraformResult.DeploymentScenarioEnum.fromValue(
-                    task.getDeploymentScenario().toValue()));
             try {
                 executor.destroy();
                 terraformResult.setCommandSuccessful(true);
@@ -186,7 +178,8 @@ public class TerraformLocalDeployment implements Deployer {
             }
             terraformResult.setTerraformState(executor.getTerraformState());
             terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
-            terraformDeploymentResultCallbackManager.destroyCallback(task.getId(), terraformResult);
+            terraformDeploymentResultCallbackManager.destroyCallback(task.getId(),
+                    terraformResult, task.getDeploymentScenario());
         });
     }
 
@@ -198,8 +191,6 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setDeploymentScenario(TerraformResult.DeploymentScenarioEnum.fromValue(
-                    task.getDeploymentScenario().toValue()));
             try {
                 executor.deploy();
                 terraformResult.setCommandSuccessful(true);

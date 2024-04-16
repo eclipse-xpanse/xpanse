@@ -28,8 +28,8 @@ class ServiceDeploymentStateTest {
                 ServiceDeploymentState.getByValue("modifying"));
         assertEquals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL,
                 ServiceDeploymentState.getByValue("modification successful"));
-        assertEquals(ServiceDeploymentState.MODIFYING_FAILED,
-                ServiceDeploymentState.getByValue("modifying failed"));
+        assertEquals(ServiceDeploymentState.MODIFICATION_FAILED,
+                ServiceDeploymentState.getByValue("modification failed"));
         assertEquals(ServiceDeploymentState.DESTROYING,
                 ServiceDeploymentState.getByValue("destroying"));
         assertEquals(ServiceDeploymentState.DESTROY_SUCCESS,
@@ -58,7 +58,7 @@ class ServiceDeploymentStateTest {
         assertEquals("modifying", ServiceDeploymentState.MODIFYING.toValue());
         assertEquals("modification successful",
                 ServiceDeploymentState.MODIFICATION_SUCCESSFUL.toValue());
-        assertEquals("modifying failed", ServiceDeploymentState.MODIFYING_FAILED.toValue());
+        assertEquals("modification failed", ServiceDeploymentState.MODIFICATION_FAILED.toValue());
         assertEquals("destroying", ServiceDeploymentState.DESTROYING.toValue());
         assertEquals("destroy successful", ServiceDeploymentState.DESTROY_SUCCESS.toValue());
         assertEquals("destroy failed", ServiceDeploymentState.DESTROY_FAILED.toValue());

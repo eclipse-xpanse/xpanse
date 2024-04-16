@@ -28,8 +28,8 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequestBase;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
-import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -37,6 +37,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
+import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
+import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,36 +76,16 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         testDeployServiceThrowsServiceTemplateNotApproved(serviceTemplate);
         approveServiceTemplateRegistration(serviceTemplate);
         UUID serviceId = deployService(serviceTemplate);
-
-        if (waitServiceUtilTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {
-            UUID newServiceId = migrateService(serviceId, serviceTemplate);
-            if (serviceIsTargetState(newServiceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
-                DeployedServiceDetails newServiceDetails =
-                        serviceDeployerApi.getSelfHostedServiceDetailsById(newServiceId.toString());
-                Assertions.assertNotNull(newServiceDetails);
-                Assertions.assertEquals(ServiceDeploymentState.DEPLOY_SUCCESS,
-                        newServiceDetails.getServiceDeploymentState());
-                Assertions.assertFalse(newServiceDetails.getDeployedServiceProperties().isEmpty());
-
-                testDestroyAndGetDetails(newServiceId);
-            } else {
-                if (serviceIsTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {
-                    testPurgeAndGetDetails(serviceId);
-                }
-            }
-            if (serviceIsTargetState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
-                DeployedServiceDetails oldServiceDetails =
-                        serviceDeployerApi.getSelfHostedServiceDetailsById(serviceId.toString());
-                Assertions.assertNotNull(oldServiceDetails);
-                Assertions.assertEquals(ServiceDeploymentState.DESTROY_SUCCESS,
-                        oldServiceDetails.getServiceDeploymentState());
-                Assertions.assertNull(oldServiceDetails.getDeployedServiceProperties());
-                testPurgeAndGetDetails(serviceId);
-            } else {
-                if (serviceIsTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {
-                    testPurgeAndGetDetails(serviceId);
-                }
-
+        if (waitServiceUtilTargetState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+            testModifyAndGetDetails(serviceId, serviceTemplate);
+            waitServiceUtilTargetState(serviceId,
+                    ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
+            UUID migrateId = migrateService(serviceId, serviceTemplate);
+            if (waitMigrationCompleted(migrateId)) {
+                ServiceMigrationDetails migrationDetails =
+                        serviceMigrationApi.getMigrationOrderDetailsById(migrateId.toString());
+                testDestroyAndGetDetails(migrationDetails.getNewServiceId());
+                testPurgeAndGetDetails(migrationDetails.getOldServiceId());
             }
         } else {
             if (serviceIsTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {
@@ -202,6 +184,41 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         // Verify the results
         Assertions.assertNotNull(migrateId);
         return migrateId;
+    }
+
+    boolean waitMigrationCompleted(UUID id) throws Exception {
+        long startTime = System.currentTimeMillis();
+        while (!migrationStatueIsCompleted(id)) {
+            if (migrationStatueIsCompleted(id)) {
+                break;
+            } else {
+                if (System.currentTimeMillis() - startTime > 300 * 1000) {
+                    break;
+                }
+                Thread.sleep(5 * 1000);
+            }
+        }
+        return migrationStatueIsCompleted(id);
+    }
+
+    private boolean migrationStatueIsCompleted(UUID id) {
+        ServiceMigrationDetails migrationDetails =
+                serviceMigrationApi.getMigrationOrderDetailsById(id.toString());
+        return migrationDetails.getMigrationStatus() == MigrationStatus.MIGRATION_COMPLETED;
+    }
+
+    void testModifyAndGetDetails(UUID taskId, ServiceTemplateDetailVo serviceTemplate) {
+        // SetUp
+        ModifyRequest modifyRequest = new ModifyRequest();
+        modifyRequest.setFlavor(
+                serviceTemplate.getFlavors().getServiceFlavors().getLast().getName());
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
+        serviceRequestProperties.put("admin_passwd", "2222222222@Qq");
+        modifyRequest.setServiceRequestProperties(serviceRequestProperties);
+        // Run the test
+        UUID uuid = serviceDeployerApi.modify(taskId.toString(), modifyRequest);
+        // Verify the results
+        Assertions.assertEquals(taskId, uuid);
     }
 
     void testDestroyAndGetDetails(UUID taskId) throws Exception {
