@@ -36,7 +36,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -54,11 +53,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
  * test for WebhookApi.
  */
 @Slf4j
-@Disabled
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
-@SpringBootTest(properties = {
-        "spring.profiles.active=oauth,zitadel,zitadel-testbed,tofu-maker"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,tofu-maker"})
 @AutoConfigureMockMvc
 public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
     @Resource
@@ -106,6 +103,18 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         assertEquals(objectMapper.writeValueAsString(deployCallbackResult),
                 deployCallbackResponse.getContentAsString());
 
+        // Run the test
+        final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
+                        post("/webhook/tofu-maker/modify/{task_id}", uuid)
+                                .content(objectMapper.writeValueAsString(deployResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), modifyCallbackResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(deployCallbackResult),
+                modifyCallbackResponse.getContentAsString());
+
 
         // Setup
         OpenTofuResult destroyResult = getOpenTofuResultByFile("destroy_success_callback.json");
@@ -123,6 +132,31 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), destroyCallbackResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
                 destroyCallbackResponse.getContentAsString());
+
+        // Run the test
+        final MockHttpServletResponse rollbackCallbackResponse = mockMvc.perform(
+                        post("/webhook/tofu-maker/rollback/{task_id}", uuid)
+                                .content(objectMapper.writeValueAsString(destroyResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), rollbackCallbackResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
+                rollbackCallbackResponse.getContentAsString());
+
+
+        // Run the test
+        final MockHttpServletResponse purgeCallbackResponse = mockMvc.perform(
+                        post("/webhook/tofu-maker/purge/{task_id}", uuid)
+                                .content(objectMapper.writeValueAsString(destroyResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), purgeCallbackResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
+                purgeCallbackResponse.getContentAsString());
     }
 
     void testOpenTofuBootWebhookApisWell() throws Exception {
@@ -171,6 +205,17 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(deployCallbackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
+        // Run the test
+        final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
+                        post("/webhook/tofu-maker/modify/{task_id}",
+                                taskId)
+                                .content(objectMapper.writeValueAsString(deployResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertThat(modifyCallbackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+
         // destroy the service
         final MockHttpServletResponse destroyResponse =
                 mockMvc.perform(delete("/xpanse/services/{id}", taskId)
@@ -191,6 +236,28 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertThat(destroyCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        // Run the test
+        final MockHttpServletResponse rollbackCallBackResponse = mockMvc.perform(
+                        post("/webhook/tofu-maker/rollback/{task_id}",
+                                taskId)
+                                .content(objectMapper.writeValueAsString(destroyResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertThat(rollbackCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        // Run the test
+        final MockHttpServletResponse purgeCallBackResponse = mockMvc.perform(
+                        post("/webhook/tofu-maker/purge/{task_id}",
+                                taskId)
+                                .content(objectMapper.writeValueAsString(destroyResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertThat(purgeCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         unregisterServiceTemplate(serviceTemplate.getId());
         deployServiceStorage.deleteDeployService(

@@ -1,7 +1,9 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient;
-
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDeployFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncModifyFromScriptsRequest;
@@ -12,29 +14,18 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlanWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.Response;
-import java.util.UUID;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi")
@@ -116,7 +107,10 @@ public class OpenTofuFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/tofu-maker/scripts/deploy/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/scripts/deploy/async", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -176,7 +170,10 @@ public class OpenTofuFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/tofu-maker/scripts/destroy/async", HttpMethod.DELETE, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/scripts/destroy/async", HttpMethod.DELETE,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -236,7 +233,10 @@ public class OpenTofuFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/tofu-maker/scripts/modify/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/scripts/modify/async", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -297,7 +297,10 @@ public class OpenTofuFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {};
-        return apiClient.invokeAPI("/tofu-maker/scripts/deploy", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/scripts/deploy", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -358,7 +361,10 @@ public class OpenTofuFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {};
-        return apiClient.invokeAPI("/tofu-maker/scripts/destroy", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/scripts/destroy", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -419,7 +425,10 @@ public class OpenTofuFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {};
-        return apiClient.invokeAPI("/tofu-maker/scripts/modify", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/scripts/modify", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -480,7 +489,10 @@ public class OpenTofuFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<OpenTofuPlan> localReturnType = new ParameterizedTypeReference<OpenTofuPlan>() {};
-        return apiClient.invokeAPI("/tofu-maker/scripts/plan", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/scripts/plan", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -541,6 +553,9 @@ public class OpenTofuFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<OpenTofuValidationResult> localReturnType = new ParameterizedTypeReference<OpenTofuValidationResult>() {};
-        return apiClient.invokeAPI("/tofu-maker/scripts/validate", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/scripts/validate", HttpMethod.POST,
+                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, localReturnType);
     }
 }

@@ -3,7 +3,7 @@
   "info": {
     "title": "Tofu-Maker API",
     "description": "RESTful Services to interact with Tofu-Maker runtime",
-    "version": "1.0.0-SNAPSHOT"
+    "version": "1.0.1-SNAPSHOT"
   },
   "servers": [
     {
@@ -2115,17 +2115,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2232,17 +2221,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2276,17 +2254,6 @@
       "OpenTofuResult": {
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "commandStdOutput": {
             "type": "string",
             "description": "stdout of the command returned as string."
@@ -2325,17 +2292,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2400,17 +2356,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2454,17 +2399,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2505,17 +2439,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2599,17 +2522,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2648,17 +2560,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2694,17 +2595,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2742,17 +2632,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2813,17 +2692,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2853,17 +2721,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2897,17 +2754,6 @@
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
           },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2937,17 +2783,6 @@
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
           },
           "variables": {
             "type": "object",
@@ -2995,17 +2830,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -3047,17 +2871,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -3092,17 +2905,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -3128,17 +2930,6 @@
         ],
         "type": "object",
         "properties": {
-          "deploymentScenario": {
-            "type": "string",
-            "description": "This value can be set by the client if they wish to know the type ofrequest for which the callback response is generated from tofu-maker. There will beno difference in the way request is executed. This information is only set in thecallback response again for the client to handle the callback response accordingly.",
-            "enum": [
-              "deploy",
-              "modify",
-              "destroy",
-              "rollback",
-              "purge"
-            ]
-          },
           "variables": {
             "type": "object",
             "additionalProperties": {
