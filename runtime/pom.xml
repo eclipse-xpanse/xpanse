@@ -220,7 +220,7 @@
                                 <artifactItem>
                                     <groupId>org.openapitools</groupId>
                                     <artifactId>openapi-generator-cli</artifactId>
-                                    <version>7.4.0</version>
+                                    <version>${openapi.generator.plugin.version}</version>
                                     <destFileName>openapi-generator-cli.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
@@ -264,6 +264,7 @@
                         <configuration>
                             <profiles>
                                 <profile>generate-openapi-doc</profile>
+                                <profile>noauth</profile>
                             </profiles>
                         </configuration>
                         <executions>
@@ -284,7 +285,7 @@
                     <plugin>
                         <groupId>org.springdoc</groupId>
                         <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                        <version>1.4</version>
+                        <version>${springdoc.openapi.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>copy-api-doc</id>
