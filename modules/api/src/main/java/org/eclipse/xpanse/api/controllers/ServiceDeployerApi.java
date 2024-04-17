@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
@@ -197,6 +198,33 @@ public class ServiceDeployerApi {
                 deployTask.getId());
         log.info(successMsg);
         return deployTask.getId();
+    }
+
+    /**
+     * Start a task to modify deployed service.
+     *
+     * @param serviceLockConfig the lock config of the service.
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Change the lock config of the service.")
+    @PutMapping(value = "/services/changelock/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changeServiceLockConfig(
+            @Parameter(name = "id", description = "The id of the service")
+            @PathVariable("id") String id,
+            @Valid @RequestBody ServiceLockConfig serviceLockConfig) {
+        DeployServiceEntity deployServiceEntity =
+                this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
+        boolean currentUserIsOwner =
+                this.userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+        if (!currentUserIsOwner) {
+            throw new AccessDeniedException(
+                    "No permissions to change lock config of services belonging to other users.");
+        }
+        deployService.changeServiceLockConfig(serviceLockConfig, deployServiceEntity);
+        String successMsg = String.format(
+                "Task for modifying service started. UUID %s", id);
+        log.info(successMsg);
     }
 
     /**

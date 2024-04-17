@@ -16,6 +16,7 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -79,6 +80,9 @@ public class DeployedService {
     @Schema(description = "The id of the Service Template")
     private UUID serviceTemplateId;
 
+    @Schema(description = "The id of the user who deployed the service.")
+    private String userId;
+
     /**
      * The state of the Service.
      */
@@ -116,4 +120,7 @@ public class DeployedService {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime lastStoppedAt;
+
+    @Schema(description = "The locks whether the service can be modified or destroyed.")
+    private ServiceLockConfig lockConfig;
 }

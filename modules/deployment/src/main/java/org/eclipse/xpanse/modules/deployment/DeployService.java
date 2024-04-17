@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
@@ -240,6 +241,18 @@ public class DeployService {
             deployTask.setDeploymentScenario(DeploymentScenario.ROLLBACK);
             destroy(deployTask, deployServiceEntity);
         }
+    }
+
+    /**
+     * Method to change lock config of service.
+     *
+     * @param config              serviceLockConfig
+     * @param deployServiceEntity deployServiceEntity
+     */
+    public void changeServiceLockConfig(ServiceLockConfig config,
+                                        DeployServiceEntity deployServiceEntity) {
+        deployServiceEntity.setLockConfig(config);
+        deployServiceStorage.storeAndFlush(deployServiceEntity);
     }
 
     /**
