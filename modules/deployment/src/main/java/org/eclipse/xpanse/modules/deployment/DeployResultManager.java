@@ -103,7 +103,8 @@ public class DeployResultManager {
     }
 
     private ServiceState getServiceState(DeployerTaskStatus state) {
-        if (state == DeployerTaskStatus.DEPLOY_SUCCESS) {
+        if (state == DeployerTaskStatus.DEPLOY_SUCCESS
+                || state == DeployerTaskStatus.MODIFICATION_SUCCESSFUL) {
             return ServiceState.RUNNING;
         }
         return ServiceState.NOT_RUNNING;
