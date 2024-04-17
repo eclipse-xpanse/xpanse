@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.huaweicloud.sdk.core.invoker.SyncInvoker;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesResponse;
+import jakarta.annotation.Resource;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -33,6 +35,8 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -41,6 +45,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
@@ -87,7 +92,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest extends ApisTestCommon {
     private static final long waitTime = 60 * 1000;
-
+    @Resource
+    private DatabaseDeployServiceStorage deployServiceStorage;
     @MockBean
     private PoliciesValidateApi mockPoliciesValidateApi;
     @MockBean
@@ -164,6 +170,15 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testGetAvailabilityZonesForFlexibleEngine();
         testGetAvailabilityZonesForOpenstack();
         testGetAvailabilityZonesForScs();
+    }
+
+    @Test
+    @WithJwt(file = "jwt_user.json")
+    void testGetAvailabilityZonesThrowsException() throws Exception {
+        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.HUAWEI, "cn-southwest-2");
+        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.FLEXIBLE_ENGINE, "eu-west-0");
+        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.OPENSTACK, "RegionOne");
+        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.SCS, "RegionOne");
     }
 
     void testGetAvailabilityZonesForHuaweiCloud() throws Exception {
@@ -262,12 +277,20 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         deleteCredential(Csp.SCS, CredentialType.VARIABLES, "USERNAME_PASSWORD");
     }
 
+    void getAvailabilityZonesThrowsClientApiCallFailedException(Csp csp, String regionName)
+            throws Exception {
+        final MockHttpServletResponse listAzResponse = getAvailabilityZones(csp, regionName);
+        Response response =
+                objectMapper.readValue(listAzResponse.getContentAsString(), Response.class);
+        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listAzResponse.getStatus());
+        Assertions.assertEquals(response.getResultType(), ResultType.BACKEND_FAILURE);
+    }
+
     MockHttpServletResponse getAvailabilityZones(Csp csp, String regionName) throws Exception {
         return mockMvc.perform(get("/xpanse/csp/region/azs").param("cspName", csp.toValue())
                         .param("regionName", regionName).accept(MediaType.APPLICATION_JSON)).andReturn()
                 .getResponse();
     }
-
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -302,8 +325,13 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         mockPolicyEvaluationResult(true);
 
         UUID serviceId = deployService(serviceTemplate);
+        ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
+        serviceLockConfig.setDestroyLocked(false);
+        serviceLockConfig.setModifyLocked(false);
+        testChangeLockConfig(serviceId, serviceLockConfig);
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             listDeployedServices();
+            listDeployedServicesDetails();
         }
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             testModify(serviceId, serviceTemplate);
@@ -350,10 +378,30 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         testDeployThrowsServiceTemplateNotRegistered();
         testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
-        testGetServiceDetailsThrowsException();
-        testDestroyThrowsException();
-        testPurgeThrowsException();
+        testGetServiceDetailsThrowsServiceNotDeployedException();
+        testChangeLockConfigThrowsServiceNotDeployedException();
+        testModifyThrowsServiceNotDeployedException();
+        testDestroyThrowsServiceNotDeployedException();
+        testPurgeThrowsServiceNotDeployedException();
+
+        approveServiceTemplateRegistration(serviceTemplate.getId());
+        UUID serviceId = deployService(serviceTemplate);
+        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+            DeployServiceEntity deployServiceEntity =
+                    deployServiceStorage.findDeployServiceById(serviceId);
+            deployServiceEntity.setUserId("unique");
+            deployServiceStorage.storeAndFlush(deployServiceEntity);
+            testChangeLockConfigThrowsAccessDenied(serviceId);
+            testModifyThrowsAccessDenied(serviceId);
+            testDestroyThrowsAccessDenied(serviceId);
+            testPurgeThrowsAccessDenied(serviceId);
+
+        }
+
+        deployServiceStorage.deleteDeployService(
+                deployServiceStorage.findDeployServiceById(serviceId));
         unregisterServiceTemplate(serviceTemplate.getId());
+
     }
 
     @Test
@@ -446,6 +494,63 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         unregisterServiceTemplate(serviceTemplate.getId());
     }
 
+    void testChangeLockConfig(UUID serviceId, ServiceLockConfig lockConfig)
+            throws Exception {
+        // Run the test
+        final MockHttpServletResponse changeLockConfigResponse = mockMvc.perform(
+                        put("/xpanse/services/changelock/{id}", serviceId)
+                                .content(objectMapper.writeValueAsString(lockConfig))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertEquals(HttpStatus.NO_CONTENT.value(), changeLockConfigResponse.getStatus());
+    }
+
+    void testChangeLockConfigThrowsServiceNotDeployedException() throws Exception {
+        // SetUp
+        UUID serviceId = UUID.randomUUID();
+        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                Collections.singletonList(
+                        String.format("Service with id %s not found.", serviceId)));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        ServiceLockConfig lockConfig = new ServiceLockConfig();
+        lockConfig.setDestroyLocked(true);
+        lockConfig.setModifyLocked(true);
+        // Run the test
+        final MockHttpServletResponse changeLockConfigResponse = mockMvc.perform(
+                        put("/xpanse/services/changelock/{id}", serviceId)
+                                .content(objectMapper.writeValueAsString(lockConfig))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), changeLockConfigResponse.getStatus());
+        assertEquals(result, changeLockConfigResponse.getContentAsString());
+    }
+
+    void testChangeLockConfigThrowsAccessDenied(UUID serviceId) throws Exception {
+        // SetUp
+        Response expectedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+                Collections.singletonList(
+                        "No permissions to change lock config of services belonging to other users."));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        ServiceLockConfig lockConfig = new ServiceLockConfig();
+        lockConfig.setDestroyLocked(true);
+        lockConfig.setModifyLocked(true);
+        // Run the test
+        final MockHttpServletResponse changeLockConfigResponse = mockMvc.perform(
+                        put("/xpanse/services/changelock/{id}", serviceId)
+                                .content(objectMapper.writeValueAsString(lockConfig))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), changeLockConfigResponse.getStatus());
+        assertEquals(result, changeLockConfigResponse.getContentAsString());
+    }
+
 
     void testModify(UUID taskId, ServiceTemplateDetailVo serviceTemplate) throws Exception {
         // SetUp
@@ -471,6 +576,50 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         Assertions.assertEquals(taskId, result);
     }
 
+    void testModifyThrowsServiceNotDeployedException() throws Exception {
+        // SetUp
+        UUID uuid = UUID.randomUUID();
+        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        ModifyRequest modifyRequest = new ModifyRequest();
+        modifyRequest.setFlavor("flavor-error-test");
+        modifyRequest.setServiceRequestProperties(new HashMap<>());
+        // Run the test
+        final MockHttpServletResponse modifyResponse = mockMvc.perform(
+                        put("/xpanse/services/modify/{id}", uuid)
+                                .content(objectMapper.writeValueAsString(modifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
+        assertEquals(result, modifyResponse.getContentAsString());
+    }
+
+    void testModifyThrowsAccessDenied(UUID serviceId) throws Exception {
+        // SetUp
+        Response expectedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+                Collections.singletonList(
+                        "No permissions to modify services belonging to other users."));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        ModifyRequest modifyRequest = new ModifyRequest();
+        modifyRequest.setFlavor("flavor-error-test");
+        modifyRequest.setServiceRequestProperties(new HashMap<>());
+        // Run the test
+        final MockHttpServletResponse modifyResponse = mockMvc.perform(
+                        put("/xpanse/services/modify/{id}", serviceId)
+                                .content(objectMapper.writeValueAsString(modifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), modifyResponse.getStatus());
+        assertEquals(result, modifyResponse.getContentAsString());
+    }
+
     void testDestroy(UUID taskId) throws Exception {
         // SetUp
         String successMsg =
@@ -485,6 +634,36 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
         // Verify the results
         assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
+        assertEquals(result, destroyResponse.getContentAsString());
+    }
+
+    void testDestroyThrowsServiceNotDeployedException() throws Exception {
+        UUID uuid = UUID.randomUUID();
+        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+
+        // Run the test
+        final MockHttpServletResponse destroyResponse = mockMvc.perform(
+                delete("/xpanse/services/{id}", uuid).contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
+        assertEquals(result, destroyResponse.getContentAsString());
+    }
+
+    void testDestroyThrowsAccessDenied(UUID serviceId) throws Exception {
+        // SetUp
+        Response expectedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+                Collections.singletonList("No permissions to destroy services belonging to other "
+                        + "users."));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        // Run the test
+        final MockHttpServletResponse destroyResponse =
+                mockMvc.perform(delete("/xpanse/services/{id}", serviceId)).andReturn()
+                        .getResponse();
+        assertEquals(HttpStatus.FORBIDDEN.value(), destroyResponse.getStatus());
         assertEquals(result, destroyResponse.getContentAsString());
     }
 
@@ -506,7 +685,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
         assertEquals(result, deployResponse.getContentAsString());
-        unregisterServiceTemplate(serviceTemplate.getId());
     }
 
     void testDeployThrowsPolicyEvaluationFailedException(ServiceTemplateDetailVo serviceTemplate)
@@ -525,20 +703,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         unregisterServiceTemplate(serviceTemplate.getId());
     }
 
-    void testPurgeThrowsException() throws Exception {
-        UUID serviceId = UUID.randomUUID();
-        // SetUp
-        String refuseMsg = String.format("Service with id %s not found.", serviceId);
-        Response response = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(refuseMsg));
-        String result = objectMapper.writeValueAsString(response);
-        // Run the test
-        final MockHttpServletResponse purgeResponse =
-                mockMvc.perform(delete("/xpanse/services/purge/{id}", serviceId)).andReturn()
-                        .getResponse();
-        assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
-        assertEquals(result, purgeResponse.getContentAsString());
-    }
 
     void testPurge(UUID taskId) throws Exception {
         // SetUp
@@ -568,27 +732,62 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(detailsResult, detailsResponse.getContentAsString());
     }
 
+    void testPurgeThrowsServiceNotDeployedException() throws Exception {
+        UUID serviceId = UUID.randomUUID();
+        // SetUp
+        String refuseMsg = String.format("Service with id %s not found.", serviceId);
+        Response response = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                Collections.singletonList(refuseMsg));
+        String result = objectMapper.writeValueAsString(response);
+        // Run the test
+        final MockHttpServletResponse purgeResponse =
+                mockMvc.perform(delete("/xpanse/services/purge/{id}", serviceId)).andReturn()
+                        .getResponse();
+        assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
+        assertEquals(result, purgeResponse.getContentAsString());
+    }
 
-    List<DeployedService> listDeployedServices() throws Exception {
+    void testPurgeThrowsAccessDenied(UUID serviceId) throws Exception {
+        Response expectedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+                Collections.singletonList("No permissions to purge services belonging to other "
+                        + "users."));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        // Run the test
+        final MockHttpServletResponse purgeResponse =
+                mockMvc.perform(delete("/xpanse/services/purge/{id}", serviceId)).andReturn()
+                        .getResponse();
+        assertEquals(HttpStatus.FORBIDDEN.value(), purgeResponse.getStatus());
+        assertEquals(result, purgeResponse.getContentAsString());
+    }
+
+
+    void listDeployedServices() throws Exception {
 
         final MockHttpServletResponse listResponse = mockMvc.perform(
                         get("/xpanse/services").contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
 
                 .andReturn().getResponse();
-        return objectMapper.readValue(listResponse.getContentAsString(), new TypeReference<>() {
-        });
+        List<DeployedService> deployedServices =
+                objectMapper.readValue(listResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
+        assertFalse(deployedServices.isEmpty());
     }
 
-    List<DeployedServiceDetails> listDeployedServicesDetails() throws Exception {
+    void listDeployedServicesDetails() throws Exception {
 
         final MockHttpServletResponse listResponse = mockMvc.perform(
                         get("/xpanse/services/details").contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-        return objectMapper.readValue(listResponse.getContentAsString(),
-                new TypeReference<>() {
-                });
+        List<DeployedServiceDetails> deployedServiceDetailsList =
+                objectMapper.readValue(listResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
+        assertFalse(deployedServiceDetailsList.isEmpty());
     }
 
     void testDeployThrowsServiceTemplateNotRegistered() throws Exception {
@@ -624,7 +823,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     }
 
 
-    void testGetServiceDetailsThrowsException() throws Exception {
+    void testGetServiceDetailsThrowsServiceNotDeployedException() throws Exception {
         String uuid = UUID.randomUUID().toString();
         Response expectedResponse = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList(String.format("Service with id %s not found.", uuid)));
@@ -639,25 +838,5 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
         assertEquals(result, detailResponse.getContentAsString());
-
-
-    }
-
-
-    void testDestroyThrowsException() throws Exception {
-        UUID uuid = UUID.randomUUID();
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-
-        // Run the test
-        final MockHttpServletResponse destroyResponse = mockMvc.perform(
-                delete("/xpanse/services/{id}", uuid).contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
-
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
-        assertEquals(result, destroyResponse.getContentAsString());
-
     }
 }

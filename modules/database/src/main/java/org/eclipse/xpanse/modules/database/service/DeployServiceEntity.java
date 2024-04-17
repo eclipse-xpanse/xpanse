@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
@@ -112,9 +113,6 @@ public class DeployServiceEntity extends CreateModifiedTime {
      */
     private UUID serviceTemplateId;
 
-    /**
-     * The Ocl object of the XpanseDeployTask.
-     */
     @Column(columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
@@ -159,5 +157,10 @@ public class DeployServiceEntity extends CreateModifiedTime {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @Column(name = "LAST_STOPPED_AT")
     private OffsetDateTime lastStoppedAt;
+
+    @Column(columnDefinition = "json")
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private ServiceLockConfig lockConfig;
 
 }
