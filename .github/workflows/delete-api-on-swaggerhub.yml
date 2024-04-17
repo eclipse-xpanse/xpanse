@@ -1,0 +1,38 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+---
+name: upload-to-swagger-hub-only
+# This job deletes API that is already published on swaggerhub.
+on:
+  workflow_dispatch:
+    inputs:
+      VersionToBeDeleted:
+        type: string
+        description: Enter the version of the API that must be deleted.Eg., 1.0.1
+
+env:
+  BOT_USER_NAME: eclipse-xpanse-bot
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  upload-to-swagger-hub:
+    runs-on: ubuntu-latest
+    env:
+      SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+      SWAGGERHUB_USER: ${{ secrets.SWAGGERHUB_USER }}
+    if: github.repository == 'eclipse-xpanse/xpanse'
+    permissions:
+      packages: write
+    steps:
+      - name: Install SwaggerHub CLI
+        run: npm i -g swaggerhub-cli
+
+      - name: Unpublish API
+        run: swaggerhub api:unpublish ${{ env.SWAGGERHUB_USER }}/XpanseRuntimeApi/v${{github.event.inputs.VersionToBeDeleted}}
+        continue-on-error: true
+
+      - name: Delete provided API version
+        run: swaggerhub api:delete ${{ env.SWAGGERHUB_USER }}/XpanseRuntimeApi/v${{github.event.inputs.VersionToBeDeleted}} --force
