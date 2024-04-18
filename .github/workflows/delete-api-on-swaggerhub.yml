@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: Huawei Inc.
 #
 ---
-name: upload-to-swagger-hub-only
+name: delete-api-on-swaggerhub
 # This job deletes API that is already published on swaggerhub.
 on:
   workflow_dispatch:
