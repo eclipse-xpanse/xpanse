@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -54,10 +55,8 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approveServiceTemplateRegistration(serviceTemplate.getId());
         UUID serviceId = deployService(serviceTemplate);
-
+        testServiceMigrationApisThrowsException(serviceTemplate, serviceId);
         testServiceMigrationApisWell(serviceTemplate, serviceId);
-        testServiceMigrationApisWellThrowsException(serviceTemplate, serviceId);
-
         // clear data
         deployServiceStorage.deleteDeployService(
                 deployServiceStorage.findDeployServiceById(serviceId));
@@ -110,13 +109,14 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         }
     }
 
-    void testServiceMigrationApisWellThrowsException(ServiceTemplateDetailVo serviceTemplate,
-                                                     UUID serviceId) throws Exception {
+    void testServiceMigrationApisThrowsException(ServiceTemplateDetailVo serviceTemplate,
+                                                 UUID serviceId) throws Exception {
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         MigrateRequest migrateRequest = new MigrateRequest();
         BeanUtils.copyProperties(deployRequest, migrateRequest);
-        migrateRequest.setId(UUID.randomUUID());
         testMigrateThrowsServiceNotFoundException(migrateRequest);
+        migrateRequest.setId(serviceId);
+        testMigrateThrowsServiceLockedException(migrateRequest);
         testGetMigrationOrderDetailsThrowsServiceMigrationNotFoundException();
         testMigrateThrowsServiceNotFoundException(migrateRequest);
         testMigrateThrowsAccessDeniedException(serviceId, serviceTemplate);
@@ -130,6 +130,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
     }
 
     void testMigrateThrowsServiceNotFoundException(MigrateRequest migrateRequest) throws Exception {
+        migrateRequest.setId(UUID.randomUUID());
         // Setup
         Response expectedResponse =
                 Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
@@ -142,6 +143,28 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString()).isEqualTo(
                 objectMapper.writeValueAsString(expectedResponse));
+    }
+
+    void testMigrateThrowsServiceLockedException(MigrateRequest migrateRequest) throws Exception {
+        // Setup
+        ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
+        serviceLockConfig.setModifyLocked(true);
+        DeployServiceEntity deployService =
+                deployServiceStorage.findDeployServiceById(migrateRequest.getId());
+        deployService.setLockConfig(serviceLockConfig);
+        deployServiceStorage.storeAndFlush(deployService);
+
+        String message = String.format("Service with id %s is locked from migration.",
+                migrateRequest.getId());
+        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
+                Collections.singletonList(message));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        // Run the test
+        final MockHttpServletResponse response = migrateService(migrateRequest);
+
+        // Verify the results
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo(result);
     }
 
     void testGetMigrationOrderDetailsThrowsServiceMigrationNotFoundException() throws Exception {

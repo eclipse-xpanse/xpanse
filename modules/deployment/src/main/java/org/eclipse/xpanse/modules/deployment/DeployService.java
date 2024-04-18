@@ -281,14 +281,18 @@ public class DeployService {
 
         DeployTask modifyTask = new DeployTask();
         modifyTask.setId(deployServiceEntity.getId());
-        deployServiceEntity.getDeployRequest().getServiceRequestProperties()
-                .putAll(modifyRequest.getServiceRequestProperties());
         DeployRequest deployRequest = deployServiceEntity.getDeployRequest();
-        deployRequest.setFlavor(modifyRequest.getFlavor());
         if (StringUtils.isEmpty(modifyRequest.getCustomerServiceName())) {
             deployRequest.setCustomerServiceName(deployServiceEntity.getCustomerServiceName());
         } else {
             deployRequest.setCustomerServiceName(modifyRequest.getCustomerServiceName());
+        }
+        if (StringUtils.isNotBlank(modifyRequest.getFlavor())) {
+            deployRequest.setFlavor(modifyRequest.getFlavor());
+        }
+        if (Objects.nonNull(modifyRequest.getServiceRequestProperties())
+                && !modifyRequest.getServiceRequestProperties().isEmpty()) {
+            deployRequest.setServiceRequestProperties(modifyRequest.getServiceRequestProperties());
         }
         ServiceTemplateEntity existingServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(
