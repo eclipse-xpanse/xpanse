@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>plugins</artifactId>
-        <version>1.0.10-SNAPSHOT</version>
+        <version>1.0.11</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>scs</artifactId>
