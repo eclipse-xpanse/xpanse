@@ -272,6 +272,11 @@ public class DeployService {
                 .putAll(modifyRequest.getServiceRequestProperties());
         DeployRequest deployRequest = deployServiceEntity.getDeployRequest();
         deployRequest.setFlavor(modifyRequest.getFlavor());
+        if (StringUtils.isEmpty(modifyRequest.getCustomerServiceName())) {
+            deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
+        } else {
+            deployRequest.setCustomerServiceName(modifyRequest.getCustomerServiceName());
+        }
         ServiceTemplateEntity existingServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(
                         deployServiceEntity.getServiceTemplateId());
