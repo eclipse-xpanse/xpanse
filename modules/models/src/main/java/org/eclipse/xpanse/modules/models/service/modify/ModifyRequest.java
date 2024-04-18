@@ -30,6 +30,13 @@ public class ModifyRequest implements Serializable {
     private String userId;
 
     /**
+     * Customer provided name for the service.
+     */
+    @Schema(description = "Customer's name for the service. Used only for customer's reference."
+            + "If not provided, this value will be auto-generated")
+    private String customerServiceName;
+
+    /**
      * The flavor of the Service.
      */
     @Schema(description = "The flavor of the Service.")
