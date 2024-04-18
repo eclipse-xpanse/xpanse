@@ -19,6 +19,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -31,6 +32,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
@@ -250,6 +252,11 @@ public class ServiceDeployerApi {
             throw new AccessDeniedException(
                     "No permissions to modify services belonging to other users.");
         }
+        if (Objects.nonNull(deployServiceEntity.getLockConfig())
+                && deployServiceEntity.getLockConfig().isModifyLocked()) {
+            String errorMsg = String.format("Service with id %s is locked from modification.", id);
+            throw new ServiceLockedException(errorMsg);
+        }
         DeployTask modifyTask =
                 this.deployService.getModifyTask(modifyRequest, deployServiceEntity);
 
@@ -279,6 +286,11 @@ public class ServiceDeployerApi {
         if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to destroy services belonging to other users.");
+        }
+        if (Objects.nonNull(deployServiceEntity.getLockConfig())
+                && deployServiceEntity.getLockConfig().isDestroyLocked()) {
+            String errorMsg = String.format("Service with id %s is locked from deletion.", id);
+            throw new ServiceLockedException(errorMsg);
         }
         DeployTask destroyTask = this.deployService.getDestroyTask(deployServiceEntity);
         this.deployService.destroyService(destroyTask, deployServiceEntity);

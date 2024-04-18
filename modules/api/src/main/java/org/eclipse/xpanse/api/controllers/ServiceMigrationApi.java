@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -26,6 +27,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
 import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
@@ -85,6 +87,12 @@ public class ServiceMigrationApi {
             throw new AccessDeniedException(
                     "No permissions to migrate services belonging to other users.");
         }
+        if (Objects.nonNull(deployServiceEntity.getLockConfig())
+                && deployServiceEntity.getLockConfig().isModifyLocked()) {
+            String errorMsg = String.format("Service with id %s is locked from migration.",
+                    migrateRequest.getId());
+            throw new ServiceLockedException(errorMsg);
+        }
         Map<String, Object> variable =
                 getMigrateProcessVariable(migrateRequest, UUID.randomUUID(), userId);
         ProcessInstance instance =
@@ -115,7 +123,7 @@ public class ServiceMigrationApi {
             @RequestParam(name = "oldServiceId", required = false) UUID oldServiceId,
             @Parameter(name = "migrationStatus", description = "Status of the service migrate")
             @RequestParam(name = "migrationStatus", required = false)
-                    MigrationStatus migrationStatus
+            MigrationStatus migrationStatus
     ) {
         return migrationService.listServiceMigrations(migrationId, newServiceId, oldServiceId,
                 migrationStatus, getUserId());
@@ -143,7 +151,7 @@ public class ServiceMigrationApi {
     }
 
     private Map<String, Object> getMigrateProcessVariable(MigrateRequest migrateRequest,
-            UUID newServiceId, String userId) {
+                                                          UUID newServiceId, String userId) {
         Map<String, Object> variable = new HashMap<>();
         variable.put(MigrateConstants.ID, migrateRequest.getId());
         variable.put(MigrateConstants.NEW_ID, newServiceId);

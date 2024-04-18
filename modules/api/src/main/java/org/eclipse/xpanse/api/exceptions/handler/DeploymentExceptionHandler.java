@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploy
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
 import org.springframework.core.Ordered;
@@ -168,6 +169,18 @@ public class DeploymentExceptionHandler {
     public Response handleActivitiTaskNotFoundException(
             ActivitiTaskNotFoundException ex) {
         return Response.errorResponse(ResultType.ACTIVITI_TASK_NOT_FOUND,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceLockedException.
+     */
+    @ExceptionHandler({ServiceLockedException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceLockedException(
+            ServiceLockedException ex) {
+        return Response.errorResponse(ResultType.SERVICE_LOCKED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

@@ -31,9 +31,12 @@ import java.util.Collections;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -410,6 +413,78 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     @WithJwt(file = "jwt_user.json")
     void testGetExistingResourceNamesWithKindForScs() throws Exception {
         testGetExistingResourceNamesWithKindForCspWithOsClient(Csp.SCS);
+    }
+
+
+    @Test
+    @WithJwt(file = "jwt_user.json")
+    void testGetExistingResourceNamesWithKindThrowsException() throws Exception {
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.HUAWEI,
+                "cn-southwest-2");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.FLEXIBLE_ENGINE,
+                "eu-west-0");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.OPENSTACK,
+                "RegionOne");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.SCS, "RegionOne");
+    }
+
+
+    void getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp csp, String region)
+            throws Exception {
+        final MockHttpServletResponse listVpcResponse =
+                getExistingResourceNamesWithKind(DeployResourceKind.VPC, csp, region);
+        Response vpcResponse =
+                objectMapper.readValue(listVpcResponse.getContentAsString(), Response.class);
+        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listVpcResponse.getStatus());
+        Assertions.assertEquals(vpcResponse.getResultType(), ResultType.BACKEND_FAILURE);
+
+        final MockHttpServletResponse listSubnetResponse =
+                getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, csp, region);
+        Response subnetResponse =
+                objectMapper.readValue(listSubnetResponse.getContentAsString(), Response.class);
+        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listSubnetResponse.getStatus());
+        Assertions.assertEquals(subnetResponse.getResultType(), ResultType.BACKEND_FAILURE);
+
+        final MockHttpServletResponse listSecurityGroupResponse =
+                getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP, csp, region);
+        Response securityGroupResponse =
+                objectMapper.readValue(listSecurityGroupResponse.getContentAsString(),
+                        Response.class);
+        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(),
+                listSecurityGroupResponse.getStatus());
+        Assertions.assertEquals(securityGroupResponse.getResultType(), ResultType.BACKEND_FAILURE);
+
+        final MockHttpServletResponse listSecurityGroupRuleResponse =
+                getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP_RULE, csp,
+                        region);
+        Response securityGroupRuleResponse =
+                objectMapper.readValue(listSecurityGroupRuleResponse.getContentAsString(),
+                        Response.class);
+        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(),
+                listSecurityGroupRuleResponse.getStatus());
+        Assertions.assertEquals(securityGroupRuleResponse.getResultType(),
+                ResultType.BACKEND_FAILURE);
+
+        final MockHttpServletResponse listPublicIpResponse =
+                getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, csp, region);
+        Response publicIpResponse =
+                objectMapper.readValue(listPublicIpResponse.getContentAsString(), Response.class);
+        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listPublicIpResponse.getStatus());
+        Assertions.assertEquals(publicIpResponse.getResultType(), ResultType.BACKEND_FAILURE);
+
+        final MockHttpServletResponse listVolumeResponse =
+                getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, csp, region);
+        Response volumeResponse =
+                objectMapper.readValue(listVolumeResponse.getContentAsString(), Response.class);
+        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listVolumeResponse.getStatus());
+        Assertions.assertEquals(volumeResponse.getResultType(), ResultType.BACKEND_FAILURE);
+
+        final MockHttpServletResponse listKeypairResponse =
+                getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, csp, region);
+        Response keypairResponse =
+                objectMapper.readValue(listKeypairResponse.getContentAsString(), Response.class);
+        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listKeypairResponse.getStatus());
+        Assertions.assertEquals(keypairResponse.getResultType(), ResultType.BACKEND_FAILURE);
     }
 
     void testGetExistingResourceNamesWithKindForCspWithOsClient(Csp csp) throws Exception {

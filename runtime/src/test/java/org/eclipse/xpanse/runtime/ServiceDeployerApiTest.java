@@ -378,30 +378,43 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         testDeployThrowsServiceTemplateNotRegistered();
         testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
+        approveServiceTemplateRegistration(serviceTemplate.getId());
+        UUID serviceId = deployService(serviceTemplate);
+        testApisThrowsServiceLockedException(serviceId);
+        testApisThrowsServiceDeploymentNotFoundException();
+        testApisThrowsAccessDeniedException(serviceId);
+        deployServiceStorage.deleteDeployService(
+                deployServiceStorage.findDeployServiceById(serviceId));
+        unregisterServiceTemplate(serviceTemplate.getId());
+
+    }
+
+    void testApisThrowsServiceLockedException(UUID serviceId) throws Exception {
+        ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
+        serviceLockConfig.setDestroyLocked(true);
+        serviceLockConfig.setModifyLocked(true);
+        testChangeLockConfig(serviceId, serviceLockConfig);
+        testModifyThrowsServiceLockedException(serviceId);
+        testDestroyThrowsServiceLockedException(serviceId);
+    }
+
+    void testApisThrowsServiceDeploymentNotFoundException() throws Exception {
         testGetServiceDetailsThrowsServiceNotDeployedException();
         testChangeLockConfigThrowsServiceNotDeployedException();
         testModifyThrowsServiceNotDeployedException();
         testDestroyThrowsServiceNotDeployedException();
         testPurgeThrowsServiceNotDeployedException();
+    }
 
-        approveServiceTemplateRegistration(serviceTemplate.getId());
-        UUID serviceId = deployService(serviceTemplate);
-        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
-            DeployServiceEntity deployServiceEntity =
-                    deployServiceStorage.findDeployServiceById(serviceId);
-            deployServiceEntity.setUserId("unique");
-            deployServiceStorage.storeAndFlush(deployServiceEntity);
-            testChangeLockConfigThrowsAccessDenied(serviceId);
-            testModifyThrowsAccessDenied(serviceId);
-            testDestroyThrowsAccessDenied(serviceId);
-            testPurgeThrowsAccessDenied(serviceId);
-
-        }
-
-        deployServiceStorage.deleteDeployService(
-                deployServiceStorage.findDeployServiceById(serviceId));
-        unregisterServiceTemplate(serviceTemplate.getId());
-
+    void testApisThrowsAccessDeniedException(UUID serviceId) throws Exception {
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(serviceId);
+        deployServiceEntity.setUserId("unique");
+        deployServiceStorage.storeAndFlush(deployServiceEntity);
+        testChangeLockConfigThrowsAccessDenied(serviceId);
+        testModifyThrowsAccessDenied(serviceId);
+        testDestroyThrowsAccessDenied(serviceId);
+        testPurgeThrowsAccessDenied(serviceId);
     }
 
     @Test
@@ -620,6 +633,29 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(result, modifyResponse.getContentAsString());
     }
 
+    void testModifyThrowsServiceLockedException(UUID serviceId) throws Exception {
+        // SetUp
+        String message =
+                String.format("Service with id %s is locked from modification.", serviceId);
+        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
+                Collections.singletonList(message));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        ModifyRequest modifyRequest = new ModifyRequest();
+        modifyRequest.setFlavor("flavor-error-test");
+        modifyRequest.setServiceRequestProperties(new HashMap<>());
+        // Run the test
+        final MockHttpServletResponse modifyResponse = mockMvc.perform(
+                        put("/xpanse/services/modify/{id}", serviceId)
+                                .content(objectMapper.writeValueAsString(modifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
+        assertEquals(result, modifyResponse.getContentAsString());
+    }
+
     void testDestroy(UUID taskId) throws Exception {
         // SetUp
         String successMsg =
@@ -664,6 +700,20 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 mockMvc.perform(delete("/xpanse/services/{id}", serviceId)).andReturn()
                         .getResponse();
         assertEquals(HttpStatus.FORBIDDEN.value(), destroyResponse.getStatus());
+        assertEquals(result, destroyResponse.getContentAsString());
+    }
+
+    void testDestroyThrowsServiceLockedException(UUID serviceId) throws Exception {
+        // SetUp
+        String message = String.format("Service with id %s is locked from deletion.", serviceId);
+        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
+                Collections.singletonList(message));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        // Run the test
+        final MockHttpServletResponse destroyResponse =
+                mockMvc.perform(delete("/xpanse/services/{id}", serviceId)).andReturn()
+                        .getResponse();
+        assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
         assertEquals(result, destroyResponse.getContentAsString());
     }
 

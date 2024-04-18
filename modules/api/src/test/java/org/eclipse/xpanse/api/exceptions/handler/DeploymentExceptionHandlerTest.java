@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalid
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
@@ -154,5 +155,15 @@ class DeploymentExceptionHandlerTest {
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Variable Validation Failed")).andExpect(
                         jsonPath("$.details[0]").value("Variable validation failed: [test error]"));
+    }
+
+    @Test
+    void testServiceIsLockedException() throws Exception {
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
+                any())).thenThrow(new ServiceLockedException("test error"));
+
+        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Service Locked")).andExpect(
+                        jsonPath("$.details[0]").value("test error"));
     }
 }
