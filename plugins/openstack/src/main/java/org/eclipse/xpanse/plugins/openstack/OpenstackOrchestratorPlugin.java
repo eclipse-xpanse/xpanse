@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
+import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
@@ -168,5 +169,10 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         return openstackServersManager.restartService(serviceStateManageRequest);
+    }
+
+    @Override
+    public void auditApiRequest(AuditLog auditLog) {
+        log.info(auditLog.toString());
     }
 }

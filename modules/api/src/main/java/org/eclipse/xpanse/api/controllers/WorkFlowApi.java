@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.models.workflow.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
@@ -58,6 +59,7 @@ public class WorkFlowApi {
     @Operation(description = "Query all tasks of the given user")
     @GetMapping(value = "/workflow/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(enabled = false)
     public List<WorkFlowTask> queryTasks(
             @Parameter(name = "status", description = "the status of task")
             @RequestParam(name = "status", required = false) TaskStatus status) {
@@ -72,6 +74,7 @@ public class WorkFlowApi {
     @Operation(description = "Complete tasks by task ID and set global process variables .")
     @PutMapping(value = "/workflow/complete/task/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCsFromWorkflowTaskId")
     public void completeTask(
             @Parameter(name = "id",
                     description = "ID of the workflow task that needs to be handled")
@@ -88,6 +91,7 @@ public class WorkFlowApi {
     @PutMapping(value = "/workflow/task/{id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCsFromWorkflowTaskId")
     public void manageFailedOrder(
             @Parameter(name = "id",
                     description = "ID of the workflow task that needs to be handled")

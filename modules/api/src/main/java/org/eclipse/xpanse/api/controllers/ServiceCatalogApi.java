@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
@@ -71,6 +72,7 @@ public class ServiceCatalogApi {
     @GetMapping(value = "/catalog/services",
             produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<UserOrderableServiceVo> listOrderableServices(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category categoryName,
@@ -109,6 +111,7 @@ public class ServiceCatalogApi {
     @GetMapping(value = "/catalog/services/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public UserOrderableServiceVo getOrderableServiceDetails(
             @Parameter(name = "id", description = "The id of orderable service.")
             @PathVariable("id") String id) {
@@ -137,6 +140,7 @@ public class ServiceCatalogApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the orderable service.")
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public Link openApi(@PathVariable("id") String id) {
         String apiUrl = this.serviceTemplateManage.getOpenApiUrl(UUID.fromString(id));
         String successMsg = String.format(

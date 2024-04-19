@@ -30,7 +30,6 @@ class UserPolicyUpdateRequestTest {
     @BeforeEach
     void setUp() {
         test = new UserPolicyUpdateRequest();
-        test.setId(id);
         test.setCsp(mockCsp);
         test.setEnabled(enabled);
         test.setPolicy(policy);
@@ -38,7 +37,6 @@ class UserPolicyUpdateRequestTest {
 
     @Test
     void testGetters() {
-        assertThat(test.getId()).isEqualTo(id);
         assertThat(test.getPolicy()).isEqualTo(policy);
         assertThat(test.getCsp()).isEqualTo(mockCsp);
         assertThat(test.getEnabled()).isEqualTo(enabled);
@@ -68,8 +66,8 @@ class UserPolicyUpdateRequestTest {
 
     @Test
     void testToString() {
-        String result = String.format("UserPolicyUpdateRequest(id=%s, csp=%s, policy=%s, enabled=%s)",
-                id, mockCsp, policy, enabled);
+        String result = String.format("UserPolicyUpdateRequest(csp=%s, policy=%s, enabled=%s)",
+                mockCsp, policy, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

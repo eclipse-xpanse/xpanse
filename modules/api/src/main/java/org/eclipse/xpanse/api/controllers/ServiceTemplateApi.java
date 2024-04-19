@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
@@ -77,6 +78,7 @@ public class ServiceTemplateApi {
     @PostMapping(value = "/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public ServiceTemplateDetailVo register(@Valid @RequestBody Ocl ocl) {
         ServiceTemplateEntity templateEntity = serviceTemplateManage.registerServiceTemplate(ocl);
         String successMsg = String.format("Register service template with id %s successful.",
@@ -96,6 +98,7 @@ public class ServiceTemplateApi {
     @PutMapping(value = "/service_templates/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public ServiceTemplateDetailVo update(
             @Parameter(name = "id", description = "id of service template") @PathVariable("id")
             String id, @Valid @RequestBody Ocl ocl) {
@@ -117,6 +120,7 @@ public class ServiceTemplateApi {
     @PostMapping(value = "/service_templates/file", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
+    @AuditApiRequest(methodName = "getCspFromOclLocation")
     public ServiceTemplateDetailVo fetch(
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
@@ -141,6 +145,7 @@ public class ServiceTemplateApi {
     @PutMapping(value = "/service_templates/file/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public ServiceTemplateDetailVo fetchUpdate(
             @Parameter(name = "id", description = "id of service template")
             @PathVariable(name = "id") String id,
@@ -167,6 +172,7 @@ public class ServiceTemplateApi {
     @DeleteMapping("/service_templates/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public Response unregister(
             @Parameter(name = "id", description = "id of service template") @PathVariable("id")
             String id) {
@@ -192,6 +198,7 @@ public class ServiceTemplateApi {
     @Operation(description = "List service templates with query params.")
     @GetMapping(value = "/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<ServiceTemplateDetailVo> listServiceTemplates(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category category,
@@ -230,6 +237,7 @@ public class ServiceTemplateApi {
     @Operation(description = "Get service template using id.")
     @GetMapping(value = "/service_templates/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public ServiceTemplateDetailVo details(
             @Parameter(name = "id", description = "id of service template")
             @PathVariable("id") String id) {

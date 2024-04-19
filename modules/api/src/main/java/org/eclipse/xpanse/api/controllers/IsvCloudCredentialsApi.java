@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -69,6 +70,7 @@ public class IsvCloudCredentialsApi {
             "Users in the ISV role get all cloud provider credentials added by the user for a "
                     + "cloud service "
                     + "provider.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<AbstractCredentialInfo> getIsvCloudCredentials(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @RequestParam(name = "cspName", required = false) Csp csp,
@@ -89,6 +91,7 @@ public class IsvCloudCredentialsApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Add the user credentials for the ISV role used to connect to the "
             + "cloud service provider.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public void addIsvCloudCredential(
             @Valid @RequestBody CreateCredential createCredential) {
         credentialCenter.addCredential(createCredential);
@@ -106,6 +109,7 @@ public class IsvCloudCredentialsApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description =
             "Update the user credentials used for ISV to connect to the cloud service provider.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public void updateIsvCloudCredential(
             @Valid @RequestBody CreateCredential updateCredential) {
         credentialCenter.updateCredential(updateCredential);
@@ -127,6 +131,7 @@ public class IsvCloudCredentialsApi {
     @Operation(description =
             "Delete the credentials of the user in the USER role to connect to the cloud service "
                     + "provider.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public void deleteIsvCloudCredential(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @RequestParam("cspName") Csp csp,

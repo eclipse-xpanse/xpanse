@@ -290,7 +290,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(
-                        put("/xpanse/service/policies").content(requestBody)
+                        put("/xpanse/service/policies/{id}", servicePolicy.getId()).content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
@@ -318,7 +318,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(
-                        put("/xpanse/service/policies").content(requestBody)
+                        put("/xpanse/service/policies/{id}", uuid).content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 

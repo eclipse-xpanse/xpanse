@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
@@ -89,6 +90,7 @@ public class AdminServicesApi {
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
+    @AuditApiRequest(enabled = false)
     public SystemStatus healthCheck() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
@@ -110,6 +112,7 @@ public class AdminServicesApi {
     @GetMapping(value = "/csps/active", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
+    @AuditApiRequest(enabled = false)
     public List<Csp> getActiveCsps() {
         Set<Csp> cspSet = pluginManager.getPluginsMap().keySet();
         log.info("Cloud service providers:{} with active plugins.", cspSet);
