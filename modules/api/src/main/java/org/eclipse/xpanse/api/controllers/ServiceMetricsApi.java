@@ -16,6 +16,7 @@ import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsAdapter;
@@ -55,6 +56,7 @@ public class ServiceMetricsApi {
     @Operation(description = "Get metrics of a deployed service or a resource.")
     @GetMapping(value = "/metrics", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public List<Metric> getMetrics(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
             @RequestParam(name = "serviceId") String serviceId,

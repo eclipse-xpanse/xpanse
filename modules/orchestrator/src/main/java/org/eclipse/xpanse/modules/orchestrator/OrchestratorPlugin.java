@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.orchestrator;
 
 import java.util.List;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.orchestrator.audit.OperationalAudit;
 import org.eclipse.xpanse.modules.orchestrator.credential.AuthenticationCapabilities;
 import org.eclipse.xpanse.modules.orchestrator.deployment.ServiceResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
@@ -19,7 +20,7 @@ import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManager;
  * APIs.
  */
 public interface OrchestratorPlugin extends ServiceResourceHandler, AuthenticationCapabilities,
-        ServiceMetricsExporter, ServiceStateManager {
+        ServiceMetricsExporter, ServiceStateManager, OperationalAudit {
 
     /**
      * get the Csp of the plugin.

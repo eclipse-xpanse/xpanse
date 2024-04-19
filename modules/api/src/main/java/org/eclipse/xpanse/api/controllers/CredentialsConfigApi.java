@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -52,27 +53,6 @@ public class CredentialsConfigApi {
         this.credentialCenter = credentialCenter;
     }
 
-    /**
-     * List the available credential types of the cloud service provider.
-     *
-     * @param csp The cloud service provider.
-     * @return Returns list the available credential types of the cloud service provider.
-     */
-    @Tag(name = "CredentialsConfiguration",
-            description = "APIs Viewing Cloud Credentials Configuration")
-    @GetMapping(value = "/credential_types",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List the credential types supported by the cloud service provider.")
-    public List<CredentialType> getCredentialTypes(
-            @Parameter(name = "cspName", description = "The cloud service provider.")
-            @RequestParam(name = "cspName", required = false) Csp csp) {
-        if (Objects.isNull(csp)) {
-            return Arrays.stream(CredentialType.values()).toList();
-        }
-        return credentialCenter.listAvailableCredentialTypesByCsp(csp);
-    }
-
 
     /**
      * Get the credential capabilities defined by the cloud service provider.
@@ -88,6 +68,7 @@ public class CredentialsConfigApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description =
             "List the credential capabilities defined by the cloud service provider.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<AbstractCredentialInfo> getCredentialCapabilities(
             @Parameter(name = "cspName", description = "name of the cloud service provider.")
             @RequestParam(name = "cspName") Csp csp,
@@ -114,6 +95,7 @@ public class CredentialsConfigApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Returns the OpenAPI document for adding a credential.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public Link getCredentialOpenApi(
             @Parameter(name = "csp", description = "The cloud service provider.")
             @PathVariable(name = "csp") Csp csp,
@@ -125,5 +107,27 @@ public class CredentialsConfigApi {
                         + " %s successfully. Url %s", type.toValue(), csp.toValue(), apiUrl);
         log.info(successMsg);
         return Link.of(apiUrl, "OpenApi");
+    }
+
+    /**
+     * List the available credential types of the cloud service provider.
+     *
+     * @param csp The cloud service provider.
+     * @return Returns list the available credential types of the cloud service provider.
+     */
+    @Tag(name = "CredentialsConfiguration",
+            description = "APIs Viewing Cloud Credentials Configuration")
+    @GetMapping(value = "/credential_types",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(description = "List the credential types supported by the cloud service provider.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
+    public List<CredentialType> getCredentialTypes(
+            @Parameter(name = "cspName", description = "The cloud service provider.")
+            @RequestParam(name = "cspName", required = false) Csp csp) {
+        if (Objects.isNull(csp)) {
+            return Arrays.stream(CredentialType.values()).toList();
+        }
+        return credentialCenter.listAvailableCredentialTypesByCsp(csp);
     }
 }

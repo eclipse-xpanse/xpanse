@@ -7,8 +7,6 @@
 package org.eclipse.xpanse.modules.models.policy.userpolicy;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 
@@ -17,13 +15,6 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
  */
 @Data
 public class UserPolicyUpdateRequest {
-
-    /**
-     * The id of the policy.
-     */
-    @NotNull
-    @Schema(description = "The id of the policy.")
-    private UUID id;
 
     /**
      * The csp which the policy belongs to.

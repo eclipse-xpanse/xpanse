@@ -200,7 +200,6 @@ class UserPolicyManagerTest {
     void testUpdateUserPolicy_UpdatePolicyText() {
         // Setup
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setPolicy("policy_update");
         updateRequest.setEnabled(false);
 
@@ -239,7 +238,8 @@ class UserPolicyManagerTest {
         when(mockUserPolicyStorage.store(updatedUserPolicyEntity)).thenReturn(
                 updatedUserPolicyEntity);
         // Run the test
-        final UserPolicy result = userPolicyManagerUnderTest.updateUserPolicy(updateRequest);
+        final UserPolicy result = userPolicyManagerUnderTest.updateUserPolicy(policyId,
+                updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -249,7 +249,6 @@ class UserPolicyManagerTest {
     void testUpdateUserPolicy_UpdateCsp() {
         // Setup
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setCsp(Csp.OPENSTACK);
         updateRequest.setEnabled(false);
 
@@ -288,7 +287,8 @@ class UserPolicyManagerTest {
                 updatedUserPolicyEntity);
 
         // Run the test
-        final UserPolicy result = userPolicyManagerUnderTest.updateUserPolicy(updateRequest);
+        final UserPolicy result = userPolicyManagerUnderTest.updateUserPolicy(policyId,
+                updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -298,13 +298,13 @@ class UserPolicyManagerTest {
     void testUpdateUserPolicy_ThrowsPolicyNotFoundException() {
         // Setup
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setCsp(Csp.HUAWEI);
         updateRequest.setPolicy("policy");
         // Configure DatabaseUserPolicyStorage.findPolicyById(...).
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(null);
         // Run the test
-        assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(updateRequest))
+        assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(policyId,
+                updateRequest))
                 .isInstanceOf(PolicyNotFoundException.class);
     }
 
@@ -312,7 +312,6 @@ class UserPolicyManagerTest {
     void testUpdateUserPolicy_ThrowsAccessDeniedException() {
         // Setup
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setCsp(Csp.HUAWEI);
         updateRequest.setPolicy("policy");
 
@@ -328,7 +327,8 @@ class UserPolicyManagerTest {
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(updateRequest))
+        assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(policyId,
+                updateRequest))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -337,7 +337,6 @@ class UserPolicyManagerTest {
         // Setup
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
         UUID id1 = UUID.randomUUID();
-        updateRequest.setId(id1);
         updateRequest.setCsp(Csp.OPENSTACK);
         updateRequest.setPolicy("policy2");
         updateRequest.setEnabled(false);
@@ -372,7 +371,7 @@ class UserPolicyManagerTest {
         when(mockUserPolicyStorage.listPolicies(queryModel)).thenReturn(List.of(userPolicyEntity2));
 
         // Run the test
-        assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(updateRequest))
+        assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(id1, updateRequest))
                 .isInstanceOf(PolicyDuplicateException.class);
     }
 

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
@@ -56,6 +57,7 @@ public class ExistingCloudResourcesApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List existing cloud resource names with kind")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<String> getExistingResourceNamesWithKind(
             @Parameter(name = "csp", description = "name of the cloud service provider")
             @RequestParam(name = "csp") Csp csp,

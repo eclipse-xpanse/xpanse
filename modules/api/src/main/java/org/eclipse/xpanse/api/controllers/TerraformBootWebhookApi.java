@@ -13,6 +13,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
@@ -37,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 public class TerraformBootWebhookApi {
 
-
     @Resource
     private TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
 
@@ -50,6 +50,7 @@ public class TerraformBootWebhookApi {
     @PostMapping(value = "${webhook.terraform-boot.deployCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(enabled = false)
     public void deployCallback(
             @Parameter(name = "task_id", description = "task id")
             @PathVariable("task_id") String taskId,
@@ -67,6 +68,7 @@ public class TerraformBootWebhookApi {
     @PostMapping(value = "${webhook.terraform-boot.modifyCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(enabled = false)
     public void modifyCallback(
             @Parameter(name = "task_id", description = "task id")
             @PathVariable("task_id") String taskId,
@@ -84,6 +86,7 @@ public class TerraformBootWebhookApi {
     @PostMapping(value = "${webhook.terraform-boot.destroyCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(enabled = false)
     public void destroyCallback(
             @Parameter(name = "task_id", description = "task id")
             @PathVariable("task_id") String taskId,
@@ -103,6 +106,7 @@ public class TerraformBootWebhookApi {
     @PostMapping(value = "${webhook.terraform-boot.rollbackCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(enabled = false)
     public void rollbackCallback(
             @Parameter(name = "task_id", description = "task id")
             @PathVariable("task_id") String taskId,
@@ -121,6 +125,7 @@ public class TerraformBootWebhookApi {
     @PostMapping(value = "${webhook.terraform-boot.purgeCallbackUri}/{task_id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(enabled = false)
     public void purgeCallback(
             @Parameter(name = "task_id", description = "task id")
             @PathVariable("task_id") String taskId,

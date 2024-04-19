@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.security.TokenResponse;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderService;
@@ -44,6 +45,7 @@ public class AuthorizationApi {
     @Operation(description = "Get and redirect authorization url for user to authenticate.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/auth/authorize")
+    @AuditApiRequest(enabled = false)
     void authorize(HttpServletResponse response) throws IOException {
         IdentityProviderService identityProviderService =
                 identityProviderManager.getActiveIdentityProviderService();
@@ -65,6 +67,7 @@ public class AuthorizationApi {
     @Operation(description = "Get token info by authorization code.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/auth/token")
+    @AuditApiRequest(enabled = false)
     TokenResponse getAccessToken(
             @Parameter(name = "code", required = true, description = "The authorization code.")
             String code,

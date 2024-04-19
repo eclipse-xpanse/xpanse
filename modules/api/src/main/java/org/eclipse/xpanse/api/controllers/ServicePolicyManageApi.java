@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
@@ -61,9 +62,10 @@ public class ServicePolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies belongs to the service.")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public List<ServicePolicy> listServicePolicies(@Parameter(name = "serviceTemplateId",
             description = "The id of registered service template which the policy belongs to.")
-                                                           String serviceTemplateId) {
+                                                   String serviceTemplateId) {
         return servicePolicyManager.listServicePolicies(serviceTemplateId);
     }
 
@@ -80,6 +82,7 @@ public class ServicePolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get details of policy belongs to the registered service template.")
+    @AuditApiRequest(methodName = "getCspFromServicePolicyId")
     public ServicePolicy getServicePolicyDetails(@PathVariable String id) {
         return servicePolicyManager.getServicePolicyDetails(UUID.fromString(id));
     }
@@ -95,6 +98,7 @@ public class ServicePolicyManageApi {
     @PostMapping(value = "/service/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Add policy for the registered service template.")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public ServicePolicy addServicePolicy(
             @Valid @RequestBody ServicePolicyCreateRequest servicePolicyCreateRequest) {
         return servicePolicyManager.addServicePolicy(servicePolicyCreateRequest);
@@ -107,11 +111,15 @@ public class ServicePolicyManageApi {
      */
     @Tag(name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
-    @PutMapping(value = "/service/policies",
+    @PutMapping(value = "/service/policies/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update the policy belongs to the registered service template.")
+    @AuditApiRequest(methodName = "getCspFromServicePolicyId")
     public ServicePolicy updateServicePolicy(
+            @Parameter(name = "id", description = "ID of the policy to be updated")
+            @PathVariable("id") String id,
             @Valid @RequestBody ServicePolicyUpdateRequest updateRequest) {
+        updateRequest.setId(UUID.fromString(id));
         return servicePolicyManager.updateServicePolicy(updateRequest);
     }
 
@@ -126,6 +134,7 @@ public class ServicePolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete the policy belongs to the registered service template.")
+    @AuditApiRequest(methodName = "getCspFromServicePolicyId")
     public void deleteServicePolicy(@PathVariable("id") String id) {
         servicePolicyManager.deleteServicePolicy(UUID.fromString(id));
     }

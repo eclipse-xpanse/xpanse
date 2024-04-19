@@ -22,6 +22,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
@@ -77,6 +78,7 @@ public class ServiceMigrationApi {
     @Operation(description = "Create a job to migrate the deployed service.")
     @PostMapping(value = "/services/migration", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(migrateRequest.getId());
@@ -106,6 +108,7 @@ public class ServiceMigrationApi {
     @GetMapping(value = "/services/migrations", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceMigrationId")
     public List<ServiceMigrationDetails> listServiceMigrations(
             @Parameter(name = "migrationId", description = "Id of the service migrate")
             @RequestParam(name = "migrationId", required = false) UUID migrationId,
@@ -132,6 +135,7 @@ public class ServiceMigrationApi {
     @GetMapping(value = "/services/migration/{migrationId}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceMigrationId")
     public ServiceMigrationDetails getMigrationOrderDetailsById(
             @Parameter(name = "migrationId", description = "Migration ID")
             @PathVariable("migrationId") String migrationId) {

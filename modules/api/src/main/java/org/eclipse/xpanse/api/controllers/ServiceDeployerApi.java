@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
@@ -91,6 +92,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services/details/self_hosted/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public DeployedServiceDetails getSelfHostedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
@@ -109,6 +111,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services/details/vendor_hosted/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsById(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {
@@ -126,6 +129,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<DeployedService> listDeployedServices(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category category,
@@ -152,6 +156,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services/details",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<DeployedService> listDeployedServicesDetails(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category category,
@@ -180,6 +185,7 @@ public class ServiceDeployerApi {
     @Operation(description = "Start a task to deploy service using registered service template.")
     @PostMapping(value = "/services", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UUID deploy(@Valid @RequestBody DeployRequest deployRequest) {
         log.info("Starting managed service with name {}, version {}, csp {}",
                 deployRequest.getServiceName(),
@@ -209,6 +215,7 @@ public class ServiceDeployerApi {
     @Operation(description = "Change the lock config of the service.")
     @PutMapping(value = "/services/changelock/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public void changeServiceLockConfig(
             @Parameter(name = "id", description = "The id of the service")
             @PathVariable("id") String id,
@@ -237,6 +244,7 @@ public class ServiceDeployerApi {
     @Operation(description = "Start a task to modify service using registered service template.")
     @PutMapping(value = "/services/modify/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public UUID modify(@Parameter(name = "id", description = "The id of modify service")
                        @PathVariable("id") String id,
                        @Valid @RequestBody
@@ -270,6 +278,7 @@ public class ServiceDeployerApi {
     @Operation(description = "Start a task to destroy the deployed service using id.")
     @DeleteMapping(value = "/services/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public Response destroy(@PathVariable("id") String id) {
         log.info("Stopping managed service with id {}", id);
         DeployServiceEntity deployServiceEntity =
@@ -297,6 +306,7 @@ public class ServiceDeployerApi {
     @Operation(description = "Start a task to purge the deployed service using id.")
     @DeleteMapping(value = "/services/purge/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public Response purge(@PathVariable("id") String id) {
         log.info("Purging managed service with id {}", id);
         DeployServiceEntity deployServiceEntity =
@@ -325,6 +335,7 @@ public class ServiceDeployerApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<String> getAvailabilityZones(
             @Parameter(name = "cspName", description = "name of the cloud service provider")
             @RequestParam(name = "cspName") Csp csp,

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -43,6 +44,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -60,6 +62,7 @@ import org.springframework.core.env.Environment;
 /**
  * Test of DeployEnvironments.
  */
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class DeployEnvironmentsTest {
 
@@ -318,6 +321,11 @@ class DeployEnvironmentsTest {
         xpanseDeployTask.setDeployRequest(deployRequest);
 
         OrchestratorPlugin plugin = new OrchestratorPlugin() {
+            @Override
+            public void auditApiRequest(AuditLog auditLog) {
+                log.info(auditLog.toString());
+            }
+
             @Override
             public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
                 return true;

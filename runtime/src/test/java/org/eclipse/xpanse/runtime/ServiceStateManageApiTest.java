@@ -11,17 +11,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.huaweicloud.sdk.core.invoker.SyncInvoker;
-import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersResponse;
 import com.huaweicloud.sdk.ecs.v2.model.BatchStartServersResponse;
 import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersResponse;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse;
-import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.api.config.AuditLogWriter;
+import org.eclipse.xpanse.api.config.GetCspInfoFromRequest;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
@@ -36,28 +36,21 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentS
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
-import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 import org.openstack4j.api.OSClient;
-import org.openstack4j.api.client.IOSClientBuilder;
-import org.openstack4j.api.compute.ComputeService;
-import org.openstack4j.api.compute.ServerService;
 import org.openstack4j.model.common.ActionResponse;
-import org.openstack4j.model.common.Identifier;
 import org.openstack4j.model.compute.Action;
 import org.openstack4j.model.compute.RebootType;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.openstack.OSFactory;
-import org.openstack4j.openstack.compute.internal.ServerServiceImpl;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -72,8 +65,15 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     @MockBean
     private DeployServiceStorage deployServiceStorage;
 
+    @SpyBean
+    private AuditLogWriter auditLogWriter;
+
+    @MockBean
+    private GetCspInfoFromRequest getCspInfoFromRequest;
+
     @BeforeEach
     void setUp() {
+        auditLogWriter = new AuditLogWriter();
         mockOsFactory = mockStatic(OSFactory.class);
     }
 

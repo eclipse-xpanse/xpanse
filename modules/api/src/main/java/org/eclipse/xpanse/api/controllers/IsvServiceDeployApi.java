@@ -15,6 +15,7 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -55,6 +56,7 @@ public class IsvServiceDeployApi {
     @GetMapping(value = "/services/isv",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<DeployedService> listDeployedServicesOfIsv(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category category,
@@ -81,6 +83,7 @@ public class IsvServiceDeployApi {
     @GetMapping(value = "/services/isv/details/vendor_hosted/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public DeployedServiceDetails getServiceDetailsByIdForIsv(
             @Parameter(name = "id", description = "Task id of deployed service")
             @PathVariable("id") String id) {

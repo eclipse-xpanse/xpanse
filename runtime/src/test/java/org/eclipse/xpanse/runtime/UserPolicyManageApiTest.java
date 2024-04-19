@@ -243,14 +243,13 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         mockPoliciesValidateRequest(true);
 
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
-        updateRequest.setId(userPolicy.getId());
         updateRequest.setCsp(Csp.SCS);
         updateRequest.setPolicy("userPolicyUpdate");
         updateRequest.setEnabled(true);
         String requestBody = objectMapper.writeValueAsString(updateRequest);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(put("/xpanse/policies")
+        final MockHttpServletResponse response = mockMvc.perform(put("/xpanse/policies/{id}", userPolicy.getId())
                         .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -274,13 +273,12 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
-        updateRequest.setId(uuid);
         updateRequest.setCsp(Csp.HUAWEI);
         updateRequest.setPolicy("userPolicy");
         String requestBody = objectMapper.writeValueAsString(updateRequest);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(put("/xpanse/policies")
+        final MockHttpServletResponse response = mockMvc.perform(put("/xpanse/policies/{id}",uuid)
                         .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();

@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
@@ -74,6 +75,7 @@ public class CspServiceTemplateApi {
     @Operation(description = "List managed service templates with query params.")
     @GetMapping(value = "/csp/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(enabled = false)
     public List<ServiceTemplateDetailVo> listManagedServiceTemplates(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category categoryName,
@@ -112,6 +114,7 @@ public class CspServiceTemplateApi {
     @GetMapping(value = "/csp/service_templates/{id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public ServiceTemplateDetailVo getRegistrationDetails(
             @Parameter(name = "id", description = "id of service template")
             @PathVariable("id") String id) {
@@ -132,6 +135,7 @@ public class CspServiceTemplateApi {
     @PutMapping(value = "/service_templates/review/{id}", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public void reviewRegistration(
             @Parameter(name = "id", description = "id of service template")
             @PathVariable("id") String id,

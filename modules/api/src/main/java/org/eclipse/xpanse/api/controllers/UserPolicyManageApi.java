@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
@@ -65,6 +66,7 @@ public class UserPolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies defined by the user.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<UserPolicy> listUserPolicies(
             @Parameter(name = "cspName", description = "Name of csp which the policy belongs to.")
             @RequestParam(name = "cspName", required = false) Csp csp,
@@ -87,6 +89,7 @@ public class UserPolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the details of the policy created by the user.")
+    @AuditApiRequest(methodName = "getCspFromUserPolicyId")
     public UserPolicy getPolicyDetails(@PathVariable String id) {
         return userPolicyManager.getUserPolicyDetails(UUID.fromString(id));
     }
@@ -102,6 +105,7 @@ public class UserPolicyManageApi {
     @PostMapping(value = "/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Add policy created by the user.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UserPolicy addUserPolicy(
             @Valid @RequestBody UserPolicyCreateRequest userPolicyCreateRequest) {
         return userPolicyManager.addUserPolicy(userPolicyCreateRequest);
@@ -114,12 +118,15 @@ public class UserPolicyManageApi {
      */
     @Tag(name = "UserPoliciesManagement",
             description = "APIs for managing user's infra policies.")
-    @PutMapping(value = "/policies",
+    @PutMapping(value = "/policies/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update the policy created by the user.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UserPolicy updateUserPolicy(
+            @Parameter(name = "id", description = "ID of the policy to be updated")
+            @PathVariable("id") String id,
             @Valid @RequestBody UserPolicyUpdateRequest updateRequest) {
-        return userPolicyManager.updateUserPolicy(updateRequest);
+        return userPolicyManager.updateUserPolicy(UUID.fromString(id), updateRequest);
     }
 
     /**
@@ -133,6 +140,7 @@ public class UserPolicyManageApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete the policy created by the user.")
+    @AuditApiRequest(methodName = "getCspFromUserPolicyId")
     public void deleteUserPolicy(@PathVariable("id") String id) {
         userPolicyManager.deleteUserPolicy(UUID.fromString(id));
     }

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceStateManager;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,7 @@ public class ServiceStateManageApi {
     @Operation(description = "Start the service by the service id.")
     @PutMapping(value = "/services/start/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public DeployedService startService(@PathVariable("id") String id) {
         log.info("Start the service by service id : {}", id);
         return serviceStateManager.startService(UUID.fromString(id));
@@ -64,6 +66,7 @@ public class ServiceStateManageApi {
     @Operation(description = "Start a task to deploy service using registered service template.")
     @PutMapping(value = "/services/stop/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public DeployedService stopService(@PathVariable("id") String id) {
         return serviceStateManager.stopService(UUID.fromString(id));
     }
@@ -78,6 +81,7 @@ public class ServiceStateManageApi {
     @Operation(description = "Start a task to deploy service using registered service template.")
     @PutMapping(value = "/services/restart/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
     public DeployedService restartService(@PathVariable("id") String id) {
         return serviceStateManager.restartService(UUID.fromString(id));
     }

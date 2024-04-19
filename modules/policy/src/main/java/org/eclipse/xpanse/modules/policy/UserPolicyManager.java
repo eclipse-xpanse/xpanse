@@ -96,11 +96,10 @@ public class UserPolicyManager {
      * @param updateRequest update policy request.
      * @return Returns updated policy view object.
      */
-    public UserPolicy updateUserPolicy(UserPolicyUpdateRequest updateRequest) {
-        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(updateRequest.getId());
+    public UserPolicy updateUserPolicy(UUID id, UserPolicyUpdateRequest updateRequest) {
+        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(id);
         if (Objects.isNull(existingEntity)) {
-            String errorMsg = String.format("The policy with id %s not found.",
-                    updateRequest.getId());
+            String errorMsg = String.format("The policy with id %s not found.", id);
             throw new PolicyNotFoundException(errorMsg);
         }
 
