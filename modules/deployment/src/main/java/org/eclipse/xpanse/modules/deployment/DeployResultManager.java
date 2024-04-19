@@ -46,13 +46,11 @@ public class DeployResultManager {
      * @throws RuntimeException exception thrown in case of errors.
      */
     public DeployServiceEntity updateDeployServiceEntityWithDeployResult(
-            DeployResult deployResult, DeployServiceEntity storedEntity)
-            throws RuntimeException {
+            DeployResult deployResult, DeployServiceEntity storedEntity) throws RuntimeException {
         if (Objects.nonNull(deployResult.getState()) && Objects.nonNull(storedEntity)) {
             log.info("Deploy task update deploy service entity with id:{}", deployResult.getId());
             DeployServiceEntity deployServiceEntityToStore = new DeployServiceEntity();
             BeanUtils.copyProperties(storedEntity, deployServiceEntityToStore);
-            deployServiceEntityToStore.setLastStartedAt(OffsetDateTime.now());
             updateEntityWithDeployResult(deployResult, deployServiceEntityToStore);
             return deployServiceEntityHandler.storeAndFlush(deployServiceEntityToStore);
         } else {
@@ -69,14 +67,18 @@ public class DeployResultManager {
                 deployServiceEntity.setResultMessage(null);
             }
         }
-        deployServiceEntity.setServiceState(getServiceState(deployResult.getState()));
         deployServiceEntity.setServiceDeploymentState(
                 getServiceDeploymentState(deployResult.getState()));
 
-        boolean taskExecutedSuccess = deployResult.getState() == DeployerTaskStatus.DESTROY_SUCCESS
-                || deployResult.getState() == DeployerTaskStatus.ROLLBACK_SUCCESS
-                || deployResult.getState() == DeployerTaskStatus.PURGE_SUCCESS
-                || deployResult.getState() == DeployerTaskStatus.DEPLOY_SUCCESS;
+        DeployerTaskStatus deployerTaskStatus = deployResult.getState();
+
+        updateServiceState(deployerTaskStatus, deployServiceEntity);
+
+        boolean taskExecutedSuccess = deployerTaskStatus == DeployerTaskStatus.DESTROY_SUCCESS
+                || deployerTaskStatus == DeployerTaskStatus.MODIFICATION_SUCCESSFUL
+                || deployerTaskStatus == DeployerTaskStatus.ROLLBACK_SUCCESS
+                || deployerTaskStatus == DeployerTaskStatus.PURGE_SUCCESS
+                || deployerTaskStatus == DeployerTaskStatus.DEPLOY_SUCCESS;
 
         if (CollectionUtils.isEmpty(deployResult.getPrivateProperties())) {
             if (taskExecutedSuccess) {
@@ -105,12 +107,19 @@ public class DeployResultManager {
         sensitiveDataHandler.maskSensitiveFields(deployServiceEntity);
     }
 
-    private ServiceState getServiceState(DeployerTaskStatus state) {
+    private void updateServiceState(DeployerTaskStatus state,
+                                    DeployServiceEntity deployServiceEntity) {
         if (state == DeployerTaskStatus.DEPLOY_SUCCESS
                 || state == DeployerTaskStatus.MODIFICATION_SUCCESSFUL) {
-            return ServiceState.RUNNING;
+            deployServiceEntity.setServiceState(ServiceState.RUNNING);
+            deployServiceEntity.setLastStartedAt(OffsetDateTime.now());
         }
-        return ServiceState.NOT_RUNNING;
+        if (state == DeployerTaskStatus.DEPLOY_FAILED
+                || state == DeployerTaskStatus.DESTROY_SUCCESS
+                || state == DeployerTaskStatus.PURGE_SUCCESS) {
+            deployServiceEntity.setServiceState(ServiceState.NOT_RUNNING);
+        }
+        // case other cases, do not change the state of service.
     }
 
     private ServiceDeploymentState getServiceDeploymentState(
