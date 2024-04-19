@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
@@ -62,10 +63,12 @@ public class DeployResultManager {
                                               DeployServiceEntity deployServiceEntity) {
         if (StringUtils.isNotBlank(deployResult.getMessage())) {
             deployServiceEntity.setResultMessage(deployResult.getMessage());
-        } else {
-            if (deployResult.getState() == DeployerTaskStatus.MODIFICATION_SUCCESSFUL) {
-                deployServiceEntity.setResultMessage(null);
-            }
+        }
+        if (deployResult.getState() == DeployerTaskStatus.MODIFICATION_SUCCESSFUL) {
+            DeployRequest modifyRequest = deployServiceEntity.getDeployRequest();
+            deployServiceEntity.setResultMessage(null);
+            deployServiceEntity.setFlavor(modifyRequest.getFlavor());
+            deployServiceEntity.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }
         deployServiceEntity.setServiceDeploymentState(
                 getServiceDeploymentState(deployResult.getState()));
