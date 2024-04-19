@@ -36,12 +36,6 @@ class ServiceDeploymentStateTest {
                 ServiceDeploymentState.getByValue("destroy successful"));
         assertEquals(ServiceDeploymentState.DESTROY_FAILED,
                 ServiceDeploymentState.getByValue("destroy failed"));
-        assertEquals(ServiceDeploymentState.MIGRATING,
-                ServiceDeploymentState.getByValue("migrating"));
-        assertEquals(ServiceDeploymentState.MIGRATION_SUCCESS,
-                ServiceDeploymentState.getByValue("migration successful"));
-        assertEquals(ServiceDeploymentState.MIGRATION_FAILED,
-                ServiceDeploymentState.getByValue("migration failed"));
         assertEquals(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED,
                 ServiceDeploymentState.getByValue("manual cleanup required"));
         assertEquals(ServiceDeploymentState.ROLLBACK_FAILED,
@@ -62,9 +56,6 @@ class ServiceDeploymentStateTest {
         assertEquals("destroying", ServiceDeploymentState.DESTROYING.toValue());
         assertEquals("destroy successful", ServiceDeploymentState.DESTROY_SUCCESS.toValue());
         assertEquals("destroy failed", ServiceDeploymentState.DESTROY_FAILED.toValue());
-        assertEquals("migrating", ServiceDeploymentState.MIGRATING.toValue());
-        assertEquals("migration successful", ServiceDeploymentState.MIGRATION_SUCCESS.toValue());
-        assertEquals("migration failed", ServiceDeploymentState.MIGRATION_FAILED.toValue());
         assertEquals("manual cleanup required",
                 ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED.toValue());
         assertEquals("rollback failed", ServiceDeploymentState.ROLLBACK_FAILED.toValue());

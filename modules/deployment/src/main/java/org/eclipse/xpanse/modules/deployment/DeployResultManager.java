@@ -62,9 +62,12 @@ public class DeployResultManager {
 
     private void updateEntityWithDeployResult(DeployResult deployResult,
                                               DeployServiceEntity deployServiceEntity) {
-
         if (StringUtils.isNotBlank(deployResult.getMessage())) {
             deployServiceEntity.setResultMessage(deployResult.getMessage());
+        } else {
+            if (deployResult.getState() == DeployerTaskStatus.MODIFICATION_SUCCESSFUL) {
+                deployServiceEntity.setResultMessage(null);
+            }
         }
         deployServiceEntity.setServiceState(getServiceState(deployResult.getState()));
         deployServiceEntity.setServiceDeploymentState(
