@@ -106,12 +106,13 @@ public class DeployService {
                 deployRequest.getAvailabilityZones(),
                 existingServiceTemplate.getOcl().getDeployment().getServiceAvailability());
 
+        deployRequest.setId(UUID.randomUUID());
         if (StringUtils.isEmpty(deployRequest.getCustomerServiceName())) {
             deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
         }
         // Create new deploy task by deploy request.
         DeployTask deployTask = new DeployTask();
-        deployTask.setId(UUID.randomUUID());
+        deployTask.setId(deployRequest.getId());
         deployTask.setDeployRequest(deployRequest);
         deployTask.setNamespace(existingServiceTemplate.getNamespace());
         deployTask.setOcl(existingServiceTemplate.getOcl());
@@ -317,6 +318,7 @@ public class DeployService {
         Deployer deployer =
                 deployerKindManager.getDeployment(modifyTask.getOcl().getDeployment().getKind());
         try {
+            deployServiceEntity.setDeployRequest(modifyTask.getDeployRequest());
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.MODIFYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             modifyResult = deployer.modify(modifyTask);
