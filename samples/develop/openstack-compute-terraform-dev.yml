@@ -21,8 +21,13 @@ cloudServiceProvider:
     - name: RegionTwo
       area: Western Europe
 billing:
-  # The model of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
-  billingModel: monthly
+  # The supported mode of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
+  billingModes:
+    - yearly
+    - monthly
+    - daily
+    - hourly
+    - pay_per_use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:

@@ -9,8 +9,8 @@ package org.eclipse.xpanse.modules.models.servicetemplate.view;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import jakarta.validation.Valid;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
@@ -22,11 +22,12 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Flavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingModel;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -34,26 +35,27 @@ import org.springframework.beans.BeanUtils;
  */
 class ServiceTemplateDetailVoTest {
 
-    private static final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
-    private static final Category category = Category.COMPUTE;
-    private static final String name = "kafka";
-    private static final String version = "1.0.0";
-    private static final Csp csp = Csp.AWS;
-    private static final String description = "description";
-    private static final String namespace = "namespace";
-    private static final String icon = "icon";
-    private static final Deployment DEPLOYMENT = new Deployment();
-    private static final OffsetDateTime createTime = OffsetDateTime.now();
-    private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
-    private static final ServiceRegistrationState serviceRegistrationState =
+    private final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
+    private final Category category = Category.COMPUTE;
+    private final String name = "kafka";
+    private final String version = "1.0.0";
+    private final Csp csp = Csp.AWS;
+    private final String description = "description";
+    private final String namespace = "namespace";
+    private final String icon = "icon";
+    private final Deployment DEPLOYMENT = new Deployment();
+    private final OffsetDateTime createTime = OffsetDateTime.now();
+    private final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
+    private final ServiceRegistrationState serviceRegistrationState =
             ServiceRegistrationState.APPROVED;
-    private static final String reviewComment = "reviewComment";
-    private static ServiceProviderContactDetails serviceProviderContactDetails;
-    private static List<@Valid Region> regions;
-    private static List<@Valid DeployVariable> variables;
-    private static @Valid Flavors flavors;
-    private static Billing billing;
-    private static ServiceTemplateDetailVo serviceTemplateDetailVo;
+    private final String reviewComment = "reviewComment";
+    @Mock
+    private ServiceProviderContactDetails serviceProviderContactDetails;
+    private List<Region> regions;
+    private List<DeployVariable> variables;
+    private Flavors flavors;
+    private Billing billing;
+    private ServiceTemplateDetailVo serviceTemplateDetailVo;
 
     @BeforeEach
     void setUp() {
@@ -63,7 +65,7 @@ class ServiceTemplateDetailVoTest {
         regions = List.of(region);
 
         DeployVariable deployVariable = new DeployVariable();
-        deployVariable.setName("HuaweiClouud AK");
+        deployVariable.setName("HuaweiCloud AK");
         variables = List.of(deployVariable);
 
         flavors = new Flavors();
@@ -72,7 +74,7 @@ class ServiceTemplateDetailVoTest {
         flavors.setServiceFlavors(List.of(flavor));
 
         billing = new Billing();
-        billing.setBillingModel(BillingModel.MONTHLY);
+        billing.setBillingModes(Arrays.asList(BillingMode.values()));
 
         serviceTemplateDetailVo = new ServiceTemplateDetailVo();
         serviceTemplateDetailVo.setId(uuid);
