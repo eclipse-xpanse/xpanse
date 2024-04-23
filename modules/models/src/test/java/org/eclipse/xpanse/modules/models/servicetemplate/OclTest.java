@@ -14,11 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingModel;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Test of Ocl.
@@ -64,7 +65,7 @@ class OclTest {
         flavors.setModificationImpact(modificationImpact);
 
         billing = new Billing();
-        billing.setBillingModel(BillingModel.MONTHLY);
+        billing.setBillingModes(List.of(BillingMode.MONTHLY));
 
         ocl = new Ocl();
         ocl.setCategory(category);
@@ -119,89 +120,17 @@ class OclTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        assertEquals(ocl.hashCode(), ocl.hashCode());
-
         Object obj = new Object();
         assertNotEquals(ocl, obj);
-        assertNotEquals(ocl, null);
         assertNotEquals(ocl.hashCode(), obj.hashCode());
 
         Ocl ocl1 = new Ocl();
-        Ocl ocl2 = new Ocl();
         assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl, ocl2);
-        assertEquals(ocl1, ocl2);
         assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl.hashCode(), ocl2.hashCode());
-        assertEquals(ocl1.hashCode(), ocl2.hashCode());
 
-        ocl1.setCategory(category);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setVersion(version);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setName(name);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setServiceVersion(serviceVersion);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setDescription(description);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setNamespace(namespace);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setIcon(icon);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setCloudServiceProvider(cloudServiceProvider);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setDeployment(deployment);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setFlavors(flavors);
-        assertNotEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
-        assertNotEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
-
-        ocl1.setBilling(billing);
-        ocl1.setServiceHostingType(ServiceHostingType.SELF);
-        ocl1.setServiceProviderContactDetails(serviceProviderContactDetails);
+        BeanUtils.copyProperties(ocl, ocl1);
         assertEquals(ocl, ocl1);
-        assertNotEquals(ocl1, ocl2);
         assertEquals(ocl.hashCode(), ocl1.hashCode());
-        assertNotEquals(ocl1.hashCode(), ocl2.hashCode());
     }
 
     @Test

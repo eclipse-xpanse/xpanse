@@ -12,9 +12,9 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 
 
 /**
- * Model enum of Billing.
+ * Enum of Billing Mode.
  */
-public enum BillingModel {
+public enum BillingMode {
 
     YEARLY("yearly"),
     MONTHLY("monthly"),
@@ -22,31 +22,31 @@ public enum BillingModel {
     HOURLY("hourly"),
     PAY_PER_USE("pay_per_use");
 
-    private final String model;
+    private final String value;
 
-    BillingModel(String model) {
-        this.model = model;
+    BillingMode(String value) {
+        this.value = value;
     }
 
     /**
-     * For BillingModel serialize.
+     * For BillingMode serialize.
      */
     @JsonCreator
-    public static BillingModel getByValue(String model) {
-        for (BillingModel billingModel : values()) {
-            if (billingModel.model.equals(StringUtils.lowerCase(model))) {
-                return billingModel;
+    public static BillingMode getByValue(String value) {
+        for (BillingMode enumeration : values()) {
+            if (StringUtils.equalsIgnoreCase(enumeration.value, value)) {
+                return enumeration;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("BillingModel value %s is not supported.", model));
+                String.format("BillingMode value %s is not supported.", value));
     }
 
     /**
-     * For BillingModel deserialize.
+     * For BillingMode deserialize.
      */
     @JsonValue
     public String toValue() {
-        return this.model;
+        return this.value;
     }
 }

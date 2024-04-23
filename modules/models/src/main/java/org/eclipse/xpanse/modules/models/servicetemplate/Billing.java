@@ -7,9 +7,11 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingModel;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingMode;
 
 /**
  * Defines the billing model of the managed service.
@@ -17,8 +19,10 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingModel;
 @Data
 public class Billing implements Serializable {
 
-    @NotNull
-    @Schema(description = "The billing model of the managed service")
-    private BillingModel billingModel;
+    @Serial
+    private static final long serialVersionUID = 240913796673011260L;
 
+    @NotNull
+    @Schema(description = "Supported billing modes by the managed service")
+    private List<BillingMode> billingModes;
 }
