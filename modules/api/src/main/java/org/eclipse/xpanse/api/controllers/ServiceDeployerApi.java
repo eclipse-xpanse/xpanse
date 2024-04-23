@@ -143,7 +143,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-            ServiceDeploymentState serviceState) {
+                    ServiceDeploymentState serviceState) {
         return this.serviceDetailsViewManager.listDeployedServices(
                 category, csp, serviceName, serviceVersion, serviceState);
     }
@@ -170,7 +170,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-            ServiceDeploymentState serviceState) {
+                    ServiceDeploymentState serviceState) {
         // return type is DeployedService but actually returns one of the child types
         // VendorHostedDeployedServiceDetails or DeployedServiceDetails
         return this.serviceDetailsViewManager.listDeployedServicesDetails(
@@ -209,7 +209,7 @@ public class ServiceDeployerApi {
     }
 
     /**
-     * Start a task to modify deployed service.
+     * Method to change lock configuration of the service.
      *
      * @param serviceLockConfig the lock config of the service.
      */
@@ -232,7 +232,7 @@ public class ServiceDeployerApi {
         }
         deployService.changeServiceLockConfig(serviceLockConfig, deployServiceEntity);
         String successMsg = String.format(
-                "Task for modifying service started. UUID %s", id);
+                "Lock configuration of service %s updated.", id);
         log.info(successMsg);
     }
 
@@ -250,7 +250,7 @@ public class ServiceDeployerApi {
     public UUID modify(@Parameter(name = "id", description = "The id of modify service")
                        @PathVariable("id") String id,
                        @Valid @RequestBody
-                       ModifyRequest modifyRequest) {
+                               ModifyRequest modifyRequest) {
         log.info("Modifying service with id {}", id);
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
