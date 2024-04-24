@@ -79,7 +79,8 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         // Setup request 1
         String result1 = "[]";
         // Run the test case 1
-        final MockHttpServletResponse response1 = listOrderableServicesWithParams(null, null, null,
+        final MockHttpServletResponse response1 = listOrderableServicesWithParams(null, null,
+                "errorValue",
                 null, null);
         // Verify the result 1
         Assertions.assertEquals(HttpStatus.OK.value(), response1.getStatus());

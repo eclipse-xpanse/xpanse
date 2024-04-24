@@ -13,6 +13,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ActivitiTaskNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
@@ -181,6 +182,18 @@ public class DeploymentExceptionHandler {
     public Response handleServiceLockedException(
             ServiceLockedException ex) {
         return Response.errorResponse(ResultType.SERVICE_LOCKED,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceLockedException.
+     */
+    @ExceptionHandler({EulaNotAccepted.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleEulaNotAcceptedException(
+            EulaNotAccepted ex) {
+        return Response.errorResponse(ResultType.EULA_NOT_ACCEPTED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

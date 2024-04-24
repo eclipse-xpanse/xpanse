@@ -391,7 +391,6 @@ class ServicePolicyManagerTest {
         final String updatePolicy = "updatePolicy";
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
 
@@ -429,7 +428,7 @@ class ServicePolicyManagerTest {
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
         // Run the test
         final ServicePolicy result =
-                servicePolicyManagerUnderTest.updateServicePolicy(updateRequest);
+                servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -441,7 +440,6 @@ class ServicePolicyManagerTest {
         final List<String> flavorNameList = List.of("flavor1", "flavor2");
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setFlavorNameList(flavorNameList);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
@@ -497,7 +495,7 @@ class ServicePolicyManagerTest {
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
         // Run the test
         final ServicePolicy result =
-                servicePolicyManagerUnderTest.updateServicePolicy(updateRequest);
+                servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -510,7 +508,6 @@ class ServicePolicyManagerTest {
         final List<String> flavorNameList = List.of("flavor1", "invalid_flavor");
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setFlavorNameList(flavorNameList);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
@@ -551,7 +548,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(updateRequest))
+                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(FlavorInvalidException.class);
     }
 
@@ -560,7 +557,6 @@ class ServicePolicyManagerTest {
         final String updatePolicy = "updatePolicy";
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
@@ -568,7 +564,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(updateRequest))
+                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PolicyNotFoundException.class);
     }
 
@@ -577,7 +573,6 @@ class ServicePolicyManagerTest {
         final String updatePolicy = "updatePolicy";
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
 
@@ -597,7 +592,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(updateRequest))
+                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -607,7 +602,6 @@ class ServicePolicyManagerTest {
         final String updatePolicy = "updatePolicy";
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
 
@@ -635,7 +629,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(updateRequest))
+                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PoliciesValidationFailedException.class);
     }
 
@@ -644,7 +638,6 @@ class ServicePolicyManagerTest {
         final String updatePolicy = "updatePolicy";
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(policyId);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
 
@@ -671,7 +664,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(updateRequest))
+                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PolicyDuplicateException.class);
     }
 

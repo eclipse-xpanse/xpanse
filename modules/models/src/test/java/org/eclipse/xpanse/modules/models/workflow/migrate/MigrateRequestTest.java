@@ -23,6 +23,7 @@ class MigrateRequestTest {
     private final String serviceName = "service" ;
     private final String customerServiceName = "customerService" ;
     private final String version = "1.0" ;
+    private final boolean IS_ACCEPT_EULA = true ;
     private final String regionName = "us-east-1" ;
     private final String areaName = "Asia China" ;
     private final Region region = new Region();
@@ -50,6 +51,7 @@ class MigrateRequestTest {
         request.setServiceRequestProperties(properties);
         request.setServiceHostingType(serviceHostingType);
         request.setAvailabilityZones(availabilityZones);
+        request.setEulaAccepted(IS_ACCEPT_EULA);
     }
 
     @Test
@@ -68,6 +70,7 @@ class MigrateRequestTest {
         assertEquals(properties, request.getServiceRequestProperties());
         assertEquals(availabilityZones, request.getAvailabilityZones());
         assertEquals(serviceHostingType, request.getServiceHostingType());
+        assertEquals(IS_ACCEPT_EULA, request.isEulaAccepted());
     }
 
     @Test
@@ -105,6 +108,7 @@ class MigrateRequestTest {
                 ", serviceHostingType=" + serviceHostingType +
                 ", serviceRequestProperties=" + properties +
                 ", availabilityZones=" + availabilityZones +
+                ", isEulaAccepted=" + IS_ACCEPT_EULA +
                 "), id=" + id + ")" ;
         assertEquals(expectedToString, request.toString());
     }

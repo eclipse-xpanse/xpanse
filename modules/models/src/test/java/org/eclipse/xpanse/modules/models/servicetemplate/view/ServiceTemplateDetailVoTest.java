@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -35,18 +36,19 @@ import org.springframework.beans.BeanUtils;
  */
 class ServiceTemplateDetailVoTest {
 
-    private final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
-    private final Category category = Category.COMPUTE;
-    private final String name = "kafka";
-    private final String version = "1.0.0";
-    private final Csp csp = Csp.AWS;
-    private final String description = "description";
-    private final String namespace = "namespace";
-    private final String icon = "icon";
-    private final Deployment DEPLOYMENT = new Deployment();
-    private final OffsetDateTime createTime = OffsetDateTime.now();
-    private final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
-    private final ServiceRegistrationState serviceRegistrationState =
+    private static final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
+    private static final Category category = Category.COMPUTE;
+    private static final String name = "kafka";
+    private static final String version = "1.0.0";
+    private static final String eula = "eula";
+    private static final Csp csp = Csp.AWS;
+    private static final String description = "description";
+    private static final String namespace = "namespace";
+    private static final String icon = "icon";
+    private static final Deployment DEPLOYMENT = new Deployment();
+    private static final OffsetDateTime createTime = OffsetDateTime.now();
+    private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
+    private static final ServiceRegistrationState serviceRegistrationState =
             ServiceRegistrationState.APPROVED;
     private final String reviewComment = "reviewComment";
     @Mock
@@ -96,6 +98,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setReviewComment(reviewComment);
         serviceTemplateDetailVo.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
+        serviceTemplateDetailVo.setEula(eula);
     }
 
     @Test
@@ -121,6 +124,7 @@ class ServiceTemplateDetailVoTest {
                 serviceTemplateDetailVo.getServiceHostingType());
         assertEquals(serviceProviderContactDetails,
                 serviceTemplateDetailVo.getServiceProviderContactDetails());
+        assertEquals(Optional.of(eula), serviceTemplateDetailVo.getEula());
     }
 
     @Test
@@ -132,6 +136,7 @@ class ServiceTemplateDetailVoTest {
         assertNotEquals(serviceTemplateDetailVo.hashCode(), test.hashCode());
         ServiceTemplateDetailVo test2 = new ServiceTemplateDetailVo();
         BeanUtils.copyProperties(serviceTemplateDetailVo, test2);
+        test2.setEula(eula);
         assertEquals(serviceTemplateDetailVo, test2);
         assertEquals(serviceTemplateDetailVo.hashCode(), test2.hashCode());
     }
@@ -157,7 +162,8 @@ class ServiceTemplateDetailVoTest {
                 "lastModifiedTime=" + lastModifiedTime + ", " +
                 "serviceRegistrationState=" + serviceRegistrationState + ", " +
                 "reviewComment=" + reviewComment + ", " +
-                "serviceProviderContactDetails=" + serviceProviderContactDetails + ")";
+                "serviceProviderContactDetails=" + serviceProviderContactDetails + ", " +
+                "eula=" + Optional.of(eula) +")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());
     }

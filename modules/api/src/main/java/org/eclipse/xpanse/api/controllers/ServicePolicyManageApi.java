@@ -119,8 +119,7 @@ public class ServicePolicyManageApi {
             @Parameter(name = "id", description = "ID of the policy to be updated")
             @PathVariable("id") String id,
             @Valid @RequestBody ServicePolicyUpdateRequest updateRequest) {
-        updateRequest.setId(UUID.fromString(id));
-        return servicePolicyManager.updateServicePolicy(updateRequest);
+        return servicePolicyManager.updateServicePolicy(UUID.fromString(id), updateRequest);
     }
 
     /**

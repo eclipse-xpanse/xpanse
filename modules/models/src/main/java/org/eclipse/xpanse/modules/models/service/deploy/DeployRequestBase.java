@@ -95,4 +95,7 @@ public class DeployRequestBase implements Serializable {
 
     @Schema(description = "The availability zones to deploy the service instance.")
     private Map<String, String> availabilityZones;
+
+    @Schema(description = "The flag to determine if the user has accepted the EULA terms.")
+    private boolean isEulaAccepted;
 }

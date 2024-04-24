@@ -25,9 +25,11 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
@@ -82,6 +84,7 @@ public class ServiceMigrationApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
+        validateEula(migrateRequest);
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(migrateRequest.getId());
         String userId = getUserId();
@@ -100,6 +103,23 @@ public class ServiceMigrationApi {
         ProcessInstance instance =
                 workflowUtils.startProcess(MigrateConstants.PROCESS_KEY, variable);
         return UUID.fromString(instance.getProcessInstanceId());
+    }
+
+    private void validateEula(MigrateRequest migrateRequest) {
+        ServiceTemplateEntity searchServiceTemplate = new ServiceTemplateEntity();
+        searchServiceTemplate.setName(StringUtils.lowerCase(migrateRequest.getServiceName()));
+        searchServiceTemplate.setVersion(StringUtils.lowerCase(migrateRequest.getVersion()));
+        searchServiceTemplate.setCsp(migrateRequest.getCsp());
+        searchServiceTemplate.setCategory(migrateRequest.getCategory());
+        searchServiceTemplate.setServiceHostingType(migrateRequest.getServiceHostingType());
+        ServiceTemplateEntity existingServiceTemplate =
+                migrationService.findServiceTemplate(searchServiceTemplate);
+        if (Objects.nonNull(existingServiceTemplate)
+                && existingServiceTemplate.getOcl().getEula().isPresent()
+                && !migrateRequest.isEulaAccepted()) {
+            log.error("Service not accepted Eula.");
+            throw new EulaNotAccepted("Service not accepted Eula.");
+        }
     }
 
     /**

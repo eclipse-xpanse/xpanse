@@ -28,6 +28,7 @@ class DeployRequestTest {
 
     private final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
     private final String userId = "userId" ;
+    private final boolean IS_ACCEPT_EULA = true;
     private final Category category = Category.COMPUTE;
     private final String serviceName = "service" ;
     private final String customerServiceName = "customerService" ;
@@ -59,6 +60,7 @@ class DeployRequestTest {
         request.setServiceRequestProperties(properties);
         request.setServiceHostingType(serviceHostingType);
         request.setAvailabilityZones(availabilityZones);
+        request.setEulaAccepted(IS_ACCEPT_EULA);
     }
 
     @Test
@@ -77,6 +79,7 @@ class DeployRequestTest {
         assertEquals(properties, request.getServiceRequestProperties());
         assertEquals(availabilityZones, request.getAvailabilityZones());
         assertEquals(serviceHostingType, request.getServiceHostingType());
+        assertEquals(IS_ACCEPT_EULA, request.isEulaAccepted());
     }
 
     @Test
@@ -113,6 +116,7 @@ class DeployRequestTest {
                 ", serviceHostingType=" + serviceHostingType +
                 ", serviceRequestProperties=" + properties +
                 ", availabilityZones=" + availabilityZones +
+                ", isEulaAccepted=" + IS_ACCEPT_EULA +
                 "), id=" + id + ")";
         assertEquals(expectedToString, request.toString());
     }
