@@ -109,9 +109,9 @@ public class ServicePolicyManager {
      * @param updateRequest update policy request.
      * @return Returns updated policy view object.
      */
-    public ServicePolicy updateServicePolicy(ServicePolicyUpdateRequest updateRequest) {
+    public ServicePolicy updateServicePolicy(UUID id, ServicePolicyUpdateRequest updateRequest) {
         ServicePolicyEntity existingPolicy =
-                getServicePolicyEntity(updateRequest.getId());
+                getServicePolicyEntity(id);
 
         ServicePolicyEntity policyToUpdate =
                 getServicePolicyToUpdate(updateRequest, existingPolicy);

@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -15,11 +16,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OptionalToStringSerializer;
 import org.eclipse.xpanse.modules.models.servicetemplate.validators.DeploymentScriptsConstraint;
 
 /**
@@ -103,6 +108,32 @@ public class Ocl implements Serializable {
     @NotNull
     @Schema(description = "The contact details of the service provider.")
     private ServiceProviderContactDetails serviceProviderContactDetails;
+
+    @JsonSerialize(converter = OptionalToStringSerializer.class)
+    @Schema(description = "End user license agreement content of the service.")
+    private Optional<String> eula;
+
+    /**
+     * Get eula.
+     */
+    public Optional<String> getEula() {
+        if (Objects.nonNull(eula)) {
+            return eula;
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Set eula.
+     */
+    public void setEula(String eula) {
+        if (StringUtils.isNotBlank(eula)) {
+            this.eula = Optional.of(eula);
+        } else {
+            this.eula = Optional.empty();
+        }
+    }
 
     /**
      * an OCL object might be passed to different plugins for processing, in case any plugin want to

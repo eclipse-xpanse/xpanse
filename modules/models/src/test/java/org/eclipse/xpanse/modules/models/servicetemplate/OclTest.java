@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingMode;
@@ -149,6 +150,7 @@ class OclTest {
                 ", billing=" + billing +
                 ", serviceHostingType=" + serviceHostingType +
                 ", serviceProviderContactDetails=" + serviceProviderContactDetails +
+                ", eula=" + Optional.empty() +
                 ")";
 
         assertEquals(expectedString, ocl.toString());

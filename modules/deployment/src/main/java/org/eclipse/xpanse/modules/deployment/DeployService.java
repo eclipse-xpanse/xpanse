@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceModifyParamsNotFoundException;
@@ -96,6 +97,11 @@ public class DeployService {
                     existingServiceTemplate.getId());
             log.error(errMsg);
             throw new ServiceTemplateNotApproved("No available service templates found.");
+        }
+        if (existingServiceTemplate.getOcl().getEula().isPresent()
+                && !deployRequest.isEulaAccepted()) {
+            log.error("Service not accepted Eula.");
+            throw new EulaNotAccepted("Service not accepted Eula.");
         }
         // Check context validation
         validateDeployRequestWithServiceTemplate(existingServiceTemplate, deployRequest);

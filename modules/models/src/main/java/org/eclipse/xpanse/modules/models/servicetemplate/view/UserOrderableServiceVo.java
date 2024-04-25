@@ -6,15 +6,19 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate.view;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
@@ -24,6 +28,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OptionalToStringSerializer;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
@@ -93,4 +98,30 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
 
     @Schema(description = "The list of availability zones of the service.")
     private List<AvailabilityZoneConfig> serviceAvailability;
+
+    @JsonSerialize(converter = OptionalToStringSerializer.class)
+    @Schema(description = "End user license agreement content of the service.")
+    private Optional<String> eula;
+
+    /**
+     * Get eula.
+     */
+    public Optional<String> getEula() {
+        if (Objects.nonNull(eula)) {
+            return eula;
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Set eula.
+     */
+    public void setEula(String eula) {
+        if (StringUtils.isNotBlank(eula)) {
+            this.eula = Optional.of(eula);
+        } else {
+            this.eula = Optional.empty();
+        }
+    }
 }

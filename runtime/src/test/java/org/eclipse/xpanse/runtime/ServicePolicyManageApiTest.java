@@ -283,7 +283,6 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         mockPoliciesValidateRequest(true);
 
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(servicePolicy.getId());
         updateRequest.setPolicy("servicePolicyUpdate");
         updateRequest.setEnabled(true);
         String requestBody = objectMapper.writeValueAsString(updateRequest);
@@ -312,7 +311,6 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setId(uuid);
         updateRequest.setPolicy("servicePolicyUpdate");
         String requestBody = objectMapper.writeValueAsString(updateRequest);
 

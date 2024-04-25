@@ -7,9 +7,7 @@
 package org.eclipse.xpanse.modules.models.policy.servicepolicy;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 import lombok.Data;
 
 /**
@@ -17,14 +15,6 @@ import lombok.Data;
  */
 @Data
 public class ServicePolicyUpdateRequest {
-
-    /**
-     * The id of the policy.
-     */
-    @NotNull
-    @Schema(description = "The id of the policy.")
-    private UUID id;
-
     /**
      * The flavor name list which the policy belongs to.
      */

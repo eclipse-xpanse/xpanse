@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -27,6 +28,7 @@ class UserOrderableServiceVoTest {
 
     final String description = "description";
     final String icon = "icon";
+    final String eula = "eula";
     private final UUID id = UUID.randomUUID();
     private final String name = "name";
     private final String version = "version";
@@ -67,6 +69,7 @@ class UserOrderableServiceVoTest {
         test.setServiceHostingType(mockServiceHostingType);
         test.setServiceProviderContactDetails(mockServiceProviderContactDetails);
         test.setServiceAvailability(mockServiceAvailability);
+        test.setEula(eula);
     }
 
     @Test
@@ -88,6 +91,8 @@ class UserOrderableServiceVoTest {
                 .isEqualTo(mockServiceProviderContactDetails);
         assertThat(test.getServiceAvailability())
                 .isEqualTo(mockServiceAvailability);
+        assertThat(test.getEula())
+                .isEqualTo(Optional.of(eula));
     }
 
 
@@ -100,6 +105,7 @@ class UserOrderableServiceVoTest {
         assertNotEquals(test.hashCode(), test1.hashCode());
         UserOrderableServiceVo test2 = new UserOrderableServiceVo();
         BeanUtils.copyProperties(test, test2);
+        test2.setEula(eula);
         assertEquals(test, test2);
         assertEquals(test.hashCode(), test2.hashCode());
     }
@@ -120,7 +126,8 @@ class UserOrderableServiceVoTest {
                 "billing=" + mockBilling + ", " +
                 "serviceHostingType=" + mockServiceHostingType + ", " +
                 "serviceProviderContactDetails=" + mockServiceProviderContactDetails + ", " +
-                "serviceAvailability=" + mockServiceAvailability + ")";
+                "serviceAvailability=" + mockServiceAvailability + ", " +
+                "eula=" + Optional.of(eula) + ")";
         assertEquals(expectedToString, test.toString());
     }
 }

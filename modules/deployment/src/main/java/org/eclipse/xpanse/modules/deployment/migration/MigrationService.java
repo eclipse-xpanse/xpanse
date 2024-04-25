@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationQueryModel;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceMigrationNotFoundException;
 import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
@@ -34,6 +36,8 @@ public class MigrationService {
 
     @Resource
     private ServiceMigrationStorage serviceMigrationStorage;
+    @Resource
+    private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
      * Save or refresh ServiceMigrationEntity.
@@ -151,5 +155,12 @@ public class MigrationService {
             }
         }
         return serviceMigrationDetailsList;
+    }
+
+    /**
+     * Query service template.
+     */
+    public ServiceTemplateEntity findServiceTemplate(ServiceTemplateEntity searchServiceTemplate) {
+        return  serviceTemplateStorage.findServiceTemplate(searchServiceTemplate);
     }
 }
