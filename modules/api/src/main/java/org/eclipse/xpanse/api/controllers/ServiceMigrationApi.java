@@ -115,7 +115,7 @@ public class ServiceMigrationApi {
         ServiceTemplateEntity existingServiceTemplate =
                 migrationService.findServiceTemplate(searchServiceTemplate);
         if (Objects.nonNull(existingServiceTemplate)
-                && existingServiceTemplate.getOcl().getEula().isPresent()
+                && StringUtils.isNotBlank(existingServiceTemplate.getOcl().getEula())
                 && !migrateRequest.isEulaAccepted()) {
             log.error("Service not accepted Eula.");
             throw new EulaNotAccepted("Service not accepted Eula.");

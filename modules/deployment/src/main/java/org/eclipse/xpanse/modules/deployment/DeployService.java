@@ -98,7 +98,7 @@ public class DeployService {
             log.error(errMsg);
             throw new ServiceTemplateNotApproved("No available service templates found.");
         }
-        if (existingServiceTemplate.getOcl().getEula().isPresent()
+        if (StringUtils.isNotBlank(existingServiceTemplate.getOcl().getEula())
                 && !deployRequest.isEulaAccepted()) {
             log.error("Service not accepted Eula.");
             throw new EulaNotAccepted("Service not accepted Eula.");
