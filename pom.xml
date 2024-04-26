@@ -81,7 +81,7 @@
         <eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
         <java.uuid.generator.version>5.0.0</java.uuid.generator.version>
         <jgit.version>6.9.0.202403050737-r</jgit.version>
-        <semver4j.version>5.2.3</semver4j.version>
+        <semver4j.version>5.3.0</semver4j.version>
         <springdoc.openapi.plugin.version>1.4</springdoc.openapi.plugin.version>
     </properties>
     <scm>
