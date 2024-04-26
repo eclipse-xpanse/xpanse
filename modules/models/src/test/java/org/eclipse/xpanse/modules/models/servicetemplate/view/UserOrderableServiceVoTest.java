@@ -92,7 +92,7 @@ class UserOrderableServiceVoTest {
         assertThat(test.getServiceAvailability())
                 .isEqualTo(mockServiceAvailability);
         assertThat(test.getEula())
-                .isEqualTo(Optional.of(eula));
+                .isEqualTo(eula);
     }
 
 
@@ -127,7 +127,7 @@ class UserOrderableServiceVoTest {
                 "serviceHostingType=" + mockServiceHostingType + ", " +
                 "serviceProviderContactDetails=" + mockServiceProviderContactDetails + ", " +
                 "serviceAvailability=" + mockServiceAvailability + ", " +
-                "eula=" + Optional.of(eula) + ")";
+                "eula=" + eula + ")";
         assertEquals(expectedToString, test.toString());
     }
 }

@@ -56,7 +56,7 @@ public class ServiceTemplateEntityConverter {
                     serviceTemplateEntity.getOcl().getServiceHostingType());
             serviceTemplateDetailVo.setServiceProviderContactDetails(
                     serviceTemplateEntity.getOcl().getServiceProviderContactDetails());
-            serviceTemplateDetailVo.setEula(serviceTemplateEntity.getOcl().getEula().orElse(null));
+            serviceTemplateDetailVo.setEula(serviceTemplateEntity.getOcl().getEula());
             return serviceTemplateDetailVo;
         }
         return null;
@@ -98,7 +98,7 @@ public class ServiceTemplateEntityConverter {
                     serviceTemplateEntity.getOcl().getServiceProviderContactDetails());
             userOrderableServiceVo.setServiceAvailability(
                     serviceTemplateEntity.getOcl().getDeployment().getServiceAvailability());
-            userOrderableServiceVo.setEula(serviceTemplateEntity.getOcl().getEula().orElse(null));
+            userOrderableServiceVo.setEula(serviceTemplateEntity.getOcl().getEula());
             return userOrderableServiceVo;
         }
         return null;

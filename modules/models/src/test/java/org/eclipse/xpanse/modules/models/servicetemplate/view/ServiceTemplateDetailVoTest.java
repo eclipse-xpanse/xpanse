@@ -124,7 +124,7 @@ class ServiceTemplateDetailVoTest {
                 serviceTemplateDetailVo.getServiceHostingType());
         assertEquals(serviceProviderContactDetails,
                 serviceTemplateDetailVo.getServiceProviderContactDetails());
-        assertEquals(Optional.of(eula), serviceTemplateDetailVo.getEula());
+        assertEquals(eula, serviceTemplateDetailVo.getEula());
     }
 
     @Test
@@ -163,7 +163,7 @@ class ServiceTemplateDetailVoTest {
                 "serviceRegistrationState=" + serviceRegistrationState + ", " +
                 "reviewComment=" + reviewComment + ", " +
                 "serviceProviderContactDetails=" + serviceProviderContactDetails + ", " +
-                "eula=" + Optional.of(eula) +")";
+                "eula=" + eula +")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());
     }

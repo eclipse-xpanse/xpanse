@@ -16,12 +16,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
@@ -32,7 +29,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
-import org.eclipse.xpanse.modules.models.servicetemplate.utils.OptionalToStringSerializer;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
@@ -129,30 +125,6 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
     @Schema(description = "The contact details of the service provider.")
     private ServiceProviderContactDetails serviceProviderContactDetails;
 
-    @JsonSerialize(converter = OptionalToStringSerializer.class)
     @Schema(description = "End user license agreement content of the service.")
-    private Optional<String> eula;
-
-    /**
-     * Get eula.
-     */
-    public Optional<String> getEula() {
-        if (Objects.nonNull(eula)) {
-            return eula;
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Set eula.
-     */
-    public void setEula(String eula) {
-        if (StringUtils.isNotBlank(eula)) {
-            this.eula = Optional.of(eula);
-        } else {
-            this.eula = Optional.empty();
-        }
-    }
-
+    private String eula;
 }

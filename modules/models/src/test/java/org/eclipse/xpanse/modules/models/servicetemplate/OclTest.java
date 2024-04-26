@@ -150,7 +150,7 @@ class OclTest {
                 ", billing=" + billing +
                 ", serviceHostingType=" + serviceHostingType +
                 ", serviceProviderContactDetails=" + serviceProviderContactDetails +
-                ", eula=" + Optional.empty() +
+                ", eula=" + null +
                 ")";
 
         assertEquals(expectedString, ocl.toString());
