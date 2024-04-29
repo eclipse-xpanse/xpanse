@@ -23,45 +23,35 @@ cloudServiceProvider:
 billing:
   # The supported mode of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
   billingModes:
-    - yearly
-    - monthly
-    - daily
-    - hourly
-    - pay_per_use
+    - fixed
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   serviceFlavors:
     - name: 1-zookeeper-with-3-worker-nodes-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 40
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 95.00
+          currency: USD
+          period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3
         flavor_name: SCS-4V:8:20
         image_name: Ubuntu 20.04
     - name: 1-zookeeper-with-3-worker-nodes-performance
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 60
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 95.00
+          currency: USD
+          period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3
-        flavor_name: SCS-4V:8:20
-        image_name: Ubuntu 20.04
-    - name: 1-zookeeper-with-5-worker-nodes-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 60
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        worker_nodes_count: 5
-        flavor_name: SCS-4V:8:20
-        image_name: Ubuntu 20.04
-    - name: 1-zookeeper-with-5-worker-nodes-performance
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 80
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        worker_nodes_count: 5
         flavor_name: SCS-4V:8:20
         image_name: Ubuntu 20.04
   modificationImpact:

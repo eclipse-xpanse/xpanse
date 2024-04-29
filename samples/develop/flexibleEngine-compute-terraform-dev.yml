@@ -21,47 +21,143 @@ cloudServiceProvider:
     - name: eu-west-1
       area: Western Europe
 billing:
-  # The supported mode of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
+  # The supported mode of billing (`fixed`, `pay_per_use`)
   billingModes:
-    - yearly
-    - monthly
-    - daily
-    - hourly
+    - fixed
     - pay_per_use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   serviceFlavors:
     - name: flavor-error-test
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 10
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ec2
+                resource_type: hws.resource.type.vm
+                resource_spec: s7.small.1.linux
+            - deployResourceKind: volume
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ebs
+                resource_type: hws.resource.type.volume
+                resource_spec: SSD
+                resourceSize: 40
+            - deployResourceKind: publicIP
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.vpc
+                resource_type: hws.resource.type.bandwidth
+                resource_spec: 19_bgp
+                resourceSize: 5
+          licensePrice:
+            cost: 0.50
+            currency: EUR
+            period: hourly
+          markUpPrice:
+            cost: 0.45
+            currency: EUR
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 172
+          currency: EUR
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
-        flavor_id: s6.small.1
+        flavor_id: s7.small.1
     - name: 2vCPUs-4GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 20
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ec2
+                resource_type: hws.resource.type.vm
+                resource_spec: s6.large.2.linux
+            - deployResourceKind: volume
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ebs
+                resource_type: hws.resource.type.volume
+                resource_spec: SSD
+                resourceSize: 40
+            - deployResourceKind: publicIP
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.vpc
+                resource_type: hws.resource.type.bandwidth
+                resource_spec: 19_bgp
+                resourceSize: 5
+          licensePrice:
+            cost: 0.1033
+            currency: EUR
+            period: hourly
+          markUpPrice:
+            cost: 0.0930
+            currency: EUR
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 39.00
+          currency: EUR
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: s6.large.2
     - name: 2vCPUs-8GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 30
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ec2
+                resource_type: hws.resource.type.vm
+                resource_spec: s6.large.4.linux
+            - deployResourceKind: volume
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ebs
+                resource_type: hws.resource.type.volume
+                resource_spec: SSD
+                resourceSize: 40
+            - deployResourceKind: publicIP
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.vpc
+                resource_type: hws.resource.type.bandwidth
+                resource_spec: 19_bgp
+                resourceSize: 5
+          licensePrice:
+            cost: 0.1562
+            currency: EUR
+            period: hourly
+          markUpPrice:
+            cost: 0.1420
+            currency: EUR
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 46.50
+          currency: EUR
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: s6.large.4
-    - name: 4vCPUs-8GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 40
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        flavor_id: s6.xlarge.2
-    - name: 4vCPUs-16GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 50
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        flavor_id: s6.xlarge.4
   modificationImpact:
     isDataLost: false
     isServiceInterrupted: true

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
@@ -143,5 +144,16 @@ public class RegistrationExceptionHandler {
             InvalidServiceVersionException ex) {
         return Response.errorResponse(ResultType.INVALID_SERVICE_VERSION,
                 Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for InvalidServiceFlavorsException.
+     */
+    @ExceptionHandler({InvalidServiceFlavorsException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleInvalidServiceFlavorsException(
+            InvalidServiceFlavorsException ex) {
+        return Response.errorResponse(ResultType.INVALID_SERVICE_FLAVORS, ex.getErrorReasons());
     }
 }

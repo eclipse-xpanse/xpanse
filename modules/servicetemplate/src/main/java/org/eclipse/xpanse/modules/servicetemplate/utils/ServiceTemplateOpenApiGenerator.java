@@ -37,6 +37,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -286,7 +287,8 @@ public class ServiceTemplateOpenApiGenerator {
             regionAreaExample = regions.getFirst().getArea();
             regionAreasStr =
                     mapper.writeValueAsString(regions.stream().map(Region::getArea).toList());
-            List<ServiceFlavor> flavors = registerService.getOcl().getFlavors().getServiceFlavors();
+            List<ServiceFlavorWithPrice> flavors =
+                    registerService.getOcl().getFlavors().getServiceFlavors();
             flavorNameExample = flavors.getFirst().getName();
             flavorNamesStr =
                     mapper.writeValueAsString(

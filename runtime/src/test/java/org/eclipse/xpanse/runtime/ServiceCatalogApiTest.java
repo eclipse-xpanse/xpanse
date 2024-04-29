@@ -151,13 +151,15 @@ class ServiceCatalogApiTest extends ApisTestCommon {
 
         // Setup request 2
         UUID id2 = serviceTemplateDetailVo.getId();
-        String result2 = objectMapper.writeValueAsString(
-                transToUserOrderableServiceVo(serviceTemplateDetailVo));
+        UserOrderableServiceVo expectedResponse2 =
+                transToUserOrderableServiceVo(serviceTemplateDetailVo);
         // Run the test case 2
         final MockHttpServletResponse response2 = getOrderableServiceDetailsWithId(id2);
+        UserOrderableServiceVo result2 = objectMapper.readValue(response2.getContentAsString(),
+                UserOrderableServiceVo.class);
         // Verify the results 2
         Assertions.assertEquals(HttpStatus.OK.value(), response2.getStatus());
-        Assertions.assertEquals(result2, response2.getContentAsString());
+        Assertions.assertEquals(result2, expectedResponse2);
     }
 
     void testGetOrderableServiceDetailsThrowsException(

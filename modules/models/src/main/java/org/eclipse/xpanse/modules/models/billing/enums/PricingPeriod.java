@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.servicetemplate.enums;
+package org.eclipse.xpanse.modules.models.billing.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -12,38 +12,38 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 
 
 /**
- * Enum of Billing Mode.
+ * Enum of PricingPeriod.
  */
-public enum BillingMode {
+public enum PricingPeriod {
 
     YEARLY("yearly"),
     MONTHLY("monthly"),
     DAILY("daily"),
     HOURLY("hourly"),
-    PAY_PER_USE("pay_per_use");
+    ONE_TIME("oneTime");
 
     private final String value;
 
-    BillingMode(String value) {
+    PricingPeriod(String value) {
         this.value = value;
     }
 
     /**
-     * For BillingMode serialize.
+     * For PricingPeriod serialize.
      */
     @JsonCreator
-    public static BillingMode getByValue(String value) {
-        for (BillingMode enumeration : values()) {
+    public static PricingPeriod getByValue(String value) {
+        for (PricingPeriod enumeration : values()) {
             if (StringUtils.equalsIgnoreCase(enumeration.value, value)) {
                 return enumeration;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("BillingMode value %s is not supported.", value));
+                String.format("PricingPeriod value %s is not supported.", value));
     }
 
     /**
-     * For BillingMode deserialize.
+     * For PricingPeriod deserialize.
      */
     @JsonValue
     public String toValue() {
