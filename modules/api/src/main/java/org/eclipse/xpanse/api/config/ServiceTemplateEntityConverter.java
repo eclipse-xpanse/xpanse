@@ -10,6 +10,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.controllers.ServiceCatalogApi;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
@@ -78,13 +79,10 @@ public class ServiceTemplateEntityConverter {
             userOrderableServiceVo.setDescription(
                     serviceTemplateEntity.getOcl().getDescription());
             userOrderableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
-            List<ServiceFlavor> flavorBasics = serviceTemplateEntity.getOcl().getFlavors()
-                    .getServiceFlavors().stream().map(flavor -> {
-                        ServiceFlavor flavorBasic = new ServiceFlavor();
-                        BeanUtils.copyProperties(flavor, flavorBasic);
-                        return flavorBasic;
-                    }).toList();
-            userOrderableServiceVo.setFlavors(flavorBasics);
+
+            setFlavorsWithoutPricing(userOrderableServiceVo,
+                    serviceTemplateEntity.getOcl().getFlavors());
+
             userOrderableServiceVo.setVariables(
                     serviceTemplateEntity.getOcl().getDeployment().getVariables());
             userOrderableServiceVo.setRegions(
@@ -103,4 +101,15 @@ public class ServiceTemplateEntityConverter {
         }
         return null;
     }
+
+    private static void setFlavorsWithoutPricing(UserOrderableServiceVo serviceVo,
+                                                 FlavorsWithPrice flavors) {
+        List<ServiceFlavor> flavorBasics = flavors.getServiceFlavors().stream().map(flavor -> {
+            ServiceFlavor flavorBasic = new ServiceFlavor();
+            BeanUtils.copyProperties(flavor, flavorBasic);
+            return flavorBasic;
+        }).toList();
+        serviceVo.setFlavors(flavorBasics);
+    }
+
 }

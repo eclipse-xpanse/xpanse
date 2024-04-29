@@ -5,12 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
-import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
@@ -85,14 +84,11 @@ class UserOrderableServiceVoTest {
         assertThat(test.getVariables()).isEqualTo(mockVariables);
         assertThat(test.getFlavors()).isEqualTo(mockFlavors);
         assertThat(test.getBilling()).isEqualTo(mockBilling);
-        assertThat(test.getServiceHostingType())
-                .isEqualTo(mockServiceHostingType);
-        assertThat(test.getServiceProviderContactDetails())
-                .isEqualTo(mockServiceProviderContactDetails);
-        assertThat(test.getServiceAvailability())
-                .isEqualTo(mockServiceAvailability);
-        assertThat(test.getEula())
-                .isEqualTo(eula);
+        assertThat(test.getServiceHostingType()).isEqualTo(mockServiceHostingType);
+        assertThat(test.getServiceProviderContactDetails()).isEqualTo(
+                mockServiceProviderContactDetails);
+        assertThat(test.getServiceAvailability()).isEqualTo(mockServiceAvailability);
+        assertThat(test.getEula()).isEqualTo(eula);
     }
 
 
@@ -112,22 +108,16 @@ class UserOrderableServiceVoTest {
 
     @Test
     void testToString() {
-        String expectedToString = "UserOrderableServiceVo(" +
-                "id=" + id + ", " +
-                "category=" + mockCategory + ", " +
-                "name=" + name + ", " +
-                "version=" + version + ", " +
-                "csp=" + mockCsp + ", " +
-                "regions=" + mockRegions + ", " +
-                "description=" + description + ", " +
-                "icon=" + icon + ", " +
-                "variables=" + mockVariables + ", " +
-                "flavors=" + mockFlavors + ", " +
-                "billing=" + mockBilling + ", " +
-                "serviceHostingType=" + mockServiceHostingType + ", " +
-                "serviceProviderContactDetails=" + mockServiceProviderContactDetails + ", " +
-                "serviceAvailability=" + mockServiceAvailability + ", " +
-                "eula=" + eula + ")";
+        String expectedToString =
+                "UserOrderableServiceVo(" + "id=" + id + ", " + "category=" + mockCategory + ", "
+                        + "name=" + name + ", " + "version=" + version + ", " + "csp=" + mockCsp
+                        + ", " + "regions=" + mockRegions + ", " + "description=" + description
+                        + ", " + "icon=" + icon + ", " + "variables=" + mockVariables + ", "
+                        + "flavors=" + mockFlavors + ", " + "billing=" + mockBilling + ", "
+                        + "serviceHostingType=" + mockServiceHostingType + ", "
+                        + "serviceProviderContactDetails=" + mockServiceProviderContactDetails
+                        + ", " + "serviceAvailability=" + mockServiceAvailability + ", " + "eula="
+                        + eula + ")";
         assertEquals(expectedToString, test.toString());
     }
 }

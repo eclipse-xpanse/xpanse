@@ -42,6 +42,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
+import org.eclipse.xpanse.modules.models.servicetemplate.validators.BillingConfigValidator;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
@@ -64,6 +65,8 @@ class ServiceTemplateManageTest {
     private static OclLoader oclLoader;
     private static Ocl oclRegister;
     private static UUID uuid;
+    @Mock
+    private BillingConfigValidator billingConfigValidator;
     @Mock
     private TerraformLocalConfig terraformLocalConfig;
     @Mock
@@ -149,8 +152,7 @@ class ServiceTemplateManageTest {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         when(userServiceHelper.currentUserCanManageNamespace(any())).thenReturn(false);
         Assertions.assertThrows(AccessDeniedException.class,
-                () -> serviceTemplateManageTest.updateServiceTemplate(uuid,
-                        oclRegister));
+                () -> serviceTemplateManageTest.updateServiceTemplate(uuid, oclRegister));
     }
 
 
@@ -228,8 +230,8 @@ class ServiceTemplateManageTest {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(userServiceHelper.currentUserCanManageNamespace(
                 serviceTemplateEntity.getNamespace())).thenReturn(true);
-        when(userServiceHelper.currentUserCanManageCsp(
-                serviceTemplateEntity.getCsp())).thenReturn(true);
+        when(userServiceHelper.currentUserCanManageCsp(serviceTemplateEntity.getCsp())).thenReturn(
+                true);
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
         ServiceTemplateEntity serviceTemplate =
                 serviceTemplateManageTest.getServiceTemplateDetails(uuid, true, true);
@@ -258,8 +260,8 @@ class ServiceTemplateManageTest {
     void testReviewServiceTemplateRegistration() {
         ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity();
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(serviceTemplateEntity);
-        when(userServiceHelper.currentUserCanManageCsp(
-                serviceTemplateEntity.getCsp())).thenReturn(true);
+        when(userServiceHelper.currentUserCanManageCsp(serviceTemplateEntity.getCsp())).thenReturn(
+                true);
         ServiceTemplateEntity serviceTemplate =
                 serviceTemplateManageTest.getServiceTemplateDetails(uuid, false, true);
         Assertions.assertEquals(serviceTemplateEntity, serviceTemplate);
@@ -270,8 +272,7 @@ class ServiceTemplateManageTest {
     void testGetServiceTemplateThrowsServiceTemplateNotRegistered() {
         when(mockStorage.getServiceTemplateById(uuid)).thenReturn(null);
         Assertions.assertThrows(ServiceTemplateNotRegistered.class,
-                () -> serviceTemplateManageTest.getServiceTemplateDetails(uuid, false,
-                        false));
+                () -> serviceTemplateManageTest.getServiceTemplateDetails(uuid, false, false));
 
     }
 

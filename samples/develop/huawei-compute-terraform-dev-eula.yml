@@ -21,12 +21,9 @@ cloudServiceProvider:
     - name: cn-north-4
       area: Asia China
 billing:
-  # The supported mode of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
+  # The supported mode of billing (`fixed`, `pay_per_use`)
   billingModes:
-    - yearly
-    - monthly
-    - daily
-    - hourly
+    - fixed
     - pay_per_use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
@@ -77,12 +74,12 @@ eula: |
   1. Violate any local, national or international laws, regulations and rules;
   2. Infringe or violate the rights of others, including but not limited to privacy rights or intellectual property rights;
   3. Engage in, encourage, assist or allow others to engage in any illegal, unlawful, infringing, harmful or fraudulent behavior, including but not limited to any of the following activities: harming or attempting to harm minors in any way, pornography, illegal gambling, illegal VPN construction, Ponzi schemes, cyber attacks, phishing or damage, privately intercepting any system, program or data, monitoring service data or traffic without permission, engaging in virtual currency "mining" or virtual currency transactions;
-  4. Transmit, provide, upload, download, use or reuse, disseminate or distribute any illegal, infringing, offensive, or harmful content or materials, including but not limited to those listed in the ¡°Prohibited Content¡± below;
+  4. Transmit, provide, upload, download, use or reuse, disseminate or distribute any illegal, infringing, offensive, or harmful content or materials, including but not limited to those listed in the ï¿½ï¿½Prohibited Contentï¿½ï¿½ below;
   5. Transmit any data, send or upload any material that contains viruses, worms, Trojan horses, time bombs, keyboard loggers, spyware, adware or any other harmful programs or similar computer code designed to adversely affect the operation or security of any computer hardware or software;
   6. Attack, interfere with, disrupt or adversely affect any service, hardware, software, system, website or network, including but not limited to accessing or attacking any service, hardware, software, system, website or network using large amounts of automated means (including robots, crawlers, scripts or similar data gathering or extraction methods);
   7. Access any part of the Service, account or system without authorization, or attempt to do so;
   8. Violate or adversely affect the security or integrity of the Services, hardware, software, systems, websites or networks;
-  9. Distribute, disseminate or send unsolicited email, bulk email or other messages, promotions, advertising or solicitations (such as ¡°spam¡±);
+  9. Distribute, disseminate or send unsolicited email, bulk email or other messages, promotions, advertising or solicitations (such as ï¿½ï¿½spamï¿½ï¿½);
   10. Fraudulent offers of goods or services, or any advertising, promotional or other materials containing false, deceptive or misleading statements.
 deployment:
   # kind, Supported values are terraform, opentofu.

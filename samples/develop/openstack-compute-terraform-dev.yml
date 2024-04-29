@@ -25,28 +25,43 @@ billing:
   billingModes:
     - yearly
     - monthly
-    - daily
-    - hourly
-    - pay_per_use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   serviceFlavors:
     - name: flavor-error-test
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 10
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 6.15
+          currency: USD
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: cirros128
     - name: 1vCPUs-1GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 20
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 23.75
+          currency: USD
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: cirros256
     - name: 1vCPUs-2GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 30
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 30.50
+          currency: USD
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: cirros512

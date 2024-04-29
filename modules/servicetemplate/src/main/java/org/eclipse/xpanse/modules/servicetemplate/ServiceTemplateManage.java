@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
+import org.eclipse.xpanse.modules.models.servicetemplate.validators.BillingConfigValidator;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
@@ -64,6 +65,8 @@ public class ServiceTemplateManage {
     private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @Resource
     private DeployerKindManager deployerKindManager;
+    @Resource
+    private BillingConfigValidator billingConfigValidator;
 
     /**
      * Update service template using id and the ocl model.
@@ -76,6 +79,7 @@ public class ServiceTemplateManage {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
         iconUpdate(existingTemplate, ocl);
         checkParams(existingTemplate, ocl);
+        billingConfigValidator.validateServiceFlavors(ocl);
         validateServiceDeployment(ocl.getDeployment(), existingTemplate);
         existingTemplate.setOcl(ocl);
         existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
@@ -186,6 +190,7 @@ public class ServiceTemplateManage {
         }
         validateServiceVersion(ocl);
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
+        billingConfigValidator.validateServiceFlavors(ocl);
         validateServiceDeployment(ocl.getDeployment(), newTemplate);
         String userManageNamespace =
                 userServiceHelper.getCurrentUserManageNamespace();

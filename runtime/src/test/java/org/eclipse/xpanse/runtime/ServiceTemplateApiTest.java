@@ -8,6 +8,7 @@ package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,6 +37,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -190,6 +192,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         testRegisterThrowsInvalidValueSchemaException();
         testRegisterThrowsServiceTemplateAlreadyRegistered();
         testRegisterThrowsInvalidServiceVersionException();
+        testRegisterThrowsInvalidServiceFlavorsException();
 
         testFetchThrowsRuntimeException();
         testListServiceTemplatesThrowsException();
@@ -481,6 +484,36 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         unregister(serviceTemplate.getId());
     }
+
+    void testRegisterThrowsInvalidServiceFlavorsException() throws Exception {
+        // Setup
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ServiceFlavorWithPrice duplicatedFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
+        ocl.getFlavors().getServiceFlavors().add(duplicatedFlavor);
+        String duplicatedFlavorName = duplicatedFlavor.getName();
+        String errorMsg1 =
+                String.format("Service flavor with name %s is duplicated.", duplicatedFlavorName);
+        ServiceFlavorWithPrice errorBillingFlavor = ocl.getFlavors().getServiceFlavors().getLast();
+        String errorBillingFlavorName = errorBillingFlavor.getName();
+        errorBillingFlavor.getPricing().setFixedPrice(null);
+        errorBillingFlavor.getPricing().setResourceUsage(null);
+        String errorMsg2 = String.format("Service flavor %s has no 'resourceUsage' defined in "
+                + "'pricing' for the billing mode 'pay-per-use'.", errorBillingFlavorName);
+        String errorMsg3 = String.format("Service flavor %s has no 'fixedPrice' defined in "
+                + "'pricing' for the billing mode 'fixed'.", errorBillingFlavorName);
+        List<String> expectedDetails = Arrays.asList(errorMsg1, errorMsg2, errorMsg3);
+
+        // Run the test
+        final MockHttpServletResponse registerResponse = register(ocl);
+        Response response =
+                objectMapper.readValue(registerResponse.getContentAsString(), Response.class);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
+        assertEquals(response.getResultType(), ResultType.INVALID_SERVICE_FLAVORS);
+        assertTrue(response.getDetails().containsAll(expectedDetails));
+    }
+
 
     void testFetchThrowsRuntimeException() throws Exception {
         // Setup

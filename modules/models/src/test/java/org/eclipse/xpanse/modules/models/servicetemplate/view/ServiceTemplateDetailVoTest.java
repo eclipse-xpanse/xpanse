@@ -12,18 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.models.billing.Billing;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.servicetemplate.Billing;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavors;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +54,7 @@ class ServiceTemplateDetailVoTest {
     private ServiceProviderContactDetails serviceProviderContactDetails;
     private List<Region> regions;
     private List<DeployVariable> variables;
-    private Flavors flavors;
+    private FlavorsWithPrice flavors;
     private Billing billing;
     private ServiceTemplateDetailVo serviceTemplateDetailVo;
 
@@ -70,8 +69,8 @@ class ServiceTemplateDetailVoTest {
         deployVariable.setName("HuaweiCloud AK");
         variables = List.of(deployVariable);
 
-        flavors = new Flavors();
-        ServiceFlavor flavor = new ServiceFlavor();
+        flavors = new FlavorsWithPrice();
+        ServiceFlavorWithPrice flavor = new ServiceFlavorWithPrice();
         flavor.setName("flavor");
         flavors.setServiceFlavors(List.of(flavor));
 
@@ -143,27 +142,18 @@ class ServiceTemplateDetailVoTest {
 
     @Test
     void testToString() {
-        String expectedToString = "ServiceTemplateDetailVo(" +
-                "id=" + uuid + ", " +
-                "name=" + name + ", " +
-                "version=" + version + ", " +
-                "csp=" + csp + ", " +
-                "category=" + category + ", " +
-                "namespace=" + namespace + ", " +
-                "regions=" + regions + ", " +
-                "description=" + description + ", " +
-                "icon=" + icon + ", " +
-                "deployment=" + DEPLOYMENT + ", " +
-                "variables=" + variables + ", " +
-                "flavors=" + flavors + ", " +
-                "billing=" + billing + ", " +
-                "serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR + ", " +
-                "createTime=" + createTime + ", " +
-                "lastModifiedTime=" + lastModifiedTime + ", " +
-                "serviceRegistrationState=" + serviceRegistrationState + ", " +
-                "reviewComment=" + reviewComment + ", " +
-                "serviceProviderContactDetails=" + serviceProviderContactDetails + ", " +
-                "eula=" + eula +")";
+        String expectedToString =
+                "ServiceTemplateDetailVo(" + "id=" + uuid + ", " + "name=" + name + ", "
+                        + "version=" + version + ", " + "csp=" + csp + ", " + "category=" + category
+                        + ", " + "namespace=" + namespace + ", " + "regions=" + regions + ", "
+                        + "description=" + description + ", " + "icon=" + icon + ", "
+                        + "deployment=" + DEPLOYMENT + ", " + "variables=" + variables + ", "
+                        + "flavors=" + flavors + ", " + "billing=" + billing + ", "
+                        + "serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR + ", "
+                        + "createTime=" + createTime + ", " + "lastModifiedTime=" + lastModifiedTime
+                        + ", " + "serviceRegistrationState=" + serviceRegistrationState + ", "
+                        + "reviewComment=" + reviewComment + ", " + "serviceProviderContactDetails="
+                        + serviceProviderContactDetails + ", " + "eula=" + eula + ")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());
     }

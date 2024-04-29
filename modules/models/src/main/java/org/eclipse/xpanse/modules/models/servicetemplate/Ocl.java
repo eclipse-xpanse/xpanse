@@ -12,11 +12,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -29,6 +31,9 @@ import org.eclipse.xpanse.modules.models.servicetemplate.validators.DeploymentSc
 @Data
 @Slf4j
 public class Ocl implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -51411975788603138L;
 
     private static ObjectMapper theMapper = new ObjectMapper();
 
@@ -86,7 +91,7 @@ public class Ocl implements Serializable {
     @Valid
     @NotNull
     @Schema(description = "The flavors of the managed service")
-    private Flavors flavors;
+    private FlavorsWithPrice flavors;
 
     @Valid
     @NotNull

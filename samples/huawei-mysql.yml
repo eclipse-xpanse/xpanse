@@ -21,26 +21,97 @@ cloudServiceProvider:
     - name: cn-north-4
       area: Asia China
 billing:
-  # The supported mode of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
+  # The supported mode of billing (`fixed`, `pay_per_use`)
   billingModes:
-    - yearly
-    - monthly
-    - daily
-    - hourly
+    - fixed
     - pay_per_use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   serviceFlavors:
     - name: 2vCPUs-4GB-general
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 60
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.rds
+                resource_type: hws.resource.type.rds.vm
+                resource_spec: rds.mysql.n1.large.2.ha
+            - deployResourceKind: volume
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.rds
+                resource_type: ws.resource.type.rds.volume
+                resource_spec: rds.mysql.volume.cloudssd.ha
+                resourceSize: 40
+            - deployResourceKind: publicIP
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.vpc
+                resource_type: hws.resource.type.bandwidth
+                resource_spec: 19_bgp
+                resourceSize: 5
+          licensePrice:
+            cost: 1.50
+            currency: CNY
+            period: hourly
+          markUpPrice:
+            cost: 1.45
+            currency: CNY
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 590
+          currency: CNY
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: rds.mysql.n1.large.2.ha
     - name: 2vCPUs-4GB-dedicated
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 80
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.rds
+                resource_type: hws.resource.type.rds.vm
+                resource_spec: rds.mysql.x1.large.2.ha
+            - deployResourceKind: volume
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.rds
+                resource_type: ws.resource.type.rds.volume
+                resource_spec: rds.mysql.volume.cloudssd.ha
+                resourceSize: 40
+            - deployResourceKind: publicIP
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.vpc
+                resource_type: hws.resource.type.bandwidth
+                resource_spec: 19_bgp
+                resourceSize: 5
+          licensePrice:
+            cost: 1.60
+            currency: CNY
+            period: hourly
+          markUpPrice:
+            cost: 1.50
+            currency: CNY
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 740
+          currency: CNY
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: rds.mysql.x1.large.2.ha
@@ -301,8 +372,8 @@ deployment:
       }
 
       volume {
-        type = "ESSD"
-        size = 100
+        type = "CLOUDSSD"
+        size = 40
       }
 
       backup_strategy {

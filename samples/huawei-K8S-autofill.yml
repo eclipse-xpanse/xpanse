@@ -21,45 +21,86 @@ cloudServiceProvider:
     - name: cn-north-4
       area: Asia China
 billing:
-  # The supported mode of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
+  # The supported mode of billing (`fixed`, `pay_per_use`)
   billingModes:
-    - yearly
-    - monthly
-    - daily
-    - hourly
+    - fixed
     - pay_per_use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   serviceFlavors:
     - name: 1-master-with-3-worker-nodes-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 40
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 4
+              properties:
+                cloud_service_type: hws.service.type.ec2
+                resource_type: hws.resource.type.vm
+                resource_spec: s6.large.2.linux
+            - deployResourceKind: volume
+              count: 4
+              properties:
+                cloud_service_type: hws.service.type.ebs
+                resource_type: hws.resource.type.volume
+                resource_spec: SSD
+                resourceSize: 40
+          licensePrice:
+            cost: 1.90
+            currency: CNY
+            period: hourly
+          markUpPrice:
+            cost: 1.60
+            currency: CNY
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 730
+          currency: CNY
+          period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3
-        flavor_id: s6.large.4
+        flavor_id: s6.large.2
     - name: 1-master-with-3-worker-nodes-performance
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 60
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 4
+              properties:
+                cloud_service_type: hws.service.type.ec2
+                resource_type: hws.resource.type.vm
+                resource_spec: s6.large.4.linux
+            - deployResourceKind: volume
+              count: 4
+              properties:
+                cloud_service_type: hws.service.type.ebs
+                resource_type: hws.resource.type.volume
+                resource_spec: SSD
+                resourceSize: 40
+          licensePrice:
+            cost: 3.20
+            currency: CNY
+            period: hourly
+          markUpPrice:
+            cost: 2.88
+            currency: CNY
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 980
+          currency: CNY
+          period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3
-        flavor_id: s6.xlarge.4
-    - name: 1-master-with-5-worker-nodes-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 60
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        worker_nodes_count: 5
         flavor_id: s6.large.4
-    - name: 1-master-with-5-worker-nodes-performance
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 80
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        worker_nodes_count: 5
-        flavor_id: s6.xlarge.4
   modificationImpact:
     isDataLost: true
     isServiceInterrupted: true

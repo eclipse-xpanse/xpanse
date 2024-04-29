@@ -30,10 +30,6 @@ public class ServiceFlavor implements Serializable {
     private String name;
 
     @NotNull
-    @Schema(description = "The price of the flavor")
-    private Integer fixedPrice;
-
-    @NotNull
     @NotEmpty
     @Schema(description = "The properties of the flavor")
     private Map<String, String> properties;

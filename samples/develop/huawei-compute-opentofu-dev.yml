@@ -21,53 +21,165 @@ cloudServiceProvider:
     - name: cn-north-4
       area: Asia China
 billing:
-  # The supported mode of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
+  # The supported mode of billing (`fixed`, `pay_per_use`)
   billingModes:
-    - yearly
-    - monthly
-    - daily
-    - hourly
+    - fixed
     - pay_per_use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   serviceFlavors:
     - name: flavor-error-test
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 10
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ec2
+                resource_type: hws.resource.type.vm
+                resource_spec: s7.small.1.linux
+            - deployResourceKind: volume
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ebs
+                resource_type: hws.resource.type.volume
+                resource_spec: SSD
+                resourceSize: 40
+            - deployResourceKind: publicIP
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.vpc
+                resource_type: hws.resource.type.bandwidth
+                resource_spec: 19_bgp
+                resourceSize: 5
+          licensePrice:
+            cost: 0.50
+            currency: CNY
+            period: hourly
+          markUpPrice:
+            cost: 0.43
+            currency: CNY
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 172
+          currency: CNY
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: s7.small.1
     - name: 2vCPUs-4GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 20
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ec2
+                resource_type: hws.resource.type.vm
+                resource_spec: s6.large.2.linux
+            - deployResourceKind: volume
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ebs
+                resource_type: hws.resource.type.volume
+                resource_spec: SSD
+                resourceSize: 40
+            - deployResourceKind: publicIP
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.vpc
+                resource_type: hws.resource.type.bandwidth
+                resource_spec: 19_bgp
+                resourceSize: 5
+          licensePrice:
+            cost: 0.80
+            currency: CNY
+            period: hourly
+          markUpPrice:
+            cost: 0.72
+            currency: CNY
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 300
+          currency: CNY
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: s6.large.2
     - name: 2vCPUs-8GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 30
+      # The pricing of the flavor.
+      pricing:
+        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
+        resourceUsage:
+          resources:
+            - deployResourceKind: vm
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ec2
+                resource_type: hws.resource.type.vm
+                resource_spec: s6.large.4.linux
+            - deployResourceKind: volume
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.ebs
+                resource_type: hws.resource.type.volume
+                resource_spec: SSD
+                resourceSize: 40
+            - deployResourceKind: publicIP
+              count: 1
+              properties:
+                cloud_service_type: hws.service.type.vpc
+                resource_type: hws.resource.type.bandwidth
+                resource_spec: 19_bgp
+                resourceSize: 5
+          licensePrice:
+            cost: 1.21
+            currency: CNY
+            period: hourly
+          markUpPrice:
+            cost: 1.10
+            currency: CNY
+            period: hourly
+        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
+        fixedPrice:
+          cost: 360
+          currency: CNY
+          period: monthly
+        isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: s6.large.4
-    - name: 4vCPUs-8GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 40
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        flavor_id: s6.xlarge.2
-    - name: 4vCPUs-16GB-normal
-      # The fixed price during the period (the price applied one shot whatever is the service use)
-      fixedPrice: 50
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        flavor_id: s6.xlarge.4
   modificationImpact:
     isDataLost: false
     isServiceInterrupted: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: [ "test@test.com" ]
+# End user license agreement content of the service.
+eula: |
+  This Acceptable Use Policy ("Policy") lists prohibited conduct and content when using the services provided by or on behalf of HUAWEI CLOUD and its affiliates. This Policy is an integral part of the HUAWEI CLOUD User Agreement ("User Agreement"). The examples and restrictions listed below are not exhaustive. We may update this Policy from time to time, and the updated Policy will be posted on the Website. By continuing to use the Services, you agree to abide by the latest version of this Policy. You acknowledge and agree that we may suspend or terminate the Services if you or your users violate this Policy. Terms used in the User Agreement have the same meanings in this Policy.
+
+  Prohibited Conduct
+  When accessing or using the Services, or allowing others to access or use the Services, you may not:
+  1. Violate any local, national or international laws, regulations and rules;
+  2. Infringe or violate the rights of others, including but not limited to privacy rights or intellectual property rights;
+  3. Engage in, encourage, assist or allow others to engage in any illegal, unlawful, infringing, harmful or fraudulent behavior, including but not limited to any of the following activities: harming or attempting to harm minors in any way, pornography, illegal gambling, illegal VPN construction, Ponzi schemes, cyber attacks, phishing or damage, privately intercepting any system, program or data, monitoring service data or traffic without permission, engaging in virtual currency "mining" or virtual currency transactions;
+  4. Transmit, provide, upload, download, use or reuse, disseminate or distribute any illegal, infringing, offensive, or harmful content or materials, including but not limited to those listed in the "Prohibited Content" below;
+  5. Transmit any data, send or upload any material that contains viruses, worms, Trojan horses, time bombs, keyboard loggers, spyware, adware or any other harmful programs or similar computer code designed to adversely affect the operation or security of any computer hardware or software;
+  6. Attack, interfere with, disrupt or adversely affect any service, hardware, software, system, website or network, including but not limited to accessing or attacking any service, hardware, software, system, website or network using large amounts of automated means (including robots, crawlers, scripts or similar data gathering or extraction methods);
+  7. Access any part of the Service, account or system without authorization, or attempt to do so;
+  8. Violate or adversely affect the security or integrity of the Services, hardware, software, systems, websites or networks;
+  9. Distribute, disseminate or send unsolicited email, bulk email or other messages, promotions, advertising or solicitations (such as "spam");
+  10. Fraudulent offers of goods or services, or any advertising, promotional or other materials containing false, deceptive or misleading statements.
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: opentofu

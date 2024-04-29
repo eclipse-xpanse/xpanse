@@ -34,10 +34,10 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalid
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
-import org.eclipse.xpanse.modules.models.servicetemplate.Flavors;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -72,7 +72,7 @@ class DeployEnvironmentsTest {
 
     private static DeployTask task;
     private static DeployRequest deployRequest;
-    private static Flavors flavors;
+    private static FlavorsWithPrice flavors;
     private static DeployVariable deployVariable1;
     private static DeployVariable deployVariable2;
     private static DeployVariable deployVariable3;
@@ -130,8 +130,8 @@ class DeployEnvironmentsTest {
                 List.of(deployVariable1, deployVariable2, deployVariable3, deployVariable4));
         deployment.setCredentialType(CredentialType.VARIABLES);
 
-        flavors = new Flavors();
-        ServiceFlavor flavor = new ServiceFlavor();
+        flavors = new FlavorsWithPrice();
+        ServiceFlavorWithPrice flavor = new ServiceFlavorWithPrice();
         flavor.setName("flavor");
         flavor.setProperties(Map.ofEntries(Map.entry("key", "value")));
         flavors.setServiceFlavors(List.of(flavor));
@@ -149,8 +149,8 @@ class DeployEnvironmentsTest {
         task.setDeployRequest(deployRequest);
         task.setOcl(ocl);
 
-        deployEnvironmentsUnderTest = new DeployEnvironments(mockCredentialCenter, aesUtil,
-                pluginManager, environment);
+        deployEnvironmentsUnderTest =
+                new DeployEnvironments(mockCredentialCenter, aesUtil, pluginManager, environment);
     }
 
     @Test
@@ -179,7 +179,7 @@ class DeployEnvironmentsTest {
 
     @Test
     void testGetFlavorVariables_FlavorInvalidException() {
-        ServiceFlavor flavor = new ServiceFlavor();
+        ServiceFlavorWithPrice flavor = new ServiceFlavorWithPrice();
         flavor.setName("name");
         flavors.setServiceFlavors(List.of(flavor));
 
@@ -218,13 +218,8 @@ class DeployEnvironmentsTest {
 
         Csp csp = Csp.HUAWEI;
         List<CredentialVariable> variables = new ArrayList<>();
-        variables.add(
-                new CredentialVariable(
-                        "HW_AK",
-                        "The access key.", true));
-        variables.add(
-                new CredentialVariable("HW_SK",
-                        "The security key.", true));
+        variables.add(new CredentialVariable("HW_AK", "The access key.", true));
+        variables.add(new CredentialVariable("HW_SK", "The security key.", true));
 
         CredentialType credentialType = CredentialType.VARIABLES;
 
@@ -232,23 +227,20 @@ class DeployEnvironmentsTest {
                 new CredentialVariables(csp, credentialType, "AK_SK", "description", userId,
                         variables);
         when(mockCredentialCenter.getCredential(csp, credentialType,
-                deployRequest.getUserId()))
-                .thenReturn(abstractCredentialInfo);
+                deployRequest.getUserId())).thenReturn(abstractCredentialInfo);
 
         Map<String, String> variablesActual =
                 deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(
                         task.getDeployRequest().getServiceHostingType(),
                         task.getOcl().getDeployment().getCredentialType(),
-                        task.getDeployRequest().getCsp(),
-                        task.getDeployRequest().getUserId());
+                        task.getDeployRequest().getCsp(), task.getDeployRequest().getUserId());
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
             assertTrue(variablesActual.containsKey(variable.getName()));
             assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
         }
-        verify(mockCredentialCenter, times(1))
-                .getCredential(csp, credentialType, userId);
+        verify(mockCredentialCenter, times(1)).getCredential(csp, credentialType, userId);
 
     }
 
@@ -261,37 +253,29 @@ class DeployEnvironmentsTest {
         deployRequest.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         Csp csp = Csp.HUAWEI;
         List<CredentialVariable> variables = new ArrayList<>();
-        variables.add(
-                new CredentialVariable(
-                        "HW_AK",
-                        "The access key.", true));
-        variables.add(
-                new CredentialVariable("HW_SK",
-                        "The security key.", true));
+        variables.add(new CredentialVariable("HW_AK", "The access key.", true));
+        variables.add(new CredentialVariable("HW_SK", "The security key.", true));
 
         CredentialType credentialType = CredentialType.VARIABLES;
 
         AbstractCredentialInfo abstractCredentialInfo =
                 new CredentialVariables(csp, credentialType, "AK_SK", "description", null,
                         variables);
-        when(mockCredentialCenter.getCredential(csp, credentialType,
-                null))
-                .thenReturn(abstractCredentialInfo);
+        when(mockCredentialCenter.getCredential(csp, credentialType, null)).thenReturn(
+                abstractCredentialInfo);
 
         Map<String, String> variablesActual =
                 deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(
                         task.getDeployRequest().getServiceHostingType(),
                         task.getOcl().getDeployment().getCredentialType(),
-                        task.getDeployRequest().getCsp(),
-                        task.getDeployRequest().getUserId());
+                        task.getDeployRequest().getCsp(), task.getDeployRequest().getUserId());
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
             assertTrue(variablesActual.containsKey(variable.getName()));
             assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
         }
-        verify(mockCredentialCenter, times(1))
-                .getCredential(csp, credentialType, null);
+        verify(mockCredentialCenter, times(1)).getCredential(csp, credentialType, null);
 
 
     }
@@ -300,9 +284,8 @@ class DeployEnvironmentsTest {
     void testGetPluginMandatoryVariable() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl =
-                oclLoader.getOcl(
-                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
@@ -389,9 +372,8 @@ class DeployEnvironmentsTest {
             }
         };
         when(this.pluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(plugin);
-        Map<String, String> variables =
-                deployEnvironmentsUnderTest.getPluginMandatoryVariables(
-                        xpanseDeployTask.getDeployRequest().getCsp());
+        Map<String, String> variables = deployEnvironmentsUnderTest.getPluginMandatoryVariables(
+                xpanseDeployTask.getDeployRequest().getCsp());
 
         Assertions.assertNotNull(variables);
     }

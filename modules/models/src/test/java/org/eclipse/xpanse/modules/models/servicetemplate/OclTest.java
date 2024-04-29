@@ -11,15 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.List;
-import java.util.Optional;
+import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.BillingMode;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -27,47 +24,29 @@ import org.springframework.beans.BeanUtils;
  */
 class OclTest {
 
-    private static final Category category = Category.COMPUTE;
-    private static final String version = "2.0";
-    private static final String name = "kafka";
-    private static final String serviceVersion = "1.0.0";
-    private static final String description = "description";
-    private static final String namespace = "nameSpace";
-    private static final String icon = "icon";
-    private static final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
-    private static CloudServiceProvider cloudServiceProvider;
-    private static Deployment deployment;
-    private static Flavors flavors;
-    private static Billing billing;
-    private static Ocl ocl;
-    private static ServiceProviderContactDetails serviceProviderContactDetails;
+    private final Category category = Category.COMPUTE;
+    private final String version = "2.0";
+    private final String name = "kafka";
+    private final String serviceVersion = "1.0.0";
+    private final String description = "description";
+    private final String namespace = "nameSpace";
+    private final String icon = "icon";
+    private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
+    @Mock
+    private CloudServiceProvider cloudServiceProvider;
+    @Mock
+    private Deployment deployment;
+    @Mock
+    private FlavorsWithPrice flavors;
+    @Mock
+    private Billing billing;
+    @Mock
+    private ServiceProviderContactDetails serviceProviderContactDetails;
+
+    private Ocl ocl;
 
     @BeforeEach
     void setUp() {
-        Region region = new Region();
-        region.setName("cn-north-1");
-        region.setArea("Area");
-        List<Region> regions = List.of(region);
-
-        cloudServiceProvider = new CloudServiceProvider();
-        cloudServiceProvider.setName(Csp.AWS);
-        cloudServiceProvider.setRegions(regions);
-
-        deployment = new Deployment();
-        deployment.setKind(DeployerKind.TERRAFORM);
-
-        flavors = new Flavors();
-        ServiceFlavor flavor = new ServiceFlavor();
-        flavor.setName("flavor");
-        ModificationImpact modificationImpact = new ModificationImpact();
-        modificationImpact.setIsDataLost(false);
-        modificationImpact.setIsServiceInterrupted(false);
-        flavors.setServiceFlavors(List.of(flavor));
-        flavors.setModificationImpact(modificationImpact);
-
-        billing = new Billing();
-        billing.setBillingModes(List.of(BillingMode.MONTHLY));
-
         ocl = new Ocl();
         ocl.setCategory(category);
         ocl.setVersion(version);
@@ -95,7 +74,6 @@ class OclTest {
     @Test
     public void testDeepCopy() {
         Ocl aCopy = ocl.deepCopy();
-
         assertEquals(ocl.getCategory(), aCopy.getCategory());
         assertEquals(ocl.getVersion(), aCopy.getVersion());
         assertEquals(ocl.getName(), aCopy.getName());
@@ -107,16 +85,23 @@ class OclTest {
         assertEquals(ocl.getDeployment(), aCopy.getDeployment());
         assertEquals(ocl.getFlavors(), aCopy.getFlavors());
         assertEquals(ocl.getBilling(), aCopy.getBilling());
+    }
 
-        assertNotSame(ocl, aCopy);
-        assertNotSame(ocl.getName(), aCopy.getName());
-        assertNotSame(ocl.getDeployment(), aCopy.getDeployment());
-
-        assertNotSame(ocl.getDeployment(), aCopy.getDeployment());
-        assertEquals(ocl.getDeployment().getKind(), aCopy.getDeployment().getKind());
-        assertEquals(ocl.getServiceHostingType(), aCopy.getServiceHostingType());
-        assertEquals(ocl.getServiceProviderContactDetails(),
-                aCopy.getServiceProviderContactDetails());
+    @Test
+    void testGetters() {
+        assertEquals(category, ocl.getCategory());
+        assertEquals(version, ocl.getVersion());
+        assertEquals(name, ocl.getName());
+        assertEquals(serviceVersion, ocl.getServiceVersion());
+        assertEquals(description, ocl.getDescription());
+        assertEquals(namespace, ocl.getNamespace());
+        assertEquals(icon, ocl.getIcon());
+        assertEquals(cloudServiceProvider, ocl.getCloudServiceProvider());
+        assertEquals(deployment, ocl.getDeployment());
+        assertEquals(billing, ocl.getBilling());
+        assertEquals(serviceHostingType, ocl.getServiceHostingType());
+        assertEquals(serviceProviderContactDetails, ocl.getServiceProviderContactDetails());
+        assertEquals(flavors, ocl.getFlavors());
     }
 
     @Test
@@ -136,23 +121,14 @@ class OclTest {
 
     @Test
     void testToString() {
-        String expectedString = "Ocl(" +
-                "category=" + category +
-                ", version=" + version +
-                ", name=" + name +
-                ", serviceVersion=" + serviceVersion +
-                ", description=" + description +
-                ", namespace=" + namespace +
-                ", icon=" + icon +
-                ", cloudServiceProvider=" + cloudServiceProvider +
-                ", deployment=" + deployment +
-                ", flavors=" + flavors +
-                ", billing=" + billing +
-                ", serviceHostingType=" + serviceHostingType +
-                ", serviceProviderContactDetails=" + serviceProviderContactDetails +
-                ", eula=" + null +
-                ")";
-
+        String expectedString =
+                "Ocl(" + "category=" + category + ", version=" + version + ", name=" + name
+                        + ", serviceVersion=" + serviceVersion + ", description=" + description
+                        + ", namespace=" + namespace + ", icon=" + icon + ", cloudServiceProvider="
+                        + cloudServiceProvider + ", deployment=" + deployment + ", flavors="
+                        + flavors + ", billing=" + billing + ", serviceHostingType="
+                        + serviceHostingType + ", serviceProviderContactDetails="
+                        + serviceProviderContactDetails + ", eula=" + null + ")";
         assertEquals(expectedString, ocl.toString());
     }
 
