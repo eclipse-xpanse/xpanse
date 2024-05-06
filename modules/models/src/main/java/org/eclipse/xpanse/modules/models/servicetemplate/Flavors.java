@@ -23,4 +23,16 @@ public class Flavors {
     @NotNull
     @Schema(description = "Impact on service when flavor is changed.")
     private ModificationImpact modificationImpact;
+
+    @NotNull
+    @Schema(description = "Whether the downgrading is allowed, default value: true.")
+    private Boolean isDowngradeAllowed = true;
+
+    public Boolean isDowngradeAllowed() {
+        return isDowngradeAllowed;
+    }
+
+    public void setDowngradeAllowed(Boolean downgradeAllowed) {
+        isDowngradeAllowed = downgradeAllowed;
+    }
 }

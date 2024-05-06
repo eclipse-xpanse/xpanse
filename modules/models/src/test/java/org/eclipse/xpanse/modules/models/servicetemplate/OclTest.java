@@ -8,8 +8,6 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
@@ -31,6 +29,7 @@ class OclTest {
     private final String description = "description";
     private final String namespace = "nameSpace";
     private final String icon = "icon";
+    private final String eula = "eula";
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     @Mock
     private CloudServiceProvider cloudServiceProvider;
@@ -60,31 +59,8 @@ class OclTest {
         ocl.setFlavors(flavors);
         ocl.setBilling(billing);
         ocl.setServiceHostingType(serviceHostingType);
+        ocl.setEula(eula);
         ocl.setServiceProviderContactDetails(serviceProviderContactDetails);
-    }
-
-    @Test
-    public void testDeepCopyAnEmptyOcl() {
-        Ocl ocl1 = new Ocl();
-        Ocl aCopy = ocl1.deepCopy();
-        assertNotSame(ocl1, aCopy);
-        assertNull(aCopy.getName());
-    }
-
-    @Test
-    public void testDeepCopy() {
-        Ocl aCopy = ocl.deepCopy();
-        assertEquals(ocl.getCategory(), aCopy.getCategory());
-        assertEquals(ocl.getVersion(), aCopy.getVersion());
-        assertEquals(ocl.getName(), aCopy.getName());
-        assertEquals(ocl.getServiceVersion(), aCopy.getServiceVersion());
-        assertEquals(ocl.getDescription(), aCopy.getDescription());
-        assertEquals(ocl.getNamespace(), aCopy.getNamespace());
-        assertEquals(ocl.getIcon(), aCopy.getIcon());
-        assertEquals(ocl.getCloudServiceProvider(), aCopy.getCloudServiceProvider());
-        assertEquals(ocl.getDeployment(), aCopy.getDeployment());
-        assertEquals(ocl.getFlavors(), aCopy.getFlavors());
-        assertEquals(ocl.getBilling(), aCopy.getBilling());
     }
 
     @Test
@@ -102,6 +78,7 @@ class OclTest {
         assertEquals(serviceHostingType, ocl.getServiceHostingType());
         assertEquals(serviceProviderContactDetails, ocl.getServiceProviderContactDetails());
         assertEquals(flavors, ocl.getFlavors());
+        assertEquals(eula, ocl.getEula());
     }
 
     @Test
@@ -128,7 +105,7 @@ class OclTest {
                         + cloudServiceProvider + ", deployment=" + deployment + ", flavors="
                         + flavors + ", billing=" + billing + ", serviceHostingType="
                         + serviceHostingType + ", serviceProviderContactDetails="
-                        + serviceProviderContactDetails + ", eula=" + null + ")";
+                        + serviceProviderContactDetails + ", eula=" + eula + ")";
         assertEquals(expectedString, ocl.toString());
     }
 

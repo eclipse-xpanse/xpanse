@@ -5,22 +5,17 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.io.StringReader;
-import java.io.StringWriter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
-import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.validators.DeploymentScriptsConstraint;
 
@@ -35,8 +30,7 @@ public class Ocl implements Serializable {
     @Serial
     private static final long serialVersionUID = -51411975788603138L;
 
-    private static ObjectMapper theMapper = new ObjectMapper();
-
+    @Valid
     @NotNull
     @Schema(description = "The catalog of the service")
     private Category category;
@@ -111,24 +105,4 @@ public class Ocl implements Serializable {
 
     @Schema(description = "End user license agreement content of the service.")
     private String eula;
-
-    /**
-     * an OCL object might be passed to different plugins for processing, in case any plugin want to
-     * change the property of Ocl, we should not change the original Object, we should change a deep
-     * copy. The method is for deep copy
-     *
-     * @return copied Ocl object.
-     */
-    public Ocl deepCopy() {
-        try {
-            StringWriter out = new StringWriter();
-            theMapper.writeValue(out, this);
-            return theMapper.readValue(new StringReader(out.toString()), Ocl.class);
-        } catch (IOException ex) {
-            log.error("Deep copy failed", ex);
-            // Should not happen , since we don't actually touch any real I/O device
-            throw new XpanseUnhandledException("Deep copy failed: " + ex.getMessage());
-
-        }
-    }
 }

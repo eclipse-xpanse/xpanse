@@ -29,6 +29,7 @@ serviceHostingType: self
 flavors:
   serviceFlavors:
     - name: flavor-error-test
+      priority: 3
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -59,7 +60,7 @@ flavors:
             currency: CNY
             period: hourly
           markUpPrice:
-            cost: 0.45
+            cost: 0.43
             currency: CNY
             period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
@@ -72,6 +73,7 @@ flavors:
       properties:
         flavor_id: s7.small.1
     - name: 2vCPUs-4GB-normal
+      priority: 2
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -115,6 +117,7 @@ flavors:
       properties:
         flavor_id: s6.large.2
     - name: 2vCPUs-8GB-normal
+      priority: 1
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -160,9 +163,13 @@ flavors:
   modificationImpact:
     isDataLost: false
     isServiceInterrupted: true
+  isDowngradeAllowed: true
 # The contact details of the service.
 serviceProviderContactDetails:
-  email: [ "test@test.com" ]
+  email: ["test30@test.com","test31@test.com"]
+  phone: ["011-13422222222","022-13344444444"]
+  chat: ["test1234"]
+  website: ["https://hw.com"]
 # End user license agreement content of the service.
 eula: |
   This Acceptable Use Policy ("Policy") lists prohibited conduct and content when using the services provided by or on behalf of HUAWEI CLOUD and its affiliates. This Policy is an integral part of the HUAWEI CLOUD User Agreement ("User Agreement"). The examples and restrictions listed below are not exhaustive. We may update this Policy from time to time, and the updated Policy will be posted on the Website. By continuing to use the Services, you agree to abide by the latest version of this Policy. You acknowledge and agree that we may suspend or terminate the Services if you or your users violate this Policy. Terms used in the User Agreement have the same meanings in this Policy.

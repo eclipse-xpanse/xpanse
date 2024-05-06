@@ -21,10 +21,12 @@ import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavorDowngradeNotAllowed;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
@@ -163,7 +165,28 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new ServiceLockedException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Locked")).andExpect(
-                        jsonPath("$.details[0]").value("test error"));
+                .andExpect(jsonPath("$.resultType").value("Service Locked"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testEulaNotAcceptedException() throws Exception {
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
+                any())).thenThrow(new EulaNotAccepted("test error"));
+
+        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Eula Not Accepted"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+
+    @Test
+    void testServiceFlavorDowngradeNotAllowed() throws Exception {
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
+                any())).thenThrow(new ServiceFlavorDowngradeNotAllowed("test error"));
+
+        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Service Flavor Downgrade Not Allowed"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }

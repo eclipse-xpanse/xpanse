@@ -30,6 +30,7 @@ serviceHostingType: self
 flavors:
   serviceFlavors:
     - name: flavor-error-test
+      priority: 3
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
@@ -42,6 +43,7 @@ flavors:
       properties:
         flavor_id: cirros128
     - name: 1vCPUs-1GB-normal
+      priority: 2
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
@@ -54,6 +56,7 @@ flavors:
       properties:
         flavor_id: cirros256
     - name: 1vCPUs-2GB-normal
+      priority: 1
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
@@ -68,6 +71,7 @@ flavors:
   modificationImpact:
     isDataLost: false
     isServiceInterrupted: true
+  isDowngradeAllowed: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test@test.com"]

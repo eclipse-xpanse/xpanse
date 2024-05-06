@@ -30,6 +30,7 @@ serviceHostingType: self
 flavors:
   serviceFlavors:
     - name: 2vCPUs-4GB-normal
+      priority: 2
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -73,6 +74,7 @@ flavors:
       properties:
         flavor_id: s6.large.2
     - name: 2vCPUs-8GB-normal
+      priority: 1
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -118,6 +120,7 @@ flavors:
   modificationImpact:
     isDataLost: true
     isServiceInterrupted: true
+  isDowngradeAllowed: true
 serviceProviderContactDetails:
   email: [ "test@test.com" ]
 deployment:

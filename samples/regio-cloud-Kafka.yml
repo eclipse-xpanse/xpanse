@@ -29,6 +29,7 @@ serviceHostingType: self
 flavors:
   serviceFlavors:
     - name: 1-zookeeper-with-3-worker-nodes-normal
+      priority: 2
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
@@ -42,6 +43,7 @@ flavors:
         flavor_name: SCS-4V:8:20
         image_name: Ubuntu 20.04
     - name: 1-zookeeper-with-3-worker-nodes-performance
+      priority: 1
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
@@ -57,6 +59,7 @@ flavors:
   modificationImpact:
     isDataLost: true
     isServiceInterrupted: true
+  isDowngradeAllowed: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: ["test@test.com"]

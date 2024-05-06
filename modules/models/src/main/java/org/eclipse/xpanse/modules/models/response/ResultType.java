@@ -63,7 +63,8 @@ public enum ResultType {
     SERVICE_MIGRATION_FAILED_EXCEPTION("Service Migration Failed Exception"),
     SERVICE_MIGRATION_NOT_FOUND("Service Migration Not Found"),
     SERVICE_LOCKED("Service Locked"),
-    EULA_NOT_ACCEPTED("Eula not accepted"),
+    EULA_NOT_ACCEPTED("Eula Not Accepted"),
+    SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED("Service Flavor Downgrade Not Allowed"),
     INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details");
 
     private final String value;
@@ -71,15 +72,6 @@ public enum ResultType {
     ResultType(String value) {
         this.value = value;
     }
-
-    /**
-     * For ResultType deserialize.
-     */
-    @JsonValue
-    public String toValue() {
-        return this.value;
-    }
-
 
     /**
      * Get ResultType by value.
@@ -94,6 +86,14 @@ public enum ResultType {
             }
         }
         return null;
+    }
+
+    /**
+     * For ResultType deserialize.
+     */
+    @JsonValue
+    public String toValue() {
+        return this.value;
     }
 
     /**

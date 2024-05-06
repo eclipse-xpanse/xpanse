@@ -24,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 class ServiceFlavorWithPriceTest {
 
     private final String name = "flavor";
+    private final Integer priority = 1;
     private final Map<String, String> properties = Map.of("key", "value");
     @Mock
     private RatingMode pricing;
@@ -36,6 +37,7 @@ class ServiceFlavorWithPriceTest {
         serviceFlavor.setName(name);
         serviceFlavor.setPricing(pricing);
         serviceFlavor.setProperties(properties);
+        serviceFlavor.setPriority(priority);
     }
 
     @Test
@@ -43,6 +45,7 @@ class ServiceFlavorWithPriceTest {
         assertEquals(name, serviceFlavor.getName());
         assertEquals(pricing, serviceFlavor.getPricing());
         assertEquals(properties, serviceFlavor.getProperties());
+        assertEquals(priority, serviceFlavor.getPriority());
     }
 
     @Test
@@ -66,9 +69,9 @@ class ServiceFlavorWithPriceTest {
 
     @Test
     void testToString() {
-        String expectedString = "ServiceFlavorWithPrice(super=ServiceFlavor(" +
-                "name=" + name +
-                ", properties=" + properties + "), pricing=" + pricing + ")";
+        String expectedString =
+                "ServiceFlavorWithPrice(" + "super=ServiceFlavor(name=" + name + ", properties="
+                        + properties + ", priority=" + priority + "), pricing=" + pricing + ")";
         assertEquals(expectedString, serviceFlavor.toString());
     }
 

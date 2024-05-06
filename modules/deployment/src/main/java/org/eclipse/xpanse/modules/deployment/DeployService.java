@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -26,11 +27,14 @@ import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentS
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavorDowngradeNotAllowed;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceModifyParamsNotFoundException;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
@@ -87,8 +91,8 @@ public class DeployService {
         searchServiceTemplate.setServiceHostingType(deployRequest.getServiceHostingType());
         ServiceTemplateEntity existingServiceTemplate =
                 serviceTemplateStorage.findServiceTemplate(searchServiceTemplate);
-        if (Objects.isNull(existingServiceTemplate)
-                || Objects.isNull(existingServiceTemplate.getOcl())) {
+        if (Objects.isNull(existingServiceTemplate) || Objects.isNull(
+                existingServiceTemplate.getOcl())) {
             throw new ServiceTemplateNotRegistered("No available service templates found.");
         }
         if (ServiceRegistrationState.APPROVED
@@ -117,6 +121,11 @@ public class DeployService {
             deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
         }
         // Create new deploy task by deploy request.
+        return getDeployTask(deployRequest, existingServiceTemplate);
+    }
+
+    private DeployTask getDeployTask(DeployRequest deployRequest,
+                                     ServiceTemplateEntity existingServiceTemplate) {
         DeployTask deployTask = new DeployTask();
         deployTask.setId(deployRequest.getId());
         deployTask.setDeployRequest(deployRequest);
@@ -131,11 +140,10 @@ public class DeployService {
     }
 
     private void validateDeployRequestWithServiceTemplate(
-            ServiceTemplateEntity existingServiceTemplate,
-            DeployRequest deployRequest) {
+            ServiceTemplateEntity existingServiceTemplate, DeployRequest deployRequest) {
         // Check context validation
-        if (Objects.nonNull(existingServiceTemplate.getOcl().getDeployment())
-                && Objects.nonNull(deployRequest.getServiceRequestProperties())) {
+        if (Objects.nonNull(existingServiceTemplate.getOcl().getDeployment()) && Objects.nonNull(
+                deployRequest.getServiceRequestProperties())) {
             List<DeployVariable> deployVariables =
                     existingServiceTemplate.getOcl().getDeployment().getVariables();
 
@@ -143,17 +151,19 @@ public class DeployService {
                     deployRequest.getServiceRequestProperties(),
                     existingServiceTemplate.getJsonObjectSchema());
         }
-        if (Objects.nonNull(existingServiceTemplate.getOcl().getFlavors())) {
-            boolean containsName =
-                    existingServiceTemplate.getOcl().getFlavors().getServiceFlavors().stream()
-                            .map(ServiceFlavor::getName)
-                            .anyMatch(name -> name.equals(deployRequest.getFlavor()));
-            if (!containsName) {
-                throw new FlavorInvalidException(
-                        String.format("flavor %s not found at flavor list.",
-                                deployRequest.getFlavor()));
-            }
+        getServiceFlavorWithName(deployRequest.getFlavor(),
+                existingServiceTemplate.getOcl().getFlavors());
+    }
+
+    private ServiceFlavorWithPrice getServiceFlavorWithName(String flavorName,
+                                                            FlavorsWithPrice flavors) {
+        Optional<ServiceFlavorWithPrice> flavorOptional = flavors.getServiceFlavors().stream()
+                .filter(flavor -> flavor.getName().equals(flavorName)).findAny();
+        if (flavorOptional.isEmpty()) {
+            throw new FlavorInvalidException(
+                    String.format("Could not find service flavor with name %s", flavorName));
         }
+        return flavorOptional.get();
     }
 
     private String generateCustomerServiceName(DeployRequest deployRequest) {
@@ -269,10 +279,9 @@ public class DeployService {
      */
     public DeployTask getModifyTask(ModifyRequest modifyRequest,
                                     DeployServiceEntity deployServiceEntity) {
-        if (StringUtils.isBlank(modifyRequest.getFlavor())
-                && Objects.isNull(modifyRequest.getServiceRequestProperties())) {
-            throw new ServiceModifyParamsNotFoundException(
-                    "No params found for modify services.");
+        if (StringUtils.isBlank(modifyRequest.getFlavor()) && Objects.isNull(
+                modifyRequest.getServiceRequestProperties())) {
+            throw new ServiceModifyParamsNotFoundException("No params found for modify services.");
         }
 
         if (!deployServiceEntity.getServiceDeploymentState()
@@ -285,7 +294,9 @@ public class DeployService {
                     String.format("Service with id %s is %s.", deployServiceEntity.getId(),
                             deployServiceEntity.getServiceDeploymentState()));
         }
-
+        ServiceTemplateEntity existingServiceTemplate =
+                serviceTemplateStorage.getServiceTemplateById(
+                        deployServiceEntity.getServiceTemplateId());
         DeployTask modifyTask = new DeployTask();
         modifyTask.setId(deployServiceEntity.getId());
         DeployRequest deployRequest = deployServiceEntity.getDeployRequest();
@@ -295,21 +306,34 @@ public class DeployService {
             deployRequest.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }
         if (StringUtils.isNotBlank(modifyRequest.getFlavor())) {
+            validateFlavorDowngradedIsAllowed(deployServiceEntity.getFlavor(),
+                    modifyRequest.getFlavor(), existingServiceTemplate.getOcl().getFlavors());
             deployRequest.setFlavor(modifyRequest.getFlavor());
         }
         if (Objects.nonNull(modifyRequest.getServiceRequestProperties())
                 && !modifyRequest.getServiceRequestProperties().isEmpty()) {
             deployRequest.setServiceRequestProperties(modifyRequest.getServiceRequestProperties());
         }
-        ServiceTemplateEntity existingServiceTemplate =
-                serviceTemplateStorage.getServiceTemplateById(
-                        deployServiceEntity.getServiceTemplateId());
         validateDeployRequestWithServiceTemplate(existingServiceTemplate, deployRequest);
 
         modifyTask.setDeployRequest(deployRequest);
         modifyTask.setOcl(existingServiceTemplate.getOcl());
         modifyTask.setDeploymentScenario(DeploymentScenario.MODIFY);
         return modifyTask;
+    }
+
+    private void validateFlavorDowngradedIsAllowed(String originalFlavor, String newFlavor,
+                                                   FlavorsWithPrice flavors) {
+        if (!flavors.isDowngradeAllowed()) {
+            ServiceFlavor newServiceFlavor = getServiceFlavorWithName(newFlavor, flavors);
+            ServiceFlavor originalServiceFlavor = getServiceFlavorWithName(originalFlavor, flavors);
+            if (newServiceFlavor.getPriority() > originalServiceFlavor.getPriority()) {
+                String errorMsg = String.format("Downgrading of flavors is not allowed. New flavor"
+                                + " priority %d is lower than the original flavor priority %d.",
+                        newServiceFlavor.getPriority(), originalServiceFlavor.getPriority());
+                throw new ServiceFlavorDowngradeNotAllowed(errorMsg);
+            }
+        }
     }
 
     /**
