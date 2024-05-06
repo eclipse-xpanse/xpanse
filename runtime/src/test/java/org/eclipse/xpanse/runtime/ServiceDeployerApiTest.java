@@ -55,6 +55,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -74,6 +75,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.openstack.OSFactory;
 import org.openstack4j.openstack.networking.domain.NeutronAvailabilityZone;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -375,17 +377,57 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceDeployApiTest-5");
+        ocl.getFlavors().setIsDowngradeAllowed(false);
+        ServiceFlavorWithPrice defaultFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
+        ServiceFlavorWithPrice lowerPriorityFlavor = new ServiceFlavorWithPrice();
+        BeanUtils.copyProperties(defaultFlavor, lowerPriorityFlavor);
+        lowerPriorityFlavor.setName("lower-priority-flavor");
+        lowerPriorityFlavor.setPriority(10);
+        ocl.getFlavors().getServiceFlavors().add(lowerPriorityFlavor);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         testDeployThrowsServiceTemplateNotRegistered();
         testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
         approveServiceTemplateRegistration(serviceTemplate.getId());
         UUID serviceId = deployService(serviceTemplate);
+        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+            testApisThrowServiceFlavorDowngradeNotAllowed(serviceId, defaultFlavor,
+                    lowerPriorityFlavor);
+        }
         testApisThrowsServiceLockedException(serviceId);
         testApisThrowsServiceDeploymentNotFoundException();
         testApisThrowsAccessDeniedException(serviceId);
         deployServiceStorage.deleteDeployService(
                 deployServiceStorage.findDeployServiceById(serviceId));
         unregisterServiceTemplate(serviceTemplate.getId());
+
+    }
+
+    void testApisThrowServiceFlavorDowngradeNotAllowed(UUID serviceId,
+                                                       ServiceFlavorWithPrice originalServiceFlavor,
+                                                       ServiceFlavorWithPrice lowerPriorityFlavor)
+            throws Exception {
+        // SetUp
+        String errorMsg = String.format("Downgrading of flavors is not allowed. New flavor"
+                        + " priority %d is lower than the original flavor priority %d.",
+                lowerPriorityFlavor.getPriority(), originalServiceFlavor.getPriority());
+        Response expectedResponse =
+                Response.errorResponse(ResultType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED,
+                        Collections.singletonList(errorMsg));
+        String result = objectMapper.writeValueAsString(expectedResponse);
+        ModifyRequest modifyRequest = new ModifyRequest();
+        modifyRequest.setFlavor(lowerPriorityFlavor.getName());
+        modifyRequest.setServiceRequestProperties(new HashMap<>());
+        // Run the test
+        final MockHttpServletResponse modifyResponse = mockMvc.perform(
+                        put("/xpanse/services/modify/{id}", serviceId)
+                                .content(objectMapper.writeValueAsString(modifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
+        assertEquals(result, modifyResponse.getContentAsString());
 
     }
 

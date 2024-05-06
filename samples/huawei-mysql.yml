@@ -30,6 +30,7 @@ serviceHostingType: self
 flavors:
   serviceFlavors:
     - name: 2vCPUs-4GB-general
+      priority: 2
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -73,6 +74,7 @@ flavors:
       properties:
         flavor_id: rds.mysql.n1.large.2.ha
     - name: 2vCPUs-4GB-dedicated
+      priority: 1
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -118,6 +120,7 @@ flavors:
   modificationImpact:
     isDataLost: true
     isServiceInterrupted: true
+  isDowngradeAllowed: true
 # The contact details of the service.
 serviceProviderContactDetails:
   email: [ "test@test.com" ]

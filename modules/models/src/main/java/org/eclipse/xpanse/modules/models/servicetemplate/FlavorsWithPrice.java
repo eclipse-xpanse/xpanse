@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
@@ -17,10 +18,23 @@ import lombok.Data;
 public class FlavorsWithPrice {
 
     @NotNull
+    @Valid
     @Schema(description = "The flavors of the managed service.")
     List<ServiceFlavorWithPrice> serviceFlavors;
 
     @NotNull
     @Schema(description = "Impact on service when flavor is changed.")
     private ModificationImpact modificationImpact;
+
+    @NotNull
+    @Schema(description = "Whether the downgrading is allowed, default value: true.")
+    private Boolean isDowngradeAllowed = true;
+
+    public Boolean isDowngradeAllowed() {
+        return isDowngradeAllowed;
+    }
+
+    public void setDowngradeAllowed(Boolean downgradeAllowed) {
+        isDowngradeAllowed = downgradeAllowed;
+    }
 }

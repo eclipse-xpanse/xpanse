@@ -12,10 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.billing.RatingMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -24,6 +22,7 @@ import org.springframework.beans.BeanUtils;
 class ServiceFlavorTest {
 
     private final String name = "flavor";
+    private final int priority = 1;
     private final Map<String, String> properties = Map.of("key", "value");
     private ServiceFlavor serviceFlavor;
 
@@ -33,12 +32,14 @@ class ServiceFlavorTest {
         serviceFlavor = new ServiceFlavor();
         serviceFlavor.setName(name);
         serviceFlavor.setProperties(properties);
+        serviceFlavor.setPriority(priority);
     }
 
     @Test
     void testGetterAndSetter() {
         assertEquals(name, serviceFlavor.getName());
         assertEquals(properties, serviceFlavor.getProperties());
+        assertEquals(priority, serviceFlavor.getPriority());
     }
 
     @Test
@@ -62,9 +63,9 @@ class ServiceFlavorTest {
 
     @Test
     void testToString() {
-        String expectedString = "ServiceFlavor(" +
-                "name=" + name +
-                ", properties=" + properties + ")";
+        String expectedString = "ServiceFlavor(name=" + name
+                + ", properties=" + properties
+                + ", priority=" + priority + ")";
         assertEquals(expectedString, serviceFlavor.toString());
     }
 

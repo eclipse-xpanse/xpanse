@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploy
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavorDowngradeNotAllowed;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
@@ -186,7 +187,7 @@ public class DeploymentExceptionHandler {
     }
 
     /**
-     * Exception handler for ServiceLockedException.
+     * Exception handler for EulaNotAccepted.
      */
     @ExceptionHandler({EulaNotAccepted.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -194,6 +195,18 @@ public class DeploymentExceptionHandler {
     public Response handleEulaNotAcceptedException(
             EulaNotAccepted ex) {
         return Response.errorResponse(ResultType.EULA_NOT_ACCEPTED,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceFlavorDowngradeNotAllowed.
+     */
+    @ExceptionHandler({ServiceFlavorDowngradeNotAllowed.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceFlavorDowngradeNotAllowed(
+            ServiceFlavorDowngradeNotAllowed ex) {
+        return Response.errorResponse(ResultType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED,
                 Collections.singletonList(ex.getMessage()));
     }
 }
