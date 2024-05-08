@@ -73,6 +73,9 @@ flavors:
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: rds.mysql.n1.large.2.ha
+      features:
+        - High Availability
+        - Maximum performance
     - name: 2vCPUs-4GB-dedicated
       priority: 1
       # The pricing of the flavor.
@@ -117,6 +120,9 @@ flavors:
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: rds.mysql.x1.large.2.ha
+      features:
+        - High Availability
+        - Maximum performance
   modificationImpact:
     isDataLost: true
     isServiceInterrupted: true

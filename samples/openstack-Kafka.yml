@@ -41,6 +41,9 @@ flavors:
       properties:
         worker_nodes_count: 3
         flavor_id: cirros256
+      features:
+        - High Availability
+        - Maximum performance
     - name: 1-zookeeper-with-3-worker-nodes-performance
       priority: 1
       # The pricing of the flavor.
@@ -54,6 +57,9 @@ flavors:
       properties:
         worker_nodes_count: 3
         flavor_id: cirros512
+      features:
+        - High Availability
+        - Maximum performance
   modificationImpact:
     isDataLost: true
     isServiceInterrupted: true

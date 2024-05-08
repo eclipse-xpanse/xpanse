@@ -66,6 +66,9 @@ flavors:
       properties:
         worker_nodes_count: 3
         flavor_id: s6.large.2
+      features:
+        - High Availability
+        - Maximum performance
     - name: 1-master-with-3-worker-nodes-performance
       priority: 1
       # The pricing of the flavor.
@@ -103,6 +106,9 @@ flavors:
       properties:
         worker_nodes_count: 3
         flavor_id: s6.large.4
+      features:
+        - High Availability
+        - Maximum performance
   modificationImpact:
     isDataLost: true
     isServiceInterrupted: true

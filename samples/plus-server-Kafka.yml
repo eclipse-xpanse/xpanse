@@ -42,6 +42,9 @@ flavors:
         worker_nodes_count: 3
         flavor_name: SCS-4V:8:20
         image_name: Ubuntu 20.04
+      features:
+        - High Availability
+        - Maximum performance
     - name: 1-zookeeper-with-3-worker-nodes-performance
       priority: 1
       # The pricing of the flavor.
@@ -56,6 +59,9 @@ flavors:
         worker_nodes_count: 3
         flavor_name: SCS-4V:8:20
         image_name: Ubuntu 20.04
+      features:
+        - High Availability
+        - Maximum performance
   modificationImpact:
     isDataLost: true
     isServiceInterrupted: true

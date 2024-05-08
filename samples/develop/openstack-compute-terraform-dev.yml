@@ -42,6 +42,9 @@ flavors:
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: cirros128
+      features:
+        - High Availability
+        - Maximum performance
     - name: 1vCPUs-1GB-normal
       priority: 2
       # The pricing of the flavor.
@@ -55,6 +58,9 @@ flavors:
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: cirros256
+      features:
+        - High Availability
+        - Maximum performance
     - name: 1vCPUs-2GB-normal
       priority: 1
       # The pricing of the flavor.
@@ -68,6 +74,9 @@ flavors:
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: cirros512
+      features:
+        - High Availability
+        - Maximum performance
   modificationImpact:
     isDataLost: false
     isServiceInterrupted: true

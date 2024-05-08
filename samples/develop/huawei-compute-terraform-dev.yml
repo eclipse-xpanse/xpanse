@@ -72,6 +72,9 @@ flavors:
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: s7.small.1
+      features:
+        - High Availability
+        - Maximum performance
     - name: 2vCPUs-4GB-normal
       priority: 2
       # The pricing of the flavor.
@@ -116,6 +119,9 @@ flavors:
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: s6.large.2
+      features:
+        - High Availability
+        - Maximum performance
     - name: 2vCPUs-8GB-normal
       priority: 1
       # The pricing of the flavor.
@@ -160,6 +166,9 @@ flavors:
       # Properties for the service, which can be used by the deployment.
       properties:
         flavor_id: s6.large.4
+      features:
+        - High Availability
+        - Maximum performance
   modificationImpact:
     isDataLost: false
     isServiceInterrupted: true
