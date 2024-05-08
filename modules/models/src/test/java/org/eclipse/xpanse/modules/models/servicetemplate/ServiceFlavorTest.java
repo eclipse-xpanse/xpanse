@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ class ServiceFlavorTest {
     private final int priority = 1;
     private final Map<String, String> properties = Map.of("key", "value");
     private ServiceFlavor serviceFlavor;
+    private List<String> features = List.of("feature1", "feature2");
 
 
     @BeforeEach
@@ -33,6 +35,7 @@ class ServiceFlavorTest {
         serviceFlavor.setName(name);
         serviceFlavor.setProperties(properties);
         serviceFlavor.setPriority(priority);
+        serviceFlavor.setFeatures(features);
     }
 
     @Test
@@ -40,6 +43,7 @@ class ServiceFlavorTest {
         assertEquals(name, serviceFlavor.getName());
         assertEquals(properties, serviceFlavor.getProperties());
         assertEquals(priority, serviceFlavor.getPriority());
+        assertEquals(features, serviceFlavor.getFeatures());
     }
 
     @Test
@@ -65,7 +69,8 @@ class ServiceFlavorTest {
     void testToString() {
         String expectedString = "ServiceFlavor(name=" + name
                 + ", properties=" + properties
-                + ", priority=" + priority + ")";
+                + ", priority=" + priority
+                + ", features=" + features + ")";
         assertEquals(expectedString, serviceFlavor.toString());
     }
 

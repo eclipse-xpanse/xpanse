@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 
@@ -39,4 +40,7 @@ public class ServiceFlavor implements Serializable {
     @Min(value = 1, message = "The minimum value of priority cannot be less than 1.")
     @Schema(description = "The priority of the flavor. The larger value means lower priority.")
     private Integer priority;
+
+    @Schema(description = "Important features and differentiators of the flavor.")
+    List<String> features;
 }

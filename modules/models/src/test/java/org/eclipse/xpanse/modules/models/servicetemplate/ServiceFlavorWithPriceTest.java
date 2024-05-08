@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.models.billing.RatingMode;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ class ServiceFlavorWithPriceTest {
     private final String name = "flavor";
     private final Integer priority = 1;
     private final Map<String, String> properties = Map.of("key", "value");
+    private List<String> features = List.of("feature1", "feature2");
     @Mock
     private RatingMode pricing;
     private ServiceFlavorWithPrice serviceFlavor;
@@ -38,6 +40,7 @@ class ServiceFlavorWithPriceTest {
         serviceFlavor.setPricing(pricing);
         serviceFlavor.setProperties(properties);
         serviceFlavor.setPriority(priority);
+        serviceFlavor.setFeatures(features);
     }
 
     @Test
@@ -46,6 +49,7 @@ class ServiceFlavorWithPriceTest {
         assertEquals(pricing, serviceFlavor.getPricing());
         assertEquals(properties, serviceFlavor.getProperties());
         assertEquals(priority, serviceFlavor.getPriority());
+        assertEquals(features, serviceFlavor.getFeatures());
     }
 
     @Test
@@ -71,7 +75,8 @@ class ServiceFlavorWithPriceTest {
     void testToString() {
         String expectedString =
                 "ServiceFlavorWithPrice(" + "super=ServiceFlavor(name=" + name + ", properties="
-                        + properties + ", priority=" + priority + "), pricing=" + pricing + ")";
+                        + properties + ", priority=" + priority + ", features=" + features +
+                        "), pricing=" + pricing + ")";
         assertEquals(expectedString, serviceFlavor.toString());
     }
 
