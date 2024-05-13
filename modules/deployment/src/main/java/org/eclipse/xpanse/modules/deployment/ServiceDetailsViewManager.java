@@ -26,7 +26,6 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -40,12 +39,12 @@ public class ServiceDetailsViewManager {
 
     @Resource
     private DeployServiceEntityHandler deployServiceEntityHandler;
-
     @Resource
     private UserServiceHelper userServiceHelper;
-
     @Resource
     private DeployServiceStorage deployServiceStorage;
+    @Resource
+    private ServiceStateManager serviceStateManager;
 
     /**
      * Get deploy service detail by id.
@@ -63,13 +62,13 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        boolean isManagedByCurrentUser = userServiceHelper.currentUserCanManageNamespace(
-                deployServiceEntity.getNamespace());
+        boolean isManagedByCurrentUser =
+                userServiceHelper.currentUserCanManageNamespace(deployServiceEntity.getNamespace());
         if (!isManagedByCurrentUser) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
-        return EntityTransUtils.transDeployServiceEntityToServiceDetailVo(deployServiceEntity);
+        return EntityTransUtils.transToDeployedServiceDetails(deployServiceEntity);
     }
 
     /**
@@ -82,17 +81,15 @@ public class ServiceDetailsViewManager {
      * @param state          of the services to be filtered.
      * @return serviceVos
      */
-    public List<DeployedService> listDeployedServices(Category category,
-                                                      Csp csp,
-                                                      String serviceName,
-                                                      String serviceVersion,
+    public List<DeployedService> listDeployedServices(Category category, Csp csp,
+                                                      String serviceName, String serviceVersion,
                                                       ServiceDeploymentState state) {
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         String currentUserId = userServiceHelper.getCurrentUserId();
         query.setUserId(currentUserId);
-        List<DeployServiceEntity> deployServices = deployServiceStorage.listServices(query);
-        return deployServices.stream().map(this::convertToDeployedService).toList();
+        return deployServiceStorage.listServices(query).stream()
+                .map(EntityTransUtils::convertToDeployedService).toList();
     }
 
     /**
@@ -134,8 +131,8 @@ public class ServiceDetailsViewManager {
     public DeployedServiceDetails getSelfHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
-        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(
-                deployServiceEntity.getUserId());
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
         if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
@@ -143,12 +140,16 @@ public class ServiceDetailsViewManager {
         ServiceHostingType serviceHostingType =
                 deployServiceEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SELF != serviceHostingType) {
-            String errorMsg = String.format("details of non service-self hosted with id %s is not "
-                    + "accessible", id);
+            String errorMsg = String.format(
+                    "details of non service-self hosted with id %s is not " + "accessible", id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        return EntityTransUtils.transDeployServiceEntityToServiceDetailVo(deployServiceEntity);
+        DeployedServiceDetails deployedServiceDetails =
+                EntityTransUtils.transToDeployedServiceDetails(deployServiceEntity);
+        deployedServiceDetails.setLatestRunningManagementTask(
+                serviceStateManager.getLatestRunningManagementTask(deployServiceEntity.getId()));
+        return deployedServiceDetails;
     }
 
     /**
@@ -160,8 +161,8 @@ public class ServiceDetailsViewManager {
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsByIdForEndUser(UUID id) {
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
-        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(
-                deployServiceEntity.getUserId());
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
         if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
@@ -174,23 +175,13 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        return EntityTransUtils.transServiceEntityToVendorHostedServiceDetailsVo(
-                deployServiceEntity);
+        VendorHostedDeployedServiceDetails deployedServiceDetails =
+                EntityTransUtils.transToVendorHostedServiceDetails(deployServiceEntity);
+        deployedServiceDetails.setLatestRunningManagementTask(
+                serviceStateManager.getLatestRunningManagementTask(deployServiceEntity.getId()));
+        return deployedServiceDetails;
     }
 
-    private DeployedService convertToDeployedService(DeployServiceEntity serviceEntity) {
-        if (Objects.nonNull(serviceEntity)) {
-            DeployedService deployedService = new DeployedService();
-            BeanUtils.copyProperties(serviceEntity, deployedService);
-            deployedService.setServiceHostingType(
-                    serviceEntity.getDeployRequest().getServiceHostingType());
-            if (Objects.nonNull(serviceEntity.getServiceTemplateId())) {
-                deployedService.setServiceTemplateId(serviceEntity.getServiceTemplateId());
-            }
-            return deployedService;
-        }
-        return null;
-    }
 
     /**
      * Use query model to list SV deployment services.
@@ -202,8 +193,7 @@ public class ServiceDetailsViewManager {
      * @param state          of the services to be filtered.
      * @return serviceVos
      */
-    public List<DeployedService> listDeployedServicesOfIsv(Category category,
-                                                           Csp csp,
+    public List<DeployedService> listDeployedServicesOfIsv(Category category, Csp csp,
                                                            String serviceName,
                                                            String serviceVersion,
                                                            ServiceDeploymentState state) {
@@ -213,12 +203,10 @@ public class ServiceDetailsViewManager {
         String namespace = userServiceHelper.getCurrentUserManageNamespace();
         query.setNamespace(namespace);
         List<DeployServiceEntity> deployServices = deployServiceStorage.listServices(query);
-        return deployServices.stream().map(this::convertToDeployedService).toList();
+        return deployServices.stream().map(EntityTransUtils::convertToDeployedService).toList();
     }
 
-    private ServiceQueryModel getServiceQueryModel(Category category,
-                                                   Csp csp,
-                                                   String serviceName,
+    private ServiceQueryModel getServiceQueryModel(Category category, Csp csp, String serviceName,
                                                    String serviceVersion,
                                                    ServiceDeploymentState state) {
         ServiceQueryModel query = new ServiceQueryModel();
