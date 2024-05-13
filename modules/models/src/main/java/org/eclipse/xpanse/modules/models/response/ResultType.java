@@ -65,6 +65,7 @@ public enum ResultType {
     SERVICE_LOCKED("Service Locked"),
     EULA_NOT_ACCEPTED("Eula Not Accepted"),
     SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED("Service Flavor Downgrade Not Allowed"),
+    BILLING_MODE_NOT_SUPPORTED("Billing Mode Not Supported"),
     INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details");
 
     private final String value;

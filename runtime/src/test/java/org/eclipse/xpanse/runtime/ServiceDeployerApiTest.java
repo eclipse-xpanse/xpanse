@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -900,6 +901,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         region.setArea("areaName");
         deployRequest.setRegion(region);
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
+        deployRequest.setBillingMode(BillingMode.FIXED);
         String requestBody = objectMapper.writeValueAsString(deployRequest);
 
         // Run the test

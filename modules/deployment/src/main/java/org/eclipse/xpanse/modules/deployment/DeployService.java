@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
@@ -106,6 +107,14 @@ public class DeployService {
                 && !deployRequest.isEulaAccepted()) {
             log.error("Service not accepted Eula.");
             throw new EulaNotAccepted("Service not accepted Eula.");
+        }
+        if (!existingServiceTemplate.getOcl().getBilling().getBillingModes()
+                .contains(deployRequest.getBillingMode())) {
+            String errorMsg = String.format(
+                    "The service template with id %s does not support billing mode %s.",
+                    existingServiceTemplate.getId(), deployRequest.getBillingMode());
+            log.error(errorMsg);
+            throw new BillingModeNotSupported(errorMsg);
         }
         // Check context validation
         validateDeployRequestWithServiceTemplate(existingServiceTemplate, deployRequest);

@@ -21,10 +21,10 @@ cloudServiceProvider:
     - name: eu-west-1
       area: Western Europe
 billing:
-  # The supported mode of billing (`fixed`, `pay_per_use`)
+  # The supported mode of billing (`Fixed`, `Pay per Use`)
   billingModes:
-    - fixed
-    - pay_per_use
+    - Fixed
+    - Pay per Use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:

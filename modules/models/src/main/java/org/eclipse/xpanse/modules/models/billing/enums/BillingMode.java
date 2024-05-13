@@ -16,8 +16,8 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  */
 public enum BillingMode {
 
-    FIXED("fixed"),
-    PAY_PER_USE("pay_per_use");
+    FIXED("Fixed"),
+    PAY_PER_USE("Pay per Use");
 
     private final String value;
 

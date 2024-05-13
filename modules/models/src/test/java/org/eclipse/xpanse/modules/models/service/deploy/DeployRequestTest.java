@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
@@ -41,6 +42,7 @@ class DeployRequestTest {
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final Map<String, Object> properties = Collections.singletonMap("key", "value");
     private final Map<String, String> availabilityZones = Collections.singletonMap("key", "value");
+    private final BillingMode billingMode = BillingMode.FIXED;
     private DeployRequest request;
 
     @BeforeEach
@@ -61,6 +63,7 @@ class DeployRequestTest {
         request.setServiceHostingType(serviceHostingType);
         request.setAvailabilityZones(availabilityZones);
         request.setEulaAccepted(IS_ACCEPT_EULA);
+        request.setBillingMode(billingMode);
     }
 
     @Test
@@ -80,6 +83,7 @@ class DeployRequestTest {
         assertEquals(availabilityZones, request.getAvailabilityZones());
         assertEquals(serviceHostingType, request.getServiceHostingType());
         assertEquals(IS_ACCEPT_EULA, request.isEulaAccepted());
+        assertEquals(billingMode, request.getBillingMode());
     }
 
     @Test
@@ -117,6 +121,7 @@ class DeployRequestTest {
                 ", serviceRequestProperties=" + properties +
                 ", availabilityZones=" + availabilityZones +
                 ", isEulaAccepted=" + IS_ACCEPT_EULA +
+                ", billingMode=" + billingMode +
                 "), id=" + id + ")";
         assertEquals(expectedToString, request.toString());
     }

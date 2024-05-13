@@ -21,10 +21,10 @@ cloudServiceProvider:
     - name: RegionTwo
       area: Western Europe
 billing:
-  # The supported mode of billing (`yearly`, `monthly`, `daily`, `hourly`, `pay_per_use`)
+  # The supported mode of billing (`Fixed`, `Pay per Use`)
   billingModes:
-    - yearly
-    - monthly
+    - Fixed
+    - Pay per Use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
