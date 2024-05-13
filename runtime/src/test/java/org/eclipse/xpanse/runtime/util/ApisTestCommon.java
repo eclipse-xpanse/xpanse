@@ -340,6 +340,7 @@ public class ApisTestCommon {
                 serviceTemplate.getFlavors().getServiceFlavors().getFirst().getName());
         deployRequest.setRegion(serviceTemplate.getRegions().getFirst());
         deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
+        deployRequest.setBillingMode(serviceTemplate.getBilling().getBillingModes().getFirst());
 
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceTemplate.getDeployment().getVariables().forEach(

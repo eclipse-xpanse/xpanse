@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
@@ -98,4 +99,8 @@ public class DeployRequestBase implements Serializable {
 
     @Schema(description = "The flag to determine if the user has accepted the EULA terms.")
     private boolean isEulaAccepted;
+
+    @NotNull
+    @Schema(description = "The billing mode of the managed service.")
+    private BillingMode billingMode;
 }

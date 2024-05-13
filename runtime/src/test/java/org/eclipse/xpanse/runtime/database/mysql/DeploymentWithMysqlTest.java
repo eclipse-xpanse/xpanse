@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequestBase;
@@ -105,6 +106,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         DeployRequest deployRequest = new DeployRequest();
         DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
         BeanUtils.copyProperties(deployRequestBase, deployRequest);
+        deployRequest.setBillingMode(BillingMode.FIXED);
         UUID deployUUid = serviceDeployerApi.deploy(deployRequest);
         Assertions.assertNotNull(deployUUid);
         return deployUUid;

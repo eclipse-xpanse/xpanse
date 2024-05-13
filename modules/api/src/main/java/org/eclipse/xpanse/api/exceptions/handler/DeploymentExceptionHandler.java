@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.Terr
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ActivitiTaskNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
@@ -211,6 +212,18 @@ public class DeploymentExceptionHandler {
                 Collections.singletonList(ex.getMessage()));
     }
 
+    /**
+     * Exception handler for BillingModeNotSupported.
+     */
+    @ExceptionHandler({BillingModeNotSupported.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleBillingModeNotSupported(
+            BillingModeNotSupported ex) {
+        return Response.errorResponse(ResultType.BILLING_MODE_NOT_SUPPORTED,
+                Collections.singletonList(ex.getMessage()));
+    }
+  
     /**
      * Exception handler for ServiceStateManagementTaskNotFound.
      */

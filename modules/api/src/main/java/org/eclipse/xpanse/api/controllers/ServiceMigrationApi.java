@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
@@ -84,7 +85,7 @@ public class ServiceMigrationApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
-        validateEula(migrateRequest);
+        validateData(migrateRequest);
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(migrateRequest.getId());
         String userId = getUserId();
@@ -105,7 +106,7 @@ public class ServiceMigrationApi {
         return UUID.fromString(instance.getProcessInstanceId());
     }
 
-    private void validateEula(MigrateRequest migrateRequest) {
+    private void validateData(MigrateRequest migrateRequest) {
         ServiceTemplateEntity searchServiceTemplate = new ServiceTemplateEntity();
         searchServiceTemplate.setName(StringUtils.lowerCase(migrateRequest.getServiceName()));
         searchServiceTemplate.setVersion(StringUtils.lowerCase(migrateRequest.getVersion()));
@@ -119,6 +120,14 @@ public class ServiceMigrationApi {
                 && !migrateRequest.isEulaAccepted()) {
             log.error("Service not accepted Eula.");
             throw new EulaNotAccepted("Service not accepted Eula.");
+        }
+        if (!existingServiceTemplate.getOcl().getBilling().getBillingModes()
+                .contains(migrateRequest.getBillingMode())) {
+            String errorMsg = String.format(
+                    "The service template with id %s does not support billing mode %s.",
+                    existingServiceTemplate.getId(), migrateRequest.getBillingMode());
+            log.error(errorMsg);
+            throw new BillingModeNotSupported(errorMsg);
         }
     }
 
