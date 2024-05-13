@@ -70,11 +70,12 @@ public class DeployService {
     private DeployServiceEntityHandler deployServiceEntityHandler;
     @Resource
     private DeployResultManager deployResultManager;
-
     @Resource
     private DeployerKindManager deployerKindManager;
     @Resource
     private DeployServiceEntityToDeployTaskConverter deployServiceEntityToDeployTaskConverter;
+    @Resource
+    private ServiceStateManager serviceStateManager;
 
     /**
      * Create new deploy task by deploy request.
@@ -447,6 +448,7 @@ public class DeployService {
                 destroy(destroyTask, deployServiceEntity);
             }
             deployServiceStorage.deleteDeployService(deployServiceEntity);
+            serviceStateManager.deleteManagementTasksByServiceId(destroyTask.getId());
             log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
         } catch (RuntimeException e) {
             log.error("Error purging created resources for service with ID: {}. Ignoring.",

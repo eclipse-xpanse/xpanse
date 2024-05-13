@@ -22,6 +22,8 @@ import org.eclipse.xpanse.modules.database.servicemigration.DatabaseServiceMigra
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
+import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
+import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
@@ -50,6 +52,8 @@ public class GetCspInfoFromRequest {
     private TaskService taskService;
     @Resource
     private DatabaseServiceMigrationStorage serviceMigrationStorage;
+    @Resource
+    private DatabaseServiceStateManagementTaskStorage managementTaskStorage;
 
     /**
      * Get Csp with the URL of Ocl.
@@ -184,6 +188,28 @@ public class GetCspInfoFromRequest {
             }
         } catch (Exception e) {
             log.error("Get csp with workflow task id:{} failed.", taskId, e);
+        }
+        return null;
+    }
+
+    /**
+     * Get Csp with id of service state management task.
+     *
+     * @param managementTaskId id of service state management task.
+     * @return csp.
+     */
+    public Csp getCspFromManagementTaskId(String managementTaskId) {
+        try {
+            ServiceStateManagementTaskEntity task =
+                    managementTaskStorage.getTaskById(UUID.fromString(managementTaskId));
+            if (Objects.nonNull(task) && Objects.nonNull(task.getServiceId())) {
+                DeployServiceEntity deployService =
+                        deployServiceStorage.findDeployServiceById(task.getServiceId());
+                return deployService.getCsp();
+            }
+        } catch (Exception e) {
+            log.error("Get csp with service state management task id:{} failed.",
+                    managementTaskId, e);
         }
         return null;
     }

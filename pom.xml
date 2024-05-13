@@ -49,7 +49,7 @@
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hypersistence-utils-hibernate.version>3.7.5</hypersistence-utils-hibernate.version>
         <mockito.version>5.11.0</mockito.version>
-        <testcontainers.version>1.19.7</testcontainers.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
         <apache.commons.io.version>2.16.1</apache.commons.io.version>
         <apache.commons.lang.version>3.14.0</apache.commons.lang.version>
         <apache.commons.collections.version>4.4</apache.commons.collections.version>
@@ -59,10 +59,10 @@
         <junit4.version>4.13.2</junit4.version>
         <json.smart.version>2.5.0</json.smart.version>
         <spring.oauth.addon.test.version>7.6.13</spring.oauth.addon.test.version>
-        <openstack4j.version>3.11</openstack4j.version>
+        <openstack4j.version>3.12</openstack4j.version>
         <huawei.apigateway.version>3.1.2</huawei.apigateway.version>
         <jackson.databind.version>2.15.2</jackson.databind.version>
-        <huaweicloud.sdk.version>3.1.94</huaweicloud.sdk.version>
+        <huaweicloud.sdk.version>3.1.95</huaweicloud.sdk.version>
         <maven.clean.plugin.version>3.3.2</maven.clean.plugin.version>
         <maven.compile.plugin.version>3.13.0</maven.compile.plugin.version>
         <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>

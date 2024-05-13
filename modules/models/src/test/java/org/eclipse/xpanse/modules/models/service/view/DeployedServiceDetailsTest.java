@@ -29,25 +29,25 @@ import org.junit.jupiter.api.Test;
  * Test of DeployedServiceDetails.
  */
 class DeployedServiceDetailsTest {
-    private static final String userId = "userId";
-    private static final Category category = Category.COMPUTE;
-    private static final String serviceName = "serviceName";
-    private static final String version = "1.0.0";
-    private static final String regionName = "us-east-1";
-    private static final String areaName = "Asia China";
-    private static final Csp csp = Csp.AWS;
-    private static final String flavor = "basic";
-    private static final String customerServiceName = "customerServiceName";
-    private static final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
-    private static final String name = "resource";
-    private static final DeployResourceKind kind = DeployResourceKind.VM;
-    private static final String resultSuccessMessage = "Deployment successful";
-    private static DeployResource deployResource;
-    private static Map<String, Object> properties;
-    private static DeployRequest deployRequest;
-    private static List<@Valid DeployResource> deployResources;
-    private static Map<String, String> deployedServiceProperties;
-    private static DeployedServiceDetails deployedServiceDetails;
+    private final String userId = "userId";
+    private final Category category = Category.COMPUTE;
+    private final String serviceName = "serviceName";
+    private final String version = "1.0.0";
+    private final String regionName = "us-east-1";
+    private final String areaName = "Asia China";
+    private final Csp csp = Csp.AWS;
+    private final String flavor = "basic";
+    private final String customerServiceName = "customerServiceName";
+    private final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
+    private final String name = "resource";
+    private final DeployResourceKind kind = DeployResourceKind.VM;
+    private final String resultSuccessMessage = "Deployment successful";
+    private DeployResource deployResource;
+    private Map<String, Object> properties;
+    private DeployRequest deployRequest;
+    private List<@Valid DeployResource> deployResources;
+    private Map<String, String> deployedServiceProperties;
+    private DeployedServiceDetails deployedServiceDetails;
 
     @BeforeEach
     void setUp() {
@@ -108,7 +108,8 @@ class DeployedServiceDetailsTest {
 
         assertEquals(deployRequest, deployedServiceDetails.getDeployRequest());
         assertEquals(deployResources, deployedServiceDetails.getDeployResources());
-        assertEquals(deployedServiceProperties, deployedServiceDetails.getDeployedServiceProperties());
+        assertEquals(deployedServiceProperties,
+                deployedServiceDetails.getDeployedServiceProperties());
         assertEquals(resultSuccessMessage, deployedServiceDetails.getResultMessage());
     }
 
@@ -157,10 +158,11 @@ class DeployedServiceDetailsTest {
 
     @Test
     void testToString() {
-        String expectedToString = "DeployedServiceDetails(deployRequest=" + deployRequest +
-                ", deployResources=" + deployResources +
-                ", deployedServiceProperties=" + deployedServiceProperties +
-                ", resultMessage=" + resultSuccessMessage + ")";
+        String expectedToString =
+                "DeployedServiceDetails(deployRequest=" + deployRequest + ", deployResources="
+                        + deployResources + ", deployedServiceProperties="
+                        + deployedServiceProperties + ", resultMessage=" + resultSuccessMessage
+                        + ")";
 
         assertEquals(expectedToString, deployedServiceDetails.toString());
     }

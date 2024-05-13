@@ -8,25 +8,33 @@ package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
+import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
+import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
-import org.eclipse.xpanse.modules.models.service.view.DeployedService;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ManagementTaskStatus;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Bean to manage service state.
@@ -36,210 +44,315 @@ import org.springframework.stereotype.Component;
 public class ServiceStateManager {
 
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private DeployServiceEntityHandler serviceHandler;
     @Resource
     private PluginManager pluginManager;
     @Resource
     private UserServiceHelper userServiceHelper;
+    @Resource
+    private DatabaseServiceStateManagementTaskStorage taskStorage;
+    @Qualifier("xpanseAsyncTaskExecutor")
+    @Resource
+    private Executor taskExecutor;
 
     /**
      * Start the service by the deployed service id.
      *
      * @param id service id.
-     * @return deployedService.
+     * @return task id.
      */
-    public DeployedService startService(UUID id) {
-        DeployServiceEntity deployServiceEntity = getDeployedServiceEntityAndValidate(id);
+    public UUID startService(UUID id) {
+        ServiceStateManagementTaskType taskType = ServiceStateManagementTaskType.START;
+        DeployServiceEntity service = getDeployedServiceAndValidateState(id, taskType);
+        OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
+        ServiceStateManageRequest startRequest = getServiceManagerRequest(service);
+        ServiceStateManagementTaskEntity newTask = createNewManagementTask(id, taskType);
+        taskExecutor.execute(() -> asyncStartService(newTask, plugin, startRequest, service));
+        return newTask.getTaskId();
+    }
+
+    private ServiceStateManagementTaskEntity createNewManagementTask(
+            UUID serviceId, ServiceStateManagementTaskType taskType) {
+        ServiceStateManagementTaskEntity newTask = new ServiceStateManagementTaskEntity();
+        newTask.setTaskId(UUID.randomUUID());
+        newTask.setTaskType(taskType);
+        newTask.setServiceId(serviceId);
+        newTask.setTaskStatus(ManagementTaskStatus.CREATED);
+        return taskStorage.storeAndFlush(newTask);
+    }
+
+    private void asyncStartService(ServiceStateManagementTaskEntity taskEntity,
+                                   OrchestratorPlugin plugin, ServiceStateManageRequest request,
+                                   DeployServiceEntity service) {
+        taskEntity.setTaskStatus(ManagementTaskStatus.IN_PROGRESS);
+        taskEntity.setStartedTime(OffsetDateTime.now());
+        taskStorage.storeAndFlush(taskEntity);
+        service.setServiceState(ServiceState.STARTING);
+        serviceHandler.storeAndFlush(service);
+        boolean result = false;
         try {
-            validateStartDeployServiceEntity(deployServiceEntity);
-            deployServiceEntity.setServiceState(ServiceState.STARTING);
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
-            if (start(deployServiceEntity)) {
-                deployServiceEntity.setLastStartedAt(OffsetDateTime.now());
-                deployServiceEntity.setServiceState(ServiceState.RUNNING);
-            } else {
-                deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
-            }
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
-        } catch (RuntimeException e) {
-            log.info("start service by service id:{} failed.", id, e);
-            deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
+            result = plugin.startService(request);
+        } catch (Exception e) {
+            taskEntity.setErrorMsg(e.getMessage());
         }
-        DeployedService deployedService = new DeployedService();
-        BeanUtils.copyProperties(deployServiceEntity, deployedService);
-        deployedService.setServiceHostingType(deployServiceEntity.getDeployRequest()
-                .getServiceHostingType());
-        return deployedService;
+        taskEntity.setCompletedTime(OffsetDateTime.now());
+        if (result) {
+            taskEntity.setTaskStatus(ManagementTaskStatus.SUCCESSFUL);
+            service.setLastStartedAt(OffsetDateTime.now());
+            service.setServiceState(ServiceState.RUNNING);
+        } else {
+            taskEntity.setTaskStatus(ManagementTaskStatus.FAILED);
+            service.setServiceState(ServiceState.STOPPED);
+        }
+        taskStorage.storeAndFlush(taskEntity);
+        serviceHandler.storeAndFlush(service);
     }
 
     /**
      * Stop the service by the deployed service id.
      *
      * @param id service id.
-     * @return deployedService.
+     * @return task id.
      */
-    public DeployedService stopService(UUID id) {
-        DeployServiceEntity deployServiceEntity = getDeployedServiceEntityAndValidate(id);
+    public UUID stopService(UUID id) {
+        ServiceStateManagementTaskType taskType = ServiceStateManagementTaskType.STOP;
+        DeployServiceEntity service = getDeployedServiceAndValidateState(id, taskType);
+        OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
+        ServiceStateManageRequest stopRequest = getServiceManagerRequest(service);
+        ServiceStateManagementTaskEntity newTask = createNewManagementTask(id, taskType);
+        taskExecutor.execute(() -> asyncStopService(newTask, plugin, stopRequest, service));
+        return newTask.getTaskId();
+    }
+
+    private void asyncStopService(ServiceStateManagementTaskEntity taskEntity,
+                                  OrchestratorPlugin plugin, ServiceStateManageRequest request,
+                                  DeployServiceEntity service) {
+        taskEntity.setTaskStatus(ManagementTaskStatus.IN_PROGRESS);
+        taskEntity.setStartedTime(OffsetDateTime.now());
+        taskStorage.storeAndFlush(taskEntity);
+        service.setServiceState(ServiceState.STOPPING);
+        serviceHandler.storeAndFlush(service);
+        boolean result = false;
         try {
-            validateStopDeployServiceEntity(deployServiceEntity);
-            deployServiceEntity.setServiceState(ServiceState.STOPPING);
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
-            if (stop(deployServiceEntity)) {
-                deployServiceEntity.setLastStoppedAt(OffsetDateTime.now());
-                deployServiceEntity.setServiceState(ServiceState.STOPPED);
-            } else {
-                deployServiceEntity.setServiceState(ServiceState.STOPPING_FAILED);
-            }
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
-        } catch (RuntimeException e) {
-            log.info("stop service by service id:{} failed.", id, e);
-            deployServiceEntity.setServiceState(ServiceState.STOPPING_FAILED);
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
+            result = plugin.stopService(request);
+        } catch (Exception e) {
+            taskEntity.setErrorMsg(e.getMessage());
         }
-        DeployedService deployedService = new DeployedService();
-        BeanUtils.copyProperties(deployServiceEntity, deployedService);
-        deployedService.setServiceHostingType(deployServiceEntity.getDeployRequest()
-                .getServiceHostingType());
-        return deployedService;
+        taskEntity.setCompletedTime(OffsetDateTime.now());
+        if (result) {
+            taskEntity.setTaskStatus(ManagementTaskStatus.SUCCESSFUL);
+            service.setLastStoppedAt(OffsetDateTime.now());
+            service.setServiceState(ServiceState.STOPPED);
+        } else {
+            taskEntity.setTaskStatus(ManagementTaskStatus.FAILED);
+            service.setServiceState(ServiceState.RUNNING);
+        }
+        taskStorage.storeAndFlush(taskEntity);
+        serviceHandler.storeAndFlush(service);
     }
 
     /**
      * Restart the service by the deployed service id.
      *
      * @param id service id.
-     * @return deployedService.
+     * @return task id.
      */
-    public DeployedService restartService(UUID id) {
-        DeployServiceEntity deployServiceEntity = getDeployedServiceEntityAndValidate(id);
+    public UUID restartService(UUID id) {
+        ServiceStateManagementTaskType taskType = ServiceStateManagementTaskType.RESTART;
+        DeployServiceEntity service = getDeployedServiceAndValidateState(id, taskType);
+        OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
+        ServiceStateManageRequest restartRequest = getServiceManagerRequest(service);
+        ServiceStateManagementTaskEntity newTask = createNewManagementTask(id, taskType);
+        taskExecutor.execute(() -> asyncRestartService(newTask, plugin, restartRequest, service));
+        return newTask.getTaskId();
+    }
+
+    private void asyncRestartService(ServiceStateManagementTaskEntity taskEntity,
+                                     OrchestratorPlugin plugin, ServiceStateManageRequest request,
+                                     DeployServiceEntity service) {
+        taskEntity.setTaskStatus(ManagementTaskStatus.IN_PROGRESS);
+        taskEntity.setStartedTime(OffsetDateTime.now());
+        taskStorage.storeAndFlush(taskEntity);
+        service.setServiceState(ServiceState.RESTARTING);
+        serviceHandler.storeAndFlush(service);
+        boolean result = false;
         try {
-            deployServiceEntity.setServiceState(ServiceState.STARTING);
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
-            if (restart(deployServiceEntity)) {
-                deployServiceEntity.setLastStartedAt(OffsetDateTime.now());
-                deployServiceEntity.setServiceState(ServiceState.RUNNING);
-            } else {
-                deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
-            }
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
-        } catch (RuntimeException e) {
-            log.info("stop service by service id:{} failed.", id);
-            deployServiceEntity.setServiceState(ServiceState.STARTING_FAILED);
-            deployServiceEntityHandler.storeAndFlush(deployServiceEntity);
+            result = plugin.restartService(request);
+        } catch (Exception e) {
+            taskEntity.setErrorMsg(e.getMessage());
         }
-        DeployedService deployedService = new DeployedService();
-        BeanUtils.copyProperties(deployServiceEntity, deployedService);
-        deployedService.setServiceHostingType(deployServiceEntity.getDeployRequest()
-                .getServiceHostingType());
-        return deployedService;
-    }
-
-    private DeployServiceEntity getDeployedServiceEntityAndValidate(UUID id) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(id);
-        validateDeployServiceEntity(deployServiceEntity);
-        return deployServiceEntity;
-    }
-
-    private boolean start(DeployServiceEntity deployServiceEntity) {
-        OrchestratorPlugin plugin =
-                pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
-        List<DeployResourceEntity> deployResourceList =
-                getVmDeployResourceEntities(deployServiceEntity);
-        ServiceStateManageRequest serviceStateManageRequest =
-                getServiceManagerRequest(deployResourceList,
-                        deployServiceEntity.getDeployRequest().getServiceHostingType(),
-                        deployServiceEntity.getUserId());
-        return plugin.startService(serviceStateManageRequest);
-    }
-
-    private boolean stop(DeployServiceEntity deployServiceEntity) {
-        OrchestratorPlugin plugin =
-                pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
-        List<DeployResourceEntity> deployResourceList =
-                getVmDeployResourceEntities(deployServiceEntity);
-        ServiceStateManageRequest serviceStateManageRequest =
-                getServiceManagerRequest(deployResourceList,
-                        deployServiceEntity.getDeployRequest().getServiceHostingType(),
-                        deployServiceEntity.getUserId());
-        return plugin.stopService(serviceStateManageRequest);
-    }
-
-    private boolean restart(DeployServiceEntity deployServiceEntity) {
-        OrchestratorPlugin plugin =
-                pluginManager.getOrchestratorPlugin(deployServiceEntity.getCsp());
-        List<DeployResourceEntity> deployResourceList =
-                getVmDeployResourceEntities(deployServiceEntity);
-        ServiceStateManageRequest serviceStateManageRequest =
-                getServiceManagerRequest(deployResourceList,
-                        deployServiceEntity.getDeployRequest().getServiceHostingType(),
-                        deployServiceEntity.getUserId());
-        return plugin.restartService(serviceStateManageRequest);
-    }
-
-    private void validateStartDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
-        if (deployServiceEntity.getServiceState() == ServiceState.RUNNING
-                || deployServiceEntity.getServiceState() == ServiceState.STOPPING_FAILED) {
-            return;
+        taskEntity.setCompletedTime(OffsetDateTime.now());
+        if (result) {
+            taskEntity.setTaskStatus(ManagementTaskStatus.SUCCESSFUL);
+            service.setLastStartedAt(OffsetDateTime.now());
+            service.setServiceState(ServiceState.RUNNING);
+        } else {
+            taskEntity.setTaskStatus(ManagementTaskStatus.FAILED);
+            service.setServiceState(ServiceState.RUNNING);
         }
-        if (!(deployServiceEntity.getServiceState() == ServiceState.STOPPED
-                || deployServiceEntity.getServiceState() == ServiceState.STARTING_FAILED)) {
+        taskStorage.storeAndFlush(taskEntity);
+        serviceHandler.storeAndFlush(service);
+    }
+
+
+    /**
+     * List the service state management tasks.
+     *
+     * @param serviceId  service id.
+     * @param taskType   task type.
+     * @param taskStatus task status.
+     * @return list of service state management tasks.
+     */
+    public List<ServiceStateManagementTaskDetails> listServiceStateManagementTasks(
+            UUID serviceId, ServiceStateManagementTaskType taskType,
+            ManagementTaskStatus taskStatus) {
+        ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
+        taskQuery.setServiceId(serviceId);
+        taskQuery.setTaskType(taskType);
+        taskQuery.setTaskStatus(taskStatus);
+        List<ServiceStateManagementTaskEntity> taskEntities = taskStorage.queryTasks(taskQuery);
+        return taskEntities.stream().map(EntityTransUtils::transToServiceStateManagementTaskDetails)
+                .toList();
+    }
+
+
+    /**
+     * Delete the service state management tasks by the service id.
+     *
+     * @param serviceId service id.
+     */
+    public void deleteManagementTasksByServiceId(UUID serviceId) {
+        ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
+        taskQuery.setServiceId(serviceId);
+        List<ServiceStateManagementTaskEntity> taskEntities = taskStorage.queryTasks(taskQuery);
+        taskStorage.batchRemove(taskEntities);
+    }
+
+
+    /**
+     * Get the service state management task details with the task id.
+     *
+     * @param taskId task id.
+     * @return service state management task details.
+     */
+    public ServiceStateManagementTaskDetails getManagementTaskDetailsByTaskId(UUID taskId) {
+        ServiceStateManagementTaskEntity taskEntity = taskStorage.getTaskById(taskId);
+        return EntityTransUtils.transToServiceStateManagementTaskDetails(taskEntity);
+    }
+
+    /**
+     * Get the latest running service state management task details with the service id.
+     *
+     * @param serviceId service id.
+     * @return service state management task details.
+     */
+
+    public ServiceStateManagementTaskDetails getLatestRunningManagementTask(UUID serviceId) {
+        ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
+        taskQuery.setServiceId(serviceId);
+        List<ServiceStateManagementTaskEntity> taskEntities = taskStorage.queryTasks(taskQuery);
+        if (!CollectionUtils.isEmpty(taskEntities)) {
+            return EntityTransUtils.transToServiceStateManagementTaskDetails(
+                    taskEntities.getFirst());
+        }
+        return null;
+    }
+
+    /**
+     * Delete the service state management task details with the task id.
+     *
+     * @param taskId task id.
+     */
+    public void deleteManagementTaskByTaskId(UUID taskId) {
+        taskStorage.remove(taskStorage.getTaskById(taskId));
+    }
+
+    private DeployServiceEntity getDeployedServiceAndValidateState(
+            UUID serviceId, ServiceStateManagementTaskType taskType) {
+        DeployServiceEntity service = serviceHandler.getDeployServiceEntity(serviceId);
+        validateDeployServiceEntity(service);
+        if (service.getServiceState() == ServiceState.STARTING
+                || service.getServiceState() == ServiceState.STOPPING
+                || service.getServiceState() == ServiceState.RESTARTING) {
+            throw new InvalidServiceStateException(String.format(
+                    "Service %s with a running management task, please try again later.",
+                    serviceId));
+        }
+        if (taskType == ServiceStateManagementTaskType.START) {
+            validateStartActionForService(service);
+        } else if (taskType == ServiceStateManagementTaskType.STOP) {
+            validateStopActionForService(service);
+        } else if (taskType == ServiceStateManagementTaskType.RESTART) {
+            validateRestartActionForService(service);
+        }
+        return service;
+    }
+
+    private void validateStartActionForService(DeployServiceEntity service) {
+        if (!(service.getServiceState() == ServiceState.STOPPED
+                || service.getServiceState() == ServiceState.NOT_RUNNING)) {
             throw new InvalidServiceStateException(
-                    String.format("Service %s is not allowed to start. serviceState: %s",
-                            deployServiceEntity.getId(), deployServiceEntity.getServiceState()));
+                    String.format("Service %s with state %s is not supported to start.",
+                            service.getId(), service.getServiceState()));
         }
     }
 
-    private void validateStopDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
-        if (deployServiceEntity.getServiceState() == ServiceState.STOPPED
-                || deployServiceEntity.getServiceState() == ServiceState.STARTING_FAILED) {
-            return;
-        }
-        if (!(deployServiceEntity.getServiceState() == ServiceState.RUNNING
-                || deployServiceEntity.getServiceState() == ServiceState.STOPPING_FAILED)) {
+    private void validateStopActionForService(DeployServiceEntity service) {
+        if (service.getServiceState() != ServiceState.RUNNING) {
             throw new InvalidServiceStateException(
-                    String.format("Service %s is not allowed to stop. serviceState: %s",
-                            deployServiceEntity.getId(), deployServiceEntity.getServiceState()));
+                    String.format("Service %s with state %s is not supported to stop.",
+                            service.getId(), service.getServiceState()));
         }
     }
 
-    private void validateDeployServiceEntity(DeployServiceEntity deployServiceEntity) {
-        if (deployServiceEntity.getDeployRequest().getServiceHostingType()
-                == ServiceHostingType.SELF) {
-            boolean currentUserIsOwner =
-                    userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+    private void validateRestartActionForService(DeployServiceEntity service) {
+        if (service.getServiceState() != ServiceState.RUNNING) {
+            throw new InvalidServiceStateException(
+                    String.format("Service %s with state %s is not supported to restart.",
+                            service.getId(), service.getServiceState()));
+        }
+    }
+
+
+    private void validateDeployServiceEntity(DeployServiceEntity service) {
+        if (service.getDeployRequest().getServiceHostingType() == ServiceHostingType.SELF) {
+            boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(service.getUserId());
             if (!currentUserIsOwner) {
                 throw new AccessDeniedException(
                         "No permissions to manage status of the service belonging to other users.");
             }
         }
-        ServiceDeploymentState serviceDeploymentState =
-                deployServiceEntity.getServiceDeploymentState();
+        ServiceDeploymentState serviceDeploymentState = service.getServiceDeploymentState();
         if (!(serviceDeploymentState == ServiceDeploymentState.DEPLOY_SUCCESS
                 || serviceDeploymentState == ServiceDeploymentState.DESTROY_FAILED)) {
-            throw new InvalidServiceStateException(String.format("Service with id %s is %s.",
-                    deployServiceEntity.getId(), serviceDeploymentState));
+            throw new InvalidServiceStateException(
+                    String.format("Service with id %s is %s.", service.getId(),
+                            serviceDeploymentState));
         }
     }
 
-    private List<DeployResourceEntity> getVmDeployResourceEntities(
-            DeployServiceEntity deployServiceEntity) {
-        return deployServiceEntity.getDeployResourceList().stream()
-                .filter(deployResourceEntity -> deployResourceEntity.getKind()
-                        .equals(DeployResourceKind.VM)).collect(Collectors.toList());
-    }
 
-
-    private ServiceStateManageRequest getServiceManagerRequest(
-            List<DeployResourceEntity> deployResourceList, ServiceHostingType serviceHostingType,
-            String userId) {
+    private ServiceStateManageRequest getServiceManagerRequest(DeployServiceEntity service) {
         ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
-        serviceStateManageRequest.setDeployResourceEntityList(deployResourceList);
+        serviceStateManageRequest.setServiceId(service.getId());
+        List<DeployResourceEntity> vmResources =
+                CollectionUtils.isEmpty(service.getDeployResourceList()) ? Collections.emptyList()
+                        : service.getDeployResourceList().stream()
+                                .filter(resource -> resource.getKind() == DeployResourceKind.VM)
+                                .toList();
+        if (CollectionUtils.isEmpty(vmResources)) {
+            String errorMsg =
+                    String.format("Service with id %s has no vm resources.", service.getId());
+            log.error(errorMsg);
+            throw new ServiceNotDeployedException(errorMsg);
+        }
+        serviceStateManageRequest.setDeployResourceEntityList(vmResources);
+        ServiceHostingType serviceHostingType = service.getDeployRequest().getServiceHostingType();
         if (serviceHostingType == ServiceHostingType.SELF) {
-            serviceStateManageRequest.setUserId(userId);
+            serviceStateManageRequest.setUserId(service.getUserId());
         }
         serviceStateManageRequest.setRegionName(
-                deployResourceList.getFirst().getProperties().get("region"));
+                vmResources.getFirst().getProperties().get("region"));
         return serviceStateManageRequest;
     }
 }

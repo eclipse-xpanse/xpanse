@@ -14,7 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
+import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
+import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
@@ -38,7 +41,8 @@ public class EntityTransUtils {
      * @param entities list of deployResourceEntity
      * @return list of DeployResource
      */
-    public static List<DeployResource> transResourceEntity(List<DeployResourceEntity> entities) {
+    public static List<DeployResource> transToDeployResourceList(
+            List<DeployResourceEntity> entities) {
         List<DeployResource> resources = new ArrayList<>();
         if (!CollectionUtils.isEmpty(entities)) {
             for (DeployResourceEntity entity : entities) {
@@ -50,56 +54,66 @@ public class EntityTransUtils {
         return resources;
     }
 
+
+    /**
+     * DeployServiceEntity converted to DeployedService.
+     *
+     * @param serviceEntity DeployServiceEntity
+     * @return result
+     */
+    public static DeployedService convertToDeployedService(DeployServiceEntity serviceEntity) {
+        if (Objects.nonNull(serviceEntity)) {
+            DeployedService deployedService = new DeployedService();
+            BeanUtils.copyProperties(serviceEntity, deployedService);
+            deployedService.setServiceHostingType(
+                    serviceEntity.getDeployRequest().getServiceHostingType());
+            return deployedService;
+        }
+        return null;
+    }
+
+
     /**
      * DeployServiceEntity converted to DeployedServiceDetails.
      *
-     * @param deployServiceEntity DeployServiceEntity.
+     * @param entity DeployServiceEntity.
      * @return serviceDetailVo
      */
-    public static DeployedServiceDetails transDeployServiceEntityToServiceDetailVo(
-            DeployServiceEntity deployServiceEntity) {
-        DeployedServiceDetails deployedServiceDetails = new DeployedServiceDetails();
-        deployedServiceDetails.setServiceHostingType(
-                deployServiceEntity.getDeployRequest().getServiceHostingType());
-        BeanUtils.copyProperties(deployServiceEntity, deployedServiceDetails);
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
-            List<DeployResource> deployResources = transResourceEntity(
-                    deployServiceEntity.getDeployResourceList());
-            deployedServiceDetails.setDeployResources(deployResources);
+    public static DeployedServiceDetails transToDeployedServiceDetails(
+            DeployServiceEntity entity) {
+        DeployedServiceDetails details = new DeployedServiceDetails();
+        details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
+        BeanUtils.copyProperties(entity, details);
+        if (!CollectionUtils.isEmpty(entity.getDeployResourceList())) {
+            details.setDeployResources(transToDeployResourceList(entity.getDeployResourceList()));
         }
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
-            deployedServiceDetails.setDeployedServiceProperties(
-                    deployServiceEntity.getProperties());
+        if (!CollectionUtils.isEmpty(entity.getProperties())) {
+            details.setDeployedServiceProperties(entity.getProperties());
         }
-        if (Objects.nonNull(deployServiceEntity.getServiceTemplateId())) {
-            deployedServiceDetails.setServiceTemplateId(deployServiceEntity.getServiceTemplateId());
+        if (Objects.nonNull(entity.getServiceTemplateId())) {
+            details.setServiceTemplateId(entity.getServiceTemplateId());
         }
-        return deployedServiceDetails;
+        return details;
     }
 
     /**
      * DeployServiceEntity converted to VendorHostedDeployedServiceDetails.
      *
-     * @param deployServiceEntity DeployServiceEntity.
+     * @param entity DeployServiceEntity.
      * @return serviceDetailVo
      */
-    public static VendorHostedDeployedServiceDetails
-            transServiceEntityToVendorHostedServiceDetailsVo(
-            DeployServiceEntity deployServiceEntity) {
-        VendorHostedDeployedServiceDetails vendorHostedDeployedServiceDetails =
-                new VendorHostedDeployedServiceDetails();
-        vendorHostedDeployedServiceDetails.setServiceHostingType(
-                deployServiceEntity.getDeployRequest().getServiceHostingType());
-        BeanUtils.copyProperties(deployServiceEntity, vendorHostedDeployedServiceDetails);
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
-            vendorHostedDeployedServiceDetails.setDeployedServiceProperties(
-                    deployServiceEntity.getProperties());
+    public static VendorHostedDeployedServiceDetails transToVendorHostedServiceDetails(
+            DeployServiceEntity entity) {
+        VendorHostedDeployedServiceDetails details = new VendorHostedDeployedServiceDetails();
+        details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
+        BeanUtils.copyProperties(entity, details);
+        if (!CollectionUtils.isEmpty(entity.getProperties())) {
+            details.setDeployedServiceProperties(entity.getProperties());
         }
-        if (Objects.nonNull(deployServiceEntity.getServiceTemplateId())) {
-            vendorHostedDeployedServiceDetails.setServiceTemplateId(
-                    deployServiceEntity.getServiceTemplateId());
+        if (Objects.nonNull(entity.getServiceTemplateId())) {
+            details.setServiceTemplateId(entity.getServiceTemplateId());
         }
-        return vendorHostedDeployedServiceDetails;
+        return details;
     }
 
     /**
@@ -108,10 +122,23 @@ public class EntityTransUtils {
      * @param serviceMigrationEntity ServiceMigrationEntity.
      * @return ServiceMigrationDetails
      */
-    public static ServiceMigrationDetails transServiceMigrationDetails(
+    public static ServiceMigrationDetails transToServiceMigrationDetails(
             ServiceMigrationEntity serviceMigrationEntity) {
         ServiceMigrationDetails details = new ServiceMigrationDetails();
         BeanUtils.copyProperties(serviceMigrationEntity, details);
+        return details;
+    }
+
+    /**
+     * ServiceStateManagementTaskEntity converted to ServiceStateManagementTaskDetails.
+     *
+     * @param entity ServiceStateManagementTaskEntity
+     * @return ServiceStateManagementTaskDeTails
+     */
+    public static ServiceStateManagementTaskDetails transToServiceStateManagementTaskDetails(
+            ServiceStateManagementTaskEntity entity) {
+        ServiceStateManagementTaskDetails details = new ServiceStateManagementTaskDetails();
+        BeanUtils.copyProperties(entity, details);
         return details;
     }
 }
