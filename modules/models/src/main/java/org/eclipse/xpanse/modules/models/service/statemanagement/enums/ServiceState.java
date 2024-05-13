@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.service.deploy.enums;
+package org.eclipse.xpanse.modules.models.service.statemanagement.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -15,35 +15,31 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  * Enumeration class for service running status.
  */
 public enum ServiceState {
-
     NOT_RUNNING("not running"),
-
     RUNNING("running"),
     STARTING("starting"),
-    STARTING_FAILED("starting failed"),
-
     STOPPING("stopping"),
     STOPPED("stopped"),
-    STOPPING_FAILED("stopping failed");
+    RESTARTING("restarting");
 
-    private final String state;
+    private final String value;
 
-    ServiceState(String state) {
-        this.state = state;
+    ServiceState(String value) {
+        this.value = value;
     }
 
     /**
-     * For ServiceDeploymentState deserialize.
+     * For ServiceState deserialize.
      */
     @JsonCreator
-    public static ServiceState getByValue(String state) {
-        for (ServiceState serviceState : values()) {
-            if (StringUtils.equalsIgnoreCase(serviceState.state, state)) {
-                return serviceState;
+    public static ServiceState getByValue(String value) {
+        for (ServiceState entry : values()) {
+            if (StringUtils.equalsIgnoreCase(entry.value, value)) {
+                return entry;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("ServiceState value %s is not supported.", state));
+                String.format("ServiceState value %s is not supported.", value));
     }
 
     /**
@@ -51,7 +47,7 @@ public enum ServiceState {
      */
     @JsonValue
     public String toValue() {
-        return this.state;
+        return this.value;
     }
 
 }

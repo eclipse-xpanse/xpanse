@@ -7,6 +7,9 @@
 package org.eclipse.xpanse.modules.database.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -20,17 +23,16 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
-import org.junit.jupiter.api.Assertions;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
 class DeployServiceEntityTest {
 
-    private static final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
-    private static final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
-    private static final ServiceLockConfig LOCK_CONFIG = new ServiceLockConfig();
+    private final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
+    private final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
+    private final ServiceLockConfig LOCK_CONFIG = new ServiceLockConfig();
     private final UUID ID = UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d");
     private final String USER_ID = "defaultUserId";
     private final Category CATEGORY = Category.MIDDLEWARE;
@@ -103,25 +105,16 @@ class DeployServiceEntityTest {
     @Test
     void testToString() {
         String expectedToString =
-                "DeployServiceEntity(id=" + ID
-                        + ", userId=" + USER_ID
-                        + ", category=" + CATEGORY
-                        + ", name=" + NAME
-                        + ", customerServiceName=" + CUSTOMER_SERVICE_NAME
-                        + ", version=" + VERSION
-                        + ", namespace=" + NAMESPACE
-                        + ", csp=" + CSP
-                        + ", flavor=" + FLAVOR
-                        + ", serviceDeploymentState=" + SERVICE_STATE
-                        + ", serviceState=" + SERVICE_RUN_STATE
-                        + ", serviceTemplateId=" + SERVICE_TEMPLATE_ID
-                        + ", deployRequest=" + CREATE_REQUEST
-                        + ", properties=" + PROPERTIES
-                        + ", privateProperties=" + PRIVATE_PROPERTIES
-                        + ", resultMessage=" + RESULT_MESSAGE
-                        + ", lastStartedAt=" + LAST_STARTED_AT
-                        + ", lastStoppedAt=" + LAST_STOPPED_AT
-                        + ", lockConfig=" + LOCK_CONFIG + ")";
+                "DeployServiceEntity(id=" + ID + ", userId=" + USER_ID + ", category=" + CATEGORY
+                        + ", name=" + NAME + ", customerServiceName=" + CUSTOMER_SERVICE_NAME
+                        + ", version=" + VERSION + ", namespace=" + NAMESPACE + ", csp=" + CSP
+                        + ", flavor=" + FLAVOR + ", serviceDeploymentState=" + SERVICE_STATE
+                        + ", resultMessage=" + RESULT_MESSAGE + ", serviceState="
+                        + SERVICE_RUN_STATE + ", serviceTemplateId=" + SERVICE_TEMPLATE_ID
+                        + ", deployRequest=" + CREATE_REQUEST + ", properties=" + PROPERTIES
+                        + ", privateProperties=" + PRIVATE_PROPERTIES + ", lastStartedAt="
+                        + LAST_STARTED_AT + ", lastStoppedAt=" + LAST_STOPPED_AT + ", lockConfig="
+                        + LOCK_CONFIG + ")";
         assertEquals(expectedToString, test.toString());
     }
 
@@ -129,14 +122,17 @@ class DeployServiceEntityTest {
     @Test
     void testEqualsAndHashCode() {
         Object o = new Object();
-        Assertions.assertNotEquals(test, o);
-        Assertions.assertNotEquals(test.hashCode(), o.hashCode());
+        assertFalse(test.canEqual(o));
+        assertNotEquals(test, o);
+        assertNotEquals(test.hashCode(), o.hashCode());
 
         DeployServiceEntity test1 = new DeployServiceEntity();
-        Assertions.assertNotEquals(test, test1);
-        Assertions.assertNotEquals(test.hashCode(), test1.hashCode());
+        assertTrue(test.canEqual(test1));
+        assertNotEquals(test, test1);
+        assertNotEquals(test.hashCode(), test1.hashCode());
 
         BeanUtils.copyProperties(test, test1);
+        assertTrue(test.canEqual(test1));
         assertEquals(test, test1);
         assertEquals(test.hashCode(), test1.hashCode());
     }

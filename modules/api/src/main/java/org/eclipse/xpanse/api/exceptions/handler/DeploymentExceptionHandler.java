@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavor
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
+import org.eclipse.xpanse.modules.models.service.statemanagement.exceptions.ServiceStateManagementTaskNotFound;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -207,6 +208,18 @@ public class DeploymentExceptionHandler {
     public Response handleServiceFlavorDowngradeNotAllowed(
             ServiceFlavorDowngradeNotAllowed ex) {
         return Response.errorResponse(ResultType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceStateManagementTaskNotFound.
+     */
+    @ExceptionHandler({ServiceStateManagementTaskNotFound.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceStateManagementTaskNotFound(
+            ServiceStateManagementTaskNotFound ex) {
+        return Response.errorResponse(ResultType.SERVICE_STATE_MANAGEMENT_TASK_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 }

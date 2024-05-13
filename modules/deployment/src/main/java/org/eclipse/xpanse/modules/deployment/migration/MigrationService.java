@@ -121,7 +121,7 @@ public class MigrationService {
             throw new AccessDeniedException(
                     "No permissions to view service migration belonging to other users.");
         }
-        return EntityTransUtils.transServiceMigrationDetails(serviceMigration);
+        return EntityTransUtils.transToServiceMigrationDetails(serviceMigration);
     }
 
     /**
@@ -150,7 +150,7 @@ public class MigrationService {
         if (!CollectionUtils.isEmpty(serviceMigrationEntities)) {
             for (ServiceMigrationEntity serviceMigrationEntity : serviceMigrationEntities) {
                 ServiceMigrationDetails details =
-                        EntityTransUtils.transServiceMigrationDetails(serviceMigrationEntity);
+                        EntityTransUtils.transToServiceMigrationDetails(serviceMigrationEntity);
                 serviceMigrationDetailsList.add(details);
             }
         }
@@ -161,6 +161,6 @@ public class MigrationService {
      * Query service template.
      */
     public ServiceTemplateEntity findServiceTemplate(ServiceTemplateEntity searchServiceTemplate) {
-        return  serviceTemplateStorage.findServiceTemplate(searchServiceTemplate);
+        return serviceTemplateStorage.findServiceTemplate(searchServiceTemplate);
     }
 }

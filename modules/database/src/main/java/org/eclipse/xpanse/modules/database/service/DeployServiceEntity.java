@@ -35,7 +35,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
@@ -103,9 +103,16 @@ public class DeployServiceEntity extends CreateModifiedTime {
     private ServiceDeploymentState serviceDeploymentState;
 
     /**
+     * The result message of the deployed service.
+     */
+    @Column(name = "RESULT_MESSAGE", length = Integer.MAX_VALUE)
+    private String resultMessage;
+
+    /**
      * The run state of the Service.
      */
     @Enumerated(EnumType.STRING)
+    @Column(name = "SERVICE_STATE")
     private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
     /**
@@ -143,10 +150,6 @@ public class DeployServiceEntity extends CreateModifiedTime {
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
     private Map<String, String> privateProperties;
-
-
-    @Column(name = "RESULT_MESSAGE", length = Integer.MAX_VALUE)
-    private String resultMessage;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")

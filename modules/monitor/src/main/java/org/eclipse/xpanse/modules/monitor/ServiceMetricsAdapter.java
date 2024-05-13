@@ -62,10 +62,8 @@ public class ServiceMetricsAdapter {
                                               boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
         DeployServiceEntity serviceEntity = findDeployServiceEntity(UUID.fromString(id));
-
-        List<DeployResourceEntity> deployResourceList = serviceEntity.getDeployResourceList();
         List<DeployResource> deployResources =
-                EntityTransUtils.transResourceEntity(deployResourceList);
+                EntityTransUtils.transToDeployResourceList(serviceEntity.getDeployResourceList());
         List<DeployResource> vmResources = deployResources.stream()
                 .filter(deployResource -> DeployResourceKind.VM.equals(deployResource.getKind()))
                 .collect(Collectors.toList());

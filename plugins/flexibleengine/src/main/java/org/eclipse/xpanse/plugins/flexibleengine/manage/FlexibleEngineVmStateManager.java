@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
@@ -34,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Class that encapsulates all Manager-related public methods of the Huawei Cloud plugin.
+ * Class that encapsulates all Manager-related public methods of the FlexibleEngine plugin.
  */
 @Slf4j
 @Component
@@ -60,13 +61,12 @@ public class FlexibleEngineVmStateManager {
     }
 
     /**
-     * Start the Huawei Cloud Ecs server.
+     * Start the FlexibleEngine Ecs server.
      */
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
         EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
-        BatchStartServersRequest request =
-                converter.buildBatchStartServersRequest(
-                        serviceStateManageRequest.getDeployResourceEntityList());
+        BatchStartServersRequest request = converter.buildBatchStartServersRequest(
+                serviceStateManageRequest.getDeployResourceEntityList());
         BatchStartServersResponse response =
                 ecsClient.batchStartServersInvoker(request).retryTimes(DEFAULT_RETRY_TIMES)
                         .retryCondition(flexibleEngineClient::matchRetryCondition)
@@ -76,13 +76,12 @@ public class FlexibleEngineVmStateManager {
     }
 
     /**
-     * Stop the Huawei Cloud Ecs server.
+     * Stop the FlexibleEngine Ecs server.
      */
     public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
         EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
-        BatchStopServersRequest batchStopServersRequest =
-                converter.buildBatchStopServersRequest(
-                        serviceStateManageRequest.getDeployResourceEntityList());
+        BatchStopServersRequest batchStopServersRequest = converter.buildBatchStopServersRequest(
+                serviceStateManageRequest.getDeployResourceEntityList());
         BatchStopServersResponse response =
                 ecsClient.batchStopServersInvoker(batchStopServersRequest)
                         .retryTimes(DEFAULT_RETRY_TIMES)
@@ -93,13 +92,12 @@ public class FlexibleEngineVmStateManager {
     }
 
     /**
-     * Restart the Huawei Cloud Ecs server.
+     * Restart the FlexibleEngine Ecs server.
      */
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
-        BatchRebootServersRequest request =
-                converter.buildBatchRebootServersRequest(
-                        serviceStateManageRequest.getDeployResourceEntityList());
+        BatchRebootServersRequest request = converter.buildBatchRebootServersRequest(
+                serviceStateManageRequest.getDeployResourceEntityList());
         BatchRebootServersResponse response =
                 ecsClient.batchRebootServersInvoker(request).retryTimes(DEFAULT_RETRY_TIMES)
                         .retryCondition(flexibleEngineClient::matchRetryCondition)
@@ -125,8 +123,10 @@ public class FlexibleEngineVmStateManager {
                 .backoffStrategy(new SdkBackoffStrategy(BASE_DELAY, MAX_BACK_OFF_IN_MILLISECONDS))
                 .invoke();
         if (response.getStatus().equals(StatusEnum.FAIL)) {
-            log.error("manage vm operation failed. JobId: {} reason: {} message: {}", jobId,
+            String errorMsg = String.format(
+                    "Manage vm operation failed. JobId: %s reason: %s " + "message: %s", jobId,
                     response.getFailReason(), response.getMessage());
+            throw new ClientApiCallFailedException(errorMsg);
         }
         return response.getStatus().equals(StatusEnum.SUCCESS);
     }
