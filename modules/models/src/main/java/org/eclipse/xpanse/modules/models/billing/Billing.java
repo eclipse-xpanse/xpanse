@@ -25,4 +25,8 @@ public class Billing implements Serializable {
     @NotNull
     @Schema(description = "Supported billing modes by the managed service")
     private List<BillingMode> billingModes;
+
+    @Schema(description = " This is used only for display purposes. When provided, this "
+            + "billingMode will be selected in the frontends by default.")
+    private BillingMode defaultBillingMode;
 }
