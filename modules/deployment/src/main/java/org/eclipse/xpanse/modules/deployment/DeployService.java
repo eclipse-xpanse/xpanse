@@ -205,6 +205,10 @@ public class DeployService {
         } else {
             throw new ServiceTemplateNotRegistered("service template id can't be null.");
         }
+        ServiceLockConfig defaultLockConfig = new ServiceLockConfig();
+        defaultLockConfig.setDestroyLocked(false);
+        defaultLockConfig.setModifyLocked(false);
+        entity.setLockConfig(defaultLockConfig);
         DeployServiceEntity storedEntity = deployServiceEntityHandler.storeAndFlush(entity);
         if (Objects.isNull(storedEntity)) {
             log.error("Store new deploy service entity with id:{} failed.", deployTask.getId());
