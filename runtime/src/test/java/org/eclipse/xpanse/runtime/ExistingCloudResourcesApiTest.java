@@ -33,7 +33,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -57,6 +57,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@SuppressWarnings("unchecked")
 @Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed",
@@ -77,6 +78,15 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
 
     @Test
     @WithJwt(file = "jwt_user.json")
+    void testExistingCloudResourcesApi() throws Exception {
+        testGetExistingResourceNamesWithKindThrowsException();
+
+        testGetExistingResourceNamesWithKindForHuaweiCloud();
+        testGetExistingResourceNamesWithKindForFlexibleEngine();
+        testGetExistingResourceNamesWithKindForOpenstack();
+        testGetExistingResourceNamesWithKindForScs();
+    }
+
     void testGetExistingResourceNamesWithKindForHuaweiCloud() throws Exception {
         mockSdkClientsForHuaweiCloud();
         // Setup
@@ -264,9 +274,6 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         when(mockInvoker.invoke()).thenReturn(mockResponse);
     }
 
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testGetExistingResourceNamesWithKindForFlexibleEngine() throws Exception {
         mockSdkClientsForFlexibleEngine();
         addCredentialForFlexibleEngine();
@@ -403,21 +410,14 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
 
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testGetExistingResourceNamesWithKindForOpenstack() throws Exception {
         testGetExistingResourceNamesWithKindForCspWithOsClient(Csp.OPENSTACK);
     }
 
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testGetExistingResourceNamesWithKindForScs() throws Exception {
         testGetExistingResourceNamesWithKindForCspWithOsClient(Csp.SCS);
     }
 
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testGetExistingResourceNamesWithKindThrowsException() throws Exception {
         getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.HUAWEI,
                 "cn-southwest-2");
@@ -427,7 +427,6 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 "RegionOne");
         getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.SCS, "RegionOne");
     }
-
 
     void getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp csp, String region)
             throws Exception {

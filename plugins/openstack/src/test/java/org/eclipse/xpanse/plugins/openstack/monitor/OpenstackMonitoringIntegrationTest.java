@@ -35,7 +35,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -151,15 +151,15 @@ class OpenstackMonitoringIntegrationTest {
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, null, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
+        Assertions.assertEquals(MetricType.GAUGE, metrics.getFirst().getType());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(1).getType());
-        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.get(0).getName());
+        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.getFirst().getName());
         Assertions.assertEquals(MonitorResourceType.MEM.toValue(), metrics.get(1).getName());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING.toValue(),
                 metrics.get(2).getName());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING.toValue(),
                 metrics.get(3).getName());
-        Assertions.assertEquals(326, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(326, metrics.getFirst().getMetrics().size());
     }
 
     @Test
@@ -187,11 +187,11 @@ class OpenstackMonitoringIntegrationTest {
                         setupResourceRequest(currentTime, currentTime, null, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
+        Assertions.assertEquals(MetricType.GAUGE, metrics.getFirst().getType());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(1).getType());
-        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.get(0).getName());
+        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.getFirst().getName());
         Assertions.assertEquals(MonitorResourceType.MEM.toValue(), metrics.get(1).getName());
-        Assertions.assertEquals(326, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(326, metrics.getFirst().getMetrics().size());
         wireMockExtension.verify(3, postRequestedFor(
                 urlEqualTo("/metric/v1/aggregates?start=" + currentTime + "&end=" + currentTime)));
 
@@ -221,11 +221,11 @@ class OpenstackMonitoringIntegrationTest {
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, false));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
+        Assertions.assertEquals(MetricType.GAUGE, metrics.getFirst().getType());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(1).getType());
-        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.get(0).getName());
+        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.getFirst().getName());
         Assertions.assertEquals(MonitorResourceType.MEM.toValue(), metrics.get(1).getName());
-        Assertions.assertEquals(326, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(326, metrics.getFirst().getMetrics().size());
     }
 
     @Test
@@ -251,11 +251,11 @@ class OpenstackMonitoringIntegrationTest {
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
+        Assertions.assertEquals(MetricType.GAUGE, metrics.getFirst().getType());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(1).getType());
-        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.get(0).getName());
+        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.getFirst().getName());
         Assertions.assertEquals(MonitorResourceType.MEM.toValue(), metrics.get(1).getName());
-        Assertions.assertEquals(1, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(1, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
     }
 
@@ -283,18 +283,18 @@ class OpenstackMonitoringIntegrationTest {
                 this.plugin.getMetricsForService(setupServiceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(MetricType.GAUGE, metrics.get(0).getType());
+        Assertions.assertEquals(MetricType.GAUGE, metrics.getFirst().getType());
         Assertions.assertEquals(MetricType.GAUGE, metrics.get(1).getType());
-        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.get(0).getName());
+        Assertions.assertEquals(MonitorResourceType.CPU.toValue(), metrics.getFirst().getName());
         Assertions.assertEquals(MonitorResourceType.MEM.toValue(), metrics.get(1).getName());
-        Assertions.assertEquals(1, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(1, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
     }
 
     @Test
     void testGetMetricsException() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
-                this.plugin.getCredentialDefinitions().get(0));
+                this.plugin.getCredentialDefinitions().getFirst());
         Assertions.assertThrows(CredentialsNotFoundException.class,
                 () -> this.plugin.getMetricsForResource(
                         setupResourceRequest(null, null, 150, true)));
@@ -303,7 +303,7 @@ class OpenstackMonitoringIntegrationTest {
 
     private CredentialVariables getCredentialDefinition() {
         CredentialVariables credentialVariables =
-                (CredentialVariables) this.plugin.getCredentialDefinitions().get(0);
+                (CredentialVariables) this.plugin.getCredentialDefinitions().getFirst();
         for (CredentialVariable credentialVariable : credentialVariables.getVariables()) {
             if (credentialVariable.getName().equals(OpenstackEnvironmentConstants.USERNAME)) {
                 credentialVariable.setValue("admin");

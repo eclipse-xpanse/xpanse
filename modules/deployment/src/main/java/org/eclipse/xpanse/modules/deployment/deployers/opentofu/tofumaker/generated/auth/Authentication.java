@@ -10,6 +10,5 @@ public interface Authentication {
      * @param headerParams The header parameters for the request
      * @param cookieParams The cookie parameters for the request
      */
-    void applyToParams(MultiValueMap<String, String> queryParams, HttpHeaders headerParams,
-                       MultiValueMap<String, String> cookieParams);
+    public void applyToParams(MultiValueMap<String, String> queryParams, HttpHeaders headerParams, MultiValueMap<String, String> cookieParams);
 }

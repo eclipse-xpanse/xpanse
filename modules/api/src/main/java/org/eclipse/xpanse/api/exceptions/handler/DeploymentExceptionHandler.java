@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavor
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
+import org.eclipse.xpanse.modules.models.service.modify.exceptions.ServiceModificationAuditNotFound;
 import org.eclipse.xpanse.modules.models.service.statemanagement.exceptions.ServiceStateManagementTaskNotFound;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -223,7 +224,7 @@ public class DeploymentExceptionHandler {
         return Response.errorResponse(ResultType.BILLING_MODE_NOT_SUPPORTED,
                 Collections.singletonList(ex.getMessage()));
     }
-  
+
     /**
      * Exception handler for ServiceStateManagementTaskNotFound.
      */
@@ -233,6 +234,18 @@ public class DeploymentExceptionHandler {
     public Response handleServiceStateManagementTaskNotFound(
             ServiceStateManagementTaskNotFound ex) {
         return Response.errorResponse(ResultType.SERVICE_STATE_MANAGEMENT_TASK_NOT_FOUND,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceModificationAuditNotFound.
+     */
+    @ExceptionHandler({ServiceModificationAuditNotFound.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceModificationAuditNotFound(
+            ServiceModificationAuditNotFound ex) {
+        return Response.errorResponse(ResultType.SERVICE_MODIFICATION_AUDIT_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 }

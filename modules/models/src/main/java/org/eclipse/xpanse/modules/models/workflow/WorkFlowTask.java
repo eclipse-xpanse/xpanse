@@ -55,7 +55,7 @@ public class WorkFlowTask {
 
     @NotNull
     @Schema(description = "The status of the Task")
-    private TaskStatus status;
+    private WorkFlowTaskStatus status;
 
     @NotNull
     @Schema(description = "The create time of the task")

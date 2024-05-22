@@ -40,20 +40,19 @@ public class TofuMakerDeploymentPlanManage {
      * Method to get openTofu plan from scripts provided in OCL.
      */
     public OpenTofuPlan getOpenTofuPlanFromScripts(DeployTask deployTask) {
-        return openTofuFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(deployTask),
-                deployTask.getId());
+        return openTofuFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(deployTask));
     }
 
     /**
      * Method to get openTofu plan from scripts provided in GIT repo.
      */
     public OpenTofuPlan getOpenTofuPlanFromGitRepo(DeployTask deployTask) {
-        return openTofuFromGitRepoApi.planFromGitRepo(getPlanFromGitRepoRequest(deployTask),
-                deployTask.getId());
+        return openTofuFromGitRepoApi.planFromGitRepo(getPlanFromGitRepoRequest(deployTask));
     }
 
     private OpenTofuPlanWithScriptsRequest getPlanWithScriptsRequest(DeployTask task) {
         OpenTofuPlanWithScriptsRequest request = new OpenTofuPlanWithScriptsRequest();
+        request.setRequestId(task.getId());
         request.setScripts(tofuMakerHelper.getFiles(task));
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
@@ -62,6 +61,7 @@ public class TofuMakerDeploymentPlanManage {
 
     private OpenTofuPlanFromGitRepoRequest getPlanFromGitRepoRequest(DeployTask task) {
         OpenTofuPlanFromGitRepoRequest request = new OpenTofuPlanFromGitRepoRequest();
+        request.setRequestId(task.getId());
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
         request.setGitRepoDetails(

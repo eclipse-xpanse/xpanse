@@ -148,7 +148,8 @@ class TofuMakerDeploymentTest {
             doReturn(new HashMap<>()).when(this.deployEnvironments)
                     .getCredentialVariablesByHostingType(any(), any(), any(), any());
             deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
-            DeployResult deployResult = openTofuMakerDeployment.modify(deployTask);
+            UUID modificationId = UUID.randomUUID();
+            DeployResult deployResult = openTofuMakerDeployment.modify(modificationId,deployTask);
 
             Assertions.assertNotNull(deployResult);
             Assertions.assertEquals(id, deployResult.getId());
@@ -175,7 +176,7 @@ class TofuMakerDeploymentTest {
         ocl.getDeployment().setDeployer(errorDeployer);
 
         Mockito.doThrow(new OpenTofuMakerRequestFailedException("IO error")).when(terraformApi)
-                .asyncDeployWithScripts(any(), any());
+                .asyncDeployWithScripts(any());
 
         ocl.getDeployment().setDeployer(invalidDeployer);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
@@ -187,7 +188,7 @@ class TofuMakerDeploymentTest {
     @Test
     void testDestroy_ThrowsRestClientException() {
         Mockito.doThrow(new OpenTofuMakerRequestFailedException("IO error")).when(terraformApi)
-                .asyncDestroyWithScripts(any(), any());
+                .asyncDestroyWithScripts(any());
 
         try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
                 TfResourceTransUtils.class)) {
@@ -213,7 +214,7 @@ class TofuMakerDeploymentTest {
     void testGetDeployPlanAsJson() {
         OpenTofuPlan terraformPlan = new OpenTofuPlan();
         terraformPlan.setPlan("plan");
-        when(terraformApi.planWithScripts(any(), any())).thenReturn(terraformPlan);
+        when(terraformApi.planWithScripts(any())).thenReturn(terraformPlan);
 
         String deployPlanJson = openTofuMakerDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
@@ -223,7 +224,7 @@ class TofuMakerDeploymentTest {
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
 
-        when(terraformApi.planWithScripts(any(), any())).thenThrow(
+        when(terraformApi.planWithScripts(any())).thenThrow(
                 new OpenTofuMakerRequestFailedException("IO error"));
 
         Assertions.assertThrows(OpenTofuMakerRequestFailedException.class,

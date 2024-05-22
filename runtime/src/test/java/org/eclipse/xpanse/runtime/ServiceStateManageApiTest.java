@@ -1,6 +1,7 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,10 +15,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.huaweicloud.sdk.core.invoker.SyncInvoker;
+import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersRequest;
 import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersResponse;
+import com.huaweicloud.sdk.ecs.v2.model.BatchStartServersRequest;
 import com.huaweicloud.sdk.ecs.v2.model.BatchStartServersResponse;
+import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersRequest;
 import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersResponse;
+import com.huaweicloud.sdk.ecs.v2.model.ShowJobRequest;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse;
+import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +33,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.api.config.AuditLogWriter;
 import org.eclipse.xpanse.api.config.GetCspInfoFromRequest;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
@@ -35,12 +42,12 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ManagementTaskStatus;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
@@ -65,13 +72,18 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed",
-        "OS_AUTH_URL=http://127.0.0.1/v3/identity"})
+@SpringBootTest(properties = {
+        "spring.profiles.active=oauth,zitadel,zitadel-testbed",
+        "spring.test.retries=3",
+        "spring.test.retry.enabled=true",
+        "spring.test.retry.backoff.max-interval=1000",
+        "OS_AUTH_URL=http://127.0.0.1/v3/identity"
+})
 @AutoConfigureMockMvc
 class ServiceStateManageApiTest extends ApisTestCommon {
 
     @MockBean
-    private DeployServiceStorage deployServiceStorage;
+    private DatabaseDeployServiceStorage deployServiceStorage;
 
     @SpyBean
     private AuditLogWriter auditLogWriter;
@@ -92,7 +104,16 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
     @Test
     @WithJwt(file = "jwt_user.json")
-    void testServiceStateManageApisThrowsException() throws Exception {
+    void testServiceStateManageApis() throws Exception {
+        testServiceStateManageApisThrowExceptions();
+
+        testServiceStateManageApisForHuaweiCloud();
+        testServiceStateManageApisForFlexibleEngine();
+        testServiceStateManageApisForOpenstack();
+        testServiceStateManageApisForScs();
+    }
+
+    void testServiceStateManageApisThrowExceptions() throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
         Response result = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
@@ -256,8 +277,6 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(errorResult10));
     }
 
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testServiceStateManageApisForHuaweiCloud() throws Exception {
         // Setup
         DeployServiceEntity service = setUpWellDeployServiceEntity();
@@ -282,11 +301,19 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(startFailedResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(startFailedTaskId).isNotNull();
-        assertTaskStatus(startFailedTaskId, ManagementTaskStatus.FAILED);
+        assertTaskStatus(startFailedTaskId, TaskStatus.FAILED);
         List<ServiceStateManagementTaskDetails> startFailedTasks =
-                listServiceStateManagementTasks(service.getId(), ServiceStateManagementTaskType.START,
-                        ManagementTaskStatus.FAILED);
+                listServiceStateManagementTasks(service.getId(),
+                        ServiceStateManagementTaskType.START,
+                        TaskStatus.FAILED);
         assertThat(startFailedTasks.size()).isEqualTo(1);
+
+        MockHttpServletResponse startFailedTaskDetailsResponse =
+                getManagementTaskDetailsByTaskId(startFailedTaskId);
+        assertEquals(startFailedTaskDetailsResponse.getStatus(), HttpStatus.OK.value());
+        assertEquals(startFailedTaskDetailsResponse.getContentAsString(),
+                objectMapper.writeValueAsString(startFailedTasks.getFirst()));
+
 
         service.setServiceState(ServiceState.STOPPED);
         BatchStartServersResponse startSdkResponse = new BatchStartServersResponse();
@@ -304,11 +331,18 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(startResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(startTaskId).isNotNull();
-        assertTaskStatus(startTaskId, ManagementTaskStatus.SUCCESSFUL);
+        assertTaskStatus(startTaskId, TaskStatus.SUCCESSFUL);
         List<ServiceStateManagementTaskDetails> startSuccessFulTasks =
-                listServiceStateManagementTasks(service.getId(), ServiceStateManagementTaskType.START,
-                        ManagementTaskStatus.SUCCESSFUL);
+                listServiceStateManagementTasks(service.getId(),
+                        ServiceStateManagementTaskType.START,
+                        TaskStatus.SUCCESSFUL);
         assertThat(startSuccessFulTasks.size()).isEqualTo(1);
+
+        MockHttpServletResponse startTaskDetailsResponse =
+                getManagementTaskDetailsByTaskId(startTaskId);
+        assertEquals(startTaskDetailsResponse.getStatus(), HttpStatus.OK.value());
+        assertEquals(startTaskDetailsResponse.getContentAsString(),
+                objectMapper.writeValueAsString(startSuccessFulTasks.getFirst()));
 
         service.setServiceState(ServiceState.RUNNING);
         // Setup
@@ -324,7 +358,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(restartFailedResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(restartFailedTaskId).isNotNull();
-        assertTaskStatus(restartFailedTaskId, ManagementTaskStatus.FAILED);
+        assertTaskStatus(restartFailedTaskId, TaskStatus.FAILED);
 
         service.setServiceState(ServiceState.RUNNING);
         BatchRebootServersResponse rebootSdkResponse = new BatchRebootServersResponse();
@@ -342,7 +376,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(restartResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(restartTaskId).isNotNull();
-        assertTaskStatus(restartTaskId, ManagementTaskStatus.SUCCESSFUL);
+        assertTaskStatus(restartTaskId, TaskStatus.SUCCESSFUL);
         service.setServiceState(ServiceState.RUNNING);
 
         // Setup
@@ -358,7 +392,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(stopFailedResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(stopFailedTaskId).isNotNull();
-        assertTaskStatus(stopFailedTaskId, ManagementTaskStatus.FAILED);
+        assertTaskStatus(stopFailedTaskId, TaskStatus.FAILED);
         service.setServiceState(ServiceState.RUNNING);
 
         BatchStopServersResponse stopSdkResponse = new BatchStopServersResponse();
@@ -376,7 +410,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(stopResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(stopTaskId).isNotNull();
-        assertTaskStatus(stopTaskId, ManagementTaskStatus.SUCCESSFUL);
+        assertTaskStatus(stopTaskId, TaskStatus.SUCCESSFUL);
         service.setServiceState(ServiceState.STOPPED);
 
         listAndDeleteTasks(service.getId());
@@ -384,7 +418,8 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
 
     void mockBatchStartServersInvoker(BatchStartServersResponse startResponse) {
-        SyncInvoker mockStartSyncInvoker = mock(SyncInvoker.class);
+        SyncInvoker<BatchStartServersRequest, BatchStartServersResponse> mockStartSyncInvoker =
+                mock(SyncInvoker.class);
         when(mockEcsClient.batchStartServersInvoker(any())).thenReturn(mockStartSyncInvoker);
         when(mockStartSyncInvoker.retryTimes(anyInt())).thenReturn(mockStartSyncInvoker);
         when(mockStartSyncInvoker.retryCondition(any())).thenReturn(mockStartSyncInvoker);
@@ -393,7 +428,8 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     }
 
     void mockBatchStopServersInvoker(BatchStopServersResponse stopResponse) {
-        SyncInvoker mockStopSyncInvoker = mock(SyncInvoker.class);
+        SyncInvoker<BatchStopServersRequest, BatchStopServersResponse> mockStopSyncInvoker =
+                mock(SyncInvoker.class);
         when(mockEcsClient.batchStopServersInvoker(any())).thenReturn(mockStopSyncInvoker);
         when(mockStopSyncInvoker.retryTimes(anyInt())).thenReturn(mockStopSyncInvoker);
         when(mockStopSyncInvoker.retryCondition(any())).thenReturn(mockStopSyncInvoker);
@@ -402,7 +438,8 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     }
 
     void mockBatchRebootServersInvoker(BatchRebootServersResponse rebootResponse) {
-        SyncInvoker mockRebootSyncInvoker = mock(SyncInvoker.class);
+        SyncInvoker<BatchRebootServersRequest, BatchRebootServersResponse> mockRebootSyncInvoker =
+                mock(SyncInvoker.class);
         when(mockEcsClient.batchRebootServersInvoker(any())).thenReturn(mockRebootSyncInvoker);
         when(mockRebootSyncInvoker.retryTimes(anyInt())).thenReturn(
                 mockRebootSyncInvoker);
@@ -412,7 +449,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     }
 
     void mockShowJobInvoker(ShowJobResponse jobResponse) {
-        SyncInvoker mockJobSyncInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ShowJobRequest, ShowJobResponse> mockJobSyncInvoker = mock(SyncInvoker.class);
         when(mockEcsClient.showJobInvoker(any())).thenReturn(mockJobSyncInvoker);
         when(mockJobSyncInvoker.retryTimes(anyInt())).thenReturn(mockJobSyncInvoker);
         when(mockJobSyncInvoker.retryCondition(any())).thenReturn(mockJobSyncInvoker);
@@ -420,7 +457,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         when(mockJobSyncInvoker.invoke()).thenReturn(jobResponse);
     }
 
-    void assertTaskStatus(UUID taskId, ManagementTaskStatus expectedStatus) throws Exception {
+    void assertTaskStatus(UUID taskId, TaskStatus expectedStatus) throws Exception {
         Thread.sleep(1000);
         MockHttpServletResponse response = getManagementTaskDetailsByTaskId(taskId);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -430,8 +467,6 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         assertThat(taskDetails.getTaskStatus()).isEqualTo(expectedStatus);
     }
 
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testServiceStateManageApisForFlexibleEngine() throws Exception {
         // Setup
         DeployServiceEntity service = setUpWellDeployServiceEntity();
@@ -443,8 +478,6 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         deleteCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK");
     }
 
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testServiceStateManageApisForOpenstack() throws Exception {
         addCredentialForOpenstack();
         DeployServiceEntity service = setUpWellDeployServiceEntity();
@@ -570,8 +603,6 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         assertThat(deleteTasksResponse.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @Test
-    @WithJwt(file = "jwt_user.json")
     void testServiceStateManageApisForScs() throws Exception {
         addCredentialForScs();
         DeployServiceEntity service = setUpWellDeployServiceEntity();
@@ -632,7 +663,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
     List<ServiceStateManagementTaskDetails> listServiceStateManagementTasks(UUID serviceId,
                                                                             ServiceStateManagementTaskType taskType,
-                                                                            ManagementTaskStatus taskStatus)
+                                                                            TaskStatus taskStatus)
             throws Exception {
         MockHttpServletRequestBuilder listRequestBuilder =
                 get("/xpanse/services/{id}/tasks", serviceId).accept(MediaType.APPLICATION_JSON);

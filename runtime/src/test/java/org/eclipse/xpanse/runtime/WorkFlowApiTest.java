@@ -12,8 +12,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.models.workflow.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
+import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class WorkFlowApiTest extends ApisTestCommon {
         testCompleteTask();
     }
 
-    WorkFlowTask getTaskWithStatus(TaskStatus status) {
+    WorkFlowTask getTaskWithStatus(WorkFlowTaskStatus status) {
         String processInstanceId = UUID.randomUUID().toString();
         String processDefinitionKey = "migrate";
         WorkFlowTask task = new WorkFlowTask();
@@ -62,12 +62,12 @@ class WorkFlowApiTest extends ApisTestCommon {
 
     void testQueryTasks() throws Exception {
         String userId = "1234566";
-        WorkFlowTask todoTask = getTaskWithStatus(TaskStatus.FAILED);
-        WorkFlowTask doneTask = getTaskWithStatus(TaskStatus.DONE);
+        WorkFlowTask todoTask = getTaskWithStatus(WorkFlowTaskStatus.FAILED);
+        WorkFlowTask doneTask = getTaskWithStatus(WorkFlowTaskStatus.DONE);
         // Setup
-        when(mockWorkflowUtils.queryAllTasks(TaskStatus.DONE, userId))
+        when(mockWorkflowUtils.queryAllTasks(WorkFlowTaskStatus.DONE, userId))
                 .thenReturn(List.of(doneTask));
-        when(mockWorkflowUtils.queryAllTasks(TaskStatus.FAILED, userId))
+        when(mockWorkflowUtils.queryAllTasks(WorkFlowTaskStatus.FAILED, userId))
                 .thenReturn(List.of(todoTask));
         when(mockWorkflowUtils.queryAllTasks(null, userId))
                 .thenReturn(List.of(doneTask, todoTask));

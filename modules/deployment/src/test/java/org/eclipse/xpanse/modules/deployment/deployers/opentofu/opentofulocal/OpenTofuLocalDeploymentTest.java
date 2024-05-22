@@ -37,7 +37,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResource
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -151,14 +151,14 @@ class OpenTofuLocalDeploymentTest {
         return deployRequest;
     }
 
-    String getFileContent(String fileName) {
+    String getFileContent() {
         String content = "";
         try {
-            ClassPathResource classPathResource = new ClassPathResource(fileName);
+            ClassPathResource classPathResource = new ClassPathResource(STATE_FILE_NAME);
             InputStream inputStream = classPathResource.getInputStream();
             content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log.error("Failed to read file: {}", fileName, e);
+            log.error("Failed to read file: {}", STATE_FILE_NAME, e);
         }
         return content;
     }
@@ -191,7 +191,8 @@ class OpenTofuLocalDeploymentTest {
     @Test
     void testModify() {
         DeployTask deployTask = getDeployTask(ocl);
-        String tfState = getFileContent(STATE_FILE_NAME);
+        UUID modificationId = UUID.randomUUID();
+        String tfState = getFileContent();
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
@@ -199,14 +200,16 @@ class OpenTofuLocalDeploymentTest {
 
         deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
 
-        DeployResult deployResult = openTofuLocalDeployment.modify(deployTask);
+        DeployResult deployResult = openTofuLocalDeployment.modify(modificationId, deployTask);
         Assertions.assertNotNull(deployResult);
         Assertions.assertNotNull(deployResult.getPrivateProperties());
         Assertions.assertNull(deployResult.getState());
 
         try {
+            UUID modificationId1 = UUID.randomUUID();
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts);
-            DeployResult deployResult1 = openTofuLocalDeployment.modify(deployTask1);
+            DeployResult deployResult1 =
+                    openTofuLocalDeployment.modify(modificationId1, deployTask1);
             Assertions.assertNotNull(deployResult1);
             Assertions.assertNotNull(deployResult1.getPrivateProperties());
             String tfState1 = deployResult1.getPrivateProperties().get(STATE_FILE_NAME);
@@ -220,7 +223,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testDestroy() {
-        String tfState = getFileContent(STATE_FILE_NAME);
+        String tfState = getFileContent();
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
@@ -269,14 +272,16 @@ class OpenTofuLocalDeploymentTest {
                 TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
-            String tfState = getFileContent(STATE_FILE_NAME);
+            String tfState = getFileContent();
             DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
             deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
             when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
                     deployServiceEntity);
             ocl.getDeployment().setDeployer(errorDeployer);
+            UUID modificationId = UUID.randomUUID();
             DeployTask deployTask = getDeployTask(ocl);
-            DeployResult deployResult = this.openTofuLocalDeployment.modify(deployTask);
+            DeployResult deployResult = this.openTofuLocalDeployment.modify(modificationId,
+                    deployTask);
             Assertions.assertNull(deployResult.getState());
             Assertions.assertNotEquals(DeployerTaskStatus.MODIFICATION_SUCCESSFUL.toValue(),
                     deployResult.getMessage());

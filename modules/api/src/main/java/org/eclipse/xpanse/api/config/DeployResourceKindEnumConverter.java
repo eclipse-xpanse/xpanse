@@ -5,7 +5,8 @@
 
 package org.eclipse.xpanse.api.config;
 
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import jakarta.annotation.Nonnull;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ public class DeployResourceKindEnumConverter
         implements Converter<String, DeployResourceKind> {
 
     @Override
-    public DeployResourceKind convert(String kind) {
+    public DeployResourceKind convert(@Nonnull String kind) {
         return DeployResourceKind.getByValue(kind);
     }
 }

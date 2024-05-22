@@ -11,15 +11,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
- * Task Status enums.
+ * Workflow Task Status enums.
  */
-public enum TaskStatus {
+public enum WorkFlowTaskStatus {
     DONE("done"),
     FAILED("failed");
 
     private final String status;
 
-    TaskStatus(String status) {
+    WorkFlowTaskStatus(String status) {
         this.status = status;
     }
 
@@ -27,10 +27,10 @@ public enum TaskStatus {
      * For Category deserialize.
      */
     @JsonCreator
-    public static TaskStatus getByValue(String status) {
-        for (TaskStatus taskStatus : values()) {
-            if (StringUtils.equalsIgnoreCase(taskStatus.status, status)) {
-                return taskStatus;
+    public static WorkFlowTaskStatus getByValue(String status) {
+        for (WorkFlowTaskStatus workflowTaskStatus : values()) {
+            if (StringUtils.equalsIgnoreCase(workflowTaskStatus.status, status)) {
+                return workflowTaskStatus;
             }
         }
         throw new UnsupportedEnumValueException(

@@ -15,8 +15,8 @@ import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ManagementTaskStatus;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -41,7 +41,7 @@ public class ServiceStateManagementTaskEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "TASK_STATUS", nullable = false)
-    private ManagementTaskStatus taskStatus;
+    private TaskStatus taskStatus;
 
     @Column(name = "ERROR_MSG", length = Integer.MAX_VALUE)
     private String errorMsg;

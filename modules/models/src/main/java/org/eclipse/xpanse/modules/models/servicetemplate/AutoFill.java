@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 
 /**
  * Define autofill properties for deployment variables.

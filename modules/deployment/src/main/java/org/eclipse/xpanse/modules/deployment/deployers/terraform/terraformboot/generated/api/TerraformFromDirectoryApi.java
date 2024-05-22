@@ -1,10 +1,8 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;
+
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.Response;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncModifyFromDirectoryRequest;
@@ -15,18 +13,28 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlanFromDirectoryRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
+import java.util.UUID;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromDirectoryApi")
@@ -60,11 +68,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDeployFromDirectory(String moduleDirectory, TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncDeployFromDirectoryWithHttpInfo(moduleDirectory, terraformAsyncDeployFromDirectoryRequest, xCustomRequestId);
+    public void asyncDeployFromDirectory(String moduleDirectory, TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest) throws RestClientException {
+        asyncDeployFromDirectoryWithHttpInfo(moduleDirectory, terraformAsyncDeployFromDirectoryRequest);
     }
 
     /**
@@ -77,11 +84,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncDeployFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDeployFromDirectoryWithHttpInfo(String moduleDirectory, TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncDeployFromDirectoryWithHttpInfo(String moduleDirectory, TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncDeployFromDirectoryRequest;
         
         // verify the required parameter 'moduleDirectory' is set
@@ -102,9 +108,6 @@ public class TerraformFromDirectoryApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
-
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*"
@@ -130,11 +133,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDestroyFromDirectory(String moduleDirectory, TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncDestroyFromDirectoryWithHttpInfo(moduleDirectory, terraformAsyncDestroyFromDirectoryRequest, xCustomRequestId);
+    public void asyncDestroyFromDirectory(String moduleDirectory, TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest) throws RestClientException {
+        asyncDestroyFromDirectoryWithHttpInfo(moduleDirectory, terraformAsyncDestroyFromDirectoryRequest);
     }
 
     /**
@@ -147,11 +149,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncDestroyFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDestroyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncDestroyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncDestroyFromDirectoryRequest;
         
         // verify the required parameter 'moduleDirectory' is set
@@ -172,9 +173,6 @@ public class TerraformFromDirectoryApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
-
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*"
@@ -200,11 +198,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncModifyFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncModifyFromDirectory(String moduleDirectory, TerraformAsyncModifyFromDirectoryRequest terraformAsyncModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncModifyFromDirectoryWithHttpInfo(moduleDirectory, terraformAsyncModifyFromDirectoryRequest, xCustomRequestId);
+    public void asyncModifyFromDirectory(String moduleDirectory, TerraformAsyncModifyFromDirectoryRequest terraformAsyncModifyFromDirectoryRequest) throws RestClientException {
+        asyncModifyFromDirectoryWithHttpInfo(moduleDirectory, terraformAsyncModifyFromDirectoryRequest);
     }
 
     /**
@@ -217,11 +214,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>202</b> - Accepted
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformAsyncModifyFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncModifyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformAsyncModifyFromDirectoryRequest terraformAsyncModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncModifyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformAsyncModifyFromDirectoryRequest terraformAsyncModifyFromDirectoryRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncModifyFromDirectoryRequest;
         
         // verify the required parameter 'moduleDirectory' is set
@@ -242,9 +238,6 @@ public class TerraformFromDirectoryApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
-
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*"
@@ -270,12 +263,11 @@ public class TerraformFromDirectoryApi {
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDeployFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult deployFromDirectory(String moduleDirectory, TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
-        return deployFromDirectoryWithHttpInfo(moduleDirectory, terraformDeployFromDirectoryRequest, xCustomRequestId).getBody();
+    public TerraformResult deployFromDirectory(String moduleDirectory, TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest) throws RestClientException {
+        return deployFromDirectoryWithHttpInfo(moduleDirectory, terraformDeployFromDirectoryRequest).getBody();
     }
 
     /**
@@ -288,11 +280,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDeployFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> deployFromDirectoryWithHttpInfo(String moduleDirectory, TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> deployFromDirectoryWithHttpInfo(String moduleDirectory, TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest) throws RestClientException {
         Object localVarPostBody = terraformDeployFromDirectoryRequest;
         
         // verify the required parameter 'moduleDirectory' is set
@@ -313,9 +304,6 @@ public class TerraformFromDirectoryApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
-
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*", "application/json"
@@ -341,12 +329,11 @@ public class TerraformFromDirectoryApi {
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDestroyFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult destroyFromDirectory(String moduleDirectory, TerraformDestroyFromDirectoryRequest terraformDestroyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
-        return destroyFromDirectoryWithHttpInfo(moduleDirectory, terraformDestroyFromDirectoryRequest, xCustomRequestId).getBody();
+    public TerraformResult destroyFromDirectory(String moduleDirectory, TerraformDestroyFromDirectoryRequest terraformDestroyFromDirectoryRequest) throws RestClientException {
+        return destroyFromDirectoryWithHttpInfo(moduleDirectory, terraformDestroyFromDirectoryRequest).getBody();
     }
 
     /**
@@ -359,11 +346,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformDestroyFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> destroyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformDestroyFromDirectoryRequest terraformDestroyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> destroyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformDestroyFromDirectoryRequest terraformDestroyFromDirectoryRequest) throws RestClientException {
         Object localVarPostBody = terraformDestroyFromDirectoryRequest;
         
         // verify the required parameter 'moduleDirectory' is set
@@ -384,9 +370,6 @@ public class TerraformFromDirectoryApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
-
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*", "application/json"
@@ -412,12 +395,11 @@ public class TerraformFromDirectoryApi {
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformModifyFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult modifyFromDirectory(String moduleDirectory, TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
-        return modifyFromDirectoryWithHttpInfo(moduleDirectory, terraformModifyFromDirectoryRequest, xCustomRequestId).getBody();
+    public TerraformResult modifyFromDirectory(String moduleDirectory, TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest) throws RestClientException {
+        return modifyFromDirectoryWithHttpInfo(moduleDirectory, terraformModifyFromDirectoryRequest).getBody();
     }
 
     /**
@@ -430,11 +412,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
      * @param terraformModifyFromDirectoryRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> modifyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> modifyFromDirectoryWithHttpInfo(String moduleDirectory, TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest) throws RestClientException {
         Object localVarPostBody = terraformModifyFromDirectoryRequest;
         
         // verify the required parameter 'moduleDirectory' is set
@@ -455,9 +436,6 @@ public class TerraformFromDirectoryApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
-
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*", "application/json"
@@ -553,12 +531,11 @@ public class TerraformFromDirectoryApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformValidationResult validateFromDirectory(String moduleDirectory, UUID xCustomRequestId) throws RestClientException {
-        return validateFromDirectoryWithHttpInfo(moduleDirectory, xCustomRequestId).getBody();
+    public TerraformValidationResult validateFromDirectory(String moduleDirectory) throws RestClientException {
+        return validateFromDirectoryWithHttpInfo(moduleDirectory).getBody();
     }
 
     /**
@@ -570,11 +547,10 @@ public class TerraformFromDirectoryApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformValidationResult> validateFromDirectoryWithHttpInfo(String moduleDirectory, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformValidationResult> validateFromDirectoryWithHttpInfo(String moduleDirectory) throws RestClientException {
         Object localVarPostBody = null;
         
         // verify the required parameter 'moduleDirectory' is set
@@ -590,9 +566,6 @@ public class TerraformFromDirectoryApi {
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
-
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = { 
             "*/*", "application/json"

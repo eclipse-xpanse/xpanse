@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -78,12 +78,13 @@ class FlexibleEngineMonitorIntegrationTest {
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
-        return new ResourceMetricsRequest(UUID.randomUUID(), deployResource, monitorResourceType, from, to, null,
+        return new ResourceMetricsRequest(UUID.randomUUID(), deployResource, monitorResourceType,
+                from, to, null,
                 onlyLastKnownMetric, "userId");
 
     }
 
-    void mockClientHttpRequest() throws Exception {
+    void mockClientHttpRequest() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
         when(this.client.getCesClient(any(), any())).thenReturn(getCesClient());
@@ -99,13 +100,14 @@ class FlexibleEngineMonitorIntegrationTest {
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
-        return new ServiceMetricsRequest(UUID.randomUUID(), List.of(deployResource), monitorResourceType, from, to,
+        return new ServiceMetricsRequest(UUID.randomUUID(), List.of(deployResource),
+                monitorResourceType, from, to,
                 null, onlyLastKnownMetric, "userId");
     }
 
 
     @Test
-    void testGetMetricsForResourceWithParamsOnlyLastKnownMetricTrue() throws Exception {
+    void testGetMetricsForResourceWithParamsOnlyLastKnownMetricTrue() {
 
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
@@ -118,14 +120,14 @@ class FlexibleEngineMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(1, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(1, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(2).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(3).getMetrics().size());
     }
 
     @Test
-    void testGetMetricsForResourceWithParamsFromAndTo() throws Exception {
+    void testGetMetricsForResourceWithParamsFromAndTo() {
         // Setup
         ResourceMetricsRequest resourceMetricRequest = setUpResourceMetricRequest(null,
                 System.currentTimeMillis() - FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
@@ -138,14 +140,14 @@ class FlexibleEngineMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(5, metrics.get(1).getMetrics().size());
         Assertions.assertEquals(5, metrics.get(2).getMetrics().size());
         Assertions.assertEquals(5, metrics.get(3).getMetrics().size());
     }
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeCpu() throws Exception {
+    void testGetMetricsForResourceWithParamsTypeCpu() {
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
@@ -159,13 +161,14 @@ class FlexibleEngineMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.CPU, metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(MonitorResourceType.CPU,
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeMem() throws Exception {
+    void testGetMetricsForResourceWithParamsTypeMem() {
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
@@ -179,13 +182,14 @@ class FlexibleEngineMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.MEM, metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(MonitorResourceType.MEM,
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeVmNetworkIncoming() throws Exception {
+    void testGetMetricsForResourceWithParamsTypeVmNetworkIncoming() {
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
@@ -201,13 +205,13 @@ class FlexibleEngineMonitorIntegrationTest {
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING,
-                metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
 
     @Test
-    void testGetMetricsForResourceWithParamsTypeVmNetworkOutgoing() throws Exception {
+    void testGetMetricsForResourceWithParamsTypeVmNetworkOutgoing() {
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
@@ -223,13 +227,13 @@ class FlexibleEngineMonitorIntegrationTest {
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING,
-                metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
 
     @Test
-    void testGetMetricsForServiceWithParamsOnlyLastKnownMetricTrue() throws Exception {
+    void testGetMetricsForServiceWithParamsOnlyLastKnownMetricTrue() {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(null, null, null, true);
@@ -241,14 +245,14 @@ class FlexibleEngineMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(1, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(1, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(2).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(3).getMetrics().size());
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsFromAndTo() throws Exception {
+    void testGetMetricsForServiceWithParamsFromAndTo() {
         // Setup
         ServiceMetricsRequest serviceMetricRequest = setUpServiceMetricRequest(null,
                 System.currentTimeMillis() - FlexibleEngineMonitorConstants.ONE_DAY_MILLISECONDS,
@@ -260,14 +264,14 @@ class FlexibleEngineMonitorIntegrationTest {
 
         // Verify the results
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(4, metrics.get(1).getMetrics().size());
         Assertions.assertEquals(4, metrics.get(2).getMetrics().size());
         Assertions.assertEquals(4, metrics.get(3).getMetrics().size());
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeCpu() throws Exception {
+    void testGetMetricsForServiceWithParamsTypeCpu() {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
@@ -280,12 +284,13 @@ class FlexibleEngineMonitorIntegrationTest {
 
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.CPU, metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(MonitorResourceType.CPU,
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeMem() throws Exception {
+    void testGetMetricsForServiceWithParamsTypeMem() {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
@@ -298,12 +303,13 @@ class FlexibleEngineMonitorIntegrationTest {
 
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.MEM, metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(MonitorResourceType.MEM,
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeVmNetworkIncoming() throws Exception {
+    void testGetMetricsForServiceWithParamsTypeVmNetworkIncoming() {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
@@ -318,12 +324,12 @@ class FlexibleEngineMonitorIntegrationTest {
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING,
-                metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
     @Test
-    void testGetMetricsForServiceWithParamsTypeVmNetworkOutgoing() throws Exception {
+    void testGetMetricsForServiceWithParamsTypeVmNetworkOutgoing() {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
@@ -338,14 +344,14 @@ class FlexibleEngineMonitorIntegrationTest {
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING,
-                metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
 
     private CredentialVariables getCredentialDefinition() {
         CredentialVariables credentialVariables =
-                (CredentialVariables) this.plugin.getCredentialDefinitions().get(0);
+                (CredentialVariables) this.plugin.getCredentialDefinitions().getFirst();
         for (CredentialVariable credentialVariable : credentialVariables.getVariables()) {
             if (credentialVariable.getName().equals(FlexibleEngineConstants.OS_ACCESS_KEY)) {
                 credentialVariable.setValue(FlexibleEngineConstants.OS_ACCESS_KEY);

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +31,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -38,6 +40,7 @@ import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -68,13 +71,13 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
     void mockOpenTofuMakerServices() {
         OpenTofuValidationResult validationResult = new OpenTofuValidationResult();
         validationResult.setValid(true);
-        when(mockOpenTofuFromScriptsApi.validateWithScripts(any(), any()))
+        when(mockOpenTofuFromScriptsApi.validateWithScripts(any()))
                 .thenReturn(validationResult);
-        doNothing().when(mockOpenTofuFromScriptsApi).asyncDeployWithScripts(any(), any());
+        doNothing().when(mockOpenTofuFromScriptsApi).asyncDeployWithScripts(any());
 
-        when(mockOpenTofuFromGitRepoApi.validateScriptsFromGitRepo(any(), any()))
+        when(mockOpenTofuFromGitRepoApi.validateScriptsFromGitRepo(any()))
                 .thenReturn(validationResult);
-        doNothing().when(mockOpenTofuFromGitRepoApi).asyncDeployFromGitRepo(any(), any());
+        doNothing().when(mockOpenTofuFromGitRepoApi).asyncDeployFromGitRepo(any());
     }
 
     @Test
@@ -93,7 +96,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                 Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
         final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/deploy/{task_id}", uuid)
+                        post("/webhook/tofu-maker/deploy/{serviceId}", uuid)
                                 .content(objectMapper.writeValueAsString(deployResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -105,7 +108,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/modify/{task_id}", uuid)
+                        post("/webhook/tofu-maker/modify/{serviceId}", uuid)
                                 .content(objectMapper.writeValueAsString(deployResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -123,7 +126,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                 Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
         final MockHttpServletResponse destroyCallbackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/destroy/{task_id}", uuid)
+                        post("/webhook/tofu-maker/destroy/{serviceId}", uuid)
                                 .content(objectMapper.writeValueAsString(destroyResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -135,7 +138,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse rollbackCallbackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/rollback/{task_id}", uuid)
+                        post("/webhook/tofu-maker/rollback/{serviceId}", uuid)
                                 .content(objectMapper.writeValueAsString(destroyResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -148,7 +151,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse purgeCallbackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/purge/{task_id}", uuid)
+                        post("/webhook/tofu-maker/purge/{serviceId}", uuid)
                                 .content(objectMapper.writeValueAsString(destroyResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -191,13 +194,13 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(deployRequest)))
                         .andReturn().getResponse();
-        UUID taskId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
+        UUID serviceId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
         // callback with deploy result
         OpenTofuResult deployResult = getOpenTofuResultByFile("deploy_success_callback.json");
         // Run the test
         final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/deploy/{task_id}",
-                                taskId)
+                        post("/webhook/tofu-maker/deploy/{serviceId}",
+                                serviceId)
                                 .content(objectMapper.writeValueAsString(deployResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -205,10 +208,25 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(deployCallbackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
+        // Modify the service
+        ModifyRequest modifyRequest = new ModifyRequest();
+        BeanUtils.copyProperties(deployRequest, modifyRequest);
+        modifyRequest.getServiceRequestProperties().put("admin_passwd", "2222222222@Qq");
+        final MockHttpServletResponse modifyResponse =
+                mockMvc.perform(put("/xpanse/services/modify/{serviceId}", serviceId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(modifyRequest)))
+                        .andReturn().getResponse();
+        UUID modificationId = objectMapper.readValue(modifyResponse.getContentAsString(),
+                UUID.class);
+        assertThat(modificationId).isNotNull();
+        assertThat(modificationId).isNotEqualTo(serviceId);
+        deployResult.setRequestId(modificationId);
         // Run the test
         final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/modify/{task_id}",
-                                taskId)
+                        post("/webhook/tofu-maker/modify/{serviceId}",
+                                serviceId)
                                 .content(objectMapper.writeValueAsString(deployResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -218,7 +236,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
         // destroy the service
         final MockHttpServletResponse destroyResponse =
-                mockMvc.perform(delete("/xpanse/services/{id}", taskId)
+                mockMvc.perform(delete("/xpanse/services/{id}", serviceId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
@@ -228,8 +246,8 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         OpenTofuResult destroyResult = getOpenTofuResultByFile("destroy_success_callback.json");
         // Run the test
         final MockHttpServletResponse destroyCallBackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/destroy/{task_id}",
-                                taskId)
+                        post("/webhook/tofu-maker/destroy/{serviceId}",
+                                serviceId)
                                 .content(objectMapper.writeValueAsString(destroyResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -239,8 +257,8 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse rollbackCallBackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/rollback/{task_id}",
-                                taskId)
+                        post("/webhook/tofu-maker/rollback/{serviceId}",
+                                serviceId)
                                 .content(objectMapper.writeValueAsString(destroyResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -250,8 +268,8 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse purgeCallBackResponse = mockMvc.perform(
-                        post("/webhook/tofu-maker/purge/{task_id}",
-                                taskId)
+                        post("/webhook/tofu-maker/purge/{serviceId}",
+                                serviceId)
                                 .content(objectMapper.writeValueAsString(destroyResult))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -261,7 +279,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
         unregisterServiceTemplate(serviceTemplate.getId());
         deployServiceStorage.deleteDeployService(
-                deployServiceStorage.findDeployServiceById(taskId));
+                deployServiceStorage.findDeployServiceById(serviceId));
 
     }
 

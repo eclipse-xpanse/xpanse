@@ -4,9 +4,8 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.service.enums;
+package org.eclipse.xpanse.modules.models.common.enums;
 
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
