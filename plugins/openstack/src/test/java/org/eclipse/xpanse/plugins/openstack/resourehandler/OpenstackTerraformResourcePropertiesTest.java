@@ -3,7 +3,7 @@ package org.eclipse.xpanse.plugins.openstack.resourehandler;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceProperties;
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +20,7 @@ class OpenstackTerraformResourcePropertiesTest {
         // Verify the results
         Assertions.assertNotNull(vmResult);
         Assertions.assertEquals(vmResult.getResourceKind(), DeployResourceKind.VM);
-        Assertions.assertTrue(vmResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(vmResult.getResourceProperties().isEmpty());
 
         // Run the test
         final DeployResourceProperties volumeResult =
@@ -29,7 +29,7 @@ class OpenstackTerraformResourcePropertiesTest {
         // Verify the results
         Assertions.assertNotNull(volumeResult);
         Assertions.assertEquals(volumeResult.getResourceKind(), DeployResourceKind.VOLUME);
-        Assertions.assertTrue(volumeResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(volumeResult.getResourceProperties().isEmpty());
 
 
         // Run the test
@@ -39,7 +39,7 @@ class OpenstackTerraformResourcePropertiesTest {
         // Verify the results
         Assertions.assertNotNull(subnetResult);
         Assertions.assertEquals(subnetResult.getResourceKind(), DeployResourceKind.SUBNET);
-        Assertions.assertTrue(subnetResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(subnetResult.getResourceProperties().isEmpty());
 
         // Run the test
         final DeployResourceProperties vpcResult =
@@ -48,7 +48,7 @@ class OpenstackTerraformResourcePropertiesTest {
         // Verify the results
         Assertions.assertNotNull(vpcResult);
         Assertions.assertEquals(vpcResult.getResourceKind(), DeployResourceKind.VPC);
-        Assertions.assertTrue(vpcResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(vpcResult.getResourceProperties().isEmpty());
 
         // Run the test
         final DeployResourceProperties publicIpResult =
@@ -57,7 +57,7 @@ class OpenstackTerraformResourcePropertiesTest {
         // Verify the results
         Assertions.assertNotNull(publicIpResult);
         Assertions.assertEquals(publicIpResult.getResourceKind(), DeployResourceKind.PUBLIC_IP);
-        Assertions.assertTrue(publicIpResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(publicIpResult.getResourceProperties().isEmpty());
 
         // Run the test
         final DeployResourceProperties secGroupResult =
@@ -67,7 +67,7 @@ class OpenstackTerraformResourcePropertiesTest {
         Assertions.assertNotNull(secGroupResult);
         Assertions.assertEquals(secGroupResult.getResourceKind(),
                 DeployResourceKind.SECURITY_GROUP);
-        Assertions.assertTrue(secGroupResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(secGroupResult.getResourceProperties().isEmpty());
 
         // Run the test
         final DeployResourceProperties secGroupRuleResult =
@@ -77,7 +77,7 @@ class OpenstackTerraformResourcePropertiesTest {
         Assertions.assertNotNull(secGroupRuleResult);
         Assertions.assertEquals(secGroupRuleResult.getResourceKind(),
                 DeployResourceKind.SECURITY_GROUP_RULE);
-        Assertions.assertTrue(secGroupRuleResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(secGroupRuleResult.getResourceProperties().isEmpty());
 
         // Run the test
         final DeployResourceProperties keypairResult =
@@ -86,7 +86,7 @@ class OpenstackTerraformResourcePropertiesTest {
         // Verify the results
         Assertions.assertNotNull(keypairResult);
         Assertions.assertEquals(keypairResult.getResourceKind(), DeployResourceKind.KEYPAIR);
-        Assertions.assertTrue(keypairResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(keypairResult.getResourceProperties().isEmpty());
     }
 
     @Test

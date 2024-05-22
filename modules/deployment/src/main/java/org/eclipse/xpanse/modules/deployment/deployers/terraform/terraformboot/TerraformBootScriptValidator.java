@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
+import static org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator.TASK_ID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
@@ -57,9 +59,7 @@ public class TerraformBootScriptValidator {
         try {
             TerraformValidationResult validate =
                     terraformFromScriptsApi.validateWithScripts(
-                            getValidateScriptsInOclRequest(deployment),
-                            Objects.nonNull(MDC.get("TASK_ID"))
-                                    ? UUID.fromString(MDC.get("TASK_ID")) : null);
+                            getValidateScriptsInOclRequest(deployment));
             try {
                 deploymentScriptValidationResult =
                         objectMapper.readValue(objectMapper.writeValueAsString(validate),
@@ -83,9 +83,7 @@ public class TerraformBootScriptValidator {
         try {
             TerraformValidationResult validate =
                     terraformFromGitRepoApi.validateScriptsFromGitRepo(
-                            getValidateScriptsInGitRepoRequest(deployment),
-                            Objects.nonNull(MDC.get("TASK_ID"))
-                                    ? UUID.fromString(MDC.get("TASK_ID")) : null);
+                            getValidateScriptsInGitRepoRequest(deployment));
             try {
                 deploymentScriptValidationResult =
                         objectMapper.readValue(objectMapper.writeValueAsString(validate),
@@ -104,6 +102,9 @@ public class TerraformBootScriptValidator {
             Deployment deployment) {
         TerraformDeployWithScriptsRequest request =
                 new TerraformDeployWithScriptsRequest();
+        UUID uuid = Objects.nonNull(MDC.get(TASK_ID))
+                ? UUID.fromString(MDC.get(TASK_ID)) : UUID.randomUUID();
+        request.setRequestId(uuid);
         request.setIsPlanOnly(false);
         request.setScripts(getFilesByOcl(deployment));
         return request;
@@ -113,6 +114,9 @@ public class TerraformBootScriptValidator {
             Deployment deployment) {
         TerraformDeployFromGitRepoRequest request =
                 new TerraformDeployFromGitRepoRequest();
+        UUID uuid = Objects.nonNull(MDC.get(TASK_ID))
+                ? UUID.fromString(MDC.get(TASK_ID)) : UUID.randomUUID();
+        request.setRequestId(uuid);
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(

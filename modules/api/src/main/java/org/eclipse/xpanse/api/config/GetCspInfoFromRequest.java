@@ -20,6 +20,8 @@ import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.DatabaseServiceMigrationStorage;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
+import org.eclipse.xpanse.modules.database.servicemodification.DatabaseServiceModificationAuditStorage;
+import org.eclipse.xpanse.modules.database.servicemodification.ServiceModificationAuditEntity;
 import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
@@ -54,6 +56,8 @@ public class GetCspInfoFromRequest {
     private DatabaseServiceMigrationStorage serviceMigrationStorage;
     @Resource
     private DatabaseServiceStateManagementTaskStorage managementTaskStorage;
+    @Resource
+    private DatabaseServiceModificationAuditStorage modificationAuditStorage;
 
     /**
      * Get Csp with the URL of Ocl.
@@ -210,6 +214,29 @@ public class GetCspInfoFromRequest {
         } catch (Exception e) {
             log.error("Get csp with service state management task id:{} failed.",
                     managementTaskId, e);
+        }
+        return null;
+    }
+
+
+    /**
+     * Get Csp with id of service modification audit.
+     *
+     * @param modificationAuditId id of service modification audit.
+     * @return csp.
+     */
+    public Csp getCspFromModificationAuditId(String modificationAuditId) {
+        try {
+            ServiceModificationAuditEntity audit =
+                    modificationAuditStorage.getEntityById(UUID.fromString(modificationAuditId));
+            if (Objects.nonNull(audit) && Objects.nonNull(audit.getServiceId())) {
+                DeployServiceEntity deployService =
+                        deployServiceStorage.findDeployServiceById(audit.getServiceId());
+                return deployService.getCsp();
+            }
+        } catch (Exception e) {
+            log.error("Get csp with service modification audit id:{} failed.",
+                    modificationAuditId, e);
         }
         return null;
     }

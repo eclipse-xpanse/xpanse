@@ -3,7 +3,7 @@
   "info": {
     "title": "Tofu-Maker API",
     "description": "RESTful Services to interact with Tofu-Maker runtime",
-    "version": "1.0.1-SNAPSHOT"
+    "version": "1.0.2-SNAPSHOT"
   },
   "servers": [
     {
@@ -44,17 +44,6 @@
         ],
         "description": "Deploy resources via OpenTofu",
         "operationId": "validateWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -86,8 +75,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -96,8 +85,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -126,17 +115,6 @@
         ],
         "description": "Get OpenTofu Plan as JSON string from the list of script files provided",
         "operationId": "planWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -168,8 +146,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -178,8 +156,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -208,17 +186,6 @@
         ],
         "description": "Modify resources via OpenTofu",
         "operationId": "modifyWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -250,8 +217,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -260,8 +227,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -290,17 +257,6 @@
         ],
         "description": "async modify resources via OpenTofu",
         "operationId": "asyncModifyWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -332,8 +288,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -342,8 +298,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -365,17 +321,6 @@
         ],
         "description": "Destroy resources via OpenTofu",
         "operationId": "destroyWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -407,8 +352,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -417,8 +362,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -447,17 +392,6 @@
         ],
         "description": "Deploy resources via OpenTofu",
         "operationId": "deployWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -489,8 +423,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -499,8 +433,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -529,17 +463,6 @@
         ],
         "description": "async deploy resources via OpenTofu",
         "operationId": "asyncDeployWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -571,8 +494,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -581,8 +504,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -604,17 +527,6 @@
         ],
         "description": "Deploy resources via OpenTofu",
         "operationId": "validateScriptsFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -646,8 +558,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -656,8 +568,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -686,17 +598,6 @@
         ],
         "description": "Get OpenTofu Plan as JSON string from the list of script files provided",
         "operationId": "planFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -728,8 +629,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -738,8 +639,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -768,17 +669,6 @@
         ],
         "description": "Modify resources via OpenTofu",
         "operationId": "modifyFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -810,8 +700,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -820,8 +710,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -850,17 +740,6 @@
         ],
         "description": "async modify resources via OpenTofu",
         "operationId": "asyncModifyFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -892,8 +771,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -902,8 +781,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -925,17 +804,6 @@
         ],
         "description": "Destroy resources via OpenTofu",
         "operationId": "destroyFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -967,8 +835,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -977,8 +845,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1007,17 +875,6 @@
         ],
         "description": "Deploy resources via OpenTofu",
         "operationId": "deployFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1049,8 +906,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1059,8 +916,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1089,17 +946,6 @@
         ],
         "description": "async deploy resources via OpenTofu",
         "operationId": "asyncDeployFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1131,8 +977,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1141,8 +987,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1172,15 +1018,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         ],
@@ -1215,8 +1052,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1225,8 +1062,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1264,15 +1101,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "requestBody": {
@@ -1306,8 +1134,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1316,8 +1144,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1355,15 +1183,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "requestBody": {
@@ -1397,8 +1216,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1407,8 +1226,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1438,15 +1257,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         ],
@@ -1481,8 +1291,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1491,8 +1301,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1530,15 +1340,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "requestBody": {
@@ -1572,8 +1373,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1582,8 +1383,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1626,8 +1427,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1636,8 +1437,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1675,15 +1476,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "responses": {
@@ -1707,8 +1499,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1717,8 +1509,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1747,17 +1539,6 @@
         ],
         "description": "Async destroy the OpenTofu modules",
         "operationId": "asyncDestroyWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1789,8 +1570,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1799,8 +1580,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1822,17 +1603,6 @@
         ],
         "description": "Async destroy the OpenTofu modules",
         "operationId": "asyncDestroyFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1864,8 +1634,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1874,8 +1644,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1905,15 +1675,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         ],
@@ -1948,8 +1709,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1958,8 +1719,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1997,15 +1758,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "requestBody": {
@@ -2039,8 +1791,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -2049,8 +1801,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -2111,6 +1863,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2170,6 +1927,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2217,6 +1979,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2254,6 +2021,11 @@
       "OpenTofuResult": {
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "commandStdOutput": {
             "type": "string",
             "description": "stdout of the command returned as string."
@@ -2289,6 +2061,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2356,6 +2133,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2395,6 +2177,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2436,6 +2223,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2489,6 +2281,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2518,6 +2315,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2556,6 +2358,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2595,6 +2402,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2629,6 +2441,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2663,6 +2480,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2688,6 +2510,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2718,6 +2545,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2750,6 +2582,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2780,6 +2617,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
@@ -2830,6 +2672,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2871,6 +2718,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2905,6 +2757,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2930,6 +2787,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {

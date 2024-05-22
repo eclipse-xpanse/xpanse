@@ -40,20 +40,19 @@ public class TerraformBootDeploymentPlanManage {
      * Method to get terraform plan from scripts provided in OCL.
      */
     public TerraformPlan getTerraformPlanFromScripts(DeployTask deployTask) {
-        return terraformFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(deployTask),
-                deployTask.getId());
+        return terraformFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(deployTask));
     }
 
     /**
      * Method to get terraform plan from scripts provided in GIT repo.
      */
     public TerraformPlan getTerraformPlanFromGitRepo(DeployTask deployTask) {
-        return terraformFromGitRepoApi.planFromGitRepo(getPlanFromGitRepoRequest(deployTask),
-                deployTask.getId());
+        return terraformFromGitRepoApi.planFromGitRepo(getPlanFromGitRepoRequest(deployTask));
     }
 
     private TerraformPlanWithScriptsRequest getPlanWithScriptsRequest(DeployTask task) {
         TerraformPlanWithScriptsRequest request = new TerraformPlanWithScriptsRequest();
+        request.setRequestId(task.getId());
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
@@ -62,6 +61,7 @@ public class TerraformBootDeploymentPlanManage {
 
     private TerraformPlanFromGitRepoRequest getPlanFromGitRepoRequest(DeployTask task) {
         TerraformPlanFromGitRepoRequest request = new TerraformPlanFromGitRepoRequest();
+        request.setRequestId(task.getId());
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
         request.setGitRepoDetails(

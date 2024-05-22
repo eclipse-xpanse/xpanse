@@ -149,8 +149,8 @@ class TerraformBootDeploymentTest {
             doReturn(new HashMap<>()).when(this.deployEnvironments)
                     .getCredentialVariablesByHostingType(any(), any(), any(), any());
             deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
-
-            DeployResult deployResult = terraformBootDeployment.modify(deployTask);
+            UUID modificationId = UUID.randomUUID();
+            DeployResult deployResult = terraformBootDeployment.modify(modificationId, deployTask);
 
             Assertions.assertNotNull(deployResult);
             Assertions.assertEquals(id, deployResult.getId());
@@ -179,7 +179,7 @@ class TerraformBootDeploymentTest {
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
 
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
-                .asyncDeployWithScripts(any(), any());
+                .asyncDeployWithScripts(any());
 
         ocl.getDeployment().setDeployer(invalidDeployer);
 
@@ -190,7 +190,7 @@ class TerraformBootDeploymentTest {
     @Test
     void testDestroy_ThrowsRestClientException() {
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
-                .asyncDestroyWithScripts(any(), any());
+                .asyncDestroyWithScripts(any());
 
         try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
                 TfResourceTransUtils.class)) {
@@ -216,7 +216,7 @@ class TerraformBootDeploymentTest {
     void testGetDeployPlanAsJson() {
         TerraformPlan terraformPlan = new TerraformPlan();
         terraformPlan.setPlan("plan");
-        when(terraformApi.planWithScripts(any(), any())).thenReturn(terraformPlan);
+        when(terraformApi.planWithScripts(any())).thenReturn(terraformPlan);
 
         String deployPlanJson = terraformBootDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
@@ -226,7 +226,7 @@ class TerraformBootDeploymentTest {
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
 
-        when(terraformApi.planWithScripts(any(), any())).thenThrow(
+        when(terraformApi.planWithScripts(any())).thenThrow(
                 new TerraformBootRequestFailedException("IO error"));
 
         Assertions.assertThrows(TerraformBootRequestFailedException.class,

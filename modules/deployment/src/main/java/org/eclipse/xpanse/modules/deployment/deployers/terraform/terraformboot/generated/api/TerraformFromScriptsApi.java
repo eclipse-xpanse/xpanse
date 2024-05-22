@@ -1,9 +1,8 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;
+
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.Response;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncModifyFromScriptsRequest;
@@ -14,18 +13,27 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlanWithScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi")
@@ -58,11 +66,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDeployWithScripts(TerraformAsyncDeployFromScriptsRequest terraformAsyncDeployFromScriptsRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncDeployWithScriptsWithHttpInfo(terraformAsyncDeployFromScriptsRequest, xCustomRequestId);
+    public void asyncDeployWithScripts(TerraformAsyncDeployFromScriptsRequest terraformAsyncDeployFromScriptsRequest) throws RestClientException {
+        asyncDeployWithScriptsWithHttpInfo(terraformAsyncDeployFromScriptsRequest);
     }
 
     /**
@@ -74,11 +81,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDeployWithScriptsWithHttpInfo(TerraformAsyncDeployFromScriptsRequest terraformAsyncDeployFromScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncDeployWithScriptsWithHttpInfo(TerraformAsyncDeployFromScriptsRequest terraformAsyncDeployFromScriptsRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncDeployFromScriptsRequest;
         
         // verify the required parameter 'terraformAsyncDeployFromScriptsRequest' is set
@@ -92,9 +98,6 @@ public class TerraformFromScriptsApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*"
          };
@@ -107,10 +110,7 @@ public class TerraformFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/scripts/deploy/async", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/scripts/deploy/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -121,11 +121,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDestroyWithScripts(TerraformAsyncDestroyFromScriptsRequest terraformAsyncDestroyFromScriptsRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncDestroyWithScriptsWithHttpInfo(terraformAsyncDestroyFromScriptsRequest, xCustomRequestId);
+    public void asyncDestroyWithScripts(TerraformAsyncDestroyFromScriptsRequest terraformAsyncDestroyFromScriptsRequest) throws RestClientException {
+        asyncDestroyWithScriptsWithHttpInfo(terraformAsyncDestroyFromScriptsRequest);
     }
 
     /**
@@ -137,11 +136,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDestroyWithScriptsWithHttpInfo(TerraformAsyncDestroyFromScriptsRequest terraformAsyncDestroyFromScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncDestroyWithScriptsWithHttpInfo(TerraformAsyncDestroyFromScriptsRequest terraformAsyncDestroyFromScriptsRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncDestroyFromScriptsRequest;
         
         // verify the required parameter 'terraformAsyncDestroyFromScriptsRequest' is set
@@ -155,9 +153,6 @@ public class TerraformFromScriptsApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*"
          };
@@ -170,10 +165,7 @@ public class TerraformFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/scripts/destroy/async", HttpMethod.DELETE,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/scripts/destroy/async", HttpMethod.DELETE, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -184,11 +176,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncModifyFromScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncModifyWithScripts(TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncModifyWithScriptsWithHttpInfo(terraformAsyncModifyFromScriptsRequest, xCustomRequestId);
+    public void asyncModifyWithScripts(TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest) throws RestClientException {
+        asyncModifyWithScriptsWithHttpInfo(terraformAsyncModifyFromScriptsRequest);
     }
 
     /**
@@ -200,11 +191,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncModifyFromScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncModifyWithScriptsWithHttpInfo(TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncModifyWithScriptsWithHttpInfo(TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncModifyFromScriptsRequest;
         
         // verify the required parameter 'terraformAsyncModifyFromScriptsRequest' is set
@@ -218,9 +208,6 @@ public class TerraformFromScriptsApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*"
          };
@@ -233,10 +220,7 @@ public class TerraformFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/scripts/modify/async", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/scripts/modify/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -247,12 +231,11 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult deployWithScripts(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
-        return deployWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest, xCustomRequestId).getBody();
+    public TerraformResult deployWithScripts(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest) throws RestClientException {
+        return deployWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest).getBody();
     }
 
     /**
@@ -264,11 +247,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> deployWithScriptsWithHttpInfo(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> deployWithScriptsWithHttpInfo(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = terraformDeployWithScriptsRequest;
         
         // verify the required parameter 'terraformDeployWithScriptsRequest' is set
@@ -282,9 +264,6 @@ public class TerraformFromScriptsApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -297,10 +276,7 @@ public class TerraformFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/scripts/deploy", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/scripts/deploy", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -311,12 +287,11 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult destroyWithScripts(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
-        return destroyWithScriptsWithHttpInfo(terraformDestroyWithScriptsRequest, xCustomRequestId).getBody();
+    public TerraformResult destroyWithScripts(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest) throws RestClientException {
+        return destroyWithScriptsWithHttpInfo(terraformDestroyWithScriptsRequest).getBody();
     }
 
     /**
@@ -328,11 +303,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> destroyWithScriptsWithHttpInfo(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> destroyWithScriptsWithHttpInfo(TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = terraformDestroyWithScriptsRequest;
         
         // verify the required parameter 'terraformDestroyWithScriptsRequest' is set
@@ -346,9 +320,6 @@ public class TerraformFromScriptsApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -361,10 +332,7 @@ public class TerraformFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/scripts/destroy", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/scripts/destroy", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -375,12 +343,11 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformModifyWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult modifyWithScripts(TerraformModifyWithScriptsRequest terraformModifyWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
-        return modifyWithScriptsWithHttpInfo(terraformModifyWithScriptsRequest, xCustomRequestId).getBody();
+    public TerraformResult modifyWithScripts(TerraformModifyWithScriptsRequest terraformModifyWithScriptsRequest) throws RestClientException {
+        return modifyWithScriptsWithHttpInfo(terraformModifyWithScriptsRequest).getBody();
     }
 
     /**
@@ -392,11 +359,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformModifyWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> modifyWithScriptsWithHttpInfo(TerraformModifyWithScriptsRequest terraformModifyWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> modifyWithScriptsWithHttpInfo(TerraformModifyWithScriptsRequest terraformModifyWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = terraformModifyWithScriptsRequest;
         
         // verify the required parameter 'terraformModifyWithScriptsRequest' is set
@@ -410,9 +376,6 @@ public class TerraformFromScriptsApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -425,10 +388,7 @@ public class TerraformFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/scripts/modify", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/scripts/modify", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -439,12 +399,11 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformPlanWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformPlan planWithScripts(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
-        return planWithScriptsWithHttpInfo(terraformPlanWithScriptsRequest, xCustomRequestId).getBody();
+    public TerraformPlan planWithScripts(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest) throws RestClientException {
+        return planWithScriptsWithHttpInfo(terraformPlanWithScriptsRequest).getBody();
     }
 
     /**
@@ -456,11 +415,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformPlanWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformPlan&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformPlan> planWithScriptsWithHttpInfo(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformPlan> planWithScriptsWithHttpInfo(TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = terraformPlanWithScriptsRequest;
         
         // verify the required parameter 'terraformPlanWithScriptsRequest' is set
@@ -474,9 +432,6 @@ public class TerraformFromScriptsApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -489,10 +444,7 @@ public class TerraformFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformPlan> localReturnType = new ParameterizedTypeReference<TerraformPlan>() {};
-        return apiClient.invokeAPI("/terraform-boot/scripts/plan", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/scripts/plan", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -503,12 +455,11 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformValidationResult validateWithScripts(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
-        return validateWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest, xCustomRequestId).getBody();
+    public TerraformValidationResult validateWithScripts(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest) throws RestClientException {
+        return validateWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest).getBody();
     }
 
     /**
@@ -520,11 +471,10 @@ public class TerraformFromScriptsApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployWithScriptsRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformValidationResult> validateWithScriptsWithHttpInfo(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformValidationResult> validateWithScriptsWithHttpInfo(TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = terraformDeployWithScriptsRequest;
         
         // verify the required parameter 'terraformDeployWithScriptsRequest' is set
@@ -538,9 +488,6 @@ public class TerraformFromScriptsApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -553,9 +500,6 @@ public class TerraformFromScriptsApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformValidationResult> localReturnType = new ParameterizedTypeReference<TerraformValidationResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/scripts/validate", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/scripts/validate", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 }

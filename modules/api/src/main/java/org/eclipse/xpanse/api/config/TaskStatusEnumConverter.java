@@ -5,7 +5,8 @@
 
 package org.eclipse.xpanse.api.config;
 
-import org.eclipse.xpanse.modules.models.workflow.TaskStatus;
+import jakarta.annotation.Nonnull;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class TaskStatusEnumConverter implements Converter<String, TaskStatus> {
 
     @Override
-    public TaskStatus convert(String status) {
+    public TaskStatus convert(@Nonnull String status) {
         return TaskStatus.getByValue(status);
     }
 }

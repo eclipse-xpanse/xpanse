@@ -6,12 +6,15 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks;
 
 import jakarta.annotation.Resource;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
+import org.eclipse.xpanse.modules.database.servicemodification.DatabaseServiceModificationAuditStorage;
+import org.eclipse.xpanse.modules.database.servicemodification.ServiceModificationAuditEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
@@ -23,8 +26,9 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
@@ -39,28 +43,23 @@ import org.springframework.stereotype.Component;
 public class TerraformDeploymentResultCallbackManager {
 
     @Resource
-    DeployServiceEntityHandler deployServiceEntityHandler;
-
+    private DeployServiceEntityHandler deployServiceEntityHandler;
     @Resource
-    ResourceHandlerManager resourceHandlerManager;
-
+    private ResourceHandlerManager resourceHandlerManager;
     @Resource
-    DeployResultManager deployResultManager;
-
+    private DeployResultManager deployResultManager;
     @Resource
     private DeployServiceEntityToDeployTaskConverter deployServiceEntityToDeployTaskConverter;
-
     @Resource
     private DeployService deployService;
-
     @Resource
     private MigrationService migrationService;
-
     @Resource
     private WorkflowUtils workflowUtils;
-
     @Resource
     private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource
+    private DatabaseServiceModificationAuditStorage modificationAuditStorage;
 
     /**
      * Callback method after the deployment task is completed.
@@ -87,8 +86,24 @@ public class TerraformDeploymentResultCallbackManager {
     /**
      * Callback method after the modification task is completed.
      */
-    public void modifyCallback(UUID taskId, TerraformResult terraformResult) {
-        handleCallbackTerraformResult(taskId, terraformResult, DeploymentScenario.MODIFY);
+    public void modifyCallback(UUID serviceId, TerraformResult terraformResult) {
+        handleCallbackTerraformResult(serviceId, terraformResult, DeploymentScenario.MODIFY);
+        updateModificationAuditWithResult(terraformResult);
+    }
+
+    private void updateModificationAuditWithResult(TerraformResult result) {
+        ServiceModificationAuditEntity auditEntityInProgress =
+                modificationAuditStorage.getEntityById(result.getRequestId());
+        if (Objects.nonNull(auditEntityInProgress)) {
+            if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
+                auditEntityInProgress.setTaskStatus(TaskStatus.SUCCESSFUL);
+            } else {
+                auditEntityInProgress.setTaskStatus(TaskStatus.FAILED);
+                auditEntityInProgress.setErrorMsg(result.getCommandStdError());
+            }
+            auditEntityInProgress.setCompletedTime(OffsetDateTime.now());
+            modificationAuditStorage.storeAndFlush(auditEntityInProgress);
+        }
     }
 
     /**

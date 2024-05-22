@@ -5,7 +5,8 @@
 
 package org.eclipse.xpanse.api.config;
 
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import jakarta.annotation.Nonnull;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class ServiceDeploymentStateConverter implements Converter<String, ServiceDeploymentState> {
 
     @Override
-    public ServiceDeploymentState convert(String status) {
+    public ServiceDeploymentState convert(@Nonnull String status) {
         return ServiceDeploymentState.getByValue(status);
     }
 }

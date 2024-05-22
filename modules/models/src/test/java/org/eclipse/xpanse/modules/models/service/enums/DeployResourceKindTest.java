@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.service.deploy.enums;
+package org.eclipse.xpanse.modules.models.service.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,18 +30,18 @@ class DeployResourceKindTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(vmKind, DeployResourceKind.UNKNOWN.getByValue("vm"));
-        assertEquals(containerKind, DeployResourceKind.UNKNOWN.getByValue("container"));
-        assertEquals(publicIpKind, DeployResourceKind.UNKNOWN.getByValue("publicIP"));
-        assertEquals(vpcKind, DeployResourceKind.UNKNOWN.getByValue("vpc"));
-        assertEquals(volumeKind, DeployResourceKind.UNKNOWN.getByValue("volume"));
-        assertEquals(unknownKind, DeployResourceKind.UNKNOWN.getByValue("unknown"));
-        assertEquals(securityGroupKind, DeployResourceKind.UNKNOWN.getByValue("Security_Group"));
+        assertEquals(vmKind, DeployResourceKind.getByValue("vm"));
+        assertEquals(containerKind, DeployResourceKind.getByValue("container"));
+        assertEquals(publicIpKind, DeployResourceKind.getByValue("publicIP"));
+        assertEquals(vpcKind, DeployResourceKind.getByValue("vpc"));
+        assertEquals(volumeKind, DeployResourceKind.getByValue("volume"));
+        assertEquals(unknownKind, DeployResourceKind.getByValue("unknown"));
+        assertEquals(securityGroupKind, DeployResourceKind.getByValue("Security_Group"));
         assertEquals(securityGroupRuleKind,
-                DeployResourceKind.UNKNOWN.getByValue("security_Group_rule"));
-        assertEquals(keyPairKind, DeployResourceKind.UNKNOWN.getByValue("Keypair"));
+                DeployResourceKind.getByValue("security_Group_rule"));
+        assertEquals(keyPairKind, DeployResourceKind.getByValue("Keypair"));
         assertThrows(UnsupportedEnumValueException.class,
-                () -> DeployResourceKind.UNKNOWN.getByValue("unavailable"));
+                () -> DeployResourceKind.getByValue("unavailable"));
     }
 
     @Test

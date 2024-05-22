@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 
 
 /**

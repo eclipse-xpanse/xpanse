@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -124,7 +124,7 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(1, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(1, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(2).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(3).getMetrics().size());
@@ -146,7 +146,7 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(5, metrics.get(1).getMetrics().size());
         Assertions.assertEquals(5, metrics.get(2).getMetrics().size());
         Assertions.assertEquals(5, metrics.get(3).getMetrics().size());
@@ -167,8 +167,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.CPU, metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(MonitorResourceType.CPU, metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
 
@@ -187,8 +187,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.MEM, metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(MonitorResourceType.MEM, metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
 
@@ -209,8 +209,8 @@ class HuaweiCloudMonitorIntegrationTest {
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING,
-                metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
 
@@ -231,8 +231,8 @@ class HuaweiCloudMonitorIntegrationTest {
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING,
-                metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(5, metrics.get(0).getMetrics().size());
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
 
@@ -249,7 +249,7 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(1, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(1, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(1, metrics.get(1).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(2).getMetrics().size());
         Assertions.assertEquals(1, metrics.get(3).getMetrics().size());
@@ -269,7 +269,7 @@ class HuaweiCloudMonitorIntegrationTest {
 
         // Verify the results
         Assertions.assertEquals(4, metrics.size());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
         Assertions.assertEquals(4, metrics.get(1).getMetrics().size());
         Assertions.assertEquals(4, metrics.get(2).getMetrics().size());
         Assertions.assertEquals(4, metrics.get(3).getMetrics().size());
@@ -289,8 +289,8 @@ class HuaweiCloudMonitorIntegrationTest {
 
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.CPU, metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(MonitorResourceType.CPU, metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
     @Test
@@ -307,8 +307,8 @@ class HuaweiCloudMonitorIntegrationTest {
 
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.MEM, metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+        Assertions.assertEquals(MonitorResourceType.MEM, metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
     @Test
@@ -327,8 +327,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING,
-                metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
     @Test
@@ -347,14 +347,14 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
         Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING,
-                metrics.get(0).getMonitorResourceType());
-        Assertions.assertEquals(4, metrics.get(0).getMetrics().size());
+                metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
 
     private CredentialVariables getCredentialDefinition() {
         CredentialVariables credentialVariables =
-                (CredentialVariables) this.plugin.getCredentialDefinitions().get(0);
+                (CredentialVariables) this.plugin.getCredentialDefinitions().getFirst();
         for (CredentialVariable credentialVariable : credentialVariables.getVariables()) {
             if (credentialVariable.getName().equals(HuaweiCloudMonitorConstants.HW_ACCESS_KEY)) {
                 credentialVariable.setValue(HuaweiCloudMonitorConstants.HW_ACCESS_KEY);

@@ -13,8 +13,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ManagementTaskStatus;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 
 /**
  * Define view object for detail of the service state management task.
@@ -36,18 +36,16 @@ public class ServiceStateManagementTaskDetails {
 
     @NotNull
     @Schema(description = "The status of the service state management task.")
-    private ManagementTaskStatus taskStatus;
+    private TaskStatus taskStatus;
 
     @Schema(description = "The error message of the failed management task.")
     private String errorMsg;
 
-    @NotNull
     @Schema(description = "The started time of the task.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime startedTime;
 
-    @NotNull
     @Schema(description = "The completed time of the task.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)

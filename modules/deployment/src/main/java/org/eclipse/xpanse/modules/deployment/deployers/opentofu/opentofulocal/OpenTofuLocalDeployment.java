@@ -119,10 +119,11 @@ public class OpenTofuLocalDeployment implements Deployer {
     /**
      * Modify the DeployTask.
      *
-     * @param task the task for the deployment.
+     * @param modificationId the modification id.
+     * @param task           the task for the deployment.
      */
     @Override
-    public DeployResult modify(DeployTask task) {
+    public DeployResult modify(UUID modificationId, DeployTask task) {
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(task.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(
@@ -135,7 +136,7 @@ public class OpenTofuLocalDeployment implements Deployer {
         }
         DeployResult modifyResult = new DeployResult();
         modifyResult.setId(task.getId());
-        asyncExecModify(task, resourceState);
+        asyncExecModify(modificationId, task, resourceState);
         return modifyResult;
     }
 
@@ -148,6 +149,7 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
+            openTofuResult.setRequestId(task.getId());
             try {
                 executor.deploy();
                 openTofuResult.setCommandSuccessful(true);
@@ -169,6 +171,7 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
+            openTofuResult.setRequestId(task.getId());
             try {
                 executor.destroy();
                 openTofuResult.setCommandSuccessful(true);
@@ -184,7 +187,7 @@ public class OpenTofuLocalDeployment implements Deployer {
         });
     }
 
-    private void asyncExecModify(DeployTask task, String tfState) {
+    private void asyncExecModify(UUID modificationId, DeployTask task, String tfState) {
         String workspace = getWorkspacePath(task.getId());
         prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
         prepareDeployWorkspaceWithScripts(task, workspace);
@@ -192,6 +195,7 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
+            openTofuResult.setRequestId(modificationId);
             try {
                 executor.deploy();
                 openTofuResult.setCommandSuccessful(true);

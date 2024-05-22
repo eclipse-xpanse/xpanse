@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -55,8 +55,6 @@ class DeployResourceEntityTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(test, test);
-        assertEquals(test.hashCode(), test.hashCode());
 
         Object o = new Object();
         assertNotEquals(test, o);

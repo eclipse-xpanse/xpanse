@@ -57,7 +57,7 @@ public class TerraformBootServiceDestroyer {
         TerraformAsyncDestroyFromScriptsRequest request =
                 getDestroyFromScriptsRequest(deployTask, resourceState);
         try {
-            terraformFromScriptsApi.asyncDestroyWithScripts(request, deployTask.getId());
+            terraformFromScriptsApi.asyncDestroyWithScripts(request);
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -78,7 +78,7 @@ public class TerraformBootServiceDestroyer {
         TerraformAsyncDestroyFromGitRepoRequest request =
                 getDestroyFromGitRepoRequest(deployTask, resourceState);
         try {
-            terraformFromGitRepoApi.asyncDestroyFromGitRepo(request, deployTask.getId());
+            terraformFromGitRepoApi.asyncDestroyFromGitRepo(request);
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -93,6 +93,7 @@ public class TerraformBootServiceDestroyer {
             throws TerraformBootRequestFailedException {
         TerraformAsyncDestroyFromScriptsRequest request =
                 new TerraformAsyncDestroyFromScriptsRequest();
+        request.setRequestId(task.getId());
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
@@ -106,6 +107,7 @@ public class TerraformBootServiceDestroyer {
             throws TerraformBootRequestFailedException {
         TerraformAsyncDestroyFromGitRepoRequest request =
                 new TerraformAsyncDestroyFromGitRepoRequest();
+        request.setRequestId(task.getId());
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

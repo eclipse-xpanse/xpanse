@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 
 /**
  * The result of the deployment.

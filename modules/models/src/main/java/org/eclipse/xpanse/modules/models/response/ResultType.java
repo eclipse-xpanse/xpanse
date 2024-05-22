@@ -67,6 +67,7 @@ public enum ResultType {
     SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED("Service Flavor Downgrade Not Allowed"),
     BILLING_MODE_NOT_SUPPORTED("Billing Mode Not Supported"),
     SERVICE_STATE_MANAGEMENT_TASK_NOT_FOUND("Service State Management Task Not Found"),
+    SERVICE_MODIFICATION_AUDIT_NOT_FOUND("Service Modification Audit Not Found"),
     INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details");
 
     private final String value;

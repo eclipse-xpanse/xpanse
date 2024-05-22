@@ -11,12 +11,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * ModifyRequest model.
  */
-@ToString(callSuper = true)
 @Data
 public class ModifyRequest implements Serializable {
 

@@ -47,7 +47,7 @@ public class TerraformBootServiceDeployer {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromScriptsRequest request = getDeployFromScriptsRequest(deployTask);
         try {
-            terraformFromScriptsApi.asyncDeployWithScripts(request, deployTask.getId());
+            terraformFromScriptsApi.asyncDeployWithScripts(request);
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -64,7 +64,7 @@ public class TerraformBootServiceDeployer {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromGitRepoRequest request = getDeployFromGitRepoRequest(deployTask);
         try {
-            terraformFromGitRepoApi.asyncDeployFromGitRepo(request, deployTask.getId());
+            terraformFromGitRepoApi.asyncDeployFromGitRepo(request);
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -77,6 +77,7 @@ public class TerraformBootServiceDeployer {
     private TerraformAsyncDeployFromScriptsRequest getDeployFromScriptsRequest(DeployTask task) {
         TerraformAsyncDeployFromScriptsRequest request =
                 new TerraformAsyncDeployFromScriptsRequest();
+        request.setRequestId(task.getId());
         request.setIsPlanOnly(false);
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
@@ -88,6 +89,7 @@ public class TerraformBootServiceDeployer {
     private TerraformAsyncDeployFromGitRepoRequest getDeployFromGitRepoRequest(DeployTask task) {
         TerraformAsyncDeployFromGitRepoRequest request =
                 new TerraformAsyncDeployFromGitRepoRequest();
+        request.setRequestId(task.getId());
         request.setIsPlanOnly(false);
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

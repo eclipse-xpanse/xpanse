@@ -1,31 +1,7 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TimeZone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.auth.Authentication;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.auth.OAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -50,18 +26,59 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TimeZone;
+import java.util.function.Supplier;
+import java.time.OffsetDateTime;
+
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.auth.Authentication;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.auth.OAuth;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient")
 public class ApiClient extends JavaTimeFormatter {
-    private final HttpHeaders defaultHeaders = new HttpHeaders();
+    public enum CollectionFormat {
+        CSV(","), TSV("\t"), SSV(" "), PIPES("|"), MULTI(null);
+
+        private final String separator;
+
+        private CollectionFormat(String separator) {
+            this.separator = separator;
+        }
+
+        private String collectionToString(Collection<?> collection) {
+            return StringUtils.collectionToDelimitedString(collection, separator);
+        }
+    }
 
     private boolean debugging = false;
-    private final MultiValueMap<String, String> defaultCookies =
-            new LinkedMultiValueMap<String, String>();
-    private final RestTemplate restTemplate;
+
+    private HttpHeaders defaultHeaders = new HttpHeaders();
+    private MultiValueMap<String, String> defaultCookies = new LinkedMultiValueMap<String, String>();
 
     private int maxAttemptsForRetry = 1;
 
@@ -69,18 +86,7 @@ public class ApiClient extends JavaTimeFormatter {
 
     private String basePath = "http://localhost:9092";
 
-    /**
-     * Add a default header.
-     *
-     * @param name  The header's name
-     * @param value The header's value
-     * @return ApiClient this client
-     */
-    public ApiClient addDefaultHeader(String name, String value) {
-        defaultHeaders.remove(name);
-        defaultHeaders.add(name, value);
-        return this;
-    }
+    private RestTemplate restTemplate;
 
     private Map<String, Authentication> authentications;
 
@@ -225,6 +231,21 @@ public class ApiClient extends JavaTimeFormatter {
     }
 
     /**
+     * Add a default header.
+     *
+     * @param name  The header's name
+     * @param value The header's value
+     * @return ApiClient this client
+     */
+    public ApiClient addDefaultHeader(String name, String value) {
+        if (defaultHeaders.containsKey(name)) {
+            defaultHeaders.remove(name);
+        }
+        defaultHeaders.add(name, value);
+        return this;
+    }
+
+    /**
      * Add a default cookie.
      *
      * @param name  The cookie's name
@@ -232,36 +253,11 @@ public class ApiClient extends JavaTimeFormatter {
      * @return ApiClient this client
      */
     public ApiClient addDefaultCookie(String name, String value) {
-        defaultCookies.remove(name);
+        if (defaultCookies.containsKey(name)) {
+            defaultCookies.remove(name);
+        }
         defaultCookies.add(name, value);
         return this;
-    }
-
-    /**
-     * Format the given parameter object into string.
-     *
-     * @param param the object to convert
-     * @return String the parameter represented as a String
-     */
-    public String parameterToString(Object param) {
-        if (param == null) {
-            return "";
-        } else if (param instanceof Date) {
-            return formatDate((Date) param);
-        } else if (param instanceof OffsetDateTime) {
-            return formatOffsetDateTime((OffsetDateTime) param);
-        } else if (param instanceof Collection) {
-            StringBuilder b = new StringBuilder();
-            for (Object o : (Collection<?>) param) {
-                if (b.length() > 0) {
-                    b.append(",");
-                }
-                b.append(o);
-            }
-            return b.toString();
-        } else {
-            return String.valueOf(param);
-        }
     }
 
     public void setDebugging(boolean debugging) {
@@ -339,39 +335,30 @@ public class ApiClient extends JavaTimeFormatter {
     }
 
     /**
-     * Include queryParams in uriParams taking into account the paramName
+     * Format the given parameter object into string.
      *
-     * @param queryParams The query parameters
-     * @param uriParams The path parameters
-     * return templatized query string
+     * @param param the object to convert
+     * @return String the parameter represented as a String
      */
-    public String generateQueryUri(MultiValueMap<String, String> queryParams,
-                                   Map<String, Object> uriParams) {
-        StringBuilder queryBuilder = new StringBuilder();
-        queryParams.forEach((name, values) -> {
-            final String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
-            if (CollectionUtils.isEmpty(values)) {
-                if (queryBuilder.length() != 0) {
-                    queryBuilder.append('&');
+    public String parameterToString(Object param) {
+        if (param == null) {
+            return "";
+        } else if (param instanceof Date) {
+            return formatDate( (Date) param);
+        } else if (param instanceof OffsetDateTime) {
+            return formatOffsetDateTime((OffsetDateTime) param);
+        } else if (param instanceof Collection) {
+            StringBuilder b = new StringBuilder();
+            for (Object o : (Collection<?>) param) {
+                if (b.length() > 0) {
+                    b.append(",");
                 }
-                queryBuilder.append(encodedName);
-            } else {
-                int valueItemCounter = 0;
-                for (Object value : values) {
-                    if (queryBuilder.length() != 0) {
-                        queryBuilder.append('&');
-                    }
-                    queryBuilder.append(encodedName);
-                    if (value != null) {
-                        String templatizedKey = encodedName + valueItemCounter++;
-                        uriParams.put(templatizedKey, value.toString());
-                        queryBuilder.append('=').append("{").append(templatizedKey).append("}");
-                    }
-                }
+                b.append(String.valueOf(o));
             }
-        });
-        return queryBuilder.toString();
-
+            return b.toString();
+        } else {
+            return String.valueOf(param);
+        }
     }
 
     /**
@@ -562,6 +549,45 @@ public class ApiClient extends JavaTimeFormatter {
     }
 
     /**
+     * Include queryParams in uriParams taking into account the paramName
+     *
+     * @param queryParams The query parameters
+     * @param uriParams The path parameters
+     * return templatized query string
+     */
+    public String generateQueryUri(MultiValueMap<String, String> queryParams, Map<String, Object> uriParams) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryParams.forEach((name, values) -> {
+            try {
+                final String encodedName = URLEncoder.encode(name.toString(), "UTF-8");
+                if (CollectionUtils.isEmpty(values)) {
+                    if (queryBuilder.length() != 0) {
+                        queryBuilder.append('&');
+                    }
+                    queryBuilder.append(encodedName);
+                } else {
+                    int valueItemCounter = 0;
+                    for (Object value : values) {
+                        if (queryBuilder.length() != 0) {
+                            queryBuilder.append('&');
+                        }
+                        queryBuilder.append(encodedName);
+                        if (value != null) {
+                            String templatizedKey = encodedName + valueItemCounter++;
+                            uriParams.put(templatizedKey, value.toString());
+                            queryBuilder.append('=').append("{").append(templatizedKey).append("}");
+                        }
+                    }
+                }
+            } catch (UnsupportedEncodingException e) {
+
+            }
+        });
+        return queryBuilder.toString();
+
+    }
+
+    /**
      * Invoke API by sending HTTP request with the given options.
      *
      * @param <T> the return type to use
@@ -626,7 +652,7 @@ public class ApiClient extends JavaTimeFormatter {
                 break;
             } catch (HttpServerErrorException | HttpClientErrorException ex) {
                 if (ex instanceof HttpServerErrorException
-                        || ex
+                        || ((HttpClientErrorException) ex)
                         .getStatusCode()
                         .equals(HttpStatus.TOO_MANY_REQUESTS)) {
                     attempts++;
@@ -654,20 +680,6 @@ public class ApiClient extends JavaTimeFormatter {
         } else {
             // The error handler built into the RestTemplate should handle 400 and 500 series errors.
             throw new RestClientException("API returned " + responseEntity.getStatusCode() + " and it wasn't handled by the RestTemplate error handler");
-        }
-    }
-
-    public enum CollectionFormat {
-        CSV(","), TSV("\t"), SSV(" "), PIPES("|"), MULTI(null);
-
-        private final String separator;
-
-        CollectionFormat(String separator) {
-            this.separator = separator;
-        }
-
-        private String collectionToString(Collection<?> collection) {
-            return StringUtils.collectionToDelimitedString(collection, separator);
         }
     }
 

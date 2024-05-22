@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
@@ -48,15 +49,16 @@ public class TofuMakerServiceModifier {
     /**
      * method to perform service modify using scripts provided in OCL.
      */
-    public DeployResult modifyFromScripts(DeployTask deployTask) {
+    public DeployResult modifyFromScripts(UUID modificationId, DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncModifyFromScriptsRequest request =
                 getModifyFromScriptsRequest(deployTask, resourceState);
+        request.setRequestId(modificationId);
         try {
-            openTofuFromScriptsApi.asyncModifyWithScripts(request, deployTask.getId());
+            openTofuFromScriptsApi.asyncModifyWithScripts(request);
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -69,15 +71,16 @@ public class TofuMakerServiceModifier {
     /**
      * method to perform service modify using scripts form GIT repo.
      */
-    public DeployResult modifyFromGitRepo(DeployTask deployTask) {
+    public DeployResult modifyFromGitRepo(UUID modificationId, DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncModifyFromGitRepoRequest request =
                 getModifyFromGitRepoRequest(deployTask, resourceState);
+        request.setRequestId(modificationId);
         try {
-            openTofuFromGitRepoApi.asyncModifyFromGitRepo(request, deployTask.getId());
+            openTofuFromGitRepoApi.asyncModifyFromGitRepo(request);
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {

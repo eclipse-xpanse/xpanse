@@ -19,8 +19,8 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
-import org.eclipse.xpanse.modules.models.workflow.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
+import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.http.HttpStatus;
@@ -62,7 +62,7 @@ public class WorkFlowApi {
     @AuditApiRequest(enabled = false)
     public List<WorkFlowTask> queryTasks(
             @Parameter(name = "status", description = "the status of task")
-            @RequestParam(name = "status", required = false) TaskStatus status) {
+            @RequestParam(name = "status", required = false) WorkFlowTaskStatus status) {
         String currentUserId = userServiceHelper.getCurrentUserId();
         return workflowUtils.queryAllTasks(status, currentUserId);
     }

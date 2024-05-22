@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.Collections;
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,8 +45,6 @@ class DeployResourceTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(resource, resource);
-        assertEquals(resource.hashCode(), resource.hashCode());
 
         Object obj = new Object();
         assertNotEquals(resource, obj);

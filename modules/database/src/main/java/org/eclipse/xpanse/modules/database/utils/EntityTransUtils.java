@@ -14,8 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
+import org.eclipse.xpanse.modules.database.servicemodification.ServiceModificationAuditEntity;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.modify.ServiceModificationAuditDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
@@ -36,7 +38,7 @@ public class EntityTransUtils {
 
 
     /**
-     * Transform ist of deployResourceEntity to list of DeployResource.
+     * Transform list of deployResourceEntity to list of DeployResource.
      *
      * @param entities list of deployResourceEntity
      * @return list of DeployResource
@@ -141,4 +143,19 @@ public class EntityTransUtils {
         BeanUtils.copyProperties(entity, details);
         return details;
     }
+
+
+    /**
+     * ServiceModificationAuditEntity converted to ServiceModificationAuditDetails.
+     *
+     * @param entity ServiceModificationAuditEntity
+     * @return ServiceModificationAuditDetails
+     */
+    public static ServiceModificationAuditDetails transToServiceModificationAuditDetails(
+            ServiceModificationAuditEntity entity) {
+        ServiceModificationAuditDetails details = new ServiceModificationAuditDetails();
+        BeanUtils.copyProperties(entity, details);
+        return details;
+    }
+
 }

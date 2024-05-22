@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator.TASK_ID;
+
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -18,18 +20,19 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.servicemodification.ServiceModificationAuditEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployerTaskStatus;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavorDowngradeNotAllowed;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceModifyParamsNotFoundException;
+import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
@@ -44,6 +47,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.slf4j.MDC;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,8 +57,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class DeployService {
-
-    private static final String TASK_ID = "TASK_ID";
 
     @Resource
     private ServiceTemplateStorage serviceTemplateStorage;
@@ -76,6 +78,8 @@ public class DeployService {
     private DeployServiceEntityToDeployTaskConverter deployServiceEntityToDeployTaskConverter;
     @Resource
     private ServiceStateManager serviceStateManager;
+    @Resource
+    private ServiceModificationAuditManager modificationAuditManager;
 
     /**
      * Create new deploy task by deploy request.
@@ -311,26 +315,26 @@ public class DeployService {
         ServiceTemplateEntity existingServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(
                         deployServiceEntity.getServiceTemplateId());
-        DeployTask modifyTask = new DeployTask();
-        modifyTask.setId(deployServiceEntity.getId());
-        DeployRequest deployRequest = deployServiceEntity.getDeployRequest();
-        if (StringUtils.isEmpty(modifyRequest.getCustomerServiceName())) {
-            deployRequest.setCustomerServiceName(deployServiceEntity.getCustomerServiceName());
-        } else {
-            deployRequest.setCustomerServiceName(modifyRequest.getCustomerServiceName());
+        DeployRequest previousDeployRequest = deployServiceEntity.getDeployRequest();
+        DeployRequest newDeployRequest = new DeployRequest();
+        BeanUtils.copyProperties(previousDeployRequest, newDeployRequest);
+        if (StringUtils.isNotEmpty(modifyRequest.getCustomerServiceName())) {
+            newDeployRequest.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }
         if (StringUtils.isNotBlank(modifyRequest.getFlavor())) {
             validateFlavorDowngradedIsAllowed(deployServiceEntity.getFlavor(),
                     modifyRequest.getFlavor(), existingServiceTemplate.getOcl().getFlavors());
-            deployRequest.setFlavor(modifyRequest.getFlavor());
+            newDeployRequest.setFlavor(modifyRequest.getFlavor());
         }
         if (Objects.nonNull(modifyRequest.getServiceRequestProperties())
                 && !modifyRequest.getServiceRequestProperties().isEmpty()) {
-            deployRequest.setServiceRequestProperties(modifyRequest.getServiceRequestProperties());
+            newDeployRequest.setServiceRequestProperties(
+                    modifyRequest.getServiceRequestProperties());
         }
-        validateDeployRequestWithServiceTemplate(existingServiceTemplate, deployRequest);
-
-        modifyTask.setDeployRequest(deployRequest);
+        validateDeployRequestWithServiceTemplate(existingServiceTemplate, newDeployRequest);
+        DeployTask modifyTask = new DeployTask();
+        modifyTask.setId(deployServiceEntity.getId());
+        modifyTask.setDeployRequest(newDeployRequest);
         modifyTask.setOcl(existingServiceTemplate.getOcl());
         modifyTask.setDeploymentScenario(DeploymentScenario.MODIFY);
         return modifyTask;
@@ -353,33 +357,36 @@ public class DeployService {
     /**
      * Async method to modify service.
      *
+     * @param modificationId        modificationId.
      * @param modifyTask          modifyTask.
      * @param deployServiceEntity deployServiceEntity
      */
-    public void modifyService(DeployTask modifyTask, DeployServiceEntity deployServiceEntity) {
+    public void modifyService(UUID modificationId, DeployTask modifyTask,
+                              DeployServiceEntity deployServiceEntity) {
+
         MDC.put(TASK_ID, modifyTask.getId().toString());
         DeployResult modifyResult;
         Deployer deployer =
                 deployerKindManager.getDeployment(modifyTask.getOcl().getDeployment().getKind());
+        ServiceModificationAuditEntity modificationAuditEntity =
+                modificationAuditManager.createNewModificationAudit(
+                        modificationId, modifyTask, deployServiceEntity);
         try {
             deployServiceEntity.setDeployRequest(modifyTask.getDeployRequest());
             deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.MODIFYING);
             deployServiceStorage.storeAndFlush(deployServiceEntity);
-            modifyResult = deployer.modify(modifyTask);
+            modificationAuditManager.startModificationProgressById(modificationId);
+            modifyResult = deployer.modify(modificationId, modifyTask);
         } catch (RuntimeException e) {
-            log.info("Modify service with id:{} failed.", modifyTask.getId(), e);
             modifyResult = new DeployResult();
             modifyResult.setId(modifyTask.getId());
             modifyResult.setState(getDeployerTaskFailedState(modifyTask.getDeploymentScenario()));
             modifyResult.setMessage(e.getMessage());
         }
-        try {
-            deployResultManager.updateDeployServiceEntityWithDeployResult(modifyResult,
-                    deployServiceEntity);
-        } catch (RuntimeException e) {
-            log.error("Modify service with id:{} update database entity failed.",
-                    modifyTask.getId(), e);
-        }
+        deployResultManager.updateDeployServiceEntityWithDeployResult(modifyResult,
+                deployServiceEntity);
+        modificationAuditManager.updateModificationAuditWithDeployResult(
+                modificationAuditEntity, modifyResult);
     }
 
     /**

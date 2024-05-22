@@ -3,7 +3,7 @@ package org.eclipse.xpanse.modules.models.billing;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

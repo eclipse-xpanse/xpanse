@@ -57,7 +57,7 @@ public class TofuMakerServiceDestroyer {
         OpenTofuAsyncDestroyFromScriptsRequest request =
                 getDestroyFromScriptsRequest(deployTask, resourceState);
         try {
-            openTofuFromScriptsApi.asyncDestroyWithScripts(request, deployTask.getId());
+            openTofuFromScriptsApi.asyncDestroyWithScripts(request);
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -78,7 +78,7 @@ public class TofuMakerServiceDestroyer {
         OpenTofuAsyncDestroyFromGitRepoRequest request =
                 getDestroyFromGitRepoRequest(deployTask, resourceState);
         try {
-            openTofuFromGitRepoApi.asyncDestroyFromGitRepo(request, deployTask.getId());
+            openTofuFromGitRepoApi.asyncDestroyFromGitRepo(request);
             result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
@@ -93,6 +93,7 @@ public class TofuMakerServiceDestroyer {
             throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncDestroyFromScriptsRequest request =
                 new OpenTofuAsyncDestroyFromScriptsRequest();
+        request.setRequestId(task.getId());
         request.setScripts(tofuMakerHelper.getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
@@ -106,6 +107,7 @@ public class TofuMakerServiceDestroyer {
             throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncDestroyFromGitRepoRequest request =
                 new OpenTofuAsyncDestroyFromGitRepoRequest();
+        request.setRequestId(task.getId());
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));

@@ -1,9 +1,8 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;
+
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.Response;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDeployFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncDestroyFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformAsyncModifyFromGitRepoRequest;
@@ -14,18 +13,27 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlanFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.4.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi")
@@ -58,11 +66,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDeployFromGitRepo(TerraformAsyncDeployFromGitRepoRequest terraformAsyncDeployFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncDeployFromGitRepoWithHttpInfo(terraformAsyncDeployFromGitRepoRequest, xCustomRequestId);
+    public void asyncDeployFromGitRepo(TerraformAsyncDeployFromGitRepoRequest terraformAsyncDeployFromGitRepoRequest) throws RestClientException {
+        asyncDeployFromGitRepoWithHttpInfo(terraformAsyncDeployFromGitRepoRequest);
     }
 
     /**
@@ -74,11 +81,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDeployFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDeployFromGitRepoWithHttpInfo(TerraformAsyncDeployFromGitRepoRequest terraformAsyncDeployFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncDeployFromGitRepoWithHttpInfo(TerraformAsyncDeployFromGitRepoRequest terraformAsyncDeployFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncDeployFromGitRepoRequest;
         
         // verify the required parameter 'terraformAsyncDeployFromGitRepoRequest' is set
@@ -92,9 +98,6 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*"
          };
@@ -107,10 +110,7 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/deploy/async", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/deploy/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -121,11 +121,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDestroyFromGitRepo(TerraformAsyncDestroyFromGitRepoRequest terraformAsyncDestroyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncDestroyFromGitRepoWithHttpInfo(terraformAsyncDestroyFromGitRepoRequest, xCustomRequestId);
+    public void asyncDestroyFromGitRepo(TerraformAsyncDestroyFromGitRepoRequest terraformAsyncDestroyFromGitRepoRequest) throws RestClientException {
+        asyncDestroyFromGitRepoWithHttpInfo(terraformAsyncDestroyFromGitRepoRequest);
     }
 
     /**
@@ -137,11 +136,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncDestroyFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncDestroyFromGitRepoWithHttpInfo(TerraformAsyncDestroyFromGitRepoRequest terraformAsyncDestroyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncDestroyFromGitRepoWithHttpInfo(TerraformAsyncDestroyFromGitRepoRequest terraformAsyncDestroyFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncDestroyFromGitRepoRequest;
         
         // verify the required parameter 'terraformAsyncDestroyFromGitRepoRequest' is set
@@ -155,9 +153,6 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*"
          };
@@ -170,10 +165,7 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/destroy/async", HttpMethod.DELETE,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/destroy/async", HttpMethod.DELETE, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -184,11 +176,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncModifyFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncModifyFromGitRepo(TerraformAsyncModifyFromGitRepoRequest terraformAsyncModifyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
-        asyncModifyFromGitRepoWithHttpInfo(terraformAsyncModifyFromGitRepoRequest, xCustomRequestId);
+    public void asyncModifyFromGitRepo(TerraformAsyncModifyFromGitRepoRequest terraformAsyncModifyFromGitRepoRequest) throws RestClientException {
+        asyncModifyFromGitRepoWithHttpInfo(terraformAsyncModifyFromGitRepoRequest);
     }
 
     /**
@@ -200,11 +191,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
      * @param terraformAsyncModifyFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<Void> asyncModifyFromGitRepoWithHttpInfo(TerraformAsyncModifyFromGitRepoRequest terraformAsyncModifyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<Void> asyncModifyFromGitRepoWithHttpInfo(TerraformAsyncModifyFromGitRepoRequest terraformAsyncModifyFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = terraformAsyncModifyFromGitRepoRequest;
         
         // verify the required parameter 'terraformAsyncModifyFromGitRepoRequest' is set
@@ -218,9 +208,6 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*"
          };
@@ -233,10 +220,7 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/modify/async", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/modify/async", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -247,12 +231,11 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult deployFromGitRepo(TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
-        return deployFromGitRepoWithHttpInfo(terraformDeployFromGitRepoRequest, xCustomRequestId).getBody();
+    public TerraformResult deployFromGitRepo(TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest) throws RestClientException {
+        return deployFromGitRepoWithHttpInfo(terraformDeployFromGitRepoRequest).getBody();
     }
 
     /**
@@ -264,11 +247,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> deployFromGitRepoWithHttpInfo(TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> deployFromGitRepoWithHttpInfo(TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = terraformDeployFromGitRepoRequest;
         
         // verify the required parameter 'terraformDeployFromGitRepoRequest' is set
@@ -282,9 +264,6 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -297,10 +276,7 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/deploy", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/deploy", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -311,12 +287,11 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult destroyFromGitRepo(TerraformDestroyFromGitRepoRequest terraformDestroyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
-        return destroyFromGitRepoWithHttpInfo(terraformDestroyFromGitRepoRequest, xCustomRequestId).getBody();
+    public TerraformResult destroyFromGitRepo(TerraformDestroyFromGitRepoRequest terraformDestroyFromGitRepoRequest) throws RestClientException {
+        return destroyFromGitRepoWithHttpInfo(terraformDestroyFromGitRepoRequest).getBody();
     }
 
     /**
@@ -328,11 +303,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDestroyFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> destroyFromGitRepoWithHttpInfo(TerraformDestroyFromGitRepoRequest terraformDestroyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> destroyFromGitRepoWithHttpInfo(TerraformDestroyFromGitRepoRequest terraformDestroyFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = terraformDestroyFromGitRepoRequest;
         
         // verify the required parameter 'terraformDestroyFromGitRepoRequest' is set
@@ -346,9 +320,6 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -361,10 +332,7 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/destroy", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/destroy", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -375,12 +343,11 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformModifyFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformResult modifyFromGitRepo(TerraformModifyFromGitRepoRequest terraformModifyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
-        return modifyFromGitRepoWithHttpInfo(terraformModifyFromGitRepoRequest, xCustomRequestId).getBody();
+    public TerraformResult modifyFromGitRepo(TerraformModifyFromGitRepoRequest terraformModifyFromGitRepoRequest) throws RestClientException {
+        return modifyFromGitRepoWithHttpInfo(terraformModifyFromGitRepoRequest).getBody();
     }
 
     /**
@@ -392,11 +359,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformModifyFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformResult> modifyFromGitRepoWithHttpInfo(TerraformModifyFromGitRepoRequest terraformModifyFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformResult> modifyFromGitRepoWithHttpInfo(TerraformModifyFromGitRepoRequest terraformModifyFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = terraformModifyFromGitRepoRequest;
         
         // verify the required parameter 'terraformModifyFromGitRepoRequest' is set
@@ -410,9 +376,6 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -425,10 +388,7 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformResult> localReturnType = new ParameterizedTypeReference<TerraformResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/modify", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/modify", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -439,12 +399,11 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformPlanFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformPlan planFromGitRepo(TerraformPlanFromGitRepoRequest terraformPlanFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
-        return planFromGitRepoWithHttpInfo(terraformPlanFromGitRepoRequest, xCustomRequestId).getBody();
+    public TerraformPlan planFromGitRepo(TerraformPlanFromGitRepoRequest terraformPlanFromGitRepoRequest) throws RestClientException {
+        return planFromGitRepoWithHttpInfo(terraformPlanFromGitRepoRequest).getBody();
     }
 
     /**
@@ -456,11 +415,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformPlanFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformPlan&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformPlan> planFromGitRepoWithHttpInfo(TerraformPlanFromGitRepoRequest terraformPlanFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformPlan> planFromGitRepoWithHttpInfo(TerraformPlanFromGitRepoRequest terraformPlanFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = terraformPlanFromGitRepoRequest;
         
         // verify the required parameter 'terraformPlanFromGitRepoRequest' is set
@@ -474,9 +432,6 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -489,10 +444,7 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformPlan> localReturnType = new ParameterizedTypeReference<TerraformPlan>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/plan", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/plan", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
     /**
      * 
@@ -503,12 +455,11 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return TerraformValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformValidationResult validateScriptsFromGitRepo(TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
-        return validateScriptsFromGitRepoWithHttpInfo(terraformDeployFromGitRepoRequest, xCustomRequestId).getBody();
+    public TerraformValidationResult validateScriptsFromGitRepo(TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest) throws RestClientException {
+        return validateScriptsFromGitRepoWithHttpInfo(terraformDeployFromGitRepoRequest).getBody();
     }
 
     /**
@@ -520,11 +471,10 @@ public class TerraformFromGitRepoApi {
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
      * @param terraformDeployFromGitRepoRequest  (required)
-     * @param xCustomRequestId  (optional)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<TerraformValidationResult> validateScriptsFromGitRepoWithHttpInfo(TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest, UUID xCustomRequestId) throws RestClientException {
+    public ResponseEntity<TerraformValidationResult> validateScriptsFromGitRepoWithHttpInfo(TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = terraformDeployFromGitRepoRequest;
         
         // verify the required parameter 'terraformDeployFromGitRepoRequest' is set
@@ -538,9 +488,6 @@ public class TerraformFromGitRepoApi {
         final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
-        if (xCustomRequestId != null)
-        localVarHeaderParams.add("X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
-
         final String[] localVarAccepts = { 
             "*/*", "application/json"
          };
@@ -553,9 +500,6 @@ public class TerraformFromGitRepoApi {
         String[] localVarAuthNames = new String[] { "OAuth2Flow" };
 
         ParameterizedTypeReference<TerraformValidationResult> localReturnType = new ParameterizedTypeReference<TerraformValidationResult>() {};
-        return apiClient.invokeAPI("/terraform-boot/git/validate", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/terraform-boot/git/validate", HttpMethod.POST, Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 }

@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.UUID;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.api.controllers.ServiceMigrationApi;
+import org.eclipse.xpanse.api.controllers.ServiceModificationApi;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -27,9 +28,10 @@ import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequestBase;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
+import org.eclipse.xpanse.modules.models.service.modify.ServiceModificationAuditDetails;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -57,6 +59,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     @Resource
     private ServiceDeployerApi serviceDeployerApi;
+    @Resource
+    private ServiceModificationApi serviceModificationApi;
     @Resource
     private ServiceTemplateApi serviceTemplateApi;
     @Resource
@@ -144,6 +148,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
                 serviceTemplate.getFlavors().getServiceFlavors().getFirst().getName());
         deployRequestBase.setRegion(serviceTemplate.getRegions().getFirst());
         deployRequestBase.setServiceHostingType(serviceTemplate.getServiceHostingType());
+        deployRequestBase.setBillingMode(serviceTemplate.getBilling().getBillingModes().getFirst());
 
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
@@ -209,7 +214,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return migrationDetails.getMigrationStatus() == MigrationStatus.MIGRATION_COMPLETED;
     }
 
-    void testModifyAndGetDetails(UUID taskId, ServiceTemplateDetailVo serviceTemplate) {
+    void testModifyAndGetDetails(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) {
         // SetUp
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor(
@@ -218,9 +223,14 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         serviceRequestProperties.put("admin_passwd", "2222222222@Qq");
         modifyRequest.setServiceRequestProperties(serviceRequestProperties);
         // Run the test
-        UUID uuid = serviceDeployerApi.modify(taskId.toString(), modifyRequest);
+        UUID modificationId = serviceModificationApi.modify(serviceId.toString(), modifyRequest);
         // Verify the results
-        Assertions.assertEquals(taskId, uuid);
+        Assertions.assertNotNull(modificationId);
+
+        ServiceModificationAuditDetails serviceModificationDetails =
+                serviceModificationApi.getAuditDetailsByModificationId(modificationId.toString());
+        Assertions.assertNotNull(serviceModificationDetails);
+        Assertions.assertEquals(serviceModificationDetails.getServiceId(), serviceId);
     }
 
     void testDestroyAndGetDetails(UUID taskId) throws Exception {

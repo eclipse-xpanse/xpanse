@@ -18,9 +18,9 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceStateManager;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ManagementTaskStatus;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -117,8 +117,8 @@ public class ServiceStateManageApi {
             @Parameter(name = "taskType", description = "type of the management task")
             @RequestParam(name = "taskType", required = false)
             ServiceStateManagementTaskType taskType,
-            @Parameter(name = "taskStatus", description = "status of the management task")
-            @RequestParam(name = "taskStatus", required = false) ManagementTaskStatus taskStatus) {
+            @Parameter(name = "taskStatus", description = "status of the task")
+            @RequestParam(name = "taskStatus", required = false) TaskStatus taskStatus) {
         return serviceStateManager.listServiceStateManagementTasks(UUID.fromString(serviceId),
                 taskType, taskStatus);
     }

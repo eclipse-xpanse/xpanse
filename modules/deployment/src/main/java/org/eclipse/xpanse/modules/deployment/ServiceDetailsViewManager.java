@@ -19,8 +19,8 @@ import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
@@ -45,6 +45,8 @@ public class ServiceDetailsViewManager {
     private DeployServiceStorage deployServiceStorage;
     @Resource
     private ServiceStateManager serviceStateManager;
+    @Resource
+    private ServiceModificationAuditManager modificationAuditManager;
 
     /**
      * Get deploy service detail by id.
@@ -149,6 +151,8 @@ public class ServiceDetailsViewManager {
                 EntityTransUtils.transToDeployedServiceDetails(deployServiceEntity);
         deployedServiceDetails.setLatestRunningManagementTask(
                 serviceStateManager.getLatestRunningManagementTask(deployServiceEntity.getId()));
+        deployedServiceDetails.setLatestModificationAudit(
+                modificationAuditManager.getLatestModificationAudit(deployServiceEntity.getId()));
         return deployedServiceDetails;
     }
 
@@ -179,6 +183,8 @@ public class ServiceDetailsViewManager {
                 EntityTransUtils.transToVendorHostedServiceDetails(deployServiceEntity);
         deployedServiceDetails.setLatestRunningManagementTask(
                 serviceStateManager.getLatestRunningManagementTask(deployServiceEntity.getId()));
+        deployedServiceDetails.setLatestModificationAudit(
+                modificationAuditManager.getLatestModificationAudit(deployServiceEntity.getId()));
         return deployedServiceDetails;
     }
 

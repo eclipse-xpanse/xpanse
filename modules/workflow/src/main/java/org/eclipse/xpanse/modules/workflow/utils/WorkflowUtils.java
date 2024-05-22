@@ -25,8 +25,8 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.workflow.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
+import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.springframework.stereotype.Component;
 
 /**
@@ -93,16 +93,16 @@ public class WorkflowUtils {
      *
      * @param userId userId the ID of the currently logged in user.
      */
-    public List<WorkFlowTask> queryAllTasks(TaskStatus status, String userId) {
+    public List<WorkFlowTask> queryAllTasks(WorkFlowTaskStatus status, String userId) {
         List<WorkFlowTask> workFlowTasks = new ArrayList<>();
         List<WorkFlowTask> todoTasks = todoTasks(userId);
         List<WorkFlowTask> doneTasks = doneTasks(userId);
         if (Objects.isNull(status)) {
             workFlowTasks.addAll(todoTasks.stream().map(this::setTodoTaskStatus).toList());
             workFlowTasks.addAll(doneTasks.stream().map(this::setDoneTaskStatus).toList());
-        } else if (status == TaskStatus.DONE) {
+        } else if (status == WorkFlowTaskStatus.DONE) {
             workFlowTasks.addAll(doneTasks.stream().map(this::setDoneTaskStatus).toList());
-        } else if (status == TaskStatus.FAILED) {
+        } else if (status == WorkFlowTaskStatus.FAILED) {
             workFlowTasks.addAll(todoTasks.stream().map(this::setTodoTaskStatus).toList());
         }
         return workFlowTasks;
@@ -196,12 +196,12 @@ public class WorkflowUtils {
     }
 
     private WorkFlowTask setTodoTaskStatus(WorkFlowTask workFlowTask) {
-        workFlowTask.setStatus(TaskStatus.FAILED);
+        workFlowTask.setStatus(WorkFlowTaskStatus.FAILED);
         return workFlowTask;
     }
 
     private WorkFlowTask setDoneTaskStatus(WorkFlowTask workFlowTask) {
-        workFlowTask.setStatus(TaskStatus.DONE);
+        workFlowTask.setStatus(WorkFlowTaskStatus.DONE);
         return workFlowTask;
     }
 }

@@ -18,14 +18,14 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ManagementTaskStatus;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -77,14 +77,14 @@ public class ServiceStateManager {
         newTask.setTaskId(UUID.randomUUID());
         newTask.setTaskType(taskType);
         newTask.setServiceId(serviceId);
-        newTask.setTaskStatus(ManagementTaskStatus.CREATED);
+        newTask.setTaskStatus(TaskStatus.CREATED);
         return taskStorage.storeAndFlush(newTask);
     }
 
     private void asyncStartService(ServiceStateManagementTaskEntity taskEntity,
                                    OrchestratorPlugin plugin, ServiceStateManageRequest request,
                                    DeployServiceEntity service) {
-        taskEntity.setTaskStatus(ManagementTaskStatus.IN_PROGRESS);
+        taskEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
         taskEntity.setStartedTime(OffsetDateTime.now());
         taskStorage.storeAndFlush(taskEntity);
         service.setServiceState(ServiceState.STARTING);
@@ -97,11 +97,11 @@ public class ServiceStateManager {
         }
         taskEntity.setCompletedTime(OffsetDateTime.now());
         if (result) {
-            taskEntity.setTaskStatus(ManagementTaskStatus.SUCCESSFUL);
+            taskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
             service.setLastStartedAt(OffsetDateTime.now());
             service.setServiceState(ServiceState.RUNNING);
         } else {
-            taskEntity.setTaskStatus(ManagementTaskStatus.FAILED);
+            taskEntity.setTaskStatus(TaskStatus.FAILED);
             service.setServiceState(ServiceState.STOPPED);
         }
         taskStorage.storeAndFlush(taskEntity);
@@ -127,7 +127,7 @@ public class ServiceStateManager {
     private void asyncStopService(ServiceStateManagementTaskEntity taskEntity,
                                   OrchestratorPlugin plugin, ServiceStateManageRequest request,
                                   DeployServiceEntity service) {
-        taskEntity.setTaskStatus(ManagementTaskStatus.IN_PROGRESS);
+        taskEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
         taskEntity.setStartedTime(OffsetDateTime.now());
         taskStorage.storeAndFlush(taskEntity);
         service.setServiceState(ServiceState.STOPPING);
@@ -140,11 +140,11 @@ public class ServiceStateManager {
         }
         taskEntity.setCompletedTime(OffsetDateTime.now());
         if (result) {
-            taskEntity.setTaskStatus(ManagementTaskStatus.SUCCESSFUL);
+            taskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
             service.setLastStoppedAt(OffsetDateTime.now());
             service.setServiceState(ServiceState.STOPPED);
         } else {
-            taskEntity.setTaskStatus(ManagementTaskStatus.FAILED);
+            taskEntity.setTaskStatus(TaskStatus.FAILED);
             service.setServiceState(ServiceState.RUNNING);
         }
         taskStorage.storeAndFlush(taskEntity);
@@ -170,7 +170,7 @@ public class ServiceStateManager {
     private void asyncRestartService(ServiceStateManagementTaskEntity taskEntity,
                                      OrchestratorPlugin plugin, ServiceStateManageRequest request,
                                      DeployServiceEntity service) {
-        taskEntity.setTaskStatus(ManagementTaskStatus.IN_PROGRESS);
+        taskEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
         taskEntity.setStartedTime(OffsetDateTime.now());
         taskStorage.storeAndFlush(taskEntity);
         service.setServiceState(ServiceState.RESTARTING);
@@ -183,11 +183,11 @@ public class ServiceStateManager {
         }
         taskEntity.setCompletedTime(OffsetDateTime.now());
         if (result) {
-            taskEntity.setTaskStatus(ManagementTaskStatus.SUCCESSFUL);
+            taskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
             service.setLastStartedAt(OffsetDateTime.now());
             service.setServiceState(ServiceState.RUNNING);
         } else {
-            taskEntity.setTaskStatus(ManagementTaskStatus.FAILED);
+            taskEntity.setTaskStatus(TaskStatus.FAILED);
             service.setServiceState(ServiceState.RUNNING);
         }
         taskStorage.storeAndFlush(taskEntity);
@@ -205,7 +205,7 @@ public class ServiceStateManager {
      */
     public List<ServiceStateManagementTaskDetails> listServiceStateManagementTasks(
             UUID serviceId, ServiceStateManagementTaskType taskType,
-            ManagementTaskStatus taskStatus) {
+            TaskStatus taskStatus) {
         ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
         taskQuery.setServiceId(serviceId);
         taskQuery.setTaskType(taskType);

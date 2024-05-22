@@ -58,11 +58,11 @@ public class TerraformBootDeployment implements Deployer {
     }
 
     @Override
-    public DeployResult modify(DeployTask deployTask) {
+    public DeployResult modify(UUID modificationId, DeployTask deployTask) {
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            return terraformBootServiceModifier.modifyFromScripts(deployTask);
+            return terraformBootServiceModifier.modifyFromScripts(modificationId, deployTask);
         }
-        return terraformBootServiceModifier.modifyFromGitRepo(deployTask);
+        return terraformBootServiceModifier.modifyFromGitRepo(modificationId, deployTask);
     }
 
     @Override

@@ -3,10 +3,11 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.service.deploy.enums;
+package org.eclipse.xpanse.modules.models.service.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
@@ -27,6 +28,11 @@ public enum DeployResourceKind {
     SUBNET("subnet", DeployResourceKind.VPC);
 
     private final String kind;
+
+    /**
+     *  For XpanseResourceKind deserialize.
+     */
+    @Getter
     private final DeployResourceKind parent;
 
 
@@ -58,10 +64,4 @@ public enum DeployResourceKind {
         return this.kind;
     }
 
-    /**
-     * For XpanseResourceKind deserialize.
-     */
-    public DeployResourceKind getParent() {
-        return this.parent;
-    }
 }

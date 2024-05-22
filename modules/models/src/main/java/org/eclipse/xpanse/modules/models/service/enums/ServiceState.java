@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.service.statemanagement.enums;
+package org.eclipse.xpanse.modules.models.service.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -12,35 +12,38 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
- * Enumeration class for management task type.
+ * Enumeration class for service running status.
  */
-public enum ServiceStateManagementTaskType {
-    START("start"),
-    STOP("stop"),
-    RESTART("restart");
+public enum ServiceState {
+    NOT_RUNNING("not running"),
+    RUNNING("running"),
+    STARTING("starting"),
+    STOPPING("stopping"),
+    STOPPED("stopped"),
+    RESTARTING("restarting");
 
     private final String value;
 
-    ServiceStateManagementTaskType(String value) {
+    ServiceState(String value) {
         this.value = value;
     }
 
     /**
-     * For ServiceStateManagementTaskType deserialize.
+     * For ServiceState deserialize.
      */
     @JsonCreator
-    public static ServiceStateManagementTaskType getByValue(String value) {
-        for (ServiceStateManagementTaskType entry : values()) {
+    public static ServiceState getByValue(String value) {
+        for (ServiceState entry : values()) {
             if (StringUtils.equalsIgnoreCase(entry.value, value)) {
                 return entry;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("ServiceStateManagementTaskType value %s is not supported.", value));
+                String.format("ServiceState value %s is not supported.", value));
     }
 
     /**
-     * For ServiceStateManagementTaskType serialize.
+     * For ServiceState serialize.
      */
     @JsonValue
     public String toValue() {

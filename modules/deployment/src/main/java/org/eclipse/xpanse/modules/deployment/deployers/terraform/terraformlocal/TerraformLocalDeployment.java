@@ -122,7 +122,7 @@ public class TerraformLocalDeployment implements Deployer {
      * @param task the task for the deployment.
      */
     @Override
-    public DeployResult modify(DeployTask task) {
+    public DeployResult modify(UUID modificationId, DeployTask task) {
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(task.getId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
@@ -134,7 +134,7 @@ public class TerraformLocalDeployment implements Deployer {
         }
         DeployResult modifyResult = new DeployResult();
         modifyResult.setId(task.getId());
-        asyncExecModify(task, resourceState);
+        asyncExecModify(modificationId, task, resourceState);
         return modifyResult;
     }
 
@@ -147,6 +147,7 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
+            terraformResult.setRequestId(task.getId());
             try {
                 executor.deploy();
                 terraformResult.setCommandSuccessful(true);
@@ -168,6 +169,7 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
+            terraformResult.setRequestId(task.getId());
             try {
                 executor.destroy();
                 terraformResult.setCommandSuccessful(true);
@@ -183,7 +185,7 @@ public class TerraformLocalDeployment implements Deployer {
         });
     }
 
-    private void asyncExecModify(DeployTask task, String tfState) {
+    private void asyncExecModify(UUID modificationId, DeployTask task, String tfState) {
         String workspace = getWorkspacePath(task.getId());
         prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
         prepareDeployWorkspaceWithScripts(task, workspace);
@@ -191,6 +193,7 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
+            terraformResult.setRequestId(modificationId);
             try {
                 executor.deploy();
                 terraformResult.setCommandSuccessful(true);

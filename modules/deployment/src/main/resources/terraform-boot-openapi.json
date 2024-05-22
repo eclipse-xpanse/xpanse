@@ -3,7 +3,7 @@
   "info": {
     "title": "Terraform-Boot API",
     "description": "RESTful Services to interact with Terraform-Boot runtime",
-    "version": "1.0.6-SNAPSHOT"
+    "version": "1.0.7-SNAPSHOT"
   },
   "servers": [
     {
@@ -44,17 +44,6 @@
         ],
         "description": "Deploy resources via Terraform",
         "operationId": "validateWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -126,17 +115,6 @@
         ],
         "description": "Get Terraform Plan as JSON string from the list of script files provided",
         "operationId": "planWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -208,17 +186,6 @@
         ],
         "description": "Modify resources via Terraform",
         "operationId": "modifyWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -290,17 +257,6 @@
         ],
         "description": "async modify resources via Terraform",
         "operationId": "asyncModifyWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -365,17 +321,6 @@
         ],
         "description": "Destroy resources via Terraform",
         "operationId": "destroyWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -447,17 +392,6 @@
         ],
         "description": "Deploy resources via Terraform",
         "operationId": "deployWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -529,17 +463,6 @@
         ],
         "description": "async deploy resources via Terraform",
         "operationId": "asyncDeployWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -604,17 +527,6 @@
         ],
         "description": "Deploy resources via Terraform",
         "operationId": "validateScriptsFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -686,17 +598,6 @@
         ],
         "description": "Get Terraform Plan as JSON string from the list of script files provided",
         "operationId": "planFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -768,17 +669,6 @@
         ],
         "description": "Modify resources via Terraform",
         "operationId": "modifyFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -850,17 +740,6 @@
         ],
         "description": "async deploy resources via Terraform",
         "operationId": "asyncModifyFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -925,17 +804,6 @@
         ],
         "description": "Destroy resources via Terraform",
         "operationId": "destroyFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1007,17 +875,6 @@
         ],
         "description": "Deploy resources via Terraform",
         "operationId": "deployFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1089,17 +946,6 @@
         ],
         "description": "async deploy resources via Terraform",
         "operationId": "asyncDeployFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1264,15 +1110,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "requestBody": {
@@ -1355,15 +1192,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "requestBody": {
@@ -1438,15 +1266,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         ],
@@ -1529,15 +1348,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         ],
@@ -1675,15 +1485,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "responses": {
@@ -1747,17 +1548,6 @@
         ],
         "description": "Async destroy the Terraform modules",
         "operationId": "asyncDestroyWithScripts",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1822,17 +1612,6 @@
         ],
         "description": "Async destroy the Terraform modules",
         "operationId": "asyncDestroyFromGitRepo",
-        "parameters": [
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1905,15 +1684,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         ],
@@ -1996,15 +1766,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         ],
@@ -2111,6 +1872,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2170,6 +1936,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2217,6 +1988,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2237,6 +2013,11 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
+          "taskId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "scripts": {
             "type": "array",
             "description": "List of script files for modify requests deployed via scripts",
@@ -2254,6 +2035,11 @@
       "TerraformResult": {
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "commandStdOutput": {
             "type": "string",
             "description": "stdout of the command returned as string."
@@ -2289,6 +2075,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2308,6 +2099,11 @@
               "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "taskId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
           },
           "scripts": {
             "type": "array",
@@ -2356,6 +2152,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2395,6 +2196,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2436,6 +2242,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2489,6 +2300,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2518,6 +2334,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2556,6 +2377,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2595,6 +2421,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2629,6 +2460,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2663,6 +2499,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request.",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2688,6 +2529,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2718,6 +2564,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2750,6 +2601,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2780,6 +2636,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "isPlanOnly": {
             "type": "boolean",
             "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
@@ -2830,6 +2691,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2871,6 +2737,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2905,6 +2776,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
@@ -2930,6 +2806,11 @@
         ],
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Id of the request",
+            "format": "uuid"
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {

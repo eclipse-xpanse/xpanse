@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
+import static org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator.TASK_ID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
@@ -57,9 +59,7 @@ public class TofuMakerScriptValidator {
         try {
             OpenTofuValidationResult validate =
                     openTofuFromScriptsApi.validateWithScripts(
-                            getValidateScriptsInOclRequest(deployment),
-                            Objects.nonNull(MDC.get("TASK_ID"))
-                                    ? UUID.fromString(MDC.get("TASK_ID")) : null);
+                            getValidateScriptsInOclRequest(deployment));
             try {
                 deployValidationResult =
                         objectMapper.readValue(objectMapper.writeValueAsString(validate),
@@ -83,9 +83,7 @@ public class TofuMakerScriptValidator {
         try {
             OpenTofuValidationResult validate =
                     openTofuFromGitRepoApi.validateScriptsFromGitRepo(
-                            getValidateScriptsInGitRepoRequest(deployment),
-                            Objects.nonNull(MDC.get("TASK_ID"))
-                                    ? UUID.fromString(MDC.get("TASK_ID")) : null);
+                            getValidateScriptsInGitRepoRequest(deployment));
             try {
                 deployValidationResult =
                         objectMapper.readValue(objectMapper.writeValueAsString(validate),
@@ -103,6 +101,9 @@ public class TofuMakerScriptValidator {
     private OpenTofuDeployWithScriptsRequest getValidateScriptsInOclRequest(Deployment deployment) {
         OpenTofuDeployWithScriptsRequest request =
                 new OpenTofuDeployWithScriptsRequest();
+        UUID uuid = Objects.nonNull(MDC.get(TASK_ID))
+                ? UUID.fromString(MDC.get(TASK_ID)) : UUID.randomUUID();
+        request.setRequestId(uuid);
         request.setIsPlanOnly(false);
         request.setScripts(getFilesByOcl(deployment));
         return request;
@@ -112,6 +113,9 @@ public class TofuMakerScriptValidator {
             Deployment deployment) {
         OpenTofuDeployFromGitRepoRequest request =
                 new OpenTofuDeployFromGitRepoRequest();
+        UUID uuid = Objects.nonNull(MDC.get(TASK_ID))
+                ? UUID.fromString(MDC.get(TASK_ID)) : UUID.randomUUID();
+        request.setRequestId(uuid);
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(

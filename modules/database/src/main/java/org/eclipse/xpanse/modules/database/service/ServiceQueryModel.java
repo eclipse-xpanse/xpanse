@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.database.service;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 
 /**
  * The query model for search services.

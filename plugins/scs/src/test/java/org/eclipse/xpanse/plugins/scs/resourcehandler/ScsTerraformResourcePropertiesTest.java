@@ -3,7 +3,7 @@ package org.eclipse.xpanse.plugins.scs.resourcehandler;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -66,7 +66,7 @@ class ScsTerraformResourcePropertiesTest {
         Assertions.assertNotNull(secGroupResult);
         Assertions.assertEquals(secGroupResult.getResourceKind(),
                 DeployResourceKind.SECURITY_GROUP);
-        Assertions.assertTrue(secGroupResult.getResourceProperties().size() >= 1);
+        Assertions.assertFalse(secGroupResult.getResourceProperties().isEmpty());
 
         // Run the test
         final DeployResourceProperties secGroupRuleResult =

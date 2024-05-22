@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
@@ -304,11 +303,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         ocl.setName("serviceDeployApiTest-1");
         testDeployerWithOclAndPolicy(ocl, "policy-1");
 
-
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
         oclFromGit.setName("serviceDeployApiTest-2");
-        testDeployerWithOclAndPolicy(ocl, "policy-2");
+        testDeployerWithOclAndPolicy(oclFromGit, "policy-2");
     }
 
     void testDeployerWithOclAndPolicy(Ocl ocl, String policy) throws Exception {
@@ -337,16 +335,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
             listDeployedServicesDetails();
         }
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
-            testModify(serviceId, serviceTemplate);
-            boolean modifySuccess = waitUntilExceptedState(serviceId,
-                    ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
-            boolean modifyFailed = waitUntilExceptedState(serviceId,
-                    ServiceDeploymentState.MODIFICATION_FAILED);
-            if (modifySuccess || modifyFailed) {
-                testDestroy(serviceId);
-                if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
-                    testPurge(serviceId);
-                }
+            testDestroy(serviceId);
+            if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
+                testPurge(serviceId);
             }
         } else {
             testPurge(serviceId);
@@ -437,14 +428,12 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         serviceLockConfig.setDestroyLocked(true);
         serviceLockConfig.setModifyLocked(true);
         testChangeLockConfig(serviceId, serviceLockConfig);
-        testModifyThrowsServiceLockedException(serviceId);
         testDestroyThrowsServiceLockedException(serviceId);
     }
 
     void testApisThrowsServiceDeploymentNotFoundException() throws Exception {
         testGetServiceDetailsThrowsServiceNotDeployedException();
         testChangeLockConfigThrowsServiceNotDeployedException();
-        testModifyThrowsServiceNotDeployedException();
         testDestroyThrowsServiceNotDeployedException();
         testPurgeThrowsServiceNotDeployedException();
     }
@@ -455,7 +444,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         deployServiceEntity.setUserId("unique");
         deployServiceStorage.storeAndFlush(deployServiceEntity);
         testChangeLockConfigThrowsAccessDenied(serviceId);
-        testModifyThrowsAccessDenied(serviceId);
         testDestroyThrowsAccessDenied(serviceId);
         testPurgeThrowsAccessDenied(serviceId);
     }
@@ -605,98 +593,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), changeLockConfigResponse.getStatus());
         assertEquals(result, changeLockConfigResponse.getContentAsString());
-    }
-
-
-    void testModify(UUID taskId, ServiceTemplateDetailVo serviceTemplate) throws Exception {
-        // SetUp
-        ModifyRequest modifyRequest = new ModifyRequest();
-        modifyRequest.setFlavor(
-                serviceTemplate.getFlavors().getServiceFlavors().getLast().getName());
-        Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("admin_passwd", "2222222222@Qq");
-        modifyRequest.setServiceRequestProperties(serviceRequestProperties);
-
-        // Run the test
-        final MockHttpServletResponse modifyResponse = mockMvc.perform(
-                        put("/xpanse/services/modify/{id}", taskId)
-                                .content(objectMapper.writeValueAsString(modifyRequest))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-        UUID result = objectMapper.readValue(modifyResponse.getContentAsString(), UUID.class);
-
-        // Verify the results
-        assertEquals(HttpStatus.ACCEPTED.value(), modifyResponse.getStatus());
-        // Verify the results
-        Assertions.assertEquals(taskId, result);
-    }
-
-    void testModifyThrowsServiceNotDeployedException() throws Exception {
-        // SetUp
-        UUID uuid = UUID.randomUUID();
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-        ModifyRequest modifyRequest = new ModifyRequest();
-        modifyRequest.setFlavor("flavor-error-test");
-        modifyRequest.setServiceRequestProperties(new HashMap<>());
-        // Run the test
-        final MockHttpServletResponse modifyResponse = mockMvc.perform(
-                        put("/xpanse/services/modify/{id}", uuid)
-                                .content(objectMapper.writeValueAsString(modifyRequest))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
-        assertEquals(result, modifyResponse.getContentAsString());
-    }
-
-    void testModifyThrowsAccessDenied(UUID serviceId) throws Exception {
-        // SetUp
-        Response expectedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
-                Collections.singletonList(
-                        "No permissions to modify services belonging to other users."));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-        ModifyRequest modifyRequest = new ModifyRequest();
-        modifyRequest.setFlavor("flavor-error-test");
-        modifyRequest.setServiceRequestProperties(new HashMap<>());
-        // Run the test
-        final MockHttpServletResponse modifyResponse = mockMvc.perform(
-                        put("/xpanse/services/modify/{id}", serviceId)
-                                .content(objectMapper.writeValueAsString(modifyRequest))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        assertEquals(HttpStatus.FORBIDDEN.value(), modifyResponse.getStatus());
-        assertEquals(result, modifyResponse.getContentAsString());
-    }
-
-    void testModifyThrowsServiceLockedException(UUID serviceId) throws Exception {
-        // SetUp
-        String message =
-                String.format("Service with id %s is locked from modification.", serviceId);
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
-                Collections.singletonList(message));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-        ModifyRequest modifyRequest = new ModifyRequest();
-        modifyRequest.setFlavor("flavor-error-test");
-        modifyRequest.setServiceRequestProperties(new HashMap<>());
-        // Run the test
-        final MockHttpServletResponse modifyResponse = mockMvc.perform(
-                        put("/xpanse/services/modify/{id}", serviceId)
-                                .content(objectMapper.writeValueAsString(modifyRequest))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
-        assertEquals(result, modifyResponse.getContentAsString());
     }
 
     void testDestroy(UUID taskId) throws Exception {
