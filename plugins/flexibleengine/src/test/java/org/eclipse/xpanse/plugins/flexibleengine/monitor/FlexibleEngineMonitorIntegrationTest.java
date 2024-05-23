@@ -35,6 +35,7 @@ import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceMa
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.price.FlexibleEnginePriceCalculator;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         FlexibleEngineMetricsService.class, FlexibleEngineClient.class,
         FlexibleEngineMonitorConstants.class, FlexibleEngineDataModelConverter.class,
         CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
-        FlexibleEngineTerraformResourceHandler.class, FlexibleEngineResourceManager.class})
+        FlexibleEngineTerraformResourceHandler.class, FlexibleEngineResourceManager.class,
+        FlexibleEnginePriceCalculator.class})
 class FlexibleEngineMonitorIntegrationTest {
 
     @RegisterExtension

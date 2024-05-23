@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.billing.ServicePrice;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -26,11 +27,13 @@ import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
 import org.springframework.stereotype.Component;
 
@@ -43,15 +46,14 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Resource
     private HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler;
-
     @Resource
     private HuaweiCloudMetricsService huaweiCloudMetricsService;
-
     @Resource
     private HuaweiCloudVmStateManager huaweiCloudVmStateManager;
-
     @Resource
     private HuaweiCloudResourceManager huaweiCloudResourceManager;
+    @Resource
+    private HuaweiCloudPriceCalculator huaweiCloudPriceCalculator;
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
@@ -154,5 +156,11 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public void auditApiRequest(AuditLog auditLog) {
         log.info(auditLog.toString());
+    }
+
+
+    @Override
+    public ServicePrice getServicePrice(ServicePriceRequest request) {
+        return huaweiCloudPriceCalculator.getServicePrice(request);
     }
 }

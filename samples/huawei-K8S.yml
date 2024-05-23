@@ -48,7 +48,8 @@ flavors:
                 cloud_service_type: hws.service.type.ebs
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
           licensePrice:
             cost: 1.90
             currency: CNY
@@ -88,7 +89,8 @@ flavors:
                 cloud_service_type: hws.service.type.ebs
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
           licensePrice:
             cost: 3.20
             currency: CNY

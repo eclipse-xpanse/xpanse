@@ -18,9 +18,11 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
+import com.huaweicloud.sdk.bss.v2.BssClient;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.eip.v2.EipClient;
 import com.huaweicloud.sdk.evs.v2.EvsClient;
+import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.huaweicloud.sdk.vpc.v2.VpcClient;
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
@@ -93,6 +95,10 @@ public class ApisTestCommon {
     protected EipClient mockEipClient;
     @MockBean
     protected EvsClient mockEvsClient;
+    @MockBean
+    protected IamClient mockIamClient;
+    @MockBean
+    protected BssClient mockBssClient;
     protected MockedStatic<OSFactory> mockOsFactory;
 
     @BeforeAll
@@ -109,6 +115,8 @@ public class ApisTestCommon {
         when(huaweiCloudClient.getEipClient(any(), any())).thenReturn(mockEipClient);
         when(huaweiCloudClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         when(huaweiCloudClient.getVpcClient(any(), any())).thenReturn(mockVpcClient);
+        when(huaweiCloudClient.getIamClient(any(), any())).thenReturn(mockIamClient);
+        when(huaweiCloudClient.getBssClient(any())).thenReturn(mockBssClient);
     }
 
     protected void mockSdkClientsForFlexibleEngine() {

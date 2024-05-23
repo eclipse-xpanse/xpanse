@@ -9,6 +9,8 @@ package org.eclipse.xpanse.plugins.huaweicloud.common;
 import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.ERROR_CODE_INTERNAL_SERVER_ERROR;
 import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.ERROR_CODE_TOO_MANY_REQUESTS;
 
+import com.huaweicloud.sdk.bss.v2.BssClient;
+import com.huaweicloud.sdk.bss.v2.region.BssRegion;
 import com.huaweicloud.sdk.ces.v1.CesClient;
 import com.huaweicloud.sdk.ces.v1.region.CesRegion;
 import com.huaweicloud.sdk.core.HttpListener;
@@ -22,6 +24,8 @@ import com.huaweicloud.sdk.eip.v2.EipClient;
 import com.huaweicloud.sdk.eip.v2.region.EipRegion;
 import com.huaweicloud.sdk.evs.v2.EvsClient;
 import com.huaweicloud.sdk.evs.v2.region.EvsRegion;
+import com.huaweicloud.sdk.iam.v3.IamClient;
+import com.huaweicloud.sdk.iam.v3.region.IamRegion;
 import com.huaweicloud.sdk.vpc.v2.VpcClient;
 import com.huaweicloud.sdk.vpc.v2.region.VpcRegion;
 import java.util.Objects;
@@ -79,12 +83,12 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
     /**
      * Get HuaweiCloud Eip Client.
      *
-     * @param icredential ICredential
-     * @param regionName  region.
+     * @param basicCredential ICredential
+     * @param regionName      region.
      */
-    public EipClient getEipClient(ICredential icredential, String regionName) {
+    public EipClient getEipClient(ICredential basicCredential, String regionName) {
         return EipClient.newBuilder()
-                .withCredential(icredential)
+                .withCredential(basicCredential)
                 .withRegion(EipRegion.valueOf(regionName))
                 .build();
     }
@@ -92,13 +96,38 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
     /**
      * Get HuaweiCloud Evs Client.
      *
-     * @param icredential ICredential
-     * @param regionName  region.
+     * @param basicCredential ICredential
+     * @param regionName      region.
      */
-    public EvsClient getEvsClient(ICredential icredential, String regionName) {
-        return  EvsClient.newBuilder()
-                .withCredential(icredential)
+    public EvsClient getEvsClient(ICredential basicCredential, String regionName) {
+        return EvsClient.newBuilder()
+                .withCredential(basicCredential)
                 .withRegion(EvsRegion.valueOf(regionName))
+                .build();
+    }
+
+    /**
+     * Get HuaweiCloud Iam Client.
+     *
+     * @param globalCredential ICredential
+     * @param regionName       region.
+     */
+    public IamClient getIamClient(ICredential globalCredential, String regionName) {
+        return IamClient.newBuilder()
+                .withCredential(globalCredential)
+                .withRegion(IamRegion.valueOf(regionName))
+                .build();
+    }
+
+    /**
+     * Get HuaweiCloud Bss Client.
+     *
+     * @param globalCredential ICredential
+     */
+    public BssClient getBssClient(ICredential globalCredential) {
+        return BssClient.newBuilder()
+                .withCredential(globalCredential)
+                .withRegion(BssRegion.CN_NORTH_1)
                 .build();
     }
 

@@ -49,14 +49,16 @@ flavors:
                 cloud_service_type: hws.service.type.ebs
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
             - deployResourceKind: publicIP
               count: 1
               properties:
                 cloud_service_type: hws.service.type.vpc
                 resource_type: hws.resource.type.bandwidth
                 resource_spec: 19_bgp
-                resourceSize: 5
+                resource_size: 5
+                size_measure_id: 15
           licensePrice:
             cost: 0.50
             currency: CNY
@@ -96,14 +98,16 @@ flavors:
                 cloud_service_type: hws.service.type.ebs
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
             - deployResourceKind: publicIP
               count: 1
               properties:
                 cloud_service_type: hws.service.type.vpc
                 resource_type: hws.resource.type.bandwidth
                 resource_spec: 19_bgp
-                resourceSize: 5
+                resource_size: 5
+                size_measure_id: 15
           licensePrice:
             cost: 0.80
             currency: CNY
@@ -143,14 +147,16 @@ flavors:
                 cloud_service_type: hws.service.type.ebs
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
             - deployResourceKind: publicIP
               count: 1
               properties:
                 cloud_service_type: hws.service.type.vpc
                 resource_type: hws.resource.type.bandwidth
                 resource_spec: 19_bgp
-                resourceSize: 5
+                resource_size: 5
+                size_measure_id: 15
           licensePrice:
             cost: 1.21
             currency: CNY

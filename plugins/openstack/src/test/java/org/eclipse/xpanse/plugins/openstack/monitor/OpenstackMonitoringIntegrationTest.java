@@ -54,6 +54,7 @@ import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.MeasuresService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.api.ResourcesService;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils.GnocchiToXpanseModelConverter;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils.MetricsQueryBuilder;
+import org.eclipse.xpanse.plugins.openstack.price.OpenstackPriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
 import org.instancio.Instancio;
 import org.instancio.Select;
@@ -73,20 +74,17 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         KeystoneManager.class, ResourcesService.class, GnocchiToXpanseModelConverter.class,
         AggregationService.class, MeasuresService.class, MetricsQueryBuilder.class,
         CredentialCenter.class, ServiceMetricsStore.class, OpenstackTerraformResourceHandler.class,
-        DeployEnvironments.class, AesUtil.class, PluginManager.class,ServiceTemplateStorage.class
-        , OpenstackResourceManager.class})
+        DeployEnvironments.class, AesUtil.class, PluginManager.class, ServiceTemplateStorage.class,
+        OpenstackResourceManager.class, OpenstackPriceCalculator.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpenstackMonitoringIntegrationTest {
 
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
-            .options(wireMockConfig()
-                    .dynamicPort()
-                    .extensions(
-                            new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
-                                    false, new ClasspathFileSource("src/test/resources/mappings"),
-                                    Collections.emptyList())))
-            .build();
+            .options(wireMockConfig().dynamicPort().extensions(
+                    new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
+                            false, new ClasspathFileSource("src/test/resources/mappings"),
+                            Collections.emptyList()))).build();
     @Autowired
     OpenstackOrchestratorPlugin plugin;
     @MockBean
@@ -143,10 +141,13 @@ class OpenstackMonitoringIntegrationTest {
         deployment.setVariables(variables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
-        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(
+                serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
-                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
+                any(), any(), any(), any())).thenReturn(
+                Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, null, false));
         Assertions.assertFalse(metrics.isEmpty());
@@ -177,10 +178,13 @@ class OpenstackMonitoringIntegrationTest {
         deployment.setVariables(variables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
-        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(
+                serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
-                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
+                any(), any(), any(), any())).thenReturn(
+                Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         Long currentTime = Instant.now().getEpochSecond();
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(
@@ -213,10 +217,13 @@ class OpenstackMonitoringIntegrationTest {
         deployment.setVariables(variables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
-        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(
+                serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
-                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
+                any(), any(), any(), any())).thenReturn(
+                Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, false));
         Assertions.assertFalse(metrics.isEmpty());
@@ -243,10 +250,13 @@ class OpenstackMonitoringIntegrationTest {
         deployment.setVariables(variables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
-        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(
+                serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
-                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
+                any(), any(), any(), any())).thenReturn(
+                Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
                 this.plugin.getMetricsForResource(setupResourceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());
@@ -275,10 +285,13 @@ class OpenstackMonitoringIntegrationTest {
         deployment.setVariables(variables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(deployServiceEntity);
-        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
+        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
+                deployServiceEntity);
+        when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(
+                serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
-                any(), any(), any(), any())).thenReturn(Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
+                any(), any(), any(), any())).thenReturn(
+                Map.of("OS_AUTH_URL", wireMockExtension.baseUrl() + "/identity/v3"));
         List<Metric> metrics =
                 this.plugin.getMetricsForService(setupServiceRequest(null, null, 150, true));
         Assertions.assertFalse(metrics.isEmpty());

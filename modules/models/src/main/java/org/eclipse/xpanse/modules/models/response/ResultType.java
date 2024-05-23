@@ -68,6 +68,7 @@ public enum ResultType {
     BILLING_MODE_NOT_SUPPORTED("Billing Mode Not Supported"),
     SERVICE_STATE_MANAGEMENT_TASK_NOT_FOUND("Service State Management Task Not Found"),
     SERVICE_MODIFICATION_AUDIT_NOT_FOUND("Service Modification Audit Not Found"),
+    SERVICE_PRICE_CALCULATION_FAILED("Service Price Calculation Failed"),
     INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details");
 
     private final String value;

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.billing.ServicePrice;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -26,11 +27,13 @@ import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceManager;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
+import org.eclipse.xpanse.plugins.flexibleengine.price.FlexibleEnginePriceCalculator;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +51,9 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     private FlexibleEngineVmStateManager flexibleEngineVmStateManagerService;
     @Resource
     private FlexibleEngineResourceManager flexibleEngineResourceManager;
+
+    @Resource
+    private FlexibleEnginePriceCalculator pricingCalculator;
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
@@ -149,5 +155,10 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public void auditApiRequest(AuditLog auditLog) {
         log.info(auditLog.toString());
+    }
+
+    @Override
+    public ServicePrice getServicePrice(ServicePriceRequest request) {
+        return pricingCalculator.getServicePrice(request);
     }
 }
