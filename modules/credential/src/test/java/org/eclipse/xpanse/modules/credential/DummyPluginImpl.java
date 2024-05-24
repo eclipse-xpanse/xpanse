@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.java.Log;
+import org.eclipse.xpanse.modules.models.billing.ServicePrice;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -24,6 +25,7 @@ import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.springframework.stereotype.Component;
 
@@ -122,6 +124,11 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     @Override
     public void auditApiRequest(AuditLog auditLog) {
         log.info(auditLog.toString());
+    }
+
+    @Override
+    public ServicePrice getServicePrice(ServicePriceRequest request) {
+        return null;
     }
 }
 

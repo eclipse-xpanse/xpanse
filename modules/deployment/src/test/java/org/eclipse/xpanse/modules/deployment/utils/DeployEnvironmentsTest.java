@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
+import org.eclipse.xpanse.modules.models.billing.ServicePrice;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -49,6 +50,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.Assertions;
@@ -304,6 +306,11 @@ class DeployEnvironmentsTest {
         xpanseDeployTask.setDeployRequest(deployRequest);
 
         OrchestratorPlugin plugin = new OrchestratorPlugin() {
+            @Override
+            public ServicePrice getServicePrice(ServicePriceRequest request) {
+                return null;
+            }
+
             @Override
             public void auditApiRequest(AuditLog auditLog) {
                 log.info(auditLog.toString());

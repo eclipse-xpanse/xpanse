@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.models.billing.ServicePrice;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -32,6 +33,7 @@ import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.junit.jupiter.api.Assertions;
@@ -198,6 +200,11 @@ class ServiceMetricsAdapterTest {
 
     private OrchestratorPlugin getOrchestratorPlugin(Csp csp, List<Metric> metrics) {
         return new OrchestratorPlugin() {
+
+            @Override
+            public ServicePrice getServicePrice(ServicePriceRequest request) {
+                return null;
+            }
 
             @Override
             public void auditApiRequest(AuditLog auditLog) {

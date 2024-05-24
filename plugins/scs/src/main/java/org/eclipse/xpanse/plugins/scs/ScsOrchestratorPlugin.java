@@ -6,12 +6,14 @@
 
 package org.eclipse.xpanse.plugins.scs;
 
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.billing.ServicePrice;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -25,12 +27,13 @@ import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
 import org.eclipse.xpanse.plugins.scs.manage.ScsResourceManager;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
+import org.eclipse.xpanse.plugins.scs.price.ScsPriceCalculator;
 import org.eclipse.xpanse.plugins.scs.resourcehandler.ScsTerraformResourceHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,21 +43,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
-    private final ScsTerraformResourceHandler scsTerraformResourceHandler;
-    private final ScsServersManager scsServersManager;
-    private final ScsResourceManager scsResourceManager;
-
-    /**
-     * Constructor.
-     */
-    @Autowired
-    public ScsOrchestratorPlugin(ScsTerraformResourceHandler scsTerraformResourceHandler,
-            ScsServersManager scsServersManager,
-            ScsResourceManager scsResourceManager) {
-        this.scsTerraformResourceHandler = scsTerraformResourceHandler;
-        this.scsServersManager = scsServersManager;
-        this.scsResourceManager = scsResourceManager;
-    }
+    @Resource
+    private ScsTerraformResourceHandler scsTerraformResourceHandler;
+    @Resource
+    private ScsServersManager scsServersManager;
+    @Resource
+    private ScsResourceManager scsResourceManager;
+    @Resource
+    private ScsPriceCalculator scsPricingCalculator;
 
 
     /**
@@ -171,5 +167,10 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public void auditApiRequest(AuditLog auditLog) {
         log.info(auditLog.toString());
+    }
+
+    @Override
+    public ServicePrice getServicePrice(ServicePriceRequest request) {
+        return scsPricingCalculator.getServicePrice(request);
     }
 }

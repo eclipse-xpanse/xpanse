@@ -34,6 +34,7 @@ import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,10 +48,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class,
         HuaweiCloudVmStateManager.class, HuaweiCloudServerManageRequestConverter.class,
-        HuaweiCloudMetricsService.class, HuaweiCloudClient.class,
-        HuaweiCloudMonitorConstants.class, HuaweiCloudDataModelConverter.class,
-        CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
-        HuaweiCloudTerraformResourceHandler.class, HuaweiCloudResourceManager.class})
+        HuaweiCloudMetricsService.class, HuaweiCloudClient.class, HuaweiCloudMonitorConstants.class,
+        HuaweiCloudDataModelConverter.class, CredentialCenter.class, ServiceMetricsStore.class,
+        ServiceMetricsCacheManager.class, HuaweiCloudTerraformResourceHandler.class,
+        HuaweiCloudResourceManager.class, HuaweiCloudPriceCalculator.class})
 class HuaweiCloudMonitorIntegrationTest {
 
     @RegisterExtension
@@ -78,16 +79,15 @@ class HuaweiCloudMonitorIntegrationTest {
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "cn-southwest-2")));
-        return new ResourceMetricsRequest(UUID.randomUUID(), deployResource, monitorResourceType, from, to, null,
-                onlyLastKnownMetric, "userId");
+        return new ResourceMetricsRequest(UUID.randomUUID(), deployResource, monitorResourceType,
+                from, to, null, onlyLastKnownMetric, "userId");
     }
 
     void mockCesClient() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 getCredentialDefinition());
         when(this.huaweiCloudClient.getCesClient(any(), any())).thenReturn(getCesClient());
-        when(this.huaweiCloudClient.getCredential(any())).thenReturn(
-                getCredential());
+        when(this.huaweiCloudClient.getCredential(any())).thenReturn(getCredential());
     }
 
 
@@ -99,9 +99,8 @@ class HuaweiCloudMonitorIntegrationTest {
         deployResource.setName("name");
         deployResource.setKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "cn-southwest-2")));
-        return new ServiceMetricsRequest(UUID.randomUUID(), List.of(deployResource), monitorResourceType, from, to,
-                null,
-                onlyLastKnownMetric, "userId");
+        return new ServiceMetricsRequest(UUID.randomUUID(), List.of(deployResource),
+                monitorResourceType, from, to, null, onlyLastKnownMetric, "userId");
     }
 
     void mockAllRequestForService() {
@@ -134,10 +133,9 @@ class HuaweiCloudMonitorIntegrationTest {
     void testGetMetricsForResourceWithParamsFromAndTo() {
         mockCesClient();
         // Setup
-        ResourceMetricsRequest resourceMetricRequest =
-                setUpResourceMetricRequest(null, System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
-                        System.currentTimeMillis(), false);
+        ResourceMetricsRequest resourceMetricRequest = setUpResourceMetricRequest(null,
+                System.currentTimeMillis() - HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
+                System.currentTimeMillis(), false);
         mockCesClient();
 
         // Run the test
@@ -156,8 +154,8 @@ class HuaweiCloudMonitorIntegrationTest {
     void testGetMetricsForResourceWithParamsTypeCpu() {
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
-                setUpResourceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.THREE_DAY_MILLISECONDS,
+                setUpResourceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis()
+                                - HuaweiCloudMonitorConstants.THREE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
         mockCesClient();
 
@@ -167,7 +165,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.CPU, metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(MonitorResourceType.CPU,
+                metrics.getFirst().getMonitorResourceType());
         Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
@@ -176,8 +175,8 @@ class HuaweiCloudMonitorIntegrationTest {
     void testGetMetricsForResourceWithParamsTypeMem() {
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
-                setUpResourceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.TEN_DAY_MILLISECONDS,
+                setUpResourceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis()
+                                - HuaweiCloudMonitorConstants.TEN_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
         mockCesClient();
 
@@ -187,7 +186,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Verify the results
         Assertions.assertFalse(metrics.isEmpty());
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.MEM, metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(MonitorResourceType.MEM,
+                metrics.getFirst().getMonitorResourceType());
         Assertions.assertEquals(5, metrics.getFirst().getMetrics().size());
     }
 
@@ -197,8 +197,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
-                        System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.ONE_MONTH_MILLISECONDS,
+                        System.currentTimeMillis()
+                                - HuaweiCloudMonitorConstants.ONE_MONTH_MILLISECONDS,
                         System.currentTimeMillis(), false);
         mockCesClient();
 
@@ -219,8 +219,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Setup
         ResourceMetricsRequest resourceMetricRequest =
                 setUpResourceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
-                        System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.ONE_MONTH_MILLISECONDS - 1,
+                        System.currentTimeMillis()
+                                - HuaweiCloudMonitorConstants.ONE_MONTH_MILLISECONDS - 1,
                         System.currentTimeMillis(), false);
         mockCesClient();
 
@@ -258,10 +258,9 @@ class HuaweiCloudMonitorIntegrationTest {
     @Test
     void testGetMetricsForServiceWithParamsFromAndTo() {
         // Setup
-        ServiceMetricsRequest serviceMetricRequest =
-                setUpServiceMetricRequest(null, System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
-                        System.currentTimeMillis(), false);
+        ServiceMetricsRequest serviceMetricRequest = setUpServiceMetricRequest(null,
+                System.currentTimeMillis() - HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
+                System.currentTimeMillis(), false);
         mockAllRequestForService();
 
         // Run the test
@@ -279,8 +278,8 @@ class HuaweiCloudMonitorIntegrationTest {
     void testGetMetricsForServiceWithParamsTypeCpu() {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
-                setUpServiceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
+                setUpServiceMetricRequest(MonitorResourceType.CPU, System.currentTimeMillis()
+                                - HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
         mockAllRequestForService();
 
@@ -289,7 +288,8 @@ class HuaweiCloudMonitorIntegrationTest {
 
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.CPU, metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(MonitorResourceType.CPU,
+                metrics.getFirst().getMonitorResourceType());
         Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
@@ -297,8 +297,8 @@ class HuaweiCloudMonitorIntegrationTest {
     void testGetMetricsForServiceWithParamsTypeMem() {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
-                setUpServiceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
+                setUpServiceMetricRequest(MonitorResourceType.MEM, System.currentTimeMillis()
+                                - HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
         mockAllRequestForService();
 
@@ -307,7 +307,8 @@ class HuaweiCloudMonitorIntegrationTest {
 
         // Verify the results
         Assertions.assertEquals(1, metrics.size());
-        Assertions.assertEquals(MonitorResourceType.MEM, metrics.getFirst().getMonitorResourceType());
+        Assertions.assertEquals(MonitorResourceType.MEM,
+                metrics.getFirst().getMonitorResourceType());
         Assertions.assertEquals(4, metrics.getFirst().getMetrics().size());
     }
 
@@ -316,8 +317,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_INCOMING,
-                        System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
+                        System.currentTimeMillis()
+                                - HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
         mockAllRequestForService();
 
@@ -336,8 +337,8 @@ class HuaweiCloudMonitorIntegrationTest {
         // Setup
         ServiceMetricsRequest serviceMetricRequest =
                 setUpServiceMetricRequest(MonitorResourceType.VM_NETWORK_OUTGOING,
-                        System.currentTimeMillis() -
-                                HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
+                        System.currentTimeMillis()
+                                - HuaweiCloudMonitorConstants.ONE_DAY_MILLISECONDS,
                         System.currentTimeMillis(), false);
         mockAllRequestForService();
 
@@ -368,9 +369,9 @@ class HuaweiCloudMonitorIntegrationTest {
 
 
     private CesClient getCesClient() {
-        ICredential iCredential = new BasicCredentials()
-                .withAk(HuaweiCloudMonitorConstants.HW_ACCESS_KEY)
-                .withSk(HuaweiCloudMonitorConstants.HW_SECRET_KEY);
+        ICredential iCredential =
+                new BasicCredentials().withAk(HuaweiCloudMonitorConstants.HW_ACCESS_KEY)
+                        .withSk(HuaweiCloudMonitorConstants.HW_SECRET_KEY);
         HcClient hcClient = new HcClient(HttpConfig.getDefaultHttpConfig());
         hcClient.withCredential(iCredential);
         hcClient.withEndpoints(
@@ -379,8 +380,7 @@ class HuaweiCloudMonitorIntegrationTest {
     }
 
     private ICredential getCredential() {
-        return new BasicCredentials()
-                .withAk(HuaweiCloudMonitorConstants.HW_ACCESS_KEY)
+        return new BasicCredentials().withAk(HuaweiCloudMonitorConstants.HW_ACCESS_KEY)
                 .withSk(HuaweiCloudMonitorConstants.HW_SECRET_KEY);
     }
 

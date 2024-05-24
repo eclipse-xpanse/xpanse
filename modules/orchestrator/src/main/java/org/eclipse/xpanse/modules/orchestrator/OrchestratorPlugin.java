@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.orchestrator.audit.OperationalAudit;
 import org.eclipse.xpanse.modules.orchestrator.credential.AuthenticationCapabilities;
 import org.eclipse.xpanse.modules.orchestrator.deployment.ServiceResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
+import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceCalculator;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManager;
 
 
@@ -20,7 +21,7 @@ import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManager;
  * APIs.
  */
 public interface OrchestratorPlugin extends ServiceResourceHandler, AuthenticationCapabilities,
-        ServiceMetricsExporter, ServiceStateManager, OperationalAudit {
+        ServiceMetricsExporter, ServiceStateManager, OperationalAudit, ServicePriceCalculator {
 
     /**
      * get the Csp of the plugin.

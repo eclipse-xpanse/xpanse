@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.billing.ServicePrice;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -27,11 +28,13 @@ import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.manage.OpenstackResourceManager;
 import org.eclipse.xpanse.plugins.openstack.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
+import org.eclipse.xpanse.plugins.openstack.price.OpenstackPriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +44,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
-
     @Resource
     private OpenstackTerraformResourceHandler openstackTerraformResourceHandler;
     @Resource
@@ -50,6 +52,8 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     private OpenstackServersManager openstackServersManager;
     @Resource
     private OpenstackResourceManager openStackResourceManager;
+    @Resource
+    private OpenstackPriceCalculator openstackPriceCalculator;
 
     /**
      * Get the resource handlers for OpenStack.
@@ -64,7 +68,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                   DeployResourceKind kind) {
+                                                         DeployResourceKind kind) {
         return openStackResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
     }
 
@@ -174,5 +178,10 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public void auditApiRequest(AuditLog auditLog) {
         log.info(auditLog.toString());
+    }
+
+    @Override
+    public ServicePrice getServicePrice(ServicePriceRequest request) {
+        return openstackPriceCalculator.getServicePrice(request);
     }
 }

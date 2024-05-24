@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
@@ -24,13 +25,12 @@ public class Price implements Serializable {
 
     @NotNull
     @Schema(description = "The value of the cost.")
-    private Long cost;
+    private BigDecimal cost;
 
     @NotNull
     @Schema(description = "The currency of the cost.")
     private Currency currency;
 
-    @NotNull
     @Schema(description = "The period of the cost.")
     private PricingPeriod period;
 }

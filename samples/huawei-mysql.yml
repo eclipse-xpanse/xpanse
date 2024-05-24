@@ -48,14 +48,16 @@ flavors:
                 cloud_service_type: hws.service.type.rds
                 resource_type: ws.resource.type.rds.volume
                 resource_spec: rds.mysql.volume.cloudssd.ha
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
             - deployResourceKind: publicIP
               count: 1
               properties:
                 cloud_service_type: hws.service.type.vpc
                 resource_type: hws.resource.type.bandwidth
                 resource_spec: 19_bgp
-                resourceSize: 5
+                resource_size: 5
+                size_measure_id: 15
           licensePrice:
             cost: 1.50
             currency: CNY
@@ -95,14 +97,16 @@ flavors:
                 cloud_service_type: hws.service.type.rds
                 resource_type: ws.resource.type.rds.volume
                 resource_spec: rds.mysql.volume.cloudssd.ha
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
             - deployResourceKind: publicIP
               count: 1
               properties:
                 cloud_service_type: hws.service.type.vpc
                 resource_type: hws.resource.type.bandwidth
                 resource_spec: 19_bgp
-                resourceSize: 5
+                resource_size: 5
+                size_measure_id: 15
           licensePrice:
             cost: 1.60
             currency: CNY

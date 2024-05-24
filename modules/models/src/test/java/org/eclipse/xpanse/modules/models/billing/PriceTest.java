@@ -2,6 +2,7 @@ package org.eclipse.xpanse.modules.models.billing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
 import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,7 @@ import org.springframework.beans.BeanUtils;
 
 class PriceTest {
 
-    private final long cost = 10;
+    private final BigDecimal cost = BigDecimal.ONE;
     private final Currency currency = Currency.USD;
     private final PricingPeriod period = PricingPeriod.MONTHLY;
 

@@ -33,30 +33,6 @@ flavors:
       priority: 2
       # The pricing of the flavor.
       pricing:
-        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
-        resourceUsage:
-          resources:
-            - deployResourceKind: vm
-              count: 4
-              properties:
-                cloud_service_type: hws.service.type.ec2
-                resource_type: hws.resource.type.vm
-                resource_spec: s6.large.2.linux
-            - deployResourceKind: volume
-              count: 4
-              properties:
-                cloud_service_type: hws.service.type.ebs
-                resource_type: hws.resource.type.volume
-                resource_spec: SSD
-                resourceSize: 40
-          licensePrice:
-            cost: 0.2452
-            currency: EUR
-            period: hourly
-          markUpPrice:
-            cost: 0.2065
-            currency: EUR
-            period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrice:
           cost: 95.20
@@ -73,30 +49,6 @@ flavors:
       priority: 1
       # The pricing of the flavor.
       pricing:
-        # Used to calculate charges when users select 'pay_per_use' as the billing mode.
-        resourceUsage:
-          resources:
-            - deployResourceKind: vm
-              count: 4
-              properties:
-                cloud_service_type: hws.service.type.ec2
-                resource_type: hws.resource.type.vm
-                resource_spec: s6.large.4.linux
-            - deployResourceKind: volume
-              count: 4
-              properties:
-                cloud_service_type: hws.service.type.ebs
-                resource_type: hws.resource.type.volume
-                resource_spec: SSD
-                resourceSize: 40
-          licensePrice:
-            cost: 0.4130
-            currency: EUR
-            period: hourly
-          markUpPrice:
-            cost: 0.4013
-            currency: EUR
-            period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrice:
           cost: 126.48

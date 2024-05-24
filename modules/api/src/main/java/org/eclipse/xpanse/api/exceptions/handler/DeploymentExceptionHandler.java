@@ -9,6 +9,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.models.billing.exceptions.ServicePriceCalculationFailed;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ActivitiTaskNotFoundException;
@@ -224,7 +225,7 @@ public class DeploymentExceptionHandler {
         return Response.errorResponse(ResultType.BILLING_MODE_NOT_SUPPORTED,
                 Collections.singletonList(ex.getMessage()));
     }
-
+  
     /**
      * Exception handler for ServiceStateManagementTaskNotFound.
      */
@@ -246,6 +247,17 @@ public class DeploymentExceptionHandler {
     public Response handleServiceModificationAuditNotFound(
             ServiceModificationAuditNotFound ex) {
         return Response.errorResponse(ResultType.SERVICE_MODIFICATION_AUDIT_NOT_FOUND,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServicePriceCalculationFailed.
+     */
+    @ExceptionHandler({ServicePriceCalculationFailed.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServicePriceCalculationFailed(ServicePriceCalculationFailed ex) {
+        return Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 }
