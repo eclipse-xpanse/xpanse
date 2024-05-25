@@ -6,14 +6,18 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
@@ -51,6 +55,8 @@ public class ServiceStateManager {
     private UserServiceHelper userServiceHelper;
     @Resource
     private DatabaseServiceStateManagementTaskStorage taskStorage;
+    @Resource
+    private DatabaseDeployServiceStorage deployServiceStorage;
     @Qualifier("xpanseAsyncTaskExecutor")
     @Resource
     private Executor taskExecutor;
@@ -204,10 +210,10 @@ public class ServiceStateManager {
      * @return list of service state management tasks.
      */
     public List<ServiceStateManagementTaskDetails> listServiceStateManagementTasks(
-            UUID serviceId, ServiceStateManagementTaskType taskType,
-            TaskStatus taskStatus) {
+            UUID serviceId, ServiceStateManagementTaskType taskType, TaskStatus taskStatus) {
+        DeployServiceEntity deployedService = getDeployServiceEntity(serviceId);
         ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
-        taskQuery.setServiceId(serviceId);
+        taskQuery.setServiceId(deployedService.getId());
         taskQuery.setTaskType(taskType);
         taskQuery.setTaskStatus(taskStatus);
         List<ServiceStateManagementTaskEntity> taskEntities = taskStorage.queryTasks(taskQuery);
@@ -222,8 +228,9 @@ public class ServiceStateManager {
      * @param serviceId service id.
      */
     public void deleteManagementTasksByServiceId(UUID serviceId) {
+        DeployServiceEntity deployService = getDeployServiceEntity(serviceId);
         ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
-        taskQuery.setServiceId(serviceId);
+        taskQuery.setServiceId(deployService.getId());
         List<ServiceStateManagementTaskEntity> taskEntities = taskStorage.queryTasks(taskQuery);
         taskStorage.batchRemove(taskEntities);
     }
@@ -236,7 +243,7 @@ public class ServiceStateManager {
      * @return service state management task details.
      */
     public ServiceStateManagementTaskDetails getManagementTaskDetailsByTaskId(UUID taskId) {
-        ServiceStateManagementTaskEntity taskEntity = taskStorage.getTaskById(taskId);
+        ServiceStateManagementTaskEntity taskEntity = getManagementTaskEntity(taskId);
         return EntityTransUtils.transToServiceStateManagementTaskDetails(taskEntity);
     }
 
@@ -264,7 +271,8 @@ public class ServiceStateManager {
      * @param taskId task id.
      */
     public void deleteManagementTaskByTaskId(UUID taskId) {
-        taskStorage.remove(taskStorage.getTaskById(taskId));
+        ServiceStateManagementTaskEntity task = getManagementTaskEntity(taskId);
+        taskStorage.remove(task);
     }
 
     private DeployServiceEntity getDeployedServiceAndValidateState(
@@ -313,7 +321,6 @@ public class ServiceStateManager {
         }
     }
 
-
     private void validateDeployServiceEntity(DeployServiceEntity service) {
         if (service.getDeployRequest().getServiceHostingType() == ServiceHostingType.SELF) {
             boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(service.getUserId());
@@ -338,8 +345,8 @@ public class ServiceStateManager {
         List<DeployResourceEntity> vmResources =
                 CollectionUtils.isEmpty(service.getDeployResourceList()) ? Collections.emptyList()
                         : service.getDeployResourceList().stream()
-                                .filter(resource -> resource.getKind() == DeployResourceKind.VM)
-                                .toList();
+                        .filter(resource -> resource.getKind() == DeployResourceKind.VM)
+                        .toList();
         if (CollectionUtils.isEmpty(vmResources)) {
             String errorMsg =
                     String.format("Service with id %s has no vm resources.", service.getId());
@@ -354,5 +361,41 @@ public class ServiceStateManager {
         serviceStateManageRequest.setRegionName(
                 vmResources.getFirst().getProperties().get("region"));
         return serviceStateManageRequest;
+    }
+
+
+    private DeployServiceEntity getDeployServiceEntity(UUID serviceId) {
+        DeployServiceEntity deployedService = deployServiceStorage.findDeployServiceById(serviceId);
+        if (Objects.nonNull(deployedService)) {
+            if (isNotOwnerOrAdminUser(deployedService)) {
+                String errorMsg = "No permissions to manage service state management tasks of "
+                        + "the services belonging to other users";
+                throw new AccessDeniedException(errorMsg);
+            }
+        }
+        return deployedService;
+    }
+
+    private ServiceStateManagementTaskEntity getManagementTaskEntity(UUID taskId) {
+        ServiceStateManagementTaskEntity task = taskStorage.getTaskById(taskId);
+        if (Objects.nonNull(task)) {
+            DeployServiceEntity deployedService =
+                    deployServiceStorage.findDeployServiceById(task.getServiceId());
+            if (Objects.nonNull(deployedService)) {
+                if (isNotOwnerOrAdminUser(deployedService)) {
+                    String errorMsg = "No permissions to manage service state management tasks of "
+                            + "the services belonging to other users";
+                    throw new AccessDeniedException(errorMsg);
+                }
+            }
+        }
+        return task;
+    }
+
+
+    private boolean isNotOwnerOrAdminUser(DeployServiceEntity deployServiceEntity) {
+        boolean isOwner = userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+        boolean isAdmin = userServiceHelper.currentUserHasRole(ROLE_ADMIN);
+        return !isOwner && !isAdmin;
     }
 }
