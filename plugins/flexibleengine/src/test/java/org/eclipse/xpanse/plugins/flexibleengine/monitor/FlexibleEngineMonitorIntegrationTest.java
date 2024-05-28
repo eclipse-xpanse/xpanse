@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceManager;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
@@ -53,7 +54,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         FlexibleEngineMonitorConstants.class, FlexibleEngineDataModelConverter.class,
         CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
         FlexibleEngineTerraformResourceHandler.class, FlexibleEngineResourceManager.class,
-        FlexibleEnginePriceCalculator.class})
+        FlexibleEnginePriceCalculator.class, FlexibleEngineRetryStrategy.class})
 class FlexibleEngineMonitorIntegrationTest {
 
     @RegisterExtension
@@ -71,6 +72,9 @@ class FlexibleEngineMonitorIntegrationTest {
 
     @MockBean
     FlexibleEngineClient client;
+
+    @MockBean
+    FlexibleEngineRetryStrategy retryStrategy;
 
     ResourceMetricsRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
                                                       Long from, Long to,

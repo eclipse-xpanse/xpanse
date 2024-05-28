@@ -6,9 +6,6 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.price;
 
-import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS;
-import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.DEFAULT_RETRY_TIMES;
-
 import com.huaweicloud.sdk.bss.v2.BssClient;
 import com.huaweicloud.sdk.bss.v2.model.DemandProductInfo;
 import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsRequest;
@@ -43,7 +40,9 @@ import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedE
 import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,20 +56,12 @@ public class HuaweiCloudPriceCalculator {
     private static final BigDecimal HOURS_PER_YEAR = BigDecimal.valueOf(24 * 365L);
     private static final int SCALE = 4;
     private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
-
-    private final CredentialCenter credentialCenter;
-    private final HuaweiCloudClient huaweiCloudClient;
-
-
-    /**
-     * Constructs a HuaweiCloudPriceCalculator with the necessary dependencies.
-     */
-    @Autowired
-    public HuaweiCloudPriceCalculator(CredentialCenter credentialCenter,
-                                      HuaweiCloudClient huaweiCloudClient) {
-        this.credentialCenter = credentialCenter;
-        this.huaweiCloudClient = huaweiCloudClient;
-    }
+    @jakarta.annotation.Resource
+    private CredentialCenter credentialCenter;
+    @jakarta.annotation.Resource
+    private HuaweiCloudClient huaweiCloudClient;
+    @jakarta.annotation.Resource
+    private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
 
 
     /**
@@ -79,14 +70,20 @@ public class HuaweiCloudPriceCalculator {
      * @param request service price request
      * @return price
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
         if (request.getBillingMode() == BillingMode.PAY_PER_USE) {
             try {
                 return getServicePriceWithPayPerUse(request);
             } catch (Exception e) {
-                String errorMessage = "Get service price with billingModel Pay per Use error."
+                String errorMsg = "Get service price with billingModel Pay per Use error."
                         + e.getMessage();
-                throw new ClientApiCallFailedException(errorMessage);
+                int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                        ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+                log.error(errorMsg + " Retry count:" + retryCount);
+                throw new ClientApiCallFailedException(errorMsg);
             }
         } else {
             return getServicePriceWithFixed(request);
@@ -123,9 +120,9 @@ public class HuaweiCloudPriceCalculator {
                 convertToPayPerUseRequest(request, projectId);
         ListOnDemandResourceRatingsResponse response =
                 bssClient.listOnDemandResourceRatingsInvoker(payPerUseRequest)
-                        .retryTimes(DEFAULT_RETRY_TIMES)
-                        .retryCondition(huaweiCloudClient::matchRetryCondition)
-                        .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                        .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                        .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                        .backoffStrategy(huaweiCloudRetryStrategy)
                         .invoke();
         return convertResourceRatingsResponseToRecurringPrice(response);
     }
@@ -137,9 +134,9 @@ public class HuaweiCloudPriceCalculator {
         KeystoneListProjectsRequest listProjectsRequest = new KeystoneListProjectsRequest();
         KeystoneListProjectsResponse listProjectsResponse =
                 iamClient.keystoneListProjectsInvoker(listProjectsRequest)
-                        .retryTimes(DEFAULT_RETRY_TIMES)
-                        .retryCondition(huaweiCloudClient::matchRetryCondition)
-                        .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                        .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                        .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                        .backoffStrategy(huaweiCloudRetryStrategy)
                         .invoke();
         if (CollectionUtils.isNotEmpty(listProjectsResponse.getProjects())) {
             projectId = listProjectsResponse.getProjects().getFirst().getId();

@@ -14,18 +14,12 @@ import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineCon
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.IAM_ENDPOINT_PREFIX;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.PROTOCOL_HTTPS;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.VPC_ENDPOINT_PREFIX;
-import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_DELAY_MILLIS;
-import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_RETRY_TIMES;
-import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.ERROR_CODE_INTERNAL_SERVER_ERROR;
-import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.ERROR_CODE_TOO_MANY_REQUESTS;
 
 import com.huaweicloud.sdk.ces.v1.CesClient;
 import com.huaweicloud.sdk.core.HcClient;
 import com.huaweicloud.sdk.core.HttpListener;
-import com.huaweicloud.sdk.core.SdkResponse;
 import com.huaweicloud.sdk.core.auth.BasicCredentials;
 import com.huaweicloud.sdk.core.auth.ICredential;
-import com.huaweicloud.sdk.core.exception.ServiceResponseException;
 import com.huaweicloud.sdk.core.http.HttpConfig;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.eip.v2.EipClient;
@@ -34,6 +28,7 @@ import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsRequest;
 import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsResponse;
 import com.huaweicloud.sdk.vpc.v2.VpcClient;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,6 +44,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class FlexibleEngineClient extends FlexibleEngineCredentials {
+
+    @Resource
+    private FlexibleEngineRetryStrategy retryStrategy;
 
     /**
      * Get client for service ECS.
@@ -110,25 +108,6 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
         return new EvsClient(hcClient);
     }
 
-    /**
-     * Match retry condition.
-     *
-     * @param response response
-     * @param ex       exception
-     * @return true if match retry condition, otherwise false
-     */
-    public boolean matchRetryCondition(SdkResponse response, Exception ex) {
-        if (Objects.isNull(ex)) {
-            return false;
-        }
-        if (!ServiceResponseException.class.isAssignableFrom(ex.getClass())) {
-            return false;
-        }
-        int statusCode = ((ServiceResponseException) ex).getHttpStatusCode();
-        return statusCode == ERROR_CODE_TOO_MANY_REQUESTS
-                || statusCode == ERROR_CODE_INTERNAL_SERVER_ERROR;
-    }
-
     private HcClient getHcClient(ICredential credential, String servicePrefix, String regionName) {
         String endpoint = PROTOCOL_HTTPS + servicePrefix + regionName + ENDPOINT_SUFFIX;
         HcClient hcClient = new HcClient(getHttpConfig());
@@ -161,42 +140,56 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
             listProjectsRequest.setName(regionName);
             KeystoneListProjectsResponse response =
                     iamClient.keystoneListProjectsInvoker(listProjectsRequest)
-                            .retryTimes(DEFAULT_RETRY_TIMES)
-                            .retryCondition(this::matchRetryCondition)
-                            .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                            .retryTimes(retryStrategy.getRetryMaxAttempts())
+                            .retryCondition(retryStrategy::matchRetryCondition)
+                            .backoffStrategy(retryStrategy)
                             .invoke();
             if (Objects.nonNull(response) && CollectionUtils.isNotEmpty(response.getProjects())) {
                 projectId = response.getProjects().getFirst().getId();
             }
         } catch (RuntimeException e) {
             String errorMsg =
-                    String.format("Query project id by region name: %s failed.", regionName);
+                    String.format("Query project id by region name %s failed.", regionName);
             throw new ClientApiCallFailedException(errorMsg);
         }
         if (StringUtils.isNotBlank(projectId)) {
-            log.info("Query project id:{} by region name:{} success.", projectId, regionName);
+            log.info("Query project id {} by region name {} success.", projectId, regionName);
             return projectId;
         }
-        String errorMsg = String.format("Query project id by region name: %s failed.", regionName);
+        String errorMsg = String.format("Query project id by region name %s failed.", regionName);
         throw new ClientApiCallFailedException(errorMsg);
     }
 
     private HttpConfig getHttpConfig() {
         HttpConfig httpConfig = HttpConfig.getDefaultHttpConfig();
         if (log.isInfoEnabled()) {
-            HttpListener requestListener = HttpListener.forRequestListener(
-                    listener -> log.info("> Request %s %s\n> Headers:\n%s\n> Body: %s\n",
-                            listener.httpMethod(), listener.uri(),
-                            getRequestHeadersString(listener), listener.body().orElse("")));
+            HttpListener requestListener =
+                    HttpListener.forRequestListener(this::outputRequestInfo);
             httpConfig.addHttpListener(requestListener);
 
-            HttpListener responseListener = HttpListener.forResponseListener(
-                    listener -> log.info("< Response %s %s %s\n< Headers:\n%s\n< Body: %s\n",
-                            listener.httpMethod(), listener.uri(), listener.statusCode(),
-                            getResponseHeadersString(listener), listener.body().orElse("")));
+            HttpListener responseListener =
+                    HttpListener.forResponseListener(this::outputResponseInfo);
             httpConfig.addHttpListener(responseListener);
         }
         return httpConfig;
+    }
+
+    private void outputRequestInfo(HttpListener.RequestListener listener) {
+        String requestInfo = "> Request " + listener.httpMethod() + " " + listener.uri()
+                + System.lineSeparator()
+                + "> Headers:" + System.lineSeparator() + getRequestHeadersString(listener)
+                + System.lineSeparator() + "> Body:" + listener.body().orElse("")
+                + System.lineSeparator();
+        log.info(requestInfo);
+    }
+
+    private void outputResponseInfo(HttpListener.ResponseListener listener) {
+        String responseInfo = "< Response " + listener.httpMethod() + " " + listener.uri() + " "
+                + listener.statusCode() + System.lineSeparator()
+                + "< Headers:" + System.lineSeparator() + getResponseHeadersString(listener)
+                + System.lineSeparator() + "< Body:" + listener.body().orElse("")
+                + System.lineSeparator();
+        log.info(responseInfo);
     }
 
     private String getRequestHeadersString(HttpListener.RequestListener listener) {

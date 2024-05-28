@@ -5,9 +5,6 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.manage;
 
-import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.DEFAULT_DELAY_MILLIS;
-import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.DEFAULT_RETRY_TIMES;
-
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
@@ -38,8 +35,10 @@ import com.huaweicloud.sdk.vpc.v2.model.SecurityGroup;
 import com.huaweicloud.sdk.vpc.v2.model.SecurityGroupRule;
 import com.huaweicloud.sdk.vpc.v2.model.Subnet;
 import com.huaweicloud.sdk.vpc.v2.model.Vpc;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -49,7 +48,9 @@ import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedE
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -59,22 +60,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class HuaweiCloudResourceManager {
 
-    private final CredentialCenter credentialCenter;
-    private final HuaweiCloudClient huaweiCloudClient;
-
-    @Autowired
-    public HuaweiCloudResourceManager(
-            CredentialCenter credentialCenter,
-            HuaweiCloudClient huaweiCloudClient) {
-        this.credentialCenter = credentialCenter;
-        this.huaweiCloudClient = huaweiCloudClient;
-    }
+    @Resource
+    private CredentialCenter credentialCenter;
+    @Resource
+    private HuaweiCloudClient huaweiCloudClient;
+    @Resource
+    private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
 
     /**
      * List HuaweiCloud resource by the kind of ReusableCloudResource.
      */
-    public List<String> getExistingResourceNamesWithKind(String userId,
-                                                         String region, DeployResourceKind kind) {
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+    public List<String> getExistingResourceNamesWithKind(String userId, String region,
+                                                         DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
             return getVpcList(userId, region);
         } else if (kind == DeployResourceKind.SUBNET) {
@@ -94,7 +94,6 @@ public class HuaweiCloudResourceManager {
         }
     }
 
-
     /**
      * List availability zones of region.
      *
@@ -102,6 +101,9 @@ public class HuaweiCloudResourceManager {
      * @param region region
      * @return availability zones
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
@@ -109,9 +111,9 @@ public class HuaweiCloudResourceManager {
             NovaListAvailabilityZonesRequest request = new NovaListAvailabilityZonesRequest();
             NovaListAvailabilityZonesResponse response =
                     ecsClient.novaListAvailabilityZonesInvoker(request)
-                            .retryTimes(DEFAULT_RETRY_TIMES)
-                            .retryCondition(huaweiCloudClient::matchRetryCondition)
-                            .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                            .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(huaweiCloudRetryStrategy)
                             .invoke();
             if (response.getHttpStatusCode() == 200) {
                 availabilityZoneNames = response.getAvailabilityZoneInfo()
@@ -121,7 +123,9 @@ public class HuaweiCloudResourceManager {
             String errorMsg = String.format(
                     "HuaweiCloudClient listAvailabilityZones with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return availabilityZoneNames;
@@ -133,9 +137,9 @@ public class HuaweiCloudResourceManager {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListVpcsRequest request = new ListVpcsRequest();
             ListVpcsResponse response = vpcClient.listVpcsInvoker(request)
-                    .retryTimes(DEFAULT_RETRY_TIMES)
-                    .retryCondition(huaweiCloudClient::matchRetryCondition)
-                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(huaweiCloudRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 vpcNames = response.getVpcs().stream().map(Vpc::getName).toList();
@@ -144,7 +148,9 @@ public class HuaweiCloudResourceManager {
             String errorMsg = String.format(
                     "HuaweiCloudClient listVpcs with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return vpcNames;
@@ -156,9 +162,9 @@ public class HuaweiCloudResourceManager {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListSubnetsRequest request = new ListSubnetsRequest();
             ListSubnetsResponse response = vpcClient.listSubnetsInvoker(request)
-                    .retryTimes(DEFAULT_RETRY_TIMES)
-                    .retryCondition(huaweiCloudClient::matchRetryCondition)
-                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(huaweiCloudRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 subnetNames = response.getSubnets().stream().map(Subnet::getName).toList();
@@ -167,7 +173,9 @@ public class HuaweiCloudResourceManager {
             String errorMsg = String.format(
                     "HuaweiCloudClient listSubnets with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return subnetNames;
@@ -179,9 +187,9 @@ public class HuaweiCloudResourceManager {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListSecurityGroupsRequest request = new ListSecurityGroupsRequest();
             ListSecurityGroupsResponse response = vpcClient.listSecurityGroupsInvoker(request)
-                    .retryTimes(DEFAULT_RETRY_TIMES)
-                    .retryCondition(huaweiCloudClient::matchRetryCondition)
-                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(huaweiCloudRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 securityGroupNames = response.getSecurityGroups()
@@ -191,7 +199,9 @@ public class HuaweiCloudResourceManager {
             String errorMsg = String.format(
                     "HuaweiCloudClient listSecurityGroups with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return securityGroupNames;
@@ -204,9 +214,9 @@ public class HuaweiCloudResourceManager {
             ListSecurityGroupRulesRequest request = new ListSecurityGroupRulesRequest();
             ListSecurityGroupRulesResponse response =
                     vpcClient.listSecurityGroupRulesInvoker(request)
-                            .retryTimes(DEFAULT_RETRY_TIMES)
-                            .retryCondition(huaweiCloudClient::matchRetryCondition)
-                            .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                            .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(huaweiCloudRetryStrategy)
                             .invoke();
             if (response.getHttpStatusCode() == 200) {
                 securityGroupRuleIds = response.getSecurityGroupRules()
@@ -216,7 +226,9 @@ public class HuaweiCloudResourceManager {
             String errorMsg = String.format(
                     "HuaweiCloudClient listSecurityGroupRules with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return securityGroupRuleIds;
@@ -228,9 +240,9 @@ public class HuaweiCloudResourceManager {
             EipClient eipClient = getEipClient(userId, region);
             ListPublicipsRequest request = new ListPublicipsRequest();
             ListPublicipsResponse response = eipClient.listPublicipsInvoker(request)
-                    .retryTimes(DEFAULT_RETRY_TIMES)
-                    .retryCondition(huaweiCloudClient::matchRetryCondition)
-                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(huaweiCloudRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 publicIpAddresses = response.getPublicips()
@@ -240,7 +252,9 @@ public class HuaweiCloudResourceManager {
             String errorMsg = String.format(
                     "HuaweiCloudClient listPublicIps with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return publicIpAddresses;
@@ -252,9 +266,9 @@ public class HuaweiCloudResourceManager {
             EvsClient evsClient = getEvsClient(userId, region);
             ListVolumesRequest request = new ListVolumesRequest();
             ListVolumesResponse response = evsClient.listVolumesInvoker(request)
-                    .retryTimes(DEFAULT_RETRY_TIMES)
-                    .retryCondition(huaweiCloudClient::matchRetryCondition)
-                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(huaweiCloudRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 volumeNames = response.getVolumes().stream().map(VolumeDetail::getName).toList();
@@ -263,7 +277,9 @@ public class HuaweiCloudResourceManager {
             String errorMsg = String.format(
                     "HuaweiCloudClient listVolumes with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return volumeNames;
@@ -275,9 +291,9 @@ public class HuaweiCloudResourceManager {
             EcsClient ecsClient = getEcsClient(userId, region);
             NovaListKeypairsRequest request = new NovaListKeypairsRequest();
             NovaListKeypairsResponse response = ecsClient.novaListKeypairsInvoker(request)
-                    .retryTimes(DEFAULT_RETRY_TIMES)
-                    .retryCondition(huaweiCloudClient::matchRetryCondition)
-                    .backoffStrategy(new HuaweiCloudRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(huaweiCloudRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 keyPairNames = response.getKeypairs().stream()
@@ -288,7 +304,9 @@ public class HuaweiCloudResourceManager {
             String errorMsg = String.format(
                     "HuaweiCloudClient listKeyPairs with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return keyPairNames;

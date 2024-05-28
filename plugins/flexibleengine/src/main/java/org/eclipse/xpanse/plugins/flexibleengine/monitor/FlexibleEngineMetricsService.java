@@ -6,9 +6,6 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine.monitor;
 
-import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_DELAY_MILLIS;
-import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_RETRY_TIMES;
-
 import com.huaweicloud.sdk.ces.v1.CesClient;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
@@ -18,6 +15,7 @@ import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.auth.ICredential;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +37,9 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -50,27 +50,17 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class FlexibleEngineMetricsService {
 
-    private final FlexibleEngineClient flexibleEngineClient;
+    @Resource
+    private FlexibleEngineClient flexibleEngineClient;
+    @Resource
+    private ServiceMetricsStore serviceMetricsStore;
+    @Resource
+    private FlexibleEngineDataModelConverter modelConverter;
+    @Resource
+    private CredentialCenter credentialCenter;
+    @Resource
+    private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
 
-    private final ServiceMetricsStore serviceMetricsStore;
-
-    private final FlexibleEngineDataModelConverter modelConverter;
-
-    private final CredentialCenter credentialCenter;
-
-    /**
-     * Constructs a FlexibleEngineMetricsService with the necessary dependencies.
-     */
-    @Autowired
-    public FlexibleEngineMetricsService(FlexibleEngineClient flexibleEngineClient,
-                                        ServiceMetricsStore serviceMetricsStore,
-                                        FlexibleEngineDataModelConverter modelConverter,
-                                        CredentialCenter credentialCenter) {
-        this.flexibleEngineClient = flexibleEngineClient;
-        this.serviceMetricsStore = serviceMetricsStore;
-        this.modelConverter = modelConverter;
-        this.credentialCenter = credentialCenter;
-    }
 
     /**
      * Get metrics of the @deployResource.
@@ -78,40 +68,50 @@ public class FlexibleEngineMetricsService {
      * @param resourceMetricRequest The request model to query metrics.
      * @return Returns list of metric result.
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<Metric> getMetricsByResource(ResourceMetricsRequest resourceMetricRequest) {
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         String regionName = deployResource.getProperties().get("region");
-        if (StringUtils.isEmpty(regionName)) {
-            String errorMsg = "Could not get region from resource.";
+        List<Metric> metrics = new ArrayList<>();
+        try {
+            AbstractCredentialInfo credential =
+                    credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
+                            resourceMetricRequest.getUserId());
+            ICredential icredential = flexibleEngineClient.getCredential(credential);
+            CesClient client = flexibleEngineClient.getCesClient(icredential, regionName);
+
+            MonitorResourceType monitorResourceType =
+                    resourceMetricRequest.getMonitorResourceType();
+            Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
+                    getTargetMetricsMap(deployResource, monitorResourceType, client);
+            for (Map.Entry<MonitorResourceType, MetricInfoList> entry
+                    : targetMetricsMap.entrySet()) {
+                ShowMetricDataRequest showMetricDataRequest =
+                        modelConverter.buildShowMetricDataRequest(resourceMetricRequest,
+                                entry.getValue());
+                ShowMetricDataResponse showMetricDataResponse =
+                        client.showMetricDataInvoker(showMetricDataRequest)
+                                .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                                .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                                .backoffStrategy(flexibleEngineRetryStrategy)
+                                .invoke();
+                Metric metric = modelConverter.convertShowMetricDataResponseToMetric(deployResource,
+                        showMetricDataResponse, entry.getValue(),
+                        resourceMetricRequest.isOnlyLastKnownMetric());
+                doCacheActionForResourceMetrics(resourceMetricRequest, entry.getKey(), metric);
+                metrics.add(metric);
+            }
+            return metrics;
+        } catch (Exception e) {
+            String errorMsg = String.format("Get metrics of resource %s error. %s",
+                    deployResource.getResourceId(), e.getMessage());
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
-        List<Metric> metrics = new ArrayList<>();
-
-        AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
-                        resourceMetricRequest.getUserId());
-        ICredential icredential = flexibleEngineClient.getCredential(credential);
-        CesClient client = flexibleEngineClient.getCesClient(icredential, regionName);
-
-        MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
-        Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
-                getTargetMetricsMap(deployResource, monitorResourceType, client);
-        for (Map.Entry<MonitorResourceType, MetricInfoList> entry : targetMetricsMap.entrySet()) {
-            ShowMetricDataRequest showMetricDataRequest =
-                    modelConverter.buildShowMetricDataRequest(resourceMetricRequest,
-                            entry.getValue());
-            ShowMetricDataResponse showMetricDataResponse =
-                    client.showMetricDataInvoker(showMetricDataRequest)
-                            .retryCondition(flexibleEngineClient::matchRetryCondition)
-                            .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
-                            .invoke();
-            Metric metric = modelConverter.convertShowMetricDataResponseToMetric(deployResource,
-                    showMetricDataResponse, entry.getValue(),
-                    resourceMetricRequest.isOnlyLastKnownMetric());
-            doCacheActionForResourceMetrics(resourceMetricRequest, entry.getKey(), metric);
-            metrics.add(metric);
-        }
-        return metrics;
     }
 
 
@@ -121,41 +121,51 @@ public class FlexibleEngineMetricsService {
      * @param serviceMetricRequest The request model to query metrics.
      * @return Returns list of metric result.
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<Metric> getMetricsByService(ServiceMetricsRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
-        String regionName = deployResources.get(0).getProperties().get("region");
-        if (StringUtils.isEmpty(regionName)) {
-            String errorMsg = "Could not get region from services.";
+        String regionName = deployResources.getFirst().getProperties().get("region");
+        try {
+            AbstractCredentialInfo credential =
+                    credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
+                            serviceMetricRequest.getUserId());
+            ICredential icredential = flexibleEngineClient.getCredential(credential);
+            CesClient client = flexibleEngineClient.getCesClient(icredential, regionName);
+            MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
+            Map<String, List<MetricInfoList>> deployResourceMetricInfoMap = new HashMap<>();
+            for (DeployResource deployResource : deployResources) {
+                Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
+                        getTargetMetricsMap(deployResource, monitorResourceType, client);
+                List<MetricInfoList> targetMetricInfoList =
+                        targetMetricsMap.values().stream().toList();
+                deployResourceMetricInfoMap.put(deployResource.getResourceId(),
+                        targetMetricInfoList);
+            }
+            BatchListMetricDataRequest batchListMetricDataRequest =
+                    modelConverter.buildBatchListMetricDataRequest(serviceMetricRequest,
+                            deployResourceMetricInfoMap);
+            BatchListMetricDataResponse batchListMetricDataResponse =
+                    client.batchListMetricDataInvoker(batchListMetricDataRequest)
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
+            List<Metric> metrics = modelConverter.convertBatchListMetricDataResponseToMetric(
+                    batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources,
+                    serviceMetricRequest.isOnlyLastKnownMetric());
+            doCacheActionForServiceMetrics(serviceMetricRequest, deployResourceMetricInfoMap,
+                    metrics);
+            return metrics;
+        } catch (Exception e) {
+            String errorMsg = String.format("Get metrics of service %s error. %s",
+                    serviceMetricRequest.getServiceId(), e.getMessage());
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
-        AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
-                        serviceMetricRequest.getUserId());
-        ICredential icredential = flexibleEngineClient.getCredential(credential);
-        CesClient client = flexibleEngineClient.getCesClient(icredential, regionName);
-
-        MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
-        Map<String, List<MetricInfoList>> deployResourceMetricInfoMap = new HashMap<>();
-        for (DeployResource deployResource : deployResources) {
-            Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
-                    getTargetMetricsMap(deployResource, monitorResourceType, client);
-            List<MetricInfoList> targetMetricInfoList = targetMetricsMap.values().stream().toList();
-            deployResourceMetricInfoMap.put(deployResource.getResourceId(), targetMetricInfoList);
-        }
-        BatchListMetricDataRequest batchListMetricDataRequest =
-                modelConverter.buildBatchListMetricDataRequest(serviceMetricRequest,
-                        deployResourceMetricInfoMap);
-        BatchListMetricDataResponse batchListMetricDataResponse =
-                client.batchListMetricDataInvoker(batchListMetricDataRequest)
-                        .retryTimes(DEFAULT_RETRY_TIMES)
-                        .retryCondition(flexibleEngineClient::matchRetryCondition)
-                        .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
-                        .invoke();
-        List<Metric> metrics = modelConverter.convertBatchListMetricDataResponseToMetric(
-                batchListMetricDataResponse, deployResourceMetricInfoMap, deployResources,
-                serviceMetricRequest.isOnlyLastKnownMetric());
-        doCacheActionForServiceMetrics(serviceMetricRequest, deployResourceMetricInfoMap, metrics);
-        return metrics;
     }
 
     private void doCacheActionForResourceMetrics(ResourceMetricsRequest resourceMetricRequest,
@@ -250,9 +260,10 @@ public class FlexibleEngineMetricsService {
         ListMetricsRequest request = modelConverter.buildListMetricsRequest(deployResource);
         log.error("Flexible Request:{}", request);
         ListMetricsResponse listMetricsResponse =
-                client.listMetricsInvoker(request).retryTimes(DEFAULT_RETRY_TIMES)
-                        .retryCondition(flexibleEngineClient::matchRetryCondition)
-                        .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                client.listMetricsInvoker(request)
+                        .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                        .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                        .backoffStrategy(flexibleEngineRetryStrategy)
                         .invoke();
         if (Objects.nonNull(listMetricsResponse) && !CollectionUtils.isEmpty(
                 listMetricsResponse.getMetrics())) {

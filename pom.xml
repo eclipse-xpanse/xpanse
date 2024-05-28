@@ -41,7 +41,7 @@
         <checkstyle-maven-plugin.version>3.3.1</checkstyle-maven-plugin.version>
         <logbook.version>3.8.0</logbook.version>
         <wiremock.version>3.6.0</wiremock.version>
-        <instancio.version>4.6.0</instancio.version>
+        <instancio.version>4.7.0</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
         <jacoco.version>0.8.12</jacoco.version>
         <springdoc.version>2.5.0</springdoc.version>
@@ -58,7 +58,7 @@
         <system.stubs.version>2.1.6</system.stubs.version>
         <junit4.version>4.13.2</junit4.version>
         <json.smart.version>2.5.0</json.smart.version>
-        <spring.oauth.addon.test.version>7.7.0</spring.oauth.addon.test.version>
+        <spring.oauth.addon.test.version>7.8.0</spring.oauth.addon.test.version>
         <openstack4j.version>3.12</openstack4j.version>
         <huawei.apigateway.version>3.1.2</huawei.apigateway.version>
         <jackson.databind.version>2.15.2</jackson.databind.version>

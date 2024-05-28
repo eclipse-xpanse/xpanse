@@ -6,17 +6,12 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.common;
 
-import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.ERROR_CODE_INTERNAL_SERVER_ERROR;
-import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.ERROR_CODE_TOO_MANY_REQUESTS;
-
 import com.huaweicloud.sdk.bss.v2.BssClient;
 import com.huaweicloud.sdk.bss.v2.region.BssRegion;
 import com.huaweicloud.sdk.ces.v1.CesClient;
 import com.huaweicloud.sdk.ces.v1.region.CesRegion;
 import com.huaweicloud.sdk.core.HttpListener;
-import com.huaweicloud.sdk.core.SdkResponse;
 import com.huaweicloud.sdk.core.auth.ICredential;
-import com.huaweicloud.sdk.core.exception.ServiceResponseException;
 import com.huaweicloud.sdk.core.http.HttpConfig;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.region.EcsRegion;
@@ -28,7 +23,6 @@ import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.huaweicloud.sdk.iam.v3.region.IamRegion;
 import com.huaweicloud.sdk.vpc.v2.VpcClient;
 import com.huaweicloud.sdk.vpc.v2.region.VpcRegion;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -83,12 +77,12 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
     /**
      * Get HuaweiCloud Eip Client.
      *
-     * @param basicCredential ICredential
-     * @param regionName      region.
+     * @param credential ICredential
+     * @param regionName  region.
      */
-    public EipClient getEipClient(ICredential basicCredential, String regionName) {
+    public EipClient getEipClient(ICredential credential, String regionName) {
         return EipClient.newBuilder()
-                .withCredential(basicCredential)
+                .withCredential(credential)
                 .withRegion(EipRegion.valueOf(regionName))
                 .build();
     }
@@ -96,12 +90,12 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
     /**
      * Get HuaweiCloud Evs Client.
      *
-     * @param basicCredential ICredential
-     * @param regionName      region.
+     * @param credential ICredential
+     * @param regionName  region.
      */
-    public EvsClient getEvsClient(ICredential basicCredential, String regionName) {
+    public EvsClient getEvsClient(ICredential credential, String regionName) {
         return EvsClient.newBuilder()
-                .withCredential(basicCredential)
+                .withCredential(credential)
                 .withRegion(EvsRegion.valueOf(regionName))
                 .build();
     }
@@ -131,45 +125,36 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
                 .build();
     }
 
-
-    /**
-     * Match retry condition.
-     *
-     * @param response response
-     * @param ex       exception
-     * @return true if match retry condition, otherwise false
-     */
-    public boolean matchRetryCondition(SdkResponse response, Exception ex) {
-        if (Objects.isNull(ex)) {
-            return false;
-        }
-        if (!ServiceResponseException.class.isAssignableFrom(ex.getClass())) {
-            return false;
-        }
-        int statusCode = ((ServiceResponseException) ex).getHttpStatusCode();
-        return statusCode == ERROR_CODE_TOO_MANY_REQUESTS
-                || statusCode == ERROR_CODE_INTERNAL_SERVER_ERROR;
-    }
-
-
     private HttpConfig getHttpConfig() {
         HttpConfig httpConfig = HttpConfig.getDefaultHttpConfig();
         if (log.isInfoEnabled()) {
-            HttpListener requestListener = HttpListener.forRequestListener(
-                    listener -> log.info("> Request %s %s\n> Headers:\n%s\n> Body: %s\n",
-                            listener.httpMethod(), listener.uri(),
-                            getRequestHeadersString(listener),
-                            listener.body().orElse("")));
+            HttpListener requestListener =
+                    HttpListener.forRequestListener(this::outputRequestInfo);
             httpConfig.addHttpListener(requestListener);
 
-            HttpListener responseListener = HttpListener.forResponseListener(
-                    listener -> log.info("< Response %s %s %s\n< Headers:\n%s\n< Body: %s\n",
-                            listener.httpMethod(), listener.uri(), listener.statusCode(),
-                            getResponseHeadersString(listener),
-                            listener.body().orElse("")));
+            HttpListener responseListener =
+                    HttpListener.forResponseListener(this::outputResponseInfo);
             httpConfig.addHttpListener(responseListener);
         }
         return httpConfig;
+    }
+
+    private void outputRequestInfo(HttpListener.RequestListener listener) {
+        String requestInfo = "> Request " + listener.httpMethod() + " " + listener.uri()
+                + System.lineSeparator()
+                + "> Headers:" + System.lineSeparator() + getRequestHeadersString(listener)
+                + System.lineSeparator() + "> Body:" + listener.body().orElse("")
+                + System.lineSeparator();
+        log.info(requestInfo);
+    }
+
+    private void outputResponseInfo(HttpListener.ResponseListener listener) {
+        String responseInfo = "< Response " + listener.httpMethod() + " " + listener.uri() + " "
+                + listener.statusCode() + System.lineSeparator()
+                + "< Headers:" + System.lineSeparator() + getResponseHeadersString(listener)
+                + System.lineSeparator() + "< Body:" + listener.body().orElse("")
+                + System.lineSeparator();
+        log.info(responseInfo);
     }
 
     private String getRequestHeadersString(HttpListener.RequestListener listener) {

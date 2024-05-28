@@ -74,9 +74,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {
         "spring.profiles.active=oauth,zitadel,zitadel-testbed",
-        "spring.test.retries=3",
-        "spring.test.retry.enabled=true",
-        "spring.test.retry.backoff.max-interval=1000",
+        "http.request.retry.max.attempts=5",
+        "http.request.retry.delay.milliseconds=1000",
         "OS_AUTH_URL=http://127.0.0.1/v3/identity"
 })
 @AutoConfigureMockMvc
@@ -458,7 +457,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     }
 
     void assertTaskStatus(UUID taskId, TaskStatus expectedStatus) throws Exception {
-        Thread.sleep(1000);
+        Thread.sleep(10000);
         MockHttpServletResponse response = getManagementTaskDetailsByTaskId(taskId);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         ServiceStateManagementTaskDetails taskDetails =

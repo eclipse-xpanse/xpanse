@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
@@ -29,12 +31,14 @@ import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.resources.Ins
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.models.resources.InstanceResource;
 import org.eclipse.xpanse.plugins.openstack.monitor.gnocchi.utils.GnocchiToXpanseModelConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /**
  * Class to encapsulate all Metric related public methods for Openstack plugin.
  */
+@Slf4j
 @Component
 public class MetricsManager {
 
@@ -84,56 +88,67 @@ public class MetricsManager {
      * @return returns list of Metrics.
      */
     public List<Metric> getMetrics(ResourceMetricsRequest resourceMetricRequest) {
-        keystoneManager.authenticate(resourceMetricRequest.getServiceId(),
-                credentialCenter.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES,
-                        resourceMetricRequest.getUserId()));
-        MonitorResourceType monitorResourceType = resourceMetricRequest.getMonitorResourceType();
-        InstanceResource instanceResource = this.resourcesService.getInstanceResourceInfoById(
-                resourceMetricRequest.getDeployResource().getResourceId());
         List<Metric> metrics = new ArrayList<>();
-        if (Objects.nonNull(instanceResource)) {
-            for (Map.Entry<String, String> entry : instanceResource.getMetrics().entrySet()) {
-                if (monitorResourceType == MonitorResourceType.CPU || Objects.isNull(
-                        monitorResourceType)) {
-                    if (entry.getKey().equals(CeilometerMetricType.CPU.toValue())) {
-                        metrics.add(getCpuUsage(resourceMetricRequest, entry.getValue()));
-                    }
-                }
-                if (monitorResourceType == MonitorResourceType.MEM || Objects.isNull(
-                        monitorResourceType)) {
-                    if (entry.getKey().equals(CeilometerMetricType.MEMORY_USAGE.toValue())) {
-                        metrics.add(getMemoryUsage(resourceMetricRequest, entry.getValue()));
-                    }
-                }
-            }
-            if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
-                    || monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
-                    || Objects.isNull(monitorResourceType)) {
-                InstanceNetworkResource instanceNetworkResource =
-                        this.resourcesService.getInstanceNetworkResourceInfoByInstanceId(
-                                resourceMetricRequest.getDeployResource().getResourceId());
-                for (Map.Entry<String, String> entry : instanceNetworkResource.getMetrics()
-                        .entrySet()) {
-                    if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
-                            || Objects.isNull(monitorResourceType)) {
-                        if (entry.getKey()
-                                .equals(CeilometerMetricType.NETWORK_INCOMING.toValue())) {
-                            metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
-                                    MonitorResourceType.VM_NETWORK_INCOMING));
+        String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
+        try {
+            MonitorResourceType monitorResourceType =
+                    resourceMetricRequest.getMonitorResourceType();
+            keystoneManager.authenticate(resourceMetricRequest.getServiceId(),
+                    credentialCenter.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES,
+                            resourceMetricRequest.getUserId()));
+            InstanceResource instanceResource =
+                    this.resourcesService.getInstanceResourceInfoById(resourceId);
+            if (Objects.nonNull(instanceResource)) {
+                for (Map.Entry<String, String> entry : instanceResource.getMetrics().entrySet()) {
+                    if (monitorResourceType == MonitorResourceType.CPU || Objects.isNull(
+                            monitorResourceType)) {
+                        if (entry.getKey().equals(CeilometerMetricType.CPU.toValue())) {
+                            metrics.add(getCpuUsage(resourceMetricRequest, entry.getValue()));
                         }
                     }
-                    if (monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
-                            || Objects.isNull(monitorResourceType)) {
-                        if (entry.getKey()
-                                .equals(CeilometerMetricType.NETWORK_OUTGOING.toValue())) {
-                            metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
-                                    MonitorResourceType.VM_NETWORK_OUTGOING));
+                    if (monitorResourceType == MonitorResourceType.MEM || Objects.isNull(
+                            monitorResourceType)) {
+                        if (entry.getKey().equals(CeilometerMetricType.MEMORY_USAGE.toValue())) {
+                            metrics.add(getMemoryUsage(resourceMetricRequest, entry.getValue()));
                         }
                     }
                 }
+                if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
+                        || monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
+                        || Objects.isNull(monitorResourceType)) {
+                    InstanceNetworkResource instanceNetworkResource =
+                            this.resourcesService.getInstanceNetworkResourceInfoByInstanceId(
+                                    resourceMetricRequest.getDeployResource().getResourceId());
+                    for (Map.Entry<String, String> entry : instanceNetworkResource.getMetrics()
+                            .entrySet()) {
+                        if (monitorResourceType == MonitorResourceType.VM_NETWORK_INCOMING
+                                || Objects.isNull(monitorResourceType)) {
+                            if (entry.getKey()
+                                    .equals(CeilometerMetricType.NETWORK_INCOMING.toValue())) {
+                                metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
+                                        MonitorResourceType.VM_NETWORK_INCOMING));
+                            }
+                        }
+                        if (monitorResourceType == MonitorResourceType.VM_NETWORK_OUTGOING
+                                || Objects.isNull(monitorResourceType)) {
+                            if (entry.getKey()
+                                    .equals(CeilometerMetricType.NETWORK_OUTGOING.toValue())) {
+                                metrics.add(getNetworkUsage(resourceMetricRequest, entry.getValue(),
+                                        MonitorResourceType.VM_NETWORK_OUTGOING));
+                            }
+                        }
+                    }
+                }
             }
+            return metrics;
+        } catch (Exception e) {
+            String errorMsg = String.format("Get metrics of resource %s error. %s",
+                    resourceId, e.getMessage());
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(errorMsg);
         }
-        return metrics;
     }
 
 
