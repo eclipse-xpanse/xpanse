@@ -6,12 +6,12 @@
 
 package org.eclipse.xpanse.modules.orchestrator.price;
 
-import org.eclipse.xpanse.modules.models.billing.ServicePrice;
+import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 
 /**
  * Interface to calculate the service price.
  */
 public interface ServicePriceCalculator {
 
-    ServicePrice getServicePrice(ServicePriceRequest request);
+    FlavorPriceResult getServicePrice(ServicePriceRequest request);
 }

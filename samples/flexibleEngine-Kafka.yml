@@ -24,7 +24,6 @@ billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
   billingModes:
     - Fixed
-    - Pay per Use
 serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:

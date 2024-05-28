@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.BeanUtils;
 
 @ExtendWith(MockitoExtension.class)
-class ServicePriceRequestTest {
+class FlavorPriceResultRequestTest {
 
     private final String regionName = "regionName";
     private final String userId = "userId";

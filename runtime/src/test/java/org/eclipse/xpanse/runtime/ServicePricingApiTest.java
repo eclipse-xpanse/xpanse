@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsRequest;
 import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsResponse;
 import com.huaweicloud.sdk.core.invoker.SyncInvoker;
@@ -30,9 +31,9 @@ import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.billing.Price;
 import org.eclipse.xpanse.modules.models.billing.RatingMode;
-import org.eclipse.xpanse.modules.models.billing.ServicePrice;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
@@ -57,7 +58,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
- * Test for ServiceTemplateManageApi.
+ * Test for ServicePricingApi.
  */
 @SuppressWarnings("unchecked")
 @Transactional
@@ -102,38 +103,63 @@ class ServicePricingApiTest extends ApisTestCommon {
         UUID templateId = serviceTemplateDetails.getId();
         MockHttpServletResponse fixedPriceResponse =
                 getServicePriceByFlavor(templateId, regionName, flavorName, BillingMode.FIXED);
-        ServicePrice servicePrice = objectMapper.readValue(fixedPriceResponse.getContentAsString(),
-                ServicePrice.class);
+        FlavorPriceResult flavorPriceResult =
+                objectMapper.readValue(fixedPriceResponse.getContentAsString(),
+                        FlavorPriceResult.class);
         assertEquals(HttpStatus.OK.value(), fixedPriceResponse.getStatus());
-        Assertions.assertNotNull(servicePrice.getRecurringPrice());
-        Assertions.assertNull(servicePrice.getOneTimePaymentPrice());
+        Assertions.assertNotNull(flavorPriceResult.getRecurringPrice());
+        Assertions.assertNull(flavorPriceResult.getOneTimePaymentPrice());
 
         // Setup
         mockSdkClientsForHuaweiCloud();
         addCredentialForHuaweiCloud();
         mockListProjectInvoker();
         mockListOnDemandResourceRatingsInvoker();
+
+        int flavorCount = ocl.getFlavors().getServiceFlavors().size();
+        MockHttpServletResponse serviceFixedPricesResponse =
+                getPricesByService(templateId, regionName, BillingMode.FIXED);
+
+        List<FlavorPriceResult> fixedPriceResultList =
+                objectMapper.readValue(serviceFixedPricesResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(HttpStatus.OK.value(), serviceFixedPricesResponse.getStatus());
+        Assertions.assertEquals(flavorCount, fixedPriceResultList.size());
+
+
+        MockHttpServletResponse servicePayPerUsePricesResponse =
+                getPricesByService(templateId, regionName, BillingMode.PAY_PER_USE);
+
+        List<FlavorPriceResult> payPerUsePriceResultList =
+                objectMapper.readValue(servicePayPerUsePricesResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(HttpStatus.OK.value(), servicePayPerUsePricesResponse.getStatus());
+        Assertions.assertEquals(flavorCount, payPerUsePriceResultList.size());
+
+
         MockHttpServletResponse payPerUsePriceResponse =
                 getServicePriceByFlavor(templateId, regionName, flavorName,
                         BillingMode.PAY_PER_USE);
-        ServicePrice servicePrice1 =
+        FlavorPriceResult flavorPriceResult1 =
                 objectMapper.readValue(payPerUsePriceResponse.getContentAsString(),
-                        ServicePrice.class);
+                        FlavorPriceResult.class);
         assertEquals(HttpStatus.OK.value(), payPerUsePriceResponse.getStatus());
-        Assertions.assertNotNull(servicePrice1.getRecurringPrice());
-        Assertions.assertNotNull(servicePrice1.getOneTimePaymentPrice());
+        Assertions.assertNotNull(flavorPriceResult1.getRecurringPrice());
+        Assertions.assertNotNull(flavorPriceResult1.getOneTimePaymentPrice());
 
         // Setup
         changeFlavorPriceNotOneTime(templateId, ocl);
         MockHttpServletResponse payPerUsePriceResponse2 =
                 getServicePriceByFlavor(templateId, regionName, flavorName,
                         BillingMode.PAY_PER_USE);
-        ServicePrice servicePrice2 =
+        FlavorPriceResult flavorPriceResult2 =
                 objectMapper.readValue(payPerUsePriceResponse2.getContentAsString(),
-                        ServicePrice.class);
+                        FlavorPriceResult.class);
         assertEquals(HttpStatus.OK.value(), payPerUsePriceResponse2.getStatus());
-        Assertions.assertNotNull(servicePrice2.getRecurringPrice());
-        Assertions.assertNull(servicePrice2.getOneTimePaymentPrice());
+        Assertions.assertNotNull(flavorPriceResult2.getRecurringPrice());
+        Assertions.assertNull(flavorPriceResult2.getOneTimePaymentPrice());
 
         unregisterServiceTemplate(templateId);
     }
@@ -214,36 +240,59 @@ class ServicePricingApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         UUID templateId = serviceTemplate.getId();
 
+        int flavorCount = ocl.getFlavors().getServiceFlavors().size();
+        MockHttpServletResponse serviceFixedPricesResponse =
+                getPricesByService(templateId, regionName, BillingMode.FIXED);
+
+        List<FlavorPriceResult> fixedPriceResultList =
+                objectMapper.readValue(serviceFixedPricesResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(HttpStatus.OK.value(), serviceFixedPricesResponse.getStatus());
+        Assertions.assertEquals(flavorCount, fixedPriceResultList.size());
+
+
+        MockHttpServletResponse servicePayPerUsePricesResponse =
+                getPricesByService(templateId, regionName, BillingMode.PAY_PER_USE);
+
+        List<FlavorPriceResult> payPerUsePriceResultList =
+                objectMapper.readValue(servicePayPerUsePricesResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(HttpStatus.OK.value(), servicePayPerUsePricesResponse.getStatus());
+        Assertions.assertEquals(flavorCount, payPerUsePriceResultList.size());
+
         MockHttpServletResponse fixedPriceResponse =
                 getServicePriceByFlavor(templateId, regionName, flavorName, BillingMode.FIXED);
-        ServicePrice servicePrice = objectMapper.readValue(fixedPriceResponse.getContentAsString(),
-                ServicePrice.class);
+        FlavorPriceResult flavorPriceResult =
+                objectMapper.readValue(fixedPriceResponse.getContentAsString(),
+                        FlavorPriceResult.class);
         assertEquals(HttpStatus.OK.value(), fixedPriceResponse.getStatus());
-        Assertions.assertNotNull(servicePrice.getRecurringPrice());
-        Assertions.assertNull(servicePrice.getOneTimePaymentPrice());
+        Assertions.assertNotNull(flavorPriceResult.getRecurringPrice());
+        Assertions.assertNull(flavorPriceResult.getOneTimePaymentPrice());
 
         // Setup
         MockHttpServletResponse payPerUsePriceResponse =
                 getServicePriceByFlavor(templateId, regionName, flavorName,
                         BillingMode.PAY_PER_USE);
-        ServicePrice servicePrice1 =
+        FlavorPriceResult flavorPriceResult1 =
                 objectMapper.readValue(payPerUsePriceResponse.getContentAsString(),
-                        ServicePrice.class);
+                        FlavorPriceResult.class);
         assertEquals(HttpStatus.OK.value(), payPerUsePriceResponse.getStatus());
-        Assertions.assertNull(servicePrice1.getRecurringPrice());
-        Assertions.assertNotNull(servicePrice1.getOneTimePaymentPrice());
+        Assertions.assertNull(flavorPriceResult1.getRecurringPrice());
+        Assertions.assertNotNull(flavorPriceResult1.getOneTimePaymentPrice());
 
         // Setup
         changeFlavorPriceNotOneTime(templateId, ocl);
         MockHttpServletResponse payPerUsePriceResponse2 =
                 getServicePriceByFlavor(templateId, regionName, flavorName,
                         BillingMode.PAY_PER_USE);
-        ServicePrice servicePrice2 =
+        FlavorPriceResult flavorPriceResult2 =
                 objectMapper.readValue(payPerUsePriceResponse2.getContentAsString(),
-                        ServicePrice.class);
+                        FlavorPriceResult.class);
         assertEquals(HttpStatus.OK.value(), payPerUsePriceResponse2.getStatus());
-        Assertions.assertNotNull(servicePrice2.getRecurringPrice());
-        Assertions.assertNull(servicePrice2.getOneTimePaymentPrice());
+        Assertions.assertNotNull(flavorPriceResult2.getRecurringPrice());
+        Assertions.assertNull(flavorPriceResult2.getOneTimePaymentPrice());
 
         unregisterServiceTemplate(templateId);
     }
@@ -299,8 +348,8 @@ class ServicePricingApiTest extends ApisTestCommon {
         Response expectedResponse3 =
                 Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
                         Collections.singletonList(
-                                "BillingMode 'Pay-Per-Use' can not be supported due to the "
-                                        + "'ResourceUsage' is null."));
+                                "BillingMode 'Fixed' can not be supported due to the "
+                                        + "'FixedPrice' is null."));
         String result3 = objectMapper.writeValueAsString(expectedResponse3);
         // Run the test
         final MockHttpServletResponse priceResponse3 = getServicePriceByFlavor(templateId,
@@ -312,8 +361,8 @@ class ServicePricingApiTest extends ApisTestCommon {
 
         Response expectedResponse4 =
                 Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
-                        Collections.singletonList("BillingMode 'Fixed' can not be supported due to "
-                                + "the 'FixedPrice' is null."));
+                        Collections.singletonList("BillingMode 'Pay-Per-Use' can not be supported "
+                                + "due to the 'ResourceUsage' is null."));
         String result4 = objectMapper.writeValueAsString(expectedResponse4);
         // Run the test
         final MockHttpServletResponse priceResponse4 = getServicePriceByFlavor(templateId,
@@ -347,8 +396,18 @@ class ServicePricingApiTest extends ApisTestCommon {
             UUID templateId, String region, String flavorName, BillingMode billingMode)
             throws Exception {
         return mockMvc.perform(
-                        get("/xpanse/pricing/{templateId}/{region}/{flavorName}/{billingMode}",
-                                templateId, region, flavorName, billingMode)
+                        get("/xpanse/pricing/{templateId}/{region}/{billingMode}/{flavorName}",
+                                templateId, region, billingMode, flavorName)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+    }
+
+    private MockHttpServletResponse getPricesByService(
+            UUID templateId, String region, BillingMode billingMode)
+            throws Exception {
+        return mockMvc.perform(
+                        get("/xpanse/pricing/service/{templateId}/{region}/{billingMode}",
+                                templateId, region, billingMode)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
     }
