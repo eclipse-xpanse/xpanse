@@ -7,6 +7,7 @@ package org.eclipse.xpanse.plugins.openstack.manage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -18,6 +19,9 @@ import org.eclipse.xpanse.plugins.openstack.common.keystone.KeystoneManager;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +45,9 @@ public class OpenstackResourceManager {
     /**
      * List Openstack resource by the kind of ReusableCloudResource.
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<String> getExistingResourceNamesWithKind(String userId,
                                                          String region, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
@@ -69,6 +76,9 @@ public class OpenstackResourceManager {
      * @param region region
      * @return availability zones
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
@@ -79,8 +89,10 @@ public class OpenstackResourceManager {
             String errorMsg = String.format(
                     "OpenstackClient listAvailabilityZones with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return availabilityZoneNames;
     }
@@ -96,8 +108,10 @@ public class OpenstackResourceManager {
             String errorMsg = String.format(
                     "OpenstackClient listVpcs with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return vpcNames;
     }
@@ -112,8 +126,10 @@ public class OpenstackResourceManager {
             String errorMsg = String.format(
                     "OpenstackClient listSubnets with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return subnetNames;
     }
@@ -128,8 +144,10 @@ public class OpenstackResourceManager {
             String errorMsg = String.format(
                     "OpenstackClient listSecurityGroups with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupNames;
     }
@@ -144,8 +162,10 @@ public class OpenstackResourceManager {
             String errorMsg = String.format(
                     "OpenstackClient listSecurityGroupRules with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupRuleIds;
     }
@@ -160,8 +180,10 @@ public class OpenstackResourceManager {
             String errorMsg = String.format(
                     "OpenstackClient listPublicIps with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return publicIpAddresses;
     }
@@ -176,8 +198,10 @@ public class OpenstackResourceManager {
             String errorMsg = String.format(
                     "OpenstackClient listVolumes with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return volumeNames;
     }
@@ -192,8 +216,10 @@ public class OpenstackResourceManager {
             String errorMsg = String.format(
                     "OpenstackClient listKeyPairs with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return keyPairNames;
     }

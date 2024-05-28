@@ -33,6 +33,7 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFou
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
+import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
@@ -308,7 +309,7 @@ class OpenstackMonitoringIntegrationTest {
     void testGetMetricsException() {
         when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
                 this.plugin.getCredentialDefinitions().getFirst());
-        Assertions.assertThrows(CredentialsNotFoundException.class,
+        Assertions.assertThrows(ClientApiCallFailedException.class,
                 () -> this.plugin.getMetricsForResource(
                         setupResourceRequest(null, null, 150, true)));
     }

@@ -5,8 +5,6 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine.manage;
 
-import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.DEFAULT_DELAY_MILLIS;
-
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
@@ -37,8 +35,10 @@ import com.huaweicloud.sdk.vpc.v2.model.SecurityGroup;
 import com.huaweicloud.sdk.vpc.v2.model.SecurityGroupRule;
 import com.huaweicloud.sdk.vpc.v2.model.Subnet;
 import com.huaweicloud.sdk.vpc.v2.model.Vpc;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -48,7 +48,9 @@ import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedE
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -58,19 +60,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlexibleEngineResourceManager {
 
-    private final CredentialCenter credentialCenter;
-    private final FlexibleEngineClient flexibleEngineClient;
+    @Resource
+    private CredentialCenter credentialCenter;
+    @Resource
+    private FlexibleEngineClient flexibleEngineClient;
+    @Resource
+    private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
 
-    @Autowired
-    public FlexibleEngineResourceManager(CredentialCenter credentialCenter,
-                                         FlexibleEngineClient flexibleEngineClient) {
-        this.credentialCenter = credentialCenter;
-        this.flexibleEngineClient = flexibleEngineClient;
-    }
 
     /**
      * List FlexibleEngine resource by the kind of ReusableCloudResource.
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
                                                          DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
@@ -99,6 +102,9 @@ public class FlexibleEngineResourceManager {
      * @param region region
      * @return availability zones
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
@@ -106,18 +112,21 @@ public class FlexibleEngineResourceManager {
             NovaListAvailabilityZonesRequest request = new NovaListAvailabilityZonesRequest();
             NovaListAvailabilityZonesResponse response =
                     ecsClient.novaListAvailabilityZonesInvoker(request)
-                            .retryCondition(flexibleEngineClient::matchRetryCondition)
-                            .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
                             .invoke();
             if (response.getHttpStatusCode() == 200) {
-                availabilityZoneNames = response.getAvailabilityZoneInfo().stream()
-                        .map(NovaAvailabilityZone::getZoneName).toList();
+                availabilityZoneNames = response.getAvailabilityZoneInfo()
+                        .stream().map(NovaAvailabilityZone::getZoneName).toList();
             }
         } catch (Exception e) {
             String errorMsg = String.format(
                     "FlexibleEngineClient listAvailabilityZones with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return availabilityZoneNames;
@@ -129,8 +138,9 @@ public class FlexibleEngineResourceManager {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListVpcsRequest request = new ListVpcsRequest();
             ListVpcsResponse response = vpcClient.listVpcsInvoker(request)
-                    .retryCondition(flexibleEngineClient::matchRetryCondition)
-                    .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(flexibleEngineRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 vpcNames = response.getVpcs().stream().map(Vpc::getName).toList();
@@ -139,7 +149,9 @@ public class FlexibleEngineResourceManager {
             String errorMsg = String.format(
                     "FlexibleEngineClient listVpcs with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return vpcNames;
@@ -151,8 +163,9 @@ public class FlexibleEngineResourceManager {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListSubnetsRequest request = new ListSubnetsRequest();
             ListSubnetsResponse response = vpcClient.listSubnetsInvoker(request)
-                    .retryCondition(flexibleEngineClient::matchRetryCondition)
-                    .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(flexibleEngineRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 subnetNames = response.getSubnets().stream().map(Subnet::getName).toList();
@@ -161,7 +174,9 @@ public class FlexibleEngineResourceManager {
             String errorMsg = String.format(
                     "FlexibleEngineClient listSubnets with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return subnetNames;
@@ -173,18 +188,21 @@ public class FlexibleEngineResourceManager {
             VpcClient vpcClient = getVpcClient(userId, region);
             ListSecurityGroupsRequest request = new ListSecurityGroupsRequest();
             ListSecurityGroupsResponse response = vpcClient.listSecurityGroupsInvoker(request)
-                    .retryCondition(flexibleEngineClient::matchRetryCondition)
-                    .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(flexibleEngineRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
-                securityGroupNames =
-                        response.getSecurityGroups().stream().map(SecurityGroup::getName).toList();
+                securityGroupNames = response.getSecurityGroups()
+                        .stream().map(SecurityGroup::getName).toList();
             }
         } catch (Exception e) {
             String errorMsg = String.format(
                     "FlexibleEngineClient listSecurityGroups with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return securityGroupNames;
@@ -197,19 +215,21 @@ public class FlexibleEngineResourceManager {
             ListSecurityGroupRulesRequest request = new ListSecurityGroupRulesRequest();
             ListSecurityGroupRulesResponse response =
                     vpcClient.listSecurityGroupRulesInvoker(request)
-                            .retryCondition(flexibleEngineClient::matchRetryCondition)
-                            .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
                             .invoke();
             if (response.getHttpStatusCode() == 200) {
-                securityGroupRuleIds =
-                        response.getSecurityGroupRules().stream().map(SecurityGroupRule::getId)
-                                .toList();
+                securityGroupRuleIds = response.getSecurityGroupRules()
+                        .stream().map(SecurityGroupRule::getId).toList();
             }
         } catch (Exception e) {
             String errorMsg = String.format(
                     "FlexibleEngineClient listSecurityGroupRules with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return securityGroupRuleIds;
@@ -221,19 +241,21 @@ public class FlexibleEngineResourceManager {
             EipClient eipClient = getEipClient(userId, region);
             ListPublicipsRequest request = new ListPublicipsRequest();
             ListPublicipsResponse response = eipClient.listPublicipsInvoker(request)
-                    .retryCondition(flexibleEngineClient::matchRetryCondition)
-                    .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(flexibleEngineRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
-                publicIpAddresses =
-                        response.getPublicips().stream().map(PublicipShowResp::getPublicIpAddress)
-                                .toList();
+                publicIpAddresses = response.getPublicips()
+                        .stream().map(PublicipShowResp::getPublicIpAddress).toList();
             }
         } catch (Exception e) {
             String errorMsg = String.format(
                     "FlexibleEngineClient listPublicIps with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return publicIpAddresses;
@@ -245,8 +267,9 @@ public class FlexibleEngineResourceManager {
             EvsClient evsClient = getEvsClient(userId, region);
             ListVolumesRequest request = new ListVolumesRequest();
             ListVolumesResponse response = evsClient.listVolumesInvoker(request)
-                    .retryCondition(flexibleEngineClient::matchRetryCondition)
-                    .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(flexibleEngineRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
                 volumeNames = response.getVolumes().stream().map(VolumeDetail::getName).toList();
@@ -255,7 +278,9 @@ public class FlexibleEngineResourceManager {
             String errorMsg = String.format(
                     "FlexibleEngineClient listVolumes with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return volumeNames;
@@ -267,19 +292,22 @@ public class FlexibleEngineResourceManager {
             EcsClient ecsClient = getEcsClient(userId, region);
             NovaListKeypairsRequest request = new NovaListKeypairsRequest();
             NovaListKeypairsResponse response = ecsClient.novaListKeypairsInvoker(request)
-                    .retryCondition(flexibleEngineClient::matchRetryCondition)
-                    .backoffStrategy(new FlexibleEngineRetryStrategy(DEFAULT_DELAY_MILLIS))
+                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                    .backoffStrategy(flexibleEngineRetryStrategy)
                     .invoke();
             if (response.getHttpStatusCode() == 200) {
-                keyPairNames =
-                        response.getKeypairs().stream().map(NovaListKeypairsResult::getKeypair)
-                                .map(NovaSimpleKeypair::getName).toList();
+                keyPairNames = response.getKeypairs().stream()
+                        .map(NovaListKeypairsResult::getKeypair)
+                        .map(NovaSimpleKeypair::getName).toList();
             }
         } catch (Exception e) {
             String errorMsg = String.format(
                     "FlexibleEngineClient listKeyPairs with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
             throw new ClientApiCallFailedException(errorMsg);
         }
         return keyPairNames;

@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
+import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
@@ -51,7 +52,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         HuaweiCloudMetricsService.class, HuaweiCloudClient.class, HuaweiCloudMonitorConstants.class,
         HuaweiCloudDataModelConverter.class, CredentialCenter.class, ServiceMetricsStore.class,
         ServiceMetricsCacheManager.class, HuaweiCloudTerraformResourceHandler.class,
-        HuaweiCloudResourceManager.class, HuaweiCloudPriceCalculator.class})
+        HuaweiCloudResourceManager.class, HuaweiCloudPriceCalculator.class,
+        HuaweiCloudRetryStrategy.class})
 class HuaweiCloudMonitorIntegrationTest {
 
     @RegisterExtension
@@ -70,6 +72,8 @@ class HuaweiCloudMonitorIntegrationTest {
     HuaweiCloudClient huaweiCloudClient;
     @MockBean
     CredentialCenter credentialCenter;
+    @MockBean
+    HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
 
     ResourceMetricsRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
                                                       Long from, Long to,

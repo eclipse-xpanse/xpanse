@@ -8,6 +8,7 @@ package org.eclipse.xpanse.plugins.scs.manage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -19,6 +20,9 @@ import org.eclipse.xpanse.plugins.scs.common.keystone.ScsKeystoneManager;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 
@@ -42,8 +46,11 @@ public class ScsResourceManager {
     /**
      * List Scs resource by the kind of ReusableCloudResource.
      */
-    public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+    public List<String> getExistingResourceNamesWithKind(String userId,
+                                                         String region, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
             return getVpcList(userId, region);
         } else if (kind == DeployResourceKind.SUBNET) {
@@ -70,6 +77,9 @@ public class ScsResourceManager {
      * @param region region
      * @return availability zones
      */
+    @Retryable(retryFor = ClientApiCallFailedException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
@@ -80,8 +90,10 @@ public class ScsResourceManager {
             String errorMsg = String.format(
                     "ScsOpenstackClient listAvailabilityZones with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return availabilityZoneNames;
     }
@@ -96,8 +108,10 @@ public class ScsResourceManager {
             String errorMsg = String.format(
                     "ScsOpenstackClient listVpcs with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return vpcNames;
     }
@@ -112,8 +126,10 @@ public class ScsResourceManager {
             String errorMsg = String.format(
                     "ScsOpenstackClient listSubnets with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return subnetNames;
     }
@@ -128,8 +144,10 @@ public class ScsResourceManager {
             String errorMsg = String.format(
                     "ScsOpenstackClient listSecurityGroups with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupNames;
     }
@@ -144,8 +162,10 @@ public class ScsResourceManager {
             String errorMsg = String.format(
                     "ScsOpenstackClient listSecurityGroupRules with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupRuleIds;
     }
@@ -160,8 +180,10 @@ public class ScsResourceManager {
             String errorMsg = String.format(
                     "ScsOpenstackClient listPublicIps with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return publicIpAddresses;
     }
@@ -176,8 +198,10 @@ public class ScsResourceManager {
             String errorMsg = String.format(
                     "ScsOpenstackClient listVolumes with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return volumeNames;
     }
@@ -192,8 +216,10 @@ public class ScsResourceManager {
             String errorMsg = String.format(
                     "ScsOpenstackClient listKeyPairs with region %s failed. %s",
                     region, e.getMessage());
-            log.error(errorMsg, e);
-            throw new ClientApiCallFailedException(errorMsg);
+            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+            log.error(errorMsg + " Retry count:" + retryCount);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return keyPairNames;
     }
