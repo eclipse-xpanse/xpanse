@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.java.Log;
-import org.eclipse.xpanse.modules.models.billing.ServicePrice;
+import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -127,7 +127,7 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     }
 
     @Override
-    public ServicePrice getServicePrice(ServicePriceRequest request) {
+    public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
         return null;
     }
 }

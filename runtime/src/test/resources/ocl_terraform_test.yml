@@ -110,11 +110,11 @@ flavors:
           licensePrice:
             cost: 1.21
             currency: CNY
-            period: hourly
+            period: daily
           markUpPrice:
             cost: 1.10
             currency: CNY
-            period: hourly
+            period: daily
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrice:
           cost: 360

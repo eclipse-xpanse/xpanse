@@ -14,7 +14,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
-import org.eclipse.xpanse.modules.models.billing.ServicePrice;
+import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -202,7 +202,7 @@ class ServiceMetricsAdapterTest {
         return new OrchestratorPlugin() {
 
             @Override
-            public ServicePrice getServicePrice(ServicePriceRequest request) {
+            public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
                 return null;
             }
 

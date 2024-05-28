@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
-import org.eclipse.xpanse.modules.models.billing.ServicePrice;
+import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -307,7 +307,7 @@ class DeployEnvironmentsTest {
 
         OrchestratorPlugin plugin = new OrchestratorPlugin() {
             @Override
-            public ServicePrice getServicePrice(ServicePriceRequest request) {
+            public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
                 return null;
             }
 
