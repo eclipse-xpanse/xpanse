@@ -6,8 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
@@ -44,34 +42,6 @@ class DatabaseDeployServiceStorageTest {
         entity.setName("name");
         entity.setCustomerServiceName("customerServiceName");
         verify(mockDeployServiceRepository).saveAndFlush(entity);
-    }
-
-    @Test
-    void testServices() {
-        final DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setId(id);
-        deployServiceEntity.setUserId(userId);
-        deployServiceEntity.setCategory(Category.AI);
-        deployServiceEntity.setName("name");
-        deployServiceEntity.setCustomerServiceName("customerServiceName");
-        final List<DeployServiceEntity> expectedResult = List.of(deployServiceEntity);
-        final DeployServiceEntity deployServiceEntity1 = new DeployServiceEntity();
-        deployServiceEntity1.setId(id);
-        deployServiceEntity1.setUserId(userId);
-        deployServiceEntity1.setCategory(Category.AI);
-        deployServiceEntity1.setName("name");
-        deployServiceEntity1.setCustomerServiceName("customerServiceName");
-        final List<DeployServiceEntity> deployServiceEntities = List.of(deployServiceEntity1);
-        when(mockDeployServiceRepository.findAll()).thenReturn(deployServiceEntities);
-        final List<DeployServiceEntity> result = databaseDeployServiceStorageUnderTest.services();
-        assertThat(result).isEqualTo(expectedResult);
-    }
-
-    @Test
-    void testServices_DeployServiceRepositoryReturnsNoItems() {
-        when(mockDeployServiceRepository.findAll()).thenReturn(Collections.emptyList());
-        final List<DeployServiceEntity> result = databaseDeployServiceStorageUnderTest.services();
-        assertThat(result).isEqualTo(Collections.emptyList());
     }
 
     @Test

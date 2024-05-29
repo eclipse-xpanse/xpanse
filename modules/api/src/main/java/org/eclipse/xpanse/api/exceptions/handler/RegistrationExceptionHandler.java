@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateStillInUseException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.springframework.core.Ordered;
@@ -155,5 +156,17 @@ public class RegistrationExceptionHandler {
     public Response handleInvalidServiceFlavorsException(
             InvalidServiceFlavorsException ex) {
         return Response.errorResponse(ResultType.INVALID_SERVICE_FLAVORS, ex.getErrorReasons());
+    }
+
+    /**
+     * Exception handler for InvalidServiceFlavorsException.
+     */
+    @ExceptionHandler({ServiceTemplateStillInUseException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceTemplateStillInUseException(
+            ServiceTemplateStillInUseException ex) {
+        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE,
+                Collections.singletonList(ex.getMessage()));
     }
 }

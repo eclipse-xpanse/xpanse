@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.database.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
@@ -28,6 +29,7 @@ class ServiceQueryModelTest {
     private final ServiceDeploymentState serviceState = ServiceDeploymentState.DEPLOY_SUCCESS;
     private final String userId = "defaultUserId";
     private final String namespace = "defaultNamespace";
+    private final UUID serviceTemplateId = UUID.randomUUID();
     private ServiceQueryModel serviceQueryTest;
 
     @BeforeEach
@@ -40,6 +42,7 @@ class ServiceQueryModelTest {
         serviceQueryTest.setServiceState(serviceState);
         serviceQueryTest.setUserId(userId);
         serviceQueryTest.setNamespace(namespace);
+        serviceQueryTest.setServiceTemplateId(serviceTemplateId);
     }
 
     @Test
@@ -51,6 +54,7 @@ class ServiceQueryModelTest {
         assertEquals(userId, serviceQueryTest.getUserId());
         assertEquals(serviceState, serviceQueryTest.getServiceState());
         assertEquals(namespace, serviceQueryTest.getNamespace());
+        assertEquals(serviceTemplateId, serviceQueryTest.getServiceTemplateId());
     }
 
     @Test
@@ -76,7 +80,9 @@ class ServiceQueryModelTest {
                 + ", serviceVersion=" + serviceVersion
                 + ", serviceState=" + serviceState
                 + ", userId=" + userId
-                + ", namespace=" + namespace + ")";
+                + ", namespace=" + namespace
+                + ", serviceTemplateId=" + serviceTemplateId
+                + ")";
         assertEquals(expectedString, serviceQueryTest.toString());
     }
 

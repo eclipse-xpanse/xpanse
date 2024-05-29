@@ -9,6 +9,8 @@ package org.eclipse.xpanse.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,6 +30,9 @@ import java.util.Locale;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -49,6 +54,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.semver4j.Semver;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -68,6 +74,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
     private final OclLoader oclLoader = new OclLoader();
     @Resource
     private DatabaseServiceTemplateStorage serviceTemplateStorage;
+
+    @MockBean
+    private DatabaseDeployServiceStorage deployServiceStorage;
 
     @Test
     @WithJwt(file = "jwt_isv.json")
@@ -136,15 +145,36 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
 
+
         // Setup unregister request
-        Response expectedResponse = Response.successResponse(Collections.singletonList(
-                String.format("Unregister service template using id %s successful.", id)));
         // Run the test
         final MockHttpServletResponse unregisterResponse = unregister(id);
+        ServiceTemplateDetailVo unregisteredServiceTemplateDetailVo =
+                objectMapper.readValue(unregisterResponse.getContentAsString(),
+                        ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), unregisterResponse.getStatus());
-        assertEquals(unregisterResponse.getContentAsString(),
-                objectMapper.writeValueAsString(expectedResponse));
+        assertEquals(unregisteredServiceTemplateDetailVo.getServiceRegistrationState(),
+                ServiceRegistrationState.UNREGISTERED);
+
+        // Setup reRegister request
+        // Run the test
+        final MockHttpServletResponse reRegisterResponse = reRegisterServiceTemplate(id);
+        ServiceTemplateDetailVo reRegisteredServiceTemplateDetailVo =
+                objectMapper.readValue(reRegisterResponse.getContentAsString(),
+                        ServiceTemplateDetailVo.class);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), reRegisterResponse.getStatus());
+        assertEquals(reRegisteredServiceTemplateDetailVo.getServiceRegistrationState(),
+                ServiceRegistrationState.APPROVAL_PENDING);
+
+
+        // Setup delete request
+        unregister(id);
+        // Run the test
+        final MockHttpServletResponse deleteResponse = deleteServiceTemplate(id);
+        // Verify the results
+        assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.getStatus());
     }
 
     void testFetchApisWorkWell() throws Exception {
@@ -176,7 +206,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
         assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
-        unregister(id);
+
+        serviceTemplateStorage.removeById(id);
     }
 
 
@@ -196,19 +227,20 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         testFetchThrowsRuntimeException();
         testListServiceTemplatesThrowsException();
+        testDeleteServiceTemplateThrowsException();
     }
 
     void testManageApisThrowsServiceTemplateNotRegistered() throws Exception {
         // Setup
-        UUID uuid = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
         Response expectedResponse =
                 Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
                         Collections.singletonList(
-                                String.format("Service template with id %s not found.", uuid)));
+                                String.format("Service template with id %s not found.", id)));
         String result = objectMapper.writeValueAsString(expectedResponse);
 
         // Run the test -detail
-        final MockHttpServletResponse detailResponse = detail(uuid);
+        final MockHttpServletResponse detailResponse = detail(id);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
         assertEquals(result, detailResponse.getContentAsString());
@@ -217,19 +249,19 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL();
         // Run the test -update
         Ocl updateOcl = oclLoader.getOcl(updateUrl);
-        final MockHttpServletResponse updateResponse = update(uuid, updateOcl);
+        final MockHttpServletResponse updateResponse = update(id, updateOcl);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse.getStatus());
         assertEquals(result, updateResponse.getContentAsString());
 
         // Run the test -fetchUpdate
-        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(uuid, updateUrl.toString());
+        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), fetchUpdateResponse.getStatus());
         assertEquals(result, fetchUpdateResponse.getContentAsString());
 
         // Run the test -unregister
-        final MockHttpServletResponse unregisterResponse = unregister(uuid);
+        final MockHttpServletResponse unregisterResponse = unregister(id);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), unregisterResponse.getStatus());
         assertEquals(result, unregisterResponse.getContentAsString());
@@ -248,14 +280,14 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplateDetail =
                 objectMapper.readValue(response.getContentAsString(),
                         ServiceTemplateDetailVo.class);
-        UUID uuid = serviceTemplateDetail.getId();
+        UUID id = serviceTemplateDetail.getId();
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateStorage.getServiceTemplateById(uuid);
+                serviceTemplateStorage.getServiceTemplateById(id);
         serviceTemplateEntity.setNamespace("test");
         serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
 
         // Run the test detail
-        final MockHttpServletResponse detailResponse = detail(uuid);
+        final MockHttpServletResponse detailResponse = detail(id);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), detailResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
@@ -267,14 +299,14 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Run the test update
         Ocl updateOcl = oclLoader.getOcl(updateUrl);
         updateOcl.setName("serviceTemplateApiTest-02");
-        final MockHttpServletResponse updateResponse = update(uuid, updateOcl);
+        final MockHttpServletResponse updateResponse = update(id, updateOcl);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), updateResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
                 updateResponse.getContentAsString());
 
         // Run the test -fetchUpdate
-        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(uuid, updateUrl.toString());
+        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), fetchUpdateResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
@@ -282,13 +314,27 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
 
         // Run the test unregister
-        final MockHttpServletResponse unregisterResponse = unregister(uuid);
+        final MockHttpServletResponse unregisterResponse = unregister(id);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), unregisterResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
                 unregisterResponse.getContentAsString());
 
-        unregister(uuid);
+        // Run the test re-register
+        final MockHttpServletResponse reRegisterResponse = reRegisterServiceTemplate(id);
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), reRegisterResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                reRegisterResponse.getContentAsString());
+
+        // Run the test deleteServiceTemplate
+        final MockHttpServletResponse deleteResponse = deleteServiceTemplate(id);
+        // Verify the results
+        assertEquals(HttpStatus.FORBIDDEN.value(), deleteResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                deleteResponse.getContentAsString());
+
+        serviceTemplateStorage.removeById(id);
     }
 
     void testRegisterThrowsMethodArgumentNotValidException() throws Exception {
@@ -306,8 +352,6 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 response.getContentAsString());
     }
 
-    @Test
-    @WithJwt(file = "jwt_isv.json")
     void testRegisterThrowsPluginNotFoundException() throws Exception {
         // Setup
         Ocl ocl = oclLoader.getOcl(
@@ -442,6 +486,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerSameResponse.getStatus());
         assertEquals(registerSameResponse.getContentAsString(), result);
         unregister(serviceTemplateDetail.getId());
+        deleteServiceTemplate(serviceTemplateDetail.getId());
     }
 
     void testRegisterThrowsInvalidServiceVersionException() throws Exception {
@@ -483,6 +528,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(expectedResponse2));
 
         unregister(serviceTemplate.getId());
+        deleteServiceTemplate(serviceTemplate.getId());
     }
 
     void testRegisterThrowsInvalidServiceFlavorsException() throws Exception {
@@ -550,6 +596,38 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(expectedResponse.getResultType(), resultResponse.getResultType());
     }
 
+    void testDeleteServiceTemplateThrowsException() throws Exception {
+        // Setup
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("serviceTemplateApiTest-05");
+        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        UUID id = serviceTemplate.getId();
+        // Setup
+        String errorMsg = String.format("Service template with id %s is not unregistered.", id);
+        Response expectedResponse =
+                Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE, List.of(errorMsg));
+        MockHttpServletResponse deleteResponse = deleteServiceTemplate(id);
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse.getStatus());
+        assertEquals(deleteResponse.getContentAsString(),
+                objectMapper.writeValueAsString(expectedResponse));
+
+        String errorMsg2 = String.format("Service template with id %s is still in use.", id);
+        Response expectedResponse2 =
+                Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE,
+                        List.of(errorMsg2));
+        unregister(serviceTemplate.getId());
+        when(deployServiceStorage.listServices(any(ServiceQueryModel.class))).thenReturn(
+                List.of(new DeployServiceEntity()));
+        MockHttpServletResponse deleteResponse2 = deleteServiceTemplate(id);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse2.getStatus());
+        assertEquals(deleteResponse2.getContentAsString(),
+                objectMapper.writeValueAsString(expectedResponse2));
+
+        serviceTemplateStorage.removeById(id);
+    }
+
     MockHttpServletResponse register(Ocl ocl) throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
@@ -584,6 +662,20 @@ class ServiceTemplateApiTest extends ApisTestCommon {
     }
 
     MockHttpServletResponse unregister(UUID id) throws Exception {
+        return mockMvc.perform(
+                        put("/xpanse/service_templates/unregister/{id}", id).accept(
+                                MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+    }
+
+    MockHttpServletResponse reRegisterServiceTemplate(UUID id) throws Exception {
+        return mockMvc.perform(
+                        put("/xpanse/service_templates/re-register/{id}", id).accept(
+                                MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+    }
+
+    MockHttpServletResponse deleteServiceTemplate(UUID id) throws Exception {
         return mockMvc.perform(
                         delete("/xpanse/service_templates/{id}", id).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();

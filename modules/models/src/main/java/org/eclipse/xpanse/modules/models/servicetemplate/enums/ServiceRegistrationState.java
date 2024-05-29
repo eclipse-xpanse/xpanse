@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  */
 public enum ServiceRegistrationState {
 
+    UNREGISTERED("unregistered"),
     APPROVAL_PENDING("approval pending"),
     APPROVED("approved"),
     REJECTED("rejected");
