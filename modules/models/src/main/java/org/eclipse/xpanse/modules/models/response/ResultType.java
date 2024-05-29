@@ -43,6 +43,7 @@ public enum ResultType {
     RESOURCE_NOT_FOUND("Resource Not Found"),
     DEPLOYMENT_VARIABLE_INVALID("Deployment Variable Invalid"),
     SERVICE_TEMPLATE_UPDATE_NOT_ALLOWED("Service Template Update Not Allowed"),
+    SERVICE_TEMPLATE_STILL_IN_USE("Service Template Still In Use"),
     UNAUTHORIZED("Unauthorized"),
     ACCESS_DENIED("Access Denied"),
     SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION("Sensitive "

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.database.service;
 
+import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -30,5 +31,7 @@ public class ServiceQueryModel {
     private String userId;
 
     private String namespace;
+
+    private UUID serviceTemplateId;
 
 }

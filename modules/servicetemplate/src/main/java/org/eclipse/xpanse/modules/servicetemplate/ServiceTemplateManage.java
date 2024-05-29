@@ -14,6 +14,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
@@ -31,6 +34,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScri
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateStillInUseException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
@@ -56,7 +60,9 @@ import org.springframework.util.CollectionUtils;
 public class ServiceTemplateManage {
 
     @Resource
-    private ServiceTemplateStorage storage;
+    private ServiceTemplateStorage templateStorage;
+    @Resource
+    private DeployServiceStorage deployServiceStorage;
     @Resource
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
     @Resource
@@ -83,7 +89,8 @@ public class ServiceTemplateManage {
         validateServiceDeployment(ocl.getDeployment(), existingTemplate);
         existingTemplate.setOcl(ocl);
         existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
-        ServiceTemplateEntity updatedServiceTemplate = storage.storeAndFlush(existingTemplate);
+        ServiceTemplateEntity updatedServiceTemplate =
+                templateStorage.storeAndFlush(existingTemplate);
         serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
         return updatedServiceTemplate;
     }
@@ -150,7 +157,7 @@ public class ServiceTemplateManage {
         ServiceTemplateQueryModel query = new ServiceTemplateQueryModel(ocl.getCategory(),
                 ocl.getCloudServiceProvider().getName(), ocl.getName(), null,
                 ocl.getServiceHostingType(), null, false);
-        List<ServiceTemplateEntity> templates = storage.listServiceTemplates(query);
+        List<ServiceTemplateEntity> templates = templateStorage.listServiceTemplates(query);
         if (!CollectionUtils.isEmpty(templates)) {
             Semver highestVersion = templates.stream()
                     .map(serviceTemplate -> new Semver(serviceTemplate.getVersion())).sorted()
@@ -181,7 +188,7 @@ public class ServiceTemplateManage {
      */
     public ServiceTemplateEntity registerServiceTemplate(Ocl ocl) {
         ServiceTemplateEntity newTemplate = getNewServiceTemplateEntity(ocl);
-        ServiceTemplateEntity existingTemplate = storage.findServiceTemplate(newTemplate);
+        ServiceTemplateEntity existingTemplate = templateStorage.findServiceTemplate(newTemplate);
         if (Objects.nonNull(existingTemplate)) {
             String errorMsg = String.format("Service template already registered with id %s",
                     existingTemplate.getId());
@@ -195,7 +202,7 @@ public class ServiceTemplateManage {
         String userManageNamespace =
                 userServiceHelper.getCurrentUserManageNamespace();
         newTemplate.setNamespace(userManageNamespace);
-        ServiceTemplateEntity storedServiceTemplate = storage.storeAndFlush(newTemplate);
+        ServiceTemplateEntity storedServiceTemplate = templateStorage.storeAndFlush(newTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
         return storedServiceTemplate;
     }
@@ -250,7 +257,7 @@ public class ServiceTemplateManage {
      */
     public List<ServiceTemplateEntity> listServiceTemplates(ServiceTemplateQueryModel query) {
         fillParamFromUserMetadata(query);
-        return storage.listServiceTemplates(query);
+        return templateStorage.listServiceTemplates(query);
     }
 
     /**
@@ -277,7 +284,7 @@ public class ServiceTemplateManage {
         String reviewComment = StringUtils.isNotBlank(request.getReviewComment())
                 ? request.getReviewComment() : request.getReviewResult().toValue();
         existingTemplate.setReviewComment(reviewComment);
-        storage.storeAndFlush(existingTemplate);
+        templateStorage.storeAndFlush(existingTemplate);
     }
 
 
@@ -285,10 +292,47 @@ public class ServiceTemplateManage {
      * Unregister service template using the ID of service template.
      *
      * @param id ID of service template.
+     * @return Returns updated service template.
      */
-    public void unregisterServiceTemplate(UUID id) {
+    public ServiceTemplateEntity unregisterServiceTemplate(UUID id) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
-        storage.removeById(existingTemplate.getId());
+        existingTemplate.setServiceRegistrationState(ServiceRegistrationState.UNREGISTERED);
+        return templateStorage.storeAndFlush(existingTemplate);
+    }
+
+    /**
+     * Re-register service template using the ID of service template.
+     *
+     * @param id ID of service template.
+     * @return Returns updated service template.
+     */
+    public ServiceTemplateEntity reRegisterServiceTemplate(UUID id) {
+        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
+        existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+        return templateStorage.storeAndFlush(existingTemplate);
+    }
+
+    /**
+     * Delete service template using the ID of service template.
+     *
+     * @param id ID of service template.
+     */
+    public void deleteServiceTemplate(UUID id) {
+        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
+        if (ServiceRegistrationState.UNREGISTERED
+                != existingTemplate.getServiceRegistrationState()) {
+            String errMsg = String.format("Service template with id %s is not unregistered.", id);
+            log.error(errMsg);
+            throw new ServiceTemplateStillInUseException(errMsg);
+        }
+        List<DeployServiceEntity> deployServiceEntities =
+                listDeployServicesByTemplateId(existingTemplate.getId());
+        if (!deployServiceEntities.isEmpty()) {
+            String errMsg = String.format("Service template with id %s is still in use.", id);
+            log.error(errMsg);
+            throw new ServiceTemplateStillInUseException(errMsg);
+        }
+        templateStorage.removeById(existingTemplate.getId());
         serviceTemplateOpenApiGenerator.deleteServiceApi(id.toString());
     }
 
@@ -307,7 +351,7 @@ public class ServiceTemplateManage {
     }
 
     private ServiceTemplateEntity getServiceTemplateById(UUID id) {
-        ServiceTemplateEntity serviceTemplate = storage.getServiceTemplateById(id);
+        ServiceTemplateEntity serviceTemplate = templateStorage.getServiceTemplateById(id);
         if (Objects.isNull(serviceTemplate) || Objects.isNull(serviceTemplate.getOcl())) {
             String errMsg = String.format("Service template with id %s not found.", id);
             log.error(errMsg);
@@ -315,6 +359,13 @@ public class ServiceTemplateManage {
         }
         return serviceTemplate;
     }
+
+    private List<DeployServiceEntity> listDeployServicesByTemplateId(UUID serviceTemplateId) {
+        ServiceQueryModel query = new ServiceQueryModel();
+        query.setServiceTemplateId(serviceTemplateId);
+        return deployServiceStorage.listServices(query);
+    }
+
 
     private void validateTerraformScript(Deployment deployment) {
         if (deployment.getKind() == DeployerKind.TERRAFORM) {

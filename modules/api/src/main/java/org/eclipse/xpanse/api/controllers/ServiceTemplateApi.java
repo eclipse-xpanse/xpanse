@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +27,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -81,9 +79,7 @@ public class ServiceTemplateApi {
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public ServiceTemplateDetailVo register(@Valid @RequestBody Ocl ocl) {
         ServiceTemplateEntity templateEntity = serviceTemplateManage.registerServiceTemplate(ocl);
-        String successMsg = String.format("Register service template with id %s successful.",
-                templateEntity.getId());
-        log.info(successMsg);
+        log.info("Register service template with id {} successfully.", templateEntity.getId());
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 
@@ -104,8 +100,7 @@ public class ServiceTemplateApi {
             String id, @Valid @RequestBody Ocl ocl) {
         ServiceTemplateEntity templateEntity =
                 serviceTemplateManage.updateServiceTemplate(UUID.fromString(id), ocl);
-        String successMsg = String.format("Update service template with id %s successful.", id);
-        log.info(successMsg);
+        log.info("Update service template with id {} successfully.", id);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 
@@ -126,9 +121,7 @@ public class ServiceTemplateApi {
             @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ServiceTemplateEntity templateEntity = serviceTemplateManage.registerServiceTemplate(ocl);
-        String message = String.format("Register service template by file with URL %s successful.",
-                oclLocation);
-        log.info(message);
+        log.info("Register service template by file with URL {} successfully.", oclLocation);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 
@@ -142,7 +135,8 @@ public class ServiceTemplateApi {
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Update service template using id and URL of Ocl file.")
-    @PutMapping(value = "/service_templates/file/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/service_templates/file/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
@@ -151,13 +145,10 @@ public class ServiceTemplateApi {
             @PathVariable(name = "id") String id,
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
-        log.info("Update service template {} with Url {}", id, oclLocation);
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ServiceTemplateEntity templateEntity =
                 serviceTemplateManage.updateServiceTemplate(UUID.fromString(id), ocl);
-        String successMsg = String.format("Update service template with id %s by Url %s", id,
-                oclLocation);
-        log.info(successMsg);
+        log.info("Update service template with id {} by URL {} successfully.", id, oclLocation);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 
@@ -168,19 +159,58 @@ public class ServiceTemplateApi {
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Delete service template using id.")
-    @DeleteMapping("/service_templates/{id}")
+    @Operation(description = "Unregister service template using id.")
+    @PutMapping("/service_templates/unregister/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public Response unregister(
-            @Parameter(name = "id", description = "id of service template") @PathVariable("id")
-            String id) {
-        serviceTemplateManage.unregisterServiceTemplate(UUID.fromString(id));
-        String successMsg =
-                String.format("Unregister service template using id %s successful.", id);
-        log.info(successMsg);
-        return Response.successResponse(Collections.singletonList(successMsg));
+    public ServiceTemplateDetailVo unregister(
+            @Parameter(name = "id", description = "id of service template")
+            @PathVariable("id") String id) {
+        ServiceTemplateEntity templateEntity =
+                serviceTemplateManage.unregisterServiceTemplate(UUID.fromString(id));
+        log.info("Unregister service template with id {} successfully.", id);
+        return convertToServiceTemplateDetailVo(templateEntity);
+    }
+
+    /**
+     * Unregister service template using id.
+     *
+     * @param id id of service template.
+     * @return response
+     */
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
+    @Operation(description = "Re-register the unregistered service template using id.")
+    @PutMapping("/service_templates/re-register/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    public ServiceTemplateDetailVo reRegisterServiceTemplate(
+            @Parameter(name = "id", description = "id of service template")
+            @PathVariable("id") String id) {
+        ServiceTemplateEntity templateEntity =
+                serviceTemplateManage.reRegisterServiceTemplate(UUID.fromString(id));
+        log.info("Unregister service template with id {} successfully.", id);
+        return convertToServiceTemplateDetailVo(templateEntity);
+    }
+
+
+    /**
+     * Delete service template using id.
+     *
+     * @param id id of service template.
+     */
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
+    @Operation(description = "Delete unregistered service template using id.")
+    @DeleteMapping("/service_templates/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    public void deleteServiceTemplate(
+            @Parameter(name = "id", description = "id of service template")
+            @PathVariable("id") String id) {
+        serviceTemplateManage.deleteServiceTemplate(UUID.fromString(id));
+        log.info("Unregister service template using id {} successfully.", id);
     }
 
     /**

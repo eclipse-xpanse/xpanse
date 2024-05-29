@@ -43,11 +43,6 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
         return this.deployServiceRepository.saveAndFlush(deployServiceEntity);
     }
 
-    @Override
-    public List<DeployServiceEntity> services() {
-        return this.deployServiceRepository.findAll();
-    }
-
     /**
      * Method to list database entries based DeployServiceEntity.
      *
@@ -61,6 +56,10 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
         Specification<DeployServiceEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
+                    if (Objects.nonNull(serviceQuery.getServiceTemplateId())) {
+                        predicateList.add(criteriaBuilder.equal(root.get("serviceTemplateId"),
+                                serviceQuery.getServiceTemplateId()));
+                    }
                     if (Objects.nonNull(serviceQuery.getCategory())) {
                         predicateList.add(criteriaBuilder.equal(root.get("category"),
                                 serviceQuery.getCategory()));

@@ -23,13 +23,6 @@ public interface DeployServiceStorage {
     DeployServiceEntity storeAndFlush(DeployServiceEntity deployServiceEntity);
 
     /**
-     * Method to get all stored database entries.
-     *
-     * @return Returns all rows from the service status database table.
-     */
-    List<DeployServiceEntity> services();
-
-    /**
      * Method to get stored database entries by query model.
      *
      * @param query service query model.
