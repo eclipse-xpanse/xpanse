@@ -36,6 +36,7 @@ import org.eclipse.xpanse.plugins.openstack.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
 import org.eclipse.xpanse.plugins.openstack.price.OpenstackPriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,6 +55,8 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     private OpenstackResourceManager openStackResourceManager;
     @Resource
     private OpenstackPriceCalculator openstackPriceCalculator;
+    @Value("${openstack.auto.approve.service.template.enabled:false}")
+    private boolean openstackAutoApproveServiceTemplateEnabled;
 
     /**
      * Get the resource handlers for OpenStack.
@@ -88,6 +91,11 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<String> requiredProperties() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean autoApproveServiceTemplateIsEnabled() {
+        return openstackAutoApproveServiceTemplateEnabled;
     }
 
     @Override

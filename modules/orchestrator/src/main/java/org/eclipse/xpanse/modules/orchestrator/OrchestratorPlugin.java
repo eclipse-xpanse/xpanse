@@ -24,9 +24,24 @@ public interface OrchestratorPlugin extends ServiceResourceHandler, Authenticati
         ServiceMetricsExporter, ServiceStateManager, OperationalAudit, ServicePriceCalculator {
 
     /**
-     * get the Csp of the plugin.
+     * Get the Csp of the plugin.
+     *
+     * @return cloud service provider.
      */
     Csp getCsp();
 
+    /**
+     * Get the required properties of the plugin.
+     *
+     * @return required properties.
+     */
     List<String> requiredProperties();
+
+
+    /**
+     * Check if auto approve service template is enabled.
+     *
+     * @return true if auto approve service template is enabled.
+     */
+    boolean autoApproveServiceTemplateIsEnabled();
 }

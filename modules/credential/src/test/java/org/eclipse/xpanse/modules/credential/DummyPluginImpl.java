@@ -63,6 +63,11 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     }
 
     @Override
+    public boolean autoApproveServiceTemplateIsEnabled() {
+        return false;
+    }
+
+    @Override
     public List<CredentialType> getAvailableCredentialTypes() {
         return null;
     }
