@@ -39,7 +39,7 @@
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <lombok.version>1.18.32</lombok.version>
         <checkstyle-maven-plugin.version>3.3.1</checkstyle-maven-plugin.version>
-        <logbook.version>3.8.0</logbook.version>
+        <logbook.version>3.9.0</logbook.version>
         <wiremock.version>3.6.0</wiremock.version>
         <instancio.version>4.7.0</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
