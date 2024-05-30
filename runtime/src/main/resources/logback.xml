@@ -11,7 +11,7 @@
   <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <Pattern>
-        %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} [%X{TASK_ID}]- %msg%n
+        %d{yyyyMMdd HH:mm:ss.SSS} [%t] %-5level %logger{36} [%X{TRACKING_ID}] [%X{TASK_ID}]- %msg%n
       </Pattern>
     </encoder>
   </appender>
