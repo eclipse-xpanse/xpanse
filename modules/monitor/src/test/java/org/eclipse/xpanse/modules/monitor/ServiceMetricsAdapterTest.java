@@ -237,6 +237,11 @@ class ServiceMetricsAdapterTest {
             }
 
             @Override
+            public boolean autoApproveServiceTemplateIsEnabled() {
+                return false;
+            }
+
+            @Override
             public List<CredentialType> getAvailableCredentialTypes() {
                 return null;
             }

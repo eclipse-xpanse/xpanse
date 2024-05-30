@@ -35,6 +35,7 @@ import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,6 +55,9 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     private HuaweiCloudResourceManager huaweiCloudResourceManager;
     @Resource
     private HuaweiCloudPriceCalculator huaweiCloudPriceCalculator;
+
+    @Value("${huaweicloud.auto.approve.service.template.enabled:false}")
+    private boolean huaweiCloudAutoApproveServiceTemplateEnabled;
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
@@ -82,6 +86,11 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<String> requiredProperties() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean autoApproveServiceTemplateIsEnabled() {
+        return huaweiCloudAutoApproveServiceTemplateEnabled;
     }
 
 

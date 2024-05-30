@@ -35,6 +35,7 @@ import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateMan
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.price.FlexibleEnginePriceCalculator;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,9 +52,10 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     private FlexibleEngineVmStateManager flexibleEngineVmStateManagerService;
     @Resource
     private FlexibleEngineResourceManager flexibleEngineResourceManager;
-
     @Resource
     private FlexibleEnginePriceCalculator pricingCalculator;
+    @Value("${flexibleengine.auto.approve.service.template.enabled:false}")
+    private boolean flexibleEngineAutoApproveServiceTemplateEnabled;
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
@@ -82,6 +84,12 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<String> requiredProperties() {
         return Collections.emptyList();
+    }
+
+
+    @Override
+    public boolean autoApproveServiceTemplateIsEnabled() {
+        return flexibleEngineAutoApproveServiceTemplateEnabled;
     }
 
     @Override

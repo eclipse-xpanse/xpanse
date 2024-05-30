@@ -34,6 +34,7 @@ import org.eclipse.xpanse.plugins.scs.manage.ScsResourceManager;
 import org.eclipse.xpanse.plugins.scs.manage.ScsServersManager;
 import org.eclipse.xpanse.plugins.scs.price.ScsPriceCalculator;
 import org.eclipse.xpanse.plugins.scs.resourcehandler.ScsTerraformResourceHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,7 +52,8 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     private ScsResourceManager scsResourceManager;
     @Resource
     private ScsPriceCalculator scsPricingCalculator;
-
+    @Value("${scs.auto.approve.service.template.enabled:false}")
+    private boolean scsAutoApproveServiceTemplateEnabled;
 
     /**
      * Get the resource handlers for SCS.
@@ -86,6 +88,11 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<String> requiredProperties() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean autoApproveServiceTemplateIsEnabled() {
+        return scsAutoApproveServiceTemplateEnabled;
     }
 
     @Override

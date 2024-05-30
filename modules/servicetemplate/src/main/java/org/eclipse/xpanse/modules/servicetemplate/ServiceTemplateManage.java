@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -39,6 +40,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.validators.BillingConfigValidator;
+import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
@@ -73,6 +76,8 @@ public class ServiceTemplateManage {
     private DeployerKindManager deployerKindManager;
     @Resource
     private BillingConfigValidator billingConfigValidator;
+    @Resource
+    private PluginManager pluginManager;
 
     /**
      * Update service template using id and the ocl model.
@@ -88,7 +93,7 @@ public class ServiceTemplateManage {
         billingConfigValidator.validateServiceFlavors(ocl);
         validateServiceDeployment(ocl.getDeployment(), existingTemplate);
         existingTemplate.setOcl(ocl);
-        existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+        setServiceRegistrationState(existingTemplate);
         ServiceTemplateEntity updatedServiceTemplate =
                 templateStorage.storeAndFlush(existingTemplate);
         serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
@@ -136,9 +141,23 @@ public class ServiceTemplateManage {
         newTemplate.setCategory(ocl.getCategory());
         newTemplate.setServiceHostingType(ocl.getServiceHostingType());
         newTemplate.setOcl(ocl);
-        newTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
         newTemplate.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
+        setServiceRegistrationState(newTemplate);
         return newTemplate;
+    }
+
+
+    private void setServiceRegistrationState(ServiceTemplateEntity serviceTemplate) {
+        Csp csp = serviceTemplate.getCsp();
+        OrchestratorPlugin cspPlugin = pluginManager.getOrchestratorPlugin(csp);
+        boolean cspAutoApproveIsEnabled = cspPlugin.autoApproveServiceTemplateIsEnabled();
+        if (cspAutoApproveIsEnabled) {
+            serviceTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
+            log.info("Service template {} managed by Csp {} auto approved",
+                    serviceTemplate.getId(), csp);
+        } else {
+            serviceTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+        }
     }
 
 
@@ -308,7 +327,7 @@ public class ServiceTemplateManage {
      */
     public ServiceTemplateEntity reRegisterServiceTemplate(UUID id) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
-        existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+        setServiceRegistrationState(existingTemplate);
         return templateStorage.storeAndFlush(existingTemplate);
     }
 
