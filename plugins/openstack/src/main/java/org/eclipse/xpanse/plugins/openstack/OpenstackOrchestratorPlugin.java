@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.cache.consts.CacheNames;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -37,6 +38,7 @@ import org.eclipse.xpanse.plugins.openstack.monitor.MetricsManager;
 import org.eclipse.xpanse.plugins.openstack.price.OpenstackPriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.resourcehandler.OpenstackTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -76,6 +78,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    @Cacheable(CacheNames.REGION_AZ_CACHE_NAME)
     public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
         return openStackResourceManager.getAvailabilityZonesOfRegion(userId, region);
     }

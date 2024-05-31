@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -41,8 +42,11 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -67,6 +71,9 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
 public class ServiceDeployerApi {
+
+    @Value("${region.azs.cache.expire.time.in.minutes:60}")
+    private long duration;
 
     @Resource
     private DeployService deployService;
@@ -308,7 +315,7 @@ public class ServiceDeployerApi {
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public List<String> getAvailabilityZones(
+    public ResponseEntity<List<String>> getAvailabilityZones(
             @Parameter(name = "cspName", description = "name of the cloud service provider")
             @RequestParam(name = "cspName") Csp csp,
             @Parameter(name = "regionName", description = "name of the region")
@@ -316,8 +323,11 @@ public class ServiceDeployerApi {
 
         String currentUserId = this.userServiceHelper.getCurrentUserId();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        return orchestratorPlugin.getAvailabilityZonesOfRegion(
+        List<String> availabilityZones = orchestratorPlugin.getAvailabilityZonesOfRegion(
                 currentUserId, regionName);
+        CacheControl cacheControl =
+                CacheControl.maxAge(duration, TimeUnit.MINUTES).mustRevalidate();
+        return ResponseEntity.ok().cacheControl(cacheControl).body(availabilityZones);
     }
 
 }

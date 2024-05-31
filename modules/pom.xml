@@ -35,6 +35,7 @@
         <module>workflow</module>
         <module>observability</module>
         <module>async</module>
+        <module>cache</module>
     </modules>
 
 </project>
