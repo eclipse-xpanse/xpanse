@@ -70,7 +70,7 @@ public class ServiceModificationApi {
      * @return response
      */
     @Tag(name = "ServiceModification",
-            description = "APIs to manage modifications of the service instances.")
+            description = "APIs to manage modifications of the service instances")
     @Operation(description = "Start a modification to modify the deployed service instance.")
     @PutMapping(value = "/services/modify/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -109,7 +109,7 @@ public class ServiceModificationApi {
      */
     @Tag(name = "ServiceModification",
             description = "APIs to manage modifications of the service instances.")
-    @Operation(description = "List modification audits of the service instance.")
+    @Operation(description = "List modification audits of the service instance")
     @GetMapping(value = "/services/{serviceId}/modifications", produces =
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
