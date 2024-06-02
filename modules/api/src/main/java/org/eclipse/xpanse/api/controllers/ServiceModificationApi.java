@@ -108,7 +108,7 @@ public class ServiceModificationApi {
      * @return service modification audits.
      */
     @Tag(name = "ServiceModification",
-            description = "APIs to manage modifications of the service instances.")
+            description = "APIs to manage modifications of the service instances")
     @Operation(description = "List modification audits of the service instance")
     @GetMapping(value = "/services/{serviceId}/modifications", produces =
             MediaType.APPLICATION_JSON_VALUE)
