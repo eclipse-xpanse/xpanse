@@ -18,7 +18,7 @@ class BackendSystemTypeTest {
 
     @Test
     public void testGetByValue() {
-        BackendSystemType type = BackendSystemType.getByValue("identityProvider");
+        BackendSystemType type = BackendSystemType.getByValue("identity provider");
         Assertions.assertEquals(type, BackendSystemType.IDENTITY_PROVIDER);
 
         BackendSystemType type1 = BackendSystemType.getByValue("database");
@@ -30,7 +30,7 @@ class BackendSystemTypeTest {
         BackendSystemType type3 = BackendSystemType.getByValue("tofu maker");
         Assertions.assertEquals(type3, BackendSystemType.TOFU_MAKER);
 
-        BackendSystemType type4 = BackendSystemType.getByValue("policyMan");
+        BackendSystemType type4 = BackendSystemType.getByValue("policy man");
         Assertions.assertEquals(type4, BackendSystemType.POLICY_MAN);
 
         BackendSystemType type5 = BackendSystemType.getByValue("OpenTelemetry Collector");
@@ -43,7 +43,7 @@ class BackendSystemTypeTest {
     @Test
     public void testToValue() {
         String value = BackendSystemType.IDENTITY_PROVIDER.toValue();
-        Assertions.assertEquals("IdentityProvider", value);
+        Assertions.assertEquals("Identity Provider", value);
         String name = BackendSystemType.IDENTITY_PROVIDER.name();
         Assertions.assertEquals("IDENTITY_PROVIDER", name);
         String string = BackendSystemType.IDENTITY_PROVIDER.toString();
@@ -71,7 +71,7 @@ class BackendSystemTypeTest {
         Assertions.assertEquals("TOFU_MAKER", string3);
 
         String value4 = BackendSystemType.POLICY_MAN.toValue();
-        Assertions.assertEquals("PolicyMan", value4);
+        Assertions.assertEquals("Policy Man", value4);
         String name4 = BackendSystemType.POLICY_MAN.name();
         Assertions.assertEquals("POLICY_MAN", name4);
         String string4 = BackendSystemType.POLICY_MAN.toString();

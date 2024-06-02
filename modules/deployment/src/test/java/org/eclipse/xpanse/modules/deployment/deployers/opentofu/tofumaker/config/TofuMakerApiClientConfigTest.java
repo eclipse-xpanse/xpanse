@@ -2,7 +2,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.confi
 
 import static org.mockito.Mockito.verify;
 
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

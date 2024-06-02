@@ -96,7 +96,7 @@ public class ScsKeystoneManager {
         // there is no need to return the authenticated client because the below method already sets
         // the authentication details in the thread context.
         String url = Objects.nonNull(serviceId) ? getUrlFromDeploymentVariables(serviceId)
-                : System.getProperty(ScsEnvironmentConstants.AUTH_URL);
+                : System.getenv(ScsEnvironmentConstants.AUTH_URL);
 
         return OSFactory
                 .builderV3()

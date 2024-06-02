@@ -15,11 +15,11 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  */
 public enum BackendSystemType {
 
-    IDENTITY_PROVIDER("IdentityProvider"),
+    IDENTITY_PROVIDER("Identity Provider"),
     DATABASE("Database"),
     TERRAFORM_BOOT("Terraform Boot"),
     TOFU_MAKER("Tofu Maker"),
-    POLICY_MAN("PolicyMan"),
+    POLICY_MAN("Policy Man"),
     OPEN_TELEMETRY_COLLECTOR("OpenTelemetry Collector");
 
     private final String code;

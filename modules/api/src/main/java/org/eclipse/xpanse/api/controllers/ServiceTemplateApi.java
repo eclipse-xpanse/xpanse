@@ -190,7 +190,7 @@ public class ServiceTemplateApi {
             @PathVariable("id") String id) {
         ServiceTemplateEntity templateEntity =
                 serviceTemplateManage.reRegisterServiceTemplate(UUID.fromString(id));
-        log.info("Unregister service template with id {} successfully.", id);
+        log.info("Re-register service template with id {} successfully.", id);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 
