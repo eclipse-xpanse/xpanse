@@ -15,7 +15,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  */
 public enum BackendSystemType {
 
-    IDENTITY_PROVIDER("IdentityProvider"),
+    IDENTITY_PROVIDER("Identity Provider"),
     DATABASE("Database"),
     TERRAFORM_BOOT("Terraform Boot"),
     TOFU_MAKER("Tofu Maker"),
