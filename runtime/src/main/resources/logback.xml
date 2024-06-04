@@ -32,4 +32,5 @@
   <root level="error">
     <appender-ref ref="Console"/>
   </root>
+  <logger name="HuaweiCloud-SDK-Access" level="INFO"/>
 </configuration>
