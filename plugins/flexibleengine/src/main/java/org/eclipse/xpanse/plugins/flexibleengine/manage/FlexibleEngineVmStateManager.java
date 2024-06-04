@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine.manage;
 
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy.WAITING_JOB_SUCCESS_RETRY_TIMES;
+
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersRequest;
@@ -147,9 +149,8 @@ public class FlexibleEngineVmStateManager {
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {
         ShowJobRequest jobRequest = new ShowJobRequest().withJobId(jobId);
         ShowJobResponse response = ecsClient.showJobInvoker(jobRequest)
-                .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts()).retryCondition(
-                        (resp, ex) -> Objects.nonNull(resp)
-                                && !resp.getStatus().equals(StatusEnum.SUCCESS))
+                .retryTimes(WAITING_JOB_SUCCESS_RETRY_TIMES)
+                .retryCondition(this::jobIsNotSuccess)
                 .backoffStrategy(flexibleEngineRetryStrategy)
                 .invoke();
         if (response.getStatus().equals(StatusEnum.FAIL)) {
@@ -159,6 +160,13 @@ public class FlexibleEngineVmStateManager {
             throw new ClientApiCallFailedException(errorMsg);
         }
         return response.getStatus().equals(StatusEnum.SUCCESS);
+    }
+
+    private boolean jobIsNotSuccess(ShowJobResponse response, Exception ex) {
+        if (Objects.nonNull(ex)) {
+            return false;
+        }
+        return response.getStatus() != StatusEnum.SUCCESS;
     }
 
 }

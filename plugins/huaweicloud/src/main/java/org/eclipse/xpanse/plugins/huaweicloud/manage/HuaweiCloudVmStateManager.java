@@ -6,6 +6,9 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.manage;
 
+
+import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.WAITING_JOB_SUCCESS_RETRY_TIMES;
+
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.model.BatchRebootServersRequest;
@@ -142,8 +145,8 @@ public class HuaweiCloudVmStateManager {
 
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {
         ShowJobResponse response = ecsClient.showJobInvoker(new ShowJobRequest().withJobId(jobId))
-                .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
-                .retryCondition(this::matchRetryCondition)
+                .retryTimes(WAITING_JOB_SUCCESS_RETRY_TIMES)
+                .retryCondition(this::jobIsNotSuccess)
                 .backoffStrategy(huaweiCloudRetryStrategy).invoke();
         if (response.getStatus().equals(StatusEnum.FAIL)) {
             String errorMsg = String.format(
@@ -154,7 +157,7 @@ public class HuaweiCloudVmStateManager {
         return response.getStatus().equals(StatusEnum.SUCCESS);
     }
 
-    private boolean matchRetryCondition(ShowJobResponse response, Exception ex) {
+    private boolean jobIsNotSuccess(ShowJobResponse response, Exception ex) {
         if (Objects.nonNull(ex)) {
             return false;
         }
