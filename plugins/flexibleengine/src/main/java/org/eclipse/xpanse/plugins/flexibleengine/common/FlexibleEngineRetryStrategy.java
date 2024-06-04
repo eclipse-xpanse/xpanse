@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlexibleEngineRetryStrategy implements BackoffStrategy {
 
+    public static final int WAITING_JOB_SUCCESS_RETRY_TIMES = 30;
     private static final int ERROR_CODE_TOO_MANY_REQUESTS = 429;
     private static final int ERROR_CODE_INTERNAL_SERVER_ERROR = 500;
     private static final int DEFAULT_RETRY_ATTEMPTS = 5;
@@ -40,7 +41,7 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
      *
      * @param maxAttempts retry max attempts.
      */
-    @Value("${http.request.retry.max.attempts}")
+    @Value("${http.request.retry.max.attempts:5}")
     public void setRetryAttempts(int maxAttempts) {
         if (retryMaxAttempts <= 0) {
             retryMaxAttempts = DEFAULT_RETRY_ATTEMPTS;
@@ -55,7 +56,7 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
      *
      * @param delayMillions max delay millions time.
      */
-    @Value("${http.request.retry.delay.milliseconds}")
+    @Value("${http.request.retry.delay.milliseconds:30000}")
     public void setRetryDelayMillions(long delayMillions) {
         if (delayMillions <= 0) {
             retryMaxDelayMillions = DEFAULT_DELAY_MILLIONS;
