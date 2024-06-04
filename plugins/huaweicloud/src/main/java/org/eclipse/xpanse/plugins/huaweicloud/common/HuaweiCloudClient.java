@@ -8,6 +8,8 @@ package org.eclipse.xpanse.plugins.huaweicloud.common;
 
 import com.huaweicloud.sdk.bss.v2.BssClient;
 import com.huaweicloud.sdk.bss.v2.region.BssRegion;
+import com.huaweicloud.sdk.bssintl.v2.BssintlClient;
+import com.huaweicloud.sdk.bssintl.v2.region.BssintlRegion;
 import com.huaweicloud.sdk.ces.v1.CesClient;
 import com.huaweicloud.sdk.ces.v1.region.CesRegion;
 import com.huaweicloud.sdk.core.HttpListener;
@@ -20,13 +22,17 @@ import com.huaweicloud.sdk.eip.v2.region.EipRegion;
 import com.huaweicloud.sdk.evs.v2.EvsClient;
 import com.huaweicloud.sdk.evs.v2.region.EvsRegion;
 import com.huaweicloud.sdk.iam.v3.IamClient;
+import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsRequest;
+import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsResponse;
 import com.huaweicloud.sdk.iam.v3.region.IamRegion;
 import com.huaweicloud.sdk.vpc.v2.VpcClient;
 import com.huaweicloud.sdk.vpc.v2.region.VpcRegion;
+import jakarta.annotation.Resource;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * HuaweiCloud Service Client.
@@ -37,6 +43,9 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
 
     @Value("${huaweicloud.sdk.enable.http.debug.logs:false}")
     private boolean sdkHttpDebugLogsEnabled;
+
+    @Resource
+    private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
 
     /**
      * Get HuaweiCloud CES Client.
@@ -60,7 +69,6 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      */
     public EcsClient getEcsClient(ICredential credential, String regionName) {
         return EcsClient.newBuilder()
-                .withHttpConfig(getHttpConfig())
                 .withCredential(credential)
                 .withRegion(EcsRegion.valueOf(regionName))
                 .build();
@@ -131,8 +139,49 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
         return BssClient.newBuilder()
                 .withHttpConfig(getHttpConfig())
                 .withCredential(globalCredential)
+                // The fixed BssRegion maps the endpoint 'https://bss.myhuaweicloud.com'
                 .withRegion(BssRegion.CN_NORTH_1)
                 .build();
+    }
+
+    /**
+     * Get HuaweiCloud Bss intl Client.
+     *
+     * @param globalCredential ICredential
+     */
+    public BssintlClient getBssintlClient(ICredential globalCredential) {
+        return BssintlClient.newBuilder()
+                .withHttpConfig(getHttpConfig())
+                .withCredential(globalCredential)
+                // The fixed BssintlRegion maps the endpoint 'https://bss-intl.myhuaweicloud.com'.
+                .withRegion(BssintlRegion.AP_SOUTHEAST_1)
+                .build();
+    }
+
+
+    /**
+     * Get projectId with region.
+     *
+     * @param globalCredential ICredential
+     * @param regionName       region name.
+     * @return projectId.
+     */
+    public String getProjectId(ICredential globalCredential,
+                               String regionName) {
+        String projectId = null;
+        IamClient iamClient = getIamClient(globalCredential, regionName);
+        KeystoneListProjectsRequest listProjectsRequest =
+                new KeystoneListProjectsRequest().withName(regionName);
+        KeystoneListProjectsResponse listProjectsResponse =
+                iamClient.keystoneListProjectsInvoker(listProjectsRequest)
+                        .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                        .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                        .backoffStrategy(huaweiCloudRetryStrategy)
+                        .invoke();
+        if (!CollectionUtils.isEmpty(listProjectsResponse.getProjects())) {
+            projectId = listProjectsResponse.getProjects().getFirst().getId();
+        }
+        return projectId;
     }
 
     private HttpConfig getHttpConfig() {

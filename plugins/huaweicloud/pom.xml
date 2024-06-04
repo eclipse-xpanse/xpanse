@@ -48,17 +48,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-            <version>${apache.commons.validator.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <artifactId>huaweicloud-sdk-ces</artifactId>
             <groupId>com.huaweicloud.sdk</groupId>
             <version>${huaweicloud.sdk.version}</version>
@@ -86,6 +75,11 @@
         <dependency>
             <groupId>com.huaweicloud.sdk</groupId>
             <artifactId>huaweicloud-sdk-bss</artifactId>
+            <version>${huaweicloud.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.huaweicloud.sdk</groupId>
+            <artifactId>huaweicloud-sdk-bssintl</artifactId>
             <version>${huaweicloud.sdk.version}</version>
         </dependency>
         <dependency>

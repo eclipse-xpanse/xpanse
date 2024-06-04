@@ -35,6 +35,7 @@ import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudInternationalPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
 import org.junit.jupiter.api.Assertions;
@@ -53,7 +54,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         HuaweiCloudDataModelConverter.class, CredentialCenter.class, ServiceMetricsStore.class,
         ServiceMetricsCacheManager.class, HuaweiCloudTerraformResourceHandler.class,
         HuaweiCloudResourceManager.class, HuaweiCloudPriceCalculator.class,
-        HuaweiCloudRetryStrategy.class})
+        HuaweiCloudInternationalPriceCalculator.class, HuaweiCloudRetryStrategy.class})
 class HuaweiCloudMonitorIntegrationTest {
 
     @RegisterExtension
