@@ -25,6 +25,7 @@ import com.huaweicloud.sdk.vpc.v2.VpcClient;
 import com.huaweicloud.sdk.vpc.v2.region.VpcRegion;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,6 +34,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class HuaweiCloudClient extends HuaweiCloudCredentials {
+
+    @Value("${huaweicloud.sdk.enable.http.debug.logs:false}")
+    private boolean sdkHttpDebugLogsEnabled;
 
     /**
      * Get HuaweiCloud CES Client.
@@ -56,6 +60,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      */
     public EcsClient getEcsClient(ICredential credential, String regionName) {
         return EcsClient.newBuilder()
+                .withHttpConfig(getHttpConfig())
                 .withCredential(credential)
                 .withRegion(EcsRegion.valueOf(regionName))
                 .build();
@@ -69,6 +74,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      */
     public VpcClient getVpcClient(ICredential credential, String regionName) {
         return VpcClient.newBuilder()
+                .withHttpConfig(getHttpConfig())
                 .withCredential(credential)
                 .withRegion(VpcRegion.valueOf(regionName))
                 .build();
@@ -78,10 +84,11 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      * Get HuaweiCloud Eip Client.
      *
      * @param credential ICredential
-     * @param regionName  region.
+     * @param regionName region.
      */
     public EipClient getEipClient(ICredential credential, String regionName) {
         return EipClient.newBuilder()
+                .withHttpConfig(getHttpConfig())
                 .withCredential(credential)
                 .withRegion(EipRegion.valueOf(regionName))
                 .build();
@@ -91,10 +98,11 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      * Get HuaweiCloud Evs Client.
      *
      * @param credential ICredential
-     * @param regionName  region.
+     * @param regionName region.
      */
     public EvsClient getEvsClient(ICredential credential, String regionName) {
         return EvsClient.newBuilder()
+                .withHttpConfig(getHttpConfig())
                 .withCredential(credential)
                 .withRegion(EvsRegion.valueOf(regionName))
                 .build();
@@ -108,6 +116,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      */
     public IamClient getIamClient(ICredential globalCredential, String regionName) {
         return IamClient.newBuilder()
+                .withHttpConfig(getHttpConfig())
                 .withCredential(globalCredential)
                 .withRegion(IamRegion.valueOf(regionName))
                 .build();
@@ -120,6 +129,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      */
     public BssClient getBssClient(ICredential globalCredential) {
         return BssClient.newBuilder()
+                .withHttpConfig(getHttpConfig())
                 .withCredential(globalCredential)
                 .withRegion(BssRegion.CN_NORTH_1)
                 .build();
@@ -127,7 +137,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
 
     private HttpConfig getHttpConfig() {
         HttpConfig httpConfig = HttpConfig.getDefaultHttpConfig();
-        if (log.isInfoEnabled()) {
+        if (sdkHttpDebugLogsEnabled) {
             HttpListener requestListener =
                     HttpListener.forRequestListener(this::outputRequestInfo);
             httpConfig.addHttpListener(requestListener);

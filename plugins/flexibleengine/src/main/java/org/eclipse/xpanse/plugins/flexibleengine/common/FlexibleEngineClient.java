@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,6 +45,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class FlexibleEngineClient extends FlexibleEngineCredentials {
+
+    @Value("${flexibleengine.sdk.enable.http.debug.logs:false}")
+    private boolean sdkHttpDebugLogsEnabled;
 
     @Resource
     private FlexibleEngineRetryStrategy retryStrategy;
@@ -162,7 +166,7 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
 
     private HttpConfig getHttpConfig() {
         HttpConfig httpConfig = HttpConfig.getDefaultHttpConfig();
-        if (log.isInfoEnabled()) {
+        if (sdkHttpDebugLogsEnabled) {
             HttpListener requestListener =
                     HttpListener.forRequestListener(this::outputRequestInfo);
             httpConfig.addHttpListener(requestListener);
