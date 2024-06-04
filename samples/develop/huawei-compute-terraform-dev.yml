@@ -60,13 +60,13 @@ flavors:
                 resource_size: 5
                 size_measure_id: 15
           licensePrice:
-            cost: 0.50
+            cost: 1.01
             currency: CNY
-            period: hourly
+            period: monthly
           markUpPrice:
-            cost: 0.43
+            cost: 1.02
             currency: CNY
-            period: hourly
+            period: monthly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrice:
           cost: 172
@@ -109,13 +109,13 @@ flavors:
                 resource_size: 5
                 size_measure_id: 15
           licensePrice:
-            cost: 0.80
+            cost: 12.20
             currency: CNY
-            period: hourly
+            period: yearly
           markUpPrice:
-            cost: 0.72
+            cost: 12.10
             currency: CNY
-            period: hourly
+            period: yearly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrice:
           cost: 300
@@ -158,13 +158,13 @@ flavors:
                 resource_size: 5
                 size_measure_id: 15
           licensePrice:
-            cost: 1.21
+            cost: 30.21
             currency: CNY
-            period: hourly
+            period: oneTime
           markUpPrice:
-            cost: 1.10
+            cost: 30.10
             currency: CNY
-            period: hourly
+            period: oneTime
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrice:
           cost: 360

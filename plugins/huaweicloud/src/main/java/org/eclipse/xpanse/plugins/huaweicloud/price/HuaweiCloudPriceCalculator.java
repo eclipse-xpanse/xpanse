@@ -12,9 +12,7 @@ import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsRequest;
 import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsResponse;
 import com.huaweicloud.sdk.bss.v2.model.RateOnDemandReq;
 import com.huaweicloud.sdk.core.auth.ICredential;
-import com.huaweicloud.sdk.iam.v3.IamClient;
-import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsRequest;
-import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsResponse;
+import com.huaweicloud.sdk.core.exception.ClientRequestException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -22,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
@@ -62,6 +59,8 @@ public class HuaweiCloudPriceCalculator {
     private HuaweiCloudClient huaweiCloudClient;
     @jakarta.annotation.Resource
     private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+    @jakarta.annotation.Resource
+    private HuaweiCloudInternationalPriceCalculator internationalPriceCalculator;
 
 
     /**
@@ -93,9 +92,29 @@ public class HuaweiCloudPriceCalculator {
 
     private FlavorPriceResult getServicePriceWithPayPerUse(ServicePriceRequest request) {
         ResourceUsage resourceUsage = request.getFlavorRatingMode().getResourceUsage();
+        AbstractCredentialInfo credential =
+                credentialCenter.getCredential(Csp.HUAWEI, CredentialType.VARIABLES,
+                        request.getUserId());
+        Map<String, String> credentialVariablesMap =
+                huaweiCloudClient.getCredentialVariablesMap((CredentialVariables) credential);
+        ICredential globalCredential =
+                huaweiCloudClient.getGlobalCredential(credentialVariablesMap);
+        String projectId =
+                huaweiCloudClient.getProjectId(globalCredential, request.getRegionName());
+        // Get recurring price with resources usage in HuaweiCloud International Website
+        Price recurringPrice = null;
+        try {
+            recurringPrice =
+                    getRecurringPriceWithResourcesUsage(request, globalCredential, projectId);
+        } catch (ClientRequestException e) {
+            if (e.getErrorCode().equals("CBC.0150") && e.getHttpStatusCode() == 403) {
+                log.error("Get the price with resources usage failed. {}", e.getMessage());
+                recurringPrice = internationalPriceCalculator
+                        .getInternationalRecurringPriceWithResourcesUsage(
+                                request, globalCredential, projectId);
+            }
+        }
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
-        // Get recurring price with resources usage
-        Price recurringPrice = getRecurringPriceWithResourcesUsage(request);
         flavorPriceResult.setRecurringPrice(recurringPrice);
         // Add markup price if not null
         Price markUpPrice = resourceUsage.getMarkUpPrice();
@@ -106,16 +125,10 @@ public class HuaweiCloudPriceCalculator {
         return flavorPriceResult;
     }
 
-    private Price getRecurringPriceWithResourcesUsage(ServicePriceRequest request) {
-        AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.HUAWEI, CredentialType.VARIABLES,
-                        request.getUserId());
-        Map<String, String> credentialVariablesMap =
-                huaweiCloudClient.getCredentialVariablesMap((CredentialVariables) credential);
-        ICredential globalCredential =
-                huaweiCloudClient.getGlobalCredential(credentialVariablesMap);
+    private Price getRecurringPriceWithResourcesUsage(ServicePriceRequest request,
+                                                      ICredential globalCredential,
+                                                      String projectId) {
         BssClient bssClient = huaweiCloudClient.getBssClient(globalCredential);
-        String projectId = getProjectId(globalCredential, request.getRegionName());
         ListOnDemandResourceRatingsRequest payPerUseRequest =
                 convertToPayPerUseRequest(request, projectId);
         ListOnDemandResourceRatingsResponse response =
@@ -125,23 +138,6 @@ public class HuaweiCloudPriceCalculator {
                         .backoffStrategy(huaweiCloudRetryStrategy)
                         .invoke();
         return convertResourceRatingsResponseToRecurringPrice(response);
-    }
-
-    private String getProjectId(ICredential globalCredential,
-                                String regionName) {
-        String projectId = null;
-        IamClient iamClient = huaweiCloudClient.getIamClient(globalCredential, regionName);
-        KeystoneListProjectsRequest listProjectsRequest = new KeystoneListProjectsRequest();
-        KeystoneListProjectsResponse listProjectsResponse =
-                iamClient.keystoneListProjectsInvoker(listProjectsRequest)
-                        .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
-                        .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
-                        .backoffStrategy(huaweiCloudRetryStrategy)
-                        .invoke();
-        if (CollectionUtils.isNotEmpty(listProjectsResponse.getProjects())) {
-            projectId = listProjectsResponse.getProjects().getFirst().getId();
-        }
-        return projectId;
     }
 
     private ListOnDemandResourceRatingsRequest convertToPayPerUseRequest(

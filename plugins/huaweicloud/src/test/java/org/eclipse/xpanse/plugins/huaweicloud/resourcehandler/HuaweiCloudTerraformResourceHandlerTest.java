@@ -5,11 +5,11 @@ import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terrafor
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
-import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfState;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.CollectionUtils;
 
 class HuaweiCloudTerraformResourceHandlerTest {
 
@@ -26,7 +26,7 @@ class HuaweiCloudTerraformResourceHandlerTest {
         deployResult.getPrivateProperties()
                 .put(STATE_FILE_NAME, objectMapper.writeValueAsString(tfState));
         huaweiHandler.handler(deployResult);
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(deployResult.getResources()));
+        Assertions.assertFalse(CollectionUtils.isEmpty(deployResult.getResources()));
         Assertions.assertFalse(deployResult.getProperties().isEmpty());
     }
 
