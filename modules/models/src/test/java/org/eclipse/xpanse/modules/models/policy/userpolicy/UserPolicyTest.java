@@ -37,12 +37,12 @@ class UserPolicyTest {
         test.setCsp(mockCsp);
         test.setEnabled(enabled);
         test.setPolicy(policy);
-        test.setId(id);
+        test.setUserPolicyId(id);
     }
 
     @Test
     void testGetters() {
-        assertThat(test.getId()).isEqualTo(id);
+        assertThat(test.getUserPolicyId()).isEqualTo(id);
         assertThat(test.getPolicy()).isEqualTo(policy);
         assertThat(test.getCsp()).isEqualTo(mockCsp);
         assertThat(test.getEnabled()).isEqualTo(enabled);
@@ -89,7 +89,7 @@ class UserPolicyTest {
     @Test
     void testToString() {
         String result = String.format(
-                "UserPolicy(id=%s, policy=%s, csp=%s, enabled=%s, createTime=%s, lastModifiedTime=%s)",
+                "UserPolicy(userPolicyId=%s, policy=%s, csp=%s, enabled=%s, createTime=%s, lastModifiedTime=%s)",
                 id, policy, mockCsp, enabled, null, null);
         assertThat(test.toString()).isEqualTo(result);
     }

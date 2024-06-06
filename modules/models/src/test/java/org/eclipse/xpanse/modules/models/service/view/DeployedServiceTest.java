@@ -54,7 +54,7 @@ class DeployedServiceTest {
     @BeforeEach
     void setUp() {
         deployedService = new DeployedService();
-        deployedService.setId(uuid);
+        deployedService.setServiceId(uuid);
         deployedService.setUserId(userId);
         deployedService.setCategory(category);
         deployedService.setName(name);
@@ -77,7 +77,7 @@ class DeployedServiceTest {
 
     @Test
     void testGetterAndSetter() {
-        assertEquals(uuid, deployedService.getId());
+        assertEquals(uuid, deployedService.getServiceId());
         assertEquals(userId, deployedService.getUserId());
         assertEquals(category, deployedService.getCategory());
         assertEquals(name, deployedService.getName());
@@ -119,7 +119,7 @@ class DeployedServiceTest {
     @Test
     void testToString() {
         String expectedString =
-                "DeployedService(" + "id=" + uuid + ", category=" + category + ", name=" + name
+                "DeployedService(" + "serviceId=" + uuid + ", category=" + category + ", name=" + name
                         + ", customerServiceName=" + customerServiceName + ", version=" + version
                         + ", csp=" + csp + ", flavor=" + flavor + ", serviceTemplateId="
                         + serviceTemplateId + ", userId=" + userId + ", serviceDeploymentState="

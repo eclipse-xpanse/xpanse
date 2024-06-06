@@ -57,7 +57,7 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                 registeredServiceTemplate.getServiceRegistrationState());
 
         ServiceTemplateDetailVo serviceTemplateDetail =
-                serviceTemplateApi.details(registeredServiceTemplate.getId().toString());
+                serviceTemplateApi.details(registeredServiceTemplate.getServiceTemplateId().toString());
 
         List<ServiceTemplateDetailVo> serviceTemplates =
                 serviceTemplateApi.listServiceTemplates(ocl.getCategory(),
@@ -66,8 +66,8 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                         ServiceRegistrationState.APPROVAL_PENDING);
 
         Assertions.assertEquals(1, serviceTemplates.size());
-        Assertions.assertEquals(serviceTemplateDetail.getId(),
-                serviceTemplates.getFirst().getId());
+        Assertions.assertEquals(serviceTemplateDetail.getServiceTemplateId(),
+                serviceTemplates.getFirst().getServiceTemplateId());
     }
 
     @Test
@@ -87,13 +87,13 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                 serviceTemplateApi.register(ocl);
         ocl.setDescription("Hello");
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
-                serviceTemplateApi.update(serviceTemplateDetailVo.getId().toString(), ocl);
+                serviceTemplateApi.update(serviceTemplateDetailVo.getServiceTemplateId().toString(), ocl);
         Assertions.assertEquals(1, serviceTemplateApi.listServiceTemplates(
                 null, null, null, null, null, null
         ).stream().filter(registeredServiceVo1 -> registeredServiceVo1.getName()
                 .equals(serviceTemplateDetailVo.getName())).toList().size());
         Assertions.assertEquals("Hello",
-                serviceTemplateApi.details(updatedServiceTemplateDetailVo.getId().toString())
+                serviceTemplateApi.details(updatedServiceTemplateDetailVo.getServiceTemplateId().toString())
                         .getDescription());
     }
 

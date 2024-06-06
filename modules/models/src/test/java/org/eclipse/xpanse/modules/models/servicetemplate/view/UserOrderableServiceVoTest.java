@@ -54,7 +54,7 @@ class UserOrderableServiceVoTest {
     @BeforeEach
     void setUp() {
         test = new UserOrderableServiceVo();
-        test.setId(id);
+        test.setServiceTemplateId(id);
         test.setName(name);
         test.setVersion(version);
         test.setDescription(description);
@@ -73,7 +73,7 @@ class UserOrderableServiceVoTest {
 
     @Test
     void testGetters() {
-        assertThat(test.getId()).isEqualTo(id);
+        assertThat(test.getServiceTemplateId()).isEqualTo(id);
         assertThat(test.getDescription()).isEqualTo(description);
         assertThat(test.getCategory()).isEqualTo(mockCategory);
         assertThat(test.getName()).isEqualTo(name);
@@ -109,7 +109,7 @@ class UserOrderableServiceVoTest {
     @Test
     void testToString() {
         String expectedToString =
-                "UserOrderableServiceVo(" + "id=" + id + ", " + "category=" + mockCategory + ", "
+                "UserOrderableServiceVo(" + "serviceTemplateId=" + id + ", " + "category=" + mockCategory + ", "
                         + "name=" + name + ", " + "version=" + version + ", " + "csp=" + mockCsp
                         + ", " + "regions=" + mockRegions + ", " + "description=" + description
                         + ", " + "icon=" + icon + ", " + "variables=" + mockVariables + ", "

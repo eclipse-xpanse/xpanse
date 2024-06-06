@@ -180,6 +180,7 @@ public class UserPolicyManager {
         if (Objects.nonNull(userPolicyEntity)) {
             UserPolicy userPolicy = new UserPolicy();
             BeanUtils.copyProperties(userPolicyEntity, userPolicy);
+            userPolicy.setUserPolicyId(userPolicyEntity.getId());
             return userPolicy;
         }
         return null;

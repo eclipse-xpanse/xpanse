@@ -184,7 +184,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         if (Objects.isNull(serviceTemplate)) {
             Assertions.fail("Failed to register service template.");
         }
-        approveServiceTemplateRegistration(serviceTemplate.getId());
+        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
 
         // deploy a service
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
@@ -277,7 +277,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(purgeCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
-        unregisterServiceTemplate(serviceTemplate.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
         deployServiceStorage.deleteDeployService(
                 deployServiceStorage.findDeployServiceById(serviceId));
 

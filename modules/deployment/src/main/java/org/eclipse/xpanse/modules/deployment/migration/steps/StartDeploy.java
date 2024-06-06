@@ -84,6 +84,7 @@ public class StartDeploy implements Serializable, JavaDelegate {
                 (MigrateRequest) variables.get(MigrateConstants.MIGRATE_REQUEST);
         DeployRequest deployRequest = new DeployRequest();
         BeanUtils.copyProperties(migrateRequest, deployRequest);
+        deployRequest.setServiceId(migrateRequest.getOriginalServiceId());
         deployService.deployServiceById(newServiceId, userId, deployRequest);
     }
 }

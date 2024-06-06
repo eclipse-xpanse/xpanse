@@ -56,11 +56,11 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         testListManagedServiceTemplatesWithStateApprovalPending(serviceTemplate);
         testReviewRegistration(serviceTemplate);
         final MockHttpServletResponse registrationDetails =
-                getRegistrationDetails(serviceTemplate.getId());
+                getRegistrationDetails(serviceTemplate.getServiceTemplateId());
         serviceTemplate = objectMapper.readValue(registrationDetails.getContentAsString()
                 , ServiceTemplateDetailVo.class);
         testListManagedServiceTemplatesWithStateApproved(serviceTemplate);
-        unregisterServiceTemplate(serviceTemplate.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     @Test
@@ -77,13 +77,13 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         testGetRegistrationDetailsThrowsAccessDeniedException(serviceTemplate);
         testReviewRegistrationThrowsAccessDeniedException(serviceTemplate);
         testListManagedServiceTemplatesReturnsEmptyList(serviceTemplate);
-        unregisterServiceTemplate(serviceTemplate.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testGetRegistrationDetails(ServiceTemplateDetailVo serviceTemplateDetailVo)
             throws Exception {
         // Setup detail request
-        UUID id = serviceTemplateDetailVo.getId();
+        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         String result = objectMapper.writeValueAsString(serviceTemplateDetailVo);
         // Run the test
         final MockHttpServletResponse detailResponse = getRegistrationDetails(id);
@@ -100,7 +100,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 Collections.singletonList("No permissions to review service template "
                         + "belonging to other cloud service providers."));
         // Setup detail request
-        UUID id = serviceTemplateDetailVo.getId();
+        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         // Run the test detail
         final MockHttpServletResponse detailResponse = getRegistrationDetails(id);
         // Verify the results
@@ -112,7 +112,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     void testReviewRegistration(ServiceTemplateDetailVo serviceTemplateDetailVo)
             throws Exception {
         // Setup request 1
-        UUID id1 = serviceTemplateDetailVo.getId();
+        UUID id1 = serviceTemplateDetailVo.getServiceTemplateId();
         ReviewRegistrationRequest request1 = new ReviewRegistrationRequest();
         request1.setReviewResult(ServiceReviewResult.APPROVED);
         request1.setReviewComment("reviewComment");
@@ -135,7 +135,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         String result2 = objectMapper.writeValueAsString(expectedResponse2);
         // Run the test case 2
         final MockHttpServletResponse response2 =
-                reviewServiceRegistrationWithParams(serviceTemplateDetailVo.getId(), request2);
+                reviewServiceRegistrationWithParams(serviceTemplateDetailVo.getServiceTemplateId(), request2);
         // Verify the result 2
         assertThat(response2.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response2.getContentAsString()).isEqualTo(result2);
@@ -167,7 +167,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         Response accessDeniedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList("No permissions to review service template "
                         + "belonging to other cloud service providers."));
-        UUID id = serviceTemplateDetailVo.getId();
+        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         ReviewRegistrationRequest request = new ReviewRegistrationRequest();
         request.setReviewResult(ServiceReviewResult.APPROVED);
         request.setReviewComment("reviewComment");

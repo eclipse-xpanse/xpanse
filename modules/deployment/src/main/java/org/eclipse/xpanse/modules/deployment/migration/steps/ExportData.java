@@ -73,7 +73,7 @@ public class ExportData implements Serializable, JavaDelegate {
         UUID newServiceId = (UUID) variables.get(MigrateConstants.NEW_ID);
         String userId = (String) variables.get(MigrateConstants.USER_ID);
         ServiceMigrationEntity serviceMigrationEntity =
-                getServiceMigrationEntity(processInstanceId, migrateRequest.getId(),
+                getServiceMigrationEntity(processInstanceId, migrateRequest.getOriginalServiceId(),
                         newServiceId, userId);
         return migrationService.storeOrFlushServiceMigrationEntity(serviceMigrationEntity);
     }

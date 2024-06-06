@@ -100,7 +100,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
         String regionName = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
         ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
-        UUID templateId = serviceTemplateDetails.getId();
+        UUID templateId = serviceTemplateDetails.getServiceTemplateId();
         MockHttpServletResponse fixedPriceResponse =
                 getServicePriceByFlavor(templateId, regionName, flavorName, BillingMode.FIXED);
         FlavorPriceResult flavorPriceResult =
@@ -238,7 +238,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
         String regionName = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        UUID templateId = serviceTemplate.getId();
+        UUID templateId = serviceTemplate.getServiceTemplateId();
 
         int flavorCount = ocl.getFlavors().getServiceFlavors().size();
         MockHttpServletResponse serviceFixedPricesResponse =
@@ -321,7 +321,7 @@ class ServicePricingApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("ServicePricingApi-error");
         ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
-        UUID templateId = serviceTemplateDetails.getId();
+        UUID templateId = serviceTemplateDetails.getServiceTemplateId();
         Response expectedResponse2 =
                 Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
                         Collections.singletonList(

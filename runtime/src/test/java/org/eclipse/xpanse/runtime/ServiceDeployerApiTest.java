@@ -120,7 +120,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void addServicePolicies(ServiceTemplateDetailVo serviceTemplate) throws Exception {
         ServicePolicyCreateRequest servicePolicy = new ServicePolicyCreateRequest();
-        servicePolicy.setServiceTemplateId(serviceTemplate.getId());
+        servicePolicy.setServiceTemplateId(serviceTemplate.getServiceTemplateId());
         servicePolicy.setPolicy("servicePolicy");
         servicePolicy.setEnabled(true);
         mockMvc.perform(post("/xpanse/service/policies").content(
@@ -129,7 +129,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
 
         ServicePolicyCreateRequest serviceFlavorPolicy = new ServicePolicyCreateRequest();
-        serviceFlavorPolicy.setServiceTemplateId(serviceTemplate.getId());
+        serviceFlavorPolicy.setServiceTemplateId(serviceTemplate.getServiceTemplateId());
         List<String> flavors = serviceTemplate.getFlavors().getServiceFlavors().stream().map(
                 ServiceFlavor::getName).toList();
         serviceFlavorPolicy.setFlavorNameList(flavors);
@@ -315,7 +315,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
             log.error("Register service template failed.");
             return;
         }
-        approveServiceTemplateRegistration(serviceTemplate.getId());
+        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         setMockPoliciesValidateApi();
         UserPolicyCreateRequest userPolicyCreateRequest = new UserPolicyCreateRequest();
         userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
@@ -342,8 +342,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         } else {
             testPurge(serviceId);
         }
-        unregisterServiceTemplate(serviceTemplate.getId());
-        deleteUserPolicy(userPolicy.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
+        deleteUserPolicy(userPolicy.getUserPolicyId());
     }
 
     @Test
@@ -379,7 +379,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         testDeployThrowsServiceTemplateNotRegistered();
         testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
-        approveServiceTemplateRegistration(serviceTemplate.getId());
+        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         UUID serviceId = deployService(serviceTemplate);
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             testApisThrowServiceFlavorDowngradeNotAllowed(serviceId, defaultFlavor,
@@ -390,7 +390,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testApisThrowsAccessDeniedException(serviceId);
         deployServiceStorage.deleteDeployService(
                 deployServiceStorage.findDeployServiceById(serviceId));
-        unregisterServiceTemplate(serviceTemplate.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
 
     }
 
@@ -488,7 +488,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         List<AvailabilityZoneConfig> zoneConfigs = List.of(zoneConfig, zoneConfig2);
         ocl.getDeployment().setServiceAvailability(zoneConfigs);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        approveServiceTemplateRegistration(serviceTemplate.getId());
+        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         // Run the test
         DeployRequest deployRequest1 = getDeployRequest(serviceTemplate);
         deployRequest1.getServiceRequestProperties().clear();
@@ -535,7 +535,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse2.getStatus());
         assertEquals(result2, deployResponse2.getContentAsString());
-        unregisterServiceTemplate(serviceTemplate.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testChangeLockConfig(UUID serviceId, ServiceLockConfig lockConfig)
@@ -678,7 +678,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testDeployThrowsPolicyEvaluationFailedException(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
-        approveServiceTemplateRegistration(serviceTemplate.getId());
+        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         setMockPoliciesValidateApi();
         UserPolicyCreateRequest userPolicyCreateRequest = new UserPolicyCreateRequest();
         userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
@@ -688,8 +688,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         addCredentialForHuaweiCloud();
         mockPolicyEvaluationResult(false);
         deployService(serviceTemplate);
-        deleteUserPolicy(userPolicy.getId());
-        unregisterServiceTemplate(serviceTemplate.getId());
+        deleteUserPolicy(userPolicy.getUserPolicyId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
 

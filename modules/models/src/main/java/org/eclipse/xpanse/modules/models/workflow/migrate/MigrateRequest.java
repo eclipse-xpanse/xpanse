@@ -30,5 +30,5 @@ public class MigrateRequest extends DeployRequestBase {
      */
     @NotNull
     @Schema(description = "The id of the service to migrate")
-    private UUID id;
+    private UUID originalServiceId;
 }

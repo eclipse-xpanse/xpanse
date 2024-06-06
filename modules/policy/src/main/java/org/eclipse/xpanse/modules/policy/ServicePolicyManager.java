@@ -204,6 +204,7 @@ public class ServicePolicyManager {
                 servicePolicyEntity.getServiceTemplate())) {
             ServicePolicy servicePolicy = new ServicePolicy();
             BeanUtils.copyProperties(servicePolicyEntity, servicePolicy);
+            servicePolicy.setServicePolicyId(servicePolicyEntity.getId());
             if (StringUtils.isNotBlank(servicePolicyEntity.getFlavorNames())) {
                 List<String> flavorNames = Arrays.asList(
                         StringUtils.split(servicePolicyEntity.getFlavorNames(), SEPARATOR));

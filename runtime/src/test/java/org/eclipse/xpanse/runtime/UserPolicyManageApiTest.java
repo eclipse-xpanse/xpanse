@@ -15,15 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +30,6 @@ import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolic
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidateResponse;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -48,7 +39,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Test for UserPolicyManageApi.
@@ -80,7 +70,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         testListUserPolicies(userPolicy);
         testGetPolicyDetails(userPolicy);
         testUpdatePolicy(userPolicy);
-        testDeletePolicy(userPolicy.getId());
+        testDeletePolicy(userPolicy.getUserPolicyId());
         testListPoliciesReturnsEmptyList(createRequest.getCsp());
     }
 
@@ -97,8 +87,8 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         testUpdatePolicy_ThrowsPolicyNotFoundException(UUID.randomUUID());
         testGetPolicyDetails_ThrowsPolicyNotFoundException(UUID.randomUUID());
         testDeletePolicy_ThrowsPolicyNotFoundException();
-        testDeletePolicy(userPolicy.getId());
-        testGetPolicyDetails_ThrowsPolicyNotFoundException(userPolicy.getId());
+        testDeletePolicy(userPolicy.getUserPolicyId());
+        testGetPolicyDetails_ThrowsPolicyNotFoundException(userPolicy.getUserPolicyId());
     }
 
 
@@ -117,7 +107,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
-        Assertions.assertNotNull(userPolicy.getId());
+        Assertions.assertNotNull(userPolicy.getUserPolicyId());
         Assertions.assertEquals(userPolicy.getCsp(), createRequest.getCsp());
         Assertions.assertEquals(userPolicy.getCreateTime(), userPolicy.getLastModifiedTime());
         Assertions.assertEquals(userPolicy.getPolicy(), createRequest.getPolicy());
@@ -132,7 +122,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/policies/{id}", userPolicy.getId())
+                mockMvc.perform(get("/xpanse/policies/{id}", userPolicy.getUserPolicyId())
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
 
@@ -217,7 +207,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         // Setup
         mockPoliciesValidateRequest(true);
         String errMsg = String.format("The same policy already exists for Csp: %s."
-                + " with id: %s", userPolicy.getCsp(), userPolicy.getId());
+                + " with id: %s", userPolicy.getCsp(), userPolicy.getUserPolicyId());
         Response result = Response.errorResponse(ResultType.POLICY_DUPLICATE, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
@@ -249,7 +239,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         String requestBody = objectMapper.writeValueAsString(updateRequest);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(put("/xpanse/policies/{id}", userPolicy.getId())
+        final MockHttpServletResponse response = mockMvc.perform(put("/xpanse/policies/{id}", userPolicy.getUserPolicyId())
                         .content(requestBody).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -259,7 +249,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
-        Assertions.assertEquals(updatedUserPolicy.getId(), userPolicy.getId());
+        Assertions.assertEquals(updatedUserPolicy.getUserPolicyId(), userPolicy.getUserPolicyId());
         Assertions.assertEquals(updatedUserPolicy.getCsp(), Csp.SCS);
         Assertions.assertEquals(updatedUserPolicy.getPolicy(), "userPolicyUpdate");
         Assertions.assertTrue(updatedUserPolicy.getEnabled());

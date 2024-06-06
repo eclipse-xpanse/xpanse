@@ -106,7 +106,7 @@ public class ServiceDetailsViewManager {
     public List<DeployedService> listDeployedServicesDetails(Category category, Csp csp,
                                                              String serviceName,
                                                              String serviceVersion,
-                                                             ServiceDeploymentState serviceState) {
+            ServiceDeploymentState serviceState) {
         List<DeployedService> servicesDetails = new ArrayList<>();
         List<DeployedService> services =
                 listDeployedServices(category, csp, serviceName, serviceVersion, serviceState);
@@ -114,10 +114,12 @@ public class ServiceDetailsViewManager {
             for (DeployedService deployService : services) {
                 if (deployService.getServiceHostingType() == ServiceHostingType.SERVICE_VENDOR) {
                     servicesDetails.add(
-                            getVendorHostedServiceDetailsByIdForEndUser(deployService.getId()));
+                            getVendorHostedServiceDetailsByIdForEndUser(
+                                    deployService.getServiceId()));
                 } else {
                     servicesDetails.add(
-                            getSelfHostedServiceDetailsByIdForEndUser(deployService.getId()));
+                            getSelfHostedServiceDetailsByIdForEndUser(
+                                    deployService.getServiceId()));
                 }
             }
         }

@@ -31,7 +31,7 @@ public class DeployedService {
 
     @NotNull
     @Schema(description = "The ID of the service")
-    private UUID id;
+    private UUID serviceId;
 
     /**
      * The category of the Service.

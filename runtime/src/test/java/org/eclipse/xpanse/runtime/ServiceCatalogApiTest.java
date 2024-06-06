@@ -60,14 +60,14 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         testOpenApi(serviceTemplate);
         testListOrderableServices(serviceTemplate);
         testGetOrderableServiceDetails(serviceTemplate);
-        unregisterServiceTemplate(serviceTemplate.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
 
     private UserOrderableServiceVo approveServiceTemplateRegistration(
             ServiceTemplateDetailVo serviceTemplateDetailVo)
             throws Exception {
-        UUID id = serviceTemplateDetailVo.getId();
+        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         approveServiceTemplateRegistration(id);
         final MockHttpServletResponse response = getOrderableServiceDetailsWithId(id);
         return objectMapper.readValue(response.getContentAsString(),
@@ -128,7 +128,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
                 .getServiceAvailability());
         userOrderableServiceVo.add(
                 Link.of(String.format("http://localhost/xpanse/catalog/services/%s/openapi",
-                        serviceTemplateDetailVo.getId().toString()), "openApi"));
+                        serviceTemplateDetailVo.getServiceTemplateId().toString()), "openApi"));
 
         return userOrderableServiceVo;
     }
@@ -150,7 +150,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         Assertions.assertEquals(result1, response1.getContentAsString());
 
         // Setup request 2
-        UUID id2 = serviceTemplateDetailVo.getId();
+        UUID id2 = serviceTemplateDetailVo.getServiceTemplateId();
         UserOrderableServiceVo expectedResponse2 =
                 transToUserOrderableServiceVo(serviceTemplateDetailVo);
         // Run the test case 2
@@ -165,7 +165,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
     void testGetOrderableServiceDetailsThrowsException(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup request 1
-        UUID id1 = serviceTemplateDetailVo.getId();
+        UUID id1 = serviceTemplateDetailVo.getServiceTemplateId();
         Response expectedResponse1 = Response.errorResponse(
                 ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
                 Collections.singletonList(
@@ -186,7 +186,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
 
     void testOpenApi(ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup request 1
-        UUID id1 = serviceTemplateDetailVo.getId();
+        UUID id1 = serviceTemplateDetailVo.getServiceTemplateId();
         Link link = Link.of(String.format("http://localhost/openapi/%s.html", id1), "OpenApi");
         String result1 = objectMapper.writeValueAsString(link);
         // Run the test case 1

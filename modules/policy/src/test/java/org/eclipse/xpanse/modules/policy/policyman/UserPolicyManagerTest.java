@@ -54,7 +54,7 @@ class UserPolicyManagerTest {
         queryModel.setPolicy("userPolicy");
 
         final UserPolicy userPolicy = new UserPolicy();
-        userPolicy.setId(policyId);
+        userPolicy.setUserPolicyId(policyId);
         userPolicy.setPolicy("userPolicy");
         userPolicy.setCsp(Csp.HUAWEI);
         userPolicy.setEnabled(true);
@@ -111,7 +111,7 @@ class UserPolicyManagerTest {
         createRequest.setPolicy("policy");
 
         final UserPolicy expectedResult = new UserPolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setUserPolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
@@ -183,7 +183,7 @@ class UserPolicyManagerTest {
         createRequest.setEnabled(true);
 
         final UserPolicy expectedResult = new UserPolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setUserPolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
@@ -204,7 +204,7 @@ class UserPolicyManagerTest {
         updateRequest.setEnabled(false);
 
         final UserPolicy expectedResult = new UserPolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setUserPolicyId(policyId);
         expectedResult.setPolicy("policy_update");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(false);
@@ -253,7 +253,7 @@ class UserPolicyManagerTest {
         updateRequest.setEnabled(false);
 
         final UserPolicy expectedResult = new UserPolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setUserPolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.OPENSTACK);
         expectedResult.setEnabled(false);
@@ -379,7 +379,7 @@ class UserPolicyManagerTest {
     void testGetUserPolicyDetails() {
         // Setup
         final UserPolicy expectedResult = new UserPolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setUserPolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
@@ -406,7 +406,7 @@ class UserPolicyManagerTest {
     void testGetUserPolicyDetails_ThrowsPolicyNotFoundException() {
         // Setup
         final UserPolicy expectedResult = new UserPolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setUserPolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
@@ -423,7 +423,7 @@ class UserPolicyManagerTest {
     void testGetUserPolicyDetails_ThrowsAccessDeniedException() {
         // Setup
         final UserPolicy expectedResult = new UserPolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setUserPolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setCsp(Csp.HUAWEI);
         expectedResult.setEnabled(true);
