@@ -171,7 +171,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
     void purgeService(UUID taskId) throws Exception {
         // SetUp
         String successMsg =
-                String.format("Purging task for service with ID %s has started.", taskId);
+                String.format("Task for purging managed service %s has started.", taskId);
         Response response = Response.successResponse(Collections.singletonList(successMsg));
         String result = objectMapper.writeValueAsString(response);
         // Run the test

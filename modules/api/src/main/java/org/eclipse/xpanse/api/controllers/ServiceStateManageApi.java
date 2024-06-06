@@ -119,8 +119,9 @@ public class ServiceStateManageApi {
             ServiceStateManagementTaskType taskType,
             @Parameter(name = "taskStatus", description = "status of the task")
             @RequestParam(name = "taskStatus", required = false) TaskStatus taskStatus) {
-        return serviceStateManager.listServiceStateManagementTasks(UUID.fromString(serviceId),
-                taskType, taskStatus);
+        UUID uuid = UUID.fromString(serviceId);
+        serviceStateManager.getDeployServiceEntity(uuid);
+        return serviceStateManager.listServiceStateManagementTasks(uuid, taskType, taskStatus);
     }
 
 
@@ -139,7 +140,9 @@ public class ServiceStateManageApi {
     public void deleteManagementTasksByServiceId(
             @Parameter(name = "serviceId", description = "id of the service")
             @PathVariable(name = "serviceId") String serviceId) {
-        serviceStateManager.deleteManagementTasksByServiceId(UUID.fromString(serviceId));
+        UUID uuid = UUID.fromString(serviceId);
+        serviceStateManager.getDeployServiceEntity(uuid);
+        serviceStateManager.deleteManagementTasksByServiceId(uuid);
     }
 
 

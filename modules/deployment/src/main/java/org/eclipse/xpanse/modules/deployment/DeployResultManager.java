@@ -63,10 +63,11 @@ public class DeployResultManager {
                                               DeployServiceEntity deployServiceEntity) {
         if (StringUtils.isNotBlank(deployResult.getMessage())) {
             deployServiceEntity.setResultMessage(deployResult.getMessage());
+        } else {
+            deployServiceEntity.setResultMessage(null);
         }
         if (deployResult.getState() == DeployerTaskStatus.MODIFICATION_SUCCESSFUL) {
             DeployRequest modifyRequest = deployServiceEntity.getDeployRequest();
-            deployServiceEntity.setResultMessage(null);
             deployServiceEntity.setFlavor(modifyRequest.getFlavor());
             deployServiceEntity.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }

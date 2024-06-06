@@ -149,7 +149,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-                    ServiceDeploymentState serviceState) {
+            ServiceDeploymentState serviceState) {
         return this.serviceDetailsViewManager.listDeployedServices(
                 category, csp, serviceName, serviceVersion, serviceState);
     }
@@ -176,7 +176,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-                    ServiceDeploymentState serviceState) {
+            ServiceDeploymentState serviceState) {
         // return type is DeployedService but actually returns one of the child types
         // VendorHostedDeployedServiceDetails or DeployedServiceDetails
         return this.serviceDetailsViewManager.listDeployedServicesDetails(
@@ -254,7 +254,6 @@ public class ServiceDeployerApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public Response destroy(@PathVariable("id") String id) {
-        log.info("Stopping managed service with id {}", id);
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
         boolean currentUserIsOwner =
@@ -298,7 +297,35 @@ public class ServiceDeployerApi {
         }
         DeployTask purgeTask = this.deployService.getPurgeTask(deployServiceEntity);
         this.deployService.purgeService(purgeTask, deployServiceEntity);
-        String successMsg = String.format("Purging task for service with ID %s has started.", id);
+        String successMsg = String.format("Task for purging managed service %s has started.", id);
+        return Response.successResponse(Collections.singletonList(successMsg));
+    }
+
+
+    /**
+     * Start a task to redeploy the failed deployment using id.
+     *
+     * @param id ID of deployed service.
+     * @return response
+     */
+    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Operation(description = "Start a task to redeploy the failed deployment using id.")
+    @PutMapping(value = "/services/deploy/retry/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
+    public Response redeployFailedDeployment(@PathVariable("id") String id) {
+        DeployServiceEntity deployServiceEntity =
+                this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
+        boolean currentUserIsOwner = this.userServiceHelper.currentUserIsOwner(
+                deployServiceEntity.getUserId());
+        if (!currentUserIsOwner) {
+            throw new AccessDeniedException(
+                    "No permissions to redeploy services belonging to other users.");
+        }
+        this.deployService.redeployService(deployServiceEntity);
+        String successMsg =
+                String.format("Task for redeploying managed service %s has started.", id);
         return Response.successResponse(Collections.singletonList(successMsg));
     }
 

@@ -242,7 +242,7 @@ public class DeployService {
             policyValidator.validateDeploymentWithPolicies(deployTask);
             deployResult = deployer.deploy(deployTask);
         } catch (RuntimeException e) {
-            log.info("Deploy service with id:{} failed.", deployTask.getId(), e);
+            log.error("Deploy service {} failed.", deployTask.getId(), e);
             deployResult = new DeployResult();
             deployResult.setId(deployTask.getId());
             deployResult.setState(getDeployerTaskFailedState(deployTask.getDeploymentScenario()));
@@ -257,8 +257,43 @@ public class DeployService {
                 rollbackOnDeploymentFailure(deployTask, updatedDeployServiceEntity);
             }
         } catch (RuntimeException e) {
-            log.error("Deploy service with id:{} update database entity failed.",
-                    deployTask.getId(), e);
+            log.error("Update service database entity {} failed.", deployTask.getId(), e);
+        }
+    }
+
+    /**
+     * Redeploy service with failed state.
+     *
+     * @param serviceToRedeploy serviceToRedeploy
+     */
+    public void redeployService(DeployServiceEntity serviceToRedeploy) {
+        DeployTask redeployTask = getRedeployTask(serviceToRedeploy);
+        MDC.put(TASK_ID, redeployTask.getId().toString());
+        Deployer deployer =
+                deployerKindManager.getDeployment(redeployTask.getOcl().getDeployment().getKind());
+        DeployResult redeployResult;
+        try {
+            serviceToRedeploy.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
+            serviceToRedeploy = deployServiceEntityHandler.storeAndFlush(serviceToRedeploy);
+            policyValidator.validateDeploymentWithPolicies(redeployTask);
+            redeployResult = deployer.deploy(redeployTask);
+        } catch (RuntimeException e) {
+            log.error("Redeploy service {} failed.", redeployTask.getId(), e);
+            redeployResult = new DeployResult();
+            redeployResult.setId(redeployTask.getId());
+            redeployResult.setState(getDeployerTaskFailedState(DeploymentScenario.DEPLOY));
+            redeployResult.setMessage(e.getMessage());
+        }
+        try {
+            DeployServiceEntity updatedDeployServiceEntity =
+                    deployResultManager.updateDeployServiceEntityWithDeployResult(redeployResult,
+                            serviceToRedeploy);
+            if (ServiceDeploymentState.DEPLOY_FAILED
+                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
+                rollbackOnDeploymentFailure(redeployTask, updatedDeployServiceEntity);
+            }
+        } catch (RuntimeException e) {
+            log.error("Update service database entity {} failed.", redeployResult.getId(), e);
         }
     }
 
@@ -309,7 +344,8 @@ public class DeployService {
                 && !deployServiceEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL)) {
             throw new InvalidServiceStateException(
-                    String.format("Service with id %s is %s.", deployServiceEntity.getId(),
+                    String.format("Service %s with the state %s is not allowed to modify.",
+                            deployServiceEntity.getId(),
                             deployServiceEntity.getServiceDeploymentState()));
         }
         ServiceTemplateEntity existingServiceTemplate =
@@ -357,7 +393,7 @@ public class DeployService {
     /**
      * Async method to modify service.
      *
-     * @param modificationId        modificationId.
+     * @param modificationId      modificationId.
      * @param modifyTask          modifyTask.
      * @param deployServiceEntity deployServiceEntity
      */
@@ -378,6 +414,7 @@ public class DeployService {
             modificationAuditManager.startModificationProgressById(modificationId);
             modifyResult = deployer.modify(modificationId, modifyTask);
         } catch (RuntimeException e) {
+            log.error("Modify service {} failed.", modifyTask.getId(), e);
             modifyResult = new DeployResult();
             modifyResult.setId(modifyTask.getId());
             modifyResult.setState(getDeployerTaskFailedState(modifyTask.getDeploymentScenario()));
@@ -412,7 +449,7 @@ public class DeployService {
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             destroyResult = deployer.destroy(destroyTask);
         } catch (RuntimeException e) {
-            log.info("Destroy service with id:{} failed.", destroyTask.getId(), e);
+            log.error("Destroy service {} failed.", destroyTask.getId(), e);
             destroyResult = new DeployResult();
             destroyResult.setId(destroyTask.getId());
             destroyResult.setState(getDeployerTaskFailedState(destroyTask.getDeploymentScenario()));
@@ -427,8 +464,7 @@ public class DeployService {
                 deployer.deleteTaskWorkspace(destroyTask.getId());
             }
         } catch (RuntimeException e) {
-            log.error("Destroy service with id:{} update database entity failed.",
-                    destroyTask.getId(), e);
+            log.error("Update service database entity {} failed.", destroyTask.getId(), e);
         }
     }
 
@@ -512,7 +548,8 @@ public class DeployService {
                 ServiceDeploymentState.DESTROYING) || state.equals(
                 ServiceDeploymentState.MODIFYING)) {
             throw new InvalidServiceStateException(
-                    String.format("Service with id %s is %s.", deployServiceEntity.getId(), state));
+                    String.format("Service %s with the state %s is not allowed to destroy.",
+                            deployServiceEntity.getId(), state));
         }
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
         DeployServiceEntity updatedDeployServiceEntity =
@@ -536,8 +573,29 @@ public class DeployService {
                 || state == ServiceDeploymentState.ROLLBACK_FAILED
                 || state == ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED)) {
             throw new InvalidServiceStateException(
-                    String.format("Service %s is not in the state allowed for purging.",
-                            deployServiceEntity.getId()));
+                    String.format("Service %s with the state %s is not allowed to purge.",
+                            deployServiceEntity.getId(), state));
+        }
+        return deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
+                deployServiceEntity);
+    }
+
+
+    /**
+     * Get deploy task to redeploy the failed service by stored deploy service entity.
+     *
+     * @param deployServiceEntity deploy service entity.
+     * @return deploy task.
+     */
+    public DeployTask getRedeployTask(DeployServiceEntity deployServiceEntity) {
+        // Get state of service.
+        ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
+        if (!(state == ServiceDeploymentState.DEPLOY_FAILED
+                || state == ServiceDeploymentState.DESTROY_FAILED
+                || state == ServiceDeploymentState.ROLLBACK_FAILED)) {
+            throw new InvalidServiceStateException(
+                    String.format("Service %s with the state %s is not allowed to redeploy.",
+                            deployServiceEntity.getId(), state));
         }
         return deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
                 deployServiceEntity);
