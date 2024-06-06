@@ -130,6 +130,8 @@ public class TerraformDeploymentResultCallbackManager {
         deployResult.setId(taskId);
         if (Boolean.FALSE.equals(result.getCommandSuccessful())) {
             deployResult.setMessage(result.getCommandStdError());
+        } else {
+            deployResult.setMessage(null);
         }
         deployResult.setState(getDeployerTaskStatus(scenario, result.getCommandSuccessful()));
         deployResult.getPrivateProperties()

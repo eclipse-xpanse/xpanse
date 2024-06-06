@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.api.controllers.ServiceMigrationApi;
 import org.eclipse.xpanse.api.controllers.ServiceModificationApi;
@@ -116,20 +117,19 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return deployUUid;
     }
 
+
     boolean waitServiceUtilTargetState(UUID id, ServiceDeploymentState targetState)
-            throws Exception {
-        long startTime = System.currentTimeMillis();
-        while (!serviceIsTargetState(id, targetState)) {
+            throws InterruptedException {
+        final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(2);
+        while (true) {
             if (serviceIsTargetState(id, targetState)) {
-                break;
-            } else {
-                if (System.currentTimeMillis() - startTime > 120 * 1000) {
-                    break;
-                }
-                Thread.sleep(5 * 1000);
+                return true;
             }
+            if (System.nanoTime() > endTime) {
+                return false;
+            }
+            Thread.sleep(TimeUnit.SECONDS.toMillis(5));
         }
-        return serviceIsTargetState(id, targetState);
     }
 
     private boolean serviceIsTargetState(UUID id, ServiceDeploymentState targetState) {
@@ -157,10 +157,9 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         List<AvailabilityZoneConfig> availabilityZoneConfigs =
                 serviceTemplate.getDeployment().getServiceAvailability();
         Map<String, String> availabilityZones = new HashMap<>();
-        availabilityZoneConfigs.forEach(availabilityZoneConfig -> {
-            availabilityZones.put(availabilityZoneConfig.getVarName(),
-                    availabilityZoneConfig.getDisplayName());
-        });
+        availabilityZoneConfigs.forEach(availabilityZoneConfig ->
+                availabilityZones.put(availabilityZoneConfig.getVarName(),
+                        availabilityZoneConfig.getDisplayName()));
         deployRequestBase.setAvailabilityZones(availabilityZones);
         return deployRequestBase;
     }
@@ -256,7 +255,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     void testPurgeAndGetDetails(UUID taskId) throws Exception {
         // SetUp
         String successMsg =
-                String.format("Purging task for service with ID %s has started.", taskId);
+                String.format("Task for purging managed service %s has started.", taskId);
         Response response = Response.successResponse(Collections.singletonList(successMsg));
         // Run the test
         Response result = serviceDeployerApi.purge(taskId.toString());

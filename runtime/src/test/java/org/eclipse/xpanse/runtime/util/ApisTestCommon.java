@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -174,22 +175,18 @@ public class ApisTestCommon {
 
     protected boolean waitUntilExceptedState(UUID id, ServiceDeploymentState targetState)
             throws Exception {
-        boolean isDone = false;
-        long startTime = System.currentTimeMillis();
-        while (!isDone) {
+        final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(1);
+        while (true) {
             DeployedService deployedService = getDeployedServiceDetails(id);
             if (Objects.nonNull(deployedService)
                     && deployedService.getServiceDeploymentState() == targetState) {
-                isDone = true;
-            } else {
-                if (System.currentTimeMillis() - startTime > 60 * 1000) {
-                    break;
-                }
-                Thread.sleep(5 * 1000);
+                return true;
             }
-
+            if (System.nanoTime() > endTime) {
+                return false;
+            }
+            Thread.sleep(TimeUnit.SECONDS.toMillis(5));
         }
-        return isDone;
     }
 
     protected UUID deployService(ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {

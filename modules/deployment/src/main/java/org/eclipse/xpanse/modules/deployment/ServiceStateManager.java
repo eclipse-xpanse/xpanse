@@ -211,9 +211,8 @@ public class ServiceStateManager {
      */
     public List<ServiceStateManagementTaskDetails> listServiceStateManagementTasks(
             UUID serviceId, ServiceStateManagementTaskType taskType, TaskStatus taskStatus) {
-        DeployServiceEntity deployedService = getDeployServiceEntity(serviceId);
         ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
-        taskQuery.setServiceId(deployedService.getId());
+        taskQuery.setServiceId(serviceId);
         taskQuery.setTaskType(taskType);
         taskQuery.setTaskStatus(taskStatus);
         List<ServiceStateManagementTaskEntity> taskEntities = taskStorage.queryTasks(taskQuery);
@@ -228,9 +227,8 @@ public class ServiceStateManager {
      * @param serviceId service id.
      */
     public void deleteManagementTasksByServiceId(UUID serviceId) {
-        DeployServiceEntity deployService = getDeployServiceEntity(serviceId);
         ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
-        taskQuery.setServiceId(deployService.getId());
+        taskQuery.setServiceId(serviceId);
         List<ServiceStateManagementTaskEntity> taskEntities = taskStorage.queryTasks(taskQuery);
         taskStorage.batchRemove(taskEntities);
     }
@@ -364,7 +362,13 @@ public class ServiceStateManager {
     }
 
 
-    private DeployServiceEntity getDeployServiceEntity(UUID serviceId) {
+    /**
+     * Get the deployed service entity with the service id.
+     *
+     * @param serviceId service id.
+     * @return DeployServiceEntity.
+     */
+    public DeployServiceEntity getDeployServiceEntity(UUID serviceId) {
         DeployServiceEntity deployedService = deployServiceStorage.findDeployServiceById(serviceId);
         if (Objects.nonNull(deployedService)) {
             if (isNotOwnerOrAdminUser(deployedService)) {

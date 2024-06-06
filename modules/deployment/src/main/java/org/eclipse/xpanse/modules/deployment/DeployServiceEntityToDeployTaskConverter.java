@@ -37,6 +37,7 @@ public class DeployServiceEntityToDeployTaskConverter {
         ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
                 deployServiceEntity.getServiceTemplateId());
         deployTask.setOcl(serviceTemplateEntity.getOcl());
+        deployTask.setServiceTemplateId(serviceTemplateEntity.getId());
         return deployTask;
 
     }
