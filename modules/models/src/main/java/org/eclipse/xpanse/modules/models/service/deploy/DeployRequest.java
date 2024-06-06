@@ -27,5 +27,5 @@ public class DeployRequest extends DeployRequestBase {
      * The id of the service to deploy.
      */
     @Hidden
-    private UUID id;
+    private UUID serviceId;
 }

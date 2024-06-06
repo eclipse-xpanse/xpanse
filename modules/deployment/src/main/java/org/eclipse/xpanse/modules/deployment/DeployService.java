@@ -130,7 +130,7 @@ public class DeployService {
                 deployRequest.getAvailabilityZones(),
                 existingServiceTemplate.getOcl().getDeployment().getServiceAvailability());
 
-        deployRequest.setId(UUID.randomUUID());
+        deployRequest.setServiceId(UUID.randomUUID());
         if (StringUtils.isEmpty(deployRequest.getCustomerServiceName())) {
             deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
         }
@@ -141,7 +141,7 @@ public class DeployService {
     private DeployTask getDeployTask(DeployRequest deployRequest,
                                      ServiceTemplateEntity existingServiceTemplate) {
         DeployTask deployTask = new DeployTask();
-        deployTask.setId(deployRequest.getId());
+        deployTask.setId(deployRequest.getServiceId());
         deployTask.setDeployRequest(deployRequest);
         deployTask.setNamespace(existingServiceTemplate.getNamespace());
         deployTask.setOcl(existingServiceTemplate.getOcl());

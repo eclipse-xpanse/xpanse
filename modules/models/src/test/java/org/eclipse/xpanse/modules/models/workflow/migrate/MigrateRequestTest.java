@@ -1,6 +1,5 @@
 package org.eclipse.xpanse.modules.models.workflow.migrate;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -39,7 +38,7 @@ class MigrateRequestTest {
     @BeforeEach
     void setUp() {
         request = new MigrateRequest();
-        request.setId(id);
+        request.setOriginalServiceId(id);
         request.setUserId(userId);
         request.setCategory(category);
         request.setServiceName(serviceName);
@@ -59,7 +58,7 @@ class MigrateRequestTest {
 
     @Test
     void testGetterAndSetter() {
-        assertEquals(id, request.getId());
+        assertEquals(id, request.getOriginalServiceId());
         assertEquals(userId, request.getUserId());
         assertEquals(category, request.getCategory());
         assertEquals(serviceName, request.getServiceName());
@@ -114,7 +113,7 @@ class MigrateRequestTest {
                 ", availabilityZones=" + availabilityZones +
                 ", isEulaAccepted=" + IS_ACCEPT_EULA +
                 ", billingMode=" + billingMode +
-                "), id=" + id + ")" ;
+                "), originalServiceId=" + id + ")" ;
         assertEquals(expectedToString, request.toString());
     }
 }

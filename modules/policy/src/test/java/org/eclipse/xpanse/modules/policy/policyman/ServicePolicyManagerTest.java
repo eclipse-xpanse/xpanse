@@ -64,7 +64,7 @@ class ServicePolicyManagerTest {
     void testListServicePolicies() {
         // Setup
         final ServicePolicy servicePolicy = new ServicePolicy();
-        servicePolicy.setId(policyId);
+        servicePolicy.setServicePolicyId(policyId);
         servicePolicy.setPolicy("policy");
         servicePolicy.setServiceTemplateId(serviceTemplateId);
         servicePolicy.setEnabled(false);
@@ -139,7 +139,7 @@ class ServicePolicyManagerTest {
         createRequest.setEnabled(false);
 
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(newPolicyId);
+        expectedResult.setServicePolicyId(newPolicyId);
         expectedResult.setPolicy(newPolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
@@ -191,7 +191,7 @@ class ServicePolicyManagerTest {
         createRequest.setEnabled(false);
 
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(newPolicyId);
+        expectedResult.setServicePolicyId(newPolicyId);
         expectedResult.setPolicy(newPolicy);
         expectedResult.setFlavorNameList(flavorNameList);
         expectedResult.setServiceTemplateId(serviceTemplateId);
@@ -360,7 +360,7 @@ class ServicePolicyManagerTest {
         createRequest.setEnabled(false);
 
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(newPolicyId);
+        expectedResult.setServicePolicyId(newPolicyId);
         expectedResult.setPolicy(newPolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
@@ -395,7 +395,7 @@ class ServicePolicyManagerTest {
         updateRequest.setEnabled(true);
 
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setServicePolicyId(policyId);
         expectedResult.setPolicy(updatePolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(true);
@@ -445,7 +445,7 @@ class ServicePolicyManagerTest {
         updateRequest.setEnabled(true);
 
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setServicePolicyId(policyId);
         expectedResult.setFlavorNameList(flavorNameList);
         expectedResult.setPolicy(updatePolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
@@ -513,7 +513,7 @@ class ServicePolicyManagerTest {
         updateRequest.setEnabled(true);
 
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setServicePolicyId(policyId);
         expectedResult.setFlavorNameList(flavorNameList);
         expectedResult.setPolicy(updatePolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
@@ -606,7 +606,7 @@ class ServicePolicyManagerTest {
         updateRequest.setEnabled(true);
 
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setServicePolicyId(policyId);
         expectedResult.setPolicy(updatePolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(true);
@@ -672,7 +672,7 @@ class ServicePolicyManagerTest {
     void testGetServicePolicyDetails() {
         // Setup
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setServicePolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
@@ -704,7 +704,7 @@ class ServicePolicyManagerTest {
     void testGetServicePolicyDetails_ThrowsAccessDeniedException() {
         // Setup
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setServicePolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
@@ -766,7 +766,7 @@ class ServicePolicyManagerTest {
     void testDeleteServicePolicy_ThrowsAccessDeniedException() {
         // Setup
         final ServicePolicy expectedResult = new ServicePolicy();
-        expectedResult.setId(policyId);
+        expectedResult.setServicePolicyId(policyId);
         expectedResult.setPolicy("policy");
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);

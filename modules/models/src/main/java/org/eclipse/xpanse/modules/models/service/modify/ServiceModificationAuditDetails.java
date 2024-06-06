@@ -28,7 +28,7 @@ public class ServiceModificationAuditDetails {
 
     @NotNull
     @Schema(description = "The id of the service modification request.")
-    private UUID id;
+    private UUID serviceModificationRequestId;
 
     @NotNull
     @Schema(description = "The id of the deployed service.")

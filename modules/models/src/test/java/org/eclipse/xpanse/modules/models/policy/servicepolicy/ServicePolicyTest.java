@@ -27,12 +27,12 @@ class ServicePolicyTest {
         test.setFlavorNameList(flavorNameList);
         test.setEnabled(enabled);
         test.setPolicy(policy);
-        test.setId(id);
+        test.setServicePolicyId(id);
     }
 
     @Test
     void testGetters() {
-        assertThat(test.getId()).isEqualTo(id);
+        assertThat(test.getServicePolicyId()).isEqualTo(id);
         assertThat(test.getPolicy()).isEqualTo(policy);
         assertThat(test.getFlavorNameList()).isEqualTo(flavorNameList);
         assertThat(test.getServiceTemplateId()).isEqualTo(serviceTemplateId);
@@ -79,7 +79,7 @@ class ServicePolicyTest {
     @Test
     void testToString() {
         String result = String.format(
-                "ServicePolicy(id=%s, policy=%s, serviceTemplateId=%s, flavorNameList=%s, "
+                "ServicePolicy(servicePolicyId=%s, policy=%s, serviceTemplateId=%s, flavorNameList=%s, "
                         + "enabled=%s, createTime=%s, lastModifiedTime=%s)",
                 id, policy, serviceTemplateId, flavorNameList, enabled, null, null);
 

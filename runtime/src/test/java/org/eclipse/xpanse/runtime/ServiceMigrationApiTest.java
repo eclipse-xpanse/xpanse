@@ -53,14 +53,14 @@ class ServiceMigrationApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("ServiceMigrationApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        approveServiceTemplateRegistration(serviceTemplate.getId());
+        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         UUID serviceId = deployService(serviceTemplate);
         testServiceMigrationApisThrowsException(serviceTemplate, serviceId);
         testServiceMigrationApisWell(serviceTemplate, serviceId);
         // clear data
         deployServiceStorage.deleteDeployService(
                 deployServiceStorage.findDeployServiceById(serviceId));
-        unregisterServiceTemplate(serviceTemplate.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
 
@@ -72,7 +72,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
             DeployRequest deployRequest = getDeployRequest(serviceTemplate);
             MigrateRequest migrateRequest = new MigrateRequest();
             BeanUtils.copyProperties(deployRequest, migrateRequest);
-            migrateRequest.setId(serviceId);
+            migrateRequest.setOriginalServiceId(serviceId);
             migrateRequest.setCustomerServiceName("newService");
             MockHttpServletResponse migrateResponse = migrateService(migrateRequest);
             UUID migrationId =
@@ -115,7 +115,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         MigrateRequest migrateRequest = new MigrateRequest();
         BeanUtils.copyProperties(deployRequest, migrateRequest);
         testMigrateThrowsServiceNotFoundException(migrateRequest);
-        migrateRequest.setId(serviceId);
+        migrateRequest.setOriginalServiceId(serviceId);
         testMigrateThrowsServiceLockedException(migrateRequest);
         testGetMigrationOrderDetailsThrowsServiceMigrationNotFoundException();
         testMigrateThrowsServiceNotFoundException(migrateRequest);
@@ -130,12 +130,12 @@ class ServiceMigrationApiTest extends ApisTestCommon {
     }
 
     void testMigrateThrowsServiceNotFoundException(MigrateRequest migrateRequest) throws Exception {
-        migrateRequest.setId(UUID.randomUUID());
+        migrateRequest.setOriginalServiceId(UUID.randomUUID());
         // Setup
         Response expectedResponse =
                 Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                         List.of(String.format("Service with id %s not found.",
-                                migrateRequest.getId())));
+                                migrateRequest.getOriginalServiceId())));
         // Run the test
         final MockHttpServletResponse response = migrateService(migrateRequest);
 
@@ -150,12 +150,12 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
         serviceLockConfig.setModifyLocked(true);
         DeployServiceEntity deployService =
-                deployServiceStorage.findDeployServiceById(migrateRequest.getId());
+                deployServiceStorage.findDeployServiceById(migrateRequest.getOriginalServiceId());
         deployService.setLockConfig(serviceLockConfig);
         deployServiceStorage.storeAndFlush(deployService);
 
         String message = String.format("Service with id %s is locked from migration.",
-                migrateRequest.getId());
+                migrateRequest.getOriginalServiceId());
         Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
                 Collections.singletonList(message));
         String result = objectMapper.writeValueAsString(expectedResponse);
@@ -199,7 +199,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         MigrateRequest migrateRequest = new MigrateRequest();
         BeanUtils.copyProperties(deployRequest, migrateRequest);
-        migrateRequest.setId(serviceId);
+        migrateRequest.setOriginalServiceId(serviceId);
 
         MockHttpServletResponse response = migrateService(migrateRequest);
 

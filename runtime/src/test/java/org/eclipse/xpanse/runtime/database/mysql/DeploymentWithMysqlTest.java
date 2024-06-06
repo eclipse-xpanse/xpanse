@@ -101,7 +101,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     void approveServiceTemplateRegistration(ServiceTemplateDetailVo serviceTemplate) {
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateStorage.getServiceTemplateById(serviceTemplate.getId());
+                serviceTemplateStorage.getServiceTemplateById(serviceTemplate.getServiceTemplateId());
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
         serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
     }
@@ -184,7 +184,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     UUID migrateService(UUID taskId, ServiceTemplateDetailVo serviceTemplate) {
         MigrateRequest migrateRequest = new MigrateRequest();
-        migrateRequest.setId(taskId);
+        migrateRequest.setOriginalServiceId(taskId);
         DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
         BeanUtils.copyProperties(deployRequestBase, migrateRequest);
         UUID migrateId = serviceMigrationApi.migrate(migrateRequest);

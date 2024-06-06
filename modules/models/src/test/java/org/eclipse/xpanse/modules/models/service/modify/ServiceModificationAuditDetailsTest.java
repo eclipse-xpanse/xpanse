@@ -44,7 +44,7 @@ class ServiceModificationAuditDetailsTest {
     @BeforeEach
     void setUp() {
         test = new ServiceModificationAuditDetails();
-        test.setId(id);
+        test.setServiceModificationRequestId(id);
         test.setServiceId(serviceId);
         test.setStartedTime(startedTime);
         test.setCompletedTime(completedTime);
@@ -59,7 +59,7 @@ class ServiceModificationAuditDetailsTest {
 
     @Test
     void testGetters() {
-        assertThat(test.getId()).isEqualTo(id);
+        assertThat(test.getServiceModificationRequestId()).isEqualTo(id);
         assertThat(test.getServiceId()).isEqualTo(serviceId);
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
         assertThat(test.getErrorMsg()).isEqualTo(errorMsg);
@@ -94,7 +94,7 @@ class ServiceModificationAuditDetailsTest {
 
     @Test
     void testToString() {
-        String result = "ServiceModificationAuditDetails(id=" + id + ", serviceId="
+        String result = "ServiceModificationAuditDetails(serviceModificationRequestId=" + id + ", serviceId="
                 + serviceId + ", taskStatus=" + taskStatus
                 + ", errorMsg=" + errorMsg + ", startedTime=" + startedTime
                 + ", completedTime=" + completedTime

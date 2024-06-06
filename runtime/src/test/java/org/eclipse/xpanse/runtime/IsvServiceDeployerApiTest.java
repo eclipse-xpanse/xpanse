@@ -93,12 +93,12 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         ocl.setName("IsvServiceDeployApiTest-1");
         ocl.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        approveServiceTemplateRegistration(serviceTemplate.getId());
+        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         addIsvCredential();
 
         UUID serviceId = deployService(serviceTemplate);
         DeployedServiceDetails deployedServiceDetails = getDeployedServiceDetailsForIsv(serviceId);
-        assertEquals(serviceId, deployedServiceDetails.getId());
+        assertEquals(serviceId, deployedServiceDetails.getServiceId());
         assertEquals(ServiceDeploymentState.DEPLOYING,
                 deployedServiceDetails.getServiceDeploymentState());
         if (waitUntilExceptedStateForIsv(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
@@ -110,7 +110,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         if (waitUntilExceptedStateForIsv(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
             purgeService(serviceId);
         }
-        unregisterServiceTemplate(serviceTemplate.getId());
+        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
         deleteIsvCredential();
     }
 

@@ -34,6 +34,7 @@ public class ServiceTemplateEntityConverter {
                 && Objects.nonNull(serviceTemplateEntity.getOcl())) {
             ServiceTemplateDetailVo serviceTemplateDetailVo = new ServiceTemplateDetailVo();
             BeanUtils.copyProperties(serviceTemplateEntity, serviceTemplateDetailVo);
+            serviceTemplateDetailVo.setServiceTemplateId(serviceTemplateEntity.getId());
             serviceTemplateDetailVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
             serviceTemplateDetailVo.setDescription(
                     serviceTemplateEntity.getOcl().getDescription());
@@ -75,6 +76,7 @@ public class ServiceTemplateEntityConverter {
                 && Objects.nonNull(serviceTemplateEntity.getOcl())) {
             UserOrderableServiceVo userOrderableServiceVo = new UserOrderableServiceVo();
             BeanUtils.copyProperties(serviceTemplateEntity, userOrderableServiceVo);
+            userOrderableServiceVo.setServiceTemplateId(serviceTemplateEntity.getId());
             userOrderableServiceVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
             userOrderableServiceVo.setDescription(
                     serviceTemplateEntity.getOcl().getDescription());

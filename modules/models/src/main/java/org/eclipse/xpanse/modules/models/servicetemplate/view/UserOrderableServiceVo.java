@@ -35,7 +35,7 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
 
     @NotNull
     @Schema(description = "The id of the orderable service.")
-    private UUID id;
+    private UUID serviceTemplateId;
 
     @NotNull
     @Schema(description = "The category of the orderable service.")

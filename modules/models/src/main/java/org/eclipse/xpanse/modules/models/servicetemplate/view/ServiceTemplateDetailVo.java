@@ -40,7 +40,7 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
 
     @NotNull
     @Schema(description = "ID of the registered service.")
-    private UUID id;
+    private UUID serviceTemplateId;
 
     @NotNull
     @NotBlank

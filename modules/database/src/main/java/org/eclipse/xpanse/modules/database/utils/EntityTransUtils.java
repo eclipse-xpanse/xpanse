@@ -67,6 +67,7 @@ public class EntityTransUtils {
         if (Objects.nonNull(serviceEntity)) {
             DeployedService deployedService = new DeployedService();
             BeanUtils.copyProperties(serviceEntity, deployedService);
+            deployedService.setServiceId(serviceEntity.getId());
             deployedService.setServiceHostingType(
                     serviceEntity.getDeployRequest().getServiceHostingType());
             return deployedService;
@@ -86,6 +87,7 @@ public class EntityTransUtils {
         DeployedServiceDetails details = new DeployedServiceDetails();
         details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
         BeanUtils.copyProperties(entity, details);
+        details.setServiceId(entity.getId());
         if (!CollectionUtils.isEmpty(entity.getDeployResourceList())) {
             details.setDeployResources(transToDeployResourceList(entity.getDeployResourceList()));
         }
@@ -109,6 +111,7 @@ public class EntityTransUtils {
         VendorHostedDeployedServiceDetails details = new VendorHostedDeployedServiceDetails();
         details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
         BeanUtils.copyProperties(entity, details);
+        details.setServiceId(entity.getId());
         if (!CollectionUtils.isEmpty(entity.getProperties())) {
             details.setDeployedServiceProperties(entity.getProperties());
         }
@@ -155,6 +158,7 @@ public class EntityTransUtils {
             ServiceModificationAuditEntity entity) {
         ServiceModificationAuditDetails details = new ServiceModificationAuditDetails();
         BeanUtils.copyProperties(entity, details);
+        details.setServiceModificationRequestId(entity.getId());
         return details;
     }
 

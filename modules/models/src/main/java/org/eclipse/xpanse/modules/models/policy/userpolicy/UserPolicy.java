@@ -28,7 +28,7 @@ public class UserPolicy {
      */
     @NotNull
     @Schema(description = "The id of the policy.")
-    private UUID id;
+    private UUID userPolicyId;
 
     /**
      * The valid policy created by the user.

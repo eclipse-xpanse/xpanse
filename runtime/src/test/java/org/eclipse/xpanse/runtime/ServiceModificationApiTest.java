@@ -71,7 +71,7 @@ class ServiceModificationApiTest extends ApisTestCommon {
             log.error("Register service template failed.");
             return;
         }
-        approveServiceTemplateRegistration(serviceTemplate.getId());
+        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         UUID serviceId = deployService(serviceTemplate);
 
         testModificationApisWell(serviceId, serviceTemplate);
@@ -93,7 +93,7 @@ class ServiceModificationApiTest extends ApisTestCommon {
                     objectMapper.readValue(getAuditDetailsResponse.getContentAsString(),
                             ServiceModificationAuditDetails.class);
             assertNotNull(auditDetails);
-            assertEquals(modifyModificationId, auditDetails.getId());
+            assertEquals(modifyModificationId, auditDetails.getServiceModificationRequestId());
             if (modifySuccess) {
                 assertEquals(TaskStatus.SUCCESSFUL, auditDetails.getTaskStatus());
             } else {

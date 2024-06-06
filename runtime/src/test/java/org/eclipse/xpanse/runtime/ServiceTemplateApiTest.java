@@ -106,7 +106,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 serviceTemplateDetailVo.getVersion());
 
         // Setup detail request
-        UUID id = serviceTemplateDetailVo.getId();
+        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         String result = objectMapper.writeValueAsString(serviceTemplateDetailVo);
         // Run the test
         final MockHttpServletResponse detailResponse = detail(id);
@@ -143,7 +143,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
+        assertEquals(serviceTemplateDetailVo.getServiceTemplateId(), updatedServiceTemplateDetailVo.getServiceTemplateId());
 
 
         // Setup unregister request
@@ -197,7 +197,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         // Setup fetch update request
         URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
-        UUID id = serviceTemplateDetailVo.getId();
+        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         // Run the test
         final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
@@ -205,7 +205,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
-        assertEquals(serviceTemplateDetailVo.getId(), updatedServiceTemplateDetailVo.getId());
+        assertEquals(serviceTemplateDetailVo.getServiceTemplateId(), updatedServiceTemplateDetailVo.getServiceTemplateId());
 
         serviceTemplateStorage.removeById(id);
     }
@@ -280,7 +280,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplateDetail =
                 objectMapper.readValue(response.getContentAsString(),
                         ServiceTemplateDetailVo.class);
-        UUID id = serviceTemplateDetail.getId();
+        UUID id = serviceTemplateDetail.getServiceTemplateId();
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(id);
         serviceTemplateEntity.setNamespace("test");
@@ -478,15 +478,15 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 Response.errorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
                         Collections.singletonList(
                                 String.format("Service template already registered with id %s",
-                                        serviceTemplateDetail.getId())));
+                                        serviceTemplateDetail.getServiceTemplateId())));
         String result = objectMapper.writeValueAsString(expectedResponse);
         // Run the test
         final MockHttpServletResponse registerSameResponse = register(ocl);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerSameResponse.getStatus());
         assertEquals(registerSameResponse.getContentAsString(), result);
-        unregister(serviceTemplateDetail.getId());
-        deleteServiceTemplate(serviceTemplateDetail.getId());
+        unregister(serviceTemplateDetail.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplateDetail.getServiceTemplateId());
     }
 
     void testRegisterThrowsInvalidServiceVersionException() throws Exception {
@@ -527,8 +527,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(registerResponse2.getContentAsString(),
                 objectMapper.writeValueAsString(expectedResponse2));
 
-        unregister(serviceTemplate.getId());
-        deleteServiceTemplate(serviceTemplate.getId());
+        unregister(serviceTemplate.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testRegisterThrowsInvalidServiceFlavorsException() throws Exception {
@@ -602,7 +602,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceTemplateApiTest-05");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        UUID id = serviceTemplate.getId();
+        UUID id = serviceTemplate.getServiceTemplateId();
         // Setup
         String errorMsg = String.format("Service template with id %s is not unregistered.", id);
         Response expectedResponse =
@@ -617,7 +617,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Response expectedResponse2 =
                 Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE,
                         List.of(errorMsg2));
-        unregister(serviceTemplate.getId());
+        unregister(serviceTemplate.getServiceTemplateId());
         when(deployServiceStorage.listServices(any(ServiceQueryModel.class))).thenReturn(
                 List.of(new DeployServiceEntity()));
         MockHttpServletResponse deleteResponse2 = deleteServiceTemplate(id);

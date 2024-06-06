@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.models.service.deploy;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -48,7 +47,7 @@ class DeployRequestTest {
     @BeforeEach
     void setUp() {
         request = new DeployRequest();
-        request.setId(id);
+        request.setServiceId(id);
         request.setUserId(userId);
         request.setCategory(category);
         request.setServiceName(serviceName);
@@ -68,7 +67,7 @@ class DeployRequestTest {
 
     @Test
     void testGetters() {
-        assertEquals(id, request.getId());
+        assertEquals(id, request.getServiceId());
         assertEquals(userId, request.getUserId());
         assertEquals(category, request.getCategory());
         assertEquals(serviceName, request.getServiceName());
@@ -122,7 +121,7 @@ class DeployRequestTest {
                 ", availabilityZones=" + availabilityZones +
                 ", isEulaAccepted=" + IS_ACCEPT_EULA +
                 ", billingMode=" + billingMode +
-                "), id=" + id + ")";
+                "), serviceId=" + id + ")";
         assertEquals(expectedToString, request.toString());
     }
 

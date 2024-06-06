@@ -78,7 +78,7 @@ class ServiceTemplateDetailVoTest {
         billing.setBillingModes(Arrays.asList(BillingMode.values()));
 
         serviceTemplateDetailVo = new ServiceTemplateDetailVo();
-        serviceTemplateDetailVo.setId(uuid);
+        serviceTemplateDetailVo.setServiceTemplateId(uuid);
         serviceTemplateDetailVo.setCategory(category);
         serviceTemplateDetailVo.setName(name);
         serviceTemplateDetailVo.setVersion(version);
@@ -102,7 +102,7 @@ class ServiceTemplateDetailVoTest {
 
     @Test
     void testGetterAndSetter() {
-        assertEquals(uuid, serviceTemplateDetailVo.getId());
+        assertEquals(uuid, serviceTemplateDetailVo.getServiceTemplateId());
         assertEquals(category, serviceTemplateDetailVo.getCategory());
         assertEquals(name, serviceTemplateDetailVo.getName());
         assertEquals(version, serviceTemplateDetailVo.getVersion());
@@ -143,7 +143,7 @@ class ServiceTemplateDetailVoTest {
     @Test
     void testToString() {
         String expectedToString =
-                "ServiceTemplateDetailVo(" + "id=" + uuid + ", " + "name=" + name + ", "
+                "ServiceTemplateDetailVo(" + "serviceTemplateId=" + uuid + ", " + "name=" + name + ", "
                         + "version=" + version + ", " + "csp=" + csp + ", " + "category=" + category
                         + ", " + "namespace=" + namespace + ", " + "regions=" + regions + ", "
                         + "description=" + description + ", " + "icon=" + icon + ", "

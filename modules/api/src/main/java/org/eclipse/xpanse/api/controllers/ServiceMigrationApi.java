@@ -87,7 +87,8 @@ public class ServiceMigrationApi {
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
         validateData(migrateRequest);
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(migrateRequest.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(
+                        migrateRequest.getOriginalServiceId());
         String userId = getUserId();
         if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
@@ -96,7 +97,7 @@ public class ServiceMigrationApi {
         if (Objects.nonNull(deployServiceEntity.getLockConfig())
                 && deployServiceEntity.getLockConfig().isModifyLocked()) {
             String errorMsg = String.format("Service with id %s is locked from migration.",
-                    migrateRequest.getId());
+                    migrateRequest.getOriginalServiceId());
             throw new ServiceLockedException(errorMsg);
         }
         Map<String, Object> variable =
@@ -186,7 +187,7 @@ public class ServiceMigrationApi {
     private Map<String, Object> getMigrateProcessVariable(MigrateRequest migrateRequest,
                                                           UUID newServiceId, String userId) {
         Map<String, Object> variable = new HashMap<>();
-        variable.put(MigrateConstants.ID, migrateRequest.getId());
+        variable.put(MigrateConstants.ID, migrateRequest.getOriginalServiceId());
         variable.put(MigrateConstants.NEW_ID, newServiceId);
         variable.put(MigrateConstants.MIGRATE_REQUEST, migrateRequest);
         variable.put(MigrateConstants.USER_ID, userId);

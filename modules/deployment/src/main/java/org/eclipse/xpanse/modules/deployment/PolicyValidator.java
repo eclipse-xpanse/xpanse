@@ -118,7 +118,9 @@ public class PolicyValidator {
                                 .equals(evalResult.getPolicy())).findFirst().orElse(null);
                 if (Objects.nonNull(failedServicePolicy)) {
                     errMsg = String.format(errMsg + "\n Failed by the service policy with id: %s."
-                            + "\n Deployment plan: %s", failedServicePolicy.getId(), planJson);
+                                    + "\n Deployment plan: %s",
+                            failedServicePolicy.getServicePolicyId(),
+                            planJson);
                 } else {
                     errMsg = String.format(errMsg + "\n Failed by the service policy with context"
                             + ": %s.\"\nDeployment plan: %s", evalResult.getPolicy(), planJson);
@@ -144,7 +146,8 @@ public class PolicyValidator {
                         .findFirst().orElse(null);
                 if (Objects.nonNull(failedUserPolicy)) {
                     errMsg = String.format(errMsg + "\n Failed by the user policy with id: %s."
-                            + "\n Deployment plan: %s", failedUserPolicy.getId(), planJson);
+                                    + "\n Deployment plan: %s", failedUserPolicy.getUserPolicyId(),
+                            planJson);
                 } else {
                     errMsg = String.format(errMsg + "\n Failed by the user policy with context: %s."
                             + "\nDeployment plan: %s", evalResult.getPolicy(), planJson);
