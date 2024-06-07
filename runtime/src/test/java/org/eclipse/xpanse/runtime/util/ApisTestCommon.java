@@ -2,6 +2,7 @@ package org.eclipse.xpanse.runtime.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -19,6 +20,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import com.huaweicloud.sdk.bss.v2.BssClient;
+import com.huaweicloud.sdk.bssintl.v2.BssintlClient;
+import com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsRequest;
+import com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsResponse;
+import com.huaweicloud.sdk.core.exception.ClientRequestException;
+import com.huaweicloud.sdk.core.invoker.SyncInvoker;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.eip.v2.EipClient;
 import com.huaweicloud.sdk.evs.v2.EvsClient;
@@ -100,6 +106,8 @@ public class ApisTestCommon {
     protected IamClient mockIamClient;
     @MockBean
     protected BssClient mockBssClient;
+    @MockBean
+    protected BssintlClient mockBssintlClient;
     protected MockedStatic<OSFactory> mockOsFactory;
 
     @BeforeAll
@@ -117,6 +125,7 @@ public class ApisTestCommon {
         when(huaweiCloudClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         when(huaweiCloudClient.getVpcClient(any(), any())).thenReturn(mockVpcClient);
         when(huaweiCloudClient.getIamClient(any(), any())).thenReturn(mockIamClient);
+        when(huaweiCloudClient.getBssintlClient(any())).thenReturn(mockBssintlClient);
         when(huaweiCloudClient.getBssClient(any())).thenReturn(mockBssClient);
     }
 
@@ -366,6 +375,18 @@ public class ApisTestCommon {
         mockMvc.perform(delete("/xpanse/user/credentials").param("cspName", csp.toValue())
                 .param("type", type.toValue()).param("name", name)
                 .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+    }
+
+    protected void mockListOnDemandResourceRatingsInvokerWithBssintlClientThrowAccessDeniedException() {
+        ClientRequestException clientRequestException = new ClientRequestException(403, "CBC.0150"
+                , "Access Denied", UUID.randomUUID().toString());
+        SyncInvoker<ListOnDemandResourceRatingsRequest, ListOnDemandResourceRatingsResponse>
+                mockInvoker = mock(SyncInvoker.class);
+        when(mockBssintlClient.listOnDemandResourceRatingsInvoker(any())).thenReturn(mockInvoker);
+        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
+        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
+        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
+        when(mockInvoker.invoke()).thenThrow(clientRequestException);
     }
 }
 
