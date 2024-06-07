@@ -114,7 +114,8 @@ class ServicePricingApiTest extends ApisTestCommon {
         mockSdkClientsForHuaweiCloud();
         addCredentialForHuaweiCloud();
         mockListProjectInvoker();
-        mockListOnDemandResourceRatingsInvoker();
+        mockListOnDemandResourceRatingsInvokerWithBssintlClientThrowAccessDeniedException();
+        mockListOnDemandResourceRatingsInvokerWithBssClient();
 
         int flavorCount = ocl.getFlavors().getServiceFlavors().size();
         MockHttpServletResponse serviceFixedPricesResponse =
@@ -178,7 +179,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         when(mockInvoker.invoke()).thenReturn(listProjectsResponse);
     }
 
-    void mockListOnDemandResourceRatingsInvoker() {
+    void mockListOnDemandResourceRatingsInvokerWithBssClient() {
         ListOnDemandResourceRatingsResponse listOnDemandResourceRatingsResponse =
                 new ListOnDemandResourceRatingsResponse();
         listOnDemandResourceRatingsResponse.setAmount(BigDecimal.valueOf(100L));
