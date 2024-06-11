@@ -83,6 +83,8 @@
         <jgit.version>6.9.0.202403050737-r</jgit.version>
         <semver4j.version>5.3.0</semver4j.version>
         <springdoc.openapi.plugin.version>1.4</springdoc.openapi.plugin.version>
+        <swagger.parser.version>2.1.22</swagger.parser.version>
+        <swagger.core.v3.version>2.2.22</swagger.core.v3.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
