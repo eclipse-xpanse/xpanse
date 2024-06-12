@@ -155,7 +155,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequestBase.setServiceRequestProperties(serviceRequestProperties);
 
         List<AvailabilityZoneConfig> availabilityZoneConfigs =
-                serviceTemplate.getDeployment().getServiceAvailability();
+                serviceTemplate.getDeployment().getServiceAvailabilityConfigs();
         Map<String, String> availabilityZones = new HashMap<>();
         availabilityZoneConfigs.forEach(availabilityZoneConfig ->
                 availabilityZones.put(availabilityZoneConfig.getVarName(),

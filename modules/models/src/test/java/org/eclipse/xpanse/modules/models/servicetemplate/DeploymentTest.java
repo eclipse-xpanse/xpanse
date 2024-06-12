@@ -24,7 +24,7 @@ class DeploymentTest {
     private final String deployer = "deployer";
     private ScriptsRepo scriptsRepo;
     private List<DeployVariable> variables;
-    private List<AvailabilityZoneConfig> availabilityZones;
+    private List<AvailabilityZoneConfig> availabilityZoneConfigs;
     private final CredentialType credentialType = CredentialType.API_KEY;
     private Deployment test;
 
@@ -39,7 +39,7 @@ class DeploymentTest {
         availabilityZoneConfig.setVarName("varName");
         availabilityZoneConfig.setMandatory(true);
         availabilityZoneConfig.setDescription("description");
-        availabilityZones = List.of(availabilityZoneConfig);
+        availabilityZoneConfigs = List.of(availabilityZoneConfig);
 
         scriptsRepo = new ScriptsRepo();
         scriptsRepo.setRepoUrl("repoUrl");
@@ -51,7 +51,7 @@ class DeploymentTest {
         test.setDeployer(deployer);
         test.setVariables(variables);
         test.setCredentialType(credentialType);
-        test.setServiceAvailability(availabilityZones);
+        test.setServiceAvailabilityConfigs(availabilityZoneConfigs);
         test.setScriptsRepo(scriptsRepo);
     }
 
@@ -61,7 +61,7 @@ class DeploymentTest {
         assertEquals(deployer, test.getDeployer());
         assertEquals(variables, test.getVariables());
         assertEquals(credentialType, test.getCredentialType());
-        assertEquals(availabilityZones, test.getServiceAvailability());
+        assertEquals(availabilityZoneConfigs, test.getServiceAvailabilityConfigs());
         assertEquals(scriptsRepo, test.getScriptsRepo());
     }
 
@@ -92,7 +92,7 @@ class DeploymentTest {
                 "kind=" + kind +
                 ", variables=" + variables +
                 ", credentialType=" + credentialType +
-                ", serviceAvailability=" + availabilityZones +
+                ", serviceAvailabilityConfigs=" + availabilityZoneConfigs +
                 ", deployer=" + deployer +
                 ", scriptsRepo=" + scriptsRepo +
                 ")";

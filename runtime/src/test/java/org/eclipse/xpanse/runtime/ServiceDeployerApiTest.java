@@ -608,7 +608,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         zoneConfig2.setVarName("secondary_az");
         zoneConfig2.setMandatory(true);
         List<AvailabilityZoneConfig> zoneConfigs = List.of(zoneConfig, zoneConfig2);
-        ocl.getDeployment().setServiceAvailability(zoneConfigs);
+        ocl.getDeployment().setServiceAvailabilityConfigs(zoneConfigs);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         // Run the test

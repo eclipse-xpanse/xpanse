@@ -113,8 +113,8 @@ class ServiceTemplateOpenApiGeneratorTest {
     ServiceTemplateEntity getServiceTemplateEntity(URL url) throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(url);
-        AvailabilityZoneSchemaValidator.validateServiceAvailability(
-                ocl.getDeployment().getServiceAvailability());
+        AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
+                ocl.getDeployment().getServiceAvailabilityConfigs());
         DeployVariableSchemaValidator.validateDeployVariable(
                 ocl.getDeployment().getVariables());
         ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =

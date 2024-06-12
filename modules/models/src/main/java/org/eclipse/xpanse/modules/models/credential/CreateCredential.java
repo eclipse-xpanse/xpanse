@@ -9,11 +9,13 @@ package org.eclipse.xpanse.modules.models.credential;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * Create credential model.
@@ -41,7 +43,9 @@ public class CreateCredential {
     private CredentialType type;
 
     @NotNull
-    @Schema(description = "The variables list of the credential")
+    @NotEmpty
+    @UniqueElements
+    @Schema(description = "The variables list of the credential. The list elements must be unique.")
     private List<CredentialVariable> variables;
 
     @NotNull

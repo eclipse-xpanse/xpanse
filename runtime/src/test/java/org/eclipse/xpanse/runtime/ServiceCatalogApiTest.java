@@ -124,8 +124,8 @@ class ServiceCatalogApiTest extends ApisTestCommon {
                     return flavorBasic;
                 }).toList();
         userOrderableServiceVo.setFlavors(flavorBasics);
-        userOrderableServiceVo.setServiceAvailability(serviceTemplateDetailVo.getDeployment()
-                .getServiceAvailability());
+        userOrderableServiceVo.setServiceAvailabilityConfigs(serviceTemplateDetailVo.getDeployment()
+                .getServiceAvailabilityConfigs());
         userOrderableServiceVo.add(
                 Link.of(String.format("http://localhost/xpanse/catalog/services/%s/openapi",
                         serviceTemplateDetailVo.getServiceTemplateId().toString()), "openApi"));

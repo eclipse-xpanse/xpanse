@@ -7,13 +7,16 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -32,14 +35,21 @@ public class Deployment implements Serializable {
 
     @Valid
     @NotNull
-    @Schema(description = "The variables for the deployment, which will be passed to the deployer")
+    @NotEmpty
+    @UniqueElements
+    @Schema(description = "The variables for the deployment, which will be passed to the deployer."
+            + "The list elements must be unique.")
     private List<DeployVariable> variables;
 
     @Schema(description = "The credential type to do the deployment")
     private CredentialType credentialType = CredentialType.VARIABLES;
 
-    @Schema(description = "The list of availability zones of the service.")
-    private List<AvailabilityZoneConfig> serviceAvailability;
+    @Valid
+    @Size(min = 1)
+    @UniqueElements
+    @Schema(description = "The list of availability zone configuration of the service."
+            + "The list elements must be unique.")
+    private List<AvailabilityZoneConfig> serviceAvailabilityConfigs;
 
     @Schema(description = "The real deployer, something like terraform scripts. "
             + "Either deployer or deployFromGitRepo must be provided.")

@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * Defines for the Cloud Service Provider.
@@ -29,7 +30,10 @@ public class CloudServiceProvider implements Serializable {
     private Csp name;
 
     @Valid
+    @NotNull
     @NotEmpty
-    @Schema(description = "The regions of the Cloud Service Provider")
+    @UniqueElements
+    @Schema(description = "The regions of the Cloud Service Provider. "
+            + "The list elements must be unique.")
     private List<Region> regions;
 }

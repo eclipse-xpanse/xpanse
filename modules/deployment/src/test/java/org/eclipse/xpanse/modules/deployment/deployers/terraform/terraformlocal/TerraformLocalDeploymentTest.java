@@ -143,21 +143,22 @@ class TerraformLocalDeploymentTest {
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
         Map<String, String> availabilityZones = new HashMap<>();
-        ocl.getDeployment().getServiceAvailability().forEach(
+        ocl.getDeployment().getServiceAvailabilityConfigs().forEach(
                 availabilityZoneConfig -> availabilityZones.put(availabilityZoneConfig.getVarName(),
                         availabilityZoneConfig.getDisplayName()));
         deployRequest.setAvailabilityZones(availabilityZones);
         return deployRequest;
     }
 
-    String getFileContent(String fileName) {
+    String getFileContent() {
         String content = "";
         try {
-            ClassPathResource classPathResource = new ClassPathResource(fileName);
+            ClassPathResource classPathResource = new ClassPathResource(
+                    TerraformLocalDeployment.STATE_FILE_NAME);
             InputStream inputStream = classPathResource.getInputStream();
             content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log.error("Failed to read file: {}", fileName, e);
+            log.error("Failed to read file: {}", TerraformLocalDeployment.STATE_FILE_NAME, e);
         }
         return content;
     }
@@ -190,7 +191,7 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testModify() {
-        String tfState = getFileContent(STATE_FILE_NAME);
+        String tfState = getFileContent();
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
@@ -219,7 +220,7 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testDestroy() {
-        String tfState = getFileContent(STATE_FILE_NAME);
+        String tfState = getFileContent();
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(

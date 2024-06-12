@@ -228,8 +228,8 @@ public class ServiceTemplateManage {
 
     private void validateServiceDeployment(Deployment deployment,
                                            ServiceTemplateEntity serviceTemplate) {
-        AvailabilityZoneSchemaValidator.validateServiceAvailability(
-                deployment.getServiceAvailability());
+        AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
+                deployment.getServiceAvailabilityConfigs());
         DeployVariableSchemaValidator.validateDeployVariable(deployment.getVariables());
         JsonObjectSchema jsonObjectSchema =
                 serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(

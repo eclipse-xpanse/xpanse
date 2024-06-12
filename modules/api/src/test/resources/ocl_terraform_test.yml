@@ -128,11 +128,11 @@ flavors:
     isServiceInterrupted: true
   isDowngradeAllowed: true
 serviceProviderContactDetails:
-  email: [ "test@test.com" ]
+  emails: [ "test@test.com" ]
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: terraform
-  serviceAvailability:
+  serviceAvailabilityConfigs:
     - displayName: Availability Zone
       varName: availability_zone
       mandatory: false

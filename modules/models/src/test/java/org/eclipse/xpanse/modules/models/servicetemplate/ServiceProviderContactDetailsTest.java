@@ -8,28 +8,28 @@ import org.junit.jupiter.api.Test;
 
 class ServiceProviderContactDetailsTest {
 
-    private final List<String> email = List.of("test@email");
-    private final List<String> phone = List.of("110000000");
-    private final List<String> chat = List.of("chat");
-    private final List<String> website = List.of("website");
+    private final List<String> emails = List.of("test@email");
+    private final List<String> phones = List.of("110000000");
+    private final List<String> chats = List.of("chat");
+    private final List<String> websites = List.of("website");
 
     private ServiceProviderContactDetails test;
 
     @BeforeEach
     void setUp() throws Exception {
         test = new ServiceProviderContactDetails();
-        test.setEmail(email);
-        test.setPhone(phone);
-        test.setChat(chat);
-        test.setWebsite(website);
+        test.setEmails(emails);
+        test.setPhones(phones);
+        test.setChats(chats);
+        test.setWebsites(websites);
     }
 
     @Test
     void testGetters() {
-        assertThat(test.getEmail()).isEqualTo(email);
-        assertThat(test.getPhone()).isEqualTo(phone);
-        assertThat(test.getChat()).isEqualTo(chat);
-        assertThat(test.getWebsite()).isEqualTo(website);
+        assertThat(test.getEmails()).isEqualTo(emails);
+        assertThat(test.getPhones()).isEqualTo(phones);
+        assertThat(test.getChats()).isEqualTo(chats);
+        assertThat(test.getWebsites()).isEqualTo(websites);
     }
 
     @Test
@@ -41,10 +41,10 @@ class ServiceProviderContactDetailsTest {
         assertThat(test).isNotEqualTo(test1);
         assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
         ServiceProviderContactDetails test2 = new ServiceProviderContactDetails();
-        test2.setEmail(email);
-        test2.setPhone(phone);
-        test2.setChat(chat);
-        test2.setWebsite(website);
+        test2.setEmails(emails);
+        test2.setPhones(phones);
+        test2.setChats(chats);
+        test2.setWebsites(websites);
         assertThat(test).isEqualTo(test2);
         assertThat(test.hashCode()).isEqualTo(test2.hashCode());
     }
@@ -57,9 +57,9 @@ class ServiceProviderContactDetailsTest {
 
     @Test
     void testToString() throws Exception {
-        String result = "ServiceProviderContactDetails(email=" + email
-                + ", phone=" + phone + ", chat=" + chat
-                + ", website=" + website + ")";
+        String result = "ServiceProviderContactDetails(emails=" + emails
+                + ", phones=" + phones + ", chats=" + chats
+                + ", websites=" + websites + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 

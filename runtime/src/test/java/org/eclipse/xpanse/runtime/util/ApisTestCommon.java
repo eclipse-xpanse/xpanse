@@ -364,7 +364,7 @@ public class ApisTestCommon {
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
         Map<String, String> availabilityZones = new HashMap<>();
-        serviceTemplate.getDeployment().getServiceAvailability().forEach(
+        serviceTemplate.getDeployment().getServiceAvailabilityConfigs().forEach(
                 availabilityZoneConfig -> availabilityZones.put(availabilityZoneConfig.getVarName(),
                         availabilityZoneConfig.getDisplayName()));
         deployRequest.setAvailabilityZones(availabilityZones);
