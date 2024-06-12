@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
@@ -346,12 +347,15 @@ public class ServiceDeployerApi {
             @Parameter(name = "cspName", description = "name of the cloud service provider")
             @RequestParam(name = "cspName") Csp csp,
             @Parameter(name = "regionName", description = "name of the region")
-            @RequestParam(name = "regionName") String regionName) {
+            @RequestParam(name = "regionName") String regionName,
+            @Parameter(name = "serviceId", description = "id of the deployed service")
+            @RequestParam(name = "serviceId", required = false) String serviceId) {
 
+        UUID uuid = StringUtils.isBlank(serviceId) ? null : UUID.fromString(serviceId);
         String currentUserId = this.userServiceHelper.getCurrentUserId();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
         List<String> availabilityZones = orchestratorPlugin.getAvailabilityZonesOfRegion(
-                currentUserId, regionName);
+                currentUserId, regionName, uuid);
         CacheControl cacheControl =
                 CacheControl.maxAge(duration, TimeUnit.MINUTES).mustRevalidate();
         return ResponseEntity.ok().cacheControl(cacheControl).body(availabilityZones);

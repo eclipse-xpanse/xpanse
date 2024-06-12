@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 
@@ -34,7 +35,7 @@ public interface ServiceResourceHandler {
      * @return the existing resources names with the specified kind.
      */
     List<String> getExistingResourceNamesWithKind(String userId, String region,
-            DeployResourceKind kind);
+                                                  DeployResourceKind kind);
 
 
     /**
@@ -44,5 +45,5 @@ public interface ServiceResourceHandler {
      * @param region region.
      * @return the availability zones of the specified region.
      */
-    List<String> getAvailabilityZonesOfRegion(String userId, String region);
+    List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId);
 }

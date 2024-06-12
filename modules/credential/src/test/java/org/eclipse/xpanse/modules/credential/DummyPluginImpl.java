@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.extern.java.Log;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -48,7 +49,8 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     }
 
     @Override
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region,
+                                                     UUID serviceId) {
         return new ArrayList<>();
     }
 
