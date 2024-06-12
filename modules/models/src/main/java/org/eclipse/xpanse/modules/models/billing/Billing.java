@@ -6,12 +6,14 @@
 package org.eclipse.xpanse.modules.models.billing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
+import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * Defines the billing model of the managed service.
@@ -23,7 +25,10 @@ public class Billing implements Serializable {
     private static final long serialVersionUID = 240913796673011260L;
 
     @NotNull
-    @Schema(description = "Supported billing modes by the managed service")
+    @NotEmpty
+    @UniqueElements
+    @Schema(description = "Supported billing modes by the managed service. "
+            + "The list elements must be unique.")
     private List<BillingMode> billingModes;
 
     @Schema(description = " This is used only for display purposes. When provided, this "

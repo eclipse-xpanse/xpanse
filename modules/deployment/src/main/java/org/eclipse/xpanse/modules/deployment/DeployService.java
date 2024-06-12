@@ -128,7 +128,7 @@ public class DeployService {
 
         AvailabilityZonesRequestValidator.validateAvailabilityZones(
                 deployRequest.getAvailabilityZones(),
-                existingServiceTemplate.getOcl().getDeployment().getServiceAvailability());
+                existingServiceTemplate.getOcl().getDeployment().getServiceAvailabilityConfigs());
 
         deployRequest.setServiceId(UUID.randomUUID());
         if (StringUtils.isEmpty(deployRequest.getCustomerServiceName())) {

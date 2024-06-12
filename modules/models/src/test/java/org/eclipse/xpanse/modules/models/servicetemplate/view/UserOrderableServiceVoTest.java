@@ -48,7 +48,7 @@ class UserOrderableServiceVoTest {
     @Mock
     private ServiceProviderContactDetails mockServiceProviderContactDetails;
     @Mock
-    private List<AvailabilityZoneConfig> mockServiceAvailability;
+    private List<AvailabilityZoneConfig> mockServiceAvailabilityConfigs;
     private UserOrderableServiceVo test;
 
     @BeforeEach
@@ -67,7 +67,7 @@ class UserOrderableServiceVoTest {
         test.setBilling(mockBilling);
         test.setServiceHostingType(mockServiceHostingType);
         test.setServiceProviderContactDetails(mockServiceProviderContactDetails);
-        test.setServiceAvailability(mockServiceAvailability);
+        test.setServiceAvailabilityConfigs(mockServiceAvailabilityConfigs);
         test.setEula(eula);
     }
 
@@ -87,7 +87,7 @@ class UserOrderableServiceVoTest {
         assertThat(test.getServiceHostingType()).isEqualTo(mockServiceHostingType);
         assertThat(test.getServiceProviderContactDetails()).isEqualTo(
                 mockServiceProviderContactDetails);
-        assertThat(test.getServiceAvailability()).isEqualTo(mockServiceAvailability);
+        assertThat(test.getServiceAvailabilityConfigs()).isEqualTo(mockServiceAvailabilityConfigs);
         assertThat(test.getEula()).isEqualTo(eula);
     }
 
@@ -108,16 +108,16 @@ class UserOrderableServiceVoTest {
 
     @Test
     void testToString() {
-        String expectedToString =
-                "UserOrderableServiceVo(" + "serviceTemplateId=" + id + ", " + "category=" + mockCategory + ", "
-                        + "name=" + name + ", " + "version=" + version + ", " + "csp=" + mockCsp
-                        + ", " + "regions=" + mockRegions + ", " + "description=" + description
-                        + ", " + "icon=" + icon + ", " + "variables=" + mockVariables + ", "
-                        + "flavors=" + mockFlavors + ", " + "billing=" + mockBilling + ", "
-                        + "serviceHostingType=" + mockServiceHostingType + ", "
-                        + "serviceProviderContactDetails=" + mockServiceProviderContactDetails
-                        + ", " + "serviceAvailability=" + mockServiceAvailability + ", " + "eula="
-                        + eula + ")";
+        String expectedToString = "UserOrderableServiceVo(serviceTemplateId=" + id
+                + ", category=" + mockCategory
+                + ", name=" + name + ", version=" + version + ", csp=" + mockCsp
+                + ", regions=" + mockRegions + ", description=" + description
+                + ", icon=" + icon + ", variables=" + mockVariables
+                + ", flavors=" + mockFlavors + ", billing=" + mockBilling
+                + ", serviceHostingType=" + mockServiceHostingType
+                + ", serviceProviderContactDetails=" + mockServiceProviderContactDetails
+                + ", serviceAvailabilityConfigs=" + mockServiceAvailabilityConfigs
+                + ", eula=" + eula + ")";
         assertEquals(expectedToString, test.toString());
     }
 }

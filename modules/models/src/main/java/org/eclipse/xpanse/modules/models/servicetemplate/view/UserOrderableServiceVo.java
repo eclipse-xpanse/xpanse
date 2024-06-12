@@ -91,8 +91,8 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
     @Schema(description = "The contact details of the service provider.")
     private ServiceProviderContactDetails serviceProviderContactDetails;
 
-    @Schema(description = "The list of availability zones of the service.")
-    private List<AvailabilityZoneConfig> serviceAvailability;
+    @Schema(description = "The list of availability zone configuration of the service.")
+    private List<AvailabilityZoneConfig> serviceAvailabilityConfigs;
 
     @Schema(description = "End user license agreement content of the service.")
     private String eula;

@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 
 class AvailabilityZoneSchemaValidatorTest {
     @Test
-    void testValidateServiceAvailability() {
+    void testValidateServiceAvailabilities() {
         // Setup
         final List<AvailabilityZoneConfig> availabilityZones = new ArrayList<>();
         // Run the test
         Assertions.assertThrows(InvalidValueSchemaException.class, () ->
-                AvailabilityZoneSchemaValidator.validateServiceAvailability(availabilityZones));
+                AvailabilityZoneSchemaValidator.validateServiceAvailabilities(availabilityZones));
 
         final AvailabilityZoneConfig availabilityZoneConfig = new AvailabilityZoneConfig();
         availabilityZoneConfig.setDisplayName("displayName");
@@ -25,7 +25,7 @@ class AvailabilityZoneSchemaValidatorTest {
 
         // Run the test
         Assertions.assertDoesNotThrow(() ->
-                AvailabilityZoneSchemaValidator.validateServiceAvailability(availabilityZones));
+                AvailabilityZoneSchemaValidator.validateServiceAvailabilities(availabilityZones));
 
         final AvailabilityZoneConfig availabilityZoneConfig1 = new AvailabilityZoneConfig();
         availabilityZoneConfig1.setDisplayName("displayName1");
@@ -36,6 +36,6 @@ class AvailabilityZoneSchemaValidatorTest {
         availabilityZones.add(availabilityZoneConfig1);
         // Run the test
         Assertions.assertThrows(InvalidValueSchemaException.class, () ->
-                AvailabilityZoneSchemaValidator.validateServiceAvailability(availabilityZones));
+                AvailabilityZoneSchemaValidator.validateServiceAvailabilities(availabilityZones));
     }
 }

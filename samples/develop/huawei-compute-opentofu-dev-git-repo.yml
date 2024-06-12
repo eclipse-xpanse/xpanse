@@ -183,11 +183,11 @@ flavors:
   isDowngradeAllowed: true
 # The contact details of the service.
 serviceProviderContactDetails:
-  email: [ "test@test.com" ]
+  emails: [ "test@test.com" ]
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: opentofu
-  serviceAvailability:
+  serviceAvailabilityConfigs:
     - displayName: Availability Zone
       varName: availability_zone
       mandatory: false

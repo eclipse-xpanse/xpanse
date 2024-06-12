@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.models.policy.servicepolicy;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ public class ServicePolicyUpdateRequest {
     /**
      * The flavor name list which the policy belongs to.
      */
+    @Size(min = 1)
     @Schema(description =
             "The flavor name list which the policy belongs to. If the list is empty, then the "
                     + "policy will be executed for during service deployment of all flavors.")

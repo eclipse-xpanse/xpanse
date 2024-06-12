@@ -6,10 +6,17 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.GitRepoCloneException;
 import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
@@ -21,6 +28,7 @@ import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,6 +46,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class CommonExceptionHandler {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     /**
      * Exception handler for MethodArgumentNotValidException.
      */
@@ -49,7 +59,24 @@ public class CommonExceptionHandler {
         BindingResult bindingResult = ex.getBindingResult();
         List<String> errors = new ArrayList<>();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            errors.add(fieldError.getField() + ":" + fieldError.getDefaultMessage());
+            String errorMsg = fieldError.getField() + ": " + fieldError.getDefaultMessage();
+            Object values = fieldError.getRejectedValue();
+            if (Objects.nonNull(fieldError.getCodes())) {
+                List<String> errorCodeList = Arrays.asList(fieldError.getCodes());
+                String annotationName = errorCodeList.getLast();
+                if (StringUtils.equals(annotationName, "UniqueElements")) {
+                    if (Objects.nonNull(values) && values instanceof List) {
+                        String errorValues = findDuplicatesItemsString((List<Object>) values);
+                        errorMsg = fieldError.getField() + " with duplicate items: " + errorValues
+                                + ". Violating constraint " + annotationName;
+                    }
+                } else {
+                    errorMsg = fieldError.getField() + " with invalid value: " + values
+                            + ". Violating constraint " + annotationName;
+                }
+            }
+            errors.add(errorMsg);
+            errors.sort(String::compareTo);
         }
         return Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY, errors);
     }
@@ -108,8 +135,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({ResponseInvalidException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
-    public Response handleResponseInvalidException(
-            ResponseInvalidException ex) {
+    public Response handleResponseInvalidException(ResponseInvalidException ex) {
         return Response.errorResponse(ResultType.INVALID_RESPONSE, ex.getErrorReasons());
     }
 
@@ -119,8 +145,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({XpanseUnhandledException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public Response handleXpanseUnhandledException(
-            XpanseUnhandledException ex) {
+    public Response handleXpanseUnhandledException(XpanseUnhandledException ex) {
         return Response.errorResponse(ResultType.UNHANDLED_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
@@ -131,8 +156,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({AccessDeniedException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    public Response handleAccessDeniedException(
-            AccessDeniedException ex) {
+    public Response handleAccessDeniedException(AccessDeniedException ex) {
         return Response.errorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList(ex.getMessage()));
     }
@@ -155,8 +179,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({UnsupportedEnumValueException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
-    public Response handleUnsupportedEnumValueException(
-            UnsupportedEnumValueException ex) {
+    public Response handleUnsupportedEnumValueException(UnsupportedEnumValueException ex) {
         return Response.errorResponse(ResultType.UNSUPPORTED_ENUM_VALUE,
                 Collections.singletonList(ex.getMessage()));
     }
@@ -179,8 +202,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({UserNotLoggedInException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public Response handleUserNoLoginException(
-            UserNotLoggedInException ex) {
+    public Response handleUserNoLoginException(UserNotLoggedInException ex) {
         return Response.errorResponse(ResultType.USER_NO_LOGIN_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
@@ -195,5 +217,34 @@ public class CommonExceptionHandler {
         String failMessage = ex.getMessage();
         return Response.errorResponse(ResultType.INVALID_GIT_REPO_DETAILS,
                 Collections.singletonList(failMessage));
+    }
+
+    private String findDuplicatesItemsString(List<Object> list) {
+        if (!CollectionUtils.isEmpty(list)) {
+            List<Object> duplicates = new ArrayList<>();
+            Set<Object> set = new HashSet<>();
+            for (Object item : list) {
+                if (set.contains(item)) {
+                    duplicates.add(item);
+                } else {
+                    set.add(item);
+                }
+            }
+            if (!CollectionUtils.isEmpty(duplicates)) {
+                List<String> duplicatesItems = new ArrayList<>();
+                duplicates.forEach(item -> duplicatesItems.add(getItemString(item)));
+                return duplicatesItems.toString();
+            }
+        }
+        return StringUtils.EMPTY;
+    }
+
+    private String getItemString(Object item) {
+        try {
+            return objectMapper.writeValueAsString(item);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to convert item to json string:{}", item, e);
+            return item.toString();
+        }
     }
 }

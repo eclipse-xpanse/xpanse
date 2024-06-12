@@ -132,11 +132,14 @@ flavors:
     isServiceInterrupted: true
   isDowngradeAllowed: true
 serviceProviderContactDetails:
-  email: [ "test@test.com" ]
+  emails: [ "test30@test.com","test31@test.com" ]
+  phones: [ "011-13422222222","022-13344444444" ]
+  chats: [ "test1234","test1235" ]
+  websites: [ "https://hw.com","https://hwcloud.com" ]
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: terraform
-  serviceAvailability:
+  serviceAvailabilityConfigs:
     - displayName: Availability Zone
       varName: availability_zone
       mandatory: false

@@ -25,8 +25,8 @@ public class AvailabilityZoneSchemaValidator {
      *
      * @param availabilityZones The availability zone config list.
      */
-    public static void validateServiceAvailability(List<AvailabilityZoneConfig> availabilityZones) {
-
+    public static void validateServiceAvailabilities(
+            List<AvailabilityZoneConfig> availabilityZones) {
         if (Objects.isNull(availabilityZones)) {
             return;
         }

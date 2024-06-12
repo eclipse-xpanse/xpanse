@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
+import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * Defines for service flavors with price.
@@ -17,9 +18,10 @@ import lombok.Data;
 @Data
 public class FlavorsWithPrice {
 
-    @NotNull
     @Valid
-    @Schema(description = "The flavors of the managed service.")
+    @NotNull
+    @UniqueElements
+    @Schema(description = "The flavors of the managed service. The list elements must be unique.")
     List<ServiceFlavorWithPrice> serviceFlavors;
 
     @NotNull

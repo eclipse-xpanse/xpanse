@@ -7,6 +7,7 @@ package org.eclipse.xpanse.modules.models.credential;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Getter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -15,13 +16,14 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 /**
  * List credential definition that can be provided from end user.
  */
+@Getter
 public class CredentialVariables extends AbstractCredentialInfo {
 
     /**
      * The variables list of the credential.
      */
-    @Getter
     @NotNull
+    @Size(min = 1)
     @Schema(description = "The variables list of the credential.")
     private final List<CredentialVariable> variables;
 

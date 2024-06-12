@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.modules.models.billing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ public class ResourceUsage implements Serializable {
     private static final long serialVersionUID = 240913796673011260L;
 
     @NotNull
+    @NotEmpty
     @Schema(description = "The resources of the flavor of the manged service.")
     private List<Resource> resources;
 

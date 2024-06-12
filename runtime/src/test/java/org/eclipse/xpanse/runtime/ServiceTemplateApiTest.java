@@ -8,6 +8,7 @@ package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -35,6 +36,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
@@ -42,6 +44,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
@@ -52,6 +55,7 @@ import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.semver4j.Semver;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -143,7 +147,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(serviceTemplateDetailVo.getServiceTemplateId(), updatedServiceTemplateDetailVo.getServiceTemplateId());
+        assertEquals(serviceTemplateDetailVo.getServiceTemplateId(),
+                updatedServiceTemplateDetailVo.getServiceTemplateId());
 
 
         // Setup unregister request
@@ -205,7 +210,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
-        assertEquals(serviceTemplateDetailVo.getServiceTemplateId(), updatedServiceTemplateDetailVo.getServiceTemplateId());
+        assertEquals(serviceTemplateDetailVo.getServiceTemplateId(),
+                updatedServiceTemplateDetailVo.getServiceTemplateId());
 
         serviceTemplateStorage.removeById(id);
     }
@@ -341,15 +347,33 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setBilling(null);
-        Response expectedResponse = Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY,
-                Collections.singletonList("billing:must not be null"));
+        ocl.setCategory(null);
+        BillingMode duplicateBillingMode = ocl.getBilling().getBillingModes().getFirst();
+        ocl.getBilling().getBillingModes().add(duplicateBillingMode);
+        Region duplicateRegion = ocl.getCloudServiceProvider().getRegions().getFirst();
+        ocl.getCloudServiceProvider().getRegions().add(duplicateRegion);
+        AvailabilityZoneConfig duplicateAvailabilityZoneConfig =
+                ocl.getDeployment().getServiceAvailabilityConfigs().getFirst();
+        ocl.getDeployment().getServiceAvailabilityConfigs().add(duplicateAvailabilityZoneConfig);
+        DeployVariable duplicateDeployVariable = ocl.getDeployment().getVariables().getFirst();
+        ocl.getDeployment().getVariables().add(duplicateDeployVariable);
+        ServiceFlavorWithPrice duplicateFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
+        ocl.getFlavors().getServiceFlavors().add(duplicateFlavor);
+        String duplicateEmail = ocl.getServiceProviderContactDetails().getEmails().getFirst();
+        ocl.getServiceProviderContactDetails().getEmails().add(duplicateEmail);
+        String duplicatePhone = ocl.getServiceProviderContactDetails().getPhones().getFirst();
+        ocl.getServiceProviderContactDetails().getPhones().add(duplicatePhone);
+        String duplicateWebsite = ocl.getServiceProviderContactDetails().getWebsites().getFirst();
+        ocl.getServiceProviderContactDetails().getWebsites().add(duplicateWebsite);
+        String duplicateAddress = ocl.getServiceProviderContactDetails().getChats().getFirst();
+        ocl.getServiceProviderContactDetails().getChats().add(duplicateAddress);
         // Run the test
         final MockHttpServletResponse response = register(ocl);
+        Response result = objectMapper.readValue(response.getContentAsString(), Response.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
-        assertEquals(objectMapper.writeValueAsString(expectedResponse),
-                response.getContentAsString());
+        assertEquals(result.getResultType(), ResultType.UNPROCESSABLE_ENTITY);
+        assertFalse(result.getDetails().isEmpty());
     }
 
     void testRegisterThrowsPluginNotFoundException() throws Exception {
@@ -391,8 +415,10 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
-        ocl.getDeployment().setServiceAvailability(null);
-        DeployVariable deployVariableWithRepeatName = ocl.getDeployment().getVariables().getLast();
+        ocl.getDeployment().setServiceAvailabilityConfigs(null);
+        DeployVariable deployVariable = ocl.getDeployment().getVariables().getLast();
+        DeployVariable deployVariableWithRepeatName = new DeployVariable();
+        BeanUtils.copyProperties(deployVariable, deployVariableWithRepeatName);
         deployVariableWithRepeatName.setValue("newValue");
         ocl.getDeployment().getVariables().add(deployVariableWithRepeatName);
 
@@ -414,9 +440,13 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl2 = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         AvailabilityZoneConfig availabilityZoneConfig =
-                ocl2.getDeployment().getServiceAvailability().getFirst();
-        availabilityZoneConfig.setDisplayName("newDisplayName");
-        ocl2.getDeployment().getServiceAvailability().add(availabilityZoneConfig);
+                ocl2.getDeployment().getServiceAvailabilityConfigs().getFirst();
+        AvailabilityZoneConfig availabilityZoneConfigWithRepeatName =
+                new AvailabilityZoneConfig();
+        BeanUtils.copyProperties(availabilityZoneConfig, availabilityZoneConfigWithRepeatName);
+        availabilityZoneConfigWithRepeatName.setDisplayName("newDisplayName");
+        ocl2.getDeployment().getServiceAvailabilityConfigs()
+                .add(availabilityZoneConfigWithRepeatName);
 
         String errorMessage2 = String.format(
                 "The availability zone configuration list with duplicated variable name %s",
@@ -535,7 +565,10 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ServiceFlavorWithPrice duplicatedFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
+        ServiceFlavorWithPrice favor = ocl.getFlavors().getServiceFlavors().getFirst();
+        ServiceFlavorWithPrice duplicatedFlavor = new ServiceFlavorWithPrice();
+        BeanUtils.copyProperties(favor, duplicatedFlavor);
+        duplicatedFlavor.setFeatures(List.of("Feature"));
         ocl.getFlavors().getServiceFlavors().add(duplicatedFlavor);
         String duplicatedFlavorName = duplicatedFlavor.getName();
         String errorMsg1 =
