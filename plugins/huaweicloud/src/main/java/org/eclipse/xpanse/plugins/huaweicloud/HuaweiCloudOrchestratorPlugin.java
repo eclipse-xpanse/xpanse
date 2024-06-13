@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.cache.consts.CacheNames;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
@@ -77,7 +78,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     @Cacheable(CacheNames.REGION_AZ_CACHE_NAME)
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
         return huaweiCloudResourceManager.getAvailabilityZonesOfRegion(userId, region);
     }
 

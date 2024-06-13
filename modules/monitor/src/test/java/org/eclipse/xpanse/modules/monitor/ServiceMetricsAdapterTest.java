@@ -263,7 +263,8 @@ class ServiceMetricsAdapterTest {
             }
 
             @Override
-            public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+            public List<String> getAvailabilityZonesOfRegion(String userId, String region,
+                                                             UUID serviceId) {
                 return new ArrayList<>();
             }
 

@@ -9,6 +9,7 @@ package org.eclipse.xpanse.plugins.scs.manage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -80,10 +81,10 @@ public class ScsResourceManager {
     @Retryable(retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region);
+            OSClientV3 osClient = getOsClient(userId, region, serviceId);
             osClient.networking().availabilityzone().list().forEach(
                     availabilityZone -> availabilityZoneNames.add(availabilityZone.getName()));
         } catch (Exception e) {
@@ -101,7 +102,7 @@ public class ScsResourceManager {
     private List<String> getVpcList(String userId, String region) {
         List<String> vpcNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region);
+            OSClientV3 osClient = getOsClient(userId, region, null);
             osClient.networking().network().list()
                     .forEach(network -> vpcNames.add(network.getName()));
         } catch (Exception e) {
@@ -119,7 +120,7 @@ public class ScsResourceManager {
     private List<String> getSubnetList(String userId, String region) {
         List<String> subnetNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region);
+            OSClientV3 osClient = getOsClient(userId, region, null);
             osClient.networking().subnet().list()
                     .forEach(subnet -> subnetNames.add(subnet.getName()));
         } catch (Exception e) {
@@ -137,7 +138,7 @@ public class ScsResourceManager {
     private List<String> getSecurityGroupsList(String userId, String region) {
         List<String> securityGroupNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region);
+            OSClientV3 osClient = getOsClient(userId, region, null);
             osClient.networking().securitygroup().list()
                     .forEach(securityGroup -> securityGroupNames.add(securityGroup.getName()));
         } catch (Exception e) {
@@ -155,7 +156,7 @@ public class ScsResourceManager {
     private List<String> getSecurityGroupRuleList(String userId, String region) {
         List<String> securityGroupRuleIds = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region);
+            OSClientV3 osClient = getOsClient(userId, region, null);
             osClient.networking().securityrule().list().forEach(
                     securityGroupRule -> securityGroupRuleIds.add(securityGroupRule.getId()));
         } catch (Exception e) {
@@ -173,7 +174,7 @@ public class ScsResourceManager {
     private List<String> getPublicIpList(String userId, String region) {
         List<String> publicIpAddresses = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region);
+            OSClientV3 osClient = getOsClient(userId, region, null);
             osClient.networking().floatingip().list().forEach(
                     floatingIp -> publicIpAddresses.add(floatingIp.getFloatingIpAddress()));
         } catch (Exception e) {
@@ -191,7 +192,7 @@ public class ScsResourceManager {
     private List<String> getVolumeList(String userId, String region) {
         List<String> volumeNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region);
+            OSClientV3 osClient = getOsClient(userId, region, null);
             osClient.blockStorage().volumes().list()
                     .forEach(volume -> volumeNames.add(volume.getName()));
         } catch (Exception e) {
@@ -209,7 +210,7 @@ public class ScsResourceManager {
     private List<String> getKeyPairsList(String userId, String region) {
         List<String> keyPairNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region);
+            OSClientV3 osClient = getOsClient(userId, region, null);
             osClient.compute().keypairs().list()
                     .forEach(keyPair -> keyPairNames.add(keyPair.getName()));
         } catch (Exception e) {
@@ -224,10 +225,11 @@ public class ScsResourceManager {
         return keyPairNames;
     }
 
-    private OSClient.OSClientV3 getOsClient(String userId, String region) {
+    private OSClient.OSClientV3 getOsClient(String userId, String region, UUID serviceId) {
         AbstractCredentialInfo credentialInfo =
                 credentialCenter.getCredential(Csp.SCS, CredentialType.VARIABLES, userId);
-        return scsKeystoneManager.getAuthenticatedClient(null, credentialInfo).useRegion(region);
+        return scsKeystoneManager.getAuthenticatedClient(serviceId, credentialInfo)
+                .useRegion(region);
     }
 
 }
