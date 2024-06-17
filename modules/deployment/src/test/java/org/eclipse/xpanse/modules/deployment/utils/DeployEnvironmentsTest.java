@@ -50,7 +50,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.Assertions;
@@ -307,7 +307,7 @@ class DeployEnvironmentsTest {
 
         OrchestratorPlugin plugin = new OrchestratorPlugin() {
             @Override
-            public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
+            public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
                 return null;
             }
 

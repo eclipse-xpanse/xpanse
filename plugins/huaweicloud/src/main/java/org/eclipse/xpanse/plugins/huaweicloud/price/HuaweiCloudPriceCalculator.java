@@ -34,7 +34,7 @@ import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
-import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
 import org.springframework.retry.annotation.Backoff;
@@ -72,10 +72,10 @@ public class HuaweiCloudPriceCalculator {
     @Retryable(retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
+    public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
         if (request.getBillingMode() == BillingMode.PAY_PER_USE) {
             try {
-                return getServicePriceWithPayPerUse(request);
+                return getServiceFlavorPriceWithPayPerUse(request);
             } catch (Exception e) {
                 String errorMsg = "Get service price with billingModel Pay per Use error."
                         + e.getMessage();
@@ -85,12 +85,13 @@ public class HuaweiCloudPriceCalculator {
                 throw new ClientApiCallFailedException(errorMsg);
             }
         } else {
-            return getServicePriceWithFixed(request);
+            return getServiceFlavorPriceWithFixed(request);
         }
     }
 
 
-    private FlavorPriceResult getServicePriceWithPayPerUse(ServicePriceRequest request) {
+    private FlavorPriceResult getServiceFlavorPriceWithPayPerUse(
+            ServiceFlavorPriceRequest request) {
         ResourceUsage resourceUsage = request.getFlavorRatingMode().getResourceUsage();
         AbstractCredentialInfo credential =
                 credentialCenter.getCredential(Csp.HUAWEI, CredentialType.VARIABLES,
@@ -106,7 +107,7 @@ public class HuaweiCloudPriceCalculator {
             recurringPrice = getPriceWithResourcesUsageInInternationalWebsite(
                     request, globalCredential, projectId);
         } catch (ClientRequestException e) {
-            if (e.getErrorCode().equals("CBC.0150") && e.getHttpStatusCode() == 403) {
+            if (e.getHttpStatusCode() != 200 && e.getErrorCode().startsWith("CBC.")) {
                 log.error("Calling the API of the international website to calculate the price "
                         + "failed, because the user does not belong to the website. Retrying the "
                         + "call to the chinese website to calculate the price.");
@@ -126,9 +127,10 @@ public class HuaweiCloudPriceCalculator {
         return flavorPriceResult;
     }
 
-    private Price getPriceWithResourcesUsageInInternationalWebsite(ServicePriceRequest request,
-                                                                   ICredential globalCredential,
-                                                                   String projectId) {
+    private Price getPriceWithResourcesUsageInInternationalWebsite(
+            ServiceFlavorPriceRequest request,
+            ICredential globalCredential,
+            String projectId) {
         log.info("Calling the API of the international website to calculate the price.");
         BssintlClient bssintlClient = huaweiCloudClient.getBssintlClient(globalCredential);
         ListOnDemandResourceRatingsRequest payPerUseRequest =
@@ -143,7 +145,7 @@ public class HuaweiCloudPriceCalculator {
     }
 
     private ListOnDemandResourceRatingsRequest convertToPayPerUseRequest(
-            ServicePriceRequest request, String projectId) {
+            ServiceFlavorPriceRequest request, String projectId) {
         RateOnDemandReq rateOnDemandReq = new RateOnDemandReq();
         rateOnDemandReq.setProjectId(projectId);
         rateOnDemandReq.setInquiryPrecision(0);
@@ -228,7 +230,7 @@ public class HuaweiCloudPriceCalculator {
                     Price recurringPrice = new Price();
                     recurringPrice.setCost(costPerHour);
                     recurringPrice.setCurrency(price.getCurrency());
-                    recurringPrice.setPeriod(price.getPeriod());
+                    recurringPrice.setPeriod(PricingPeriod.HOURLY);
                     flavorPriceResult.setRecurringPrice(recurringPrice);
                 }
             }
@@ -249,7 +251,7 @@ public class HuaweiCloudPriceCalculator {
         };
     }
 
-    private FlavorPriceResult getServicePriceWithFixed(ServicePriceRequest request) {
+    private FlavorPriceResult getServiceFlavorPriceWithFixed(ServiceFlavorPriceRequest request) {
         Price fixedPrice = request.getFlavorRatingMode().getFixedPrice();
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         flavorPriceResult.setRecurringPrice(fixedPrice);

@@ -13,13 +13,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.servicetemplate.price.ServicePricesManager;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Secured({ROLE_ADMIN, ROLE_USER})
 public class ServicePricingApi {
 
+    @Value("${service.flavor.price.cache.expire.time.in.minutes:60}")
+    private long duration;
+
     @Resource
     private ServicePricesManager servicePricesManager;
 
@@ -53,7 +60,7 @@ public class ServicePricingApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the price of one specific flavor of the service.")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public FlavorPriceResult getServicePriceByFlavor(
+    public ResponseEntity<FlavorPriceResult> getServicePriceByFlavor(
             @Parameter(name = "templateId", description = "id of the service template")
             @PathVariable(name = "templateId") String templateId,
             @Parameter(name = "region", description = "region name of the service")
@@ -62,8 +69,9 @@ public class ServicePricingApi {
             @PathVariable("billingMode") BillingMode billingMode,
             @Parameter(name = "flavorName", description = "flavor name of the service")
             @PathVariable("flavorName") String flavorName) {
-        return servicePricesManager.getServicePriceByFlavor(templateId, region,
-                billingMode, flavorName);
+        FlavorPriceResult flavorPriceResult = servicePricesManager
+                .getServicePriceByFlavor(templateId, region, billingMode, flavorName);
+        return ResponseEntity.ok().cacheControl(getCacheControl()).body(flavorPriceResult);
     }
 
 
@@ -77,15 +85,22 @@ public class ServicePricingApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the prices of all flavors of the service")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public List<FlavorPriceResult> getPricesByService(
+    public ResponseEntity<List<FlavorPriceResult>> getPricesByService(
             @Parameter(name = "templateId", description = "id of the service template")
             @PathVariable(name = "templateId") String templateId,
             @Parameter(name = "region", description = "region name of the service")
             @PathVariable(name = "region") String region,
             @Parameter(name = "billingMode", description = "mode of billing")
             @PathVariable("billingMode") BillingMode billingMode) {
-        return servicePricesManager.getPricesByService(templateId, region, billingMode);
+        List<FlavorPriceResult> allFlavorPriceResult =
+                servicePricesManager.getPricesByService(templateId, region, billingMode);
+        return ResponseEntity.ok().cacheControl(getCacheControl()).body(allFlavorPriceResult);
     }
 
+
+    private CacheControl getCacheControl() {
+        long durationTime = this.duration > 0 ? this.duration : 60;
+        return CacheControl.maxAge(durationTime, TimeUnit.MINUTES).mustRevalidate();
+    }
 
 }

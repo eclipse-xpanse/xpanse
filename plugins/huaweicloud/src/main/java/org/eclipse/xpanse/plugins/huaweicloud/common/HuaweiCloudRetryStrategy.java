@@ -43,7 +43,7 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
      */
     @Value("${http.request.retry.max.attempts:5}")
     public void setRetryAttempts(int maxAttempts) {
-        if (retryMaxAttempts <= 0) {
+        if (maxAttempts <= 0) {
             retryMaxAttempts = DEFAULT_RETRY_ATTEMPTS;
             log.warn("The retry max attempts is invalid, use default value {}",
                     DEFAULT_RETRY_ATTEMPTS);

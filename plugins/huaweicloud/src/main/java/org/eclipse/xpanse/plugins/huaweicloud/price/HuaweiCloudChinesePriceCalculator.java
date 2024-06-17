@@ -20,7 +20,7 @@ import org.eclipse.xpanse.modules.models.billing.Price;
 import org.eclipse.xpanse.modules.models.billing.Resource;
 import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
-import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
 import org.springframework.stereotype.Component;
@@ -41,14 +41,14 @@ public class HuaweiCloudChinesePriceCalculator {
     /**
      * Get the price of the service in the chinese website.
      *
-     * @param request          ServicePriceRequest
+     * @param request          ServiceFlavorPriceRequest
      * @param globalCredential globalCredential
      * @param projectId        projectId
      * @return Price in the international website.
      */
-    public Price getPriceWithResourcesUsageInChineseWebsite(ServicePriceRequest request,
-                                                ICredential globalCredential,
-                                                String projectId) {
+    public Price getPriceWithResourcesUsageInChineseWebsite(ServiceFlavorPriceRequest request,
+                                                            ICredential globalCredential,
+                                                            String projectId) {
         log.info("Calling the API of the Chinese website to calculate the price.");
         BssClient bssClient = huaweiCloudClient.getBssClient(globalCredential);
         ListOnDemandResourceRatingsRequest payPerUseRequest =
@@ -63,7 +63,7 @@ public class HuaweiCloudChinesePriceCalculator {
     }
 
     private ListOnDemandResourceRatingsRequest convertToPayPerUseRequest(
-            ServicePriceRequest request, String projectId) {
+            ServiceFlavorPriceRequest request, String projectId) {
         RateOnDemandReq rateOnDemandReq = new RateOnDemandReq();
         rateOnDemandReq.setProjectId(projectId);
         rateOnDemandReq.setInquiryPrecision(0);

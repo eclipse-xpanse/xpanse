@@ -13,5 +13,5 @@ import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
  */
 public interface ServicePriceCalculator {
 
-    FlavorPriceResult getServicePrice(ServicePriceRequest request);
+    FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request);
 }
