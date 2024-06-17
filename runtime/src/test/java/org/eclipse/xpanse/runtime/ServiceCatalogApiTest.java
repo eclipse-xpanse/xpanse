@@ -11,12 +11,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import jakarta.transaction.Transactional;
+import java.io.File;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.awaitility.Awaitility;
+import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
@@ -30,6 +34,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.Link;
@@ -49,6 +54,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @AutoConfigureMockMvc
 class ServiceCatalogApiTest extends ApisTestCommon {
 
+    @Autowired
+    private OpenApiGeneratorJarManage openApiGeneratorJarManage;
+
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testServiceCatalogServices() throws Exception {
@@ -56,6 +64,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceCatalogApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        waitUntilServiceTemplateFilesAreFullyGenerated(serviceTemplate.getServiceTemplateId().toString());
         testGetOrderableServiceDetailsThrowsException(serviceTemplate);
         testOpenApi(serviceTemplate);
         testListOrderableServices(serviceTemplate);
@@ -237,5 +246,12 @@ class ServiceCatalogApiTest extends ApisTestCommon {
             getRequestBuilder = getRequestBuilder.param("serviceHostingType", serviceHostingType);
         }
         return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
+    }
+
+    private void waitUntilServiceTemplateFilesAreFullyGenerated(String serviceTemplateId) {
+        String openApiDir = this.openApiGeneratorJarManage.getOpenApiWorkdir();
+        File yamlFile = new File(openApiDir, serviceTemplateId);
+        File htmlFile = new File(openApiDir, serviceTemplateId + ".html");
+        Awaitility.await().atMost(20, TimeUnit.SECONDS).until(() -> !yamlFile.exists() && htmlFile.exists());
     }
 }
