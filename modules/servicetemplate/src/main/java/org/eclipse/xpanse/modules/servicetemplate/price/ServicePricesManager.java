@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.stereotype.Service;
 
@@ -64,11 +64,13 @@ public class ServicePricesManager {
         RatingMode flavorPriceMode =
                 getServiceFlavorRatingMode(serviceTemplate, flavorName);
         validateFlavorPriceMode(flavorPriceMode, billingMode);
-        ServicePriceRequest servicePriceRequest =
-                getServicePriceRequest(flavorPriceMode, region, billingMode);
+        ServiceFlavorPriceRequest serviceFlavorPriceRequest =
+                getServiceFlavorPriceRequest(templateId, flavorName, flavorPriceMode, region,
+                        billingMode);
         Csp csp = serviceTemplate.getCsp();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        FlavorPriceResult priceResult = orchestratorPlugin.getServicePrice(servicePriceRequest);
+        FlavorPriceResult priceResult =
+                orchestratorPlugin.getServiceFlavorPrice(serviceFlavorPriceRequest);
         priceResult.setFlavorName(flavorName);
         priceResult.setBillingMode(billingMode);
         priceResult.setSuccessful(true);
@@ -94,8 +96,9 @@ public class ServicePricesManager {
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
         List<FlavorPriceResult> priceResults = new ArrayList<>();
         for (ServiceFlavorWithPrice flavor : flavors) {
-            ServicePriceRequest servicePriceRequest =
-                    getServicePriceRequest(flavor.getPricing(), region, billingMode);
+            ServiceFlavorPriceRequest serviceFlavorPriceRequest =
+                    getServiceFlavorPriceRequest(templateId, flavor.getName(), flavor.getPricing(),
+                            region, billingMode);
             FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
             flavorPriceResult.setFlavorName(flavor.getName());
             flavorPriceResult.setBillingMode(billingMode);
@@ -103,7 +106,7 @@ public class ServicePricesManager {
             try {
                 validateFlavorPriceMode(flavor.getPricing(), billingMode);
                 FlavorPriceResult flavorPrice =
-                        orchestratorPlugin.getServicePrice(servicePriceRequest);
+                        orchestratorPlugin.getServiceFlavorPrice(serviceFlavorPriceRequest);
                 flavorPriceResult.setRecurringPrice(flavorPrice.getRecurringPrice());
                 flavorPriceResult.setOneTimePaymentPrice(flavorPrice.getOneTimePaymentPrice());
             } catch (Exception e) {
@@ -117,15 +120,19 @@ public class ServicePricesManager {
     }
 
 
-    private ServicePriceRequest getServicePriceRequest(RatingMode flavorPriceMode,
-                                                       String region,
-                                                       BillingMode billingMode) {
-        ServicePriceRequest servicePriceRequest = new ServicePriceRequest();
-        servicePriceRequest.setUserId(userServiceHelper.getCurrentUserId());
-        servicePriceRequest.setRegionName(region);
-        servicePriceRequest.setFlavorRatingMode(flavorPriceMode);
-        servicePriceRequest.setBillingMode(billingMode);
-        return servicePriceRequest;
+    private ServiceFlavorPriceRequest getServiceFlavorPriceRequest(String serviceTemplateId,
+                                                                   String flavorName,
+                                                                   RatingMode flavorPriceMode,
+                                                                   String region,
+                                                                   BillingMode billingMode) {
+        ServiceFlavorPriceRequest serviceFlavorPriceRequest = new ServiceFlavorPriceRequest();
+        serviceFlavorPriceRequest.setUserId(userServiceHelper.getCurrentUserId());
+        serviceFlavorPriceRequest.setServiceTemplateId(serviceTemplateId);
+        serviceFlavorPriceRequest.setFlavorName(flavorName);
+        serviceFlavorPriceRequest.setRegionName(region);
+        serviceFlavorPriceRequest.setFlavorRatingMode(flavorPriceMode);
+        serviceFlavorPriceRequest.setBillingMode(billingMode);
+        return serviceFlavorPriceRequest;
     }
 
     private ServiceTemplateEntity getServiceTemplate(String templateId) {

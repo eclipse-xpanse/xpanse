@@ -15,7 +15,7 @@ import org.eclipse.xpanse.modules.models.billing.Price;
 import org.eclipse.xpanse.modules.models.billing.ResourceUsage;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
-import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,15 +37,16 @@ public class FlexibleEnginePriceCalculator {
      * @param request service price request
      * @return price
      */
-    public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
+    public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
         if (request.getBillingMode() == BillingMode.PAY_PER_USE) {
-            return getServicePriceWithPayPerUse(request);
+            return getServiceFlavorPriceWithPayPerUse(request);
         } else {
-            return getServicePriceWithFixed(request);
+            return getServiceFlavorPriceWithFixed(request);
         }
     }
 
-    private FlavorPriceResult getServicePriceWithPayPerUse(ServicePriceRequest request) {
+    private FlavorPriceResult getServiceFlavorPriceWithPayPerUse(
+            ServiceFlavorPriceRequest request) {
         ResourceUsage resourceUsage = request.getFlavorRatingMode().getResourceUsage();
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         // TODO Get recurring price with resource usage in future.
@@ -103,7 +104,7 @@ public class FlexibleEnginePriceCalculator {
         };
     }
 
-    private FlavorPriceResult getServicePriceWithFixed(ServicePriceRequest request) {
+    private FlavorPriceResult getServiceFlavorPriceWithFixed(ServiceFlavorPriceRequest request) {
         Price fixedPrice = request.getFlavorRatingMode().getFixedPrice();
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         flavorPriceResult.setRecurringPrice(fixedPrice);

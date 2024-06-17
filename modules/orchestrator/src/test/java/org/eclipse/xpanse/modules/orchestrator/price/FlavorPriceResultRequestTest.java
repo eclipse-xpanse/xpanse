@@ -2,6 +2,7 @@ package org.eclipse.xpanse.modules.orchestrator.price;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.UUID;
 import org.eclipse.xpanse.modules.models.billing.RatingMode;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,17 +15,22 @@ import org.springframework.beans.BeanUtils;
 @ExtendWith(MockitoExtension.class)
 class FlavorPriceResultRequestTest {
 
+    private final String serviceTemplateId = UUID.randomUUID().toString();
+    private final String flavorName = "flavorName";
+
     private final String regionName = "regionName";
     private final String userId = "userId";
     @Mock
     private RatingMode mockRatingMode;
     @Mock
     private BillingMode mockBillingMode;
-    private ServicePriceRequest test;
+    private ServiceFlavorPriceRequest test;
 
     @BeforeEach
     void setUp() {
-        test = new ServicePriceRequest();
+        test = new ServiceFlavorPriceRequest();
+        test.setServiceTemplateId(serviceTemplateId);
+        test.setFlavorName(flavorName);
         test.setUserId(userId);
         test.setRegionName(regionName);
         test.setFlavorRatingMode(mockRatingMode);
@@ -45,7 +51,7 @@ class FlavorPriceResultRequestTest {
         assertThat(test).isNotEqualTo(o);
         assertThat(test.hashCode()).isNotEqualTo(o.hashCode());
 
-        ServicePriceRequest test1 = new ServicePriceRequest();
+        ServiceFlavorPriceRequest test1 = new ServiceFlavorPriceRequest();
         assertThat(test.canEqual(test1)).isTrue();
         assertThat(test).isNotEqualTo(test1);
         assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
@@ -59,7 +65,8 @@ class FlavorPriceResultRequestTest {
 
     @Test
     void testToString() {
-        String result = "ServicePriceRequest(userId=" + userId + ", regionName=" + regionName
+        String result = "ServiceFlavorPriceRequest(serviceTemplateId=" + serviceTemplateId
+                + ", flavorName=" + flavorName + ", userId=" + userId + ", regionName=" + regionName
                 + ", flavorRatingMode=" + mockRatingMode + ", billingMode=" + mockBillingMode + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

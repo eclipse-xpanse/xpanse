@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.springframework.stereotype.Component;
 
@@ -49,8 +49,7 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     }
 
     @Override
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region,
-                                                     UUID serviceId) {
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
         return new ArrayList<>();
     }
 
@@ -134,7 +133,7 @@ public class DummyPluginImpl implements OrchestratorPlugin {
     }
 
     @Override
-    public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
+    public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
         return null;
     }
 }

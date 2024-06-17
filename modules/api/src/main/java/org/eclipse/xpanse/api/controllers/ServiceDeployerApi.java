@@ -356,9 +356,12 @@ public class ServiceDeployerApi {
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
         List<String> availabilityZones = orchestratorPlugin.getAvailabilityZonesOfRegion(
                 currentUserId, regionName, uuid);
-        CacheControl cacheControl =
-                CacheControl.maxAge(duration, TimeUnit.MINUTES).mustRevalidate();
-        return ResponseEntity.ok().cacheControl(cacheControl).body(availabilityZones);
+        return ResponseEntity.ok().cacheControl(getCacheControl()).body(availabilityZones);
+    }
+
+    private CacheControl getCacheControl() {
+        long durationTime = this.duration > 0 ? this.duration : 60;
+        return CacheControl.maxAge(durationTime, TimeUnit.MINUTES).mustRevalidate();
     }
 
 }

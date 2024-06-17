@@ -6,6 +6,9 @@
 
 package org.eclipse.xpanse.plugins.openstack;
 
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZ_CACHE_NAME;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
+
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.cache.consts.CacheNames;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -30,7 +32,7 @@ import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceRequest;
+import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.manage.OpenstackResourceManager;
@@ -79,7 +81,7 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    @Cacheable(CacheNames.REGION_AZ_CACHE_NAME)
+    @Cacheable(cacheNames = REGION_AZ_CACHE_NAME)
     public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
         return openStackResourceManager.getAvailabilityZonesOfRegion(userId, region, serviceId);
     }
@@ -193,7 +195,8 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public FlavorPriceResult getServicePrice(ServicePriceRequest request) {
-        return openstackPriceCalculator.getServicePrice(request);
+    @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME)
+    public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
+        return openstackPriceCalculator.getServiceFlavorPrice(request);
     }
 }
