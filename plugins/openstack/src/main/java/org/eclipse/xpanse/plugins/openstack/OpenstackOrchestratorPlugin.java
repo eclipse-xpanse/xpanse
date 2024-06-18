@@ -76,8 +76,9 @@ public class OpenstackOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
-        return openStackResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
+                                                         DeployResourceKind kind, UUID serviceId) {
+        return openStackResourceManager.getExistingResourceNamesWithKind(userId, region, kind,
+                serviceId);
     }
 
     @Override

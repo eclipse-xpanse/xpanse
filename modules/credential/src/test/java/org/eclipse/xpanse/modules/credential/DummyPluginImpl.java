@@ -44,7 +44,7 @@ public class DummyPluginImpl implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
+                                                         DeployResourceKind kind, UUID serviceId) {
         return new ArrayList<>();
     }
 

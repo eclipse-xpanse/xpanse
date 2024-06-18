@@ -72,7 +72,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
+                                                         DeployResourceKind kind, UUID serviceId) {
         return flexibleEngineResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
     }
 

@@ -49,22 +49,22 @@ public class OpenstackResourceManager {
     @Retryable(retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public List<String> getExistingResourceNamesWithKind(String userId,
-                                                         String region, DeployResourceKind kind) {
+    public List<String> getExistingResourceNamesWithKind(String userId, String region,
+                                                         DeployResourceKind kind, UUID serviceId) {
         if (kind == DeployResourceKind.VPC) {
-            return getVpcList(userId, region);
+            return getVpcList(userId, region, serviceId);
         } else if (kind == DeployResourceKind.SUBNET) {
-            return getSubnetList(userId, region);
+            return getSubnetList(userId, region, serviceId);
         } else if (kind == DeployResourceKind.SECURITY_GROUP) {
-            return getSecurityGroupsList(userId, region);
+            return getSecurityGroupsList(userId, region, serviceId);
         } else if (kind == DeployResourceKind.SECURITY_GROUP_RULE) {
-            return getSecurityGroupRuleList(userId, region);
+            return getSecurityGroupRuleList(userId, region, serviceId);
         } else if (kind == DeployResourceKind.PUBLIC_IP) {
-            return getPublicIpList(userId, region);
+            return getPublicIpList(userId, region, serviceId);
         } else if (kind == DeployResourceKind.VOLUME) {
-            return getVolumeList(userId, region);
+            return getVolumeList(userId, region, serviceId);
         } else if (kind == DeployResourceKind.KEYPAIR) {
-            return getKeyPairsList(userId, region);
+            return getKeyPairsList(userId, region, serviceId);
         } else {
             return new ArrayList<>();
         }
@@ -99,10 +99,10 @@ public class OpenstackResourceManager {
     }
 
 
-    private List<String> getVpcList(String userId, String region) {
+    private List<String> getVpcList(String userId, String region, UUID serviceId) {
         List<String> vpcNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region, null);
+            OSClientV3 osClient = getOsClient(userId, region, serviceId);
             osClient.networking().network().list()
                     .forEach(network -> vpcNames.add(network.getName()));
         } catch (Exception e) {
@@ -117,10 +117,10 @@ public class OpenstackResourceManager {
         return vpcNames;
     }
 
-    private List<String> getSubnetList(String userId, String region) {
+    private List<String> getSubnetList(String userId, String region, UUID serviceId) {
         List<String> subnetNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region, null);
+            OSClientV3 osClient = getOsClient(userId, region, serviceId);
             osClient.networking().subnet().list()
                     .forEach(subnet -> subnetNames.add(subnet.getName()));
         } catch (Exception e) {
@@ -135,10 +135,10 @@ public class OpenstackResourceManager {
         return subnetNames;
     }
 
-    private List<String> getSecurityGroupsList(String userId, String region) {
+    private List<String> getSecurityGroupsList(String userId, String region, UUID serviceId) {
         List<String> securityGroupNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region, null);
+            OSClientV3 osClient = getOsClient(userId, region, serviceId);
             osClient.networking().securitygroup().list()
                     .forEach(securityGroup -> securityGroupNames.add(securityGroup.getName()));
         } catch (Exception e) {
@@ -153,10 +153,10 @@ public class OpenstackResourceManager {
         return securityGroupNames;
     }
 
-    private List<String> getSecurityGroupRuleList(String userId, String region) {
+    private List<String> getSecurityGroupRuleList(String userId, String region, UUID serviceId) {
         List<String> securityGroupRuleIds = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region, null);
+            OSClientV3 osClient = getOsClient(userId, region, serviceId);
             osClient.networking().securityrule().list().forEach(
                     securityGroupRule -> securityGroupRuleIds.add(securityGroupRule.getId()));
         } catch (Exception e) {
@@ -171,10 +171,10 @@ public class OpenstackResourceManager {
         return securityGroupRuleIds;
     }
 
-    private List<String> getPublicIpList(String userId, String region) {
+    private List<String> getPublicIpList(String userId, String region, UUID serviceId) {
         List<String> publicIpAddresses = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region, null);
+            OSClientV3 osClient = getOsClient(userId, region, serviceId);
             osClient.networking().floatingip().list().forEach(
                     floatingIp -> publicIpAddresses.add(floatingIp.getFloatingIpAddress()));
         } catch (Exception e) {
@@ -189,10 +189,10 @@ public class OpenstackResourceManager {
         return publicIpAddresses;
     }
 
-    private List<String> getVolumeList(String userId, String region) {
+    private List<String> getVolumeList(String userId, String region, UUID serviceId) {
         List<String> volumeNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region, null);
+            OSClientV3 osClient = getOsClient(userId, region, serviceId);
             osClient.blockStorage().volumes().list()
                     .forEach(volume -> volumeNames.add(volume.getName()));
         } catch (Exception e) {
@@ -207,10 +207,10 @@ public class OpenstackResourceManager {
         return volumeNames;
     }
 
-    private List<String> getKeyPairsList(String userId, String region) {
+    private List<String> getKeyPairsList(String userId, String region, UUID serviceId) {
         List<String> keyPairNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(userId, region, null);
+            OSClientV3 osClient = getOsClient(userId, region, serviceId);
             osClient.compute().keypairs().list()
                     .forEach(keyPair -> keyPairNames.add(keyPair.getName()));
         } catch (Exception e) {

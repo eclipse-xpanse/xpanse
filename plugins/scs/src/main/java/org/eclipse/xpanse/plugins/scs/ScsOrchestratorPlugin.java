@@ -73,8 +73,8 @@ public class ScsOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
-        return scsResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
+                                                         DeployResourceKind kind, UUID serviceId) {
+        return scsResourceManager.getExistingResourceNamesWithKind(userId, region, kind, serviceId);
     }
 
     @Override

@@ -74,7 +74,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
+                                                         DeployResourceKind kind, UUID serviceId) {
         return huaweiCloudResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
     }
 
