@@ -206,9 +206,9 @@ public class ServiceTemplateOpenApiGenerator {
             if (yamlFile.exists()) {
                 try {
                     Files.delete(yamlFile.toPath());
-                    log.info("Deleted temp json file:{} successfully.", yamlFile.getName());
+                    log.info("Deleted temp yaml file:{} successfully.", yamlFile.getName());
                 } catch (IOException ioException) {
-                    log.info("Deleting temp json file:{} failed.", yamlFile.getName(), ioException);
+                    log.info("Deleting temp yaml file:{} failed.", yamlFile.getName(), ioException);
 
                 }
             }
