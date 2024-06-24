@@ -186,7 +186,7 @@ public class Oauth2WebSecurityFilter {
                                                   @Nullable OpaqueTokenAuthenticationConverter
                                                           opaqueTokenAuthenticationConverter)
                 throws Exception {
-            log.info("Enable web security with method authoriztion.");
+            log.info("Enable web security with method authorization.");
             configureHttpSecurity(http, introspector, jwtAuthenticationConverter,
                     opaqueTokenAuthenticationConverter);
             return http.build();

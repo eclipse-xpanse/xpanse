@@ -33,7 +33,7 @@ class TaskConfigurationTest {
         assertEquals(20, executor.getMaxPoolSize());
         assertEquals(200, executor.getQueueCapacity());
         assertEquals(300, executor.getKeepAliveSeconds());
-        assertEquals("thread-pool-", executor.getThreadNamePrefix());
+        assertEquals("xpanse-async-thread-pool-", executor.getThreadNamePrefix());
         assertNotNull(result);
         assertEquals(ServiceThreadPoolTaskExecutor.class, result.getClass());
     }

@@ -33,7 +33,7 @@ public class TaskConfiguration {
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(200);
         executor.setKeepAliveSeconds(300);
-        executor.setThreadNamePrefix("thread-pool-");
+        executor.setThreadNamePrefix("xpanse-async-thread-pool-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(300);
