@@ -12,6 +12,7 @@ import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsRequest;
 import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsResponse;
 import com.huaweicloud.sdk.bss.v2.model.RateOnDemandReq;
 import com.huaweicloud.sdk.core.auth.ICredential;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -109,9 +110,9 @@ public class HuaweiCloudChinesePriceCalculator {
         }
         String usageValue = resource.getProperties().get("usage_value");
         if (StringUtils.isNotBlank(usageValue)) {
-            productInfo.setUsageValue(Double.parseDouble(usageValue));
+            productInfo.setUsageValue(BigDecimal.valueOf(Double.parseDouble(usageValue)));
         } else {
-            productInfo.setUsageValue(1.0);
+            productInfo.setUsageValue(BigDecimal.valueOf(1.0));
         }
         return productInfo;
     }
