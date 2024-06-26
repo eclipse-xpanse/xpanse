@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfState;
+import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
@@ -49,6 +50,8 @@ class TerraformLocalExecutorTest {
     @Mock
     private Map<String, Object> mockVariables;
     private TerraformLocalExecutor terraformLocalExecutorUnderTest;
+    @Mock
+    private DeployResultFileUtils deployResultFileUtilsTest;
 
     @BeforeAll
     static void initWorkSpace() throws Exception {
@@ -67,7 +70,7 @@ class TerraformLocalExecutorTest {
     @BeforeEach
     void setUp() {
         terraformLocalExecutorUnderTest = new TerraformLocalExecutor(
-                mockEnv, mockVariables, workspace, null);
+                mockEnv, mockVariables, workspace, null, deployResultFileUtilsTest);
     }
 
     @Test

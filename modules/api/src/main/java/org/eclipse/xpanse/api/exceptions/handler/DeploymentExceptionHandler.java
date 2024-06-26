@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ActivitiTaskN
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FileLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidDeploymentVariableException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
@@ -258,6 +259,17 @@ public class DeploymentExceptionHandler {
     @ResponseBody
     public Response handleServicePriceCalculationFailed(ServicePriceCalculationFailed ex) {
         return Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for FileLockedException.
+     */
+    @ExceptionHandler({FileLockedException.class})
+    @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
+    @ResponseBody
+    public Response handleFileLockedException(FileLockedException ex) {
+        return Response.errorResponse(ResultType.FILE_LOCKED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

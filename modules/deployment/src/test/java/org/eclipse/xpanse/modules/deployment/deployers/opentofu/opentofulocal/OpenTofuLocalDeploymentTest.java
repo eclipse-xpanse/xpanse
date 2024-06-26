@@ -35,6 +35,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenT
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
+import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
@@ -82,6 +83,8 @@ class OpenTofuLocalDeploymentTest {
             """;
     @Autowired
     OpenTofuLocalDeployment openTofuLocalDeployment;
+    @MockBean
+    DeployResultFileUtils deployResultFileUtils;
     @MockBean
     DeployEnvironments deployEnvironments;
     @MockBean

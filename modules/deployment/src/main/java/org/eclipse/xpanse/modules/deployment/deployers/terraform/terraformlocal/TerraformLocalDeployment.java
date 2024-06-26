@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
+import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -59,24 +60,27 @@ public class TerraformLocalDeployment implements Deployer {
     private final TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
     private final DeployServiceEntityHandler deployServiceEntityHandler;
     private final ScriptsGitRepoManage scriptsGitRepoManage;
+    private final DeployResultFileUtils deployResultFileUtils;
 
     /**
      * Initializes the Terraform deployer.
      */
     @Autowired
     public TerraformLocalDeployment(DeployEnvironments deployEnvironments,
-                                    TerraformLocalConfig terraformLocalConfig,
-                                    @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
-                                    TerraformDeploymentResultCallbackManager
-                                            terraformDeploymentResultCallbackManager,
-                                    DeployServiceEntityHandler deployServiceEntityHandler,
-                                    ScriptsGitRepoManage scriptsGitRepoManage) {
+            TerraformLocalConfig terraformLocalConfig,
+            @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
+            TerraformDeploymentResultCallbackManager
+                    terraformDeploymentResultCallbackManager,
+            DeployServiceEntityHandler deployServiceEntityHandler,
+            ScriptsGitRepoManage scriptsGitRepoManage,
+            DeployResultFileUtils deployResultFileUtils) {
         this.deployEnvironments = deployEnvironments;
         this.terraformLocalConfig = terraformLocalConfig;
         this.taskExecutor = taskExecutor;
         this.terraformDeploymentResultCallbackManager = terraformDeploymentResultCallbackManager;
         this.deployServiceEntityHandler = deployServiceEntityHandler;
         this.scriptsGitRepoManage = scriptsGitRepoManage;
+        this.deployResultFileUtils = deployResultFileUtils;
     }
 
     /**
@@ -272,7 +276,7 @@ public class TerraformLocalDeployment implements Deployer {
             envVariables.put(TF_DEBUG_FLAG, terraformLocalConfig.getDebugLogLevel());
         }
         return new TerraformLocalExecutor(envVariables, inputVariables, workspace,
-                getSubDirectory(deployment));
+                getSubDirectory(deployment), deployResultFileUtils);
     }
 
     private void prepareDeployWorkspaceWithScripts(DeployTask deployTask, String workspace) {
