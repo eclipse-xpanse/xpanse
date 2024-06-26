@@ -18,6 +18,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
+import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
@@ -128,6 +129,9 @@ public class AuditLogWriter {
                 return userPolicyCreateRequest.getCsp();
             } else if (arg instanceof UserPolicyUpdateRequest userPolicyUpdateRequest) {
                 return userPolicyUpdateRequest.getCsp();
+            } else if (arg instanceof ServicePolicyCreateRequest servicePolicyCreateRequest) {
+                return getCspInfoFromRequest.getCspFromServiceTemplateId(
+                        servicePolicyCreateRequest.getServiceTemplateId().toString());
             } else if (arg instanceof Csp csp) {
                 return csp;
             } else {
@@ -138,7 +142,7 @@ public class AuditLogWriter {
     }
 
     private AuditLog getAuditLog(Csp csp, String methodName, String methodType, Object[] args,
-            Object result) {
+                                 Object result) {
         AuditLog auditLog = new AuditLog();
         auditLog.setMethodName(methodName);
         auditLog.setMethodType(methodType);
