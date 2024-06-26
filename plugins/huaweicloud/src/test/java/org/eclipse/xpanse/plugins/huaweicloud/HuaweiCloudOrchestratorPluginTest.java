@@ -2,6 +2,7 @@ package org.eclipse.xpanse.plugins.huaweicloud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -52,13 +53,24 @@ class HuaweiCloudOrchestratorPluginTest {
 
     @Test
     void testGetCsp() {
-        assertThat(huaweiCloudOrchestratorPluginUnderTest.getCsp()).isEqualTo(Csp.HUAWEI);
+        assertThat(huaweiCloudOrchestratorPluginUnderTest.getCsp()).isEqualTo(Csp.HUAWEI_CLOUD);
     }
 
     @Test
     void testRequiredProperties() {
         assertThat(huaweiCloudOrchestratorPluginUnderTest.requiredProperties()).isEqualTo(
                 Collections.emptyList());
+    }
+
+    @Test
+    void testGetEnvVarKeysMappingMap() {
+        // Setup
+        // Run the test
+        final Map<String, String> result =
+                huaweiCloudOrchestratorPluginUnderTest.getEnvVarKeysMappingMap();
+
+        // Verify the results
+        assertTrue(result.isEmpty());
     }
 
     @Test

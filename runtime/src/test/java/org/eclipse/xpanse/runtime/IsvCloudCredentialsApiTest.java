@@ -41,7 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class IsvCloudCredentialsApiTest extends ApisTestCommon {
 
-    private final Csp csp = Csp.HUAWEI;
+    private final Csp csp = Csp.HUAWEI_CLOUD;
     private final CredentialType credentialType = CredentialType.VARIABLES;
 
     @Test

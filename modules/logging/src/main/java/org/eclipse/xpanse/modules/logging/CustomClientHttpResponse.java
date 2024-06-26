@@ -28,12 +28,6 @@ public record CustomClientHttpResponse(ClientHttpResponse originalResponse,
 
     @NonNull
     @Override
-    public int getRawStatusCode() throws IOException {
-        return originalResponse.getStatusCode().value();
-    }
-
-    @NonNull
-    @Override
     public String getStatusText() throws IOException {
         return originalResponse.getStatusText();
     }

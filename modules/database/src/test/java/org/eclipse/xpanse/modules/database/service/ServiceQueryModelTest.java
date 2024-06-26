@@ -22,7 +22,7 @@ import org.springframework.beans.BeanUtils;
  */
 class ServiceQueryModelTest {
 
-    private final Csp csp = Csp.HUAWEI;
+    private final Csp csp = Csp.HUAWEI_CLOUD;
     private final Category category = Category.COMPUTE;
     private final String serviceName = "kafka";
     private final String serviceVersion = "1.0.0";

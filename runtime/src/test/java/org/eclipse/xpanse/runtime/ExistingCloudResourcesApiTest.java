@@ -10,16 +10,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.huaweicloud.sdk.core.invoker.SyncInvoker;
+import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsRequest;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsResponse;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsResult;
 import com.huaweicloud.sdk.ecs.v2.model.NovaSimpleKeypair;
+import com.huaweicloud.sdk.eip.v2.model.ListPublicipsRequest;
 import com.huaweicloud.sdk.eip.v2.model.ListPublicipsResponse;
 import com.huaweicloud.sdk.eip.v2.model.PublicipShowResp;
+import com.huaweicloud.sdk.evs.v2.model.ListVolumesRequest;
 import com.huaweicloud.sdk.evs.v2.model.ListVolumesResponse;
 import com.huaweicloud.sdk.evs.v2.model.VolumeDetail;
+import com.huaweicloud.sdk.vpc.v2.model.ListSecurityGroupRulesRequest;
 import com.huaweicloud.sdk.vpc.v2.model.ListSecurityGroupRulesResponse;
+import com.huaweicloud.sdk.vpc.v2.model.ListSecurityGroupsRequest;
 import com.huaweicloud.sdk.vpc.v2.model.ListSecurityGroupsResponse;
+import com.huaweicloud.sdk.vpc.v2.model.ListSubnetsRequest;
 import com.huaweicloud.sdk.vpc.v2.model.ListSubnetsResponse;
+import com.huaweicloud.sdk.vpc.v2.model.ListVpcsRequest;
 import com.huaweicloud.sdk.vpc.v2.model.ListVpcsResponse;
 import com.huaweicloud.sdk.vpc.v2.model.SecurityGroup;
 import com.huaweicloud.sdk.vpc.v2.model.SecurityGroupRule;
@@ -62,11 +69,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed",
         "http.request.retry.max.attempts=5",
-        "http.request.retry.delay.milliseconds=1000",
-        "OS_AUTH_URL=http://127.0.0.1/v3/identity"})
+        "http.request.retry.delay.milliseconds=1000"})
 @AutoConfigureMockMvc
 class ExistingCloudResourcesApiTest extends ApisTestCommon {
-
 
     @BeforeEach
     void setUp() {
@@ -85,15 +90,15 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
 
         testGetExistingResourceNamesWithKindForHuaweiCloud();
         testGetExistingResourceNamesWithKindForFlexibleEngine();
-        testGetExistingResourceNamesWithKindForOpenstack();
-        testGetExistingResourceNamesWithKindForScs();
+
+        testGetExistingResourceNamesWithKindForCspBasedOpenstack();
     }
 
     void testGetExistingResourceNamesWithKindForHuaweiCloud() throws Exception {
         mockSdkClientsForHuaweiCloud();
         // Setup
         addCredentialForHuaweiCloud();
-        Csp huawei = Csp.HUAWEI;
+        Csp huawei = Csp.HUAWEI_CLOUD;
         String huaweiRegion = "cn-southwest-2";
         ListVpcsResponse listVpcResponse = new ListVpcsResponse();
         listVpcResponse.setHttpStatusCode(200);
@@ -160,7 +165,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listPublicipsResponse.setHttpStatusCode(200);
         listPublicipsResponse.setPublicips(
                 List.of(new PublicipShowResp().withPublicIpAddress("huawei_public_ip_test")));
-        mockListPublicipsInvoker(listPublicipsResponse);
+        mockListPublicIpsInvoker(listPublicipsResponse);
         List<String> huaweiPublicIpsResult = List.of("huawei_public_ip_test");
         // Run the test
         final MockHttpServletResponse huaweiPublicIpsResponse =
@@ -210,11 +215,11 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         assertThat(huaweiVmResponse.getContentAsString()).isEqualTo(
                 objectMapper.writeValueAsString(huaweiVmResult));
 
-        deleteCredential(Csp.HUAWEI, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, "AK_SK");
     }
 
     void mockListVpcsInvoker(ListVpcsResponse listVpcResponse) {
-        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ListVpcsRequest, ListVpcsResponse> mockInvoker = mock(SyncInvoker.class);
         when(mockVpcClient.listVpcsInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -223,7 +228,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListSubnetsInvoker(ListSubnetsResponse mockResponse) {
-        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ListSubnetsRequest, ListSubnetsResponse> mockInvoker = mock(SyncInvoker.class);
         when(mockVpcClient.listSubnetsInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -232,7 +237,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListSecurityGroupsInvoker(ListSecurityGroupsResponse mockResponse) {
-        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ListSecurityGroupsRequest, ListSecurityGroupsResponse> mockInvoker = mock(SyncInvoker.class);
         when(mockVpcClient.listSecurityGroupsInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -241,7 +246,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListSecurityGroupRulesInvoker(ListSecurityGroupRulesResponse mockResponse) {
-        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ListSecurityGroupRulesRequest, ListSecurityGroupRulesResponse> mockInvoker = mock(SyncInvoker.class);
         when(mockVpcClient.listSecurityGroupRulesInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -249,8 +254,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         when(mockInvoker.invoke()).thenReturn(mockResponse);
     }
 
-    void mockListPublicipsInvoker(ListPublicipsResponse mockResponse) {
-        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+    void mockListPublicIpsInvoker(ListPublicipsResponse mockResponse) {
+        SyncInvoker<ListPublicipsRequest, ListPublicipsResponse> mockInvoker = mock(SyncInvoker.class);
         when(mockEipClient.listPublicipsInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -259,7 +264,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListVolumesInvoker(ListVolumesResponse mockResponse) {
-        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ListVolumesRequest, ListVolumesResponse> mockInvoker = mock(SyncInvoker.class);
         when(mockEvsClient.listVolumesInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -268,7 +273,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListKeypairsInvoker(NovaListKeypairsResponse mockResponse) {
-        SyncInvoker mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<NovaListKeypairsRequest, NovaListKeypairsResponse> mockInvoker = mock(SyncInvoker.class);
         when(mockEcsClient.novaListKeypairsInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -354,7 +359,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         listPublicipsResponse.setHttpStatusCode(200);
         listPublicipsResponse.setPublicips(List.of(new PublicipShowResp().withPublicIpAddress(
                 "flexibleEngine_public_ip_test")));
-        mockListPublicipsInvoker(listPublicipsResponse);
+        mockListPublicIpsInvoker(listPublicipsResponse);
         List<String> flexibleEnginePublicIpsResult = List.of("flexibleEngine_public_ip_test");
         // Run the test
         final MockHttpServletResponse flexibleEnginePublicIpsResponse =
@@ -411,23 +416,23 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         deleteCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK");
     }
 
-
-    void testGetExistingResourceNamesWithKindForOpenstack() throws Exception {
-        testGetExistingResourceNamesWithKindForCspWithOsClient(Csp.OPENSTACK);
-    }
-
-    void testGetExistingResourceNamesWithKindForScs() throws Exception {
-        testGetExistingResourceNamesWithKindForCspWithOsClient(Csp.SCS);
+    void testGetExistingResourceNamesWithKindForCspBasedOpenstack() throws Exception {
+        testGetExistingResourceNamesWithKindForCspWithOsClient(Csp.OPENSTACK_TESTLAB);
+        testGetExistingResourceNamesWithKindForCspWithOsClient(Csp.PLUS_SERVER);
+        testGetExistingResourceNamesWithKindForCspWithOsClient(Csp.REGIO_CLOUD);
     }
 
     void testGetExistingResourceNamesWithKindThrowsException() throws Exception {
-        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.HUAWEI,
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.HUAWEI_CLOUD,
                 "cn-southwest-2");
         getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.FLEXIBLE_ENGINE,
                 "eu-west-0");
-        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.OPENSTACK,
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.OPENSTACK_TESTLAB,
                 "RegionOne");
-        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.SCS, "RegionOne");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.PLUS_SERVER,
+                "RegionOne");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.REGIO_CLOUD,
+                "RegionOne");
     }
 
     void getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp csp, String region)
@@ -488,15 +493,33 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         Assertions.assertEquals(keypairResponse.getResultType(), ResultType.BACKEND_FAILURE);
     }
 
+
+    @Test
+    @WithJwt(file = "jwt_user.json")
+    void test() throws Exception{
+        Csp csp = Csp.PLUS_SERVER;
+        OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();
+        addCredentialForOpenstack(csp);
+        String openstackRegion = "RegionOne";
+        List<String> networksResult = List.of("network_test");
+        File networksjonFile = new File("src/test/resources/openstack/network/networks.json");
+        NeutronNetwork.Networks networksResponse =
+                objectMapper.readValue(networksjonFile, NeutronNetwork.Networks.class);
+        when((List<NeutronNetwork>) mockOsClient.networking().network().list()).thenReturn(
+                networksResponse.getList());
+        // Run the test
+        final MockHttpServletResponse openstackVpcResponse =
+                getExistingResourceNamesWithKind(DeployResourceKind.VPC, csp, openstackRegion);
+        // Verify the results
+        assertThat(openstackVpcResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(openstackVpcResponse.getContentAsString()).isEqualTo(
+                objectMapper.writeValueAsString(networksResult));
+    }
+
     void testGetExistingResourceNamesWithKindForCspWithOsClient(Csp csp) throws Exception {
         // Setup
         OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();
-        if (csp == Csp.OPENSTACK) {
-            addCredentialForOpenstack();
-        }
-        if (csp == Csp.SCS) {
-            addCredentialForScs();
-        }
+        addCredentialForOpenstack(csp);
         String openstackRegion = "RegionOne";
         List<String> networksResult = List.of("network_test");
         File networksjonFile = new File("src/test/resources/openstack/network/networks.json");

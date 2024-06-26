@@ -1,7 +1,7 @@
 {
   "serviceName": "terraform-ecs",
   "version": "1.0.0",
-  "csp": "flexibleengine",
+  "csp": "FlexibleEngine",
   "category": "compute",
   "flavor": "2vCPUs-4GB-normal",
   "region": {

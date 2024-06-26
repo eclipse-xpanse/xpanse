@@ -59,7 +59,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
 
     void addIsvCredential() throws Exception {
         final CreateCredential createCredential = new CreateCredential();
-        createCredential.setCsp(Csp.HUAWEI);
+        createCredential.setCsp(Csp.HUAWEI_CLOUD);
         createCredential.setType(CredentialType.VARIABLES);
         createCredential.setName("AK_SK");
         createCredential.setDescription("description");
@@ -78,7 +78,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
     }
 
     void deleteIsvCredential() throws Exception {
-        mockMvc.perform(delete("/xpanse/isv/credentials").param("cspName", Csp.HUAWEI.toValue())
+        mockMvc.perform(delete("/xpanse/isv/credentials").param("cspName", Csp.HUAWEI_CLOUD.toValue())
                 .param("type", CredentialType.VARIABLES.toValue()).param("name", "AK_SK")
                 .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
     }
@@ -87,10 +87,9 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
     @WithJwt(file = "jwt_all_roles.json")
     void testIsvServiceDeployApis() throws Exception {
         // Setup
-
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("IsvServiceDeployApiTest-1");
+        ocl.setName("Test-"+UUID.randomUUID());
         ocl.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());

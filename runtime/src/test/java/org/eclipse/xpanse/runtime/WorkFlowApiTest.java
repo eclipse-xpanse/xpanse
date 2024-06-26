@@ -61,7 +61,7 @@ class WorkFlowApiTest extends ApisTestCommon {
     }
 
     void testQueryTasks() throws Exception {
-        String userId = "1234566";
+        String userId = "userId";
         WorkFlowTask todoTask = getTaskWithStatus(WorkFlowTaskStatus.FAILED);
         WorkFlowTask doneTask = getTaskWithStatus(WorkFlowTaskStatus.DONE);
         // Setup

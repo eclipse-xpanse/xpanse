@@ -3,9 +3,14 @@
   "email": "test@xpanse.de",
   "aud": "https://localhost:7082",
   "scope": "openid user isv admin csp",
-  "roles": ["user", "isv", "admin", "csp"],
+  "roles": [
+    "user",
+    "isv",
+    "admin",
+    "csp"
+  ],
   "urn:zitadel:iam:org:project:roles": {
     "user": "user"
   },
-  "sub": "1234566"
+  "sub": "userId"
 }

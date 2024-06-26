@@ -7,145 +7,85 @@
 package org.eclipse.xpanse.modules.models.credential;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Test of CreateCredential.
  */
 class CreateCredentialTest {
 
-    private static final String name = "credential";
-    private static final String userId = "user";
-    private static final Csp csp = Csp.AWS;
-    private static final String description = "Test credential";
-    private static final CredentialType type = CredentialType.VARIABLES;
-    private static final List<CredentialVariable> variables =
-            List.of(new CredentialVariable("variable1", "description1", false, false),
-                    new CredentialVariable("variable2", "description2", true, true));
-    private static final Integer timeToLive = 36000;
-    private static CreateCredential createCredential;
+    private final String name = "credential";
+    private final String userId = "userId";
+    private final Csp csp = Csp.HUAWEI_CLOUD;
+    private final String description = "Test credential";
+    private final CredentialType type = CredentialType.VARIABLES;
+    private final Integer timeToLive = 36000;
+    @Mock
+    private List<CredentialVariable> variables;
+    private CreateCredential test;
 
     @BeforeEach
     void setUp() {
-        createCredential = new CreateCredential();
-        createCredential.setName(name);
-        createCredential.setUserId(userId);
-        createCredential.setCsp(csp);
-        createCredential.setDescription(description);
-        createCredential.setType(type);
-        createCredential.setVariables(variables);
-        createCredential.setTimeToLive(timeToLive);
+        test = new CreateCredential();
+        test.setName(name);
+        test.setUserId(userId);
+        test.setCsp(csp);
+        test.setDescription(description);
+        test.setType(type);
+        test.setVariables(variables);
+        test.setTimeToLive(timeToLive);
     }
 
     @Test
     public void testConstructorAndGetters() {
-        assertEquals(name, createCredential.getName());
-        assertEquals(userId, createCredential.getUserId());
-        assertEquals(csp, createCredential.getCsp());
-        assertEquals(description, createCredential.getDescription());
-        assertEquals(type, createCredential.getType());
-        assertEquals(variables, createCredential.getVariables());
-        assertEquals(timeToLive, createCredential.getTimeToLive());
+        assertEquals(name, test.getName());
+        assertEquals(userId, test.getUserId());
+        assertEquals(csp, test.getCsp());
+        assertEquals(description, test.getDescription());
+        assertEquals(type, test.getType());
+        assertEquals(variables, test.getVariables());
+        assertEquals(timeToLive, test.getTimeToLive());
     }
 
     @Test
     public void testEqualsAndHashCode() {
-        assertEquals(createCredential, createCredential);
-        assertEquals(createCredential.hashCode(), createCredential.hashCode());
+        Object o = new Object();
+        assertFalse(test.canEqual(o));
+        assertNotEquals(test, o);
+        assertNotEquals(test.hashCode(), o.hashCode());
 
-        Object obj = new Object();
-        assertNotEquals(createCredential, obj);
-        assertNotEquals(createCredential, null);
-        assertNotEquals(createCredential.hashCode(), obj.hashCode());
+        CreateCredential test1 = new CreateCredential();
+        assertTrue(test.canEqual(test1));
+        assertNotEquals(test, test1);
+        assertNotEquals(test.hashCode(), test1.hashCode());
 
-        CreateCredential createCredential1 = new CreateCredential();
-        CreateCredential createCredential2 = new CreateCredential();
-        assertNotEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential, createCredential2);
-        assertEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential.hashCode(), createCredential2.hashCode());
-        assertEquals(createCredential1.hashCode(), createCredential2.hashCode());
+        BeanUtils.copyProperties(test, test1);
+        assertTrue(test.canEqual(test1));
+        assertEquals(test, test1);
+        assertEquals(test.hashCode(), test1.hashCode());
 
-        createCredential1.setName(name);
-        assertNotEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
-
-        createCredential1.setUserId(userId);
-        assertNotEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
-
-        createCredential1.setDescription(description);
-        assertNotEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
-
-        createCredential1.setCsp(csp);
-        assertNotEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential, createCredential2);
-        assertNotEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
-
-        createCredential1.setType(type);
-        assertNotEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
-
-        createCredential1.setVariables(variables);
-        assertNotEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
-
-        createCredential1.setTimeToLive(timeToLive);
-        assertEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential1, createCredential2);
-        assertEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
-
-        createCredential1.setTimeToLive(48000);
-        assertNotEquals(createCredential, createCredential1);
-        assertNotEquals(createCredential1, createCredential2);
-        assertNotEquals(createCredential.hashCode(), createCredential1.hashCode());
-        assertNotEquals(createCredential1.hashCode(), createCredential2.hashCode());
     }
 
     @Test
     void testToString() {
-        CreateCredential createCredential = new CreateCredential();
-        createCredential.setName(name);
-        createCredential.setUserId(userId);
-        createCredential.setCsp(csp);
-        createCredential.setDescription(description);
-        createCredential.setType(type);
-        createCredential.setVariables(variables);
-        createCredential.setTimeToLive(timeToLive);
-
-        String expectedToString = "CreateCredential(" +
-                "name=credential, " +
-                "userId=user, " +
-                "csp=AWS, " +
-                "description=Test credential, " +
-                "type=VARIABLES, " +
-                "variables=[CredentialVariable(name=variable1, description=description1, " +
-                "isMandatory=false, isSensitive=false, value=null), " +
-                "CredentialVariable(name=variable2, description=description2, " +
-                "isMandatory=true, isSensitive=true, value=null)], " +
-                "timeToLive=36000)";
-        assertEquals(expectedToString, createCredential.toString());
+        String expectedToString = "CreateCredential(name=" + name + ", "
+                + "userId=" + userId + ", "
+                + "csp=" + csp + ", "
+                + "description=" + description + ", "
+                + "type=" + type + ", "
+                + "variables=" + variables + ", "
+                + "timeToLive=" + timeToLive + ")";
+        assertEquals(expectedToString, test.toString());
     }
 
 }

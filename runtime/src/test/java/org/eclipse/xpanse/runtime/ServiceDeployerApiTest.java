@@ -183,14 +183,12 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testGetAvailabilityZonesForHuaweiCloud();
         testGetAvailabilityZonesForFlexibleEngine();
         testGetAvailabilityZonesForOpenstack();
-        testGetAvailabilityZonesForScs();
     }
 
     void testGetAvailabilityZonesApiThrowsException() throws Exception {
-        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.HUAWEI, "cn-southwest");
+        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.HUAWEI_CLOUD, "cn-southwest");
         getAvailabilityZonesThrowsClientApiCallFailedException(Csp.FLEXIBLE_ENGINE, "eu-west");
-        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.OPENSTACK, "RegionOne");
-        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.SCS, "RegionOne");
+        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.OPENSTACK_TESTLAB, "RegionOne");
     }
 
     void testGetAvailabilityZonesForHuaweiCloud() throws Exception {
@@ -206,14 +204,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         mockListAvailabilityZonesInvoker(response);
         // Run the test
         final MockHttpServletResponse listAzResponse =
-                getAvailabilityZones(Csp.HUAWEI, "cn-southwest-2");
+                getAvailabilityZones(Csp.HUAWEI_CLOUD, "cn-southwest-2");
         List<String> azs =
                 objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
                 });
         Assertions.assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
         Assertions.assertEquals(2, azs.size());
         Assertions.assertEquals("cn-southwest-2a", azs.getFirst());
-        deleteCredential(Csp.HUAWEI, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, "AK_SK");
     }
 
     void mockListAvailabilityZonesInvoker(NovaListAvailabilityZonesResponse mockResponse) {
@@ -251,7 +249,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testGetAvailabilityZonesForOpenstack() throws Exception {
         // Setup
-        addCredentialForOpenstack();
+        addCredentialForOpenstack(Csp.OPENSTACK_TESTLAB);
         OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();
         File azsjonFile = new File("src/test/resources/openstack/network/availability_zones.json");
         NeutronAvailabilityZone.AvailabilityZones azResponse =
@@ -260,34 +258,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 .list()).thenReturn(azResponse.getList());
         // Run the test
         final MockHttpServletResponse listAzResponse =
-                getAvailabilityZones(Csp.OPENSTACK, "RegionOne");
+                getAvailabilityZones(Csp.OPENSTACK_TESTLAB, "RegionOne");
         List<String> azNames =
                 objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
                 });
         Assertions.assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
         Assertions.assertEquals(1, azNames.size());
         Assertions.assertEquals("nova", azNames.getFirst());
-        deleteCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "USERNAME_PASSWORD");
-    }
-
-    void testGetAvailabilityZonesForScs() throws Exception {
-        // Setup
-        addCredentialForScs();
-        OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();
-        File azsjonFile = new File("src/test/resources/openstack/network/availability_zones.json");
-        NeutronAvailabilityZone.AvailabilityZones azResponse =
-                objectMapper.readValue(azsjonFile, NeutronAvailabilityZone.AvailabilityZones.class);
-        when((List<NeutronAvailabilityZone>) mockOsClient.networking().availabilityzone()
-                .list()).thenReturn(azResponse.getList());
-        // Run the test
-        final MockHttpServletResponse listAzResponse = getAvailabilityZones(Csp.SCS, "RegionOne");
-        List<String> azNames =
-                objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
-                });
-        Assertions.assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
-        Assertions.assertEquals(1, azNames.size());
-        Assertions.assertEquals("nova", azNames.getFirst());
-        deleteCredential(Csp.SCS, CredentialType.VARIABLES, "USERNAME_PASSWORD");
+        deleteCredential(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "USERNAME_PASSWORD");
     }
 
     void getAvailabilityZonesThrowsClientApiCallFailedException(Csp csp, String regionName)
@@ -792,7 +770,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName("redis");
         deployRequest.setVersion("1.0.0");
-        deployRequest.setCsp(Csp.HUAWEI);
+        deployRequest.setCsp(Csp.HUAWEI_CLOUD);
         deployRequest.setCategory(Category.AI);
         deployRequest.setFlavor("flavor2");
         Region region = new Region();

@@ -21,7 +21,7 @@ class UserServiceHelperTest {
 
     private final String userId = "userId";
     private final String namespace = "namespace";
-    private final Csp csp = Csp.HUAWEI;
+    private final Csp csp = Csp.HUAWEI_CLOUD;
     private final List<String> roles = List.of("admin", "csp", "isv", "user");
     @Mock
     private IdentityProviderManager mockIdentityProviderManager;
@@ -185,22 +185,22 @@ class UserServiceHelperTest {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final boolean result = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI);
+        final boolean result = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI_CLOUD);
         // Verify the results
         assertThat(result).isTrue();
         // Run the test
-        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK);
+        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
         // Verify the results
         assertThat(result1).isTrue();
 
         // Setup without auth
         setUpSecurityConfig(true, true);
         // Run the test
-        final boolean result2 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI);
+        final boolean result2 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI_CLOUD);
         // Verify the results
         assertThat(result2).isTrue();
         // Run the test
-        final boolean result3 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK);
+        final boolean result3 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
         // Verify the results
         assertThat(result3).isFalse();
     }
@@ -211,18 +211,18 @@ class UserServiceHelperTest {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final boolean result = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI);
+        final boolean result = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI_CLOUD);
         // Verify the results
         assertThat(result).isTrue();
         // Run the test
-        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK);
+        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
         // Verify the results
         assertThat(result1).isTrue();
 
         // Setup without auth
         setUpSecurityConfig(true, true);
         // Run the test
-        assertThatThrownBy(() -> userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI))
+        assertThatThrownBy(() -> userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI_CLOUD))
                 .isInstanceOf(UserNotLoggedInException.class);
 
     }
@@ -309,7 +309,7 @@ class UserServiceHelperTest {
 
     @Test
     void testGetCspManagedByCurrentUser() {
-        Csp csp = Csp.HUAWEI;
+        Csp csp = Csp.HUAWEI_CLOUD;
         when(mockIdentityProviderManager.getCurrentUserInfo()).thenReturn(getMockCurrentUserInfo());
         // Setup without auth
         setUpSecurityConfig(false, true);

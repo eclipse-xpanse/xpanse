@@ -94,7 +94,7 @@ public class HuaweiCloudPriceCalculator {
             ServiceFlavorPriceRequest request) {
         ResourceUsage resourceUsage = request.getFlavorRatingMode().getResourceUsage();
         AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.HUAWEI, CredentialType.VARIABLES,
+                credentialCenter.getCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES,
                         request.getUserId());
         Map<String, String> credentialVariablesMap =
                 huaweiCloudClient.getCredentialVariablesMap((CredentialVariables) credential);

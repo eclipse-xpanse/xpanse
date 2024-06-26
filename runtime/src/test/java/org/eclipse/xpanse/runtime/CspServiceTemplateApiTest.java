@@ -59,7 +59,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 getRegistrationDetails(serviceTemplate.getServiceTemplateId());
         serviceTemplate = objectMapper.readValue(registrationDetails.getContentAsString()
                 , ServiceTemplateDetailVo.class);
-        testListManagedServiceTemplatesWithStateApproved(serviceTemplate);
+        testListManagedServiceTemplatesWithStateApproved();
         unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
@@ -181,8 +181,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 response.getContentAsString());
     }
 
-    void testListManagedServiceTemplatesWithStateApproved(
-            ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
+    void testListManagedServiceTemplatesWithStateApproved() throws Exception {
 
         // Setup request 1
         String serviceRegistrationState1 = "errorState";
@@ -234,7 +233,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     void testListManagedServiceTemplatesReturnsEmptyList(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup
-        String serviceRegistrationState = ServiceRegistrationState.APPROVAL_PENDING.toValue();
+        String serviceRegistrationState = ServiceRegistrationState.UNREGISTERED.toValue();
         // Run the test
         MockHttpServletResponse response = listServiceTemplatesWithParams(
                 serviceTemplateDetailVo.getCategory().toValue(),

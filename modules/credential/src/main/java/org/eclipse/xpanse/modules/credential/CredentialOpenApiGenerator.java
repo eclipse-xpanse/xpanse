@@ -244,8 +244,15 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
         return exampleString;
     }
 
-    private String getApiDocsJson(CredentialVariables credentialVariables) {
+    private List<String> getActiveCspValues() {
+        return pluginManager.getPluginsMap().keySet().stream().map(Csp::toValue)
+                .collect(Collectors.toList());
+    }
+
+    private String getApiDocsJson(CredentialVariables credentialVariables)
+            throws JsonProcessingException {
         String serviceUrl = getServiceUrl();
+        String cspValuesStr = OBJECT_MAPPER.writeValueAsString(getActiveCspValues());
         String csp = credentialVariables.getCsp().toValue();
         String type = credentialVariables.getType().toValue();
         String variablesExampleStr = getVariablesExampleStr(credentialVariables.getVariables());
@@ -398,14 +405,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                                                 "type": "string",
                                                 "example": "%s",
                                                 "description": "The cloud service provider of the credential.",
-                                                "enum": [
-                                                    "aws",
-                                                    "azure",
-                                                    "alicloud",
-                                                    "huawei",
-                                                    "openstack",
-                                                    "flexibleEngine"
-                                                ]
+                                                "enum": %s
                                             },
                                             "description": {
                                                 "type": "string",
@@ -467,7 +467,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                         }
                         """,
                 csp, appVersion, serviceUrl, type, csp, credentialVariables.getName(),
-                csp, credentialVariables.getDescription(),
+                csp, cspValuesStr, credentialVariables.getDescription(),
                 type, variablesExampleStr);
     }
 }

@@ -27,7 +27,7 @@ class MigrateRequestTest {
     private final String regionName = "us-east-1" ;
     private final String areaName = "Asia China" ;
     private final Region region = new Region();
-    private final Csp csp = Csp.AWS;
+    private final Csp csp = Csp.HUAWEI_CLOUD;
     private final String flavor = "flavor" ;
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final Map<String, Object> properties = Collections.singletonMap("key", "value");

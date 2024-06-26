@@ -109,7 +109,6 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         testServiceStateManageApisForHuaweiCloud();
         testServiceStateManageApisForFlexibleEngine();
         testServiceStateManageApisForOpenstack();
-        testServiceStateManageApisForScs();
     }
 
     void testServiceStateManageApisThrowExceptions() throws Exception {
@@ -284,7 +283,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         when(huaweiCloudClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         addCredentialForHuaweiCloud();
         testServiceStateManageApisWithHuaweiCloudSdk(service);
-        deleteCredential(Csp.HUAWEI, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, "AK_SK");
     }
 
     void testServiceStateManageApisWithHuaweiCloudSdk(DeployServiceEntity service)
@@ -478,12 +477,12 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     }
 
     void testServiceStateManageApisForOpenstack() throws Exception {
-        addCredentialForOpenstack();
+        addCredentialForOpenstack(Csp.OPENSTACK_TESTLAB);
         DeployServiceEntity service = setUpWellDeployServiceEntity();
-        service.setCsp(Csp.OPENSTACK);
+        service.setCsp(Csp.OPENSTACK_TESTLAB);
         when(deployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
         testServiceStateManageApisWithOpenstackSdk(service);
-        deleteCredential(Csp.OPENSTACK, CredentialType.VARIABLES, "USERNAME_PASSWORD");
+        deleteCredential(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "USERNAME_PASSWORD");
     }
 
     void testServiceStateManageApisWithOpenstackSdk(DeployServiceEntity service) throws Exception {
@@ -602,25 +601,16 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         assertThat(deleteTasksResponse.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    void testServiceStateManageApisForScs() throws Exception {
-        addCredentialForScs();
-        DeployServiceEntity service = setUpWellDeployServiceEntity();
-        service.setCsp(Csp.SCS);
-        when(deployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
-        testServiceStateManageApisWithOpenstackSdk(service);
-        deleteCredential(Csp.SCS, CredentialType.VARIABLES, "USERNAME_PASSWORD");
-    }
-
 
     DeployServiceEntity setUpWellDeployServiceEntity() {
         UUID id = UUID.randomUUID();
         DeployServiceEntity deployedServiceEntity = new DeployServiceEntity();
         deployedServiceEntity.setId(id);
-        deployedServiceEntity.setCsp(Csp.HUAWEI);
+        deployedServiceEntity.setCsp(Csp.HUAWEI_CLOUD);
         deployedServiceEntity.setCategory(Category.COMPUTE);
         deployedServiceEntity.setName("test-service");
         deployedServiceEntity.setVersion("1.0");
-        deployedServiceEntity.setUserId("1234566");
+        deployedServiceEntity.setUserId("userId");
         deployedServiceEntity.setFlavor("2vCPUs-4GB-normal");
         deployedServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
         DeployRequest deployRequest = new DeployRequest();

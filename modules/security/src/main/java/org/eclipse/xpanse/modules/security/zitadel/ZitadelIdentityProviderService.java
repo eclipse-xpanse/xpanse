@@ -6,19 +6,20 @@
 
 package org.eclipse.xpanse.modules.security.zitadel;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.eclipse.xpanse.modules.models.security.TokenResponse;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
@@ -81,14 +82,15 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
             SecureRandom sr = new SecureRandom();
             byte[] code = new byte[32];
             sr.nextBytes(code);
-            String verifier = Base64.encodeBase64String(code);
+            String verifier = Base64.getEncoder().encodeToString(code);
             map.put("code_verifier", verifier);
 
             byte[] bytes = verifier.getBytes(StandardCharsets.US_ASCII);
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(bytes, 0, bytes.length);
             byte[] digest = md.digest();
-            String challenge = Base64.encodeBase64URLSafeString(digest);
+            String challenge = Base64.getUrlEncoder()
+                    .withoutPadding().encodeToString(digest);
             map.put("code_challenge", challenge);
         } catch (NoSuchAlgorithmException e) {
             log.error("initCodeChallengeMap error.", e);
@@ -152,13 +154,14 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
             if (claimsMap.containsKey(metadataKey)) {
                 Object metadataObject = claimsMap.get(metadataKey);
                 if (Objects.nonNull(metadataObject)) {
-                    Map<String, String> metadataMap =
-                            OBJECT_MAPPER.convertValue(metadataObject, Map.class);
+                    Map<String, String> metadataMap = OBJECT_MAPPER.convertValue(metadataObject,
+                            new TypeReference<>() {
+                            });
                     if (!metadataMap.isEmpty()) {
                         Map<String, String> userMetadata = new HashMap<>();
                         for (String key : metadataMap.keySet()) {
                             String value = new String(
-                                    java.util.Base64.getDecoder().decode(metadataMap.get(key)),
+                                    Base64.getDecoder().decode(metadataMap.get(key)),
                                     StandardCharsets.UTF_8);
                             userMetadata.put(key, value);
                             if (StringUtils.equals(namespaceKey, key)) {

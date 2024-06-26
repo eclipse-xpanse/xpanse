@@ -17,25 +17,27 @@ class CspTest {
 
     @Test
     void testGetByValue() {
-        Assertions.assertEquals(Csp.HUAWEI, Csp.getByValue("huawei"));
-        Assertions.assertEquals(Csp.FLEXIBLE_ENGINE, Csp.getByValue("flexibleEngine"));
-        Assertions.assertEquals(Csp.OPENSTACK, Csp.getByValue("openstack"));
-        Assertions.assertEquals(Csp.ALICLOUD, Csp.getByValue("alicloud"));
+        Assertions.assertEquals(Csp.HUAWEI_CLOUD, Csp.getByValue("HuaweiCloud"));
+        Assertions.assertEquals(Csp.FLEXIBLE_ENGINE, Csp.getByValue("FlexibleEngine"));
+        Assertions.assertEquals(Csp.OPENSTACK_TESTLAB, Csp.getByValue("OpenstackTestlab"));
+        Assertions.assertEquals(Csp.PLUS_SERVER, Csp.getByValue("PlusServer"));
+        Assertions.assertEquals(Csp.REGIO_CLOUD, Csp.getByValue("RegioCloud"));
+        Assertions.assertEquals(Csp.ALIBABA_CLOUD, Csp.getByValue("AlibabaCloud"));
         Assertions.assertEquals(Csp.AWS, Csp.getByValue("aws"));
-        Assertions.assertEquals(Csp.AZURE, Csp.getByValue("azure"));
-        Assertions.assertEquals(Csp.GOOGLE, Csp.getByValue("google"));
+        Assertions.assertEquals(Csp.AZURE, Csp.getByValue("Azure"));
+        Assertions.assertEquals(Csp.GCP, Csp.getByValue("GoogleCloudPlatform"));
         Assertions.assertThrows(UnsupportedEnumValueException.class, () -> Csp.getByValue("null"));
     }
 
     @Test
     void testToValue() {
-        Assertions.assertEquals("huawei", Csp.HUAWEI.toValue());
-        Assertions.assertEquals("flexibleEngine", Csp.FLEXIBLE_ENGINE.toValue());
-        Assertions.assertEquals("openstack", Csp.OPENSTACK.toValue());
-        Assertions.assertEquals("alicloud", Csp.ALICLOUD.toValue());
+        Assertions.assertEquals("HuaweiCloud", Csp.HUAWEI_CLOUD.toValue());
+        Assertions.assertEquals("FlexibleEngine", Csp.FLEXIBLE_ENGINE.toValue());
+        Assertions.assertEquals("OpenstackTestlab", Csp.OPENSTACK_TESTLAB.toValue());
+        Assertions.assertEquals("AlibabaCloud", Csp.ALIBABA_CLOUD.toValue());
         Assertions.assertEquals("aws", Csp.AWS.toValue());
         Assertions.assertEquals("azure", Csp.AZURE.toValue());
-        Assertions.assertEquals("google", Csp.GOOGLE.toValue());
+        Assertions.assertEquals("GoogleCloudPlatform", Csp.GCP.toValue());
     }
 
 }

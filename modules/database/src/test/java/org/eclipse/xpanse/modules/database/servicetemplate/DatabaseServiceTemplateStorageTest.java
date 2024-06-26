@@ -45,7 +45,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
         serviceTemplateEntity.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
 
@@ -58,7 +58,7 @@ class DatabaseServiceTemplateStorageTest {
         entity.setId(id);
         entity.setName("name");
         entity.setVersion("version");
-        entity.setCsp(Csp.HUAWEI);
+        entity.setCsp(Csp.HUAWEI_CLOUD);
         entity.setCategory(Category.AI);
         entity.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         verify(mockServiceTemplateRepository).saveAndFlush(entity);
@@ -71,7 +71,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
 
         // Configure ServiceTemplateRepository.save(...).
@@ -79,7 +79,7 @@ class DatabaseServiceTemplateStorageTest {
         entity.setId(id);
         entity.setName("name");
         entity.setVersion("version");
-        entity.setCsp(Csp.HUAWEI);
+        entity.setCsp(Csp.HUAWEI_CLOUD);
         entity.setCategory(Category.AI);
         when(mockServiceTemplateRepository.saveAndFlush(entity))
                 .thenThrow(OptimisticLockingFailureException.class);
@@ -96,14 +96,14 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
 
         final ServiceTemplateEntity expectedResult = new ServiceTemplateEntity();
         expectedResult.setId(id);
         expectedResult.setName("name");
         expectedResult.setVersion("version");
-        expectedResult.setCsp(Csp.HUAWEI);
+        expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setCategory(Category.AI);
 
         // Configure ServiceTemplateRepository.findOne(...).
@@ -111,7 +111,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity2.setId(id);
         serviceTemplateEntity2.setName("name");
         serviceTemplateEntity2.setVersion("version");
-        serviceTemplateEntity2.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity2.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity2.setCategory(Category.AI);
         final Optional<ServiceTemplateEntity> ServiceTemplateEntity1 =
                 Optional.of(serviceTemplateEntity2);
@@ -134,7 +134,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
 
         when(mockServiceTemplateRepository.findOne(any(Specification.class)))
@@ -156,7 +156,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
 
         when(mockServiceTemplateRepository.findOne(any(Specification.class)))
@@ -171,14 +171,14 @@ class DatabaseServiceTemplateStorageTest {
     void testQueryServiceTemplates() {
         // Setup
         final ServiceTemplateQueryModel serviceQuery =
-                new ServiceTemplateQueryModel(Category.AI, Csp.HUAWEI, null, null, null, null,
+                new ServiceTemplateQueryModel(Category.AI, Csp.HUAWEI_CLOUD, null, null, null, null,
                         false);
 
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
         final List<ServiceTemplateEntity> expectedResult = List.of(serviceTemplateEntity);
 
@@ -187,7 +187,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity1.setId(id);
         serviceTemplateEntity1.setName("name");
         serviceTemplateEntity1.setVersion("version");
-        serviceTemplateEntity1.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity1.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity1.setCategory(Category.AI);
         final List<ServiceTemplateEntity> ServiceTemplateEntities = List.of(serviceTemplateEntity1);
         when(mockServiceTemplateRepository.findAll(any(Specification.class)))
@@ -205,7 +205,7 @@ class DatabaseServiceTemplateStorageTest {
     void testQueryServiceTemplates_ServiceTemplateRepositoryReturnsNoItems() {
         // Setup
         final ServiceTemplateQueryModel serviceQuery = new ServiceTemplateQueryModel(Category.AI,
-                Csp.HUAWEI, "serviceName", "serviceVersion", ServiceHostingType.SELF,
+                Csp.HUAWEI_CLOUD, "serviceName", "serviceVersion", ServiceHostingType.SELF,
                 ServiceRegistrationState.APPROVED, false);
 
         when(mockServiceTemplateRepository.findAll(any(Specification.class)))
@@ -226,7 +226,7 @@ class DatabaseServiceTemplateStorageTest {
         expectedResult.setId(id);
         expectedResult.setName("name");
         expectedResult.setVersion("version");
-        expectedResult.setCsp(Csp.HUAWEI);
+        expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setCategory(Category.AI);
 
         // Configure ServiceTemplateRepository.findById(...).
@@ -234,7 +234,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity1.setId(id);
         serviceTemplateEntity1.setName("name");
         serviceTemplateEntity1.setVersion("version");
-        serviceTemplateEntity1.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity1.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity1.setCategory(Category.AI);
         final Optional<ServiceTemplateEntity> ServiceTemplateEntity =
                 Optional.of(serviceTemplateEntity1);
@@ -256,7 +256,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
         final List<ServiceTemplateEntity> expectedResult = List.of(serviceTemplateEntity);
 
@@ -265,7 +265,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity1.setId(id);
         serviceTemplateEntity1.setName("name");
         serviceTemplateEntity1.setVersion("version");
-        serviceTemplateEntity1.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity1.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity1.setCategory(Category.AI);
         final List<ServiceTemplateEntity> ServiceTemplateEntities = List.of(serviceTemplateEntity1);
         when(mockServiceTemplateRepository.findAll()).thenReturn(ServiceTemplateEntities);
@@ -318,7 +318,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
 
         // Run the test
@@ -330,7 +330,7 @@ class DatabaseServiceTemplateStorageTest {
         entity.setId(id);
         entity.setName("name");
         entity.setVersion("version");
-        entity.setCsp(Csp.HUAWEI);
+        entity.setCsp(Csp.HUAWEI_CLOUD);
         entity.setCategory(Category.AI);
         verify(mockServiceTemplateRepository).delete(entity);
     }
@@ -342,7 +342,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setId(id);
         serviceTemplateEntity.setName("name");
         serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI);
+        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
         serviceTemplateEntity.setCategory(Category.AI);
 
         // Configure ServiceTemplateRepository.delete(...).
@@ -350,7 +350,7 @@ class DatabaseServiceTemplateStorageTest {
         entity.setId(id);
         entity.setName("name");
         entity.setVersion("version");
-        entity.setCsp(Csp.HUAWEI);
+        entity.setCsp(Csp.HUAWEI_CLOUD);
         entity.setCategory(Category.AI);
         doThrow(OptimisticLockingFailureException.class).when(mockServiceTemplateRepository)
                 .delete(entity);

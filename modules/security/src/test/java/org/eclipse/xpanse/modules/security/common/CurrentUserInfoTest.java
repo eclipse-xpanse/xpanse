@@ -30,7 +30,7 @@ class CurrentUserInfoTest {
         test.setRoles(mockRoles);
         test.setMetadata(mockMetadata);
         test.setNamespace("namespace");
-        test.setCsp(Csp.HUAWEI.toValue());
+        test.setCsp(Csp.HUAWEI_CLOUD.toValue());
         test.setToken("token");
     }
 
@@ -41,7 +41,7 @@ class CurrentUserInfoTest {
         assertThat(test.getRoles()).isEqualTo(mockRoles);
         assertThat(test.getMetadata()).isEqualTo(mockMetadata);
         assertThat(test.getNamespace()).isEqualTo("namespace");
-        assertThat(test.getCsp()).isEqualTo(Csp.HUAWEI.toValue());
+        assertThat(test.getCsp()).isEqualTo(Csp.HUAWEI_CLOUD.toValue());
         assertThat(test.getToken()).isEqualTo("token");
     }
 
@@ -71,7 +71,7 @@ class CurrentUserInfoTest {
     @Test
     void testToString() {
         String result = "CurrentUserInfo(userId=userId, userName=userName, roles=mockRoles, "
-                + "metadata=mockMetadata, namespace=namespace, csp=huawei, token=token)";
+                + "metadata=mockMetadata, namespace=namespace, csp=HuaweiCloud, token=token)";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.orchestrator.credential;
 
 import java.util.List;
+import java.util.Map;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
@@ -24,4 +25,12 @@ public interface AuthenticationCapabilities {
      * Get the credential definitions.
      */
     List<AbstractCredentialInfo> getCredentialDefinitions();
+
+
+    /**
+     * Get the env var keys mapping properties.
+     *
+     * @return Map of environment variables.
+     */
+    Map<String, String> getEnvVarKeysMappingMap();
 }

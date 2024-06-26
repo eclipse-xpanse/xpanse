@@ -76,7 +76,7 @@ public class HuaweiCloudMetricsService {
         List<Metric> metrics = new ArrayList<>();
         try {
             AbstractCredentialInfo credential = credentialCenter.getCredential(
-                    Csp.HUAWEI, CredentialType.VARIABLES, resourceMetricRequest.getUserId());
+                    Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, resourceMetricRequest.getUserId());
             MonitorResourceType monitorResourceType =
                     resourceMetricRequest.getMonitorResourceType();
             ICredential icredential = huaweiCloudClient.getCredential(credential);
@@ -127,7 +127,7 @@ public class HuaweiCloudMetricsService {
         String regionName = deployResources.getFirst().getProperties().get("region");
         try {
             AbstractCredentialInfo credential = credentialCenter.getCredential(
-                    Csp.HUAWEI, CredentialType.VARIABLES, serviceMetricRequest.getUserId());
+                    Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, serviceMetricRequest.getUserId());
             MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
             ICredential icredential = huaweiCloudClient.getCredential(credential);
             CesClient client = huaweiCloudClient.getCesClient(icredential, regionName);
@@ -173,11 +173,11 @@ public class HuaweiCloudMetricsService {
         if (resourceMetricRequest.isOnlyLastKnownMetric()) {
             String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
             if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, resourceId,
+                serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI_CLOUD, resourceId,
                         monitorResourceType, metric);
             } else {
-                Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, resourceId,
-                        monitorResourceType);
+                Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD,
+                        resourceId, monitorResourceType);
                 if (Objects.nonNull(cacheMetric)
                         && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
                     metric = cacheMetric;
@@ -208,7 +208,7 @@ public class HuaweiCloudMetricsService {
                         huaweiCloudDataModelConverter.getMonitorResourceTypeByMetricName(
                                 metricInfo.getMetricName());
                 Metric metricCache =
-                        serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, resourceId, type);
+                        serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD, resourceId, type);
                 if (Objects.nonNull(metricCache)) {
                     metricCacheMap.put(metricInfo.getMetricName(), metricCache);
                 }
@@ -241,13 +241,14 @@ public class HuaweiCloudMetricsService {
                         .findAny()
                         .orElse(null);
                 if (metric == null) {
-                    Metric metricCache =
-                            serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, resourceId, type);
+                    Metric metricCache = serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD,
+                            resourceId, type);
                     if (Objects.nonNull(metricCache)) {
                         metrics.add(metricCache);
                     }
                 } else {
-                    serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, resourceId, type, metric);
+                    serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI_CLOUD,
+                            resourceId, type, metric);
                 }
             }
         }

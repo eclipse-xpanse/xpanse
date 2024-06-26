@@ -29,13 +29,14 @@ public interface ServiceResourceHandler {
     /**
      * get the existing resources of the specified kind.
      *
-     * @param userId id of the user.
-     * @param region region of the resource.
-     * @param kind   kind of the resource.
+     * @param userId    id of the user.
+     * @param region    region of the resource.
+     * @param kind      kind of the resource.
+     * @param serviceId id of the service.
      * @return the existing resources names with the specified kind.
      */
     List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                  DeployResourceKind kind);
+                                                  DeployResourceKind kind, UUID serviceId);
 
 
     /**
