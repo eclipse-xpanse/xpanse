@@ -13,7 +13,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
@@ -64,11 +66,13 @@ public class ExistingCloudResourcesApi {
             @Parameter(name = "region", description = "name of he region")
             @RequestParam(name = "region") String region,
             @Parameter(name = "deployResourceKind", description = "kind of the CloudResource")
-            @PathVariable("deployResourceKind") DeployResourceKind deployResourceKind) {
-
+            @PathVariable("deployResourceKind") DeployResourceKind deployResourceKind,
+            @Parameter(name = "serviceId", description = "id of the deployed service")
+            @RequestParam(name = "serviceId", required = false) String serviceId) {
+        UUID uuid = StringUtils.isBlank(serviceId) ? null : UUID.fromString(serviceId);
         String userId = userServiceHelper.getCurrentUserId();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
         return orchestratorPlugin.getExistingResourceNamesWithKind(userId, region,
-                deployResourceKind);
+                deployResourceKind, uuid);
     }
 }

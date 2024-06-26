@@ -8,16 +8,17 @@ import org.junit.jupiter.api.Test;
 class ServiceMetricsCacheKeyTest {
 
     private final ServiceMetricsCacheKey testCacheKey =
-            new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
+            new ServiceMetricsCacheKey(Csp.HUAWEI_CLOUD, "resourceId", MonitorResourceType.CPU);
 
     @Test
     void testEquals() {
         // Setup
 
         final ServiceMetricsCacheKey cacheKey1 =
-                new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
+                new ServiceMetricsCacheKey(Csp.HUAWEI_CLOUD, "resourceId", MonitorResourceType.CPU);
         final ServiceMetricsCacheKey cacheKey2 =
-                new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId1", MonitorResourceType.CPU);
+                new ServiceMetricsCacheKey(Csp.HUAWEI_CLOUD, "resourceId1",
+                        MonitorResourceType.CPU);
         final ServiceMetricsCacheKey cacheKey3 =
                 new ServiceMetricsCacheKey(null, null, null);
         final Object object = new Object();
@@ -39,9 +40,10 @@ class ServiceMetricsCacheKeyTest {
     void testHashCode() {
         // Setup
         final ServiceMetricsCacheKey cacheKey1 =
-                new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU);
+                new ServiceMetricsCacheKey(Csp.HUAWEI_CLOUD, "resourceId", MonitorResourceType.CPU);
         final ServiceMetricsCacheKey cacheKey2 =
-                new ServiceMetricsCacheKey(Csp.HUAWEI, "resourceId1", MonitorResourceType.CPU);
+                new ServiceMetricsCacheKey(Csp.HUAWEI_CLOUD, "resourceId1",
+                        MonitorResourceType.CPU);
         final ServiceMetricsCacheKey cacheKey3 =
                 new ServiceMetricsCacheKey(null, null, null);
         // Run the test

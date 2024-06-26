@@ -23,14 +23,14 @@ import org.junit.jupiter.api.Test;
 class ServiceTemplateQueryModelTest {
 
     private final Category category = Category.COMPUTE;
-    private final Csp csp = Csp.HUAWEI;
+    private final Csp csp = Csp.HUAWEI_CLOUD;
     private final String serviceName = "kafka";
     private final String serviceVersion = "1.0.0";
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final ServiceRegistrationState serviceRegistrationState =
             ServiceRegistrationState.APPROVED;
     private final boolean checkNamespace = true;
-    private final String namespace = "huawei";
+    private final String namespace = "HuaweiCloud";
     private ServiceTemplateQueryModel testModel;
 
     @BeforeEach

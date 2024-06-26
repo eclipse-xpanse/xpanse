@@ -38,14 +38,14 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         userPolicyEntity.setUserId("userId");
         userPolicyEntity.setPolicy("policy");
-        userPolicyEntity.setCsp(Csp.HUAWEI);
+        userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(false);
 
         final UserPolicyEntity expectedResult = new UserPolicyEntity();
         expectedResult.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         expectedResult.setUserId("userId");
         expectedResult.setPolicy("policy");
-        expectedResult.setCsp(Csp.HUAWEI);
+        expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setEnabled(false);
 
         // Configure UserPolicyRepository.save(...).
@@ -53,13 +53,13 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity1.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         userPolicyEntity1.setUserId("userId");
         userPolicyEntity1.setPolicy("policy");
-        userPolicyEntity1.setCsp(Csp.HUAWEI);
+        userPolicyEntity1.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity1.setEnabled(false);
         final UserPolicyEntity entity = new UserPolicyEntity();
         entity.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         entity.setUserId("userId");
         entity.setPolicy("policy");
-        entity.setCsp(Csp.HUAWEI);
+        entity.setCsp(Csp.HUAWEI_CLOUD);
         entity.setEnabled(false);
         when(mockUserPolicyRepository.save(entity)).thenReturn(userPolicyEntity1);
 
@@ -77,7 +77,7 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         userPolicyEntity.setUserId("userId");
         userPolicyEntity.setPolicy("policy");
-        userPolicyEntity.setCsp(Csp.HUAWEI);
+        userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(false);
         final List<UserPolicyEntity> expectedResult = List.of(userPolicyEntity);
 
@@ -86,7 +86,7 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity1.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         userPolicyEntity1.setUserId("userId");
         userPolicyEntity1.setPolicy("policy");
-        userPolicyEntity1.setCsp(Csp.HUAWEI);
+        userPolicyEntity1.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity1.setEnabled(false);
         final List<UserPolicyEntity> policyEntities = List.of(userPolicyEntity1);
         when(mockUserPolicyRepository.findAll()).thenReturn(policyEntities);
@@ -116,14 +116,14 @@ class DatabaseUserPolicyStorageTest {
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
         queryModel.setEnabled(false);
         queryModel.setUserId("userId");
-        queryModel.setCsp(Csp.HUAWEI);
+        queryModel.setCsp(Csp.HUAWEI_CLOUD);
         queryModel.setPolicy("policy");
 
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         userPolicyEntity.setUserId("userId");
         userPolicyEntity.setPolicy("policy");
-        userPolicyEntity.setCsp(Csp.HUAWEI);
+        userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(false);
         final List<UserPolicyEntity> expectedResult = List.of(userPolicyEntity);
 
@@ -132,7 +132,7 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity1.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         userPolicyEntity1.setUserId("userId");
         userPolicyEntity1.setPolicy("policy");
-        userPolicyEntity1.setCsp(Csp.HUAWEI);
+        userPolicyEntity1.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity1.setEnabled(false);
         final List<UserPolicyEntity> policyEntities = List.of(userPolicyEntity1);
         when(mockUserPolicyRepository.findAll(any(Specification.class))).thenReturn(policyEntities);
@@ -150,7 +150,7 @@ class DatabaseUserPolicyStorageTest {
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
         queryModel.setEnabled(false);
         queryModel.setUserId("userId");
-        queryModel.setCsp(Csp.HUAWEI);
+        queryModel.setCsp(Csp.HUAWEI_CLOUD);
         queryModel.setPolicy("policy");
 
         // Run the test
@@ -167,7 +167,7 @@ class DatabaseUserPolicyStorageTest {
         expectedResult.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         expectedResult.setUserId("userId");
         expectedResult.setPolicy("policy");
-        expectedResult.setCsp(Csp.HUAWEI);
+        expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setEnabled(false);
 
         // Configure UserPolicyRepository.findById(...).
@@ -175,7 +175,7 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         userPolicyEntity.setUserId("userId");
         userPolicyEntity.setPolicy("policy");
-        userPolicyEntity.setCsp(Csp.HUAWEI);
+        userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(false);
         final Optional<UserPolicyEntity> policyEntityOptional = Optional.of(userPolicyEntity);
         when(mockUserPolicyRepository.findById(
@@ -212,7 +212,7 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         userPolicyEntity.setUserId("userId");
         userPolicyEntity.setPolicy("policy");
-        userPolicyEntity.setCsp(Csp.HUAWEI);
+        userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(false);
 
         // Run the test
@@ -224,7 +224,7 @@ class DatabaseUserPolicyStorageTest {
         entity.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
         entity.setUserId("userId");
         entity.setPolicy("policy");
-        entity.setCsp(Csp.HUAWEI);
+        entity.setCsp(Csp.HUAWEI_CLOUD);
         entity.setEnabled(false);
         verify(mockUserPolicyRepository).delete(entity);
     }

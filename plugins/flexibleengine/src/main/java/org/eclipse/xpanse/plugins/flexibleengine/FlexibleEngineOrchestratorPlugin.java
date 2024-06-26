@@ -41,6 +41,7 @@ import org.eclipse.xpanse.plugins.flexibleengine.price.FlexibleEnginePriceCalcul
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,6 +50,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
+
+    @Resource
+    private Environment environment;
     @Resource
     private FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler;
     @Resource
@@ -72,7 +76,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
+                                                         DeployResourceKind kind, UUID serviceId) {
         return flexibleEngineResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
     }
 
@@ -90,6 +94,11 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<String> requiredProperties() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Map<String, String> getEnvVarKeysMappingMap() {
+        return Collections.emptyMap();
     }
 
 

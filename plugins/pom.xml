@@ -17,10 +17,12 @@
     <artifactId>plugins</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>openstack</module>
         <module>huaweicloud</module>
         <module>flexibleengine</module>
-        <module>scs</module>
+        <module>openstack-common</module>
+        <module>openstacktestlab</module>
+        <module>plusserver</module>
+        <module>regiocloud</module>
     </modules>
 
 </project>

@@ -55,7 +55,7 @@ class CredentialOpenApiGeneratorTest {
 
     @Test
     void testGetCredentialOpenApiUrl() {
-        Csp csp = Csp.HUAWEI;
+        Csp csp = Csp.HUAWEI_CLOUD;
         CredentialType type = CredentialType.VARIABLES;
 
         String htmlFileName = csp.toValue() + "_" + type.toValue() + "_credentialApi.html";

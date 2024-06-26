@@ -44,7 +44,7 @@ public class DummyPluginImpl implements OrchestratorPlugin {
 
     @Override
     public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
+                                                         DeployResourceKind kind, UUID serviceId) {
         return new ArrayList<>();
     }
 
@@ -55,12 +55,17 @@ public class DummyPluginImpl implements OrchestratorPlugin {
 
     @Override
     public Csp getCsp() {
-        return Csp.OPENSTACK;
+        return Csp.OPENSTACK_TESTLAB;
     }
 
     @Override
     public List<String> requiredProperties() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Map<String, String> getEnvVarKeysMappingMap() {
+        return Collections.emptyMap();
     }
 
     @Override

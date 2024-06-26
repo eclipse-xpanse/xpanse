@@ -89,7 +89,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         testServicePricingApiWithHuaweiCloud();
         testServicePricingApiWithFlexibleEngine();
         testServicePricingApiWithOpenstack();
-        testServicePricingApiWithScs();
+        testServicePricingApiWithPlusServer();
     }
 
     void testServicePricingApiWithHuaweiCloud() throws Exception {
@@ -222,15 +222,15 @@ class ServicePricingApiTest extends ApisTestCommon {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("Openstack-Service-Test-" + UUID.randomUUID());
-        ocl.getCloudServiceProvider().setName(Csp.OPENSTACK);
+        ocl.getCloudServiceProvider().setName(Csp.OPENSTACK_TESTLAB);
         testGetServicePricing(ocl);
     }
 
-    void testServicePricingApiWithScs() throws Exception {
+    void testServicePricingApiWithPlusServer() throws Exception {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("Scs-Service-Test-" + UUID.randomUUID());
-        ocl.getCloudServiceProvider().setName(Csp.SCS);
+        ocl.setName("PlusServer-Service-Test-" + UUID.randomUUID());
+        ocl.getCloudServiceProvider().setName(Csp.PLUS_SERVER);
         testGetServicePricing(ocl);
     }
 

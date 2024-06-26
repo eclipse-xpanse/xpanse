@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.1</version>
+        <version>3.3.0</version>
     </parent>
     <licenses>
         <license>
@@ -34,20 +34,20 @@
     </modules>
     <properties>
         <java.version>21</java.version>
-        <spring-boot.version>3.3.1</spring-boot.version>
+        <spring-boot.version>3.3.0</spring-boot.version>
         <spring.retry.version>2.0.6</spring.retry.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <lombok.version>1.18.32</lombok.version>
         <checkstyle-maven-plugin.version>3.4.0</checkstyle-maven-plugin.version>
         <logbook.version>3.9.0</logbook.version>
-        <wiremock.version>3.7.0</wiremock.version>
+        <wiremock.version>3.6.0</wiremock.version>
         <instancio.version>4.8.0</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
         <jacoco.version>0.8.12</jacoco.version>
         <springdoc.version>2.5.0</springdoc.version>
         <slf4j-api.version>2.0.13</slf4j-api.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
-        <hypersistence-utils-hibernate.version>3.7.7</hypersistence-utils-hibernate.version>
+        <hypersistence-utils-hibernate.version>3.7.6</hypersistence-utils-hibernate.version>
         <mockito.version>5.12.0</mockito.version>
         <testcontainers.version>1.19.8</testcontainers.version>
         <apache.commons.io.version>2.16.1</apache.commons.io.version>
@@ -60,20 +60,19 @@
         <json.smart.version>2.5.0</json.smart.version>
         <spring.oauth.addon.test.version>7.8.4</spring.oauth.addon.test.version>
         <openstack4j.version>3.12</openstack4j.version>
-        <huawei.apigateway.version>3.1.2</huawei.apigateway.version>
         <jackson.databind.version>2.15.2</jackson.databind.version>
         <huaweicloud.sdk.version>3.1.101</huaweicloud.sdk.version>
-        <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
+        <maven.clean.plugin.version>3.3.2</maven.clean.plugin.version>
         <maven.compile.plugin.version>3.13.0</maven.compile.plugin.version>
         <maven.javadoc.plugin.version>3.7.0</maven.javadoc.plugin.version>
         <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
-        <maven.dependency.plugin.version>3.7.1</maven.dependency.plugin.version>
+        <maven.dependency.plugin.version>3.7.0</maven.dependency.plugin.version>
         <maven.surefire.plugin.version>3.3.0</maven.surefire.plugin.version>
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
         <openapi.generator.plugin.version>7.6.0</openapi.generator.plugin.version>
         <nimbusds.oidc.sdk.version>11.13</nimbusds.oidc.sdk.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <json-schema-validator.version>1.4.2</json-schema-validator.version>
+        <json-schema-validator.version>1.4.0</json-schema-validator.version>
         <archunit.version>1.3.0</archunit.version>
         <activiti.version>8.5.0</activiti.version>
         <maven.enforcer.plugin.version>3.5.0</maven.enforcer.plugin.version>

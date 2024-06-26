@@ -99,7 +99,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         String errorMessage = "Failed to convert value of type 'java.lang.String' to required type";
         // Run the test case 2
         final MockHttpServletResponse response2 = listOrderableServicesWithParams("errorValue",
-                Csp.HUAWEI.toValue(), null, null, null);
+                Csp.HUAWEI_CLOUD.toValue(), null, null, null);
         // Verify the result 2
         assertThat(response2.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
         assertThat(errorMessage).isSubstringOf(response2.getContentAsString());

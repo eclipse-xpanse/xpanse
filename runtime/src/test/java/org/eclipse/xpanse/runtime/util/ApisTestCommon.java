@@ -1,5 +1,8 @@
 package org.eclipse.xpanse.runtime.util;
 
+import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OPENSTACK_TESTLAB_AUTH_URL;
+import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.PLUS_SERVER_AUTH_URL;
+import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.REGIO_CLOUD_AUTH_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -51,12 +54,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
-import org.eclipse.xpanse.plugins.openstack.common.constants.OpenstackEnvironmentConstants;
-import org.eclipse.xpanse.plugins.scs.common.constants.ScsEnvironmentConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.MockedStatic;
@@ -117,6 +119,13 @@ public class ApisTestCommon {
                 OffsetDateTimeSerializer.INSTANCE));
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
+    }
+
+    @BeforeAll
+    static void setEnvVar() {
+        System.setProperty(OPENSTACK_TESTLAB_AUTH_URL, "http://127.0.0.1/identity/v3");
+        System.setProperty(PLUS_SERVER_AUTH_URL, "http://127.0.0.1/identity/v3");
+        System.setProperty(REGIO_CLOUD_AUTH_URL, "http://127.0.0.1/identity/v3");
     }
 
     protected void mockSdkClientsForHuaweiCloud() {
@@ -227,7 +236,7 @@ public class ApisTestCommon {
 
     protected void addCredentialForHuaweiCloud() throws Exception {
         final CreateCredential createCredential = new CreateCredential();
-        createCredential.setCsp(Csp.HUAWEI);
+        createCredential.setCsp(Csp.HUAWEI_CLOUD);
         createCredential.setType(CredentialType.VARIABLES);
         createCredential.setName("AK_SK");
         createCredential.setDescription("description");
@@ -258,48 +267,32 @@ public class ApisTestCommon {
         addUserCredential(createCredential);
     }
 
-    protected void addCredentialForOpenstack() throws Exception {
+    protected void addCredentialForOpenstack(Csp csp) throws Exception {
 
         final CreateCredential createCredential = new CreateCredential();
-        createCredential.setCsp(Csp.OPENSTACK);
+        createCredential.setCsp(csp);
         createCredential.setType(CredentialType.VARIABLES);
         createCredential.setName("USERNAME_PASSWORD");
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.PROJECT,
+        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT,
                 "The Name of the Tenant or Project to use.", true, false, "PROJECT"));
-        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.USERNAME,
+        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.USERNAME,
                 "The Username to login with.", true, false, "USERNAME"));
-        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.PASSWORD,
+        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.PASSWORD,
                 "The Password to login with.", true, true, "PASSWORD"));
-        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.USER_DOMAIN,
-                "The domain to which the openstack user is linked to.", true, false,
-                "USER_DOMAIN"));
-        credentialVariables.add(new CredentialVariable(OpenstackEnvironmentConstants.PROJECT_DOMAIN,
-                "The domain to which the openstack project is linked to.", true, false,
-                "PROJECT_DOMAIN"));
-        createCredential.setVariables(credentialVariables);
-        createCredential.setTimeToLive(300);
-        addUserCredential(createCredential);
-    }
-
-
-    protected void addCredentialForScs() throws Exception {
-
-        final CreateCredential createCredential = new CreateCredential();
-        createCredential.setCsp(Csp.SCS);
-        createCredential.setType(CredentialType.VARIABLES);
-        createCredential.setName("USERNAME_PASSWORD");
-        createCredential.setDescription("description");
-        List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(new CredentialVariable(ScsEnvironmentConstants.PROJECT,
-                "The Name of the Tenant or Project to use.", true, false, "PROJECT"));
-        credentialVariables.add(new CredentialVariable(ScsEnvironmentConstants.USERNAME,
-                "The Username to login with.", true, false, "USERNAME"));
-        credentialVariables.add(new CredentialVariable(ScsEnvironmentConstants.PASSWORD,
-                "The Password to login with.", true, true, "PASSWORD"));
-        credentialVariables.add(new CredentialVariable(ScsEnvironmentConstants.DOMAIN,
-                "The domain of the SCS installation to be used.", true, false, "DOMAIN"));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackCommonEnvironmentConstants.DOMAIN,
+                        "The domain to which the openstack user is linked to.", true, false,
+                        "DOMAIN"));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackCommonEnvironmentConstants.USER_DOMAIN,
+                        "The domain to which the openstack user is linked to.", true, false,
+                        "USER_DOMAIN"));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT_DOMAIN,
+                        "The domain to which the openstack project is linked to.", true, false,
+                        "PROJECT_DOMAIN"));
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(300);
         addUserCredential(createCredential);

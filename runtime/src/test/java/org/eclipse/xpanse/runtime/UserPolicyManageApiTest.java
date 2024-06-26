@@ -64,7 +64,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
     @WithJwt(file = "jwt_user.json")
     void testPoliciesManageApisWell() throws Exception {
         UserPolicyCreateRequest createRequest = new UserPolicyCreateRequest();
-        createRequest.setCsp(Csp.OPENSTACK);
+        createRequest.setCsp(Csp.OPENSTACK_TESTLAB);
         createRequest.setPolicy("userPolicy");
         UserPolicy userPolicy = addUserPolicy(createRequest);
         testListUserPolicies(userPolicy);
@@ -80,7 +80,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
     void testPoliciesManage_ThrowsExceptions() throws Exception {
         testAddPolicy_ThrowsPoliciesValidationFailed();
         UserPolicyCreateRequest createRequest = new UserPolicyCreateRequest();
-        createRequest.setCsp(Csp.OPENSTACK);
+        createRequest.setCsp(Csp.OPENSTACK_TESTLAB);
         createRequest.setPolicy("userPolicy");
         UserPolicy userPolicy = addUserPolicy(createRequest);
         testAddPolicy_ThrowsPolicyDuplicateException(userPolicy);
@@ -185,7 +185,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         mockPoliciesValidateRequest(false);
 
         final UserPolicyCreateRequest createRequest = new UserPolicyCreateRequest();
-        createRequest.setCsp(Csp.HUAWEI);
+        createRequest.setCsp(Csp.HUAWEI_CLOUD);
         createRequest.setPolicy("userPolicy");
         String requestBody = objectMapper.writeValueAsString(createRequest);
 
@@ -233,7 +233,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         mockPoliciesValidateRequest(true);
 
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
-        updateRequest.setCsp(Csp.SCS);
+        updateRequest.setCsp(Csp.OPENSTACK_TESTLAB);
         updateRequest.setPolicy("userPolicyUpdate");
         updateRequest.setEnabled(true);
         String requestBody = objectMapper.writeValueAsString(updateRequest);
@@ -250,7 +250,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
         Assertions.assertEquals(updatedUserPolicy.getUserPolicyId(), userPolicy.getUserPolicyId());
-        Assertions.assertEquals(updatedUserPolicy.getCsp(), Csp.SCS);
+        Assertions.assertEquals(updatedUserPolicy.getCsp(), Csp.OPENSTACK_TESTLAB);
         Assertions.assertEquals(updatedUserPolicy.getPolicy(), "userPolicyUpdate");
         Assertions.assertTrue(updatedUserPolicy.getEnabled());
     }
@@ -263,7 +263,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
-        updateRequest.setCsp(Csp.HUAWEI);
+        updateRequest.setCsp(Csp.HUAWEI_CLOUD);
         updateRequest.setPolicy("userPolicy");
         String requestBody = objectMapper.writeValueAsString(updateRequest);
 

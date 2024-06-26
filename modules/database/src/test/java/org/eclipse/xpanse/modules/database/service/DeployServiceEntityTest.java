@@ -40,7 +40,7 @@ class DeployServiceEntityTest {
     private final String CUSTOMER_SERVICE_NAME = "kafka-cluster";
     private final String VERSION = "2.0";
     private final String NAMESPACE = "defaultUserId";
-    private final Csp CSP = Csp.HUAWEI;
+    private final Csp CSP = Csp.HUAWEI_CLOUD;
     private final String FLAVOR = "1-zookeeper-with-3-worker-nodes-normal";
     private final ServiceDeploymentState SERVICE_STATE = ServiceDeploymentState.DEPLOYING;
     private final ServiceState SERVICE_RUN_STATE = ServiceState.NOT_RUNNING;

@@ -39,6 +39,7 @@ public class Oauth2GrantedAuthoritiesExtractor implements
     private String grantedRolesScope;
 
     @Override
+    @SuppressWarnings("unchecked")
     public Collection<GrantedAuthority> convert(Map<String, Object> claims) {
         Set<GrantedAuthority> roles;
         String userId = (String) claims.get(userIdKey);

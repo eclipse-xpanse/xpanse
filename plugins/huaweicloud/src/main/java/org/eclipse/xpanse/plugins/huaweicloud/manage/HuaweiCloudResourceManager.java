@@ -334,7 +334,7 @@ public class HuaweiCloudResourceManager {
 
     private ICredential getCredential(String userId) {
         AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.HUAWEI, CredentialType.VARIABLES, userId);
+                credentialCenter.getCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, userId);
         return huaweiCloudClient.getCredential(credential);
     }
 }

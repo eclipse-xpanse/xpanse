@@ -65,7 +65,7 @@ class CredentialCenterTest {
 
     @Test
     void testGetAvailableCredentialTypesByCsp() {
-        Csp csp = Csp.OPENSTACK;
+        Csp csp = Csp.OPENSTACK_TESTLAB;
         List<CredentialType> expectedCredentialTypes = new ArrayList<>();
         expectedCredentialTypes.add(CredentialType.VARIABLES);
         expectedCredentialTypes.add(CredentialType.API_KEY);
@@ -81,11 +81,11 @@ class CredentialCenterTest {
 
     @Test
     public void testListCredentialCapabilities_WithValidType() {
-        Csp csp = Csp.OPENSTACK;
+        Csp csp = Csp.OPENSTACK_TESTLAB;
         CredentialType credentialType = CredentialType.VARIABLES;
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
@@ -102,9 +102,9 @@ class CredentialCenterTest {
 
     @Test
     public void testListCredentialCapabilities_WithNullType() {
-        Csp csp = Csp.OPENSTACK;
+        Csp csp = Csp.OPENSTACK_TESTLAB;
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
@@ -119,10 +119,10 @@ class CredentialCenterTest {
 
     @Test
     public void testListCredentialCapabilities_WithNoMatchingType() {
-        Csp csp = Csp.OPENSTACK;
+        Csp csp = Csp.OPENSTACK_TESTLAB;
         CredentialType credentialType = CredentialType.API_KEY;
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
@@ -137,7 +137,7 @@ class CredentialCenterTest {
 
     @Test
     public void testGetCredentialOpenApiUrl() {
-        Csp csp = Csp.OPENSTACK;
+        Csp csp = Csp.OPENSTACK_TESTLAB;
         CredentialType credentialType = CredentialType.VARIABLES;
         String expectedUrl = "https://example.com/credential/openapi";
 
@@ -174,7 +174,7 @@ class CredentialCenterTest {
 
     @Test
     void testListCredentials_WithoutuserId() {
-        Csp csp = Csp.OPENSTACK;
+        Csp csp = Csp.OPENSTACK_TESTLAB;
         String userId = "";
         CredentialType requestedCredentialType = CredentialType.VARIABLES;
         when(mockPluginManager.getOrchestratorPlugin(csp)).thenReturn(orchestratorPlugin);
@@ -186,7 +186,7 @@ class CredentialCenterTest {
 
     @Test
     void testDeleteCredential() {
-        Csp csp = Csp.OPENSTACK;
+        Csp csp = Csp.OPENSTACK_TESTLAB;
         String userId = "user123";
         CredentialType credentialType = CredentialType.API_KEY;
 
@@ -199,7 +199,7 @@ class CredentialCenterTest {
     @Test
     void testCreateCredential() {
         final AbstractCredentialInfo credentialInfo =
-                new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description1", true, false),
                                 new CredentialVariable("id", "description", true, false)));
@@ -213,7 +213,7 @@ class CredentialCenterTest {
     void testCheckInputCredentialIsValid_WithCredentialTypeValid() {
 
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.VARIABLES);
         inputCredential.setName(credentialName);
         inputCredential.setVariables(
@@ -221,7 +221,7 @@ class CredentialCenterTest {
                         new CredentialVariable("id", "description", true, false, "value")));
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false, "value"),
                                 new CredentialVariable("id", "description", true, false,
@@ -236,7 +236,7 @@ class CredentialCenterTest {
     void testCheckInputCredentialIsValid_WithCredentialTypeNotEquals() {
 
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.VARIABLES);
         inputCredential.setName(credentialName);
         inputCredential.setVariables(
@@ -244,7 +244,7 @@ class CredentialCenterTest {
                         new CredentialVariable("id", "description", true, false, "value")));
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.API_KEY,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.API_KEY,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false, "value"),
                                 new CredentialVariable("id", "description", true, false,
@@ -262,12 +262,12 @@ class CredentialCenterTest {
     void testCheckInputCredentialIsValid_WithCredentialTypeValidNameNotValid() {
 
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.VARIABLES);
         inputCredential.setName("name1");
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
@@ -283,7 +283,7 @@ class CredentialCenterTest {
     void testCheckInputCredentialIsValid_WithCredentialTypeValidIsMandatoryValid() {
 
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.VARIABLES);
         inputCredential.setName(credentialName);
         inputCredential.setVariables(
@@ -291,7 +291,7 @@ class CredentialCenterTest {
                         new CredentialVariable("id1", "description", true, false)));
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
@@ -307,7 +307,7 @@ class CredentialCenterTest {
     void testCheckInputCredentialIsValid_WithCredentialTypeValidIsMandatoryNotValid() {
 
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.VARIABLES);
         inputCredential.setName(credentialName);
         inputCredential.setVariables(
@@ -315,7 +315,7 @@ class CredentialCenterTest {
                         new CredentialVariable("id1", "description", true, false)));
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", false, false),
                                 new CredentialVariable("id", "description", true, false))));
@@ -331,12 +331,12 @@ class CredentialCenterTest {
     void testCheckInputCredentialIsValid_WithNotMatchingCredential() {
 
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.API_KEY);
         inputCredential.setName(credentialName);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         List.of(new CredentialVariable("name", "description", true, false),
                                 new CredentialVariable("id", "description", true, false))));
@@ -352,7 +352,7 @@ class CredentialCenterTest {
     @Test
     void testAddCredential_WithCredentialTypeValid() {
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.VARIABLES);
         inputCredential.setName(credentialName);
         inputCredential.setUserId("userId");
@@ -369,7 +369,7 @@ class CredentialCenterTest {
         credentialVariable.setTimeToLive(5);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         new ArrayList<>()));
 
@@ -388,14 +388,14 @@ class CredentialCenterTest {
         assertTrue(credentialTypes.contains(inputCredential.getType()));
 
         Assertions.assertTrue(Objects.nonNull(
-                credentialCenter.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES,
+                credentialCenter.getCredential(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         "user")));
     }
 
     @Test
     void testAddCredential_WithoutCredentialType() {
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.API_KEY);
         inputCredential.setName(credentialName);
         inputCredential.setUserId("userId");
@@ -412,7 +412,7 @@ class CredentialCenterTest {
         credentialVariable.setTimeToLive(5);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.API_KEY,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.API_KEY,
                         credentialName, "description", "userId",
                         new ArrayList<>()));
 
@@ -435,7 +435,7 @@ class CredentialCenterTest {
     @Test
     void testUpdateCredential_WithCredentialTypeValid() {
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.VARIABLES);
         inputCredential.setName(credentialName);
         inputCredential.setUserId("userId");
@@ -452,7 +452,7 @@ class CredentialCenterTest {
         credentialVariable.setTimeToLive(5);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         new ArrayList<>()));
 
@@ -472,14 +472,14 @@ class CredentialCenterTest {
 
 
         Assertions.assertTrue(Objects.nonNull(
-                credentialCenter.getCredential(Csp.OPENSTACK, CredentialType.VARIABLES,
+                credentialCenter.getCredential(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         "user")));
     }
 
     @Test
     void testUpdateCredential_WithoutCredentialType() {
         CreateCredential inputCredential = new CreateCredential();
-        inputCredential.setCsp(Csp.OPENSTACK);
+        inputCredential.setCsp(Csp.OPENSTACK_TESTLAB);
         inputCredential.setType(CredentialType.API_KEY);
         inputCredential.setName(credentialName);
         inputCredential.setUserId("userId");
@@ -496,7 +496,7 @@ class CredentialCenterTest {
         credentialVariable.setTimeToLive(5);
 
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES,
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES,
                         credentialName, "description", "userId",
                         new ArrayList<>()));
 

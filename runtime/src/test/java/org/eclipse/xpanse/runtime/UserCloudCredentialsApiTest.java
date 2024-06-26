@@ -45,7 +45,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserCloudCredentialsApiTest extends ApisTestCommon {
 
-    private final Csp csp = Csp.HUAWEI;
+    private final Csp csp = Csp.HUAWEI_CLOUD;
     private final CredentialType credentialType = CredentialType.VARIABLES;
 
     @Test
@@ -99,7 +99,7 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
         String requestBody = objectMapper.writeValueAsString(createCredential);
 
         String addResult = "";
-        createCredential.setUserId("1234566");
+        createCredential.setUserId("userId");
         CredentialVariables credentialVariables1 = new CredentialVariables(createCredential);
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
@@ -156,13 +156,13 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
 
     void testGetCredentialOpenApi() throws Exception {
         // Setup
-        Link link = Link.of("http://localhost/openapi/huawei_variables_credentialApi.html",
+        Link link = Link.of("http://localhost/openapi/HuaweiCloud_variables_credentialApi.html",
                 "OpenApi");
         String result = objectMapper.writeValueAsString(link);
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/credentials/openapi/{csp}/{type}", Csp.HUAWEI,
+                        get("/xpanse/credentials/openapi/{csp}/{type}", Csp.HUAWEI_CLOUD,
                                 CredentialType.VARIABLES)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -179,7 +179,7 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
 
         String requestBody = objectMapper.writeValueAsString(updateCredential);
         String updateResult = "";
-        updateCredential.setUserId("1234566");
+        updateCredential.setUserId("userId");
         CredentialVariables credentialVariables1 = new CredentialVariables(updateCredential);
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
 

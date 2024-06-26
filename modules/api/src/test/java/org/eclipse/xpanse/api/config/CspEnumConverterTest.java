@@ -13,12 +13,12 @@ class CspEnumConverterTest {
 
     @Test
     void testConvert() {
-        assertEquals(converterTest.convert("huawei"), Csp.HUAWEI);
-        assertEquals(converterTest.convert("flexibleEngine"), Csp.FLEXIBLE_ENGINE);
-        assertEquals(converterTest.convert("openstack"), Csp.OPENSTACK);
-        assertEquals(converterTest.convert("scs"), Csp.SCS);
-        assertEquals(converterTest.convert("google"), Csp.GOOGLE);
-        assertEquals(converterTest.convert("alicloud"), Csp.ALICLOUD);
+        assertEquals(converterTest.convert("HuaweiCloud"), Csp.HUAWEI_CLOUD);
+        assertEquals(converterTest.convert("FlexibleEngine"), Csp.FLEXIBLE_ENGINE);
+        assertEquals(converterTest.convert("OpenstackTestlab"), Csp.OPENSTACK_TESTLAB);
+        assertEquals(converterTest.convert("PlusServer"), Csp.PLUS_SERVER);
+        assertEquals(converterTest.convert("GoogleCloudPlatform"), Csp.GCP);
+        assertEquals(converterTest.convert("AlibabaCloud"), Csp.ALIBABA_CLOUD);
         assertEquals(converterTest.convert("aws"), Csp.AWS);
         assertEquals(converterTest.convert("azure"), Csp.AZURE);
         Assertions.assertThrows(UnsupportedEnumValueException.class,

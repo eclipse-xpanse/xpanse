@@ -16,22 +16,20 @@ import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
-import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
-import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -40,18 +38,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
-import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
-import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
-import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,6 +78,8 @@ class DeployEnvironmentsTest {
     private PluginManager pluginManager;
     @Mock
     private Environment environment;
+    @Mock
+    private OrchestratorPlugin mockOrchestratorPlugin;
     private DeployEnvironments deployEnvironmentsUnderTest;
 
     @BeforeEach
@@ -101,7 +94,7 @@ class DeployEnvironmentsTest {
         deployRequest.setFlavor("flavor");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
-        deployRequest.setCsp(Csp.HUAWEI);
+        deployRequest.setCsp(Csp.HUAWEI_CLOUD);
         Region region = new Region();
         region.setName(regionName);
         region.setArea(areaName);
@@ -139,7 +132,7 @@ class DeployEnvironmentsTest {
         flavors.setServiceFlavors(List.of(flavor));
 
         CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
-        cloudServiceProvider.setName(Csp.HUAWEI);
+        cloudServiceProvider.setName(Csp.HUAWEI_CLOUD);
 
         Ocl ocl = new Ocl();
 
@@ -163,9 +156,22 @@ class DeployEnvironmentsTest {
         expectedResult.put("key1", null);
         expectedResult.put("key2", "value2");
 
+        task.getOcl().getCloudServiceProvider().setName(Csp.HUAWEI_CLOUD);
+        when(pluginManager.getOrchestratorPlugin(any())).thenReturn(mockOrchestratorPlugin);
+        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD)
+                .getEnvVarKeysMappingMap()).thenReturn(Collections.emptyMap());
         Map<String, String> result = deployEnvironmentsUnderTest.getEnvFromDeployTask(task);
-
         assertThat(result).isEqualTo(expectedResult);
+
+        String osAuthUrl = "http://127.0.0.1";
+        expectedResult.put("OS_AUTH_URL", osAuthUrl);
+        task.getOcl().getCloudServiceProvider().setName(Csp.OPENSTACK_TESTLAB);
+        when(pluginManager.getOrchestratorPlugin(Csp.OPENSTACK_TESTLAB)
+                .getEnvVarKeysMappingMap()).thenReturn(
+                Map.of("OS_AUTH_URL", "OPENSTACK_TESTLAB_AUTH_URL"));
+        when(environment.getProperty("OPENSTACK_TESTLAB_AUTH_URL")).thenReturn(osAuthUrl);
+        Map<String, String> result2 = deployEnvironmentsUnderTest.getEnvFromDeployTask(task);
+        assertThat(result2).isEqualTo(expectedResult);
     }
 
     @Test
@@ -218,7 +224,7 @@ class DeployEnvironmentsTest {
         deployVariable2.setKind(DeployVariableKind.ENV_VARIABLE);
         deployVariable3.setKind(DeployVariableKind.FIX_VARIABLE);
 
-        Csp csp = Csp.HUAWEI;
+        Csp csp = Csp.HUAWEI_CLOUD;
         List<CredentialVariable> variables = new ArrayList<>();
         variables.add(new CredentialVariable("HW_AK", "The access key.", true));
         variables.add(new CredentialVariable("HW_SK", "The security key.", true));
@@ -253,7 +259,7 @@ class DeployEnvironmentsTest {
         deployVariable2.setKind(DeployVariableKind.ENV_VARIABLE);
         deployVariable3.setKind(DeployVariableKind.FIX_VARIABLE);
         deployRequest.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
-        Csp csp = Csp.HUAWEI;
+        Csp csp = Csp.HUAWEI_CLOUD;
         List<CredentialVariable> variables = new ArrayList<>();
         variables.add(new CredentialVariable("HW_AK", "The access key.", true));
         variables.add(new CredentialVariable("HW_SK", "The security key.", true));
@@ -305,86 +311,9 @@ class DeployEnvironmentsTest {
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployRequest(deployRequest);
 
-        OrchestratorPlugin plugin = new OrchestratorPlugin() {
-            @Override
-            public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
-                return null;
-            }
-
-            @Override
-            public void auditApiRequest(AuditLog auditLog) {
-                log.info(auditLog.toString());
-            }
-
-            @Override
-            public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
-                return true;
-            }
-
-            @Override
-            public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
-                return true;
-            }
-
-            @Override
-            public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
-                return true;
-            }
-
-            @Override
-            public Csp getCsp() {
-                return Csp.OPENSTACK;
-            }
-
-            @Override
-            public List<String> requiredProperties() {
-                return List.of("OS_AUTH_URL");
-            }
-
-            @Override
-            public boolean autoApproveServiceTemplateIsEnabled() {
-                return false;
-            }
-
-            @Override
-            public List<CredentialType> getAvailableCredentialTypes() {
-                return null;
-            }
-
-            @Override
-            public List<AbstractCredentialInfo> getCredentialDefinitions() {
-                return null;
-            }
-
-            @Override
-            public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
-                return null;
-            }
-
-            @Override
-            public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                                 DeployResourceKind kind) {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public List<String> getAvailabilityZonesOfRegion(String userId, String region,
-                                                             UUID serviceId) {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public List<Metric> getMetricsForResource(
-                    ResourceMetricsRequest resourceMetricRequest) {
-                return null;
-            }
-
-            @Override
-            public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
-                return null;
-            }
-        };
-        when(this.pluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(plugin);
+        when(this.pluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(
+                mockOrchestratorPlugin);
+        when(mockOrchestratorPlugin.requiredProperties()).thenReturn(List.of("OS_AUTH_URL"));
         Map<String, String> variables = deployEnvironmentsUnderTest.getPluginMandatoryVariables(
                 xpanseDeployTask.getDeployRequest().getCsp());
 

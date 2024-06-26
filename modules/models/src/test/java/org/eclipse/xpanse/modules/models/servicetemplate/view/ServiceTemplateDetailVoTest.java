@@ -40,7 +40,7 @@ class ServiceTemplateDetailVoTest {
     private static final String name = "kafka";
     private static final String version = "1.0.0";
     private static final String eula = "eula";
-    private static final Csp csp = Csp.AWS;
+    private static final Csp csp = Csp.HUAWEI_CLOUD;
     private static final String description = "description";
     private static final String namespace = "namespace";
     private static final String icon = "icon";
