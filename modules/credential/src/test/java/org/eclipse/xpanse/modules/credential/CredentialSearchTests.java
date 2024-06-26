@@ -50,14 +50,14 @@ class CredentialSearchTests {
     void testCredentialVariablesNotCompleteIsThrownWhenMandatoryVariablesAreMissing() {
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(new DummyPluginImpl());
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES, "name",
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "name",
                         "description",
                         "userId",
                         List.of(new CredentialVariable("name", "description", false))));
         when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
                 credentialVariables.getFirst());
         Assertions.assertThrows(CredentialVariablesNotComplete.class,
-                () -> this.credentialCenter.getCredential(Csp.OPENSTACK,
+                () -> this.credentialCenter.getCredential(Csp.OPENSTACK_TESTLAB,
                         CredentialType.VARIABLES, "user"));
     }
 
@@ -65,7 +65,7 @@ class CredentialSearchTests {
     void testSuccessfulCredentialsGet() {
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(new DummyPluginImpl());
         final List<AbstractCredentialInfo> credentialVariables =
-                List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES, "name",
+                List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "name",
                         "description",
                         "userId",
                         List.of(new CredentialVariable("name", "description", false, false),
@@ -74,10 +74,10 @@ class CredentialSearchTests {
         when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
                 credentialVariables.getFirst());
         AbstractCredentialInfo abstractCredentialInfo =
-                this.credentialCenter.getCredential(Csp.OPENSTACK,
+                this.credentialCenter.getCredential(Csp.OPENSTACK_TESTLAB,
                         CredentialType.VARIABLES, "user");
         Assertions.assertTrue(Objects.nonNull(abstractCredentialInfo));
-        Assertions.assertSame(Csp.OPENSTACK, abstractCredentialInfo.getCsp());
+        Assertions.assertSame(Csp.OPENSTACK_TESTLAB, abstractCredentialInfo.getCsp());
         Assertions.assertSame(CredentialType.VARIABLES, abstractCredentialInfo.getType());
     }
 
@@ -86,7 +86,7 @@ class CredentialSearchTests {
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(new DummyPluginImpl());
         withEnvironmentVariable("name", "testUser").execute(() -> {
             final List<AbstractCredentialInfo> credentialVariables =
-                    List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES, "name",
+                    List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "name",
                             "description",
                             "userId",
                             List.of(new CredentialVariable("name", "description", true, false),
@@ -95,10 +95,10 @@ class CredentialSearchTests {
             when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
                     credentialVariables.getFirst());
             AbstractCredentialInfo abstractCredentialInfo =
-                    this.credentialCenter.getCredential(Csp.OPENSTACK,
+                    this.credentialCenter.getCredential(Csp.OPENSTACK_TESTLAB,
                             CredentialType.VARIABLES, "user");
             Assertions.assertTrue(Objects.nonNull(abstractCredentialInfo));
-            Assertions.assertSame(Csp.OPENSTACK, abstractCredentialInfo.getCsp());
+            Assertions.assertSame(Csp.OPENSTACK_TESTLAB, abstractCredentialInfo.getCsp());
             Assertions.assertSame(CredentialType.VARIABLES, abstractCredentialInfo.getType());
             Assertions.assertEquals(2,
                     ((CredentialVariables) abstractCredentialInfo).getVariables().stream()
@@ -112,7 +112,7 @@ class CredentialSearchTests {
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(new DummyPluginImpl());
         withEnvironmentVariables("name", "testUser", "id", "testId").execute(() -> {
             final List<AbstractCredentialInfo> credentialVariables =
-                    List.of(new CredentialVariables(Csp.OPENSTACK, CredentialType.VARIABLES, "name",
+                    List.of(new CredentialVariables(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "name",
                             "description",
                             "userId",
                             List.of(new CredentialVariable("name", "description", true, false),
@@ -120,10 +120,10 @@ class CredentialSearchTests {
             when(credentialsStore.getCredential(any(), any(), any(), any())).thenReturn(
                     credentialVariables.getFirst());
             AbstractCredentialInfo abstractCredentialInfo =
-                    this.credentialCenter.getCredential(Csp.OPENSTACK,
+                    this.credentialCenter.getCredential(Csp.OPENSTACK_TESTLAB,
                             CredentialType.VARIABLES, "user");
             Assertions.assertTrue(Objects.nonNull(abstractCredentialInfo));
-            Assertions.assertSame(Csp.OPENSTACK, abstractCredentialInfo.getCsp());
+            Assertions.assertSame(Csp.OPENSTACK_TESTLAB, abstractCredentialInfo.getCsp());
             Assertions.assertSame(CredentialType.VARIABLES, abstractCredentialInfo.getType());
             Assertions.assertEquals(2,
                     ((CredentialVariables) abstractCredentialInfo).getVariables().stream()

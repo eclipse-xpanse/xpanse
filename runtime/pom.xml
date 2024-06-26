@@ -270,12 +270,17 @@
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.xpanse.plugins</groupId>
-                    <artifactId>openstack</artifactId>
+                    <artifactId>openstacktestlab</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.xpanse.plugins</groupId>
-                    <artifactId>scs</artifactId>
+                    <artifactId>plusserver</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>regiocloud</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
@@ -340,18 +345,23 @@
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.xpanse.plugins</groupId>
-                    <artifactId>openstack</artifactId>
+                    <artifactId>openstacktestlab</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.xpanse.plugins</groupId>
-                    <artifactId>scs</artifactId>
+                    <artifactId>plusserver</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.xpanse.plugins</groupId>
+                    <artifactId>regiocloud</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
         </profile>
         <profile>
-            <id>plugin-huawei</id>
+            <id>plugin-huaweicloud</id>
             <dependencies>
                 <dependency>
                     <groupId>org.eclipse.xpanse.plugins</groupId>
@@ -368,29 +378,34 @@
                     <artifactId>flexibleengine</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>plugin-openstacktestlab</id>
+            <dependencies>
                 <dependency>
                     <groupId>org.eclipse.xpanse.plugins</groupId>
-                    <artifactId>scs</artifactId>
+                    <artifactId>openstacktestlab</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
         </profile>
         <profile>
-            <id>plugin-openstack</id>
+            <id>plugin-plusserver</id>
             <dependencies>
                 <dependency>
                     <groupId>org.eclipse.xpanse.plugins</groupId>
-                    <artifactId>openstack</artifactId>
+                    <artifactId>plusserver</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
         </profile>
         <profile>
-            <id>plugin-scs</id>
+            <id>plugin-regiocloud</id>
             <dependencies>
                 <dependency>
                     <groupId>org.eclipse.xpanse.plugins</groupId>
-                    <artifactId>scs</artifactId>
+                    <artifactId>regiocloud</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>

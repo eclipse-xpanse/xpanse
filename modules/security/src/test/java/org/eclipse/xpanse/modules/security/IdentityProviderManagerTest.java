@@ -34,7 +34,7 @@ class IdentityProviderManagerTest {
     CurrentUserInfo getMockCurrentUserInfo() {
         final String userId = "userId";
         final String namespace = "namespace";
-        final Csp csp = Csp.HUAWEI;
+        final Csp csp = Csp.HUAWEI_CLOUD;
         final List<String> roles = List.of("admin", "csp", "isv", "user");
         final CurrentUserInfo currentUserInfo = new CurrentUserInfo();
         currentUserInfo.setUserId(userId);

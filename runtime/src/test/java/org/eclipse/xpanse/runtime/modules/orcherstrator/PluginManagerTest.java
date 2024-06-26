@@ -70,7 +70,7 @@ class PluginManagerTest {
 
         // Run the test
         Assertions.assertThrows(PluginNotFoundException.class, () -> {
-            pluginManager.getOrchestratorPlugin(Csp.AZURE);
+            pluginManager.getOrchestratorPlugin(Csp.AWS);
         });
     }
 

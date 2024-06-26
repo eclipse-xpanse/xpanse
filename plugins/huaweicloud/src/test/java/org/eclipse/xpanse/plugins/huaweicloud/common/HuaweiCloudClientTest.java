@@ -70,7 +70,7 @@ class HuaweiCloudClientTest {
                 "The access key.", true, true, skValue);
         credentialVariables.add(sk);
         return new CredentialVariables(
-                Csp.HUAWEI, CredentialType.VARIABLES, "AK_SK",
+                Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, "AK_SK",
                 "The access key and security key.",
                 "userId", credentialVariables);
     }

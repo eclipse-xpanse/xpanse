@@ -2,6 +2,7 @@ package org.eclipse.xpanse.plugins.flexibleengine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -61,6 +62,17 @@ class FlexibleEngineOrchestratorPluginTest {
     void testRequiredProperties() {
         assertThat(flexibleEngineOrchestratorPluginUnderTest.requiredProperties()).isEqualTo(
                 Collections.emptyList());
+    }
+
+    @Test
+    void testGetEnvVarKeysMappingMap() {
+        // Setup
+        // Run the test
+        final Map<String, String> result =
+                flexibleEngineOrchestratorPluginUnderTest.getEnvVarKeysMappingMap();
+
+        // Verify the results
+        assertTrue(result.isEmpty());
     }
 
     @Test

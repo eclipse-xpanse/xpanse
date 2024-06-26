@@ -114,7 +114,7 @@ class AesUtilTest {
         final Object decodedBoolResult = aesUtilTest.decodeBackToOriginalType(
                 DeployVariableDataType.BOOLEAN, aesUtilTest.encode(String.valueOf(bool)));
         // Verify the results
-        Assertions.assertTrue(decodedBoolResult instanceof Boolean);
+        Assertions.assertInstanceOf(Boolean.class, decodedBoolResult);
         Assertions.assertEquals(decodedBoolResult, bool);
     }
 

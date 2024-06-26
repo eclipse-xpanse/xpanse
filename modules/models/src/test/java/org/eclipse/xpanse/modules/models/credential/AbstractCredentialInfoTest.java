@@ -19,7 +19,7 @@ class AbstractCredentialInfoTest {
 
     @Test
     public void testConstructorAndGetters() {
-        Csp csp = Csp.HUAWEI;
+        Csp csp = Csp.HUAWEI_CLOUD;
         String UserId = "user";
         String name = "credential";
         String description = "Test credential";

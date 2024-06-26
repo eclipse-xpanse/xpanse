@@ -14,7 +14,7 @@
     "csp": "csp"
   },
   "urn:zitadel:iam:user:metadata": {
-    "csp": "aHVhd2Vp"
+    "csp": "SHVhd2VpQ2xvdWQ="
   },
-  "sub": "1234566"
+  "sub": "userId"
 }

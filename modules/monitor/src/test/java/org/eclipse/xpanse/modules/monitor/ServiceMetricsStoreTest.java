@@ -48,42 +48,45 @@ class ServiceMetricsStoreTest {
 
     @Test
     void testWriteToCache() {
-        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
+        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
+                MonitorResourceType.CPU,
                 setUpMetric());
         Assertions.assertTrue(Objects.nonNull(
-                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
                         MonitorResourceType.CPU)));
     }
 
     @Test
     void testCacheKey() {
-        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
+        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
+                MonitorResourceType.CPU,
                 setUpMetric());
         Assertions.assertTrue(Objects.nonNull(
-                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
                         MonitorResourceType.CPU)));
         Assertions.assertTrue(Objects.isNull(
-                serviceMetricsStore.getMonitorMetric(Csp.OPENSTACK, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.OPENSTACK_TESTLAB, "resourceId",
                         MonitorResourceType.CPU)));
         Assertions.assertTrue(Objects.isNull(
-                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId1",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId1",
                         MonitorResourceType.CPU)));
         Assertions.assertTrue(Objects.isNull(
-                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
                         MonitorResourceType.MEM)));
     }
 
     @Test
     void testCacheDeletion() {
-        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI, "resourceId", MonitorResourceType.CPU,
+        serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
+                MonitorResourceType.CPU,
                 setUpMetric());
         Assertions.assertTrue(Objects.nonNull(
-                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
                         MonitorResourceType.CPU)));
-        serviceMetricsStore.deleteMonitorMetric(Csp.HUAWEI, "resourceId",
+        serviceMetricsStore.deleteMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
                 MonitorResourceType.CPU);
         Assertions.assertTrue(Objects.isNull(
-                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI, "resourceId",
+                serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD, "resourceId",
                         MonitorResourceType.CPU)));
     }
 }

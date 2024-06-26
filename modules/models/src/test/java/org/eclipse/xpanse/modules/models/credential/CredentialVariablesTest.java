@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
  */
 class CredentialVariablesTest {
 
-    private static final Csp csp = Csp.AWS;
+    private static final Csp csp = Csp.HUAWEI_CLOUD;
     private static final String userId = "user";
     private static final String name = "credential";
     private static final String description = "Test credential";

@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.orchestrator;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,6 +22,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.exceptions.DuplicateCredentialDefinition;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,8 @@ public class PluginManager {
 
     @Getter
     private final Map<Csp, OrchestratorPlugin> pluginsMap = new ConcurrentHashMap<>();
+    @Value("${multiple.providers.black.properties}")
+    private String multipleProvidersBlackProperties;
     @Resource
     private ApplicationContext applicationContext;
 
@@ -46,16 +50,25 @@ public class PluginManager {
         applicationContext.getBeansOfType(OrchestratorPlugin.class).forEach((key, value) -> {
             if (isPluginUsable(value.requiredProperties(), value.getCsp())) {
                 pluginsMap.put(value.getCsp(), value);
-            } else {
-                log.error(String.format(
-                        "Plugin for csp %s is not in usable state. Will not be activated.",
-                        value.getCsp()));
             }
         });
         checkCredentialDefinitions();
-        log.info("Cloud service providers:{} with activated plugins.", pluginsMap.keySet());
+        log.info("Cloud service providers {} with activated plugins.", pluginsMap.keySet());
         if (pluginsMap.isEmpty()) {
             throw new PluginNotFoundException("No plugin is activated.");
+        }
+        if (pluginsMap.size() > 1) {
+            List<String> blackProperties =
+                    Arrays.asList(StringUtils.split(multipleProvidersBlackProperties, ","));
+            if (!CollectionUtils.isEmpty(blackProperties)) {
+                blackProperties.forEach(env -> {
+                    if (Objects.nonNull(applicationContext.getEnvironment().getProperty(env))) {
+                        log.warn("More than one plugin is activated. The environment variable "
+                                + env + " will cause the exception when connecting to the provider "
+                                + "service.");
+                    }
+                });
+            }
         }
     }
 
@@ -83,8 +96,9 @@ public class PluginManager {
             }
         }
         if (!missingMandatoryProperties.isEmpty()) {
-            log.error("Missing mandatory configuration properties for Csp " + csp + ": "
-                    + String.join(", ", missingMandatoryProperties));
+            log.warn("Plugin for provider {} will not be activated. Due to missing mandatory "
+                            + "configuration properties {}", csp,
+                    String.join(",", missingMandatoryProperties));
             return false;
         }
         return true;
@@ -96,7 +110,7 @@ public class PluginManager {
             List<AbstractCredentialInfo> cspCredentialDefinitions =
                     entry.getValue().getCredentialDefinitions();
             if (CollectionUtils.isEmpty(cspCredentialDefinitions)) {
-                log.error("No defined credential definition found in the plugin of csp:{}",
+                log.warn("No defined credential definition found in the plugin of csp:{}",
                         entry.getKey());
                 continue;
             }

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -35,6 +36,7 @@ import org.springframework.util.CollectionUtils;
 /**
  * Environment variables utils for deployment.
  */
+@Slf4j
 @Component
 public class DeployEnvironments {
 
@@ -73,6 +75,7 @@ public class DeployEnvironments {
      */
     public Map<String, String> getEnvFromDeployTask(DeployTask task) {
         return getEnv(
+                task.getOcl().getCloudServiceProvider().getName(),
                 task.getDeployRequest().getServiceRequestProperties(),
                 task.getOcl().getDeployment().getVariables());
     }
@@ -83,7 +86,8 @@ public class DeployEnvironments {
      * @param serviceRequestProperties variables passed by end user during ordering.
      * @param deployVariables          deploy variables defined in the service template.
      */
-    private Map<String, String> getEnv(Map<String, Object> serviceRequestProperties,
+    private Map<String, String> getEnv(Csp csp,
+                                       Map<String, Object> serviceRequestProperties,
                                        List<DeployVariable> deployVariables) {
         Map<String, String> variables = new HashMap<>();
         for (DeployVariable variable : deployVariables) {
@@ -113,9 +117,15 @@ public class DeployEnvironments {
                                 ? aesUtil.decode(variable.getValue()) : variable.getValue());
             }
         }
-
+        Map<String, String> envVarKeysMappingMap =
+                pluginManager.getOrchestratorPlugin(csp).getEnvVarKeysMappingMap();
+        if (!CollectionUtils.isEmpty(envVarKeysMappingMap)) {
+            envVarKeysMappingMap.forEach((key, value) -> variables.put(key,
+                    environment.getProperty(value)));
+        }
         return variables;
     }
+
 
     /**
      * Get flavor variables.
@@ -269,9 +279,10 @@ public class DeployEnvironments {
             List<DeployVariable> deployVariables,
             String requestedFlavor,
             Ocl ocl) {
+        Csp csp = ocl.getCloudServiceProvider().getName();
         Map<String, Object> allVariables = new HashMap<>();
         allVariables.putAll(getVariables(serviceRequestProperties, deployVariables, false));
-        allVariables.putAll(getEnv(serviceRequestProperties, deployVariables));
+        allVariables.putAll(getEnv(csp, serviceRequestProperties, deployVariables));
         allVariables.putAll(getFlavorVariables(ocl, requestedFlavor));
         return allVariables;
     }

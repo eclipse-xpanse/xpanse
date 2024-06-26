@@ -98,7 +98,7 @@ public class ServicePolicyManageApi {
     @PostMapping(value = "/service/policies",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Add policy for the registered service template.")
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
     public ServicePolicy addServicePolicy(
             @Valid @RequestBody ServicePolicyCreateRequest servicePolicyCreateRequest) {
         return servicePolicyManager.addServicePolicy(servicePolicyCreateRequest);

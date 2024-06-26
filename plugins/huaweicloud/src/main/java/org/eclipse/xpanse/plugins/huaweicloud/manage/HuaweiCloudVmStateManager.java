@@ -136,7 +136,7 @@ public class HuaweiCloudVmStateManager {
 
     private EcsClient getEcsClient(ServiceStateManageRequest serviceStateManageRequest) {
         AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.HUAWEI, CredentialType.VARIABLES,
+                credentialCenter.getCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES,
                         serviceStateManageRequest.getUserId());
         ICredential icredential = huaweiCloudClient.getCredential(credential);
         return huaweiCloudClient.getEcsClient(icredential,

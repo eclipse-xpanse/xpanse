@@ -21,7 +21,7 @@ class CurrentUserInfoHolderTest {
         currentUserInfo.setUserId("userId");
         currentUserInfo.setUserName("userName");
         currentUserInfo.setRoles(List.of("value"));
-        currentUserInfo.setMetadata(Map.ofEntries(Map.entry("csp", "huawei")));
+        currentUserInfo.setMetadata(Map.ofEntries(Map.entry("csp", "HuaweiCloud")));
         currentUserInfo.setToken("token");
 
         // Run the test
@@ -38,7 +38,7 @@ class CurrentUserInfoHolderTest {
         expectedResult.setUserId("userId");
         expectedResult.setUserName("userName");
         expectedResult.setRoles(List.of("value"));
-        expectedResult.setMetadata(Map.ofEntries(Map.entry("csp", "huawei")));
+        expectedResult.setMetadata(Map.ofEntries(Map.entry("csp", "HuaweiCloud")));
         expectedResult.setToken("token");
 
         // Run the test

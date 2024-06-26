@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
  */
 class CloudServiceProviderTest {
 
-    private static final Csp name = Csp.HUAWEI;
+    private static final Csp name = Csp.HUAWEI_CLOUD;
     private static List<Region> regions;
     private static CloudServiceProvider cloudServiceProvider;
 

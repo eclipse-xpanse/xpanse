@@ -34,7 +34,7 @@ class DeployedServiceTest {
     private final String name = "kafka";
     private final String customerServiceName = "customerServiceName";
     private final String version = "1.0.0";
-    private final Csp csp = Csp.AWS;
+    private final Csp csp = Csp.HUAWEI_CLOUD;
     private final String flavor = "basic";
     private final UUID serviceTemplateId = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f4");
     private final ServiceDeploymentState serviceDeploymentState =

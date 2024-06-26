@@ -35,7 +35,7 @@ class DeployedServiceDetailsTest {
     private final String version = "1.0.0";
     private final String regionName = "us-east-1";
     private final String areaName = "Asia China";
-    private final Csp csp = Csp.AWS;
+    private final Csp csp = Csp.HUAWEI_CLOUD;
     private final String flavor = "basic";
     private final String customerServiceName = "customerServiceName";
     private final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
