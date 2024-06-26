@@ -70,7 +70,8 @@ public enum ResultType {
     SERVICE_STATE_MANAGEMENT_TASK_NOT_FOUND("Service State Management Task Not Found"),
     SERVICE_MODIFICATION_AUDIT_NOT_FOUND("Service Modification Audit Not Found"),
     SERVICE_PRICE_CALCULATION_FAILED("Service Price Calculation Failed"),
-    INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details");
+    INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details"),
+    FILE_LOCKED("File Locked");
 
     private final String value;
 

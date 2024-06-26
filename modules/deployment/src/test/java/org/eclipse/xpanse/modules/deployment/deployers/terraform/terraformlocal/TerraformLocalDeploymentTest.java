@@ -35,6 +35,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.Terr
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
+import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
@@ -82,6 +83,8 @@ class TerraformLocalDeploymentTest {
             """;
     @Autowired
     TerraformLocalDeployment terraformLocalDeployment;
+    @MockBean
+    DeployResultFileUtils deployResultFileUtils;
     @MockBean
     DeployEnvironments deployEnvironments;
     @MockBean

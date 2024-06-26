@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.systemcmd.SystemCmd;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
+import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 
 /**
@@ -43,24 +44,28 @@ public class OpenTofuLocalExecutor {
     private final Map<String, String> env;
     private final Map<String, Object> variables;
     private final String workspace;
+    private final DeployResultFileUtils deployResultFileUtils;
 
     /**
      * Constructor for openTofuExecutor.
      *
-     * @param env       environment for the open tofu command line.
-     * @param variables variables for the open tofu command line.
-     * @param workspace workspace for the open tofu command line.
+     * @param env                   environment for the open tofu command line.
+     * @param variables             variables for the open tofu command line.
+     * @param workspace             workspace for the open tofu command line.
+     * @param deployResultFileUtils file tool class.
      */
     OpenTofuLocalExecutor(Map<String, String> env,
-                          Map<String, Object> variables,
-                          String workspace,
-                          @Nullable String subDirectory) {
+            Map<String, Object> variables,
+            String workspace,
+            @Nullable String subDirectory,
+            DeployResultFileUtils deployResultFileUtils) {
         this.env = env;
         this.variables = variables;
         this.workspace =
                 Objects.nonNull(subDirectory)
                         ? workspace + File.separator + subDirectory
                         : workspace;
+        this.deployResultFileUtils = deployResultFileUtils;
     }
 
     /**
@@ -192,8 +197,10 @@ public class OpenTofuLocalExecutor {
      */
     public String getTerraformState() {
         String state = null;
+        String path = workspace + File.separator + STATE_FILE_NAME;
         try {
-            File tfState = new File(workspace + File.separator + STATE_FILE_NAME);
+            deployResultFileUtils.waitUntilFileIsNotLocked(path);
+            File tfState = new File(path);
             if (tfState.exists()) {
                 state = Files.readString(tfState.toPath());
             }

@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMa
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
+import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -60,24 +61,27 @@ public class OpenTofuLocalDeployment implements Deployer {
     private final OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
     private final DeployServiceEntityHandler deployServiceEntityHandler;
     private final ScriptsGitRepoManage scriptsGitRepoManage;
+    private final DeployResultFileUtils deployResultFileUtils;
 
     /**
      * Initializes the OpenTofu deployer.
      */
     @Autowired
     public OpenTofuLocalDeployment(DeployEnvironments deployEnvironments,
-                                   OpenTofuLocalConfig openTofuLocalConfig,
-                                   @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
-                                   OpenTofuDeploymentResultCallbackManager
-                                           openTofuDeploymentResultCallbackManager,
-                                   DeployServiceEntityHandler deployServiceEntityHandler,
-                                   ScriptsGitRepoManage scriptsGitRepoManage) {
+            OpenTofuLocalConfig openTofuLocalConfig,
+            @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
+            OpenTofuDeploymentResultCallbackManager
+                    openTofuDeploymentResultCallbackManager,
+            DeployServiceEntityHandler deployServiceEntityHandler,
+            ScriptsGitRepoManage scriptsGitRepoManage,
+            DeployResultFileUtils deployResultFileUtils) {
         this.deployEnvironments = deployEnvironments;
         this.openTofuLocalConfig = openTofuLocalConfig;
         this.taskExecutor = taskExecutor;
         this.openTofuDeploymentResultCallbackManager = openTofuDeploymentResultCallbackManager;
         this.deployServiceEntityHandler = deployServiceEntityHandler;
         this.scriptsGitRepoManage = scriptsGitRepoManage;
+        this.deployResultFileUtils = deployResultFileUtils;
     }
 
     /**
@@ -274,7 +278,7 @@ public class OpenTofuLocalDeployment implements Deployer {
             envVariables.put(TF_DEBUG_FLAG, openTofuLocalConfig.getDebugLogLevel());
         }
         return new OpenTofuLocalExecutor(envVariables, inputVariables, workspace,
-                getSubDirectory(deployment));
+                getSubDirectory(deployment), deployResultFileUtils);
     }
 
     private void prepareDeployWorkspaceWithScripts(DeployTask deployTask, String workspace) {

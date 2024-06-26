@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.systemcmd.SystemCmd;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 
 /**
@@ -42,24 +43,28 @@ public class TerraformLocalExecutor {
     private final Map<String, String> env;
     private final Map<String, Object> variables;
     private final String workspace;
+    private final DeployResultFileUtils deployResultFileUtils;
 
     /**
      * Constructor for terraformExecutor.
      *
-     * @param env       environment for the terraform command line.
-     * @param variables variables for the terraform command line.
-     * @param workspace workspace for the terraform command line.
+     * @param env                   environment for the terraform command line.
+     * @param variables             variables for the terraform command line.
+     * @param workspace             workspace for the terraform command line.
+     * @param deployResultFileUtils file tool class.
      */
     TerraformLocalExecutor(Map<String, String> env,
-                           Map<String, Object> variables,
-                           String workspace,
-                           @Nullable String subDirectory) {
+            Map<String, Object> variables,
+            String workspace,
+            @Nullable String subDirectory,
+            DeployResultFileUtils deployResultFileUtils) {
         this.env = env;
         this.variables = variables;
         this.workspace =
                 Objects.nonNull(subDirectory)
                         ? workspace + File.separator + subDirectory
                         : workspace;
+        this.deployResultFileUtils = deployResultFileUtils;
     }
 
     /**
@@ -191,8 +196,10 @@ public class TerraformLocalExecutor {
      */
     public String getTerraformState() {
         String state = null;
+        String path = workspace + File.separator + STATE_FILE_NAME;
         try {
-            File tfState = new File(workspace + File.separator + STATE_FILE_NAME);
+            deployResultFileUtils.waitUntilFileIsNotLocked(path);
+            File tfState = new File(path);
             if (tfState.exists()) {
                 state = Files.readString(tfState.toPath());
             }
