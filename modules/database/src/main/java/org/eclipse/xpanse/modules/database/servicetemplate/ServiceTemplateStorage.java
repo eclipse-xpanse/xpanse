@@ -46,13 +46,6 @@ public interface ServiceTemplateStorage {
     ServiceTemplateEntity findServiceTemplate(ServiceTemplateEntity serviceTemplateEntity);
 
     /**
-     * Method to get all stored database entries.
-     *
-     * @return Returns all rows from the service status database table.
-     */
-    List<ServiceTemplateEntity> services();
-
-    /**
      * Remove service template entity from database by uuid.
      *
      * @param uuid uuid of service template entity

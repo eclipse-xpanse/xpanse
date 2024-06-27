@@ -31,8 +31,15 @@ public class DatabaseDeployResourceStorage implements DeployResourceStorage {
     }
 
     @Override
-    public void deleteByDeployServiceId(UUID id) {
-        deployResourceRepository.deleteByDeployServiceId(id);
+    public void deleteByDeployServiceId(UUID serviceId) {
+        Specification<DeployResourceEntity> specification =
+                (root, query, criteriaBuilder) -> {
+                    List<Predicate> predicateList = new ArrayList<>();
+                    predicateList.add(criteriaBuilder.equal(root.get("serviceId"), serviceId));
+                    return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
+                            .getRestriction();
+                };
+        deployResourceRepository.delete(specification);
     }
 
     /**
@@ -66,7 +73,7 @@ public class DatabaseDeployResourceStorage implements DeployResourceStorage {
         List<DeployResourceEntity> deployResources =
                 deployResourceRepository.findAll(specification);
         if (!CollectionUtils.isEmpty(deployResources)) {
-            return deployResources.get(0);
+            return deployResources.getFirst();
         }
         return null;
     }

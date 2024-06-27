@@ -39,17 +39,17 @@ public interface ServiceModificationAuditStorage {
     ServiceModificationAuditEntity getEntityById(UUID uuid);
 
     /**
-     * Remove service modification audit entity from database by entity.
+     * Delete service modification audit entity from database by entity.
      *
      * @param entity service modification audit entity
      */
-    void remove(ServiceModificationAuditEntity entity);
+    void delete(ServiceModificationAuditEntity entity);
 
     /**
-     * Batch remove service modification audit entities from database.
+     * Batch delete service modification audit entities from database.
      *
      * @param entities service modification audit entities
      */
-    void batchRemove(List<ServiceModificationAuditEntity> entities);
+    void deleteBatch(List<ServiceModificationAuditEntity> entities);
 
 }

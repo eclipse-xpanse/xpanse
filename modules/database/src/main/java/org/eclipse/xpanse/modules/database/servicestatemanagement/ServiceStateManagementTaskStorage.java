@@ -43,13 +43,13 @@ public interface ServiceStateManagementTaskStorage {
      *
      * @param taskEntity management task entity
      */
-    void remove(ServiceStateManagementTaskEntity taskEntity);
+    void delete(ServiceStateManagementTaskEntity taskEntity);
 
     /**
      * Batch remove management task entities from database.
      *
      * @param taskEntities management task entities
      */
-    void batchRemove(List<ServiceStateManagementTaskEntity> taskEntities);
+    void deleteBatch(List<ServiceStateManagementTaskEntity> taskEntities);
 
 }

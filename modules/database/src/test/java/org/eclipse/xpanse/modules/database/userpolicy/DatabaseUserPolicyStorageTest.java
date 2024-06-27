@@ -61,53 +61,14 @@ class DatabaseUserPolicyStorageTest {
         entity.setPolicy("policy");
         entity.setCsp(Csp.HUAWEI_CLOUD);
         entity.setEnabled(false);
-        when(mockUserPolicyRepository.save(entity)).thenReturn(userPolicyEntity1);
+        when(mockUserPolicyRepository.saveAndFlush(entity)).thenReturn(userPolicyEntity1);
 
         // Run the test
-        final UserPolicyEntity result = databasePolicyStorageUnderTest.store(userPolicyEntity);
+        final UserPolicyEntity result =
+                databasePolicyStorageUnderTest.storeAndFlush(userPolicyEntity);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
-    }
-
-    @Test
-    void testPolicies() {
-        // Setup
-        final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
-        userPolicyEntity.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
-        userPolicyEntity.setUserId("userId");
-        userPolicyEntity.setPolicy("policy");
-        userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
-        userPolicyEntity.setEnabled(false);
-        final List<UserPolicyEntity> expectedResult = List.of(userPolicyEntity);
-
-        // Configure UserPolicyRepository.findAll(...).
-        final UserPolicyEntity userPolicyEntity1 = new UserPolicyEntity();
-        userPolicyEntity1.setId(UUID.fromString("118a5df2-6984-42c8-800b-b95736d089af"));
-        userPolicyEntity1.setUserId("userId");
-        userPolicyEntity1.setPolicy("policy");
-        userPolicyEntity1.setCsp(Csp.HUAWEI_CLOUD);
-        userPolicyEntity1.setEnabled(false);
-        final List<UserPolicyEntity> policyEntities = List.of(userPolicyEntity1);
-        when(mockUserPolicyRepository.findAll()).thenReturn(policyEntities);
-
-        // Run the test
-        final List<UserPolicyEntity> result = databasePolicyStorageUnderTest.policies();
-
-        // Verify the results
-        assertThat(result).isEqualTo(expectedResult);
-    }
-
-    @Test
-    void testPolicies_PolicyRepositoryReturnsNoItems() {
-        // Setup
-        when(mockUserPolicyRepository.findAll()).thenReturn(Collections.emptyList());
-
-        // Run the test
-        final List<UserPolicyEntity> result = databasePolicyStorageUnderTest.policies();
-
-        // Verify the results
-        assertThat(result).isEqualTo(Collections.emptyList());
     }
 
     @Test
@@ -138,7 +99,8 @@ class DatabaseUserPolicyStorageTest {
         when(mockUserPolicyRepository.findAll(any(Specification.class))).thenReturn(policyEntities);
 
         // Run the test
-        final List<UserPolicyEntity> result = databasePolicyStorageUnderTest.listPolicies(queryModel);
+        final List<UserPolicyEntity> result =
+                databasePolicyStorageUnderTest.listPolicies(queryModel);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);

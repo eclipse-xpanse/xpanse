@@ -78,12 +78,12 @@ public class DatabaseServiceStateManagementTaskStorage
     }
 
     @Override
-    public void batchRemove(List<ServiceStateManagementTaskEntity> taskEntities) {
-        repository.deleteAll(taskEntities);
+    public void deleteBatch(List<ServiceStateManagementTaskEntity> taskEntities) {
+        repository.deleteAllInBatch(taskEntities);
     }
 
     @Override
-    public void remove(ServiceStateManagementTaskEntity taskEntity) {
+    public void delete(ServiceStateManagementTaskEntity taskEntity) {
         repository.delete(taskEntity);
     }
 }

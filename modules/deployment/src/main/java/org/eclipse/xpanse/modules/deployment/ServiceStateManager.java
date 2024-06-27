@@ -230,7 +230,7 @@ public class ServiceStateManager {
         ServiceStateManagementTaskEntity taskQuery = new ServiceStateManagementTaskEntity();
         taskQuery.setServiceId(serviceId);
         List<ServiceStateManagementTaskEntity> taskEntities = taskStorage.queryTasks(taskQuery);
-        taskStorage.batchRemove(taskEntities);
+        taskStorage.deleteBatch(taskEntities);
     }
 
 
@@ -270,7 +270,7 @@ public class ServiceStateManager {
      */
     public void deleteManagementTaskByTaskId(UUID taskId) {
         ServiceStateManagementTaskEntity task = getManagementTaskEntity(taskId);
-        taskStorage.remove(task);
+        taskStorage.delete(task);
     }
 
     private DeployServiceEntity getDeployedServiceAndValidateState(

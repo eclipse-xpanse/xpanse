@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.database.servicetemplate;
 
 import java.util.UUID;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.eclipse.xpanse.modules.database.CustomJpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
  * Interface to access default JPA methods.
  */
 @Repository
-public interface ServiceTemplateRepository extends JpaRepository<ServiceTemplateEntity, UUID>,
+public interface ServiceTemplateRepository extends CustomJpaRepository<ServiceTemplateEntity, UUID>,
         JpaSpecificationExecutor<ServiceTemplateEntity> {
 
 }

@@ -46,14 +46,6 @@ public class DatabaseServiceMigrationStorage implements ServiceMigrationStorage 
 
     /**
      * Method to list database entries based ServiceMigrationEntity.
-     */
-    @Override
-    public List<ServiceMigrationEntity> serviceMigrations() {
-        return serviceMigrationRepository.findAll();
-    }
-
-    /**
-     * Method to list database entries based ServiceMigrationEntity.
      *
      * @param serviceMigrationQuery query model for search Service Migration entity.
      * @return Returns the database entry for the provided arguments.
@@ -104,15 +96,5 @@ public class DatabaseServiceMigrationStorage implements ServiceMigrationStorage 
     public ServiceMigrationEntity findServiceMigrationById(UUID id) {
         Optional<ServiceMigrationEntity> optional = serviceMigrationRepository.findById(id);
         return optional.orElse(null);
-    }
-
-    /**
-     * delete the serviceMigrationEntity.
-     *
-     * @param serviceMigrationEntity the model of deployServiceEntity.
-     */
-    @Override
-    public void deleteServiceMigration(ServiceMigrationEntity serviceMigrationEntity) {
-        serviceMigrationRepository.delete(serviceMigrationEntity);
     }
 }

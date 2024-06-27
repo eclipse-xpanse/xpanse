@@ -23,13 +23,6 @@ public interface ServiceMigrationStorage {
     ServiceMigrationEntity storeAndFlush(ServiceMigrationEntity serviceMigrationEntity);
 
     /**
-     * Method to get all stored database entries.
-     *
-     * @return Returns all rows from the database table.
-     */
-    List<ServiceMigrationEntity> serviceMigrations();
-
-    /**
      * Method to get stored database entries by query model.
      *
      * @param query query model.
@@ -44,11 +37,4 @@ public interface ServiceMigrationStorage {
      * @return serviceMigrationEntity.
      */
     ServiceMigrationEntity findServiceMigrationById(UUID id);
-
-    /**
-     * Delete stored ServiceMigrationEntity using serviceMigration entity.
-     *
-     * @param serviceMigrationEntity the entity of ServiceMigration.
-     */
-    void deleteServiceMigration(ServiceMigrationEntity serviceMigrationEntity);
 }

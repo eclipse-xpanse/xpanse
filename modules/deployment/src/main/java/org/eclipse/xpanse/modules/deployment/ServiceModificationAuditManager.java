@@ -142,7 +142,7 @@ public class ServiceModificationAuditManager {
         query.setServiceId(deployService.getId());
         List<ServiceModificationAuditEntity> modificationEntities =
                 modificationAuditStorage.queryEntities(query);
-        modificationAuditStorage.batchRemove(modificationEntities);
+        modificationAuditStorage.deleteBatch(modificationEntities);
     }
 
 
@@ -182,7 +182,7 @@ public class ServiceModificationAuditManager {
      */
     public void deleteAuditByModificationId(UUID modificationId) {
         ServiceModificationAuditEntity modificationEntity = getModificationEntity(modificationId);
-        modificationAuditStorage.remove(modificationEntity);
+        modificationAuditStorage.delete(modificationEntity);
     }
 
     private DeployServiceEntity getDeployServiceEntity(UUID serviceId) {

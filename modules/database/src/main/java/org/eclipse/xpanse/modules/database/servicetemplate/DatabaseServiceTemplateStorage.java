@@ -141,15 +141,6 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
         ));
     }
 
-    /**
-     * Method to get all stored database entries.
-     *
-     * @return Returns all rows from the service status database table.
-     */
-    @Override
-    public List<ServiceTemplateEntity> services() {
-        return repository.findAll();
-    }
 
     /**
      * Remove register service entity from database by uuid.
