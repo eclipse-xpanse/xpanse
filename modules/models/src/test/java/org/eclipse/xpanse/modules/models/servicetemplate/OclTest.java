@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.List;
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -41,6 +42,8 @@ class OclTest {
     private Billing billing;
     @Mock
     private ServiceProviderContactDetails serviceProviderContactDetails;
+    @Mock
+    private List<ServiceConfigurationParameter> serviceConfigurationParameters;
 
     private Ocl ocl;
 
@@ -61,6 +64,7 @@ class OclTest {
         ocl.setServiceHostingType(serviceHostingType);
         ocl.setEula(eula);
         ocl.setServiceProviderContactDetails(serviceProviderContactDetails);
+        ocl.setConfigurationParameters(serviceConfigurationParameters);
     }
 
     @Test
@@ -79,6 +83,7 @@ class OclTest {
         assertEquals(serviceProviderContactDetails, ocl.getServiceProviderContactDetails());
         assertEquals(flavors, ocl.getFlavors());
         assertEquals(eula, ocl.getEula());
+        assertEquals(serviceConfigurationParameters, ocl.getConfigurationParameters());
     }
 
     @Test
@@ -105,7 +110,8 @@ class OclTest {
                         + cloudServiceProvider + ", deployment=" + deployment + ", flavors="
                         + flavors + ", billing=" + billing + ", serviceHostingType="
                         + serviceHostingType + ", serviceProviderContactDetails="
-                        + serviceProviderContactDetails + ", eula=" + eula + ")";
+                        + serviceProviderContactDetails + ", eula=" + eula + ", "
+                        + "configurationParameters=" + serviceConfigurationParameters + ")";
         assertEquals(expectedString, ocl.toString());
     }
 
