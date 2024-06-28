@@ -21,14 +21,7 @@ public interface UserPolicyStorage {
      * @param userPolicyEntity the model of deployed service.
      * @return Returns stored entity.
      */
-    UserPolicyEntity store(UserPolicyEntity userPolicyEntity);
-
-    /**
-     * Method to get all stored database entries.
-     *
-     * @return Returns all rows from the database table.
-     */
-    List<UserPolicyEntity> policies();
+    UserPolicyEntity storeAndFlush(UserPolicyEntity userPolicyEntity);
 
     /**
      * Method to get stored database entries by query model.

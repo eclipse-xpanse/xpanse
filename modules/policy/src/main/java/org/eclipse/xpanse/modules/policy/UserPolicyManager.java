@@ -86,7 +86,7 @@ public class UserPolicyManager {
         policyManager.validatePolicy(createRequest.getPolicy());
         checkIfUserPolicyIsDuplicate(createRequest.getCsp(), createRequest.getPolicy());
         UserPolicyEntity newPolicy = conventToUserPolicyEntity(createRequest);
-        UserPolicyEntity userPolicyEntity = userPolicyStorage.store(newPolicy);
+        UserPolicyEntity userPolicyEntity = userPolicyStorage.storeAndFlush(newPolicy);
         return conventToUserPolicy(userPolicyEntity);
     }
 
@@ -112,7 +112,7 @@ public class UserPolicyManager {
 
         UserPolicyEntity policyToUpdate = getUserPolicyToUpdate(updateRequest, existingEntity);
 
-        UserPolicyEntity updatedPolicy = userPolicyStorage.store(policyToUpdate);
+        UserPolicyEntity updatedPolicy = userPolicyStorage.storeAndFlush(policyToUpdate);
         return conventToUserPolicy(updatedPolicy);
     }
 

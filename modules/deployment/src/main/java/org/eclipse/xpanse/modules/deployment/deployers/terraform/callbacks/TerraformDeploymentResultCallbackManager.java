@@ -76,7 +76,7 @@ public class TerraformDeploymentResultCallbackManager {
         }
 
         ServiceMigrationEntity serviceMigrationEntity =
-                migrationService.getServiceMigrationEntityByNewServiceId(taskId.toString());
+                migrationService.getServiceMigrationEntityByNewServiceId(taskId);
         if (Objects.nonNull(serviceMigrationEntity)) {
             workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
                     MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
@@ -112,7 +112,7 @@ public class TerraformDeploymentResultCallbackManager {
     public void destroyCallback(UUID taskId, TerraformResult result, DeploymentScenario scenario) {
         handleCallbackTerraformResult(taskId, result, scenario);
         ServiceMigrationEntity serviceMigrationEntity =
-                migrationService.getServiceMigrationEntityByOldServiceId(taskId.toString());
+                migrationService.getServiceMigrationEntityByOldServiceId(taskId);
         if (Objects.nonNull(serviceMigrationEntity)) {
             workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
                     MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);

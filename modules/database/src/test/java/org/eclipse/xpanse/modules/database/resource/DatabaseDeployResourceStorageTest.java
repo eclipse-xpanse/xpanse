@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.database.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -39,14 +38,6 @@ class DatabaseDeployResourceStorageTest {
     void setUp() {
         databaseDeployResourceStorageUnderTest =
                 new DatabaseDeployResourceStorage(mockDeployResourceRepository);
-    }
-
-    @Test
-    void testDeleteByDeployServiceId() {
-        databaseDeployResourceStorageUnderTest.deleteByDeployServiceId(
-                UUID.fromString("533b5d23-fb46-45fc-a27f-d49c44983074"));
-        verify(mockDeployResourceRepository).deleteByDeployServiceId(
-                UUID.fromString("533b5d23-fb46-45fc-a27f-d49c44983074"));
     }
 
     @Test

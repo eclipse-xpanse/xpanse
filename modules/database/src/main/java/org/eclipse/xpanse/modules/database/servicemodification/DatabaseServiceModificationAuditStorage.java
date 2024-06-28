@@ -74,12 +74,12 @@ public class DatabaseServiceModificationAuditStorage
     }
 
     @Override
-    public void batchRemove(List<ServiceModificationAuditEntity> taskEntities) {
-        repository.deleteAll(taskEntities);
+    public void deleteBatch(List<ServiceModificationAuditEntity> taskEntities) {
+        repository.deleteAllInBatch(taskEntities);
     }
 
     @Override
-    public void remove(ServiceModificationAuditEntity taskEntity) {
+    public void delete(ServiceModificationAuditEntity taskEntity) {
         repository.delete(taskEntity);
     }
 }

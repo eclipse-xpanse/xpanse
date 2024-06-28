@@ -126,7 +126,7 @@ class UserPolicyManagerTest {
 
         when(mockUserPolicyStorage.listPolicies(queryModel)).thenReturn(Collections.emptyList());
 
-        // Configure DatabaseUserPolicyStorage.store(...).
+        // Configure DatabaseUserPolicyStorage.storeAndFlush(...).
         final UserPolicyEntity userPolicyEntity1 = new UserPolicyEntity();
         userPolicyEntity1.setId(policyId);
         userPolicyEntity1.setUserId(userId);
@@ -134,7 +134,7 @@ class UserPolicyManagerTest {
         userPolicyEntity1.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity1.setEnabled(true);
 
-        when(mockUserPolicyStorage.store(any(UserPolicyEntity.class))).thenReturn(
+        when(mockUserPolicyStorage.storeAndFlush(any(UserPolicyEntity.class))).thenReturn(
                 userPolicyEntity1);
 
         // Run the test
@@ -228,14 +228,14 @@ class UserPolicyManagerTest {
         queryModel.setCsp(Csp.HUAWEI_CLOUD);
         queryModel.setPolicy("policy_update");
 
-        // Configure DatabaseUserPolicyStorage.store(...).
+        // Configure DatabaseUserPolicyStorage.storeAndFlush(...).
         final UserPolicyEntity updatedUserPolicyEntity = new UserPolicyEntity();
         updatedUserPolicyEntity.setId(policyId);
         updatedUserPolicyEntity.setUserId(userId);
         updatedUserPolicyEntity.setPolicy("policy_update");
         updatedUserPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         updatedUserPolicyEntity.setEnabled(false);
-        when(mockUserPolicyStorage.store(updatedUserPolicyEntity)).thenReturn(
+        when(mockUserPolicyStorage.storeAndFlush(updatedUserPolicyEntity)).thenReturn(
                 updatedUserPolicyEntity);
         // Run the test
         final UserPolicy result = userPolicyManagerUnderTest.updateUserPolicy(policyId,
@@ -276,14 +276,14 @@ class UserPolicyManagerTest {
         queryModel.setCsp(Csp.HUAWEI_CLOUD);
         queryModel.setPolicy("policy");
 
-        // Configure DatabaseUserPolicyStorage.store(...).
+        // Configure DatabaseUserPolicyStorage.storeAndFlush(...).
         final UserPolicyEntity updatedUserPolicyEntity = new UserPolicyEntity();
         updatedUserPolicyEntity.setId(policyId);
         updatedUserPolicyEntity.setUserId(userId);
         updatedUserPolicyEntity.setPolicy("policy");
         updatedUserPolicyEntity.setCsp(Csp.OPENSTACK_TESTLAB);
         updatedUserPolicyEntity.setEnabled(false);
-        when(mockUserPolicyStorage.store(updatedUserPolicyEntity)).thenReturn(
+        when(mockUserPolicyStorage.storeAndFlush(updatedUserPolicyEntity)).thenReturn(
                 updatedUserPolicyEntity);
 
         // Run the test

@@ -250,46 +250,6 @@ class DatabaseServiceTemplateStorageTest {
     }
 
     @Test
-    void testServices() {
-        // Setup
-        final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setId(id);
-        serviceTemplateEntity.setName("name");
-        serviceTemplateEntity.setVersion("version");
-        serviceTemplateEntity.setCsp(Csp.HUAWEI_CLOUD);
-        serviceTemplateEntity.setCategory(Category.AI);
-        final List<ServiceTemplateEntity> expectedResult = List.of(serviceTemplateEntity);
-
-        // Configure ServiceTemplateRepository.findAll(...).
-        final ServiceTemplateEntity serviceTemplateEntity1 = new ServiceTemplateEntity();
-        serviceTemplateEntity1.setId(id);
-        serviceTemplateEntity1.setName("name");
-        serviceTemplateEntity1.setVersion("version");
-        serviceTemplateEntity1.setCsp(Csp.HUAWEI_CLOUD);
-        serviceTemplateEntity1.setCategory(Category.AI);
-        final List<ServiceTemplateEntity> ServiceTemplateEntities = List.of(serviceTemplateEntity1);
-        when(mockServiceTemplateRepository.findAll()).thenReturn(ServiceTemplateEntities);
-
-        // Run the test
-        final List<ServiceTemplateEntity> result = test.services();
-
-        // Verify the results
-        assertThat(result).isEqualTo(expectedResult);
-    }
-
-    @Test
-    void testServices_ServiceTemplateRepositoryReturnsNoItems() {
-        // Setup
-        when(mockServiceTemplateRepository.findAll()).thenReturn(Collections.emptyList());
-
-        // Run the test
-        final List<ServiceTemplateEntity> result = test.services();
-
-        // Verify the results
-        assertThat(result).isEqualTo(Collections.emptyList());
-    }
-
-    @Test
     void testRemoveById() {
         // Setup
         when(mockServiceTemplateRepository.existsById(id)).thenReturn(true);

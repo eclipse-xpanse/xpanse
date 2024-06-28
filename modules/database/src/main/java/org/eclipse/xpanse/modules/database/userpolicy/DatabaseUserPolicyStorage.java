@@ -33,13 +33,8 @@ public class DatabaseUserPolicyStorage implements UserPolicyStorage {
     }
 
     @Override
-    public UserPolicyEntity store(UserPolicyEntity userPolicyEntity) {
-        return userPolicyRepository.save(userPolicyEntity);
-    }
-
-    @Override
-    public List<UserPolicyEntity> policies() {
-        return userPolicyRepository.findAll();
+    public UserPolicyEntity storeAndFlush(UserPolicyEntity userPolicyEntity) {
+        return userPolicyRepository.saveAndFlush(userPolicyEntity);
     }
 
     @Override

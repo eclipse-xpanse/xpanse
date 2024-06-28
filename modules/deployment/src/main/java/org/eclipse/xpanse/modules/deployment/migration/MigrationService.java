@@ -74,11 +74,11 @@ public class MigrationService {
      * @param taskId newServiceId.
      * @return ServiceMigrationEntity.
      */
-    public ServiceMigrationEntity getServiceMigrationEntityByNewServiceId(String taskId) {
+    public ServiceMigrationEntity getServiceMigrationEntityByNewServiceId(UUID taskId) {
+        ServiceMigrationQueryModel query = new ServiceMigrationQueryModel();
+        query.setNewServiceId(taskId);
         List<ServiceMigrationEntity> serviceMigrationEntities =
-                serviceMigrationStorage.serviceMigrations().stream()
-                        .filter(serviceMigrationEntity -> taskId.equals(
-                                serviceMigrationEntity.getNewServiceId().toString())).toList();
+                serviceMigrationStorage.listServiceMigrations(query);
         if (CollectionUtils.isEmpty(serviceMigrationEntities)) {
             return null;
         }
@@ -92,11 +92,11 @@ public class MigrationService {
      * @param taskId oldServiceId.
      * @return ServiceMigrationEntity.
      */
-    public ServiceMigrationEntity getServiceMigrationEntityByOldServiceId(String taskId) {
+    public ServiceMigrationEntity getServiceMigrationEntityByOldServiceId(UUID taskId) {
+        ServiceMigrationQueryModel query = new ServiceMigrationQueryModel();
+        query.setOldServiceId(taskId);
         List<ServiceMigrationEntity> serviceMigrationEntities =
-                serviceMigrationStorage.serviceMigrations().stream()
-                        .filter(serviceMigrationEntity -> taskId.equals(
-                                serviceMigrationEntity.getOldServiceId().toString())).toList();
+                serviceMigrationStorage.listServiceMigrations(query);
         if (CollectionUtils.isEmpty(serviceMigrationEntities)) {
             return null;
         }
