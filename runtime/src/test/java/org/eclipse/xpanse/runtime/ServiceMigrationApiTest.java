@@ -54,6 +54,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         ocl.setName("ServiceMigrationApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
+        addCredentialForHuaweiCloud();
         UUID serviceId = deployService(serviceTemplate);
         testServiceMigrationApisThrowsException(serviceTemplate, serviceId);
         testServiceMigrationApisWell(serviceTemplate, serviceId);

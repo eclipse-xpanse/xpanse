@@ -47,7 +47,7 @@ public class DeployResultManager {
      * @throws RuntimeException exception thrown in case of errors.
      */
     public DeployServiceEntity updateDeployServiceEntityWithDeployResult(
-            DeployResult deployResult, DeployServiceEntity storedEntity) throws RuntimeException {
+            DeployResult deployResult, DeployServiceEntity storedEntity) {
         if (Objects.nonNull(deployResult.getState()) && Objects.nonNull(storedEntity)) {
             log.info("Deploy task update deploy service entity with id:{}", deployResult.getId());
             DeployServiceEntity deployServiceEntityToStore = new DeployServiceEntity();

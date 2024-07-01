@@ -72,6 +72,7 @@ class ServiceModificationApiTest extends ApisTestCommon {
             return;
         }
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
+        addCredentialForHuaweiCloud();
         UUID serviceId = deployService(serviceTemplate);
 
         testModificationApisWell(serviceId, serviceTemplate);
