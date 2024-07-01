@@ -9,6 +9,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentFailedException;
 import org.eclipse.xpanse.modules.models.billing.exceptions.ServicePriceCalculationFailed;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
@@ -226,7 +227,7 @@ public class DeploymentExceptionHandler {
         return Response.errorResponse(ResultType.BILLING_MODE_NOT_SUPPORTED,
                 Collections.singletonList(ex.getMessage()));
     }
-  
+
     /**
      * Exception handler for ServiceStateManagementTaskNotFound.
      */
@@ -270,6 +271,17 @@ public class DeploymentExceptionHandler {
     @ResponseBody
     public Response handleFileLockedException(FileLockedException ex) {
         return Response.errorResponse(ResultType.FILE_LOCKED,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for DeploymentFailedException.
+     */
+    @ExceptionHandler({DeploymentFailedException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleDeploymentFailedException(DeploymentFailedException ex) {
+        return Response.errorResponse(ResultType.DEPLOYMENT_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

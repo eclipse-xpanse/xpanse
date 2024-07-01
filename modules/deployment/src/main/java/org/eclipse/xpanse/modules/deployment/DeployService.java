@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.servicemodification.ServiceModificationAuditEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentFailedException;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
@@ -39,6 +40,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
@@ -234,30 +236,32 @@ public class DeployService {
     private void deploy(DeployTask deployTask) {
         MDC.put(TASK_ID, deployTask.getId().toString());
         DeployResult deployResult;
-        DeployServiceEntity storedEntity = null;
-        Deployer deployer =
-                deployerKindManager.getDeployment(deployTask.getOcl().getDeployment().getKind());
+        Exception exception = null;
+        String errorMsg = null;
+        DeployServiceEntity storedEntity = storeNewDeployServiceEntity(deployTask);
+        DeployerKind deployerKind = deployTask.getOcl().getDeployment().getKind();
+        Deployer deployer = deployerKindManager.getDeployment(deployerKind);
         try {
-            storedEntity = storeNewDeployServiceEntity(deployTask);
             policyValidator.validateDeploymentWithPolicies(deployTask);
             deployResult = deployer.deploy(deployTask);
         } catch (RuntimeException e) {
-            log.error("Deploy service {} failed.", deployTask.getId(), e);
+            exception = e;
+            errorMsg = String.format("Deploy service %s failed. Error message:\n %s",
+                    deployTask.getId(), e.getMessage());
             deployResult = new DeployResult();
             deployResult.setId(deployTask.getId());
             deployResult.setState(getDeployerTaskFailedState(deployTask.getDeploymentScenario()));
-            deployResult.setMessage(e.getMessage());
+            deployResult.setMessage(errorMsg);
         }
-        try {
-            DeployServiceEntity updatedDeployServiceEntity =
-                    deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
-                            storedEntity);
-            if (ServiceDeploymentState.DEPLOY_FAILED
-                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
-                rollbackOnDeploymentFailure(deployTask, updatedDeployServiceEntity);
-            }
-        } catch (RuntimeException e) {
-            log.error("Update service database entity {} failed.", deployTask.getId(), e);
+        DeployServiceEntity updatedDeployServiceEntity =
+                deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
+                        storedEntity);
+        if (ServiceDeploymentState.DEPLOY_FAILED
+                == updatedDeployServiceEntity.getServiceDeploymentState()) {
+            rollbackOnDeploymentFailure(deployTask, updatedDeployServiceEntity);
+        }
+        if (Objects.nonNull(exception) && Objects.nonNull(errorMsg)) {
+            throw new DeploymentFailedException(errorMsg);
         }
     }
 
@@ -267,33 +271,37 @@ public class DeployService {
      * @param serviceToRedeploy serviceToRedeploy
      */
     public void redeployService(DeployServiceEntity serviceToRedeploy) {
-        DeployTask redeployTask = getRedeployTask(serviceToRedeploy);
-        MDC.put(TASK_ID, redeployTask.getId().toString());
-        Deployer deployer =
-                deployerKindManager.getDeployment(redeployTask.getOcl().getDeployment().getKind());
+        MDC.put(TASK_ID, serviceToRedeploy.getId().toString());
         DeployResult redeployResult;
+        Exception exception = null;
+        String errorMsg = null;
+        DeployTask redeployTask = getRedeployTask(serviceToRedeploy);
+        DeployerKind deployerKind = redeployTask.getOcl().getDeployment().getKind();
+        Deployer deployer = deployerKindManager.getDeployment(deployerKind);
         try {
             serviceToRedeploy.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
             serviceToRedeploy = deployServiceEntityHandler.storeAndFlush(serviceToRedeploy);
             policyValidator.validateDeploymentWithPolicies(redeployTask);
             redeployResult = deployer.deploy(redeployTask);
         } catch (RuntimeException e) {
-            log.error("Redeploy service {} failed.", redeployTask.getId(), e);
+            exception = e;
+            errorMsg = String.format("Redeploy service %s failed. Error message:\n %s",
+                    redeployTask.getId(), exception.getMessage());
             redeployResult = new DeployResult();
             redeployResult.setId(redeployTask.getId());
             redeployResult.setState(getDeployerTaskFailedState(DeploymentScenario.DEPLOY));
-            redeployResult.setMessage(e.getMessage());
+            redeployResult.setMessage(errorMsg);
         }
-        try {
-            DeployServiceEntity updatedDeployServiceEntity =
-                    deployResultManager.updateDeployServiceEntityWithDeployResult(redeployResult,
-                            serviceToRedeploy);
-            if (ServiceDeploymentState.DEPLOY_FAILED
-                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
-                rollbackOnDeploymentFailure(redeployTask, updatedDeployServiceEntity);
-            }
-        } catch (RuntimeException e) {
-            log.error("Update service database entity {} failed.", redeployResult.getId(), e);
+        DeployServiceEntity updatedDeployServiceEntity =
+                deployResultManager.updateDeployServiceEntityWithDeployResult(redeployResult,
+                        serviceToRedeploy);
+        if (ServiceDeploymentState.DEPLOY_FAILED
+                == updatedDeployServiceEntity.getServiceDeploymentState()) {
+            rollbackOnDeploymentFailure(redeployTask, updatedDeployServiceEntity);
+        }
+        if (Objects.nonNull(exception) && Objects.nonNull(errorMsg)) {
+            log.error(errorMsg);
+            throw new DeploymentFailedException(errorMsg);
         }
     }
 
@@ -399,8 +407,9 @@ public class DeployService {
      */
     public void modifyService(UUID modificationId, DeployTask modifyTask,
                               DeployServiceEntity deployServiceEntity) {
-
         MDC.put(TASK_ID, modifyTask.getId().toString());
+        Exception exception = null;
+        String errorMsg = null;
         DeployResult modifyResult;
         Deployer deployer =
                 deployerKindManager.getDeployment(modifyTask.getOcl().getDeployment().getKind());
@@ -414,16 +423,22 @@ public class DeployService {
             modificationAuditManager.startModificationProgressById(modificationId);
             modifyResult = deployer.modify(modificationId, modifyTask);
         } catch (RuntimeException e) {
-            log.error("Modify service {} failed.", modifyTask.getId(), e);
+            exception = e;
+            errorMsg = String.format("Modify service %s failed. Error message:\n %s",
+                    modifyTask.getId(), exception.getMessage());
             modifyResult = new DeployResult();
             modifyResult.setId(modifyTask.getId());
             modifyResult.setState(getDeployerTaskFailedState(modifyTask.getDeploymentScenario()));
-            modifyResult.setMessage(e.getMessage());
+            modifyResult.setMessage(errorMsg);
         }
         deployResultManager.updateDeployServiceEntityWithDeployResult(modifyResult,
                 deployServiceEntity);
         modificationAuditManager.updateModificationAuditWithDeployResult(
                 modificationAuditEntity, modifyResult);
+        if (Objects.nonNull(exception) && Objects.nonNull(errorMsg)) {
+            log.error(errorMsg);
+            throw new DeploymentFailedException(errorMsg);
+        }
     }
 
     /**
@@ -440,6 +455,8 @@ public class DeployService {
     private void destroy(DeployTask destroyTask, DeployServiceEntity deployServiceEntity) {
         MDC.put(TASK_ID, destroyTask.getId().toString());
         DeployResult destroyResult;
+        Exception exception = null;
+        String errorMsg = null;
         Deployer deployer =
                 deployerKindManager.getDeployment(destroyTask.getOcl().getDeployment().getKind());
         try {
@@ -449,22 +466,25 @@ public class DeployService {
             deployServiceStorage.storeAndFlush(deployServiceEntity);
             destroyResult = deployer.destroy(destroyTask);
         } catch (RuntimeException e) {
-            log.error("Destroy service {} failed.", destroyTask.getId(), e);
+            exception = e;
+            errorMsg = String.format("Destroy service %s failed. Error message:\n %s",
+                    destroyTask.getId(), exception.getMessage());
             destroyResult = new DeployResult();
             destroyResult.setId(destroyTask.getId());
             destroyResult.setState(getDeployerTaskFailedState(destroyTask.getDeploymentScenario()));
-            destroyResult.setMessage(e.getMessage());
+            destroyResult.setMessage(errorMsg);
         }
-        try {
-            DeployServiceEntity updatedDeployServiceEntity =
-                    deployResultManager.updateDeployServiceEntityWithDeployResult(destroyResult,
-                            deployServiceEntity);
-            if (ServiceDeploymentState.DESTROY_SUCCESS
-                    == updatedDeployServiceEntity.getServiceDeploymentState()) {
-                deployer.deleteTaskWorkspace(destroyTask.getId());
-            }
-        } catch (RuntimeException e) {
-            log.error("Update service database entity {} failed.", destroyTask.getId(), e);
+        DeployServiceEntity updatedDeployServiceEntity =
+                deployResultManager.updateDeployServiceEntityWithDeployResult(destroyResult,
+                        deployServiceEntity);
+        if (ServiceDeploymentState.DESTROY_SUCCESS
+                == updatedDeployServiceEntity.getServiceDeploymentState()) {
+            deployer.deleteTaskWorkspace(destroyTask.getId());
+        }
+
+        if (Objects.nonNull(exception) && Objects.nonNull(errorMsg)) {
+            log.error(errorMsg);
+            throw new DeploymentFailedException(errorMsg);
         }
     }
 
@@ -486,6 +506,8 @@ public class DeployService {
      */
     public void purgeService(DeployTask destroyTask, DeployServiceEntity deployServiceEntity) {
         MDC.put(TASK_ID, destroyTask.getId().toString());
+        Exception exception = null;
+        String errorMsg = null;
         try {
             if (Objects.nonNull(deployServiceEntity.getDeployResourceList())
                     && !deployServiceEntity.getDeployResourceList().isEmpty()) {
@@ -498,8 +520,13 @@ public class DeployService {
             serviceStateManager.deleteManagementTasksByServiceId(destroyTask.getId());
             log.info("Database entry with ID {} purged.", deployServiceEntity.getId());
         } catch (RuntimeException e) {
-            log.error("Error purging created resources for service with ID: {}. Ignoring.",
-                    destroyTask.getId(), e);
+            exception = e;
+            errorMsg = String.format("Purge service %s failed. Error message:\n %s",
+                    destroyTask.getId(), exception.getMessage());
+        }
+        if (Objects.nonNull(exception) && Objects.nonNull(errorMsg)) {
+            log.error(errorMsg);
+            throw new DeploymentFailedException(errorMsg);
         }
     }
 

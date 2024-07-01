@@ -299,7 +299,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         UUID uuid = UUID.randomUUID();
         ocl.setName("test-" + uuid);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        if (Objects.isNull(serviceTemplate.getServiceTemplateId())) {
+        if (Objects.isNull(serviceTemplate)) {
             return;
         }
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
@@ -312,10 +312,12 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         addCredentialForHuaweiCloud();
         // Set up the deployment with policy evaluation failed.
         mockPolicyEvaluationResult(false);
-        UUID serviceId = deployService(serviceTemplate);
-        Assertions.assertTrue(
-                waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_FAILED));
-
+        MockHttpServletResponse response = deployService(getDeployRequest(serviceTemplate));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        List<DeployedServiceDetails> deployedServices =
+                listDeployedServicesDetails(ServiceDeploymentState.DEPLOY_FAILED);
+        Assertions.assertNotNull(deployedServices);
+        UUID serviceId = deployedServices.getFirst().getServiceId();
         // Set up the deployment with policy evaluation successful and redeploy.
         mockPolicyEvaluationResult(true);
         testRedeploy(serviceId);
@@ -327,8 +329,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         serviceLockConfig.setModifyLocked(false);
         testChangeLockConfig(serviceId, serviceLockConfig);
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+            List<DeployedServiceDetails> deployedServiceDetailsList =
+                    listDeployedServicesDetails(ServiceDeploymentState.DEPLOY_SUCCESS);
+            Assertions.assertFalse(deployedServiceDetailsList.isEmpty());
             listDeployedServices();
-            listDeployedServicesDetails();
         }
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             testDestroy(serviceId);
@@ -370,6 +374,11 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testDeployThrowsServiceTemplateNotRegistered();
         testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
+        setMockPoliciesValidateApi();
+        addServicePolicies(serviceTemplate);
+        testDeployThrowPolicyEvaluationFailed(serviceTemplate);
+        addCredentialForHuaweiCloud();
+        mockPolicyEvaluationResult(true);
         UUID serviceId = deployService(serviceTemplate);
         if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             testApisThrowServiceFlavorDowngradeNotAllowed(serviceId, defaultFlavor,
@@ -383,6 +392,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         deployServiceStorage.deleteDeployService(
                 deployServiceStorage.findDeployServiceById(serviceId));
         serviceTemplateStorage.removeById(serviceTemplate.getServiceTemplateId());
+    }
+
+    void testDeployThrowPolicyEvaluationFailed(ServiceTemplateDetailVo serviceTemplate)
+            throws Exception {
+        mockPolicyEvaluationResult(false);
+        MockHttpServletResponse response = deployService(getDeployRequest(serviceTemplate));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(),
+                response.getStatus());
     }
 
     void testApisThrowServiceFlavorDowngradeNotAllowed(UUID serviceId,
@@ -748,18 +765,17 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertFalse(deployedServices.isEmpty());
     }
 
-    void listDeployedServicesDetails() throws Exception {
+    List<DeployedServiceDetails> listDeployedServicesDetails(ServiceDeploymentState state)
+            throws Exception {
 
         final MockHttpServletResponse listResponse = mockMvc.perform(
-                        get("/xpanse/services/details").contentType(MediaType.APPLICATION_JSON)
+                        get("/xpanse/services/details").param("serviceState", state.toValue())
+                                .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-        List<DeployedServiceDetails> deployedServiceDetailsList =
-                objectMapper.readValue(listResponse.getContentAsString(),
-                        new TypeReference<>() {
-                        });
-        assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
-        assertFalse(deployedServiceDetailsList.isEmpty());
+        return objectMapper.readValue(listResponse.getContentAsString(),
+                new TypeReference<>() {
+                });
     }
 
     void testDeployThrowsServiceTemplateNotRegistered() throws Exception {
