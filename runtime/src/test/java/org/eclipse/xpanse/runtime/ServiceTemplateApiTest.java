@@ -384,7 +384,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ocl.getCloudServiceProvider().setName(csp);
         Response expectedResponse = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", csp.name())));
+                        String.format("Can't find suitable plugin for the Csp %s", csp.toValue())));
         // Run the test
         final MockHttpServletResponse response = register(ocl);
         // Verify the results
