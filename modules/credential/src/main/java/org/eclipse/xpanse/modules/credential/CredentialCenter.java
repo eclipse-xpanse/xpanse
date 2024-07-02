@@ -221,7 +221,8 @@ public class CredentialCenter {
                 csp, credentialType, userId);
         if (credentialInfos.isEmpty()) {
             throw new CredentialsNotFoundException(
-                    String.format("No credential information found for the given Csp:%s.", csp));
+                    String.format("No credential information found for the given Csp:%s.",
+                            csp.toValue()));
         }
         Optional<AbstractCredentialInfo> credentialWithAllVariables = credentialInfos.stream()
                 .filter(credentialInfo -> allMandatoryCredentialVariableNotBlank(

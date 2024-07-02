@@ -113,7 +113,7 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp aws = Csp.AWS;
         Response awsResult = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", aws)));
+                        String.format("Can't find suitable plugin for the Csp %s", aws.toValue())));
         // Run the test
         final MockHttpServletResponse awsResponse = getCredentialTypes(aws);
         // Verify the results
@@ -231,7 +231,7 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp aliCloud = Csp.ALIBABA_CLOUD;
         Response aliCloudResult = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", aliCloud)));
+                        String.format("Can't find suitable plugin for the Csp %s", aliCloud.toValue())));
         // Run the test
         final MockHttpServletResponse aliCloudResponse =
                 getCredentialCapabilities(aliCloud, variablesType);
@@ -341,7 +341,7 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp aliCloud = Csp.ALIBABA_CLOUD;
         Response aliCloudResult = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", aliCloud)));
+                        String.format("Can't find suitable plugin for the Csp %s", aliCloud.toValue())));
         // Run the test
         final MockHttpServletResponse aliCloudResponse =
                 getCredentialOpenApi(aliCloud, variablesType);

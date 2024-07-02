@@ -142,7 +142,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         service2.setCsp(Csp.AWS);
         Response result2 = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", Csp.AWS)));
+                        String.format("Can't find suitable plugin for the Csp %s", Csp.AWS.toValue())));
 
         when(deployServiceStorage.findDeployServiceById(service2.getId())).thenReturn(service2);
         // run the test

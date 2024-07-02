@@ -83,7 +83,7 @@ public class PluginManager {
         OrchestratorPlugin plugin = pluginsMap.get(csp);
         if (Objects.isNull(plugin)) {
             throw new PluginNotFoundException(
-                    "Can't find suitable plugin for the Csp " + csp.name());
+                    "Can't find suitable plugin for the Csp " + csp.toValue());
         }
         return plugin;
     }
@@ -97,7 +97,7 @@ public class PluginManager {
         }
         if (!missingMandatoryProperties.isEmpty()) {
             log.warn("Plugin for provider {} will not be activated. Due to missing mandatory "
-                            + "configuration properties {}", csp,
+                            + "configuration properties {}", csp.toValue(),
                     String.join(",", missingMandatoryProperties));
             return false;
         }
@@ -111,7 +111,7 @@ public class PluginManager {
                     entry.getValue().getCredentialDefinitions();
             if (CollectionUtils.isEmpty(cspCredentialDefinitions)) {
                 log.warn("No defined credential definition found in the plugin of csp:{}",
-                        entry.getKey());
+                        entry.getKey().toValue());
                 continue;
             }
             Map<String, List<AbstractCredentialInfo>> uniqueKeyCredentialDefinitionsMap =
@@ -122,8 +122,8 @@ public class PluginManager {
                 if (!CollectionUtils.isEmpty(credentialEntry.getValue())
                         && credentialEntry.getValue().size() > 1) {
                     String errorMsg = String.format("In the plugin of csp %s defined duplicate "
-                                    + "credential definitions with key %s", entry.getKey(),
-                            credentialEntry.getKey());
+                                    + "credential definitions with key %s",
+                            entry.getKey().toValue(), credentialEntry.getKey());
                     errorMsgList.add(errorMsg);
                 }
             }
