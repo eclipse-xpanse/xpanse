@@ -271,10 +271,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     void getAvailabilityZonesThrowsClientApiCallFailedException(Csp csp, String regionName)
             throws Exception {
         final MockHttpServletResponse listAzResponse = getAvailabilityZones(csp, regionName);
-        Response response =
-                objectMapper.readValue(listAzResponse.getContentAsString(), Response.class);
-        Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listAzResponse.getStatus());
-        Assertions.assertEquals(response.getResultType(), ResultType.BACKEND_FAILURE);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), listAzResponse.getStatus());
+        Assertions.assertEquals(listAzResponse.getContentAsString(), "[]");
+        Assertions.assertEquals(listAzResponse.getHeader("Cache-Control"),"no-cache");
     }
 
     MockHttpServletResponse getAvailabilityZones(Csp csp, String regionName) throws Exception {

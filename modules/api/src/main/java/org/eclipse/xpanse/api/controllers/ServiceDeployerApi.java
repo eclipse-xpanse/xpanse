@@ -350,13 +350,18 @@ public class ServiceDeployerApi {
             @RequestParam(name = "regionName") String regionName,
             @Parameter(name = "serviceId", description = "id of the deployed service")
             @RequestParam(name = "serviceId", required = false) String serviceId) {
-
-        UUID uuid = StringUtils.isBlank(serviceId) ? null : UUID.fromString(serviceId);
-        String currentUserId = this.userServiceHelper.getCurrentUserId();
-        OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        List<String> availabilityZones = orchestratorPlugin.getAvailabilityZonesOfRegion(
-                currentUserId, regionName, uuid);
-        return ResponseEntity.ok().cacheControl(getCacheControl()).body(availabilityZones);
+        try {
+            UUID uuid = StringUtils.isBlank(serviceId) ? null : UUID.fromString(serviceId);
+            String currentUserId = this.userServiceHelper.getCurrentUserId();
+            OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
+            List<String> availabilityZones = orchestratorPlugin.getAvailabilityZonesOfRegion(
+                    currentUserId, regionName, uuid);
+            return ResponseEntity.ok().cacheControl(getCacheControl()).body(availabilityZones);
+        } catch (Exception ex) {
+            log.error("Error fetching availability zones", ex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .cacheControl(CacheControl.noCache()).body(Collections.emptyList());
+        }
     }
 
     private CacheControl getCacheControl() {

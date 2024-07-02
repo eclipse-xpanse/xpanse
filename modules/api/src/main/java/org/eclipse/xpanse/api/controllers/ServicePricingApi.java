@@ -69,9 +69,20 @@ public class ServicePricingApi {
             @PathVariable("billingMode") BillingMode billingMode,
             @Parameter(name = "flavorName", description = "flavor name of the service")
             @PathVariable("flavorName") String flavorName) {
-        FlavorPriceResult flavorPriceResult = servicePricesManager
-                .getServicePriceByFlavor(templateId, region, billingMode, flavorName);
-        return ResponseEntity.ok().cacheControl(getCacheControl()).body(flavorPriceResult);
+        try {
+            FlavorPriceResult flavorPriceResult = servicePricesManager
+                    .getServicePriceByFlavor(templateId, region, billingMode, flavorName);
+            return ResponseEntity.ok().cacheControl(getCacheControl()).body(flavorPriceResult);
+        } catch (Exception ex) {
+            FlavorPriceResult errorResult = new FlavorPriceResult();
+            errorResult.setSuccessful(false);
+            errorResult.setBillingMode(billingMode);
+            errorResult.setFlavorName(flavorName);
+            errorResult.setErrorMessage(ex.getMessage());
+            log.error("Error fetching prices of the flavor of the service.", ex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .cacheControl(CacheControl.noCache()).body(errorResult);
+        }
     }
 
 
@@ -94,6 +105,12 @@ public class ServicePricingApi {
             @PathVariable("billingMode") BillingMode billingMode) {
         List<FlavorPriceResult> allFlavorPriceResult =
                 servicePricesManager.getPricesByService(templateId, region, billingMode);
+        boolean findFailed = allFlavorPriceResult.stream()
+                .anyMatch(flavorPriceResult -> !flavorPriceResult.isSuccessful());
+        if (findFailed) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .cacheControl(CacheControl.noCache()).body(allFlavorPriceResult);
+        }
         return ResponseEntity.ok().cacheControl(getCacheControl()).body(allFlavorPriceResult);
     }
 
