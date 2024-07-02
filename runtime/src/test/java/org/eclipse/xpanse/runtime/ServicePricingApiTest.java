@@ -304,12 +304,14 @@ class ServicePricingApiTest extends ApisTestCommon {
         String regionName = "region";
         String flavorName = "flavor-error-test";
         BillingMode billingMode = BillingMode.FIXED;
-        Response expectedResponse1 =
-                Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
-                        Collections.singletonList(
-                                String.format("Service template with id %s not found.",
-                                        uuid)));
-        String result1 = objectMapper.writeValueAsString(expectedResponse1);
+
+        FlavorPriceResult expectedResult = new FlavorPriceResult();
+        expectedResult.setFlavorName(flavorName);
+        expectedResult.setBillingMode(billingMode);
+        expectedResult.setSuccessful(false);
+        expectedResult.setErrorMessage(
+                String.format("Service template with id %s not found.", uuid));
+        String result1 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse1 =
                 getServicePriceByFlavor(uuid, regionName, flavorName, billingMode);
@@ -323,12 +325,9 @@ class ServicePricingApiTest extends ApisTestCommon {
         ocl.setName("ServicePricingApi-error");
         ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
         UUID templateId = serviceTemplateDetails.getServiceTemplateId();
-        Response expectedResponse2 =
-                Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
-                        Collections.singletonList(
-                                String.format("Flavor %s not found in service template with id %s.",
-                                        flavorName, templateId)));
-        String result2 = objectMapper.writeValueAsString(expectedResponse2);
+        expectedResult.setErrorMessage(String.format("Flavor %s not found in service template with id %s.",
+                flavorName, templateId));
+        String result2 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse2 = getServicePriceByFlavor(templateId,
                 regionName, flavorName, billingMode);
@@ -346,28 +345,25 @@ class ServicePricingApiTest extends ApisTestCommon {
         ocl.getFlavors().getServiceFlavors().getFirst().setPricing(ratingMode);
         serviceTemplate.setOcl(ocl);
         serviceTemplateStorage.storeAndFlush(serviceTemplate);
-        Response expectedResponse3 =
-                Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
-                        Collections.singletonList(
-                                "BillingMode 'Fixed' can not be supported due to the "
-                                        + "'FixedPrice' is null."));
-        String result3 = objectMapper.writeValueAsString(expectedResponse3);
+        expectedResult.setFlavorName(flavorName);
+        expectedResult.setErrorMessage("BillingMode 'Fixed' can not be supported due to the "
+                + "'FixedPrice' is null.");
+        String result3 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse3 = getServicePriceByFlavor(templateId,
-                regionName, flavorName, BillingMode.FIXED);
+                regionName, flavorName, billingMode);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), priceResponse3.getStatus());
         assertEquals(result3, priceResponse3.getContentAsString());
 
-
-        Response expectedResponse4 =
-                Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
-                        Collections.singletonList("BillingMode 'Pay-Per-Use' can not be supported "
-                                + "due to the 'ResourceUsage' is null."));
-        String result4 = objectMapper.writeValueAsString(expectedResponse4);
+        billingMode = BillingMode.PAY_PER_USE;
+        expectedResult.setBillingMode(billingMode);
+        expectedResult.setErrorMessage("BillingMode 'Pay-Per-Use' can not be supported "
+                + "due to the 'ResourceUsage' is null.");
+        String result4 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse4 = getServicePriceByFlavor(templateId,
-                regionName, flavorName, BillingMode.PAY_PER_USE);
+                regionName, flavorName, billingMode);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), priceResponse4.getStatus());
         assertEquals(result4, priceResponse4.getContentAsString());
@@ -376,12 +372,10 @@ class ServicePricingApiTest extends ApisTestCommon {
         ocl.getFlavors().getServiceFlavors().getFirst().setPricing(null);
         serviceTemplate.setOcl(ocl);
         serviceTemplateStorage.storeAndFlush(serviceTemplate);
-        Response expectedResponse5 =
-                Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
-                        Collections.singletonList(String.format(
-                                "Flavor %s in service template with id %s has no pricing.",
-                                flavorName, templateId)));
-        String result5 = objectMapper.writeValueAsString(expectedResponse5);
+
+        expectedResult.setErrorMessage(String.format("Flavor %s in service template with id %s "
+                + "has no pricing.", flavorName, templateId));
+        String result5 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse5 = getServicePriceByFlavor(templateId,
                 regionName, flavorName, billingMode);
