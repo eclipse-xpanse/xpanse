@@ -162,6 +162,7 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
     }
 
     void testTerraformBootWebhookApisWell() throws Exception {
+        addCredentialForHuaweiCloud();
         // Setup
         mockTerraformBootServices();
         Ocl ocl = new OclLoader().getOcl(

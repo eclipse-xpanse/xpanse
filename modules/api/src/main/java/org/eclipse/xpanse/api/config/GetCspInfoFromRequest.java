@@ -87,7 +87,9 @@ public class GetCspInfoFromRequest {
         try {
             ServiceTemplateEntity serviceTemplate =
                     serviceTemplateStorage.getServiceTemplateById(UUID.fromString(id));
-            return serviceTemplate.getCsp();
+            if (Objects.nonNull(serviceTemplate)) {
+                return serviceTemplate.getCsp();
+            }
         } catch (Exception e) {
             log.error("Get csp with service template id:{} failed.", id, e);
         }
@@ -104,7 +106,9 @@ public class GetCspInfoFromRequest {
         try {
             DeployServiceEntity deployService =
                     deployServiceStorage.findDeployServiceById(UUID.fromString(id));
-            return deployService.getCsp();
+            if (Objects.nonNull(deployService)) {
+                return deployService.getCsp();
+            }
         } catch (Exception e) {
             log.error("Get csp with service id:{} failed.", id, e);
         }
@@ -143,7 +147,9 @@ public class GetCspInfoFromRequest {
         try {
             UserPolicyEntity userPolicy =
                     userPolicyStorage.findPolicyById(UUID.fromString(id));
-            return userPolicy.getCsp();
+            if (Objects.nonNull(userPolicy)) {
+                return userPolicy.getCsp();
+            }
         } catch (Exception e) {
             log.error("Get csp with user policy id:{} failed.", id, e);
         }
@@ -160,7 +166,9 @@ public class GetCspInfoFromRequest {
         try {
             ServicePolicyEntity servicePolicy =
                     servicePolicyStorage.findPolicyById(UUID.fromString(id));
-            return servicePolicy.getServiceTemplate().getCsp();
+            if (Objects.nonNull(servicePolicy)) {
+                return servicePolicy.getServiceTemplate().getCsp();
+            }
         } catch (Exception e) {
             log.error("Get csp with service policy id:{} failed.", id, e);
         }

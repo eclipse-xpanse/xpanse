@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
@@ -37,6 +38,9 @@ public class DeployResultManager {
 
     @Resource
     private SensitiveDataHandler sensitiveDataHandler;
+
+    @Resource
+    private DeployServiceEntityConverter deployServiceEntityConverter;
 
     /**
      * Method to update deployment result to DeployServiceEntity and store to database.
@@ -75,7 +79,7 @@ public class DeployResultManager {
                 getServiceDeploymentState(deployResult.getState()));
 
         DeployerTaskStatus deployerTaskStatus = deployResult.getState();
-
+        updateServiceConfiguration(deployerTaskStatus, deployServiceEntity);
         updateServiceState(deployerTaskStatus, deployServiceEntity);
 
         boolean taskExecutedSuccess = deployerTaskStatus == DeployerTaskStatus.DESTROY_SUCCESS
@@ -109,6 +113,19 @@ public class DeployResultManager {
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
         }
         sensitiveDataHandler.maskSensitiveFields(deployServiceEntity);
+    }
+
+    private void updateServiceConfiguration(DeployerTaskStatus state,
+            DeployServiceEntity deployServiceEntity) {
+        if (state == DeployerTaskStatus.DEPLOY_SUCCESS) {
+            ServiceConfigurationEntity serviceConfigurationEntity =
+                    deployServiceEntityConverter.getInitialServiceConfiguration(
+                            deployServiceEntity);
+            deployServiceEntity.setServiceConfigurationEntity(serviceConfigurationEntity);
+        }
+        if (state == DeployerTaskStatus.DESTROY_SUCCESS) {
+            deployServiceEntity.setServiceConfigurationEntity(null);
+        }
     }
 
     private void updateServiceState(DeployerTaskStatus state,
