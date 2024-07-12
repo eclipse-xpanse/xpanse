@@ -6,10 +6,12 @@
 package org.eclipse.xpanse.runtime.database.mysql;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import jakarta.annotation.Resource;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +23,16 @@ import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.api.controllers.ServiceMigrationApi;
 import org.eclipse.xpanse.api.controllers.ServiceModificationApi;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
+import org.eclipse.xpanse.api.controllers.UserCloudCredentialsApi;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
+import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.credential.CreateCredential;
+import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
+import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequestBase;
@@ -43,12 +50,14 @@ import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDet
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
 import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
+import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -57,7 +66,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql"})
 @AutoConfigureMockMvc
 class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
-
+    @Resource
+    private UserCloudCredentialsApi userCloudCredentialsApi;
     @Resource
     private ServiceDeployerApi serviceDeployerApi;
     @Resource
@@ -81,6 +91,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate();
         testDeployServiceThrowsServiceTemplateNotApproved(serviceTemplate);
         approveServiceTemplateRegistration(serviceTemplate);
+        addCredentialForHuaweiCloud();
         UUID serviceId = deployService(serviceTemplate);
         if (waitServiceUtilTargetState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             testModifyAndGetDetails(serviceId, serviceTemplate);
@@ -265,5 +276,22 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
         assertThrows(ServiceNotDeployedException.class,
                 () -> serviceDeployerApi.getSelfHostedServiceDetailsById(taskId.toString()));
+    }
+
+    private void addCredentialForHuaweiCloud() {
+        final CreateCredential createCredential = new CreateCredential();
+        createCredential.setCsp(Csp.HUAWEI_CLOUD);
+        createCredential.setType(CredentialType.VARIABLES);
+        createCredential.setName("AK_SK");
+        createCredential.setDescription("description");
+        List<CredentialVariable> credentialVariables = new ArrayList<>();
+        credentialVariables.add(
+                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY, "The access key.",
+                        true, false, "AK_VALUE"));
+        credentialVariables.add(new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                "The security key.", true, false, "SK_VALUE"));
+        createCredential.setVariables(credentialVariables);
+        createCredential.setTimeToLive(300);
+        userCloudCredentialsApi.addUserCloudCredential(createCredential);
     }
 }

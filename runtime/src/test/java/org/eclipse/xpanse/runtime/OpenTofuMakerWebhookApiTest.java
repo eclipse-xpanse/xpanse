@@ -163,6 +163,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
     }
 
     void testOpenTofuBootWebhookApisWell() throws Exception {
+        addCredentialForHuaweiCloud();
         // Setup
         mockOpenTofuMakerServices();
         Ocl ocl = new OclLoader().getOcl(

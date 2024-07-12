@@ -19,8 +19,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
 import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityToDeployTaskConverter;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
@@ -49,7 +49,7 @@ public class TerraformDeploymentResultCallbackManager {
     @Resource
     private DeployResultManager deployResultManager;
     @Resource
-    private DeployServiceEntityToDeployTaskConverter deployServiceEntityToDeployTaskConverter;
+    private DeployServiceEntityConverter deployServiceEntityConverter;
     @Resource
     private DeployService deployService;
     @Resource
@@ -70,7 +70,7 @@ public class TerraformDeploymentResultCallbackManager {
         if (ServiceDeploymentState.DEPLOY_FAILED
                 == updatedDeployServiceEntity.getServiceDeploymentState()) {
             DeployTask deployTask =
-                    deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
+                    deployServiceEntityConverter.getDeployTaskByStoredService(
                             updatedDeployServiceEntity);
             deployService.rollbackOnDeploymentFailure(deployTask, updatedDeployServiceEntity);
         }

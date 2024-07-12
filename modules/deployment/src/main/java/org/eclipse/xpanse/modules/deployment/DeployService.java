@@ -77,7 +77,7 @@ public class DeployService {
     @Resource
     private DeployerKindManager deployerKindManager;
     @Resource
-    private DeployServiceEntityToDeployTaskConverter deployServiceEntityToDeployTaskConverter;
+    private DeployServiceEntityConverter deployServiceEntityConverter;
     @Resource
     private ServiceStateManager serviceStateManager;
     @Resource
@@ -556,7 +556,7 @@ public class DeployService {
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(id));
         DeployTask deployTask =
-                deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
+                deployServiceEntityConverter.getDeployTaskByStoredService(
                         deployServiceEntity);
         deployTask.setDeploymentScenario(DeploymentScenario.DESTROY);
         destroy(deployTask, deployServiceEntity);
@@ -581,7 +581,7 @@ public class DeployService {
         deployServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DESTROYING);
         DeployServiceEntity updatedDeployServiceEntity =
                 deployServiceStorage.storeAndFlush(deployServiceEntity);
-        return deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
+        return deployServiceEntityConverter.getDeployTaskByStoredService(
                 updatedDeployServiceEntity);
     }
 
@@ -603,7 +603,7 @@ public class DeployService {
                     String.format("Service %s with the state %s is not allowed to purge.",
                             deployServiceEntity.getId(), state));
         }
-        return deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
+        return deployServiceEntityConverter.getDeployTaskByStoredService(
                 deployServiceEntity);
     }
 
@@ -624,7 +624,7 @@ public class DeployService {
                     String.format("Service %s with the state %s is not allowed to redeploy.",
                             deployServiceEntity.getId(), state));
         }
-        return deployServiceEntityToDeployTaskConverter.getDeployTaskByStoredService(
+        return deployServiceEntityConverter.getDeployTaskByStoredService(
                 deployServiceEntity);
     }
 }
