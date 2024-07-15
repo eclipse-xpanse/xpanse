@@ -76,6 +76,7 @@ configurationParameters:
     modificationImpact:
       isDataLost: true
       isServiceInterrupted: true
+    isReadOnly: false
   - name: kafka_cfg_log_dirs
     kind: variable
     dataType: string
@@ -85,6 +86,7 @@ configurationParameters:
     modificationImpact:
       isDataLost: true
       isServiceInterrupted: true
+    isReadOnly: false
   - name: kafka_cfg_num_io_threads
     kind: variable
     dataType: number
@@ -94,6 +96,7 @@ configurationParameters:
     modificationImpact:
       isDataLost: true
       isServiceInterrupted: true
+    isReadOnly: false
   - name: kafka_log_flush_interval_messages
     kind: variable
     dataType: number
@@ -103,6 +106,7 @@ configurationParameters:
     modificationImpact:
       isDataLost: true
       isServiceInterrupted: true
+    isReadOnly: false
   - name: kafka_offsets_topic_replication_factor
     kind: variable
     dataType: number
@@ -112,6 +116,7 @@ configurationParameters:
     modificationImpact:
       isDataLost: true
       isServiceInterrupted: true
+    isReadOnly: false
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: terraform
