@@ -73,4 +73,8 @@ public class ServiceConfigurationParameter implements Serializable {
     @Schema(description = "Service config parameter modificationImpact")
     private ModificationImpact modificationImpact;
 
+    @NotNull
+    @Schema(description = "Whether the service configuration parameters are read-only")
+    private Boolean isReadOnly;
+
 }

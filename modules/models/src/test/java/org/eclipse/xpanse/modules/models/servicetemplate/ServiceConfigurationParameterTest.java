@@ -50,6 +50,7 @@ class ServiceConfigurationParameterTest {
         serviceConfigurationParameter.setSensitiveScope(sensitiveScope);
         serviceConfigurationParameter.setAutoFill(autoFill);
         serviceConfigurationParameter.setModificationImpact(modificationImpact);
+        serviceConfigurationParameter.setIsReadOnly(true);
     }
 
     @Test
@@ -65,6 +66,7 @@ class ServiceConfigurationParameterTest {
         assertEquals(validatorMap, serviceConfigurationParameter.getValueSchema());
         assertEquals(sensitiveScope, serviceConfigurationParameter.getSensitiveScope());
         assertEquals(modificationImpact, serviceConfigurationParameter.getModificationImpact());
+        assertEquals(true, serviceConfigurationParameter.getIsReadOnly());
     }
 
     @Test
@@ -141,18 +143,27 @@ class ServiceConfigurationParameterTest {
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setSensitiveScope(sensitiveScope);
-        assertEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertEquals(serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceConfigurationParameter.hashCode(),
+                configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setAutoFill(autoFill);
-        assertEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertEquals(serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceConfigurationParameter.hashCode(),
+                configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setModificationImpact(modificationImpact);
+        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(configurationParameter1, configurationParameter2);
+        assertNotEquals(serviceConfigurationParameter.hashCode(),
+                configurationParameter1.hashCode());
+        assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
+
+        configurationParameter1.setIsReadOnly(true);
         assertEquals(serviceConfigurationParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
         assertEquals(serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
@@ -174,6 +185,7 @@ class ServiceConfigurationParameterTest {
                 ", sensitiveScope=" + sensitiveScope + "" +
                 ", autoFill=" + autoFill + "" +
                 ", modificationImpact=" + modificationImpact + "" +
+                ", isReadOnly=" + true + "" +
                 ")";
         assertEquals(expectedString, serviceConfigurationParameter.toString());
     }
