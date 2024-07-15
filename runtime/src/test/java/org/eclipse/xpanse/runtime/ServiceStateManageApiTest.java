@@ -23,7 +23,6 @@ import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersRequest;
 import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersResponse;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobRequest;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse;
-import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +34,6 @@ import org.eclipse.xpanse.api.config.GetCspInfoFromRequest;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -44,10 +42,10 @@ import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceStateManagementTaskType;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
@@ -82,7 +80,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class ServiceStateManageApiTest extends ApisTestCommon {
 
     @MockBean
-    private DatabaseDeployServiceStorage deployServiceStorage;
+    private DatabaseDeployServiceStorage mockDeployServiceStorage;
 
     @SpyBean
     private AuditLogWriter auditLogWriter;
@@ -129,7 +127,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         Response result1 = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList(String.format("Service with id %s has no vm resources.",
                         service1.getId())));
-        when(deployServiceStorage.findDeployServiceById(service1.getId())).thenReturn(service1);
+        when(mockDeployServiceStorage.findDeployServiceById(service1.getId())).thenReturn(service1);
         // run the test
         final MockHttpServletResponse response1 = startService(service1.getId());
         // Verify the results
@@ -142,9 +140,10 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         service2.setCsp(Csp.AWS);
         Response result2 = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", Csp.AWS.toValue())));
+                        String.format("Can't find suitable plugin for the Csp %s",
+                                Csp.AWS.toValue())));
 
-        when(deployServiceStorage.findDeployServiceById(service2.getId())).thenReturn(service2);
+        when(mockDeployServiceStorage.findDeployServiceById(service2.getId())).thenReturn(service2);
         // run the test
         final MockHttpServletResponse response2 = startService(service2.getId());
 
@@ -159,7 +158,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         Response result3 = Response.errorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList("No permissions to manage status of the service "
                         + "belonging to other users."));
-        when(deployServiceStorage.findDeployServiceById(service3.getId())).thenReturn(service3);
+        when(mockDeployServiceStorage.findDeployServiceById(service3.getId())).thenReturn(service3);
         // run the test
         final MockHttpServletResponse response3 = startService(service3.getId());
         // Verify the results
@@ -174,7 +173,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 Collections.singletonList(
                         String.format("Service with id %s is %s.", service4.getId(),
                                 service4.getServiceDeploymentState())));
-        when(deployServiceStorage.findDeployServiceById(service4.getId())).thenReturn(service4);
+        when(mockDeployServiceStorage.findDeployServiceById(service4.getId())).thenReturn(service4);
         // run the test
         final MockHttpServletResponse response4 = startService(service4.getId());
         // Verify the results
@@ -185,7 +184,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         DeployServiceEntity service5 = setUpWellDeployServiceEntity();
         service5.setServiceState(ServiceState.STARTING);
-        when(deployServiceStorage.findDeployServiceById(service5.getId())).thenReturn(service5);
+        when(mockDeployServiceStorage.findDeployServiceById(service5.getId())).thenReturn(service5);
         Response errorResult5 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
                 Collections.singletonList(String.format(
                         "Service %s with a running management task, please try again later.",
@@ -200,7 +199,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         DeployServiceEntity service6 = setUpWellDeployServiceEntity();
         service6.setServiceState(ServiceState.RUNNING);
-        when(deployServiceStorage.findDeployServiceById(service6.getId())).thenReturn(service6);
+        when(mockDeployServiceStorage.findDeployServiceById(service6.getId())).thenReturn(service6);
         Response errorResult6 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
                 Collections.singletonList(
                         String.format("Service %s with state RUNNING is not supported to start.",
@@ -219,7 +218,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 Collections.singletonList(String.format(
                         "Service %s with a running management task, please try again later.",
                         service7.getId())));
-        when(deployServiceStorage.findDeployServiceById(service7.getId())).thenReturn(service7);
+        when(mockDeployServiceStorage.findDeployServiceById(service7.getId())).thenReturn(service7);
         // run the test
         final MockHttpServletResponse response7 = stopService(service7.getId());
         // Verify the results
@@ -229,7 +228,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
         DeployServiceEntity service8 = setUpWellDeployServiceEntity();
         service8.setServiceState(ServiceState.STOPPED);
-        when(deployServiceStorage.findDeployServiceById(service8.getId())).thenReturn(service8);
+        when(mockDeployServiceStorage.findDeployServiceById(service8.getId())).thenReturn(service8);
         Response errorResult8 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
                 Collections.singletonList(
                         String.format("Service %s with state STOPPED is not supported to stop.",
@@ -243,7 +242,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
         DeployServiceEntity service9 = setUpWellDeployServiceEntity();
         service9.setServiceState(ServiceState.STOPPED);
-        when(deployServiceStorage.findDeployServiceById(service9.getId())).thenReturn(service9);
+        when(mockDeployServiceStorage.findDeployServiceById(service9.getId())).thenReturn(service9);
         Response errorResult9 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
                 Collections.singletonList(
                         String.format("Service %s with state STOPPED is not supported to restart.",
@@ -279,7 +278,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         DeployServiceEntity service = setUpWellDeployServiceEntity();
         service.setServiceState(ServiceState.STOPPED);
-        when(deployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
+        when(mockDeployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
         when(huaweiCloudClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         addCredentialForHuaweiCloud();
         testServiceStateManageApisWithHuaweiCloudSdk(service);
@@ -469,7 +468,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         DeployServiceEntity service = setUpWellDeployServiceEntity();
         service.setCsp(Csp.FLEXIBLE_ENGINE);
-        when(deployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
+        when(mockDeployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
         when(flexibleEngineClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         addCredentialForFlexibleEngine();
         testServiceStateManageApisWithHuaweiCloudSdk(service);
@@ -480,7 +479,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         addCredentialForOpenstack(Csp.OPENSTACK_TESTLAB);
         DeployServiceEntity service = setUpWellDeployServiceEntity();
         service.setCsp(Csp.OPENSTACK_TESTLAB);
-        when(deployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
+        when(mockDeployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
         testServiceStateManageApisWithOpenstackSdk(service);
         deleteCredential(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "USERNAME_PASSWORD");
     }

@@ -52,7 +52,7 @@ public class TofuMakerDeploymentPlanManage {
 
     private OpenTofuPlanWithScriptsRequest getPlanWithScriptsRequest(DeployTask task) {
         OpenTofuPlanWithScriptsRequest request = new OpenTofuPlanWithScriptsRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setScripts(tofuMakerHelper.getFiles(task));
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
@@ -61,7 +61,7 @@ public class TofuMakerDeploymentPlanManage {
 
     private OpenTofuPlanFromGitRepoRequest getPlanFromGitRepoRequest(DeployTask task) {
         OpenTofuPlanFromGitRepoRequest request = new OpenTofuPlanFromGitRepoRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
         request.setGitRepoDetails(

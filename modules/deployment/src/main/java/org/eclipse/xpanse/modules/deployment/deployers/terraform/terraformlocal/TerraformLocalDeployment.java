@@ -67,13 +67,13 @@ public class TerraformLocalDeployment implements Deployer {
      */
     @Autowired
     public TerraformLocalDeployment(DeployEnvironments deployEnvironments,
-            TerraformLocalConfig terraformLocalConfig,
-            @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
-            TerraformDeploymentResultCallbackManager
-                    terraformDeploymentResultCallbackManager,
-            DeployServiceEntityHandler deployServiceEntityHandler,
-            ScriptsGitRepoManage scriptsGitRepoManage,
-            DeployResultFileUtils deployResultFileUtils) {
+                                    TerraformLocalConfig terraformLocalConfig,
+                                    @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
+                                    TerraformDeploymentResultCallbackManager
+                                                terraformDeploymentResultCallbackManager,
+                                    DeployServiceEntityHandler deployServiceEntityHandler,
+                                    ScriptsGitRepoManage scriptsGitRepoManage,
+                                    DeployResultFileUtils deployResultFileUtils) {
         this.deployEnvironments = deployEnvironments;
         this.terraformLocalConfig = terraformLocalConfig;
         this.taskExecutor = taskExecutor;
@@ -91,7 +91,8 @@ public class TerraformLocalDeployment implements Deployer {
     @Override
     public DeployResult deploy(DeployTask task) {
         DeployResult deployResult = new DeployResult();
-        deployResult.setId(task.getId());
+        deployResult.setOrderId(task.getOrderId());
+        deployResult.setServiceId(task.getServiceId());
         asyncExecDeploy(task);
         return deployResult;
     }
@@ -105,17 +106,18 @@ public class TerraformLocalDeployment implements Deployer {
     @Override
     public DeployResult destroy(DeployTask task) {
         DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+                deployServiceEntityHandler.getDeployServiceEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         if (StringUtils.isBlank(resourceState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
-                    task.getId());
+                    task.getServiceId());
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
 
         DeployResult destroyResult = new DeployResult();
-        destroyResult.setId(task.getId());
+        destroyResult.setServiceId(task.getServiceId());
+        destroyResult.setOrderId(task.getOrderId());
         asyncExecDestroy(task, resourceState);
         return destroyResult;
     }
@@ -126,24 +128,25 @@ public class TerraformLocalDeployment implements Deployer {
      * @param task the task for the deployment.
      */
     @Override
-    public DeployResult modify(UUID modificationId, DeployTask task) {
+    public DeployResult modify(DeployTask task) {
         DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+                deployServiceEntityHandler.getDeployServiceEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         if (StringUtils.isBlank(resourceState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
-                    task.getId());
+                    task.getServiceId());
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
         DeployResult modifyResult = new DeployResult();
-        modifyResult.setId(task.getId());
-        asyncExecModify(modificationId, task, resourceState);
+        modifyResult.setServiceId(task.getServiceId());
+        modifyResult.setOrderId(task.getOrderId());
+        asyncExecModify(task, resourceState);
         return modifyResult;
     }
 
     private void asyncExecDeploy(DeployTask task) {
-        String workspace = getWorkspacePath(task.getId());
+        String workspace = getWorkspacePath(task.getServiceId());
         // Create the workspace.
         buildWorkspace(workspace);
         prepareDeployWorkspaceWithScripts(task, workspace);
@@ -151,7 +154,7 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setRequestId(task.getId());
+            terraformResult.setRequestId(task.getOrderId());
             try {
                 executor.deploy();
                 terraformResult.setCommandSuccessful(true);
@@ -162,18 +165,19 @@ public class TerraformLocalDeployment implements Deployer {
             }
             terraformResult.setTerraformState(executor.getTerraformState());
             terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
-            terraformDeploymentResultCallbackManager.deployCallback(task.getId(), terraformResult);
+            terraformDeploymentResultCallbackManager.deployCallback(task.getServiceId(),
+                    terraformResult);
         });
     }
 
     private void asyncExecDestroy(DeployTask task, String tfState) {
-        String workspace = getWorkspacePath(task.getId());
+        String workspace = getWorkspacePath(task.getServiceId());
         prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
         TerraformLocalExecutor executor = getExecutorForDeployTask(task, workspace, false);
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setRequestId(task.getId());
+            terraformResult.setRequestId(task.getOrderId());
             try {
                 executor.destroy();
                 terraformResult.setCommandSuccessful(true);
@@ -184,20 +188,20 @@ public class TerraformLocalDeployment implements Deployer {
             }
             terraformResult.setTerraformState(executor.getTerraformState());
             terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
-            terraformDeploymentResultCallbackManager.destroyCallback(task.getId(),
+            terraformDeploymentResultCallbackManager.destroyCallback(task.getServiceId(),
                     terraformResult, task.getDeploymentScenario());
         });
     }
 
-    private void asyncExecModify(UUID modificationId, DeployTask task, String tfState) {
-        String workspace = getWorkspacePath(task.getId());
+    private void asyncExecModify(DeployTask task, String tfState) {
+        String workspace = getWorkspacePath(task.getServiceId());
         prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
         prepareDeployWorkspaceWithScripts(task, workspace);
         TerraformLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setRequestId(modificationId);
+            terraformResult.setRequestId(task.getOrderId());
             try {
                 executor.deploy();
                 terraformResult.setCommandSuccessful(true);
@@ -208,13 +212,14 @@ public class TerraformLocalDeployment implements Deployer {
             }
             terraformResult.setTerraformState(executor.getTerraformState());
             terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
-            terraformDeploymentResultCallbackManager.modifyCallback(task.getId(), terraformResult);
+            terraformDeploymentResultCallbackManager.modifyCallback(task.getServiceId(),
+                    terraformResult);
         });
     }
 
     @Override
     public String getDeploymentPlanAsJson(DeployTask task) {
-        String workspace = getWorkspacePath(task.getId());
+        String workspace = getWorkspacePath(task.getServiceId());
         // Create the workspace.
         buildWorkspace(workspace);
         prepareDeployWorkspaceWithScripts(task, workspace);

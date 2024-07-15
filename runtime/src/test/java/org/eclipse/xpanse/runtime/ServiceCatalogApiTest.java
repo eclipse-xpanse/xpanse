@@ -69,7 +69,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         testOpenApi(serviceTemplate);
         testListOrderableServices(serviceTemplate);
         testGetOrderableServiceDetails(serviceTemplate);
-        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
 

@@ -20,7 +20,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.net.URL;
@@ -34,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -76,11 +74,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class ServiceTemplateApiTest extends ApisTestCommon {
 
     private final OclLoader oclLoader = new OclLoader();
-    @Resource
-    private DatabaseServiceTemplateStorage serviceTemplateStorage;
 
     @MockBean
-    private DatabaseDeployServiceStorage deployServiceStorage;
+    private DatabaseDeployServiceStorage mockDeployServiceStorage;
 
     @Test
     @WithJwt(file = "jwt_isv.json")
@@ -177,7 +173,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Setup delete request
         unregister(id);
         // Run the test
-        final MockHttpServletResponse deleteResponse = deleteServiceTemplate(id);
+        final MockHttpServletResponse deleteResponse = deleteTemplate(id);
         // Verify the results
         assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.getStatus());
     }
@@ -213,7 +209,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(serviceTemplateDetailVo.getServiceTemplateId(),
                 updatedServiceTemplateDetailVo.getServiceTemplateId());
 
-        serviceTemplateStorage.removeById(id);
+        deleteServiceTemplate(serviceTemplateDetailVo.getServiceTemplateId());
     }
 
 
@@ -333,14 +329,14 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
                 reRegisterResponse.getContentAsString());
 
-        // Run the test deleteServiceTemplate
-        final MockHttpServletResponse deleteResponse = deleteServiceTemplate(id);
+        // Run the test deleteTemplate
+        final MockHttpServletResponse deleteResponse = deleteTemplate(id);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), deleteResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
                 deleteResponse.getContentAsString());
 
-        serviceTemplateStorage.removeById(id);
+        deleteServiceTemplate(id);
     }
 
     void testRegisterThrowsMethodArgumentNotValidException() throws Exception {
@@ -516,7 +512,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerSameResponse.getStatus());
         assertEquals(registerSameResponse.getContentAsString(), result);
         unregister(serviceTemplateDetail.getServiceTemplateId());
-        deleteServiceTemplate(serviceTemplateDetail.getServiceTemplateId());
+        deleteTemplate(serviceTemplateDetail.getServiceTemplateId());
     }
 
     void testRegisterThrowsInvalidServiceVersionException() throws Exception {
@@ -558,7 +554,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(expectedResponse2));
 
         unregister(serviceTemplate.getServiceTemplateId());
-        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
+        deleteTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testRegisterThrowsInvalidServiceFlavorsException() throws Exception {
@@ -640,7 +636,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         String errorMsg = String.format("Service template with id %s is not unregistered.", id);
         Response expectedResponse =
                 Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE, List.of(errorMsg));
-        MockHttpServletResponse deleteResponse = deleteServiceTemplate(id);
+        MockHttpServletResponse deleteResponse = deleteTemplate(id);
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse.getStatus());
         assertEquals(deleteResponse.getContentAsString(),
@@ -651,14 +647,14 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE,
                         List.of(errorMsg2));
         unregister(serviceTemplate.getServiceTemplateId());
-        when(deployServiceStorage.listServices(any(ServiceQueryModel.class))).thenReturn(
+        when(mockDeployServiceStorage.listServices(any(ServiceQueryModel.class))).thenReturn(
                 List.of(new DeployServiceEntity()));
-        MockHttpServletResponse deleteResponse2 = deleteServiceTemplate(id);
+        MockHttpServletResponse deleteResponse2 = deleteTemplate(id);
         assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse2.getStatus());
         assertEquals(deleteResponse2.getContentAsString(),
                 objectMapper.writeValueAsString(expectedResponse2));
 
-        serviceTemplateStorage.removeById(id);
+        deleteTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     MockHttpServletResponse register(Ocl ocl) throws Exception {
@@ -708,7 +704,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
     }
 
-    MockHttpServletResponse deleteServiceTemplate(UUID id) throws Exception {
+    MockHttpServletResponse deleteTemplate(UUID id) throws Exception {
         return mockMvc.perform(
                         delete("/xpanse/service_templates/{id}", id).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();

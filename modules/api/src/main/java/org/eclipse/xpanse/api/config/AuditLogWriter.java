@@ -64,16 +64,14 @@ public class AuditLogWriter {
     @Around("controllerMethods()")
     public Object auditRequest(ProceedingJoinPoint joinPoint) throws Throwable {
         Csp csp = getCsp(joinPoint);
-        log.info("Get csp from request attributes: {}", csp);
         Object result = joinPoint.proceed();
         if (Objects.nonNull(csp)) {
             HttpServletRequest request =
                     ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                             .getRequest();
-
             OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
             orchestratorPlugin.auditApiRequest(
-                    getAuditLog(csp, joinPoint.getSignature().getName(), request.getMethod(),
+                    getAuditLog(csp, joinPoint.getSignature().getName(), request,
                             joinPoint.getArgs(), result));
         }
         return result;
@@ -110,47 +108,40 @@ public class AuditLogWriter {
                 return csp;
             }
         } catch (Exception e) {
-            log.error("Get csp with annotation @AuditApiRequest error.", e);
+            log.error("Get csp with method {} error.", methodName, e);
         }
         return null;
     }
 
     private Csp getCspFromRequestParams(Object[] args) {
         for (Object arg : args) {
-            if (arg instanceof Ocl ocl) {
-                return ocl.getCloudServiceProvider().getName();
-            } else if (arg instanceof DeployRequest deployRequest) {
-                return deployRequest.getCsp();
-            } else if (arg instanceof MigrateRequest migrateRequest) {
-                return migrateRequest.getCsp();
-            } else if (arg instanceof CreateCredential createCredential) {
-                return createCredential.getCsp();
-            } else if (arg instanceof UserPolicyCreateRequest userPolicyCreateRequest) {
-                return userPolicyCreateRequest.getCsp();
-            } else if (arg instanceof UserPolicyUpdateRequest userPolicyUpdateRequest) {
-                return userPolicyUpdateRequest.getCsp();
-            } else if (arg instanceof ServicePolicyCreateRequest servicePolicyCreateRequest) {
-                return getCspInfoFromRequest.getCspFromServiceTemplateId(
-                        servicePolicyCreateRequest.getServiceTemplateId().toString());
-            } else if (arg instanceof Csp csp) {
-                return csp;
-            } else {
-                return null;
-            }
+            return switch (arg) {
+                case Ocl ocl -> ocl.getCloudServiceProvider().getName();
+                case DeployRequest deployRequest -> deployRequest.getCsp();
+                case MigrateRequest migrateRequest -> migrateRequest.getCsp();
+                case CreateCredential createCredential -> createCredential.getCsp();
+                case UserPolicyCreateRequest userPolicyCreateRequest ->
+                        userPolicyCreateRequest.getCsp();
+                case UserPolicyUpdateRequest userPolicyUpdateRequest ->
+                        userPolicyUpdateRequest.getCsp();
+                case ServicePolicyCreateRequest servicePolicyCreateRequest ->
+                        getCspInfoFromRequest.getCspFromServiceTemplateId(
+                                servicePolicyCreateRequest.getServiceTemplateId().toString());
+                case Csp csp -> csp;
+                case null, default -> null;
+            };
         }
         return null;
     }
 
-    private AuditLog getAuditLog(Csp csp, String methodName, String methodType, Object[] args,
+    private AuditLog getAuditLog(Csp csp, String methodName, HttpServletRequest request,
+                                 Object[] args,
                                  Object result) {
         AuditLog auditLog = new AuditLog();
         auditLog.setMethodName(methodName);
-        auditLog.setMethodType(methodType);
+        auditLog.setMethodType(request.getMethod());
         auditLog.setParams(args);
         auditLog.setResult(result);
-        ServletRequestAttributes attributes =
-                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
         auditLog.setUrl(String.valueOf(request.getRequestURL()));
         auditLog.setCsp(csp);
         auditLog.setOperatingTime(OffsetDateTime.now());

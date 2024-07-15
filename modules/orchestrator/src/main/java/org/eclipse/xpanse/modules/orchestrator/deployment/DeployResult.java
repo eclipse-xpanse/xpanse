@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,41 +23,38 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 @Data
 public class DeployResult {
 
-    /**
-     * The id of the deployment task.
-     */
     @NotNull
-    @Schema(description = "The id of the service task.")
-    private UUID id;
-    /**
-     * The state of the deployment task.
-     */
+    @Schema(description = "The id of the service order task.")
+    private UUID orderId;
+
     @NotNull
-    @Schema(description = "The state of the service.")
+    @Schema(description = "The id of the managed service instance.")
+    private UUID serviceId;
+
+    @NotNull
+    @Schema(description = "True if the deployer task is successful.")
+    private Boolean isTaskSuccessful;
+
+    @NotNull
+    @Schema(description = "The state of the deployer task.")
     private DeployerTaskStatus state;
 
-    /**
-     * The message of the deployment task.
-     */
-    @Schema(description = "The message of the service.")
+    @Schema(description = "The message of the service order task.")
     private String message;
 
-    /**
-     * The resources of the server.
-     */
     @NotNull
-    @Schema(description = "The deployed resources of the service.")
+    @Schema(description = "The deployed resources of the service instance.")
     private List<@Valid DeployResource> resources;
 
-    /**
-     * The result property of the service task.
-     */
     @NotNull
-    @Schema(description = "The result property of the service task.")
+    @Schema(description = "The result properties of the service instance.")
     private Map<String, String> properties = new HashMap<>();
 
     @NotNull
-    @Schema(description = "The properties of the deployed result.")
+    @Schema(description = "The private properties of the service instance deployment.")
     private Map<String, String> privateProperties = new HashMap<>();
+
+    @Hidden
+    private String tfStateContent;
 
 }

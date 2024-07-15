@@ -29,14 +29,14 @@ import org.springframework.web.context.request.async.DeferredResult;
  */
 @Slf4j
 @Component
-public class StatusChangePolling {
+public class ServiceDeploymentStatusChangePolling {
 
     private static final List<ServiceDeploymentState> FINAL_SERVICE_DEPLOYMENT_STATES
             = Arrays.asList(
             ServiceDeploymentState.DEPLOY_FAILED,
+            ServiceDeploymentState.DEPLOY_SUCCESS,
             ServiceDeploymentState.DESTROY_FAILED,
-            ServiceDeploymentState.DEPLOY_SUCCESS,
-            ServiceDeploymentState.DEPLOY_SUCCESS,
+            ServiceDeploymentState.DESTROY_SUCCESS,
             ServiceDeploymentState.MODIFICATION_FAILED,
             ServiceDeploymentState.MODIFICATION_SUCCESSFUL,
             ServiceDeploymentState.ROLLBACK_FAILED,
@@ -55,21 +55,18 @@ public class StatusChangePolling {
     /**
      * Method to fetch order status by polling database for a fixed period of time.
      *
-     * @param deferredResult DeferredResult object from the original HTTP thread to which the
-     *                       result object must be set.
-     * @param serviceId ID of the service.
-     * @param previousKnownServiceDeploymentState previously known state of the service
-     *                                            deployment to client.
-     *                                            the poller will wait as long as there is a change
-     *                                            to this.
+     * @param deferredResult                      DeferredResult object from the original HTTP
+     *                                            thread to which the result object must be set.
+     * @param serviceId                           ID of the service.
+     * @param previousKnownServiceDeploymentState previously known state of the service deployment
+     *                                            to client. If not null, the poller will wait as
+     *                                            long as there is a change to this.
      */
     public void fetchServiceDeploymentStatusWithPolling(
-            DeferredResult<DeploymentStatusUpdate> deferredResult,
-            UUID serviceId,
+            DeferredResult<DeploymentStatusUpdate> deferredResult, UUID serviceId,
             ServiceDeploymentState previousKnownServiceDeploymentState) {
-        AtomicReference<DeploymentStatusUpdate> ref =
-                new AtomicReference<>(new DeploymentStatusUpdate(
-                        previousKnownServiceDeploymentState,
+        AtomicReference<DeploymentStatusUpdate> ref = new AtomicReference<>(
+                new DeploymentStatusUpdate(previousKnownServiceDeploymentState,
                         FINAL_SERVICE_DEPLOYMENT_STATES.contains(
                                 previousKnownServiceDeploymentState)));
         try {
@@ -90,9 +87,9 @@ public class StatusChangePolling {
                                         deployServiceEntity.getServiceDeploymentState())));
                         return Objects.isNull(previousKnownServiceDeploymentState)
                                 || FINAL_SERVICE_DEPLOYMENT_STATES.contains(
-                                        deployServiceEntity.getServiceDeploymentState())
+                                deployServiceEntity.getServiceDeploymentState())
                                 || deployServiceEntity.getServiceDeploymentState()
-                                        != previousKnownServiceDeploymentState;
+                                != previousKnownServiceDeploymentState;
                     });
         } catch (ConditionTimeoutException conditionTimeoutException) {
             log.info("No change to service deployment status yet.");

@@ -60,7 +60,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         serviceTemplate = objectMapper.readValue(registrationDetails.getContentAsString()
                 , ServiceTemplateDetailVo.class);
         testListManagedServiceTemplatesWithStateApproved();
-        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     @Test
@@ -77,7 +77,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         testGetRegistrationDetailsThrowsAccessDeniedException(serviceTemplate);
         testReviewRegistrationThrowsAccessDeniedException(serviceTemplate);
         testListManagedServiceTemplatesReturnsEmptyList(serviceTemplate);
-        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testGetRegistrationDetails(ServiceTemplateDetailVo serviceTemplateDetailVo)

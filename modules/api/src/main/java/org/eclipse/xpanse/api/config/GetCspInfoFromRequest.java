@@ -20,8 +20,8 @@ import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.DatabaseServiceMigrationStorage;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
-import org.eclipse.xpanse.modules.database.servicemodification.DatabaseServiceModificationAuditStorage;
-import org.eclipse.xpanse.modules.database.servicemodification.ServiceModificationAuditEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStorage;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
@@ -57,7 +57,7 @@ public class GetCspInfoFromRequest {
     @Resource
     private DatabaseServiceStateManagementTaskStorage managementTaskStorage;
     @Resource
-    private DatabaseServiceModificationAuditStorage modificationAuditStorage;
+    private DatabaseServiceOrderStorage serviceOrderTaskStorage;
 
     /**
      * Get Csp with the URL of Ocl.
@@ -122,6 +122,9 @@ public class GetCspInfoFromRequest {
      * @return csp.
      */
     public Csp getCspFromServiceMigrationId(String id) {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
         try {
             ServiceMigrationEntity serviceMigrationEntity =
                     serviceMigrationStorage.findServiceMigrationById(UUID.fromString(id));
@@ -132,7 +135,7 @@ public class GetCspInfoFromRequest {
                 return deployService.getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with service id:{} failed.", id, e);
+            log.error("Get csp with service migration id:{} failed.", id, e);
         }
         return null;
     }
@@ -228,23 +231,22 @@ public class GetCspInfoFromRequest {
 
 
     /**
-     * Get Csp with id of service modification audit.
+     * Get Csp with id of the service order.
      *
-     * @param modificationAuditId id of service modification audit.
+     * @param orderId id of the service order.
      * @return csp.
      */
-    public Csp getCspFromModificationAuditId(String modificationAuditId) {
+    public Csp getCspFromServiceOrderId(String orderId) {
         try {
-            ServiceModificationAuditEntity audit =
-                    modificationAuditStorage.getEntityById(UUID.fromString(modificationAuditId));
-            if (Objects.nonNull(audit) && Objects.nonNull(audit.getServiceId())) {
+            ServiceOrderEntity order =
+                    serviceOrderTaskStorage.getEntityById(UUID.fromString(orderId));
+            if (Objects.nonNull(order) && Objects.nonNull(order.getServiceId())) {
                 DeployServiceEntity deployService =
-                        deployServiceStorage.findDeployServiceById(audit.getServiceId());
+                        deployServiceStorage.findDeployServiceById(order.getServiceId());
                 return deployService.getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with service modification audit id:{} failed.",
-                    modificationAuditId, e);
+            log.error("Get csp with service order id:{} failed.", orderId, e);
         }
         return null;
     }

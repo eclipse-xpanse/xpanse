@@ -15,12 +15,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -34,7 +38,10 @@ import org.springframework.util.CollectionUtils;
 public class DeployResultManager {
 
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private DeployServiceStorage deployServiceStorage;
+
+    @Resource
+    private ServiceOrderStorage serviceOrderStorage;
 
     @Resource
     private SensitiveDataHandler sensitiveDataHandler;
@@ -52,23 +59,30 @@ public class DeployResultManager {
      */
     public DeployServiceEntity updateDeployServiceEntityWithDeployResult(
             DeployResult deployResult, DeployServiceEntity storedEntity) {
-        if (Objects.nonNull(deployResult.getState()) && Objects.nonNull(storedEntity)) {
-            log.info("Deploy task update deploy service entity with id:{}", deployResult.getId());
-            DeployServiceEntity deployServiceEntityToStore = new DeployServiceEntity();
-            BeanUtils.copyProperties(storedEntity, deployServiceEntityToStore);
-            updateEntityWithDeployResult(deployResult, deployServiceEntityToStore);
-            return deployServiceEntityHandler.storeAndFlush(deployServiceEntityToStore);
-        } else {
+        if (Objects.isNull(deployResult) || Objects.isNull(deployResult.getState())) {
             return storedEntity;
         }
+        if (Objects.isNull(storedEntity)) {
+            storedEntity = deployServiceStorage.findDeployServiceById(deployResult.getServiceId());
+        }
+        log.info("Update deploy service entity {} with deploy result {}",
+                deployResult.getServiceId(), deployResult);
+        DeployServiceEntity deployServiceToUpdate = new DeployServiceEntity();
+        BeanUtils.copyProperties(storedEntity, deployServiceToUpdate);
+        updateServiceEntityWithDeployResult(deployResult, deployServiceToUpdate);
+        return deployServiceStorage.storeAndFlush(deployServiceToUpdate);
+
     }
 
-    private void updateEntityWithDeployResult(DeployResult deployResult,
-                                              DeployServiceEntity deployServiceEntity) {
+    private void updateServiceEntityWithDeployResult(DeployResult deployResult,
+                                                     DeployServiceEntity deployServiceEntity) {
         if (StringUtils.isNotBlank(deployResult.getMessage())) {
             deployServiceEntity.setResultMessage(deployResult.getMessage());
         } else {
-            deployServiceEntity.setResultMessage(null);
+            // When rollback successfully, the result message should be the previous error message.
+            if (deployResult.getState() != DeployerTaskStatus.ROLLBACK_SUCCESS) {
+                deployServiceEntity.setResultMessage(null);
+            }
         }
         if (deployResult.getState() == DeployerTaskStatus.MODIFICATION_SUCCESSFUL) {
             DeployRequest modifyRequest = deployServiceEntity.getDeployRequest();
@@ -82,14 +96,9 @@ public class DeployResultManager {
         updateServiceConfiguration(deployerTaskStatus, deployServiceEntity);
         updateServiceState(deployerTaskStatus, deployServiceEntity);
 
-        boolean taskExecutedSuccess = deployerTaskStatus == DeployerTaskStatus.DESTROY_SUCCESS
-                || deployerTaskStatus == DeployerTaskStatus.MODIFICATION_SUCCESSFUL
-                || deployerTaskStatus == DeployerTaskStatus.ROLLBACK_SUCCESS
-                || deployerTaskStatus == DeployerTaskStatus.PURGE_SUCCESS
-                || deployerTaskStatus == DeployerTaskStatus.DEPLOY_SUCCESS;
-
+        boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         if (CollectionUtils.isEmpty(deployResult.getPrivateProperties())) {
-            if (taskExecutedSuccess) {
+            if (isTaskSuccessful) {
                 deployServiceEntity.getPrivateProperties().clear();
             }
         } else {
@@ -97,7 +106,7 @@ public class DeployResultManager {
         }
 
         if (CollectionUtils.isEmpty(deployResult.getProperties())) {
-            if (taskExecutedSuccess) {
+            if (isTaskSuccessful) {
                 deployServiceEntity.getProperties().clear();
             }
         } else {
@@ -105,7 +114,7 @@ public class DeployResultManager {
         }
 
         if (CollectionUtils.isEmpty(deployResult.getResources())) {
-            if (taskExecutedSuccess) {
+            if (isTaskSuccessful) {
                 deployServiceEntity.getDeployResourceList().clear();
             }
         } else {
@@ -116,7 +125,7 @@ public class DeployResultManager {
     }
 
     private void updateServiceConfiguration(DeployerTaskStatus state,
-            DeployServiceEntity deployServiceEntity) {
+                                            DeployServiceEntity deployServiceEntity) {
         if (state == DeployerTaskStatus.DEPLOY_SUCCESS) {
             ServiceConfigurationEntity serviceConfigurationEntity =
                     deployServiceEntityConverter.getInitialServiceConfiguration(
@@ -174,5 +183,32 @@ public class DeployResultManager {
             deployResourceEntities.add(deployResource);
         }
         return deployResourceEntities;
+    }
+
+    /**
+     * Update service order task in the database by the deployment result.
+     *
+     * @param deployResult Deployment Result.
+     * @param storedEntity DB entity to be updated
+     */
+    public void updateServiceOrderTaskWithDeployResult(DeployResult deployResult,
+                                                       ServiceOrderEntity storedEntity) {
+        if (Objects.isNull(deployResult) || Objects.isNull(deployResult.getIsTaskSuccessful())) {
+            return;
+        }
+        if (Objects.isNull(storedEntity)) {
+            storedEntity = serviceOrderStorage.getEntityById(deployResult.getOrderId());
+        }
+        ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
+        BeanUtils.copyProperties(storedEntity, entityToUpdate);
+        if (deployResult.getIsTaskSuccessful()) {
+            entityToUpdate.setTaskStatus(TaskStatus.SUCCESSFUL);
+            entityToUpdate.setCompletedTime(OffsetDateTime.now());
+        } else {
+            entityToUpdate.setTaskStatus(TaskStatus.FAILED);
+            entityToUpdate.setErrorMsg(deployResult.getMessage());
+            entityToUpdate.setCompletedTime(OffsetDateTime.now());
+        }
+        serviceOrderStorage.storeAndFlush(entityToUpdate);
     }
 }

@@ -48,11 +48,12 @@ public class TerraformBootServiceDeployer {
         TerraformAsyncDeployFromScriptsRequest request = getDeployFromScriptsRequest(deployTask);
         try {
             terraformFromScriptsApi.asyncDeployWithScripts(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
@@ -65,11 +66,12 @@ public class TerraformBootServiceDeployer {
         TerraformAsyncDeployFromGitRepoRequest request = getDeployFromGitRepoRequest(deployTask);
         try {
             terraformFromGitRepoApi.asyncDeployFromGitRepo(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
@@ -77,7 +79,7 @@ public class TerraformBootServiceDeployer {
     private TerraformAsyncDeployFromScriptsRequest getDeployFromScriptsRequest(DeployTask task) {
         TerraformAsyncDeployFromScriptsRequest request =
                 new TerraformAsyncDeployFromScriptsRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setIsPlanOnly(false);
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
@@ -89,7 +91,7 @@ public class TerraformBootServiceDeployer {
     private TerraformAsyncDeployFromGitRepoRequest getDeployFromGitRepoRequest(DeployTask task) {
         TerraformAsyncDeployFromGitRepoRequest request =
                 new TerraformAsyncDeployFromGitRepoRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setIsPlanOnly(false);
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

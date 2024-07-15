@@ -97,21 +97,8 @@ public class UserPolicyManager {
      * @return Returns updated policy view object.
      */
     public UserPolicy updateUserPolicy(UUID id, UserPolicyUpdateRequest updateRequest) {
-        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(id);
-        if (Objects.isNull(existingEntity)) {
-            String errorMsg = String.format("The policy with id %s not found.", id);
-            throw new PolicyNotFoundException(errorMsg);
-        }
-
-        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(
-                existingEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to view or manage policy belonging to other users.");
-        }
-
+        UserPolicyEntity existingEntity = getUserPolicyEntity(id);
         UserPolicyEntity policyToUpdate = getUserPolicyToUpdate(updateRequest, existingEntity);
-
         UserPolicyEntity updatedPolicy = userPolicyStorage.storeAndFlush(policyToUpdate);
         return conventToUserPolicy(updatedPolicy);
     }
@@ -123,18 +110,25 @@ public class UserPolicyManager {
      * @return Returns the policy view object.
      */
     public UserPolicy getUserPolicyDetails(UUID id) {
-        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(id);
+        UserPolicyEntity existingEntity = getUserPolicyEntity(id);
+        return conventToUserPolicy(existingEntity);
+    }
+
+
+    private UserPolicyEntity getUserPolicyEntity(UUID policyId) {
+        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(policyId);
         if (Objects.isNull(existingEntity)) {
-            String errorMsg = String.format("The policy with id %s not found.", id);
+            String errorMsg = String.format("The user policy with id %s not found.", policyId);
             throw new PolicyNotFoundException(errorMsg);
         }
-        boolean currentUserIsOwner =
-                userServiceHelper.currentUserIsOwner(existingEntity.getUserId());
+
+        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(
+                existingEntity.getUserId());
         if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view or manage policy belonging to other users.");
         }
-        return conventToUserPolicy(existingEntity);
+        return existingEntity;
     }
 
 
@@ -144,17 +138,7 @@ public class UserPolicyManager {
      * @param id the id of policy.
      */
     public void deleteUserPolicy(UUID id) {
-        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(id);
-        if (Objects.isNull(existingEntity)) {
-            String errorMsg = String.format("The policy with id %s not found.", id);
-            throw new PolicyNotFoundException(errorMsg);
-        }
-        boolean currentUserIsOwner =
-                userServiceHelper.currentUserIsOwner(existingEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to view or manage policy belonging to other users.");
-        }
+        getUserPolicyEntity(id);
         userPolicyStorage.deletePolicyById(id);
     }
 

@@ -10,11 +10,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -42,23 +40,32 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.view.DeployedService;
-import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.service.deploy.DeploymentStatusUpdate;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.MockedStatic;
@@ -83,13 +90,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.request.async.DeferredResult;
 
 /**
  * Test base class.
  */
+@Slf4j
 public class ApisTestCommon {
 
     protected static final ObjectMapper objectMapper = new ObjectMapper();
+    protected final OclLoader oclLoader = new OclLoader();
+    @Resource
+    public DeployService deployService;
+    @Resource
+    public ServiceOrderManager serviceOrderManager;
+    @Resource
+    protected DeployServiceStorage deployServiceStorage;
+    @Resource
+    protected ServiceTemplateStorage serviceTemplateStorage;
+    @Resource
+    protected ServiceOrderStorage serviceOrderStorage;
     @Resource
     protected MockMvc mockMvc;
     @MockBean
@@ -191,47 +211,77 @@ public class ApisTestCommon {
         return osClient;
     }
 
-    protected boolean waitUntilExceptedState(UUID id, ServiceDeploymentState targetState)
+    protected ServiceOrder deployService(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
-        final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(1);
-        while (true) {
-            DeployedService deployedService = getDeployedServiceDetails(id);
-            if (Objects.nonNull(deployedService)
-                    && deployedService.getServiceDeploymentState() == targetState) {
-                return true;
-            }
-            if (System.nanoTime() > endTime) {
-                return false;
-            }
-            Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-        }
-    }
-
-    protected UUID deployService(ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
-        DeployRequest deployRequest = getDeployRequest(serviceTemplateDetailVo);
+        DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         // Run the test
         final MockHttpServletResponse deployResponse = mockMvc.perform(
                         post("/xpanse/services").contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(deployRequest))).andReturn()
                 .getResponse();
-        UUID taskId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
+        ServiceOrder serviceOrder = objectMapper.readValue(deployResponse.getContentAsString(),
+                ServiceOrder.class);
         // Verify the results
         assertEquals(HttpStatus.ACCEPTED.value(), deployResponse.getStatus());
-        Assertions.assertNotNull(taskId);
-        return taskId;
+        Assertions.assertNotNull(serviceOrder.getServiceId());
+        Assertions.assertNotNull(serviceOrder.getOrderId());
+        return serviceOrder;
     }
 
-    protected DeployedServiceDetails getDeployedServiceDetails(UUID serviceId) throws Exception {
-        final MockHttpServletResponse detailResponse =
-                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", serviceId))
-                        .andReturn().getResponse();
-        try {
-            return objectMapper.readValue(detailResponse.getContentAsString(),
-                    DeployedServiceDetails.class);
-        } catch (JsonProcessingException e) {
-            return null;
+    protected boolean waitServiceDeploymentIsCompleted(UUID serviceId) throws Exception {
+        final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(2);
+        while (System.nanoTime() < endTime) {
+            DeploymentStatusUpdate deploymentStatusUpdate =
+                    getLatestServiceDeploymentStatus(serviceId);
+            if (Objects.nonNull(deploymentStatusUpdate)) {
+                if (deploymentStatusUpdate.getIsOrderCompleted()) {
+                    return true;
+                }
+            }
         }
+        return false;
+    }
+
+    protected DeploymentStatusUpdate getLatestServiceDeploymentStatus(UUID serviceId)
+            throws InterruptedException {
+        DeferredResult<DeploymentStatusUpdate> deferredResult =
+                deployService.getLatestServiceDeploymentStatus(serviceId, null);
+        while (Objects.isNull(deferredResult.getResult())) {
+            Thread.sleep(1000);
+        }
+        if (deferredResult.getResult() instanceof DeploymentStatusUpdate statusUpdate) {
+            return statusUpdate;
+        }
+        return null;
+    }
+
+    protected boolean waitServiceOrderIsCompleted(UUID orderId) throws Exception {
+        final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(2);
+        while (System.nanoTime() < endTime) {
+            ServiceOrderStatusUpdate serviceOrderStatusUpdate =
+                    getLatestServiceOrderStatus(orderId, null);
+            if (Objects.nonNull(serviceOrderStatusUpdate)) {
+                if (serviceOrderStatusUpdate.getIsOrderCompleted()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected ServiceOrderStatusUpdate getLatestServiceOrderStatus(UUID orderId,
+                                                                   TaskStatus taskStatus)
+            throws InterruptedException {
+        DeferredResult<ServiceOrderStatusUpdate> deferredResult =
+                serviceOrderManager.getLatestServiceOrderStatus(orderId, taskStatus);
+        while (Objects.isNull(deferredResult.getResult())) {
+            Thread.sleep(1000);
+        }
+        if (deferredResult.getResult() instanceof ServiceOrderStatusUpdate statusUpdate) {
+            return statusUpdate;
+        }
+        return null;
     }
 
     protected void addCredentialForHuaweiCloud() throws Exception {
@@ -313,10 +363,13 @@ public class ApisTestCommon {
                         post("/xpanse/service_templates").content(requestBody)
                                 .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-        try {
+        if (registerResponse.getStatus() == HttpStatus.OK.value()) {
             return objectMapper.readValue(registerResponse.getContentAsString(),
                     ServiceTemplateDetailVo.class);
-        } catch (JsonProcessingException e) {
+        } else {
+            Response response = objectMapper.readValue(registerResponse.getContentAsString(),
+                    Response.class);
+            log.error("Register service template failed. Error: " + response.getDetails());
             return null;
         }
     }
@@ -326,15 +379,21 @@ public class ApisTestCommon {
         request.setReviewResult(ServiceReviewResult.APPROVED);
         request.setReviewComment("Approved");
         String requestBody = objectMapper.writeValueAsString(request);
-        mockMvc.perform(put("/xpanse/service_templates/review/{id}", id).content(requestBody)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/xpanse/service_templates/review/{id}", id).content(requestBody)
+                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
+        Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
     }
 
-    protected void unregisterServiceTemplate(UUID id) throws Exception {
-        mockMvc.perform(
-                        delete("/xpanse/service_templates/{id}", id).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+    protected void deleteServiceTemplate(UUID serviceTemplateId) throws Exception {
+        serviceTemplateStorage.deleteServiceTemplate(
+                serviceTemplateStorage.getServiceTemplateById(serviceTemplateId));
+    }
+
+    protected void deleteDeployedService(UUID serviceId) {
+        deployServiceStorage.deleteDeployService(
+                deployServiceStorage.findDeployServiceById(serviceId));
     }
 
     protected DeployRequest getDeployRequest(ServiceTemplateDetailVo serviceTemplate) {

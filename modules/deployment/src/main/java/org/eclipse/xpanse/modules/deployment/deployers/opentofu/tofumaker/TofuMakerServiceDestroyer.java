@@ -51,18 +51,19 @@ public class TofuMakerServiceDestroyer {
      */
     public DeployResult destroyFromScripts(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncDestroyFromScriptsRequest request =
                 getDestroyFromScriptsRequest(deployTask, resourceState);
         try {
             openTofuFromScriptsApi.asyncDestroyWithScripts(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker destroy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }
@@ -72,18 +73,19 @@ public class TofuMakerServiceDestroyer {
      */
     public DeployResult destroyFromGitRepo(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncDestroyFromGitRepoRequest request =
                 getDestroyFromGitRepoRequest(deployTask, resourceState);
         try {
             openTofuFromGitRepoApi.asyncDestroyFromGitRepo(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker deploy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }
@@ -93,7 +95,7 @@ public class TofuMakerServiceDestroyer {
             throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncDestroyFromScriptsRequest request =
                 new OpenTofuAsyncDestroyFromScriptsRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setScripts(tofuMakerHelper.getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
@@ -107,7 +109,7 @@ public class TofuMakerServiceDestroyer {
             throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncDestroyFromGitRepoRequest request =
                 new OpenTofuAsyncDestroyFromGitRepoRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));

@@ -72,7 +72,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         testServicePoliciesManageApisWell(serviceTemplate);
         testServicePoliciesManage_ThrowsExceptions(serviceTemplate);
-        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
 
@@ -156,7 +156,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
 
     void testGetServicePolicyDetails_ThrowsPolicyNotFoundException(UUID uuid) throws Exception {
         // Setup
-        String errMsg = String.format("The policy with id %s not found.", uuid);
+        String errMsg = String.format("The service policy with id %s not found.", uuid);
         Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
@@ -306,7 +306,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
     void testUpdateServicePolicy_ThrowsPolicyNotFoundException(UUID uuid) throws Exception {
         // Setup
         mockPoliciesValidateRequest(true);
-        String errMsg = String.format("The policy with id %s not found.", uuid);
+        String errMsg = String.format("The service policy with id %s not found.", uuid);
         Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
@@ -340,7 +340,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
     void testDeleteServicePolicy_ThrowsPolicyNotFoundException() throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
-        String errMsg = String.format("The policy with id %s not found.", uuid);
+        String errMsg = String.format("The service policy with id %s not found.", uuid);
         Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 

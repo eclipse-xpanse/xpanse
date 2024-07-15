@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
- * Enumeration class for task status.
+ * Enumeration class for service order status.
  */
 public enum TaskStatus {
     CREATED("created"),

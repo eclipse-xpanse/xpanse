@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
@@ -50,21 +49,22 @@ public class TerraformBootServiceModifier {
     /**
      * method to perform service modify using scripts provided in OCL.
      */
-    public DeployResult modifyFromScripts(UUID modificationId, DeployTask deployTask) {
+    public DeployResult modifyFromScripts(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
+        result.setServiceId(deployTask.getServiceId());
+        result.setOrderId(deployTask.getOrderId());
         TerraformAsyncModifyFromScriptsRequest request =
                 getModifyFromScriptsRequest(deployTask, resourceState);
-        request.setRequestId(modificationId);
+        request.setRequestId(deployTask.getOrderId());
         try {
             terraformFromScriptsApi.asyncModifyWithScripts(request);
-            result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot modify service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
@@ -72,22 +72,22 @@ public class TerraformBootServiceModifier {
     /**
      * method to perform service modify using scripts form GIT repo.
      */
-    public DeployResult modifyFromGitRepo(UUID modificationId, DeployTask deployTask) {
+    public DeployResult modifyFromGitRepo(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
+        result.setServiceId(deployTask.getServiceId());
+        result.setOrderId(deployTask.getOrderId());
         TerraformAsyncModifyFromGitRepoRequest request =
                 getModifyFromGitRepoRequest(deployTask, resourceState);
-        request.setRequestId(modificationId);
-
+        request.setRequestId(deployTask.getOrderId());
         try {
             terraformFromGitRepoApi.asyncModifyFromGitRepo(request);
-            result.setId(deployTask.getId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot modify service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
@@ -110,7 +110,7 @@ public class TerraformBootServiceModifier {
             throws TerraformBootRequestFailedException {
         TerraformAsyncModifyFromGitRepoRequest request =
                 new TerraformAsyncModifyFromGitRepoRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getServiceId());
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

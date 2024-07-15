@@ -7,15 +7,14 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks;
 
 import jakarta.annotation.Resource;
-import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
-import org.eclipse.xpanse.modules.database.servicemodification.DatabaseServiceModificationAuditStorage;
-import org.eclipse.xpanse.modules.database.servicemodification.ServiceModificationAuditEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
@@ -24,12 +23,11 @@ import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
@@ -60,87 +58,69 @@ public class OpenTofuDeploymentResultCallbackManager {
     @Resource
     private ServiceTemplateStorage serviceTemplateStorage;
     @Resource
-    private DatabaseServiceModificationAuditStorage modificationAuditStorage;
+    private ServiceOrderStorage serviceOrderStorage;
 
     /**
      * Callback method after the deployment task is completed.
      */
-    public void deployCallback(UUID taskId, OpenTofuResult result) {
-        DeployServiceEntity updatedDeployServiceEntity =
-                handleCallbackOpenTofuResult(taskId, result, DeploymentScenario.DEPLOY);
+    public void deployCallback(UUID serviceId, OpenTofuResult result) {
+        DeployResult deployResult =
+                getDeployResult(serviceId, result, DeploymentScenario.DEPLOY);
+        DeployServiceEntity updatedDeployServiceEntity = updateDeployServiceEntity(deployResult);
         if (ServiceDeploymentState.DEPLOY_FAILED
                 == updatedDeployServiceEntity.getServiceDeploymentState()) {
-            DeployTask deployTask =
-                    deployServiceEntityConverter.getDeployTaskByStoredService(
-                            updatedDeployServiceEntity);
-            deployService.rollbackOnDeploymentFailure(deployTask, updatedDeployServiceEntity);
+            DeployTask rollbackTask = deployServiceEntityConverter.getDeployTaskByStoredService(
+                    updatedDeployServiceEntity);
+            rollbackTask.setOrderId(deployResult.getOrderId());
+            deployService.rollbackOnDeploymentFailure(rollbackTask, updatedDeployServiceEntity);
         }
 
         ServiceMigrationEntity serviceMigrationEntity =
-                migrationService.getServiceMigrationEntityByNewServiceId(taskId);
+                migrationService.getServiceMigrationEntityByNewServiceId(serviceId);
         if (Objects.nonNull(serviceMigrationEntity)) {
             workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
                     MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
         }
+        updateServiceOrderEntity(deployResult);
     }
 
     /**
      * Callback method after the modification task is completed.
      */
-    public void modifyCallback(UUID serviceId, OpenTofuResult openTofuResult) {
-        handleCallbackOpenTofuResult(serviceId, openTofuResult, DeploymentScenario.MODIFY);
-        updateModificationAuditWithResult(openTofuResult);
+    public void modifyCallback(UUID serviceId, OpenTofuResult terraformResult) {
+        DeployResult deployResult =
+                getDeployResult(serviceId, terraformResult, DeploymentScenario.MODIFY);
+        updateDeployServiceEntity(deployResult);
+        updateServiceOrderEntity(deployResult);
     }
 
-    private void updateModificationAuditWithResult(OpenTofuResult result) {
-        ServiceModificationAuditEntity auditEntityInProgress =
-                modificationAuditStorage.getEntityById(result.getRequestId());
-        if (Objects.nonNull(auditEntityInProgress)) {
-            if (Boolean.TRUE.equals(result.getCommandSuccessful())) {
-                auditEntityInProgress.setTaskStatus(TaskStatus.SUCCESSFUL);
-            } else {
-                auditEntityInProgress.setTaskStatus(TaskStatus.FAILED);
-                auditEntityInProgress.setErrorMsg(result.getCommandStdError());
-            }
-            auditEntityInProgress.setCompletedTime(OffsetDateTime.now());
-            modificationAuditStorage.storeAndFlush(auditEntityInProgress);
-        }
+    private void updateServiceOrderEntity(DeployResult deployResult) {
+        ServiceOrderEntity serviceOrderEntity =
+                serviceOrderStorage.getEntityById(deployResult.getOrderId());
+        deployResultManager.updateServiceOrderTaskWithDeployResult(deployResult,
+                serviceOrderEntity);
     }
 
     /**
      * Callback method after the destroy/rollback/purge task is completed.
      */
-    public void destroyCallback(UUID taskId, OpenTofuResult result, DeploymentScenario scenario) {
-        handleCallbackOpenTofuResult(taskId, result, scenario);
+    public void destroyCallback(UUID serviceId, OpenTofuResult result,
+                                DeploymentScenario scenario) {
+        DeployResult deployResult = getDeployResult(serviceId, result, scenario);
+        updateDeployServiceEntity(deployResult);
         ServiceMigrationEntity serviceMigrationEntity =
-                migrationService.getServiceMigrationEntityByOldServiceId(taskId);
+                migrationService.getServiceMigrationEntityByOldServiceId(serviceId);
         if (Objects.nonNull(serviceMigrationEntity)) {
             workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
                     MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
         }
+        updateServiceOrderEntity(deployResult);
     }
 
-    private DeployServiceEntity handleCallbackOpenTofuResult(UUID taskId, OpenTofuResult result,
-                                                             DeploymentScenario scenario) {
-        log.info("Handle openTofu callback result of task with id:{} in scenario:{}. ", taskId,
-                scenario.toValue());
+    private DeployServiceEntity updateDeployServiceEntity(DeployResult deployResult) {
         DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(taskId);
-        DeployResult deployResult = new DeployResult();
-        deployResult.setId(taskId);
-        if (Boolean.FALSE.equals(result.getCommandSuccessful())) {
-            deployResult.setMessage(result.getCommandStdError());
-        } else {
-            deployResult.setMessage(null);
-        }
-        deployResult.setState(getDeployerTaskStatus(scenario, result.getCommandSuccessful()));
-        deployResult.getPrivateProperties()
-                .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
-        if (Objects.nonNull(result.getImportantFileContentMap())) {
-            deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
-        }
-
-        if (StringUtils.isNotBlank(result.getTerraformState())) {
+                deployServiceEntityHandler.getDeployServiceEntity(deployResult.getServiceId());
+        if (StringUtils.isNotBlank(deployResult.getTfStateContent())) {
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             deployServiceEntity.getServiceTemplateId());
@@ -149,7 +129,28 @@ public class OpenTofuDeploymentResultCallbackManager {
         }
         return deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
                 deployServiceEntity);
+    }
 
+    private DeployResult getDeployResult(UUID serviceId, OpenTofuResult result,
+                                         DeploymentScenario scenario) {
+        DeployResult deployResult = new DeployResult();
+        deployResult.setOrderId(result.getRequestId());
+        deployResult.setServiceId(serviceId);
+        if (Boolean.FALSE.equals(result.getCommandSuccessful())) {
+            deployResult.setIsTaskSuccessful(false);
+            deployResult.setMessage(result.getCommandStdError());
+        } else {
+            deployResult.setIsTaskSuccessful(true);
+            deployResult.setMessage(null);
+        }
+        deployResult.setTfStateContent(result.getTerraformState());
+        deployResult.setState(getDeployerTaskStatus(scenario, result.getCommandSuccessful()));
+        deployResult.getPrivateProperties()
+                .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
+        if (Objects.nonNull(result.getImportantFileContentMap())) {
+            deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
+        }
+        return deployResult;
     }
 
     private DeployerTaskStatus getDeployerTaskStatus(DeploymentScenario scenario,

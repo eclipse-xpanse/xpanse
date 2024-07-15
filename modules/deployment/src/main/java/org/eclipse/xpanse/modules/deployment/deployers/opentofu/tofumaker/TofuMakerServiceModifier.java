@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
@@ -37,9 +36,9 @@ public class TofuMakerServiceModifier {
      * Constructor for OpenTofuMakerServiceModifyer bean.
      */
     public TofuMakerServiceModifier(OpenTofuFromScriptsApi openTofuFromScriptsApi,
-                                     OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
-                                     TofuMakerHelper tofuMakerHelper,
-                                     DeployServiceEntityHandler deployServiceEntityHandler) {
+                                    OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
+                                    TofuMakerHelper tofuMakerHelper,
+                                    DeployServiceEntityHandler deployServiceEntityHandler) {
         this.openTofuFromScriptsApi = openTofuFromScriptsApi;
         this.openTofuFromGitRepoApi = openTofuFromGitRepoApi;
         this.tofuMakerHelper = tofuMakerHelper;
@@ -49,21 +48,22 @@ public class TofuMakerServiceModifier {
     /**
      * method to perform service modify using scripts provided in OCL.
      */
-    public DeployResult modifyFromScripts(UUID modificationId, DeployTask deployTask) {
+    public DeployResult modifyFromScripts(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncModifyFromScriptsRequest request =
                 getModifyFromScriptsRequest(deployTask, resourceState);
-        request.setRequestId(modificationId);
+        request.setRequestId(deployTask.getOrderId());
         try {
             openTofuFromScriptsApi.asyncModifyWithScripts(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker modify service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }
@@ -71,27 +71,28 @@ public class TofuMakerServiceModifier {
     /**
      * method to perform service modify using scripts form GIT repo.
      */
-    public DeployResult modifyFromGitRepo(UUID modificationId, DeployTask deployTask) {
+    public DeployResult modifyFromGitRepo(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncModifyFromGitRepoRequest request =
                 getModifyFromGitRepoRequest(deployTask, resourceState);
-        request.setRequestId(modificationId);
+        request.setRequestId(deployTask.getOrderId());
         try {
             openTofuFromGitRepoApi.asyncModifyFromGitRepo(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker deploy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }
 
     private OpenTofuAsyncModifyFromScriptsRequest getModifyFromScriptsRequest(DeployTask task,
-                                                                                String stateFile)
+                                                                              String stateFile)
             throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncModifyFromScriptsRequest request =
                 new OpenTofuAsyncModifyFromScriptsRequest();
@@ -104,7 +105,7 @@ public class TofuMakerServiceModifier {
     }
 
     private OpenTofuAsyncModifyFromGitRepoRequest getModifyFromGitRepoRequest(DeployTask task,
-                                                                                String stateFile)
+                                                                              String stateFile)
             throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncModifyFromGitRepoRequest request =
                 new OpenTofuAsyncModifyFromGitRepoRequest();

@@ -28,11 +28,10 @@ public interface Deployer {
     /**
      * Method to modify the service.
      *
-     * @param modificationId modification id.
      * @param task           task to be executed.
      * @return result of modify task.
      */
-    DeployResult modify(UUID modificationId, DeployTask task);
+    DeployResult modify(DeployTask task);
 
     void deleteTaskWorkspace(UUID taskId);
 

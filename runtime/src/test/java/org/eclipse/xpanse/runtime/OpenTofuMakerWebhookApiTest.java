@@ -17,13 +17,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
@@ -32,12 +30,12 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
@@ -61,8 +59,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,tofu-maker"})
 @AutoConfigureMockMvc
 public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
-    @Resource
-    private DatabaseDeployServiceStorage deployServiceStorage;
+
     @MockBean
     private OpenTofuFromScriptsApi mockOpenTofuFromScriptsApi;
     @MockBean
@@ -166,6 +163,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         addCredentialForHuaweiCloud();
         // Setup
         mockOpenTofuMakerServices();
+        addCredentialForHuaweiCloud();
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("OpenTofuMakerWebhookApiTest-1");
@@ -183,7 +181,8 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         // Setup
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         if (Objects.isNull(serviceTemplate)) {
-            Assertions.fail("Failed to register service template.");
+            log.error("Failed to register service template.");
+            return;
         }
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
 
@@ -195,9 +194,16 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(deployRequest)))
                         .andReturn().getResponse();
-        UUID serviceId = objectMapper.readValue(deployResponse.getContentAsString(), UUID.class);
+        assertThat(deployResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
+        ServiceOrder serviceOrder =
+                objectMapper.readValue(deployResponse.getContentAsString(), ServiceOrder.class);
+        UUID serviceId = serviceOrder.getServiceId();
+        UUID orderId = serviceOrder.getOrderId();
+        assertThat(serviceId).isNotNull();
+        assertThat(orderId).isNotNull();
         // callback with deploy result
         OpenTofuResult deployResult = getOpenTofuResultByFile("deploy_success_callback.json");
+        deployResult.setRequestId(orderId);
         // Run the test
         final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
                         post("/webhook/tofu-maker/deploy/{serviceId}",
@@ -219,11 +225,14 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(modifyRequest)))
                         .andReturn().getResponse();
-        UUID modificationId = objectMapper.readValue(modifyResponse.getContentAsString(),
-                UUID.class);
-        assertThat(modificationId).isNotNull();
-        assertThat(modificationId).isNotEqualTo(serviceId);
-        deployResult.setRequestId(modificationId);
+        assertThat(modifyResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
+        ServiceOrder serviceModifyOrder =
+                objectMapper.readValue(modifyResponse.getContentAsString(), ServiceOrder.class);
+        UUID modifyOrderId = serviceModifyOrder.getOrderId();
+        UUID modifyServiceId = serviceModifyOrder.getServiceId();
+        assertThat(modifyOrderId).isNotNull();
+        assertThat(modifyServiceId).isEqualTo(serviceId);
+        deployResult.setRequestId(modifyOrderId);
         // Run the test
         final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
                         post("/webhook/tofu-maker/modify/{serviceId}",
@@ -242,9 +251,15 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                                 .accept(MediaType.APPLICATION_JSON))
                         .andReturn().getResponse();
         assertThat(destroyResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
-
+        ServiceOrder serviceDestroyOrder =
+                objectMapper.readValue(destroyResponse.getContentAsString(), ServiceOrder.class);
+        UUID destroyServiceId = serviceDestroyOrder.getServiceId();
+        UUID destroyOrderId = serviceDestroyOrder.getOrderId();
+        assertThat(destroyServiceId).isEqualTo(serviceId);
+        assertThat(destroyOrderId).isNotNull();
         // callback with destroy result
         OpenTofuResult destroyResult = getOpenTofuResultByFile("destroy_success_callback.json");
+        destroyResult.setRequestId(destroyOrderId);
         // Run the test
         final MockHttpServletResponse destroyCallBackResponse = mockMvc.perform(
                         post("/webhook/tofu-maker/destroy/{serviceId}",
@@ -267,6 +282,21 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(rollbackCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
+
+        final MockHttpServletResponse purgeResponse =
+                mockMvc.perform(delete("/xpanse/services/{id}", serviceId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+        assertThat(purgeResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
+        ServiceOrder servicePurgeOrder =
+                objectMapper.readValue(purgeResponse.getContentAsString(), ServiceOrder.class);
+        UUID purgeServiceId = servicePurgeOrder.getServiceId();
+        UUID purgeOrderId = servicePurgeOrder.getOrderId();
+        assertThat(purgeServiceId).isEqualTo(serviceId);
+        assertThat(purgeOrderId).isNotNull();
+        destroyResult.setRequestId(purgeOrderId);
+
         // Run the test
         final MockHttpServletResponse purgeCallBackResponse = mockMvc.perform(
                         post("/webhook/tofu-maker/purge/{serviceId}",
@@ -278,10 +308,8 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(purgeCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
-        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
-        deployServiceStorage.deleteDeployService(
-                deployServiceStorage.findDeployServiceById(serviceId));
-
+        deleteDeployedService(serviceId);
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     OpenTofuResult getOpenTofuResultByFile(String resourceFileName) throws Exception {

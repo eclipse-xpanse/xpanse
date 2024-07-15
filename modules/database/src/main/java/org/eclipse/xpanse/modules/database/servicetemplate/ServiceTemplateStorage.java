@@ -46,17 +46,10 @@ public interface ServiceTemplateStorage {
     ServiceTemplateEntity findServiceTemplate(ServiceTemplateEntity serviceTemplateEntity);
 
     /**
-     * Remove service template entity from database by uuid.
-     *
-     * @param uuid uuid of service template entity
-     */
-    void removeById(UUID uuid);
-
-    /**
      * Remove service template entity from database by entity.
      *
      * @param serviceTemplateEntity service template entity
      */
-    void remove(ServiceTemplateEntity serviceTemplateEntity);
+    void deleteServiceTemplate(ServiceTemplateEntity serviceTemplateEntity);
 
 }

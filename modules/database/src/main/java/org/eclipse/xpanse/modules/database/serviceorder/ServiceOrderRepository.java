@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.servicemodification;
+package org.eclipse.xpanse.modules.database.serviceorder;
 
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.CustomJpaRepository;
@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository;
  * Interface to access default JPA methods.
  */
 @Repository
-public interface ServiceModificationAuditRepository
-        extends CustomJpaRepository<ServiceModificationAuditEntity, UUID>,
-        JpaSpecificationExecutor<ServiceModificationAuditEntity> {
+public interface ServiceOrderRepository
+        extends CustomJpaRepository<ServiceOrderEntity, UUID>,
+        JpaSpecificationExecutor<ServiceOrderEntity> {
 
 }

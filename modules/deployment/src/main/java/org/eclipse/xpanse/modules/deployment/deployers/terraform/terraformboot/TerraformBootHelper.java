@@ -108,7 +108,7 @@ public class TerraformBootHelper {
         WebhookConfig webhookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port)
                 + getDeployerTaskCallbackUrl(deployTask.getDeploymentScenario());
-        webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getId());
+        webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getServiceId());
         webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
         return webhookConfig;
     }

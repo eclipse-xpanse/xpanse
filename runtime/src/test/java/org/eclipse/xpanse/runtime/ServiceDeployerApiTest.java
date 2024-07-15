@@ -8,6 +8,8 @@ package org.eclipse.xpanse.runtime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -25,19 +27,17 @@ import com.huaweicloud.sdk.core.invoker.SyncInvoker;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesRequest;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesResponse;
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -51,6 +51,7 @@ import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
@@ -97,11 +98,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 })
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest extends ApisTestCommon {
-    private static final long waitTime = 60 * 1000;
-    @Resource
-    private DatabaseDeployServiceStorage deployServiceStorage;
-    @Resource
-    private DatabaseServiceTemplateStorage serviceTemplateStorage;
     @MockBean
     private PoliciesValidateApi mockPoliciesValidateApi;
     @MockBean
@@ -166,8 +162,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     }
 
     void deleteUserPolicy(UUID id) throws Exception {
-        mockMvc.perform(delete("/xpanse/policies/{id}", id).contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        mockMvc.perform(
+                delete("/xpanse/policies/{serviceId}", id).contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
     }
 
     void mockPolicyEvaluationResult(boolean isSuccessful) {
@@ -273,7 +270,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         final MockHttpServletResponse listAzResponse = getAvailabilityZones(csp, regionName);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), listAzResponse.getStatus());
         Assertions.assertEquals(listAzResponse.getContentAsString(), "[]");
-        Assertions.assertEquals(listAzResponse.getHeader("Cache-Control"),"no-cache");
+        Assertions.assertEquals(listAzResponse.getHeader("Cache-Control"), "no-cache");
     }
 
     MockHttpServletResponse getAvailabilityZones(Csp csp, String regionName) throws Exception {
@@ -287,16 +284,17 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("TerraformTest-1");
         testDeployerWithOclAndPolicy(ocl);
 
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
+        ocl.setName("TerraformFromGitTest");
         testDeployerWithOclAndPolicy(oclFromGit);
     }
 
     void testDeployerWithOclAndPolicy(Ocl ocl) throws Exception {
         UUID uuid = UUID.randomUUID();
-        ocl.setName("test-" + uuid);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         if (Objects.isNull(serviceTemplate)) {
             return;
@@ -320,40 +318,41 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Set up the deployment with policy evaluation successful and redeploy.
         mockPolicyEvaluationResult(true);
         testRedeploy(serviceId);
-        Assertions.assertTrue(
-                waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS));
+
+        listDeployedServices();
+        List<DeployedServiceDetails> deployedServiceDetailsList =
+                listDeployedServicesDetails(ServiceDeploymentState.DEPLOY_SUCCESS);
+        Assertions.assertFalse(deployedServiceDetailsList.isEmpty());
 
         ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
         serviceLockConfig.setDestroyLocked(false);
         serviceLockConfig.setModifyLocked(false);
         testChangeLockConfig(serviceId, serviceLockConfig);
-        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
-            List<DeployedServiceDetails> deployedServiceDetailsList =
-                    listDeployedServicesDetails(ServiceDeploymentState.DEPLOY_SUCCESS);
-            Assertions.assertFalse(deployedServiceDetailsList.isEmpty());
-            listDeployedServices();
-        }
-        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+
+        testModify(serviceId, serviceTemplate);
+        if (waitServiceDeploymentIsCompleted(serviceId)) {
             testDestroy(serviceId);
-            if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
+            if (waitServiceDeploymentIsCompleted(serviceId)) {
                 testPurge(serviceId);
             }
         } else {
             testPurge(serviceId);
         }
-        serviceTemplateStorage.removeById(serviceTemplate.getServiceTemplateId());
         deleteUserPolicy(userPolicy.getUserPolicyId());
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testDeployApisWithDeployerOpenTofuLocal() throws Exception {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName("OpenTofuTest");
         ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
         testDeployerWithOclAndPolicy(ocl);
 
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
+        ocl.setName("OpenTofuFromGitTest");
         oclFromGit.getDeployment().setKind(DeployerKind.OPEN_TOFU);
         testDeployerWithOclAndPolicy(oclFromGit);
     }
@@ -361,7 +360,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     void testDeployApisThrowExceptions() throws Exception {
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("error-test-" + UUID.randomUUID());
+        ocl.setName("DeployerErrorTest-1");
         ocl.getFlavors().setIsDowngradeAllowed(false);
         ServiceFlavorWithPrice defaultFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
         ServiceFlavorWithPrice lowerPriorityFlavor = new ServiceFlavorWithPrice();
@@ -378,8 +377,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testDeployThrowPolicyEvaluationFailed(serviceTemplate);
         addCredentialForHuaweiCloud();
         mockPolicyEvaluationResult(true);
-        UUID serviceId = deployService(serviceTemplate);
-        if (waitUntilExceptedState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+        ServiceOrder serviceOrder = deployService(serviceTemplate);
+        UUID serviceId = serviceOrder.getServiceId();
+        UUID orderId = serviceOrder.getOrderId();
+        if (waitServiceOrderIsCompleted(orderId)) {
             testApisThrowServiceFlavorDowngradeNotAllowed(serviceId, defaultFlavor,
                     lowerPriorityFlavor);
         }
@@ -388,9 +389,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testApisThrowsInvalidServiceStateException(serviceId);
         testApisThrowsServiceLockedException(serviceId);
         testApisThrowsAccessDeniedException(serviceId);
-        deployServiceStorage.deleteDeployService(
-                deployServiceStorage.findDeployServiceById(serviceId));
-        serviceTemplateStorage.removeById(serviceTemplate.getServiceTemplateId());
+
+        deleteDeployedService(serviceId);
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testDeployThrowPolicyEvaluationFailed(ServiceTemplateDetailVo serviceTemplate)
@@ -455,7 +456,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(result, changeLockResponse.getContentAsString());
 
         // Run the test
-        final MockHttpServletResponse modifyResponse = redeployService(serviceId);
+        ModifyRequest modifyRequest = new ModifyRequest();
+        modifyRequest.setFlavor("flavor-new");
+        final MockHttpServletResponse modifyResponse = modifyService(serviceId, modifyRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
         assertEquals(result, modifyResponse.getContentAsString());
 
@@ -591,7 +594,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("error-test-" + UUID.randomUUID());
+        ocl.setName("DeployerErrorTest-2");
         ocl.getDeployment().getVariables().getLast().setMandatory(true);
         AvailabilityZoneConfig zoneConfig = new AvailabilityZoneConfig();
         zoneConfig.setDisplayName("Primary AZ");
@@ -641,23 +644,48 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse2.getStatus());
         assertEquals(result2, deployResponse2.getContentAsString());
-        serviceTemplateStorage.removeById(serviceTemplate.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
-    void testRedeploy(UUID serviceId)
-            throws Exception {
-        String successMsg = String.format("Task for redeploying managed service %s has started.",
-                serviceId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
-        String result = objectMapper.writeValueAsString(response);
+    void testRedeploy(UUID serviceId) throws Exception {
         // Run the test
         final MockHttpServletResponse redeployResponse = redeployService(serviceId);
         assertEquals(HttpStatus.ACCEPTED.value(), redeployResponse.getStatus());
-        assertEquals(result, redeployResponse.getContentAsString());
+        ServiceOrder serviceOrder =
+                objectMapper.readValue(redeployResponse.getContentAsString(), ServiceOrder.class);
+        assertEquals(serviceId, serviceOrder.getServiceId());
+        assertNotNull(serviceOrder.getOrderId());
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
+        assertTrue(waitServiceDeploymentIsCompleted(serviceId));
     }
 
-    void testChangeLockConfig(UUID serviceId, ServiceLockConfig lockConfig)
-            throws Exception {
+    void testModify(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) throws Exception {
+        // SetUp
+        ModifyRequest modifyRequest = new ModifyRequest();
+        modifyRequest.setFlavor(
+                serviceTemplate.getFlavors().getServiceFlavors().getLast().getName());
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
+        serviceRequestProperties.put("admin_passwd", "2222222222@Qq");
+        modifyRequest.setServiceRequestProperties(serviceRequestProperties);
+        // Run the test
+        final MockHttpServletResponse modifyResponse = mockMvc.perform(
+                        put("/xpanse/services/modify/{serviceId}", serviceId)
+                                .content(objectMapper.writeValueAsString(modifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        // Verify the results
+        assertEquals(HttpStatus.ACCEPTED.value(), modifyResponse.getStatus());
+        ServiceOrder serviceOrder =
+                objectMapper.readValue(modifyResponse.getContentAsString(), ServiceOrder.class);
+        assertEquals(serviceId, serviceOrder.getServiceId());
+        assertNotNull(serviceOrder.getOrderId());
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
+        assertTrue(waitServiceDeploymentIsCompleted(serviceId));
+    }
+
+
+    void testChangeLockConfig(UUID serviceId, ServiceLockConfig lockConfig) throws Exception {
         // Run the test
         final MockHttpServletResponse changeLockResponse = changeLockConfig(serviceId, lockConfig);
         assertEquals(HttpStatus.NO_CONTENT.value(), changeLockResponse.getStatus());
@@ -665,22 +693,22 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
 
     void testDestroy(UUID serviceId) throws Exception {
-        // SetUp
-        String successMsg =
-                String.format("Task for destroying managed service %s has started.", serviceId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
-        String result = objectMapper.writeValueAsString(response);
         // Run the test
         final MockHttpServletResponse destroyResponse = destroyService(serviceId);
         // Verify the results
         assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
-        assertEquals(result, destroyResponse.getContentAsString());
+        ServiceOrder serviceOrder =
+                objectMapper.readValue(destroyResponse.getContentAsString(), ServiceOrder.class);
+        assertEquals(serviceId, serviceOrder.getServiceId());
+        assertNotNull(serviceOrder.getOrderId());
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
+        assertTrue(waitServiceDeploymentIsCompleted(serviceId));
     }
 
 
     void testDestroyThrowsServiceLockedException(UUID serviceId) throws Exception {
         // SetUp
-        String message = String.format("Service with id %s is locked from deletion.", serviceId);
+        String message = String.format("Service %s is locked from deletion.", serviceId);
         Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
                 Collections.singletonList(message));
         String result = objectMapper.writeValueAsString(expectedResponse);
@@ -692,7 +720,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testModifyThrowsServiceLockedException(UUID serviceId) throws Exception {
         // SetUp
-        String message = String.format("Service with id %s is locked from modification.",
+        String message = String.format("Service %s is locked from modification.",
                 serviceId);
         Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
                 Collections.singletonList(message));
@@ -708,9 +736,11 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testDeployThrowsServiceTemplateNotApproved(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
+        String errorMsg = String.format("Found service template with id %s but not approved.",
+                serviceTemplate.getServiceTemplateId());
         // SetUp
         Response expectedResponse = Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
-                Collections.singletonList("No available service templates found."));
+                Collections.singletonList(errorMsg));
         String result = objectMapper.writeValueAsString(expectedResponse);
 
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
@@ -723,17 +753,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
 
     void testPurge(UUID serviceId) throws Exception {
-        // SetUp
-        String successMsg =
-                String.format("Task for purging managed service %s has started.", serviceId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
-        String result = objectMapper.writeValueAsString(response);
         // Run the test
         final MockHttpServletResponse purgeResponse = purgeService(serviceId);
         assertEquals(HttpStatus.ACCEPTED.value(), purgeResponse.getStatus());
-        assertEquals(result, purgeResponse.getContentAsString());
-
-        Thread.sleep(waitTime);
+        ServiceOrder serviceOrder =
+                objectMapper.readValue(purgeResponse.getContentAsString(), ServiceOrder.class);
+        assertEquals(serviceId, serviceOrder.getServiceId());
+        assertNotNull(serviceOrder.getOrderId());
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
         // SetUp
         String refuseMsg = String.format("Service with id %s not found.", serviceId);
         Response detailsErrorResponse =
@@ -741,7 +768,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         Collections.singletonList(refuseMsg));
         String detailsResult = objectMapper.writeValueAsString(detailsErrorResponse);
         final MockHttpServletResponse detailsResponse =
-                mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", serviceId))
+                mockMvc.perform(get("/xpanse/services/details/self_hosted/{serviceId}", serviceId))
                         .andReturn().getResponse();
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());
@@ -804,7 +831,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
 
     MockHttpServletResponse getServiceDetails(UUID serviceId) throws Exception {
-        return mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", serviceId)
+        return mockMvc.perform(get("/xpanse/services/details/self_hosted/{serviceId}", serviceId)
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
     }
@@ -820,7 +847,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     MockHttpServletResponse changeLockConfig(UUID serviceId, ServiceLockConfig lockConfig)
             throws Exception {
-        return mockMvc.perform(put("/xpanse/services/changelock/{id}", serviceId)
+        return mockMvc.perform(put("/xpanse/services/changelock/{serviceId}", serviceId)
                         .content(objectMapper.writeValueAsString(lockConfig))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -829,7 +856,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     MockHttpServletResponse modifyService(UUID serviceId, ModifyRequest modifyRequest)
             throws Exception {
-        return mockMvc.perform(put("/xpanse/services/modify/{id}", serviceId)
+        return mockMvc.perform(put("/xpanse/services/modify/{serviceId}", serviceId)
                         .content(objectMapper.writeValueAsString(modifyRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -837,20 +864,21 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     }
 
     MockHttpServletResponse destroyService(UUID serviceId) throws Exception {
-        return mockMvc.perform(delete("/xpanse/services/{id}", serviceId)
+        return mockMvc.perform(delete("/xpanse/services/{serviceId}", serviceId)
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
     }
 
     MockHttpServletResponse purgeService(UUID serviceId) throws Exception {
-        return mockMvc.perform(delete("/xpanse/services/purge/{id}", serviceId)
+        return mockMvc.perform(delete("/xpanse/services/purge/{serviceId}", serviceId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
     }
 
     MockHttpServletResponse redeployService(UUID serviceId) throws Exception {
-        return mockMvc.perform(put("/xpanse/services/deploy/retry/{id}", serviceId)
+        return mockMvc.perform(put("/xpanse/services/deploy/retry/{serviceId}", serviceId)
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
     }
+
 }

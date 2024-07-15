@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.service.modify;
+package org.eclipse.xpanse.modules.models.service.order;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -19,52 +19,58 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 
 /**
- * Define view object for detail of the service modification audit.
+ * Define view object for details of the service order.
  */
 @Data
-public class ServiceModificationAuditDetails {
+public class ServiceOrderDetails {
 
     @NotNull
-    @Schema(description = "The id of the service modification request.")
-    private UUID serviceModificationRequestId;
+    @Schema(description = "The id of the service order.")
+    private UUID orderId;
 
     @NotNull
     @Schema(description = "The id of the deployed service.")
     private UUID serviceId;
 
     @NotNull
-    @Schema(description = "The status of the service state management task.")
+    @Schema(description = "The task type of the service order.")
+    private ServiceOrderType taskType;
+
+    @NotNull
+    @Schema(description = "The task status of the service order.")
     private TaskStatus taskStatus;
 
-    @Schema(description = "The error message of the failed management task.")
+    @Schema(description = "The error message if the service order task failed.")
     private String errorMsg;
 
-    @Schema(description = "The started time of the task.")
+    @Schema(description = "The id of the user who created the service order.")
+    private String userId;
+
+    @Schema(description = "The started time of the service order.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime startedTime;
 
-    @Schema(description = "The completed time of the task.")
+    @Schema(description = "The completed time of the service order.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime completedTime;
 
-    @NotNull
-    @Schema(description = "The deploy request of the service before this modification.")
+    @Schema(description = "The deploy request of the service before this service order.")
     private DeployRequest previousDeployRequest;
 
-    @NotNull
-    @Schema(description = "The deploy request of the service after this modification.")
+    @Schema(description = "The deploy request of the service from this service order.")
     private DeployRequest newDeployRequest;
 
-    @Schema(description = "The deployed resource list of the service before this modification.")
+    @Schema(description = "The deployed resources of the service before this service order.")
     private List<DeployResource> previousDeployedResources;
 
-    @Schema(description = "The properties of the deployed service before this modification.")
+    @Schema(description = "The properties of the deployed service before this service order.")
     private Map<String, String> previousDeployedServiceProperties;
 
-    @Schema(description = "The properties of the deployed result before this modification.")
+    @Schema(description = "The properties of the deployed result before this service order.")
     private Map<String, String> previousDeployedResultProperties;
 }

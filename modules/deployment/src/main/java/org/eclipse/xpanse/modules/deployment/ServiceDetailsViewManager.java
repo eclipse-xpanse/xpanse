@@ -46,7 +46,7 @@ public class ServiceDetailsViewManager {
     @Resource
     private ServiceStateManager serviceStateManager;
     @Resource
-    private ServiceModificationAuditManager modificationAuditManager;
+    private ServiceOrderManager serviceOrderManager;
 
     /**
      * Get deploy service detail by id.
@@ -106,7 +106,7 @@ public class ServiceDetailsViewManager {
     public List<DeployedService> listDeployedServicesDetails(Category category, Csp csp,
                                                              String serviceName,
                                                              String serviceVersion,
-            ServiceDeploymentState serviceState) {
+                                                             ServiceDeploymentState serviceState) {
         List<DeployedService> servicesDetails = new ArrayList<>();
         List<DeployedService> services =
                 listDeployedServices(category, csp, serviceName, serviceVersion, serviceState);
@@ -154,7 +154,7 @@ public class ServiceDetailsViewManager {
         deployedServiceDetails.setLatestRunningManagementTask(
                 serviceStateManager.getLatestRunningManagementTask(deployServiceEntity.getId()));
         deployedServiceDetails.setLatestModificationAudit(
-                modificationAuditManager.getLatestModificationAudit(deployServiceEntity.getId()));
+                serviceOrderManager.getLatestModificationOrder(deployServiceEntity.getId()));
         return deployedServiceDetails;
     }
 
@@ -186,7 +186,7 @@ public class ServiceDetailsViewManager {
         deployedServiceDetails.setLatestRunningManagementTask(
                 serviceStateManager.getLatestRunningManagementTask(deployServiceEntity.getId()));
         deployedServiceDetails.setLatestModificationAudit(
-                modificationAuditManager.getLatestModificationAudit(deployServiceEntity.getId()));
+                serviceOrderManager.getLatestModificationOrder(deployServiceEntity.getId()));
         return deployedServiceDetails;
     }
 

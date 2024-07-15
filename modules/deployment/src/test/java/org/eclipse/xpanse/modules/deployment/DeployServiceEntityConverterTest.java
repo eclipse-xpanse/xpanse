@@ -76,7 +76,7 @@ class DeployServiceEntityConverterTest {
         DeployTask deployTask = converter.getDeployTaskByStoredService(deployServiceEntity);
 
         assertNotNull(deployTask);
-        assertEquals(deployServiceEntity.getId(), deployTask.getId());
+        assertEquals(deployServiceEntity.getId(), deployTask.getServiceId());
         assertEquals(deployServiceEntity.getDeployRequest(), deployTask.getDeployRequest());
         assertEquals(serviceTemplateEntity.getOcl(), deployTask.getOcl());
         assertEquals(serviceTemplateEntity.getId(), deployTask.getServiceTemplateId());

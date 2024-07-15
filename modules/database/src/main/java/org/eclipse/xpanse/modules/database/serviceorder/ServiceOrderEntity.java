@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.servicemodification;
+package org.eclipse.xpanse.modules.database.serviceorder;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
@@ -23,24 +23,32 @@ import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 /**
- * ServiceModificationAuditEntity for persistence.
+ * ServiceOrderEntity for persistence.
  */
-@Table(name = "SERVICE_MODIFICATION_AUDIT")
+@Table(name = "SERVICE_ORDER")
 @Entity
 @Data
-public class ServiceModificationAuditEntity {
+public class ServiceOrderEntity {
 
     @Id
-    @Column(name = "ID", nullable = false)
-    private UUID id;
+    @Column(name = "ORDER_ID", nullable = false)
+    private UUID orderId;
 
     @Column(name = "SERVICE_ID", nullable = false)
     private UUID serviceId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TASK_TYPE", nullable = false)
+    private ServiceOrderType taskType;
+
+    @Column(name = "USER_ID", nullable = false)
+    private String userId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "TASK_STATUS", nullable = false)

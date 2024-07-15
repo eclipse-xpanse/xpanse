@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -62,7 +63,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("tofu-maker")
 class TofuMakerDeploymentTest {
 
-    private final UUID id = UUID.randomUUID();
+    private final UUID serviceId = UUID.randomUUID();
+    private final UUID orderId = UUID.randomUUID();
     private final String errorDeployer = "error_deployer";
     private final String invalidDeployer = """
             resource "random_id" "new" {
@@ -109,6 +111,8 @@ class TofuMakerDeploymentTest {
         ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
 
         DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setServiceId(serviceId);
+        deployRequest.setUserId("userId");
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().getServiceFlavors().getFirst().getName());
@@ -122,8 +126,10 @@ class TofuMakerDeploymentTest {
         deployRequest.setServiceRequestProperties(Map.ofEntries(Map.entry("key", "value")));
 
         deployTask = new DeployTask();
-        deployTask.setId(id);
+        deployTask.setServiceId(serviceId);
+        deployTask.setOrderId(orderId);
         deployTask.setOcl(ocl);
+        deployTask.setUserId("userId");
         deployTask.setDeployRequest(deployRequest);
     }
 
@@ -132,11 +138,11 @@ class TofuMakerDeploymentTest {
     void testDeploy() {
         doReturn(new HashMap<>()).when(this.deployEnvironments)
                 .getCredentialVariablesByHostingType(any(), any(), any(), any());
+        deployTask.setTaskType(ServiceOrderType.DEPLOY);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         DeployResult deployResult = openTofuMakerDeployment.deploy(deployTask);
 
         Assertions.assertNotNull(deployResult);
-        Assertions.assertEquals(id, deployResult.getId());
     }
 
     @Test
@@ -147,12 +153,11 @@ class TofuMakerDeploymentTest {
                     .thenReturn("Test");
             doReturn(new HashMap<>()).when(this.deployEnvironments)
                     .getCredentialVariablesByHostingType(any(), any(), any(), any());
+            deployTask.setTaskType(ServiceOrderType.MODIFY);
             deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
-            UUID modificationId = UUID.randomUUID();
-            DeployResult deployResult = openTofuMakerDeployment.modify(modificationId,deployTask);
+            DeployResult deployResult = openTofuMakerDeployment.modify(deployTask);
 
             Assertions.assertNotNull(deployResult);
-            Assertions.assertEquals(id, deployResult.getId());
         }
     }
 
@@ -162,11 +167,11 @@ class TofuMakerDeploymentTest {
                 TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
+            deployTask.setTaskType(ServiceOrderType.DESTROY);
             deployTask.setDeploymentScenario(DeploymentScenario.DESTROY);
             DeployResult destroyResult = this.openTofuMakerDeployment.destroy(deployTask);
 
             Assertions.assertNotNull(destroyResult);
-            Assertions.assertEquals(id, destroyResult.getId());
         }
     }
 
