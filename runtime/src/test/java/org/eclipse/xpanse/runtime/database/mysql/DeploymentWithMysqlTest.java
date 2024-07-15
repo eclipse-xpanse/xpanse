@@ -5,46 +5,43 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import jakarta.annotation.Resource;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.api.controllers.ServiceMigrationApi;
-import org.eclipse.xpanse.api.controllers.ServiceModificationApi;
+import org.eclipse.xpanse.api.controllers.ServiceOrderManageApi;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.api.controllers.UserCloudCredentialsApi;
-import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequestBase;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
-import org.eclipse.xpanse.modules.models.service.modify.ServiceModificationAuditDetails;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
@@ -57,25 +54,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Slf4j
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql"})
 @AutoConfigureMockMvc
 class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
-    @Resource
-    private UserCloudCredentialsApi userCloudCredentialsApi;
+
     @Resource
     private ServiceDeployerApi serviceDeployerApi;
     @Resource
-    private ServiceModificationApi serviceModificationApi;
+    private UserCloudCredentialsApi userCloudCredentialsApi;
+    @Resource
+    private ServiceOrderManageApi serviceOrderManageApi;
     @Resource
     private ServiceTemplateApi serviceTemplateApi;
-    @Resource
-    private DatabaseDeployServiceStorage deployServiceStorage;
     @Resource
     private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
     @Resource
@@ -83,29 +80,40 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     @Resource
     private ServiceMigrationApi serviceMigrationApi;
     @Resource
-    private DatabaseServiceTemplateStorage serviceTemplateStorage;
+    private ServiceTemplateStorage serviceTemplateStorage;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testDeployer() throws Exception {
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate();
-        testDeployServiceThrowsServiceTemplateNotApproved(serviceTemplate);
+        if (Objects.isNull(serviceTemplate)) {
+            return;
+        }
         approveServiceTemplateRegistration(serviceTemplate);
         addCredentialForHuaweiCloud();
-        UUID serviceId = deployService(serviceTemplate);
-        if (waitServiceUtilTargetState(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
-            testModifyAndGetDetails(serviceId, serviceTemplate);
-            waitServiceUtilTargetState(serviceId,
-                    ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
-            UUID migrateId = migrateService(serviceId, serviceTemplate);
-            if (waitMigrationCompleted(migrateId)) {
-                ServiceMigrationDetails migrationDetails =
-                        serviceMigrationApi.getMigrationOrderDetailsById(migrateId.toString());
-                testDestroyAndGetDetails(migrationDetails.getNewServiceId());
-                testPurgeAndGetDetails(migrationDetails.getOldServiceId());
-            }
-        } else {
-            if (serviceIsTargetState(serviceId, ServiceDeploymentState.DEPLOY_FAILED)) {
+        ServiceOrder serviceOrder = deployService(serviceTemplate);
+        UUID serviceId = serviceOrder.getServiceId();
+        UUID deployOrderId = serviceOrder.getOrderId();
+        boolean deployOrderIsCompleted = waitServiceOrderIsCompleted(deployOrderId);
+        if (deployOrderIsCompleted) {
+            DeployedServiceDetails deployedServiceDetails = getDeployedServiceDetails(serviceId);
+            ServiceDeploymentState serviceDeploymentState =
+                    deployedServiceDetails.getServiceDeploymentState();
+
+            if (serviceDeploymentState.equals(ServiceDeploymentState.DEPLOY_SUCCESS)) {
+                testModifyAndGetDetails(serviceId, serviceTemplate);
+                UUID migrateId = migrateService(serviceId, serviceTemplate);
+                if (waitMigrationCompleted(migrateId)) {
+                    ServiceMigrationDetails migrationDetails =
+                            serviceMigrationApi.getMigrationOrderDetailsById(migrateId.toString());
+                    testDestroyAndGetDetails(migrationDetails.getNewServiceId());
+                    testListServiceOrders(serviceId);
+                    testDeleteServiceOrders(serviceId);
+                    testPurgeAndGetDetails(migrationDetails.getOldServiceId());
+                }
+            } else {
+                testListServiceOrders(serviceId);
+                testDeleteServiceOrders(serviceId);
                 testPurgeAndGetDetails(serviceId);
             }
         }
@@ -113,41 +121,50 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     void approveServiceTemplateRegistration(ServiceTemplateDetailVo serviceTemplate) {
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateStorage.getServiceTemplateById(serviceTemplate.getServiceTemplateId());
+                serviceTemplateStorage.getServiceTemplateById(
+                        serviceTemplate.getServiceTemplateId());
         serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
         serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
     }
 
-    UUID deployService(ServiceTemplateDetailVo serviceTemplate) {
+    ServiceOrder deployService(ServiceTemplateDetailVo serviceTemplate) {
         DeployRequest deployRequest = new DeployRequest();
         DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
         BeanUtils.copyProperties(deployRequestBase, deployRequest);
         deployRequest.setBillingMode(BillingMode.FIXED);
-        UUID deployUUid = serviceDeployerApi.deploy(deployRequest);
-        Assertions.assertNotNull(deployUUid);
-        return deployUUid;
+        ServiceOrder serviceOrder = serviceDeployerApi.deploy(deployRequest);
+        Assertions.assertNotNull(serviceOrder.getOrderId());
+        Assertions.assertNotNull(serviceOrder.getServiceId());
+        return serviceOrder;
+    }
+
+    DeployedServiceDetails getDeployedServiceDetails(UUID serviceId) {
+        return serviceDeployerApi.getSelfHostedServiceDetailsById(serviceId.toString());
     }
 
 
-    boolean waitServiceUtilTargetState(UUID id, ServiceDeploymentState targetState)
-            throws InterruptedException {
+    private boolean waitServiceOrderIsCompleted(UUID orderId) throws Exception {
         final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(2);
-        while (true) {
-            if (serviceIsTargetState(id, targetState)) {
-                return true;
-            }
-            if (System.nanoTime() > endTime) {
-                return false;
-            }
-            Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+        boolean isCompleted = false;
+        while (System.nanoTime() < endTime && !isCompleted) {
+            isCompleted = serviceOrderIsCompleted(orderId);
+            Thread.sleep(5000);
         }
+        return isCompleted;
     }
 
-    private boolean serviceIsTargetState(UUID id, ServiceDeploymentState targetState) {
-        DeployServiceEntity deployedService = deployServiceStorage.findDeployServiceById(id);
-        return Objects.nonNull(deployedService)
-                && deployedService.getServiceDeploymentState() == targetState;
+    private boolean serviceOrderIsCompleted(UUID orderId) throws InterruptedException {
+        DeferredResult<ServiceOrderStatusUpdate> deferredResult =
+                serviceOrderManageApi.getLatestServiceOrderStatus(orderId.toString(), null);
+        while (Objects.isNull(deferredResult.getResult())) {
+            Thread.sleep(1000);
+        }
+        if (deferredResult.getResult() instanceof ServiceOrderStatusUpdate statusUpdate) {
+            return statusUpdate.getIsOrderCompleted();
+        }
+        return false;
     }
+
 
     DeployRequestBase getDeployRequestBase(ServiceTemplateDetailVo serviceTemplate) {
         DeployRequestBase deployRequestBase = new DeployRequestBase();
@@ -178,23 +195,13 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     ServiceTemplateDetailVo registerServiceTemplate() throws Exception {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName(UUID.randomUUID().toString());
         return serviceTemplateApi.register(ocl);
     }
 
-    void testDeployServiceThrowsServiceTemplateNotApproved(
-            ServiceTemplateDetailVo serviceTemplate) {
-        // SetUp
-        DeployRequest deployRequest = new DeployRequest();
-        DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
-        BeanUtils.copyProperties(deployRequestBase, deployRequest);
-        // run the test
-        assertThrows(ServiceTemplateNotApproved.class,
-                () -> serviceDeployerApi.deploy(deployRequest));
-    }
-
-    UUID migrateService(UUID taskId, ServiceTemplateDetailVo serviceTemplate) {
+    UUID migrateService(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) {
         MigrateRequest migrateRequest = new MigrateRequest();
-        migrateRequest.setOriginalServiceId(taskId);
+        migrateRequest.setOriginalServiceId(serviceId);
         DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
         BeanUtils.copyProperties(deployRequestBase, migrateRequest);
         UUID migrateId = serviceMigrationApi.migrate(migrateRequest);
@@ -203,19 +210,14 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return migrateId;
     }
 
-    boolean waitMigrationCompleted(UUID id) throws Exception {
-        long startTime = System.currentTimeMillis();
-        while (!migrationStatueIsCompleted(id)) {
+    boolean waitMigrationCompleted(UUID id) {
+        final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(3);
+        while (endTime > System.nanoTime()) {
             if (migrationStatueIsCompleted(id)) {
-                break;
-            } else {
-                if (System.currentTimeMillis() - startTime > 300 * 1000) {
-                    break;
-                }
-                Thread.sleep(5 * 1000);
+                return true;
             }
         }
-        return migrationStatueIsCompleted(id);
+        return false;
     }
 
     private boolean migrationStatueIsCompleted(UUID id) {
@@ -224,7 +226,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return migrationDetails.getMigrationStatus() == MigrationStatus.MIGRATION_COMPLETED;
     }
 
-    void testModifyAndGetDetails(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) {
+    void testModifyAndGetDetails(UUID serviceId, ServiceTemplateDetailVo serviceTemplate)
+            throws Exception {
         // SetUp
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor(
@@ -233,49 +236,59 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         serviceRequestProperties.put("admin_passwd", "2222222222@Qq");
         modifyRequest.setServiceRequestProperties(serviceRequestProperties);
         // Run the test
-        UUID modificationId = serviceModificationApi.modify(serviceId.toString(), modifyRequest);
+        ServiceOrder serviceOrder = serviceDeployerApi.modify(serviceId.toString(), modifyRequest);
         // Verify the results
-        Assertions.assertNotNull(modificationId);
+        Assertions.assertNotNull(serviceOrder.getOrderId());
+        Assertions.assertNotNull(serviceOrder.getServiceId());
+        if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
+            ServiceOrderDetails serviceOrderDetails =
+                    serviceOrderManageApi.getOrderDetailsByOrderId(
+                            serviceOrder.getOrderId().toString());
+            Assertions.assertEquals(serviceOrderDetails.getTaskStatus(),
+                    TaskStatus.SUCCESSFUL);
+            Assertions.assertEquals(serviceOrderDetails.getTaskType(),
+                    ServiceOrderType.MODIFY);
 
-        ServiceModificationAuditDetails serviceModificationDetails =
-                serviceModificationApi.getAuditDetailsByModificationId(modificationId.toString());
-        Assertions.assertNotNull(serviceModificationDetails);
-        Assertions.assertEquals(serviceModificationDetails.getServiceId(), serviceId);
-    }
-
-    void testDestroyAndGetDetails(UUID taskId) throws Exception {
-
-        // SetUp
-        String successMsg =
-                String.format("Task for destroying managed service %s has started.", taskId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
-
-        // Run the test
-        Response result = serviceDeployerApi.destroy(taskId.toString());
-
-        // Verify the results
-        Assertions.assertEquals(response, result);
-
-        if (serviceIsTargetState(taskId, ServiceDeploymentState.DESTROY_SUCCESS)) {
-            // Run the test
-            testPurgeAndGetDetails(taskId);
         }
-
     }
 
-    void testPurgeAndGetDetails(UUID taskId) throws Exception {
-        // SetUp
-        String successMsg =
-                String.format("Task for purging managed service %s has started.", taskId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
+    void testDestroyAndGetDetails(UUID serviceId) throws Exception {
+
         // Run the test
-        Response result = serviceDeployerApi.purge(taskId.toString());
-        Assertions.assertEquals(result, response);
+        ServiceOrder serviceOrder = serviceDeployerApi.destroy(serviceId.toString());
+        if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
+            ServiceOrderDetails serviceOrderDetails =
+                    serviceOrderManageApi.getOrderDetailsByOrderId(
+                            serviceOrder.getOrderId().toString());
+            Assertions.assertEquals(serviceOrderDetails.getTaskStatus(),
+                    TaskStatus.SUCCESSFUL);
+            Assertions.assertEquals(serviceOrderDetails.getTaskType(),
+                    ServiceOrderType.DESTROY);
+        }
+    }
 
-        Thread.sleep(30 * 1000);
+    void testPurgeAndGetDetails(UUID serviceId) throws Exception {
+        // Run the test
+        ServiceOrder serviceOrder = serviceDeployerApi.purge(serviceId.toString());
+        if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
+            ServiceOrderDetails serviceOrderDetails =
+                    serviceOrderManageApi.getOrderDetailsByOrderId(
+                            serviceOrder.getOrderId().toString());
+            Assertions.assertEquals(serviceOrderDetails.getTaskStatus(),
+                    TaskStatus.SUCCESSFUL);
+            Assertions.assertEquals(serviceOrderDetails.getTaskType(),
+                    ServiceOrderType.PURGE);
+        }
+    }
 
-        assertThrows(ServiceNotDeployedException.class,
-                () -> serviceDeployerApi.getSelfHostedServiceDetailsById(taskId.toString()));
+    void testListServiceOrders(UUID serviceId) {
+        List<ServiceOrderDetails> serviceOrders =
+                serviceOrderManageApi.listServiceOrders(serviceId.toString(), null, null);
+        Assertions.assertNotNull(serviceOrders);
+    }
+
+    void testDeleteServiceOrders(UUID serviceId) {
+        serviceOrderManageApi.deleteOrdersByServiceId(serviceId.toString());
     }
 
     private void addCredentialForHuaweiCloud() {

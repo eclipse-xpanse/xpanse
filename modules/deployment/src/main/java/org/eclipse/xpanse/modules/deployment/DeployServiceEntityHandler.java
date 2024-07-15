@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +29,7 @@ public class DeployServiceEntityHandler {
     /**
      * Get deploy service entity by id.
      *
-     * @param id task id.
+     * @param id service id.
      * @return deploy service entity.
      */
     public DeployServiceEntity getDeployServiceEntity(UUID id) {
@@ -41,8 +42,20 @@ public class DeployServiceEntityHandler {
         return deployServiceEntity;
     }
 
+    /**
+     * Store and flush deploy service entity.
+     *
+     * @param deployServiceEntity deploy service entity.
+     * @return updated deploy service entity.
+     */
     public DeployServiceEntity storeAndFlush(DeployServiceEntity deployServiceEntity) {
         return deployServiceStorage.storeAndFlush(deployServiceEntity);
+    }
+
+    public DeployServiceEntity updateServiceDeploymentStatus(DeployServiceEntity deployService,
+                                                             ServiceDeploymentState state) {
+        deployService.setServiceDeploymentState(state);
+        return deployServiceStorage.storeAndFlush(deployService);
     }
 
 

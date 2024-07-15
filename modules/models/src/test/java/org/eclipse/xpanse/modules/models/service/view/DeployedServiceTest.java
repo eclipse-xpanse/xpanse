@@ -15,9 +15,9 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.service.modify.ServiceModificationAuditDetails;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,8 +47,8 @@ class DeployedServiceTest {
     private final ServiceLockConfig LOCK_CONFIG = new ServiceLockConfig();
     private final ServiceStateManagementTaskDetails SERVICE_STATE_MANAGEMENT_TASK_DETAILS =
             new ServiceStateManagementTaskDetails();
-    private final ServiceModificationAuditDetails SERVICE_MODIFICATION_AUDIT_DETAILS =
-            new ServiceModificationAuditDetails();
+    private final ServiceOrderDetails SERVICE_MODIFICATION_AUDIT_DETAILS =
+            new ServiceOrderDetails();
     private DeployedService deployedService;
 
     @BeforeEach

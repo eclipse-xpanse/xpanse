@@ -34,7 +34,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateStillInUseException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
@@ -351,7 +350,7 @@ public class ServiceTemplateManage {
             log.error(errMsg);
             throw new ServiceTemplateStillInUseException(errMsg);
         }
-        templateStorage.removeById(existingTemplate.getId());
+        templateStorage.deleteServiceTemplate(existingTemplate);
         serviceTemplateOpenApiGenerator.deleteServiceApi(id.toString());
     }
 
@@ -370,13 +369,7 @@ public class ServiceTemplateManage {
     }
 
     private ServiceTemplateEntity getServiceTemplateById(UUID id) {
-        ServiceTemplateEntity serviceTemplate = templateStorage.getServiceTemplateById(id);
-        if (Objects.isNull(serviceTemplate) || Objects.isNull(serviceTemplate.getOcl())) {
-            String errMsg = String.format("Service template with id %s not found.", id);
-            log.error(errMsg);
-            throw new ServiceTemplateNotRegistered(errMsg);
-        }
-        return serviceTemplate;
+        return templateStorage.getServiceTemplateById(id);
     }
 
     private List<DeployServiceEntity> listDeployServicesByTemplateId(UUID serviceTemplateId) {

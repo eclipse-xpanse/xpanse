@@ -141,31 +141,13 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
         ));
     }
 
-
-    /**
-     * Remove register service entity from database by uuid.
-     *
-     * @param uuid uuid of register service entity
-     */
-    @Override
-    public void removeById(UUID uuid) {
-        if (repository.existsById(uuid)) {
-            repository.deleteById(uuid);
-        } else {
-            String errMsg = String.format("Service template with id %s not found.", uuid);
-            log.error(errMsg);
-            throw new ServiceTemplateNotRegistered(errMsg);
-        }
-
-    }
-
     /**
      * Remove register service entity from database by entity.
      *
      * @param serviceTemplateEntity register service entity
      */
     @Override
-    public void remove(ServiceTemplateEntity serviceTemplateEntity) {
+    public void deleteServiceTemplate(ServiceTemplateEntity serviceTemplateEntity) {
         repository.delete(serviceTemplateEntity);
     }
 }

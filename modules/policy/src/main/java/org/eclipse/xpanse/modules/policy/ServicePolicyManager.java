@@ -25,7 +25,6 @@ import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
@@ -89,11 +88,6 @@ public class ServicePolicyManager {
     private ServiceTemplateEntity getServiceTemplateEntity(UUID serviceTemplateId) {
         ServiceTemplateEntity existedServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
-        if (Objects.isNull(existedServiceTemplate)) {
-            String errMsg =
-                    String.format("Service template with id %s not found.", serviceTemplateId);
-            throw new ServiceTemplateNotRegistered(errMsg);
-        }
         boolean hasManagePermission = userServiceHelper.currentUserCanManageNamespace(
                 existedServiceTemplate.getNamespace());
         if (!hasManagePermission) {
@@ -110,12 +104,9 @@ public class ServicePolicyManager {
      * @return Returns updated policy view object.
      */
     public ServicePolicy updateServicePolicy(UUID id, ServicePolicyUpdateRequest updateRequest) {
-        ServicePolicyEntity existingPolicy =
-                getServicePolicyEntity(id);
-
+        ServicePolicyEntity existingPolicy = getServicePolicyEntity(id);
         ServicePolicyEntity policyToUpdate =
                 getServicePolicyToUpdate(updateRequest, existingPolicy);
-
         ServicePolicyEntity updatedPolicy = servicePolicyStorage.storeAndFlush(policyToUpdate);
         return conventToServicePolicy(updatedPolicy);
     }
@@ -160,7 +151,7 @@ public class ServicePolicyManager {
     private ServicePolicyEntity getServicePolicyEntity(UUID policyId) {
         ServicePolicyEntity existingPolicy = servicePolicyStorage.findPolicyById(policyId);
         if (Objects.isNull(existingPolicy)) {
-            String errorMsg = String.format("The policy with id %s not found.", policyId);
+            String errorMsg = String.format("The service policy with id %s not found.", policyId);
             throw new PolicyNotFoundException(errorMsg);
         }
 

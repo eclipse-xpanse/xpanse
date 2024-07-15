@@ -37,7 +37,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;

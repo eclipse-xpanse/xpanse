@@ -51,18 +51,19 @@ public class TerraformBootServiceDestroyer {
      */
     public DeployResult destroyFromScripts(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
         TerraformAsyncDestroyFromScriptsRequest request =
                 getDestroyFromScriptsRequest(deployTask, resourceState);
         try {
             terraformFromScriptsApi.asyncDestroyWithScripts(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot destroy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
@@ -72,18 +73,19 @@ public class TerraformBootServiceDestroyer {
      */
     public DeployResult destroyFromGitRepo(DeployTask deployTask) {
         DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getId());
+                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
         TerraformAsyncDestroyFromGitRepoRequest request =
                 getDestroyFromGitRepoRequest(deployTask, resourceState);
         try {
             terraformFromGitRepoApi.asyncDestroyFromGitRepo(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
@@ -93,7 +95,7 @@ public class TerraformBootServiceDestroyer {
             throws TerraformBootRequestFailedException {
         TerraformAsyncDestroyFromScriptsRequest request =
                 new TerraformAsyncDestroyFromScriptsRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
@@ -107,7 +109,7 @@ public class TerraformBootServiceDestroyer {
             throws TerraformBootRequestFailedException {
         TerraformAsyncDestroyFromGitRepoRequest request =
                 new TerraformAsyncDestroyFromGitRepoRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

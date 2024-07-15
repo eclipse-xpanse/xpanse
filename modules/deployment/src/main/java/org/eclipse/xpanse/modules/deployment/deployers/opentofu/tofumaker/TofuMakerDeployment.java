@@ -66,11 +66,11 @@ public class TofuMakerDeployment implements Deployer {
     }
 
     @Override
-    public DeployResult modify(UUID modificationId, DeployTask deployTask) {
+    public DeployResult modify(DeployTask deployTask) {
         if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            return tofuMakerServiceModifier.modifyFromScripts(modificationId, deployTask);
+            return tofuMakerServiceModifier.modifyFromScripts(deployTask);
         }
-        return tofuMakerServiceModifier.modifyFromGitRepo(modificationId, deployTask);
+        return tofuMakerServiceModifier.modifyFromGitRepo(deployTask);
     }
 
     /**

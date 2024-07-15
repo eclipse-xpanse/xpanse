@@ -39,6 +39,7 @@ import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -116,9 +117,12 @@ class TerraformLocalDeploymentTest {
                 .getCredentialVariablesByHostingType(any(), any(), any(), any());
     }
 
-    DeployTask getDeployTask(Ocl ocl) {
+    DeployTask getDeployTask(Ocl ocl, ServiceOrderType taskType) {
         DeployTask deployTask = new DeployTask();
-        deployTask.setId(UUID.randomUUID());
+        deployTask.setOrderId(UUID.randomUUID());
+        deployTask.setServiceId(UUID.randomUUID());
+        deployTask.setTaskType(taskType);
+        deployTask.setUserId("userId");
         deployTask.setOcl(ocl);
         deployTask.setDeployRequest(getDeployRequest(ocl));
         return deployTask;
@@ -169,7 +173,7 @@ class TerraformLocalDeploymentTest {
     @Test
     void testDeploy() {
 
-        DeployTask deployTask = getDeployTask(ocl);
+        DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         DeployResult deployResult = terraformLocalDeployment.deploy(deployTask);
         String tfState = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
@@ -179,7 +183,7 @@ class TerraformLocalDeploymentTest {
         Assertions.assertNull(deployResult.getState());
 
         try {
-            DeployTask deployTask1 = getDeployTask(oclWithGitScripts);
+            DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DEPLOY);
             DeployResult deployResult1 = terraformLocalDeployment.deploy(deployTask1);
             Assertions.assertNotNull(deployResult1);
             Assertions.assertNotNull(deployResult1.getPrivateProperties());
@@ -200,15 +204,15 @@ class TerraformLocalDeploymentTest {
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
                 deployServiceEntity);
 
-        DeployTask deployTask = getDeployTask(ocl);
+        DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);
         deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
-        DeployResult deployResult = terraformLocalDeployment.modify(UUID.randomUUID(), deployTask);
+        DeployResult deployResult = terraformLocalDeployment.modify(deployTask);
         Assertions.assertNotNull(deployResult);
         Assertions.assertNotNull(deployResult.getPrivateProperties());
         Assertions.assertNull(deployResult.getState());
 
         try {
-            DeployTask deployTask1 = getDeployTask(oclWithGitScripts);
+            DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.MODIFY);
             DeployResult deployResult1 = terraformLocalDeployment.deploy(deployTask1);
             Assertions.assertNotNull(deployResult1);
             Assertions.assertNotNull(deployResult1.getPrivateProperties());
@@ -229,14 +233,14 @@ class TerraformLocalDeploymentTest {
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
                 deployServiceEntity);
 
-        DeployTask deployTask = getDeployTask(ocl);
+        DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
         deployTask.setDeploymentScenario(DeploymentScenario.DESTROY);
         DeployResult destroyResult = terraformLocalDeployment.destroy(deployTask);
         Assertions.assertNotNull(destroyResult);
         Assertions.assertNotNull(destroyResult.getPrivateProperties());
 
         try {
-            DeployTask deployTask1 = getDeployTask(oclWithGitScripts);
+            DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DESTROY);
             deployTask1.setDeploymentScenario(DeploymentScenario.DESTROY);
             DeployResult destroyResult1 = terraformLocalDeployment.destroy(deployTask1);
             Assertions.assertNotNull(destroyResult1);
@@ -258,7 +262,7 @@ class TerraformLocalDeploymentTest {
     @Test
     void testDeploy_FailedCausedByTerraformExecutorException() {
         ocl.getDeployment().setDeployer(invalidDeployer);
-        DeployTask deployTask = getDeployTask(ocl);
+        DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         DeployResult deployResult = this.terraformLocalDeployment.deploy(deployTask);
         Assertions.assertNull(deployResult.getState());
@@ -274,7 +278,7 @@ class TerraformLocalDeploymentTest {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             ocl.getDeployment().setDeployer(errorDeployer);
-            DeployTask deployTask = getDeployTask(ocl);
+            DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
             deployTask.setDeploymentScenario(DeploymentScenario.DESTROY);
             DeployResult deployResult = this.terraformLocalDeployment.destroy(deployTask);
             Assertions.assertTrue(deployResult.getProperties().isEmpty());
@@ -292,13 +296,13 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testGetDeployPlanAsJson() {
-        DeployTask deployTask = getDeployTask(ocl);
+        DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         String deployPlanJson = terraformLocalDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
 
         try {
-            DeployTask deployTask1 = getDeployTask(oclWithGitScripts);
+            DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DEPLOY);
             String deployPlanJson1 = terraformLocalDeployment.getDeploymentPlanAsJson(deployTask1);
             Assertions.assertNotNull(deployPlanJson1);
         } catch (Exception e) {
@@ -309,7 +313,7 @@ class TerraformLocalDeploymentTest {
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
         ocl.getDeployment().setDeployer(errorDeployer);
-        DeployTask deployTask = getDeployTask(ocl);
+        DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         Assertions.assertThrows(TerraformExecutorException.class,
                 () -> this.terraformLocalDeployment.getDeploymentPlanAsJson(deployTask));
     }

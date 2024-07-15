@@ -1,0 +1,20 @@
+{
+  "preferred_username": "xpanse-user",
+  "email": "test@xpanse.de",
+  "aud": "https://localhost:7082",
+  "scope": "openid user isv admin csp",
+  "roles": [
+    "user",
+    "isv",
+    "csp"
+  ],
+  "urn:zitadel:iam:org:project:roles": {
+    "user": "user",
+    "isv": "isv",
+    "csp": "csp"
+  },
+  "urn:zitadel:iam:user:metadata": {
+    "csp": "SHVhd2VpQ2xvdWQ="
+  },
+  "sub": "userId"
+}

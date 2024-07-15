@@ -1,72 +1,95 @@
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.BeanUtils;
 
 @ExtendWith(MockitoExtension.class)
 class DeployTaskTest {
 
-    final UUID id = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
+    private final UUID orderId = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
+
+    private final UUID serviceId = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
+
+    private final UUID serviceTemplateId = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
+
+    private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
+
+    private final String userId = "userId";
+
+    private final String namespace = "namespace";
     @Mock
     private DeployRequest mockDeployRequest;
     @Mock
     private Ocl mockOcl;
     @Mock
     private DeploymentScenario mockDeploymentScenario;
-    private DeployTask deployTaskUnderTest;
+    private DeployTask test;
 
     @BeforeEach
     void setUp() {
-        deployTaskUnderTest = new DeployTask();
-        deployTaskUnderTest.setId(id);
-        deployTaskUnderTest.setDeployRequest(mockDeployRequest);
-        deployTaskUnderTest.setOcl(mockOcl);
-        deployTaskUnderTest.setDeploymentScenario(mockDeploymentScenario);
+        test = new DeployTask();
+        test.setOrderId(orderId);
+        test.setServiceId(serviceId);
+        test.setTaskType(taskType);
+        test.setUserId(userId);
+        test.setNamespace(namespace);
+        test.setDeployRequest(mockDeployRequest);
+        test.setOcl(mockOcl);
+        test.setServiceTemplateId(serviceTemplateId);
+        test.setDeploymentScenario(mockDeploymentScenario);
     }
 
     @Test
-    void testGetterAndSetter() {
-        deployTaskUnderTest.setId(id);
-        assertThat(deployTaskUnderTest.getId()).isEqualTo(id);
-        final String namespace = "namespace";
-        deployTaskUnderTest.setNamespace(namespace);
-        assertThat(deployTaskUnderTest.getNamespace()).isEqualTo(namespace);
-        assertThat(deployTaskUnderTest.getDeployRequest()).isEqualTo(mockDeployRequest);
-        assertThat(deployTaskUnderTest.getOcl()).isEqualTo(mockOcl);
-        final UUID serviceTemplateId = UUID.fromString("42185b7f-c328-4d2c-b53e-18fb7a9db3b7");
-        deployTaskUnderTest.setServiceTemplateId(serviceTemplateId);
-        assertThat(deployTaskUnderTest.getServiceTemplateId()).isEqualTo(serviceTemplateId);
-        assertThat(deployTaskUnderTest.getDeploymentScenario()).isEqualTo(mockDeploymentScenario);
+    void testGetters() {
+        assertThat(test.getOrderId()).isEqualTo(orderId);
+        assertThat(test.getServiceId()).isEqualTo(serviceId);
+        assertThat(test.getTaskType()).isEqualTo(taskType);
+        assertThat(test.getUserId()).isEqualTo(userId);
+        assertThat(test.getNamespace()).isEqualTo(namespace);
+        assertThat(test.getDeployRequest()).isEqualTo(mockDeployRequest);
+        assertThat(test.getOcl()).isEqualTo(mockOcl);
+        assertThat(test.getServiceTemplateId()).isEqualTo(serviceTemplateId);
+        assertThat(test.getDeploymentScenario()).isEqualTo(mockDeploymentScenario);
     }
 
     @Test
-    void testEquals() {
-        assertThat(deployTaskUnderTest.equals("o")).isFalse();
-    }
+    void testHashCodeAndEquals() {
+        Object obj = new Object();
+        assertNotEquals(test, obj);
+        assertNotEquals(test.hashCode(), obj.hashCode());
 
-    @Test
-    void testCanEqual() {
-        assertThat(deployTaskUnderTest.canEqual("other")).isFalse();
-    }
+        DeployTask test1 = new DeployTask();
+        assertNotEquals(test, test1);
+        assertNotEquals(test.hashCode(), test1.hashCode());
 
-    @Test
-    void testHashCode() {
-        assertThat(deployTaskUnderTest.hashCode()).isNotEqualTo(0);
+        BeanUtils.copyProperties(test, test1);
+        assertEquals(test, test1);
+        assertEquals(test.hashCode(), test1.hashCode());
     }
 
     @Test
     void testToString() {
-        String exceptedString = String.format("DeployTask(id=%s, namespace=null, "
-                + "deployRequest=mockDeployRequest, ocl=mockOcl, serviceTemplateId=null, "
-                + "deploymentScenario=mockDeploymentScenario)", id);
-        assertThat(deployTaskUnderTest.toString()).isEqualTo(exceptedString);
+        String exceptedString = "DeployTask(orderId=" + orderId + ", "
+                + "taskType=" + taskType + ", "
+                + "userId=" + userId + ", "
+                + "serviceId=" + serviceId + ", "
+                + "namespace=" + namespace + ", "
+                + "deployRequest=" + mockDeployRequest + ", "
+                + "ocl=" + mockOcl + ", "
+                + "serviceTemplateId=" + serviceTemplateId + ", "
+                + "deploymentScenario=" + mockDeploymentScenario + ")";
+        assertEquals(exceptedString, test.toString());
     }
 }

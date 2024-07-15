@@ -15,7 +15,6 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -250,29 +249,7 @@ class DatabaseServiceTemplateStorageTest {
     }
 
     @Test
-    void testRemoveById() {
-        // Setup
-        when(mockServiceTemplateRepository.existsById(id)).thenReturn(true);
-
-        // Run the test
-        test.removeById(id);
-
-        // Verify the results
-        verify(mockServiceTemplateRepository).deleteById(id);
-    }
-
-    @Test
-    void testRemoveById_ServiceTemplateRepositoryExistsByIdReturnsFalse() {
-        // Setup
-        when(mockServiceTemplateRepository.existsById(id)).thenReturn(false);
-
-        // Run the test
-        assertThatThrownBy(() -> test.removeById(id))
-                .isInstanceOf(ServiceTemplateNotRegistered.class);
-    }
-
-    @Test
-    void testRemove() {
+    void testDeleteServiceTemplate() {
         // Setup
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(id);
@@ -282,7 +259,7 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity.setCategory(Category.AI);
 
         // Run the test
-        test.remove(serviceTemplateEntity);
+        test.deleteServiceTemplate(serviceTemplateEntity);
 
         // Verify the results
         // Confirm ServiceTemplateRepository.delete(...).
@@ -316,7 +293,7 @@ class DatabaseServiceTemplateStorageTest {
                 .delete(entity);
 
         // Run the test
-        assertThatThrownBy(() -> test.remove(
+        assertThatThrownBy(() -> test.deleteServiceTemplate(
                 serviceTemplateEntity)).isInstanceOf(OptimisticLockingFailureException.class);
     }
 }

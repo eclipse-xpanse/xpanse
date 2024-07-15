@@ -40,7 +40,8 @@ public class DeployServiceEntityConverter {
     public DeployTask getDeployTaskByStoredService(DeployServiceEntity deployServiceEntity) {
         // Set Ocl and CreateRequest
         DeployTask deployTask = new DeployTask();
-        deployTask.setId(deployServiceEntity.getId());
+        deployTask.setServiceId(deployServiceEntity.getId());
+        deployTask.setUserId(deployServiceEntity.getUserId());
         deployTask.setDeployRequest(deployServiceEntity.getDeployRequest());
         ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
                 deployServiceEntity.getServiceTemplateId());

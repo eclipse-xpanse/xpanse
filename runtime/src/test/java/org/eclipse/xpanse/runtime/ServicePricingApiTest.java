@@ -22,14 +22,11 @@ import com.huaweicloud.sdk.core.invoker.SyncInvoker;
 import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsRequest;
 import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsResponse;
 import com.huaweicloud.sdk.iam.v3.model.ProjectResult;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.billing.Price;
@@ -38,10 +35,7 @@ import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
@@ -67,9 +61,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class ServicePricingApiTest extends ApisTestCommon {
 
-    private final OclLoader oclLoader = new OclLoader();
-    @Resource
-    private DatabaseServiceTemplateStorage serviceTemplateStorage;
+
 
     @BeforeEach
     void setUp() {
@@ -162,7 +154,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         Assertions.assertNotNull(flavorPriceResult2.getRecurringPrice());
         Assertions.assertNull(flavorPriceResult2.getOneTimePaymentPrice());
 
-        unregisterServiceTemplate(templateId);
+        deleteServiceTemplate(templateId);
     }
 
     void mockListProjectInvoker() {
@@ -295,7 +287,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         Assertions.assertNotNull(flavorPriceResult2.getRecurringPrice());
         Assertions.assertNull(flavorPriceResult2.getOneTimePaymentPrice());
 
-        unregisterServiceTemplate(templateId);
+        deleteServiceTemplate(templateId);
     }
 
     void testServicePricingApiThrowExceptions() throws Exception {
@@ -325,8 +317,9 @@ class ServicePricingApiTest extends ApisTestCommon {
         ocl.setName("ServicePricingApi-error");
         ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
         UUID templateId = serviceTemplateDetails.getServiceTemplateId();
-        expectedResult.setErrorMessage(String.format("Flavor %s not found in service template with id %s.",
-                flavorName, templateId));
+        expectedResult.setErrorMessage(
+                String.format("Flavor %s not found in service template with id %s.",
+                        flavorName, templateId));
         String result2 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse2 = getServicePriceByFlavor(templateId,
@@ -384,7 +377,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), priceResponse5.getStatus());
         assertEquals(result5, priceResponse5.getContentAsString());
 
-        serviceTemplateStorage.removeById(templateId);
+        deleteServiceTemplate(templateId);
     }
 
     private MockHttpServletResponse getServicePriceByFlavor(

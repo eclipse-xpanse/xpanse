@@ -48,11 +48,12 @@ public class TofuMakerServiceDeployer {
         OpenTofuAsyncDeployFromScriptsRequest request = getDeployFromScriptsRequest(deployTask);
         try {
             openTofuFromScriptsApi.asyncDeployWithScripts(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker deploy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }
@@ -65,11 +66,12 @@ public class TofuMakerServiceDeployer {
         OpenTofuAsyncDeployFromGitRepoRequest request = getDeployFromGitRepoRequest(deployTask);
         try {
             openTofuFromGitRepoApi.asyncDeployFromGitRepo(request);
-            result.setId(deployTask.getId());
+            result.setOrderId(deployTask.getOrderId());
+            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker deploy service failed. service id: {} , error:{} ",
-                    deployTask.getId(), e.getMessage());
+                    deployTask.getServiceId(), e.getMessage());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }
@@ -77,7 +79,7 @@ public class TofuMakerServiceDeployer {
     private OpenTofuAsyncDeployFromScriptsRequest getDeployFromScriptsRequest(DeployTask task) {
         OpenTofuAsyncDeployFromScriptsRequest request =
                 new OpenTofuAsyncDeployFromScriptsRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setIsPlanOnly(false);
         request.setScripts(tofuMakerHelper.getFiles(task));
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
@@ -89,7 +91,7 @@ public class TofuMakerServiceDeployer {
     private OpenTofuAsyncDeployFromGitRepoRequest getDeployFromGitRepoRequest(DeployTask task) {
         OpenTofuAsyncDeployFromGitRepoRequest request =
                 new OpenTofuAsyncDeployFromGitRepoRequest();
-        request.setRequestId(task.getId());
+        request.setRequestId(task.getOrderId());
         request.setIsPlanOnly(false);
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));

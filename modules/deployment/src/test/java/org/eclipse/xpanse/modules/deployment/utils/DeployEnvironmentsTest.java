@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -307,7 +308,10 @@ class DeployEnvironmentsTest {
         deployRequest.setServiceRequestProperties(property);
 
         DeployTask xpanseDeployTask = new DeployTask();
-        xpanseDeployTask.setId(UUID.randomUUID());
+        xpanseDeployTask.setServiceId(UUID.randomUUID());
+        xpanseDeployTask.setOrderId(UUID.randomUUID());
+        xpanseDeployTask.setTaskType(ServiceOrderType.DEPLOY);
+        xpanseDeployTask.setUserId("userId");
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployRequest(deployRequest);
 

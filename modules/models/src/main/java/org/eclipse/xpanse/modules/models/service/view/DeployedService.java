@@ -18,9 +18,9 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.service.modify.ServiceModificationAuditDetails;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
@@ -130,5 +130,5 @@ public class DeployedService {
     private ServiceStateManagementTaskDetails latestRunningManagementTask;
 
     @Schema(description = "The latest service management audit details.")
-    private ServiceModificationAuditDetails latestModificationAudit;
+    private ServiceOrderDetails latestModificationAudit;
 }

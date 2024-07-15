@@ -51,7 +51,7 @@ public class IsvServiceDeployApi {
      *
      * @return list of all services deployed by a user.
      */
-    @Tag(name = "Service", description = "APIs to manage the service instances")
+    @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "List all deployed services by a user.")
     @GetMapping(value = "/services/isv",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,25 +68,26 @@ public class IsvServiceDeployApi {
             @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
             @RequestParam(name = "serviceState", required = false)
-                    ServiceDeploymentState serviceState) {
+            ServiceDeploymentState serviceState) {
         return this.serviceDetailsViewManager.listDeployedServicesOfIsv(
                 category, csp, serviceName, serviceVersion, serviceState);
     }
 
     /**
-     * Get details of the managed service by id for ISV role.
+     * Get details of the managed service by serviceId for ISV role.
      *
      * @return Details of the managed service.
      */
-    @Tag(name = "Service", description = "APIs to manage the service instances")
-    @Operation(description = "Get deployed service details by id.")
-    @GetMapping(value = "/services/isv/details/vendor_hosted/{id}",
+    @Tag(name = "Service", description = "APIs to manage the services")
+    @Operation(description = "Get the details of the deployed service by service id.")
+    @GetMapping(value = "/services/isv/details/vendor_hosted/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public DeployedServiceDetails getServiceDetailsByIdForIsv(
-            @Parameter(name = "id", description = "Task id of deployed service")
-            @PathVariable("id") String id) {
-        return this.serviceDetailsViewManager.getServiceDetailsByIdForIsv(UUID.fromString(id));
+            @Parameter(name = "serviceId", description = "Id of deployed service")
+            @PathVariable("serviceId") String serviceId) {
+        return this.serviceDetailsViewManager.getServiceDetailsByIdForIsv(
+                UUID.fromString(serviceId));
     }
 }

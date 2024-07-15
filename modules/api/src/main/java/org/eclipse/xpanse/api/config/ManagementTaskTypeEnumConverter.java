@@ -6,7 +6,7 @@
 package org.eclipse.xpanse.api.config;
 
 import lombok.NonNull;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

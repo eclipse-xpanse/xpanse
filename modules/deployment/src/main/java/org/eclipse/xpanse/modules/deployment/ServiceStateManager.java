@@ -26,10 +26,10 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServic
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceStateManagementTaskType;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;

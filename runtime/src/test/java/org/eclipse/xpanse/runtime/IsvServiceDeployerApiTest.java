@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -18,7 +20,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -28,6 +29,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
@@ -55,8 +57,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class IsvServiceDeployerApiTest extends ApisTestCommon {
-    private static final long waitTime = 60 * 1000;
-
     void addIsvCredential() throws Exception {
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.HUAWEI_CLOUD);
@@ -78,9 +78,10 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
     }
 
     void deleteIsvCredential() throws Exception {
-        mockMvc.perform(delete("/xpanse/isv/credentials").param("cspName", Csp.HUAWEI_CLOUD.toValue())
-                .param("type", CredentialType.VARIABLES.toValue()).param("name", "AK_SK")
-                .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        mockMvc.perform(
+                delete("/xpanse/isv/credentials").param("cspName", Csp.HUAWEI_CLOUD.toValue())
+                        .param("type", CredentialType.VARIABLES.toValue()).param("name", "AK_SK")
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
     }
 
     @Test
@@ -89,48 +90,27 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("Test-"+UUID.randomUUID());
+        ocl.setName("Test-" + UUID.randomUUID());
         ocl.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         addIsvCredential();
 
-        UUID serviceId = deployService(serviceTemplate);
+        ServiceOrder serviceOrder = deployService(serviceTemplate);
+        UUID serviceId = serviceOrder.getServiceId();
         DeployedServiceDetails deployedServiceDetails = getDeployedServiceDetailsForIsv(serviceId);
         assertEquals(serviceId, deployedServiceDetails.getServiceId());
         assertEquals(ServiceDeploymentState.DEPLOYING,
                 deployedServiceDetails.getServiceDeploymentState());
-        if (waitUntilExceptedStateForIsv(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
+        if (waitServiceDeploymentIsCompleted(serviceId)) {
             testListDeployedServicesOfIsv();
-        }
-        if (waitUntilExceptedStateForIsv(serviceId, ServiceDeploymentState.DEPLOY_SUCCESS)) {
             destroyService(serviceId);
         }
-        if (waitUntilExceptedStateForIsv(serviceId, ServiceDeploymentState.DESTROY_SUCCESS)) {
+        if (waitServiceDeploymentIsCompleted(serviceId)) {
             purgeService(serviceId);
         }
-        unregisterServiceTemplate(serviceTemplate.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
         deleteIsvCredential();
-    }
-
-    boolean waitUntilExceptedStateForIsv(UUID id, ServiceDeploymentState targetState)
-            throws Exception {
-        boolean isDone = false;
-        long startTime = System.currentTimeMillis();
-        while (!isDone) {
-            DeployedService deployedService = getDeployedServiceDetailsForIsv(id);
-            if (Objects.nonNull(deployedService)
-                    && deployedService.getServiceDeploymentState() == targetState) {
-                isDone = true;
-            } else {
-                if (System.currentTimeMillis() - startTime > 60 * 1000) {
-                    break;
-                }
-                Thread.sleep(5 * 1000);
-            }
-
-        }
-        return isDone;
     }
 
     void testListDeployedServicesOfIsv() throws Exception {
@@ -150,45 +130,39 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
                 ServiceDeploymentState.DEPLOY_SUCCESS);
     }
 
-    void destroyService(UUID taskId) throws Exception {
+    void destroyService(UUID serviceId) throws Exception {
         // SetUp
-        String successMsg =
-                String.format("Task for destroying managed service %s has started.", taskId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
-
-        String result = objectMapper.writeValueAsString(response);
-
         // Run the test
         final MockHttpServletResponse destroyResponse =
-                mockMvc.perform(delete("/xpanse/services/{id}", taskId)).andReturn().getResponse();
+                mockMvc.perform(delete("/xpanse/services/{serviceId}", serviceId)).andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(HttpStatus.ACCEPTED.value(), destroyResponse.getStatus());
-        assertEquals(result, destroyResponse.getContentAsString());
+        ServiceOrder serviceOrder = objectMapper.readValue(destroyResponse.getContentAsString(),
+                ServiceOrder.class);
+        assertNotNull(serviceOrder.getOrderId());
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
     }
 
-    void purgeService(UUID taskId) throws Exception {
-        // SetUp
-        String successMsg =
-                String.format("Task for purging managed service %s has started.", taskId);
-        Response response = Response.successResponse(Collections.singletonList(successMsg));
-        String result = objectMapper.writeValueAsString(response);
+    void purgeService(UUID serviceId) throws Exception {
         // Run the test
         final MockHttpServletResponse purgeResponse =
-                mockMvc.perform(delete("/xpanse/services/purge/{id}", taskId)).andReturn()
+                mockMvc.perform(delete("/xpanse/services/purge/{id}", serviceId)).andReturn()
                         .getResponse();
         assertEquals(HttpStatus.ACCEPTED.value(), purgeResponse.getStatus());
-        assertEquals(result, purgeResponse.getContentAsString());
-
-        Thread.sleep(waitTime);
+        ServiceOrder serviceOrder = objectMapper.readValue(purgeResponse.getContentAsString(),
+                ServiceOrder.class);
+        assertNotNull(serviceOrder.getOrderId());
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
         // SetUp
-        String refuseMsg = String.format("Service with id %s not found.", taskId);
+        String refuseMsg = String.format("Service with id %s not found.", serviceId);
         Response detailsErrorResponse =
                 Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                         Collections.singletonList(refuseMsg));
         String detailsResult = objectMapper.writeValueAsString(detailsErrorResponse);
         final MockHttpServletResponse detailsResponse =
-                mockMvc.perform(get("/xpanse/services/details/vendor_hosted/{id}", taskId))
+                mockMvc.perform(get("/xpanse/services/details/vendor_hosted/{id}", serviceId))
                         .andReturn().getResponse();
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());

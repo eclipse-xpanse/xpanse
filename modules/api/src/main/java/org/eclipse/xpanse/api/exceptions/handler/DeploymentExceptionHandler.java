@@ -27,7 +27,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavor
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
-import org.eclipse.xpanse.modules.models.service.modify.exceptions.ServiceModificationAuditNotFound;
+import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.models.service.statemanagement.exceptions.ServiceStateManagementTaskNotFound;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -241,14 +241,14 @@ public class DeploymentExceptionHandler {
     }
 
     /**
-     * Exception handler for ServiceModificationAuditNotFound.
+     * Exception handler for ServiceOrderNotFound.
      */
-    @ExceptionHandler({ServiceModificationAuditNotFound.class})
+    @ExceptionHandler({ServiceOrderNotFound.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceModificationAuditNotFound(
-            ServiceModificationAuditNotFound ex) {
-        return Response.errorResponse(ResultType.SERVICE_MODIFICATION_AUDIT_NOT_FOUND,
+    public Response handleServiceOrderManagementTaskNotFound(
+            ServiceOrderNotFound ex) {
+        return Response.errorResponse(ResultType.SERVICE_ORDER_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 

@@ -133,7 +133,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
 
     void testGetPolicyDetails_ThrowsPolicyNotFoundException(UUID uuid) throws Exception {
         // Setup
-        String errMsg = String.format("The policy with id %s not found.", uuid);
+        String errMsg = String.format("The user policy with id %s not found.", uuid);
         Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
@@ -258,7 +258,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
     void testUpdatePolicy_ThrowsPolicyNotFoundException(UUID uuid) throws Exception {
         // Setup
         mockPoliciesValidateRequest(true);
-        String errMsg = String.format("The policy with id %s not found.", uuid);
+        String errMsg = String.format("The user policy with id %s not found.", uuid);
         Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
@@ -294,7 +294,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
     void testDeletePolicy_ThrowsPolicyNotFoundException() throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
-        String errMsg = String.format("The policy with id %s not found.", uuid);
+        String errMsg = String.format("The user policy with id %s not found.", uuid);
         Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 

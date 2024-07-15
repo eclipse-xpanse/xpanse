@@ -1,4 +1,4 @@
-package org.eclipse.xpanse.modules.models.service.enums;
+package org.eclipse.xpanse.modules.models.service.statemanagement.enums;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

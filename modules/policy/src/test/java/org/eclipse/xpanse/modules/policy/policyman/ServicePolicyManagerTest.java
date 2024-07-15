@@ -58,7 +58,7 @@ class ServicePolicyManagerTest {
     private DatabaseServiceTemplateStorage mockServiceTemplateStorage;
 
     @InjectMocks
-    private ServicePolicyManager servicePolicyManagerUnderTest;
+    private ServicePolicyManager test;
 
     @Test
     void testListServicePolicies() {
@@ -87,7 +87,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         final List<ServicePolicy> result =
-                servicePolicyManagerUnderTest.listServicePolicies(serviceTemplateId.toString());
+                test.listServicePolicies(serviceTemplateId.toString());
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -97,13 +97,12 @@ class ServicePolicyManagerTest {
     void testListServicePolicies_ThrowsServiceTemplateNotRegisteredException() {
         // Setup
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
-        when(mockServiceTemplateStorage.getServiceTemplateById(
-                serviceTemplateId))
-                .thenReturn(null);
+        when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
+                .thenThrow(new ServiceTemplateNotRegistered("serviceTemplateId"));
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.listServicePolicies(
+                () -> test.listServicePolicies(
                         serviceTemplateId.toString()))
                 .isInstanceOf(ServiceTemplateNotRegistered.class);
     }
@@ -122,9 +121,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.listServicePolicies(
-                        serviceTemplateId.toString()))
+        assertThatThrownBy(() -> test.listServicePolicies(serviceTemplateId.toString()))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -172,7 +169,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
-        final ServicePolicy result = servicePolicyManagerUnderTest.addServicePolicy(createRequest);
+        final ServicePolicy result = test.addServicePolicy(createRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -238,7 +235,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
-        final ServicePolicy result = servicePolicyManagerUnderTest.addServicePolicy(createRequest);
+        final ServicePolicy result = test.addServicePolicy(createRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -278,7 +275,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.addServicePolicy(createRequest))
+                () -> test.addServicePolicy(createRequest))
                 .isInstanceOf(FlavorInvalidException.class);
     }
 
@@ -291,12 +288,11 @@ class ServicePolicyManagerTest {
         createRequest.setEnabled(false);
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         when(mockServiceTemplateStorage.getServiceTemplateById(
-                serviceTemplateId))
-                .thenReturn(null);
+                serviceTemplateId)).thenThrow(new ServiceTemplateNotRegistered(""));
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.addServicePolicy(createRequest))
+                () -> test.addServicePolicy(createRequest))
                 .isInstanceOf(ServiceTemplateNotRegistered.class);
     }
 
@@ -319,7 +315,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.addServicePolicy(createRequest))
+                () -> test.addServicePolicy(createRequest))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -345,7 +341,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.addServicePolicy(createRequest))
+                () -> test.addServicePolicy(createRequest))
                 .isInstanceOf(PoliciesValidationFailedException.class);
     }
 
@@ -382,7 +378,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.addServicePolicy(createRequest))
+                () -> test.addServicePolicy(createRequest))
                 .isInstanceOf(PolicyDuplicateException.class);
     }
 
@@ -428,7 +424,7 @@ class ServicePolicyManagerTest {
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
         // Run the test
         final ServicePolicy result =
-                servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest);
+                test.updateServicePolicy(policyId, updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -495,7 +491,7 @@ class ServicePolicyManagerTest {
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
         // Run the test
         final ServicePolicy result =
-                servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest);
+                test.updateServicePolicy(policyId, updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -548,7 +544,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
+                () -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(FlavorInvalidException.class);
     }
 
@@ -564,7 +560,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
+                () -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PolicyNotFoundException.class);
     }
 
@@ -592,7 +588,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
+                () -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -629,7 +625,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
+                () -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PoliciesValidationFailedException.class);
     }
 
@@ -664,7 +660,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> servicePolicyManagerUnderTest.updateServicePolicy(policyId, updateRequest))
+                () -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PolicyDuplicateException.class);
     }
 
@@ -694,7 +690,7 @@ class ServicePolicyManagerTest {
 
         // Run the test
         final ServicePolicy result =
-                servicePolicyManagerUnderTest.getServicePolicyDetails(policyId);
+                test.getServicePolicyDetails(policyId);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -725,7 +721,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(() -> servicePolicyManagerUnderTest.getServicePolicyDetails(policyId))
+        assertThatThrownBy(() -> test.getServicePolicyDetails(policyId))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -734,7 +730,7 @@ class ServicePolicyManagerTest {
         // Setup
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(null);
         // Run the test
-        assertThatThrownBy(() -> servicePolicyManagerUnderTest.getServicePolicyDetails(policyId))
+        assertThatThrownBy(() -> test.getServicePolicyDetails(policyId))
                 .isInstanceOf(PolicyNotFoundException.class);
     }
 
@@ -756,7 +752,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
-        servicePolicyManagerUnderTest.deleteServicePolicy(policyId);
+        test.deleteServicePolicy(policyId);
 
         // Verify the results
         verify(mockServicePolicyStorage).deletePolicyById(policyId);
@@ -787,7 +783,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(() -> servicePolicyManagerUnderTest.deleteServicePolicy(policyId))
+        assertThatThrownBy(() -> test.deleteServicePolicy(policyId))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -797,7 +793,7 @@ class ServicePolicyManagerTest {
         // Setup
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(null);
         // Run the test
-        assertThatThrownBy(() -> servicePolicyManagerUnderTest.deleteServicePolicy(policyId))
+        assertThatThrownBy(() -> test.deleteServicePolicy(policyId))
                 .isInstanceOf(PolicyNotFoundException.class);
     }
 }

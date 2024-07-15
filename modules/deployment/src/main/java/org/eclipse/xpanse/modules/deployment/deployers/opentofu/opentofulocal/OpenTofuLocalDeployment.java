@@ -68,13 +68,13 @@ public class OpenTofuLocalDeployment implements Deployer {
      */
     @Autowired
     public OpenTofuLocalDeployment(DeployEnvironments deployEnvironments,
-            OpenTofuLocalConfig openTofuLocalConfig,
-            @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
-            OpenTofuDeploymentResultCallbackManager
-                    openTofuDeploymentResultCallbackManager,
-            DeployServiceEntityHandler deployServiceEntityHandler,
-            ScriptsGitRepoManage scriptsGitRepoManage,
-            DeployResultFileUtils deployResultFileUtils) {
+                                   OpenTofuLocalConfig openTofuLocalConfig,
+                                   @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
+                                   OpenTofuDeploymentResultCallbackManager
+                                               openTofuDeploymentResultCallbackManager,
+                                   DeployServiceEntityHandler deployServiceEntityHandler,
+                                   ScriptsGitRepoManage scriptsGitRepoManage,
+                                   DeployResultFileUtils deployResultFileUtils) {
         this.deployEnvironments = deployEnvironments;
         this.openTofuLocalConfig = openTofuLocalConfig;
         this.taskExecutor = taskExecutor;
@@ -92,7 +92,8 @@ public class OpenTofuLocalDeployment implements Deployer {
     @Override
     public DeployResult deploy(DeployTask task) {
         DeployResult deployResult = new DeployResult();
-        deployResult.setId(task.getId());
+        deployResult.setServiceId(task.getServiceId());
+        deployResult.setOrderId(task.getOrderId());
         asyncExecDeploy(task);
         return deployResult;
     }
@@ -106,16 +107,17 @@ public class OpenTofuLocalDeployment implements Deployer {
     @Override
     public DeployResult destroy(DeployTask task) {
         DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+                deployServiceEntityHandler.getDeployServiceEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         if (StringUtils.isBlank(resourceState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
-                    task.getId());
+                    task.getServiceId());
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
         DeployResult destroyResult = new DeployResult();
-        destroyResult.setId(task.getId());
+        destroyResult.setServiceId(task.getServiceId());
+        destroyResult.setOrderId(task.getOrderId());
         asyncExecDestroy(task, resourceState);
         return destroyResult;
     }
@@ -123,29 +125,29 @@ public class OpenTofuLocalDeployment implements Deployer {
     /**
      * Modify the DeployTask.
      *
-     * @param modificationId the modification id.
-     * @param task           the task for the deployment.
+     * @param task the task for the deployment.
      */
     @Override
-    public DeployResult modify(UUID modificationId, DeployTask task) {
+    public DeployResult modify(DeployTask task) {
         DeployServiceEntity deployServiceEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(task.getId());
+                deployServiceEntityHandler.getDeployServiceEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(
                 deployServiceEntity);
         if (StringUtils.isBlank(resourceState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
-                    task.getId());
+                    task.getServiceId());
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
         DeployResult modifyResult = new DeployResult();
-        modifyResult.setId(task.getId());
-        asyncExecModify(modificationId, task, resourceState);
+        modifyResult.setOrderId(task.getOrderId());
+        modifyResult.setServiceId(task.getServiceId());
+        asyncExecModify(task, resourceState);
         return modifyResult;
     }
 
     private void asyncExecDeploy(DeployTask task) {
-        String workspace = getWorkspacePath(task.getId());
+        String workspace = getWorkspacePath(task.getServiceId());
         // Create the workspace.
         buildWorkspace(workspace);
         prepareDeployWorkspaceWithScripts(task, workspace);
@@ -153,7 +155,7 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
-            openTofuResult.setRequestId(task.getId());
+            openTofuResult.setRequestId(task.getOrderId());
             try {
                 executor.deploy();
                 openTofuResult.setCommandSuccessful(true);
@@ -164,18 +166,19 @@ public class OpenTofuLocalDeployment implements Deployer {
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
             openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
-            openTofuDeploymentResultCallbackManager.deployCallback(task.getId(), openTofuResult);
+            openTofuDeploymentResultCallbackManager.deployCallback(task.getServiceId(),
+                    openTofuResult);
         });
     }
 
     private void asyncExecDestroy(DeployTask task, String tfState) {
-        String workspace = getWorkspacePath(task.getId());
+        String workspace = getWorkspacePath(task.getServiceId());
         prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
         OpenTofuLocalExecutor executor = getExecutorForDeployTask(task, workspace, false);
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
-            openTofuResult.setRequestId(task.getId());
+            openTofuResult.setRequestId(task.getOrderId());
             try {
                 executor.destroy();
                 openTofuResult.setCommandSuccessful(true);
@@ -186,20 +189,21 @@ public class OpenTofuLocalDeployment implements Deployer {
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
             openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
-            openTofuDeploymentResultCallbackManager.destroyCallback(task.getId(), openTofuResult,
+            openTofuDeploymentResultCallbackManager.destroyCallback(task.getServiceId(),
+                    openTofuResult,
                     task.getDeploymentScenario());
         });
     }
 
-    private void asyncExecModify(UUID modificationId, DeployTask task, String tfState) {
-        String workspace = getWorkspacePath(task.getId());
+    private void asyncExecModify(DeployTask task, String tfState) {
+        String workspace = getWorkspacePath(task.getServiceId());
         prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
         prepareDeployWorkspaceWithScripts(task, workspace);
         OpenTofuLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
             OpenTofuResult openTofuResult = new OpenTofuResult();
-            openTofuResult.setRequestId(modificationId);
+            openTofuResult.setRequestId(task.getOrderId());
             try {
                 executor.deploy();
                 openTofuResult.setCommandSuccessful(true);
@@ -210,13 +214,14 @@ public class OpenTofuLocalDeployment implements Deployer {
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
             openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
-            openTofuDeploymentResultCallbackManager.modifyCallback(task.getId(), openTofuResult);
+            openTofuDeploymentResultCallbackManager.modifyCallback(task.getServiceId(),
+                    openTofuResult);
         });
     }
 
     @Override
     public String getDeploymentPlanAsJson(DeployTask task) {
-        String workspace = getWorkspacePath(task.getId());
+        String workspace = getWorkspacePath(task.getServiceId());
         // Create the workspace.
         buildWorkspace(workspace);
         prepareDeployWorkspaceWithScripts(task, workspace);
