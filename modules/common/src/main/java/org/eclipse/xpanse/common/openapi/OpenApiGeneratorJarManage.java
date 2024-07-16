@@ -39,17 +39,18 @@ public class OpenApiGeneratorJarManage implements
      * Constructor for instantiating OpenApiGeneratorJarManage bean.
      *
      * @param clientDownLoadUrl URL for downloading openapi-generator jar from maven central.
-     * @param openapiPath folder where the jar must be available.
+     * @param openapiPath       folder where the jar must be available.
      */
     @Autowired
     public OpenApiGeneratorJarManage(
-            @Value("${openapi.download-generator-client-url}") String clientDownLoadUrl,
+            @Value("${openapi.generator.client.download-url}") String clientDownLoadUrl,
             @Value("${openapi.path:openapi/}") String openapiPath) {
         this.clientDownLoadUrl = clientDownLoadUrl;
         this.openapiPath = openapiPath;
     }
 
-    /**OpenApiGeneratorJarManage
+    /**
+     * OpenApiGeneratorJarManage
      * Get the openapi-generator-cli.jar from Resources.
      * The download part is only for local development and is not required when building a "jar"
      * or using the Docker image of the application.
@@ -81,21 +82,21 @@ public class OpenApiGeneratorJarManage implements
 
     /**
      * Download openapi-generator-cli.jar from the maven repository or the URL specified by the
-     * `@openapi.download-generator-client-url` into the work directory.
+     * `@openapi.generator.client.download-url@` into the work directory.
      *
      * @return returns if the download is successful.
      */
     public boolean downloadClientJar() {
         try {
-            log.info("Downloading openapi jar from maven central");
+            log.info("Downloading openapi generator client jar from URL {}", clientDownLoadUrl);
             URL url = URI.create(clientDownLoadUrl).toURL();
             File cliJarFile = getCliFile();
             FileUtils.copyURLToFile(url, cliJarFile);
-            log.info("Downloading openapi client:{} from URL:{} successful.",
+            log.info("Downloading openapi generator client into path {} from URL{} successful.",
                     cliJarFile.getPath(), clientDownLoadUrl);
             return true;
         } catch (IOException ioException) {
-            log.error("downloading failed", ioException);
+            log.error("Downloading openapi generator client jar from URL failed.", ioException);
             return false;
         }
     }
