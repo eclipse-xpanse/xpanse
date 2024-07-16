@@ -110,7 +110,7 @@ public class HuaweiCloudChinesePriceCalculator {
         }
         String usageValue = resource.getProperties().get("usage_value");
         if (StringUtils.isNotBlank(usageValue)) {
-            productInfo.setUsageValue(BigDecimal.valueOf(Double.parseDouble(usageValue)));
+            productInfo.setUsageValue(new BigDecimal(usageValue));
         } else {
             productInfo.setUsageValue(BigDecimal.valueOf(1.0));
         }
