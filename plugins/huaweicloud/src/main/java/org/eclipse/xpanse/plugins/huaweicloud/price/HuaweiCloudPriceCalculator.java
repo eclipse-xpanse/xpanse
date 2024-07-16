@@ -191,9 +191,9 @@ public class HuaweiCloudPriceCalculator {
         }
         String usageValue = resource.getProperties().get("usage_value");
         if (StringUtils.isNotBlank(usageValue)) {
-            productInfo.setUsageValue(Double.parseDouble(usageValue));
+            productInfo.setUsageValue(new BigDecimal(usageValue));
         } else {
-            productInfo.setUsageValue(1.0);
+            productInfo.setUsageValue(BigDecimal.valueOf(1.0));
         }
         return productInfo;
     }
