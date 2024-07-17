@@ -99,8 +99,8 @@ class FlexibleEngineOrchestratorPluginTest {
         final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
-        deployResource.setName("name");
-        deployResource.setKind(DeployResourceKind.VM);
+        deployResource.setResourceName("name");
+        deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
                 new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
@@ -123,8 +123,8 @@ class FlexibleEngineOrchestratorPluginTest {
         final List<Metric> metrics = List.of(metric1);
         final DeployResource deployResource1 = new DeployResource();
         deployResource1.setResourceId("resourceId");
-        deployResource1.setName("name");
-        deployResource1.setKind(DeployResourceKind.VM);
+        deployResource1.setResourceName("name");
+        deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
                 new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
@@ -146,8 +146,8 @@ class FlexibleEngineOrchestratorPluginTest {
         final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
-        deployResource.setName("name");
-        deployResource.setKind(DeployResourceKind.VM);
+        deployResource.setResourceName("name");
+        deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
                 new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
@@ -156,8 +156,8 @@ class FlexibleEngineOrchestratorPluginTest {
         // Configure FlexibleEngineMetricsService.getMetricsByResource(...).
         final DeployResource deployResource1 = new DeployResource();
         deployResource1.setResourceId("resourceId");
-        deployResource1.setName("name");
-        deployResource1.setKind(DeployResourceKind.VM);
+        deployResource1.setResourceName("name");
+        deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
                 new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
@@ -179,8 +179,8 @@ class FlexibleEngineOrchestratorPluginTest {
         final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
-        deployResource.setName("name");
-        deployResource.setKind(DeployResourceKind.VM);
+        deployResource.setResourceName("name");
+        deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
                 new ServiceMetricsRequest(serviceId, List.of(deployResource),
@@ -203,8 +203,8 @@ class FlexibleEngineOrchestratorPluginTest {
         final List<Metric> metrics = List.of(metric1);
         final DeployResource deployResource1 = new DeployResource();
         deployResource1.setResourceId("resourceId");
-        deployResource1.setName("name");
-        deployResource1.setKind(DeployResourceKind.VM);
+        deployResource1.setResourceName("name");
+        deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
                 new ServiceMetricsRequest(serviceId, List.of(deployResource1),
@@ -226,8 +226,8 @@ class FlexibleEngineOrchestratorPluginTest {
         final UUID serviceId = UUID.randomUUID();
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
-        deployResource.setName("name");
-        deployResource.setKind(DeployResourceKind.VM);
+        deployResource.setResourceName("name");
+        deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
                 new ServiceMetricsRequest(serviceId, List.of(deployResource),
@@ -236,8 +236,8 @@ class FlexibleEngineOrchestratorPluginTest {
         // Configure FlexibleEngineMetricsService.getMetricsByService(...).
         final DeployResource deployResource1 = new DeployResource();
         deployResource1.setResourceId("resourceId");
-        deployResource1.setName("name");
-        deployResource1.setKind(DeployResourceKind.VM);
+        deployResource1.setResourceName("name");
+        deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
                 new ServiceMetricsRequest(serviceId, List.of(deployResource1),

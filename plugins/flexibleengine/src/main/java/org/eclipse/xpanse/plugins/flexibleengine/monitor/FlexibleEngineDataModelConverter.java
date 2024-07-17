@@ -147,9 +147,9 @@ public class FlexibleEngineDataModelConverter {
         List<MetricItem> metricItems = new ArrayList<>();
         if (onlyLastKnownMetric) {
             MetricItem metricItem = new MetricItem();
-            metricItem.setValue(datapointList.get(0).getAverage());
+            metricItem.setValue(datapointList.getFirst().getAverage());
             metricItem.setType(MetricItemType.VALUE);
-            metricItem.setTimeStamp(datapointList.get(datapointList.size() - 1).getTimestamp());
+            metricItem.setTimeStamp(datapointList.getLast().getTimestamp());
             metricItems.add(metricItem);
         } else {
             for (Datapoint datapoint : datapointList) {
@@ -176,7 +176,7 @@ public class FlexibleEngineDataModelConverter {
         for (DeployResource deployResource : deployResources) {
             for (BatchMetricData batchMetricData : batchListMetricDataResponse.getMetrics()) {
                 if (Objects.nonNull(batchMetricData) && deployResource.getResourceId()
-                        .equals(batchMetricData.getDimensions().get(0).getValue())) {
+                        .equals(batchMetricData.getDimensions().getFirst().getValue())) {
                     List<MetricInfoList> metricInfoLists =
                             deployResourceMetricInfoMap.get(deployResource.getResourceId());
                     for (MetricInfoList metricInfoList : metricInfoLists) {
@@ -207,12 +207,9 @@ public class FlexibleEngineDataModelConverter {
         List<MetricItem> metricItems = new ArrayList<>();
         if (onlyLastKnownMetric) {
             MetricItem metricItem = new MetricItem();
-            metricItem.setValue(
-                    datapointForBatchMetrics.get(datapointForBatchMetrics.size() - 1).getAverage());
+            metricItem.setValue(datapointForBatchMetrics.getLast().getAverage());
             metricItem.setType(MetricItemType.VALUE);
-            metricItem.setTimeStamp(
-                    datapointForBatchMetrics.get(datapointForBatchMetrics.size() - 1)
-                            .getTimestamp());
+            metricItem.setTimeStamp(datapointForBatchMetrics.getLast().getTimestamp());
             metricItems.add(metricItem);
         } else {
             for (DatapointForBatchMetric datapointForBatchMetric : datapointForBatchMetrics) {
@@ -235,7 +232,7 @@ public class FlexibleEngineDataModelConverter {
         }
         Map<String, String> labels = new HashMap<>();
         labels.put("id", deployResource.getResourceId());
-        labels.put("name", deployResource.getName());
+        labels.put("name", deployResource.getResourceName());
         metric.setLabels(labels);
         metric.setType(MetricType.GAUGE);
         if (metricInfo.getUnit().equals("%")) {

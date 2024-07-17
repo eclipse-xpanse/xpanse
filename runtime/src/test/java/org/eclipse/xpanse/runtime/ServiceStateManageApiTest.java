@@ -621,8 +621,8 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         DeployResourceEntity deployedResource = new DeployResourceEntity();
         deployedResource.setId(id);
         deployedResource.setResourceId(id.toString());
-        deployedResource.setName("test-service-ecs");
-        deployedResource.setKind(DeployResourceKind.VM);
+        deployedResource.setResourceName("test-service-ecs");
+        deployedResource.setResourceKind(DeployResourceKind.VM);
         deployedResource.setProperties(Map.of("region", "cn-southwest-2"));
         deployedResource.setDeployService(deployedServiceEntity);
         deployedServiceEntity.setDeployResourceList(List.of(deployedResource));

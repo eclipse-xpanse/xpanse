@@ -26,7 +26,9 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
@@ -34,8 +36,10 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeploymentStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -394,7 +398,7 @@ public class ServiceDeployerApi {
             @RequestParam(name = "cspName") Csp csp,
             @Parameter(name = "regionName", description = "name of the region")
             @RequestParam(name = "regionName") String regionName,
-            @Parameter(name = "serviceId", description = "serviceId of the deployed service")
+            @Parameter(name = "serviceId", description = "Id of the deployed service")
             @RequestParam(name = "serviceId", required = false) String serviceId) {
         try {
             UUID uuid = StringUtils.isBlank(serviceId) ? null : UUID.fromString(serviceId);
@@ -432,6 +436,36 @@ public class ServiceDeployerApi {
             ServiceDeploymentState lastKnownServiceDeploymentState) {
         return deployService.getLatestServiceDeploymentStatus(UUID.fromString(serviceId),
                 lastKnownServiceDeploymentState);
+    }
+
+
+    /**
+     * List compute resources of the service.
+     *
+     * @param serviceId ID of deployed service.
+     * @return List of compute resources.
+     */
+    @Tag(name = "Service", description = "APIs to manage the services")
+    @Operation(description = "List compute resources of the service.")
+    @GetMapping(value = "/services/{serviceId}/resources/compute",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
+    public List<DeployResource> getComputeResourceInventoryOfService(
+            @Parameter(name = "serviceId", description = "Id of the deployed service")
+            @PathVariable(name = "serviceId") String serviceId) {
+        DeployServiceEntity deployService =
+                deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(deployService.getUserId());
+        if (!currentUserIsOwner) {
+            throw new AccessDeniedException(
+                    "No permissions to view resources of services belonging to other users.");
+        }
+        List<DeployResourceEntity> vmEntities = deployService.getDeployResourceList().stream()
+                .filter(entity -> entity.getResourceKind().equals(DeployResourceKind.VM))
+                .toList();
+        return EntityTransUtils.transToDeployResourceList(vmEntities);
     }
 
     private CacheControl getCacheControl() {

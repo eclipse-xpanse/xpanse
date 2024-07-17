@@ -49,6 +49,7 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -320,6 +321,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testRedeploy(serviceId);
 
         listDeployedServices();
+        testGetComputeResourcesOfService(serviceId);
         List<DeployedServiceDetails> deployedServiceDetailsList =
                 listDeployedServicesDetails(ServiceDeploymentState.DEPLOY_SUCCESS);
         Assertions.assertFalse(deployedServiceDetailsList.isEmpty());
@@ -446,6 +448,12 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
         assertEquals(result, detailResponse.getContentAsString());
 
+        // SetUp getComputeResourceInventoryOfService
+        final MockHttpServletResponse getResourcesResponse =
+                getComputeResourceInventoryOfService(serviceId);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), getResourcesResponse.getStatus());
+        assertEquals(result, getResourcesResponse.getContentAsString());
+
         ServiceLockConfig lockConfig = new ServiceLockConfig();
         lockConfig.setDestroyLocked(true);
         lockConfig.setModifyLocked(true);
@@ -550,6 +558,13 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), changeLockResponse.getStatus());
         assertEquals(changeLockResult, changeLockResponse.getContentAsString());
+
+        // SetUp getComputeResourceInventoryOfService
+        String getResourcesResult = getAccessDeniedExceptedResult("view resources of");
+        final MockHttpServletResponse getResourcesResponse =
+                getComputeResourceInventoryOfService(serviceId);
+        assertEquals(HttpStatus.FORBIDDEN.value(), getResourcesResponse.getStatus());
+        assertEquals(getResourcesResult, getResourcesResponse.getContentAsString());
 
         // SetUp modify
         String modifyResult = getAccessDeniedExceptedResult("modify");
@@ -791,6 +806,17 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertFalse(deployedServices.isEmpty());
     }
 
+    void testGetComputeResourcesOfService(UUID serviceId) throws Exception {
+        MockHttpServletResponse getComputeResourcesResponse =
+                getComputeResourceInventoryOfService(serviceId);
+        assertEquals(HttpStatus.OK.value(), getComputeResourcesResponse.getStatus());
+        List<DeployResource> deployResources =
+                objectMapper.readValue(getComputeResourcesResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertTrue(deployResources.isEmpty());
+    }
+
     List<DeployedServiceDetails> listDeployedServicesDetails(ServiceDeploymentState state)
             throws Exception {
 
@@ -877,6 +903,12 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     MockHttpServletResponse redeployService(UUID serviceId) throws Exception {
         return mockMvc.perform(put("/xpanse/services/deploy/retry/{serviceId}", serviceId)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+    }
+
+    MockHttpServletResponse getComputeResourceInventoryOfService(UUID serviceId) throws Exception {
+        return mockMvc.perform(get("/xpanse/services/{serviceId}/resources/compute", serviceId)
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
     }

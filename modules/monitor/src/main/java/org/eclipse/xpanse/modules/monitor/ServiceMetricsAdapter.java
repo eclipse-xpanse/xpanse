@@ -10,7 +10,6 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
@@ -54,20 +53,14 @@ public class ServiceMetricsAdapter {
     /**
      * Get metrics of the service instance.
      */
-    public List<Metric> getMetricsByServiceId(String id,
-                                              MonitorResourceType monitorType,
-                                              Long from,
-                                              Long to,
-                                              Integer granularity,
+    public List<Metric> getMetricsByServiceId(String id, MonitorResourceType monitorType, Long from,
+                                              Long to, Integer granularity,
                                               boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
         DeployServiceEntity serviceEntity = findDeployServiceEntity(UUID.fromString(id));
-        List<DeployResource> deployResources =
-                EntityTransUtils.transToDeployResourceList(serviceEntity.getDeployResourceList());
-        List<DeployResource> vmResources = deployResources.stream()
-                .filter(deployResource -> DeployResourceKind.VM.equals(deployResource.getKind()))
-                .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(vmResources)) {
+        List<DeployResourceEntity> vmEntities = serviceEntity.getDeployResourceList().stream()
+                .filter(entity -> entity.getResourceKind().equals(DeployResourceKind.VM)).toList();
+        if (CollectionUtils.isEmpty(vmEntities)) {
             throw new ResourceNotFoundException("No resource found in the service.");
         }
 
@@ -80,10 +73,10 @@ public class ServiceMetricsAdapter {
 
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
-
+        List<DeployResource> vmResources = EntityTransUtils.transToDeployResourceList(vmEntities);
         ServiceMetricsRequest serviceMetricRequest =
-                getServiceMetricRequest(UUID.fromString(id), vmResources, monitorType, from,
-                        to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
+                getServiceMetricRequest(UUID.fromString(id), vmResources, monitorType, from, to,
+                        granularity, onlyLastKnownMetric, serviceEntity.getUserId());
 
         return orchestratorPlugin.getMetricsForService(serviceMetricRequest);
     }
@@ -92,11 +85,8 @@ public class ServiceMetricsAdapter {
     /**
      * Get metrics of the resource instance.
      */
-    public List<Metric> getMetricsByResourceId(String id,
-                                               MonitorResourceType monitorType,
-                                               Long from,
-                                               Long to,
-                                               Integer granularity,
+    public List<Metric> getMetricsByResourceId(String id, MonitorResourceType monitorType,
+                                               Long from, Long to, Integer granularity,
                                                boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
         DeployResourceEntity resourceEntity =
@@ -104,16 +94,16 @@ public class ServiceMetricsAdapter {
         if (Objects.isNull(resourceEntity)) {
             throw new ResourceNotFoundException("Resource not found.");
         }
-        if (!DeployResourceKind.VM.equals(resourceEntity.getKind())) {
-            String errorMsg =
-                    String.format("Resource kind %s not support.", resourceEntity.getKind());
+        if (!DeployResourceKind.VM.equals(resourceEntity.getResourceKind())) {
+            String errorMsg = String.format("Resource kind %s not support.",
+                    resourceEntity.getResourceKind());
             log.error(errorMsg);
             throw new ResourceNotSupportedForMonitoringException(errorMsg);
         }
         DeployResource deployResource = new DeployResource();
         BeanUtils.copyProperties(resourceEntity, deployResource);
-        DeployServiceEntity serviceEntity = findDeployServiceEntity(
-                resourceEntity.getDeployService().getId());
+        DeployServiceEntity serviceEntity =
+                findDeployServiceEntity(resourceEntity.getDeployService().getId());
 
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(serviceEntity.getUserId());
@@ -125,22 +115,15 @@ public class ServiceMetricsAdapter {
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
         ResourceMetricsRequest resourceMetricRequest =
-                getResourceMetricRequest(
-                        resourceEntity.getDeployService().getId(),
-                        deployResource,
-                        monitorType,
-                        from,
-                        to,
-                        granularity,
-                        onlyLastKnownMetric,
+                getResourceMetricRequest(resourceEntity.getDeployService().getId(), deployResource,
+                        monitorType, from, to, granularity, onlyLastKnownMetric,
                         serviceEntity.getUserId());
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
     }
 
 
     private DeployServiceEntity findDeployServiceEntity(UUID id) {
-        DeployServiceEntity serviceEntity =
-                deployServiceStorage.findDeployServiceById(id);
+        DeployServiceEntity serviceEntity = deployServiceStorage.findDeployServiceById(id);
         if (Objects.isNull(serviceEntity)) {
             throw new ServiceNotDeployedException("Service not found.");
         }
@@ -150,9 +133,7 @@ public class ServiceMetricsAdapter {
     private ResourceMetricsRequest getResourceMetricRequest(UUID serviceId,
                                                             DeployResource deployResource,
                                                             MonitorResourceType monitorType,
-                                                            Long from,
-                                                            Long to,
-                                                            Integer granularity,
+                                                            Long from, Long to, Integer granularity,
                                                             boolean onlyLastKnownMetric,
                                                             String userId) {
         if (onlyLastKnownMetric) {
@@ -174,9 +155,7 @@ public class ServiceMetricsAdapter {
     private ServiceMetricsRequest getServiceMetricRequest(UUID serviceId,
                                                           List<DeployResource> deployResources,
                                                           MonitorResourceType monitorType,
-                                                          Long from,
-                                                          Long to,
-                                                          Integer granularity,
+                                                          Long from, Long to, Integer granularity,
                                                           boolean onlyLastKnownMetric,
                                                           String userId) {
         if (onlyLastKnownMetric) {

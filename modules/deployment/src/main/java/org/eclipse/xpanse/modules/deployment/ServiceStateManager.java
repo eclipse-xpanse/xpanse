@@ -343,7 +343,7 @@ public class ServiceStateManager {
         List<DeployResourceEntity> vmResources =
                 CollectionUtils.isEmpty(service.getDeployResourceList()) ? Collections.emptyList()
                         : service.getDeployResourceList().stream()
-                        .filter(resource -> resource.getKind() == DeployResourceKind.VM)
+                        .filter(resource -> resource.getResourceKind() == DeployResourceKind.VM)
                         .toList();
         if (CollectionUtils.isEmpty(vmResources)) {
             String errorMsg =

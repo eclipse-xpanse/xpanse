@@ -21,23 +21,29 @@ import org.junit.jupiter.api.Test;
  */
 class TfResourceTransUtilsTest {
 
-    private static final String id = "ed6248d4-2bcd-4e94-84b0-29e014c05137";
-    private static final String name = "Huawei_VM";
-    private static final DeployResourceKind kind = DeployResourceKind.VM;
-    private static TfStateResourceInstance tfStateResourceInstance;
-    private static Map<String, Object> attributes;
-    private static DeployResource deployResource;
-    private static Map<String, String> keyProperty;
+    private final String id = "ed6248d4-2bcd-4e94-84b0-29e014c05137";
+    private final String resourceName = "Huawei_VM";
+    private final DeployResourceKind kind = DeployResourceKind.VM;
+    private TfStateResourceInstance tfStateResourceInstance;
+    private DeployResource deployResource;
+    private Map<String, String> keyProperty;
+
+    private Map<String, Object> attributes;
 
     @BeforeEach
     void setup() {
         attributes = new HashMap<>();
         attributes.put("id", id);
-        attributes.put("name", name);
+        attributes.put("name", resourceName);
         attributes.put("kind", kind);
         attributes.put("key", "value");
 
         deployResource = new DeployResource();
+        String groupName = "kafka";
+        deployResource.setGroupName(groupName);
+        String groupType = "huaweicloud_compute_instance";
+        deployResource.setGroupType(groupType);
+        deployResource.setResourceKind(kind);
 
         keyProperty = new HashMap<>();
         keyProperty.put("resourceId", "id");
@@ -52,10 +58,17 @@ class TfResourceTransUtilsTest {
     void testFillDeployResource() {
         TfResourceTransUtils.fillDeployResource(tfStateResourceInstance, deployResource,
                 keyProperty);
-
         // Verify the results
         assertEquals(id, deployResource.getResourceId());
-        assertEquals(name, deployResource.getName());
+        assertEquals(resourceName, deployResource.getResourceName());
+
+        // attributes without name;
+        attributes.remove("name");
+        TfResourceTransUtils.fillDeployResource(tfStateResourceInstance, deployResource,
+                keyProperty);
+        // Verify the results
+        assertEquals(id, deployResource.getResourceId());
+        assertEquals(id, deployResource.getResourceName());
     }
 
     @Test
@@ -63,10 +76,9 @@ class TfResourceTransUtilsTest {
         tfStateResourceInstance.setAttributes(null);
         TfResourceTransUtils.fillDeployResource(tfStateResourceInstance, deployResource,
                 keyProperty);
-
         // Verify the results
         assertNull(deployResource.getResourceId());
-        assertNull(deployResource.getName());
+        assertNull(deployResource.getResourceName());
     }
 
 
@@ -75,10 +87,9 @@ class TfResourceTransUtilsTest {
         keyProperty.clear();
         TfResourceTransUtils.fillDeployResource(tfStateResourceInstance, deployResource,
                 keyProperty);
-
         // Verify the results
         assertEquals(id, deployResource.getResourceId());
-        assertEquals(name, deployResource.getName());
+        assertEquals(resourceName, deployResource.getResourceName());
     }
 
 }

@@ -18,30 +18,30 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 @Data
 public class DeployResource {
 
-    /**
-     * The ID of the deployed resource.
-     */
+    @NotNull
+    @NotBlank
+    @Schema(description = "The type of the group which configuration the deployed resource.")
+    private String groupType;
+
+    @NotNull
+    @NotBlank
+    @Schema(description = "The name of the group which configuration the deployed resource.")
+    private String groupName;
+
     @NotNull
     @NotBlank
     @Schema(description = "The id of the deployed resource.")
     private String resourceId;
-    /**
-     * The name of the deployed resource.
-     */
+
     @NotNull
     @NotBlank
     @Schema(description = "The name of the deployed resource.")
-    private String name;
-    /**
-     * The kind of the deployed resource.
-     */
+    private String resourceName;
+
     @NotNull
     @Schema(description = "The kind of the deployed resource.")
-    private DeployResourceKind kind;
+    private DeployResourceKind resourceKind;
 
-    /**
-     * The property of the deployed resource.
-     */
     @NotNull
     @Schema(description = "The properties of the deployed resource.")
     private Map<String, String> properties;
