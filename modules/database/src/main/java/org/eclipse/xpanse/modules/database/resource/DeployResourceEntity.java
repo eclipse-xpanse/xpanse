@@ -45,18 +45,36 @@ public class DeployResourceEntity extends CreateModifiedTime {
     @Column(name = "ID", nullable = false)
     private UUID id;
 
+    /**
+     * The type of the group which configuration the deployed resource.
+     */
+    @Column(name = "GROUP_TYPE")
+    private String groupType;
+
+    /**
+     * The name of the group which configuration the deployed resource.
+     */
+    @Column(name = "GROUP_NAME")
+    private String groupName;
+
+    /**
+     * The id of the deployed resource.
+     */
+    @Column(name = "RESOURCE_ID")
     private String resourceId;
 
     /**
      * The name of the deployed resource.
      */
-    private String name;
+    @Column(name = "RESOURCE_NAME")
+    private String resourceName;
 
     /**
      * The kind of the deployed resource.
      */
+    @Column(name = "RESOURCE_KIND")
     @Enumerated(EnumType.STRING)
-    private DeployResourceKind kind;
+    private DeployResourceKind resourceKind;
 
     /**
      * The deployService we belonged to.

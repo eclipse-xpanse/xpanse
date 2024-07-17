@@ -81,8 +81,8 @@ class FlexibleEngineMonitorIntegrationTest {
                                                       boolean onlyLastKnownMetric) {
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd");
-        deployResource.setName("name");
-        deployResource.setKind(DeployResourceKind.VM);
+        deployResource.setResourceName("name");
+        deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
         return new ResourceMetricsRequest(UUID.randomUUID(), deployResource, monitorResourceType,
                 from, to, null,
@@ -103,8 +103,8 @@ class FlexibleEngineMonitorIntegrationTest {
                                                     boolean onlyLastKnownMetric) {
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd");
-        deployResource.setName("name");
-        deployResource.setKind(DeployResourceKind.VM);
+        deployResource.setResourceName("name");
+        deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
         return new ServiceMetricsRequest(UUID.randomUUID(), List.of(deployResource),
                 monitorResourceType, from, to,

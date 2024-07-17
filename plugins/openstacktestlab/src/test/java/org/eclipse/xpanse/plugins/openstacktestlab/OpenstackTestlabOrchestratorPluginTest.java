@@ -141,7 +141,7 @@ class OpenstackTestlabOrchestratorPluginTest {
     public ResourceMetricsRequest setupResourceRequest(Long from, Long to, Integer period,
                                                        boolean onlyLastKnownMetric) {
         return new ResourceMetricsRequest(uuid,
-                Instancio.of(DeployResource.class).set(field(DeployResource::getKind),
+                Instancio.of(DeployResource.class).set(field(DeployResource::getResourceKind),
                         DeployResourceKind.VM).set(field(DeployResource::getResourceId),
                         resourceId).create(),
                 null, from, to, period, onlyLastKnownMetric, userId);
@@ -151,7 +151,7 @@ class OpenstackTestlabOrchestratorPluginTest {
                                                      boolean onlyLastKnownMetric) {
         return new ServiceMetricsRequest(uuid,
                 List.of(Instancio.of(DeployResource.class)
-                        .set(field(DeployResource::getKind),
+                        .set(field(DeployResource::getResourceKind),
                                 DeployResourceKind.VM)
                         .set(field(DeployResource::getResourceId),
                                 resourceId).create()),

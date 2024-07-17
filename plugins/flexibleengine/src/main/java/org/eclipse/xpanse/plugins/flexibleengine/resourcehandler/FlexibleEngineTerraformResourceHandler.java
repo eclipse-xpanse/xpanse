@@ -62,19 +62,22 @@ public class FlexibleEngineTerraformResourceHandler implements DeployResourceHan
             Set<String> supportTypes =
                     FlexibleEngineTerraformResourceProperties.getTerraformResourceTypes();
             for (TfStateResource tfStateResource : tfState.getResources()) {
-                if (supportTypes.contains(tfStateResource.getType())) {
-                    DeployResourceProperties deployResourceProperties =
-                            FlexibleEngineTerraformResourceProperties.getDeployResourceProperties(
-                                    tfStateResource.getType());
-                    if (Objects.nonNull(deployResourceProperties)) {
-                        for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                            DeployResource deployResource = new DeployResource();
-                            deployResource.setKind(deployResourceProperties.getResourceKind());
-                            TfResourceTransUtils.fillDeployResource(instance, deployResource,
-                                    deployResourceProperties.getResourceProperties());
-                            deployResourceList.add(deployResource);
-                        }
-                    }
+                if (!supportTypes.contains(tfStateResource.getType())) {
+                    log.info("The resource type {} is unsupported to parse.",
+                            tfStateResource.getType());
+                    continue;
+                }
+                DeployResourceProperties deployResourceProperties =
+                        FlexibleEngineTerraformResourceProperties.getDeployResourceProperties(
+                                tfStateResource.getType());
+                for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                    DeployResource deployResource = new DeployResource();
+                    deployResource.setGroupType(tfStateResource.getType());
+                    deployResource.setGroupName(tfStateResource.getName());
+                    deployResource.setResourceKind(deployResourceProperties.getResourceKind());
+                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                            deployResourceProperties.getResourceProperties());
+                    deployResourceList.add(deployResource);
                 }
             }
         }

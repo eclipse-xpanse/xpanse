@@ -80,7 +80,7 @@ public class EntityTransUtils {
      * DeployServiceEntity converted to DeployedServiceDetails.
      *
      * @param entity DeployServiceEntity.
-     * @return serviceDetailVo
+     * @return DeployedServiceDetails
      */
     public static DeployedServiceDetails transToDeployedServiceDetails(
             DeployServiceEntity entity) {

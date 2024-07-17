@@ -45,16 +45,16 @@ class DatabaseDeployResourceStorageTest {
         final DeployResourceEntity expectedResult = new DeployResourceEntity();
         expectedResult.setId(UUID.fromString("f523205e-c10a-4060-a147-d94532ada0f2"));
         expectedResult.setResourceId("resourceId");
-        expectedResult.setName("name");
-        expectedResult.setKind(DeployResourceKind.VM);
+        expectedResult.setResourceName("name");
+        expectedResult.setResourceKind(DeployResourceKind.VM);
         final DeployServiceEntity deployService = new DeployServiceEntity();
         expectedResult.setDeployService(deployService);
 
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("f523205e-c10a-4060-a147-d94532ada0f2"));
         deployResourceEntity1.setResourceId("resourceId");
-        deployResourceEntity1.setName("name");
-        deployResourceEntity1.setKind(DeployResourceKind.VM);
+        deployResourceEntity1.setResourceName("name");
+        deployResourceEntity1.setResourceKind(DeployResourceKind.VM);
         final DeployServiceEntity deployService1 = new DeployServiceEntity();
         deployResourceEntity1.setDeployService(deployService1);
         final Optional<DeployResourceEntity> deployResourceEntity =
@@ -84,15 +84,15 @@ class DatabaseDeployResourceStorageTest {
         final DeployResourceEntity expectedResult = new DeployResourceEntity();
         expectedResult.setId(UUID.fromString("f523205e-c10a-4060-a147-d94532ada0f2"));
         expectedResult.setResourceId("resourceId");
-        expectedResult.setName("name");
-        expectedResult.setKind(DeployResourceKind.VM);
+        expectedResult.setResourceName("name");
+        expectedResult.setResourceKind(DeployResourceKind.VM);
         final DeployServiceEntity deployService = new DeployServiceEntity();
         expectedResult.setDeployService(deployService);
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("f523205e-c10a-4060-a147-d94532ada0f2"));
         deployResourceEntity.setResourceId("resourceId");
-        deployResourceEntity.setName("name");
-        deployResourceEntity.setKind(DeployResourceKind.VM);
+        deployResourceEntity.setResourceName("name");
+        deployResourceEntity.setResourceKind(DeployResourceKind.VM);
         final DeployServiceEntity deployService1 = new DeployServiceEntity();
         deployResourceEntity.setDeployService(deployService1);
         final List<DeployResourceEntity> deployResourceEntities = List.of(deployResourceEntity);

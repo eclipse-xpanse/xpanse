@@ -38,9 +38,11 @@ class DeployedServiceDetailsTest {
     private final Csp csp = Csp.HUAWEI_CLOUD;
     private final String flavor = "basic";
     private final String customerServiceName = "customerServiceName";
+    private final String groupType = "huaweicloud_compute_instance";
+    private final String groupName = "compute";
     private final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
-    private final String name = "resource";
-    private final DeployResourceKind kind = DeployResourceKind.VM;
+    private final String resourceName = "resource";
+    private final DeployResourceKind resourceKind = DeployResourceKind.VM;
     private final String resultSuccessMessage = "Deployment successful";
     private DeployResource deployResource;
     private Map<String, Object> properties;
@@ -69,9 +71,12 @@ class DeployedServiceDetailsTest {
 
         deployResources = new ArrayList<>();
         deployResource = new DeployResource();
+        deployResource.setGroupType(groupType);
+        deployResource.setGroupName(groupName);
+        deployResource.setResourceName(resourceName);
         deployResource.setResourceId(uuid.toString());
-        deployResource.setName(name);
-        deployResource.setKind(kind);
+        deployResource.setResourceName(resourceName);
+        deployResource.setResourceKind(resourceKind);
         deployResource.setProperties(new HashMap<>());
         deployResources.add(deployResource);
 
@@ -101,9 +106,11 @@ class DeployedServiceDetailsTest {
         assertEquals(customerServiceName, deployRequest.getCustomerServiceName());
         assertEquals(properties, deployRequest.getServiceRequestProperties());
 
+        assertEquals(groupType, deployResource.getGroupType());
+        assertEquals(groupName, deployResource.getGroupName());
         assertEquals(uuid.toString(), deployResource.getResourceId());
-        assertEquals(name, deployResource.getName());
-        assertEquals(kind, deployResource.getKind());
+        assertEquals(resourceName, deployResource.getResourceName());
+        assertEquals(resourceKind, deployResource.getResourceKind());
         assertEquals(Collections.emptyMap(), deployResource.getProperties());
 
         assertEquals(deployRequest, deployedServiceDetails.getDeployRequest());

@@ -43,7 +43,7 @@ public class GnocchiToXpanseModelConverter {
         metric.setMonitorResourceType(monitorResourceType);
         Map<String, String> labels = new HashMap<>();
         labels.put("id", deployResource.getResourceId());
-        labels.put("name", deployResource.getName());
+        labels.put("name", deployResource.getResourceName());
         metric.setUnit(metricUnit);
         metric.setLabels(labels);
         metric.setType(MetricType.GAUGE);
@@ -51,10 +51,9 @@ public class GnocchiToXpanseModelConverter {
             if (onlyLastKnownMetric) {
                 MetricItem metricItem = new MetricItem();
                 metricItem.setType(MetricItemType.VALUE);
-                metricItem.setValue(measures.get(measures.size() - 1).getValue());
+                metricItem.setValue(measures.getLast().getValue());
                 metricItem.setTimeStamp(
-                        Instant.parse(measures.get(measures.size() - 1).getTimestamp())
-                                .getEpochSecond());
+                        Instant.parse(measures.getLast().getTimestamp()).getEpochSecond());
                 metric.setMetrics(List.of(metricItem));
             } else {
                 metric.setMetrics(new ArrayList<>());

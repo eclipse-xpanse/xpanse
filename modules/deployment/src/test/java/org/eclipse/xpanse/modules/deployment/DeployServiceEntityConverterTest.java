@@ -22,25 +22,24 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class DeployServiceEntityConverterTest {
-
     @Mock
     private ServiceTemplateStorage serviceTemplateStorage;
-
     @InjectMocks
     private DeployServiceEntityConverter converter;
-
     private DeployServiceEntity deployServiceEntity;
     private ServiceTemplateEntity serviceTemplateEntity;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
         deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setId(UUID.randomUUID());
         deployServiceEntity.setDeployRequest(new DeployRequest());

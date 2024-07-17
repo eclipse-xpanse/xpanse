@@ -44,8 +44,8 @@ class RequiredRoleDescriptionCustomizerTest {
         final Operation expectedResult = new Operation();
         expectedResult.tags(List.of("value"));
         expectedResult.summary("summary");
-        expectedResult.setDescription("description<br>Required role:"
-                + "<b> admin</b> or <b>csp</b> or <b>isv</b> or <b>user</b>");
+        expectedResult.setDescription("description<br> Required role:"
+                + " <b>admin</b> or <b>csp</b> or <b>isv</b> or <b>user</b> </br>");
         final ExternalDocumentation externalDocs1 = new ExternalDocumentation();
         externalDocs1.description("description");
         expectedResult.externalDocs(externalDocs1);

@@ -34,8 +34,8 @@ public class RequiredRoleDescriptionCustomizer implements OperationCustomizer {
         if (Objects.nonNull(securedAnnotation)) {
             String description = operation.getDescription() == null ? ""
                     : (operation.getDescription());
-            operation.setDescription(description + "<br>Required role:<b> "
-                    + String.join("</b> or <b>", securedAnnotation.value()) + "</b>");
+            operation.setDescription(description + "<br> Required role: <b>"
+                    + String.join("</b> or <b>", securedAnnotation.value()) + "</b> </br>");
         }
         return operation;
     }
