@@ -20,32 +20,33 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /**
- * The class is used to validate deployment variables.
+ * The class is used to validate service configuration variables.
  */
 @Slf4j
 @Component
-public class ServiceVariablesJsonSchemaValidator {
+public class ServiceConfigurationVariablesJsonSchemaValidator {
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
     /**
-     * Check validation of deploy property map by list of deployVariables in registered service.
+     * Check validation of service configuration map by list of ServiceConfigurationParameter in
+     * registered service.
      *
-     * @param deployVariables list of deployVariables in registered service
-     * @param deployProperty  deploy property map
+     * @param configurationParameters list of serviceConfigurationParameter in registered service.
+     * @param configurations          service configuration map
      */
-    public void validateDeployVariables(List<DeployVariable> deployVariables,
-                                        Map<String, Object> deployProperty,
-                                        JsonObjectSchema jsonObjectSchema) {
+    public void validateServiceConfiguration(
+            List<ServiceConfigurationParameter> configurationParameters,
+            Map<String, Object> configurations, JsonObjectSchema jsonObjectSchema) {
 
-        if (CollectionUtils.isEmpty(deployVariables) || Objects.isNull(jsonObjectSchema)) {
+        if (CollectionUtils.isEmpty(configurationParameters) || Objects.isNull(jsonObjectSchema)) {
             return;
         }
         try {
@@ -54,21 +55,21 @@ public class ServiceVariablesJsonSchemaValidator {
             JsonSchemaFactory factory =
                     JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012);
             JsonSchema schema = factory.getSchema(jsonObjectSchemaString);
-            String propertyJson = jsonMapper.writeValueAsString(deployProperty);
+            String propertyJson = jsonMapper.writeValueAsString(configurations);
             JsonNode jsonNode = jsonMapper.readTree(propertyJson);
             Set<ValidationMessage> validate = schema.validate(jsonNode);
-
             if (!validate.isEmpty()) {
                 List<String> errors = new ArrayList<>();
                 for (ValidationMessage validationMessage : validate) {
                     errors.add(validationMessage.getMessage().substring(3));
                 }
-                throw new VariableInvalidException(errors);
+                throw new ServiceConfigurationInvalidException(errors.toString());
             }
         } catch (JsonProcessingException e) {
             List<String> errors = new ArrayList<>();
             errors.add(e.getMessage());
-            throw new VariableInvalidException(errors);
+            throw new ServiceConfigurationInvalidException(errors.toString());
         }
     }
+
 }

@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
@@ -70,7 +70,7 @@ public class ServiceTemplateManage {
     @Resource
     private UserServiceHelper userServiceHelper;
     @Resource
-    private ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
+    private ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator;
     @Resource
     private DeployerKindManager deployerKindManager;
     @Resource
@@ -231,7 +231,7 @@ public class ServiceTemplateManage {
                 deployment.getServiceAvailabilityConfigs());
         DeployVariableSchemaValidator.validateDeployVariable(deployment.getVariables());
         JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
                         deployment.getVariables());
         serviceTemplate.setJsonObjectSchema(jsonObjectSchema);
         validateTerraformScript(deployment);

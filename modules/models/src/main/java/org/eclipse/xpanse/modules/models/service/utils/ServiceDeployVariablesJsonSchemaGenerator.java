@@ -26,7 +26,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Component
-public class ServiceVariablesJsonSchemaGenerator {
+public class ServiceDeployVariablesJsonSchemaGenerator {
 
     private static final String VARIABLE_TYPE_KEY = "type";
     private static final String VARIABLE_DESCRIPTION_KEY = "description";
@@ -39,9 +39,9 @@ public class ServiceVariablesJsonSchemaGenerator {
      * @param deployVariables list of deployVariables in registered service
      * @return JsonObjectSchema
      */
-    public JsonObjectSchema buildJsonObjectSchema(List<DeployVariable> deployVariables) {
+    public JsonObjectSchema buildDeployVariableJsonSchema(List<DeployVariable> deployVariables) {
         JsonObjectSchema jsonObjectSchema = new JsonObjectSchema();
-        Map<String, Map<String, Object>> jsonObjectSchemaProperties = new HashMap<>();
+        Map<String, Map<String, Object>> deployVariableJsonSchemaProperties = new HashMap<>();
         List<String> requiredList = new ArrayList<>();
         for (DeployVariable variable : deployVariables) {
             if (variable.getKind() == DeployVariableKind.VARIABLE
@@ -69,13 +69,13 @@ public class ServiceVariablesJsonSchemaGenerator {
                 }
 
                 if (!validationProperties.isEmpty()) {
-                    jsonObjectSchemaProperties.put(variable.getName(), validationProperties);
+                    deployVariableJsonSchemaProperties.put(variable.getName(),
+                            validationProperties);
                 }
             }
         }
-
         jsonObjectSchema.setRequired(requiredList);
-        jsonObjectSchema.setProperties(jsonObjectSchemaProperties);
+        jsonObjectSchema.setProperties(deployVariableJsonSchemaProperties);
         validateSchemaDefinition(jsonObjectSchema);
         return jsonObjectSchema;
     }

@@ -14,7 +14,7 @@ import java.net.URI;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -45,9 +45,9 @@ class ServiceTemplateEntityTest {
     void setUp() throws Exception {
         OclLoader oclLoader = new OclLoader();
         ocl = oclLoader.getOcl(URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
-                new ServiceVariablesJsonSchemaGenerator();
-        jsonObjectSchema = serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+        ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator =
+                new ServiceDeployVariablesJsonSchemaGenerator();
+        jsonObjectSchema = serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
                 ocl.getDeployment().getVariables());
         category = ocl.getCategory();
         csp = ocl.getCloudServiceProvider().getName();

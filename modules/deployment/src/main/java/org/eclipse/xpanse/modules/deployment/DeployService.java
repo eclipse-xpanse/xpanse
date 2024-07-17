@@ -40,7 +40,7 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaValidator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
@@ -71,7 +71,7 @@ public class DeployService {
     @Resource
     private DeployServiceStorage deployServiceStorage;
     @Resource
-    private ServiceVariablesJsonSchemaValidator serviceVariablesJsonSchemaValidator;
+    private ServiceDeployVariablesJsonSchemaValidator serviceDeployVariablesJsonSchemaValidator;
     @Resource
     private PolicyValidator policyValidator;
     @Resource
@@ -164,7 +164,7 @@ public class DeployService {
             List<DeployVariable> deployVariables =
                     existingServiceTemplate.getOcl().getDeployment().getVariables();
 
-            serviceVariablesJsonSchemaValidator.validateDeployVariables(deployVariables,
+            serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(deployVariables,
                     deployRequest.getServiceRequestProperties(),
                     existingServiceTemplate.getJsonObjectSchema());
         }

@@ -28,7 +28,6 @@ class ServiceConfigurationParameterTest {
     private static final String description = "description";
     private static final String value = "value";
     private static final String initialValue = "initialValue";
-    private static final Boolean mandatory = true;
     private static final Map<String,Object> validatorMap  = Map.of("minLength","10");
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
     private static ServiceConfigurationParameter serviceConfigurationParameter;
@@ -45,7 +44,6 @@ class ServiceConfigurationParameterTest {
         serviceConfigurationParameter.setDescription(description);
         serviceConfigurationParameter.setValue(value);
         serviceConfigurationParameter.setInitialValue(initialValue);
-        serviceConfigurationParameter.setMandatory(mandatory);
         serviceConfigurationParameter.setValueSchema(validatorMap);
         serviceConfigurationParameter.setSensitiveScope(sensitiveScope);
         serviceConfigurationParameter.setAutoFill(autoFill);
@@ -62,7 +60,6 @@ class ServiceConfigurationParameterTest {
         assertEquals(description, serviceConfigurationParameter.getDescription());
         assertEquals(value, serviceConfigurationParameter.getValue());
         assertEquals(initialValue, serviceConfigurationParameter.getInitialValue());
-        assertEquals(mandatory, serviceConfigurationParameter.getMandatory());
         assertEquals(validatorMap, serviceConfigurationParameter.getValueSchema());
         assertEquals(sensitiveScope, serviceConfigurationParameter.getSensitiveScope());
         assertEquals(modificationImpact, serviceConfigurationParameter.getModificationImpact());
@@ -130,12 +127,6 @@ class ServiceConfigurationParameterTest {
         assertNotEquals(serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
-        configurationParameter1.setMandatory(mandatory);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
-        assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
-        assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
-
         configurationParameter1.setValueSchema(validatorMap);
         assertNotEquals(serviceConfigurationParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
@@ -180,7 +171,6 @@ class ServiceConfigurationParameterTest {
                 ", description=" + description + "" +
                 ", value=" + value + "" +
                 ", initialValue=" + initialValue + "" +
-                ", mandatory=" + mandatory + "" +
                 ", valueSchema=" + validatorMap + "" +
                 ", sensitiveScope=" + sensitiveScope + "" +
                 ", autoFill=" + autoFill + "" +

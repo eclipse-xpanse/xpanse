@@ -87,8 +87,8 @@ class DatabaseDeployConfigurationStorageTest {
         verify(serviceConfigurationRepository, times(1)).delete(expectedResult);
     }
 
-    private Map<String, String> getConfiguration(){
-        Map<String, String> configuration = new HashMap<>();
+    private Map<String, Object> getConfiguration(){
+        Map<String, Object> configuration = new HashMap<>();
         configuration.put("key1","value1");
         configuration.put("key2","value2");
         configuration.put("key3","value3");
