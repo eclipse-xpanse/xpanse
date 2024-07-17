@@ -46,7 +46,7 @@ public class ServiceConfigurationEntity {
     @Column(columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
-    private Map<String, String> configuration;
+    private Map<String, Object> configuration;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")

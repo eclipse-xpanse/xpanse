@@ -62,13 +62,13 @@ public class DeployServiceEntityConverter {
         ServiceConfigurationEntity entity = new ServiceConfigurationEntity();
         entity.setDeployServiceEntity(deployServiceEntity);
         entity.setCreatedTime(OffsetDateTime.now());
-        Map<String, String> configuration = getServiceConfiguration(deployServiceEntity);
+        Map<String, Object> configuration = getServiceConfiguration(deployServiceEntity);
         entity.setConfiguration(configuration);
         return entity;
     }
 
-    private Map<String, String> getServiceConfiguration(DeployServiceEntity deployServiceEntity) {
-        Map<String, String> configuration = new HashMap<>();
+    private Map<String, Object> getServiceConfiguration(DeployServiceEntity deployServiceEntity) {
+        Map<String, Object> configuration = new HashMap<>();
         DeployTask deployTask = getDeployTaskByStoredService(deployServiceEntity);
         List<ServiceConfigurationParameter> configurationParameters =
                 deployTask.getOcl().getConfigurationParameters();

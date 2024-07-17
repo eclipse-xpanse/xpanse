@@ -30,15 +30,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * Test of ServiceVariablesJsonSchemaGenerator and ServiceVariablesJsonSchemaValidator.
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ServiceVariablesJsonSchemaGenerator.class,
-        ServiceVariablesJsonSchemaValidator.class})
-class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
+@ContextConfiguration(classes = {ServiceDeployVariablesJsonSchemaGenerator.class,
+        ServiceDeployVariablesJsonSchemaValidator.class})
+class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
 
     @Autowired
-    ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator;
+    ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator;
 
     @Autowired
-    ServiceVariablesJsonSchemaValidator serviceVariablesJsonSchemaValidator;
+    ServiceDeployVariablesJsonSchemaValidator serviceDeployVariablesJsonSchemaValidator;
 
     private List<DeployVariable> variables;
 
@@ -52,13 +52,13 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
     @Test
     void validateSuccess_test() {
         JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
+                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
 
         Map<String, Object> deployProperty = new HashMap<>();
         deployProperty.put("admin_passwd", "123456@Qq");
 
         assertDoesNotThrow(() -> {
-            serviceVariablesJsonSchemaValidator.validateDeployVariables(variables, deployProperty,
+            serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables, deployProperty,
                     jsonObjectSchema);
         });
     }
@@ -66,7 +66,7 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
     @Test
     void validateWithValueSchema_test() {
         JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
+                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
 
         Map<String, Object> validateMinLengthPro = new HashMap<>();
         validateMinLengthPro.put("admin_passwd", "123456");
@@ -78,17 +78,17 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
         validatePatternPro.put("admin_passwd", "12335435@Q");
 
         assertThrows(VariableInvalidException.class, () -> {
-            serviceVariablesJsonSchemaValidator.validateDeployVariables(variables,
+            serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validateMinLengthPro,
                     jsonObjectSchema);
         });
         assertThrows(VariableInvalidException.class, () -> {
-            serviceVariablesJsonSchemaValidator.validateDeployVariables(variables,
+            serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validateMaxLengthPro,
                     jsonObjectSchema);
         });
         assertThrows(VariableInvalidException.class, () -> {
-            serviceVariablesJsonSchemaValidator.validateDeployVariables(variables,
+            serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validatePatternPro,
                     jsonObjectSchema);
         });
@@ -101,7 +101,7 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
         }
 
         JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
+                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
 
         Map<String, Object> validateRequiredPro = new HashMap<>();
         validateRequiredPro.put("admin_passwd", "123456@Qq");
@@ -110,7 +110,7 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
         validateRequiredPro.put("secgroup_name", "123456");
 
         assertDoesNotThrow(() -> {
-            serviceVariablesJsonSchemaValidator.validateDeployVariables(variables,
+            serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validateRequiredPro,
                     jsonObjectSchema);
         });
@@ -123,13 +123,13 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
         }
 
         JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
+                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
 
         Map<String, Object> validateRequiredPro = new HashMap<>();
         validateRequiredPro.put("admin_passwd", "123456@Qq");
 
         assertThrows(VariableInvalidException.class, () -> {
-            serviceVariablesJsonSchemaValidator.validateDeployVariables(variables,
+            serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validateRequiredPro,
                     jsonObjectSchema);
         });
@@ -138,7 +138,7 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
     @Test
     void validateWithDataType_test() {
         JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
+                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
 
         Map<String, Map<String, Object>> properties = jsonObjectSchema.getProperties();
         for (DeployVariable variable : variables) {
@@ -151,7 +151,7 @@ class ServiceVariablesJsonSchemaGeneratorAndValidatorTest {
     void throwExceptionWhenValueSchemaIsInvalid() {
         variables.get(0).getValueSchema().put("enums", List.of(1, 2, 3));
         assertThrows(InvalidValueSchemaException.class, () -> {
-            serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(variables);
+            serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
         });
     }
 

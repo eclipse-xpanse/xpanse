@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
@@ -117,10 +117,10 @@ class ServiceTemplateOpenApiGeneratorTest {
                 ocl.getDeployment().getServiceAvailabilityConfigs());
         DeployVariableSchemaValidator.validateDeployVariable(
                 ocl.getDeployment().getVariables());
-        ServiceVariablesJsonSchemaGenerator serviceVariablesJsonSchemaGenerator =
-                new ServiceVariablesJsonSchemaGenerator();
+        ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator =
+                new ServiceDeployVariablesJsonSchemaGenerator();
         JsonObjectSchema jsonObjectSchema =
-                serviceVariablesJsonSchemaGenerator.buildJsonObjectSchema(
+                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
                         ocl.getDeployment().getVariables());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(RANDOM_UUID);

@@ -54,10 +54,6 @@ public class ServiceConfigurationParameter implements Serializable {
     @Schema(description = "The init value of the service config parameter")
     private String initialValue;
 
-    @NotNull
-    @Schema(description = "Indicates if the service config parameter is mandatory")
-    private Boolean mandatory;
-
     @Schema(description = "valueSchema of the service config parameter. "
             + "The key be any keyword that is part of the JSON schema definition which can be "
             + "found here https://json-schema.org/draft/2020-12/schema")
