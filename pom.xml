@@ -41,7 +41,7 @@
         <checkstyle-maven-plugin.version>3.4.0</checkstyle-maven-plugin.version>
         <logbook.version>3.9.0</logbook.version>
         <wiremock.version>3.9.0</wiremock.version>
-        <instancio.version>4.8.1</instancio.version>
+        <instancio.version>5.0.0</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
         <jacoco.version>0.8.12</jacoco.version>
         <springdoc.version>2.6.0</springdoc.version>
