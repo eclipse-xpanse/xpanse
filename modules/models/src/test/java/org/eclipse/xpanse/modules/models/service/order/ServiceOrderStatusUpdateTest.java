@@ -9,6 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.BeanUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @ExtendWith(MockitoExtension.class)
 class ServiceOrderStatusUpdateTest {
 
@@ -17,11 +20,13 @@ class ServiceOrderStatusUpdateTest {
 
     private final String errorMsg = "errorMessage";
 
+    private Map<String, String> deployedServiceProperties = new HashMap<>();
+
     private ServiceOrderStatusUpdate test;
 
     @BeforeEach
     void setUp() {
-        test = new ServiceOrderStatusUpdate(taskStatus, isOrderCompleted, errorMsg);
+        test = new ServiceOrderStatusUpdate(taskStatus, isOrderCompleted, errorMsg, deployedServiceProperties);
     }
 
 
@@ -30,6 +35,7 @@ class ServiceOrderStatusUpdateTest {
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
         assertThat(test.getIsOrderCompleted()).isEqualTo(isOrderCompleted);
         assertThat(test.getErrorMsg()).isEqualTo(errorMsg);
+        assertThat(test.getDeployedServiceProperties()).isEqualTo(deployedServiceProperties);
     }
 
 
@@ -39,7 +45,7 @@ class ServiceOrderStatusUpdateTest {
         assertThat(test.equals(o)).isFalse();
         assertThat(test.hashCode()).isNotEqualTo(o.hashCode());
 
-        ServiceOrderStatusUpdate test1 = new ServiceOrderStatusUpdate(taskStatus, false, null);
+        ServiceOrderStatusUpdate test1 = new ServiceOrderStatusUpdate(taskStatus, false, null,deployedServiceProperties);
         assertThat(test.equals(test1)).isFalse();
         assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
 
@@ -52,7 +58,8 @@ class ServiceOrderStatusUpdateTest {
     void testToString() {
         String expected = "ServiceOrderStatusUpdate(taskStatus=" + taskStatus + ", "
                 + "isOrderCompleted=" + isOrderCompleted + ", "
-                + "errorMsg=" + errorMsg + ")";
+                + "errorMsg=" + errorMsg + ", "
+                + "deployedServiceProperties=" + deployedServiceProperties+")";
         assertThat(test.toString()).isEqualTo(expected);
     }
 }

@@ -7,6 +7,7 @@ package org.eclipse.xpanse.modules.models.service.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,4 +32,7 @@ public class ServiceOrderStatusUpdate {
 
     @Schema(description = "The error message if the service order failed.")
     private String errorMsg;
+
+    @Schema(description = "The properties of the deployed service.")
+    private Map<String, String> deployedServiceProperties;
 }

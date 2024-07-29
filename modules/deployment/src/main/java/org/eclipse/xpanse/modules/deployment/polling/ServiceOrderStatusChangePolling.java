@@ -7,7 +7,9 @@ package org.eclipse.xpanse.modules.deployment.polling;
 
 import jakarta.annotation.Resource;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -15,8 +17,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +42,8 @@ public class ServiceOrderStatusChangePolling {
     private int pollingWaitPeriod;
     @Resource
     private ServiceOrderStorage orderStorage;
+    @Resource
+    private DeployServiceEntityHandler deployServiceEntityHandler;
 
     /**
      * Fetch status of the service order by polling database for a fixed period of time.
@@ -55,7 +61,7 @@ public class ServiceOrderStatusChangePolling {
         log.info("Start polling for service order status with order id: {}", orderId);
         AtomicReference<ServiceOrderStatusUpdate> ref =
                 new AtomicReference<>(new ServiceOrderStatusUpdate(previousKnownTaskStatus,
-                        FINAL_TASK_STATUS.contains(previousKnownTaskStatus), null));
+                        FINAL_TASK_STATUS.contains(previousKnownTaskStatus), null, null));
         try {
             Awaitility.await().atMost(pollingWaitPeriod, TimeUnit.SECONDS)
                     .pollDelay(0, TimeUnit.SECONDS) // first check runs without wait.
@@ -63,8 +69,14 @@ public class ServiceOrderStatusChangePolling {
                         ServiceOrderEntity serviceOrderEntity = orderStorage.getEntityById(orderId);
                         TaskStatus taskStatus = serviceOrderEntity.getTaskStatus();
                         boolean isOrderCompleted = FINAL_TASK_STATUS.contains(taskStatus);
+                        Map<String, String> deployServiceProperties = new HashMap<>();
+                        if (taskStatus == TaskStatus.SUCCESSFUL) {
+                            DeployServiceEntity entity = deployServiceEntityHandler
+                                    .getDeployServiceEntity(serviceOrderEntity.getServiceId());
+                            deployServiceProperties = entity.getProperties();
+                        }
                         ref.set(new ServiceOrderStatusUpdate(taskStatus, isOrderCompleted,
-                                serviceOrderEntity.getErrorMsg()));
+                                serviceOrderEntity.getErrorMsg(), deployServiceProperties));
                         boolean statusIsChanged = Objects.nonNull(previousKnownTaskStatus)
                                 && taskStatus != previousKnownTaskStatus;
                         return isOrderCompleted || statusIsChanged;
