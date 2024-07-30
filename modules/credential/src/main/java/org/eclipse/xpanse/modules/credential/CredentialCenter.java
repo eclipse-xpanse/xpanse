@@ -13,7 +13,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.cache.credential.CredentialCacheKey;
+import org.eclipse.xpanse.modules.cache.credential.CredentialsStore;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
@@ -34,6 +37,7 @@ import org.springframework.util.CollectionUtils;
 /**
  * The credential center.
  */
+@Slf4j
 @Component
 public class CredentialCenter {
 
@@ -140,13 +144,18 @@ public class CredentialCenter {
                         .filter(abstractCredentialInfo -> Objects.equals(type,
                                 abstractCredentialInfo.getType())).toList();
             }
-            definedCredentialInfos.forEach(credentialInfo -> {
-                AbstractCredentialInfo abstractCredentialInfo =
-                        credentialsStore.getCredential(
-                                csp, credentialInfo.getType(), credentialInfo.getName(),
-                                userId);
-                if (Objects.nonNull(abstractCredentialInfo)) {
-                    userCredentials.add(abstractCredentialInfo);
+            definedCredentialInfos.forEach(credential -> {
+                CredentialCacheKey cacheKey = new CredentialCacheKey(credential.getCsp(),
+                        credential.getType(), credential.getName(), userId);
+                AbstractCredentialInfo credentialInfo = null;
+                try {
+                    credentialInfo = credentialsStore.getCredential(cacheKey);
+                    credentialsStore.updateCredentialCacheTimeToLive(cacheKey);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+                if (Objects.nonNull(credentialInfo)) {
+                    userCredentials.add(credentialInfo);
                 }
             });
         }
@@ -171,7 +180,10 @@ public class CredentialCenter {
                     String.format("Not supported credential type Csp:%s, Type: %s.",
                             createCredential.getCsp(), createCredential.getType()));
         }
-        createCredential(credential);
+        CredentialCacheKey cacheKey = new CredentialCacheKey(credential.getCsp(),
+                credential.getType(), credential.getName(), credential.getUserId());
+        credentialsStore.storeCredential(cacheKey, credential);
+        credentialsStore.updateCredentialCacheTimeToLive(cacheKey);
     }
 
     /**
@@ -190,9 +202,10 @@ public class CredentialCenter {
                     String.format("Not supported credential type Csp:%s, Type: %s.",
                             updateCredential.getCsp(), updateCredential.getType()));
         }
-        deleteCredential(updateCredential.getCsp(), updateCredential.getType(),
-                updateCredential.getName(), updateCredential.getUserId());
-        createCredential(credential);
+        CredentialCacheKey cacheKey = new CredentialCacheKey(credential.getCsp(),
+                credential.getType(), credential.getName(), credential.getUserId());
+        credentialsStore.storeCredential(cacheKey, credential);
+        credentialsStore.updateCredentialCacheTimeToLive(cacheKey);
     }
 
     /**
@@ -203,7 +216,9 @@ public class CredentialCenter {
      */
     public void deleteCredential(Csp csp, CredentialType credentialType, String credentialName,
                                  String userId) {
-        credentialsStore.deleteCredential(csp, credentialType, credentialName, userId);
+        CredentialCacheKey cacheKey =
+                new CredentialCacheKey(csp, credentialType, credentialName, userId);
+        credentialsStore.deleteCredential(cacheKey);
     }
 
     /**
@@ -312,17 +327,6 @@ public class CredentialCenter {
                 return;
             }
         }
-    }
-
-
-    /**
-     * Create credential for the @Csp with @userId.
-     *
-     * @param abstractCredentialInfo Instance of any class that implements AbstractCredentialInfo
-     */
-
-    public void createCredential(AbstractCredentialInfo abstractCredentialInfo) {
-        credentialsStore.storeCredential(abstractCredentialInfo);
     }
 
     /**

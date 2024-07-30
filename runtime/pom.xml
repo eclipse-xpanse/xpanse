@@ -33,6 +33,11 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>cache</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -84,6 +89,11 @@
         <dependency>
             <groupId>org.eclipse.xpanse.modules</groupId>
             <artifactId>servicetemplate</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!--junit4 dependency needed in classpath for testcontainers due to a known issue-->

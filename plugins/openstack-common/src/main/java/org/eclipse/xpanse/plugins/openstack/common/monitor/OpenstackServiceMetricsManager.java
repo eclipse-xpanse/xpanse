@@ -12,12 +12,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsCacheKey;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
 import org.eclipse.xpanse.plugins.openstack.common.auth.ProviderAuthInfoResolver;
@@ -50,7 +51,7 @@ public class OpenstackServiceMetricsManager {
     @Resource
     private MeasuresService measuresService;
     @Resource
-    private ServiceMetricsStore serviceMetricsStore;
+    private MonitorMetricsStore monitorMetricsStore;
     @Resource
     private ProviderAuthInfoResolver providerAuthInfoResolver;
 
@@ -172,10 +173,15 @@ public class OpenstackServiceMetricsManager {
                                                  Metric metric) {
         if (request.isOnlyLastKnownMetric()) {
             String resourceId = request.getDeployResource().getResourceId();
-            if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                serviceMetricsStore.storeMonitorMetric(Csp.OPENSTACK_TESTLAB, resourceId,
-                        monitorResourceType, metric);
-
+            MonitorMetricsCacheKey key = new MonitorMetricsCacheKey(Csp.OPENSTACK_TESTLAB,
+                    resourceId, monitorResourceType);
+            try {
+                if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
+                    monitorMetricsStore.storeMonitorMetric(key, metric);
+                    monitorMetricsStore.updateMetricsCacheTimeToLive(key);
+                }
+            } catch (Exception e) {
+                log.error("Cache metrics data error.{}", e.getMessage());
             }
         }
     }

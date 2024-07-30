@@ -10,9 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.io.File;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
+import org.eclipse.xpanse.modules.cache.credential.CredentialsStore;
 import org.eclipse.xpanse.modules.credential.CredentialOpenApiGenerator;
-import org.eclipse.xpanse.modules.credential.CredentialsStore;
-import org.eclipse.xpanse.modules.credential.cache.CaffeineCredentialCacheManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -28,10 +27,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  * Test of CredentialOpenApiGenerator.
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {XpanseApplication.class, CaffeineCredentialCacheManager.class,
-        CredentialsStore.class,
+@SpringBootTest(classes = {XpanseApplication.class, CredentialsStore.class,
         ServletUriComponentsBuilder.class, OpenApiUrlManage.class, PluginManager.class},
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
+        properties = {
+                "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
 class CredentialOpenApiGeneratorTest {
 
     @Autowired

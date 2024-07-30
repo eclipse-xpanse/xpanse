@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -24,8 +25,6 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
-import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
@@ -51,8 +50,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class,
         HuaweiCloudVmStateManager.class, HuaweiCloudServerManageRequestConverter.class,
         HuaweiCloudMetricsService.class, HuaweiCloudClient.class, HuaweiCloudMonitorConstants.class,
-        HuaweiCloudDataModelConverter.class, CredentialCenter.class, ServiceMetricsStore.class,
-        ServiceMetricsCacheManager.class, HuaweiCloudTerraformResourceHandler.class,
+        HuaweiCloudDataModelConverter.class, CredentialCenter.class, MonitorMetricsStore.class,
+        HuaweiCloudTerraformResourceHandler.class,
         HuaweiCloudResourceManager.class, HuaweiCloudPriceCalculator.class,
         HuaweiCloudChinesePriceCalculator.class, HuaweiCloudRetryStrategy.class})
 class HuaweiCloudMonitorIntegrationTest {

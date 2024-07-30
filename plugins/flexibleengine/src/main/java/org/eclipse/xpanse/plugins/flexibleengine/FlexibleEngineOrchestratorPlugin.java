@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine;
 
-import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZ_CACHE_NAME;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
 
 import jakarta.annotation.Resource;
@@ -81,7 +81,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    @Cacheable(cacheNames = REGION_AZ_CACHE_NAME)
+    @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
     public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
         return flexibleEngineResourceManager.getAvailabilityZonesOfRegion(userId, region);
     }

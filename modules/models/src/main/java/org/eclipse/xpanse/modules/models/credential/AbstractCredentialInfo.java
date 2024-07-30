@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.models.credential;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -12,18 +13,20 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.credential.config.AbstractCredentialInfoDeserializer;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
 /**
  * The Abstract class which defines the credential basic information required by a cloud provider.
  */
+@Getter
 @Schema(allOf = {CredentialVariables.class})
+@JsonDeserialize(using = AbstractCredentialInfoDeserializer.class)
 public abstract class AbstractCredentialInfo {
 
     /**
      * The cloud service provider of the credential, this field is provided by the plugins.
      */
-    @Getter
     @Setter
     @NotNull
     @Schema(description = "The cloud service provider of the credential.")
@@ -32,7 +35,6 @@ public abstract class AbstractCredentialInfo {
     /**
      * The type of the credential.
      */
-    @Getter
     @NotNull
     @Schema(description = "The type of the credential, "
             + "this field is provided by the plugin of cloud service provider.")
@@ -41,7 +43,6 @@ public abstract class AbstractCredentialInfo {
     /**
      * The name of the credential, this field is provided by the plugins.
      */
-    @Getter
     @NotNull
     @NotBlank
     @Schema(description = "The name of the credential, this field is provided by "
@@ -52,7 +53,6 @@ public abstract class AbstractCredentialInfo {
     /**
      * The description of the credential.
      */
-    @Getter
     @NotNull
     @NotBlank
     @Schema(description = "The description of the credential,"
@@ -62,7 +62,6 @@ public abstract class AbstractCredentialInfo {
     /**
      * The id of user who create the credential.
      */
-    @Getter
     @Setter
     @Schema(description = "The id of user who created the credential.")
     String userId;
@@ -70,7 +69,6 @@ public abstract class AbstractCredentialInfo {
     /**
      * The expired unix long time of the credential.
      */
-    @Getter
     @Setter
     @Hidden
     @Schema(description = "The time in seconds to live of the credential")
