@@ -362,9 +362,11 @@ public class HuaweiCloudDataModelConverter {
             case HuaweiCloudMonitorMetrics.MEM_UTILIZED,
                     HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE -> type =
                     MonitorResourceType.MEM;
-            case HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV -> type =
+            case HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV,
+                    HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN -> type =
                     MonitorResourceType.VM_NETWORK_INCOMING;
-            case HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT -> type =
+            case HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT,
+                    HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT -> type =
                     MonitorResourceType.VM_NETWORK_OUTGOING;
             default -> {
             }

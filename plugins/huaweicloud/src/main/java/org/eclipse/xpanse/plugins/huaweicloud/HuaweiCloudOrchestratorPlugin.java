@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud;
 
-import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZ_CACHE_NAME;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
 
 import jakarta.annotation.Resource;
@@ -79,7 +79,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    @Cacheable(cacheNames = REGION_AZ_CACHE_NAME)
+    @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
     public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
         return huaweiCloudResourceManager.getAvailabilityZonesOfRegion(userId, region);
     }

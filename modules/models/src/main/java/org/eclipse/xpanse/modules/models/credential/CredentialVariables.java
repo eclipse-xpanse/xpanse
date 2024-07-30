@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.modules.models.credential;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,11 +30,27 @@ public class CredentialVariables extends AbstractCredentialInfo {
     private final List<CredentialVariable> variables;
 
     /**
-     * The constructor.
+     * The constructor without filed timeToLive.
      */
     public CredentialVariables(Csp csp, CredentialType type, String name, String description,
                                String userId, List<CredentialVariable> variables) {
         super(csp, type, name, description, userId);
+        this.variables = variables;
+    }
+
+    /**
+     * The constructor with all fields.
+     */
+    @JsonCreator
+    public CredentialVariables(@JsonProperty("csp") Csp csp,
+                               @JsonProperty("type") CredentialType type,
+                               @JsonProperty("name") String name,
+                               @JsonProperty("description") String description,
+                               @JsonProperty("userId") String userId,
+                               @JsonProperty("timeToLive") Integer timeToLive,
+                               @JsonProperty("variables") List<CredentialVariable> variables) {
+        super(csp, type, name, description, userId);
+        super.timeToLive = timeToLive;
         this.variables = variables;
     }
 

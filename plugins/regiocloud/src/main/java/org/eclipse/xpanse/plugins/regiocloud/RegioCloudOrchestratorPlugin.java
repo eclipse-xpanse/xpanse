@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.plugins.regiocloud;
 
-import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZ_CACHE_NAME;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.REGIO_CLOUD_AUTH_URL;
@@ -142,7 +142,7 @@ public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    @Cacheable(cacheNames = REGION_AZ_CACHE_NAME)
+    @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
     public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
         return resourceManager.getAvailabilityZonesOfRegion(getCsp(), userId, serviceId, region);
     }

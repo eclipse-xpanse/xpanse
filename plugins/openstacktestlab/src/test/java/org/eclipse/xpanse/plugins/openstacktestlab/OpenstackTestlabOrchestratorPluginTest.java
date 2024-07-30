@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
@@ -55,7 +56,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
@@ -93,7 +93,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         OpenstackKeystoneManager.class, OpenstackServiceMetricsManager.class,
         ResourcesService.class, GnocchiToXpanseModelConverter.class, AggregationService.class,
         MeasuresService.class, MetricsQueryBuilder.class, CredentialCenter.class, AesUtil.class,
-        ServiceMetricsStore.class, OpenstackTerraformResourceHandler.class, PluginManager.class,
+        MonitorMetricsStore.class, OpenstackTerraformResourceHandler.class, PluginManager.class,
         ServiceTemplateStorage.class, OpenstackResourceManager.class,
         OpenstackServicePriceCalculator.class, ProviderAuthInfoResolver.class
 })
@@ -115,7 +115,7 @@ class OpenstackTestlabOrchestratorPluginTest {
     @MockBean
     private CredentialCenter mockCredentialCenter;
     @MockBean
-    private ServiceMetricsStore mockServiceMetricsStore;
+    private MonitorMetricsStore mockMonitorMetricsStore;
     @MockBean
     private OpenstackServersManager mockServersManager;
     @MockBean

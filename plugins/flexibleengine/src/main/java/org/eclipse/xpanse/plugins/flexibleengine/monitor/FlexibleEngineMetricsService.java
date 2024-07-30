@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsCacheKey;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -32,7 +34,6 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
@@ -53,7 +54,7 @@ public class FlexibleEngineMetricsService {
     @Resource
     private FlexibleEngineClient flexibleEngineClient;
     @Resource
-    private ServiceMetricsStore serviceMetricsStore;
+    private MonitorMetricsStore monitorMetricsStore;
     @Resource
     private FlexibleEngineDataModelConverter modelConverter;
     @Resource
@@ -173,17 +174,22 @@ public class FlexibleEngineMetricsService {
                                                  Metric metric) {
         if (resourceMetricRequest.isOnlyLastKnownMetric()) {
             String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
-            if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                serviceMetricsStore.storeMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId,
-                        monitorResourceType, metric);
-            } else {
-                Metric cacheMetric =
-                        serviceMetricsStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId,
-                                monitorResourceType);
-                if (Objects.nonNull(cacheMetric) && !CollectionUtils.isEmpty(
-                        cacheMetric.getMetrics())) {
-                    metric = cacheMetric;
+            MonitorMetricsCacheKey cacheKey = new MonitorMetricsCacheKey(
+                    Csp.FLEXIBLE_ENGINE, resourceId, monitorResourceType);
+            try {
+                if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
+                    monitorMetricsStore.storeMonitorMetric(cacheKey, metric);
+                    monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
+                } else {
+                    Metric cacheMetric = monitorMetricsStore.getMonitorMetric(cacheKey);
+                    monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
+                    if (Objects.nonNull(cacheMetric) && !CollectionUtils.isEmpty(
+                            cacheMetric.getMetrics())) {
+                        metric = cacheMetric;
+                    }
                 }
+            } catch (Exception e) {
+                log.error("Update metrics cache data error.{} ", e.getMessage());
             }
         }
     }
@@ -208,10 +214,16 @@ public class FlexibleEngineMetricsService {
             for (MetricInfoList metricInfo : entry.getValue()) {
                 MonitorResourceType type = modelConverter.getMonitorResourceTypeByMetricName(
                         metricInfo.getMetricName());
-                Metric metricCache =
-                        serviceMetricsStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId, type);
-                if (Objects.nonNull(metricCache)) {
-                    metricCacheMap.put(metricInfo.getMetricName(), metricCache);
+                MonitorMetricsCacheKey cacheKey = new MonitorMetricsCacheKey(
+                        Csp.FLEXIBLE_ENGINE, resourceId, type);
+                try {
+                    Metric metricCache = monitorMetricsStore.getMonitorMetric(cacheKey);
+                    monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
+                    if (Objects.nonNull(metricCache)) {
+                        metricCacheMap.put(metricInfo.getMetricName(), metricCache);
+                    }
+                } catch (Exception e) {
+                    log.error("Get metrics cache data error.{} ", e.getMessage());
                 }
             }
         }
@@ -233,21 +245,26 @@ public class FlexibleEngineMetricsService {
             for (MetricInfoList metricInfo : entry.getValue()) {
                 MonitorResourceType type = modelConverter.getMonitorResourceTypeByMetricName(
                         metricInfo.getMetricName());
+                MonitorMetricsCacheKey cacheKey = new MonitorMetricsCacheKey(
+                        Csp.FLEXIBLE_ENGINE, resourceId, type);
                 Metric metric = metrics.stream()
                         .filter(m -> Objects.nonNull(m) && StringUtils.equals(m.getName(),
                                 metricInfo.getMetricName()) && !CollectionUtils.isEmpty(
                                 m.getMetrics()) && StringUtils.equals(resourceId,
                                 m.getLabels().get("id"))).findAny().orElse(null);
-                if (metric == null) {
-                    Metric metricCache =
-                            serviceMetricsStore.getMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId,
-                                    type);
-                    if (Objects.nonNull(metricCache)) {
-                        metrics.add(metricCache);
+                try {
+                    if (Objects.isNull(metric)) {
+                        Metric metricCache = monitorMetricsStore.getMonitorMetric(cacheKey);
+                        monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
+                        if (Objects.nonNull(metricCache)) {
+                            metrics.add(metricCache);
+                        }
+                    } else {
+                        monitorMetricsStore.storeMonitorMetric(cacheKey, metric);
+                        monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
                     }
-                } else {
-                    serviceMetricsStore.storeMonitorMetric(Csp.FLEXIBLE_ENGINE, resourceId, type,
-                            metric);
+                } catch (Exception e) {
+                    log.error("Update metrics cache data error.{} ", e.getMessage());
                 }
             }
         }
@@ -258,7 +275,6 @@ public class FlexibleEngineMetricsService {
             CesClient client) {
         Map<MonitorResourceType, MetricInfoList> targetMetricsMap = new HashMap<>();
         ListMetricsRequest request = modelConverter.buildListMetricsRequest(deployResource);
-        log.error("Flexible Request:{}", request);
         ListMetricsResponse listMetricsResponse =
                 client.listMetricsInvoker(request)
                         .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())

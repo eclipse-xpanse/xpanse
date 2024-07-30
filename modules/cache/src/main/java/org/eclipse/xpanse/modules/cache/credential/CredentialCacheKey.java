@@ -3,8 +3,10 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.credential.cache;
+package org.eclipse.xpanse.modules.cache.credential;
 
+import java.io.Serial;
+import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -15,7 +17,10 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 public record CredentialCacheKey(Csp csp,
                                  CredentialType credentialType,
                                  String credentialName,
-                                 String userId) {
+                                 String userId) implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -663928757399114751L;
 
     @Override
     public boolean equals(Object obj) {
@@ -26,9 +31,9 @@ public record CredentialCacheKey(Csp csp,
                             && key.credentialType == this.credentialType
                             && key.credentialName.equals(this.credentialName)
                     : key.csp == this.csp
-                            && key.credentialType == this.credentialType
-                            && key.credentialName.equals(this.credentialName)
-                            && key.userId.equals(this.userId);
+                    && key.credentialType == this.credentialType
+                    && key.credentialName.equals(this.credentialName)
+                    && key.userId.equals(this.userId);
         } else {
             return false;
         }

@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsCacheKey;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -32,7 +34,6 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
@@ -53,7 +54,7 @@ public class HuaweiCloudMetricsService {
     @Resource
     private HuaweiCloudClient huaweiCloudClient;
     @Resource
-    private ServiceMetricsStore serviceMetricsStore;
+    private MonitorMetricsStore monitorMetricsStore;
     @Resource
     private HuaweiCloudDataModelConverter huaweiCloudDataModelConverter;
     @Resource
@@ -172,16 +173,22 @@ public class HuaweiCloudMetricsService {
                                                  Metric metric) {
         if (resourceMetricRequest.isOnlyLastKnownMetric()) {
             String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
-            if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
-                serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI_CLOUD, resourceId,
-                        monitorResourceType, metric);
-            } else {
-                Metric cacheMetric = serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD,
-                        resourceId, monitorResourceType);
-                if (Objects.nonNull(cacheMetric)
-                        && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
-                    metric = cacheMetric;
+            MonitorMetricsCacheKey cacheKey =
+                    new MonitorMetricsCacheKey(Csp.HUAWEI_CLOUD, resourceId, monitorResourceType);
+            try {
+                if (Objects.nonNull(metric) && !CollectionUtils.isEmpty(metric.getMetrics())) {
+                    monitorMetricsStore.storeMonitorMetric(cacheKey, metric);
+                    monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
+                } else {
+                    Metric cacheMetric = monitorMetricsStore.getMonitorMetric(cacheKey);
+                    monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
+                    if (Objects.nonNull(cacheMetric)
+                            && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
+                        metric = cacheMetric;
+                    }
                 }
+            } catch (Exception e) {
+                log.error("Update metrics cache data error.{}", e.getMessage());
             }
         }
     }
@@ -207,10 +214,16 @@ public class HuaweiCloudMetricsService {
                 MonitorResourceType type =
                         huaweiCloudDataModelConverter.getMonitorResourceTypeByMetricName(
                                 metricInfo.getMetricName());
-                Metric metricCache =
-                        serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD, resourceId, type);
-                if (Objects.nonNull(metricCache)) {
-                    metricCacheMap.put(metricInfo.getMetricName(), metricCache);
+                MonitorMetricsCacheKey cacheKey =
+                        new MonitorMetricsCacheKey(Csp.HUAWEI_CLOUD, resourceId, type);
+                try {
+                    Metric metricCache = monitorMetricsStore.getMonitorMetric(cacheKey);
+                    monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
+                    if (Objects.nonNull(metricCache)) {
+                        metricCacheMap.put(metricInfo.getMetricName(), metricCache);
+                    }
+                } catch (Exception e) {
+                    log.error("Get metrics cache data error.{}", e.getMessage());
                 }
             }
         }
@@ -233,6 +246,8 @@ public class HuaweiCloudMetricsService {
                 MonitorResourceType type =
                         huaweiCloudDataModelConverter.getMonitorResourceTypeByMetricName(
                                 metricInfo.getMetricName());
+                MonitorMetricsCacheKey cacheKey =
+                        new MonitorMetricsCacheKey(Csp.HUAWEI_CLOUD, resourceId, type);
                 Metric metric = metrics.stream()
                         .filter(m -> Objects.nonNull(m)
                                 && StringUtils.equals(m.getName(), metricInfo.getMetricName())
@@ -240,15 +255,19 @@ public class HuaweiCloudMetricsService {
                                 && StringUtils.equals(resourceId, m.getLabels().get("id")))
                         .findAny()
                         .orElse(null);
-                if (metric == null) {
-                    Metric metricCache = serviceMetricsStore.getMonitorMetric(Csp.HUAWEI_CLOUD,
-                            resourceId, type);
-                    if (Objects.nonNull(metricCache)) {
-                        metrics.add(metricCache);
+                try {
+                    if (Objects.isNull(metric)) {
+                        Metric metricCache = monitorMetricsStore.getMonitorMetric(cacheKey);
+                        monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
+                        if (Objects.nonNull(metricCache)) {
+                            metrics.add(metricCache);
+                        }
+                    } else {
+                        monitorMetricsStore.storeMonitorMetric(cacheKey, metric);
+                        monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
                     }
-                } else {
-                    serviceMetricsStore.storeMonitorMetric(Csp.HUAWEI_CLOUD,
-                            resourceId, type, metric);
+                } catch (Exception e) {
+                    log.error("Update metrics cache data error.{}", e.getMessage());
                 }
             }
         }

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -24,8 +25,6 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.monitor.ServiceMetricsStore;
-import org.eclipse.xpanse.modules.monitor.cache.ServiceMetricsCacheManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineOrchestratorPlugin;
@@ -52,7 +51,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         FlexibleEngineVmStateManager.class, FlexibleEngineServerManageRequestConverter.class,
         FlexibleEngineMetricsService.class, FlexibleEngineClient.class,
         FlexibleEngineMonitorConstants.class, FlexibleEngineDataModelConverter.class,
-        CredentialCenter.class, ServiceMetricsStore.class, ServiceMetricsCacheManager.class,
+        CredentialCenter.class, MonitorMetricsStore.class,
         FlexibleEngineTerraformResourceHandler.class, FlexibleEngineResourceManager.class,
         FlexibleEnginePriceCalculator.class, FlexibleEngineRetryStrategy.class})
 class FlexibleEngineMonitorIntegrationTest {

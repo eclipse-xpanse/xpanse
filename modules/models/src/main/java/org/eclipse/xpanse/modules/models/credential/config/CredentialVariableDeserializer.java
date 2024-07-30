@@ -19,10 +19,16 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
  */
 public class CredentialVariableDeserializer extends StdDeserializer<CredentialVariable> {
 
+    /**
+     * Constructor for CredentialVariableDeserializer.
+     */
     public CredentialVariableDeserializer() {
-        this(null);
+        this(CredentialVariable.class);
     }
 
+    /**
+     * Constructor for CredentialVariableDeserializer.
+     */
     public CredentialVariableDeserializer(Class<?> deserializedClass) {
         super(deserializedClass);
     }
