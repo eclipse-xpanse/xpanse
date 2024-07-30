@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
@@ -164,9 +165,11 @@ public class TerraformLocalDeployment implements Deployer {
                 terraformResult.setCommandStdError(tfEx.getMessage());
             }
             terraformResult.setTerraformState(executor.getTerraformState());
-            terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
+            terraformResult.setImportantFileContentMap(importantFileContentMap);
             terraformDeploymentResultCallbackManager.deployCallback(task.getServiceId(),
                     terraformResult);
+            deleteStoredFiles(workspace, importantFileContentMap.keySet());
         });
     }
 
@@ -187,9 +190,11 @@ public class TerraformLocalDeployment implements Deployer {
                 terraformResult.setCommandStdError(tfEx.getMessage());
             }
             terraformResult.setTerraformState(executor.getTerraformState());
-            terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
+            terraformResult.setImportantFileContentMap(importantFileContentMap);
             terraformDeploymentResultCallbackManager.destroyCallback(task.getServiceId(),
                     terraformResult, task.getDeploymentScenario());
+            deleteStoredFiles(workspace, importantFileContentMap.keySet());
         });
     }
 
@@ -211,9 +216,11 @@ public class TerraformLocalDeployment implements Deployer {
                 terraformResult.setCommandStdError(tfEx.getMessage());
             }
             terraformResult.setTerraformState(executor.getTerraformState());
-            terraformResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
+            terraformResult.setImportantFileContentMap(importantFileContentMap);
             terraformDeploymentResultCallbackManager.modifyCallback(task.getServiceId(),
                     terraformResult);
+            deleteStoredFiles(workspace, importantFileContentMap.keySet());
         });
     }
 
@@ -231,19 +238,31 @@ public class TerraformLocalDeployment implements Deployer {
     @Override
     public void deleteTaskWorkspace(UUID taskId) {
         String workspace = getWorkspacePath(taskId);
-        deleteWorkSpace(workspace);
+        deleteWorkspace(workspace);
     }
 
     /**
      * delete workspace.
      */
-    private void deleteWorkSpace(String workspace) {
+    private void deleteWorkspace(String workspace) {
         Path path = Paths.get(workspace);
         try (Stream<Path> pathStream = Files.walk(path)) {
             pathStream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Delete workspace:{} error.", workspace, e);
         }
+    }
+
+    private void deleteStoredFiles(String workspace, Set<String> fileNames) {
+        fileNames.forEach(fileName -> {
+            try {
+                String path = workspace + File.separator + fileName;
+                File file = new File(path);
+                Files.deleteIfExists(file.toPath());
+            } catch (IOException e) {
+                log.error("Delete file with name:{} error.", fileName, e);
+            }
+        });
     }
 
     /**

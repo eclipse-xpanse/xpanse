@@ -65,12 +65,12 @@ public class ServiceOrderEntity {
     @Column(name = "COMPLETED_TIME")
     private OffsetDateTime completedTime;
 
-    @Column(name = "PREVIOUS_DEPLOYE_REQUEST", columnDefinition = "json")
+    @Column(name = "PREVIOUS_DEPLOY_REQUEST", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private DeployRequest previousDeployRequest;
 
-    @Column(name = "NEW_DEPLOYE_REQUEST", columnDefinition = "json")
+    @Column(name = "NEW_DEPLOY_REQUEST", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private DeployRequest newDeployRequest;
@@ -80,12 +80,12 @@ public class ServiceOrderEntity {
     @Convert(converter = ObjectJsonConverter.class)
     private List<DeployResource> previousDeployedResources;
 
-    @Column(name = "PREVIOUS_DEPLOYED_RESULT_PROPERTY", columnDefinition = "json")
+    @Column(name = "PREVIOUS_DEPLOYED_SERVICE_PROPERTY", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private Map<String, String> previousDeployedServiceProperties;
 
-    @Column(name = "PREVIOUS_DEPLOYED_SERVICE_PROPERTY", columnDefinition = "json")
+    @Column(name = "PREVIOUS_DEPLOYED_RESULT_PROPERTY", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private Map<String, String> previousDeployedResultProperties;

@@ -54,10 +54,10 @@ public class TerraformLocalExecutor {
      * @param deployResultFileUtils file tool class.
      */
     TerraformLocalExecutor(Map<String, String> env,
-            Map<String, Object> variables,
-            String workspace,
-            @Nullable String subDirectory,
-            DeployResultFileUtils deployResultFileUtils) {
+                           Map<String, Object> variables,
+                           String workspace,
+                           @Nullable String subDirectory,
+                           DeployResultFileUtils deployResultFileUtils) {
         this.env = env;
         this.variables = variables;
         this.workspace =
@@ -220,17 +220,12 @@ public class TerraformLocalExecutor {
         if (workPath.isDirectory() && workPath.exists()) {
             File[] files = workPath.listFiles();
             if (Objects.nonNull(files)) {
-                List<File> importantFiles = Arrays.stream(files)
-                        .filter(file -> file.isFile() && !isExcludedFile(file.getName())).toList();
-                for (File importantFile : importantFiles) {
-                    try {
-                        String content = readFile(importantFile);
-                        fileContentMap.put(importantFile.getName(), content);
-                    } catch (IOException e) {
-                        log.error("Read content of file with name:{} error.",
-                                importantFile.getName(), e);
+                Arrays.stream(files).forEach(file -> {
+                    if (file.isFile() && !isExcludedFile(file.getName())) {
+                        String content = readFileContent(file);
+                        fileContentMap.put(file.getName(), content);
                     }
-                }
+                });
             }
         }
         return fileContentMap;
@@ -266,8 +261,15 @@ public class TerraformLocalExecutor {
         return EXCLUDED_FILE_SUFFIX_LIST.contains(fileSuffix);
     }
 
-    private String readFile(File file) throws IOException {
-        return Files.readString(file.toPath());
+    private String readFileContent(File file) {
+        String fileContent = "";
+        try {
+            fileContent = Files.readString(file.toPath());
+            log.info("Read file content with name:{} successfully.", file.getName());
+        } catch (IOException e) {
+            log.error("Read file content with name:{} error.", file.getName(), e);
+        }
+        return fileContent;
     }
 
 
