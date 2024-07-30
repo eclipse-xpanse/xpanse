@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
@@ -165,9 +166,11 @@ public class OpenTofuLocalDeployment implements Deployer {
                 openTofuResult.setCommandStdError(tfEx.getMessage());
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
-            openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            Map<String, String> importantFilesContent = executor.getImportantFilesContent();
+            openTofuResult.setImportantFileContentMap(importantFilesContent);
             openTofuDeploymentResultCallbackManager.deployCallback(task.getServiceId(),
                     openTofuResult);
+            deleteStoredFiles(workspace, importantFilesContent.keySet());
         });
     }
 
@@ -188,10 +191,11 @@ public class OpenTofuLocalDeployment implements Deployer {
                 openTofuResult.setCommandStdError(tfEx.getMessage());
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
-            openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            Map<String, String> importantFilesContent = executor.getImportantFilesContent();
+            openTofuResult.setImportantFileContentMap(importantFilesContent);
             openTofuDeploymentResultCallbackManager.destroyCallback(task.getServiceId(),
-                    openTofuResult,
-                    task.getDeploymentScenario());
+                    openTofuResult, task.getDeploymentScenario());
+            deleteStoredFiles(workspace, importantFilesContent.keySet());
         });
     }
 
@@ -213,9 +217,11 @@ public class OpenTofuLocalDeployment implements Deployer {
                 openTofuResult.setCommandStdError(tfEx.getMessage());
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
-            openTofuResult.setImportantFileContentMap(executor.getImportantFilesContent());
+            Map<String, String> importantFilesContent = executor.getImportantFilesContent();
+            openTofuResult.setImportantFileContentMap(importantFilesContent);
             openTofuDeploymentResultCallbackManager.modifyCallback(task.getServiceId(),
                     openTofuResult);
+            deleteStoredFiles(workspace, importantFilesContent.keySet());
         });
     }
 
@@ -233,19 +239,32 @@ public class OpenTofuLocalDeployment implements Deployer {
     @Override
     public void deleteTaskWorkspace(UUID taskId) {
         String workspace = getWorkspacePath(taskId);
-        deleteWorkSpace(workspace);
+        deleteWorkspace(workspace);
     }
 
     /**
      * delete workspace.
      */
-    private void deleteWorkSpace(String workspace) {
+    private void deleteWorkspace(String workspace) {
         Path path = Paths.get(workspace);
         try (Stream<Path> pathStream = Files.walk(path)) {
             pathStream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Delete workspace:{} error.", workspace, e);
         }
+    }
+
+
+    private void deleteStoredFiles(String workspace, Set<String> fileNames) {
+        fileNames.forEach(fileName -> {
+            try {
+                String path = workspace + File.separator + fileName;
+                File file = new File(path);
+                Files.deleteIfExists(file.toPath());
+            } catch (IOException e) {
+                log.error("Delete file with name:{} error.", fileName, e);
+            }
+        });
     }
 
     /**

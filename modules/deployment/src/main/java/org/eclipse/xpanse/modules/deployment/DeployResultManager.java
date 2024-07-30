@@ -201,13 +201,23 @@ public class DeployResultManager {
         }
         ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
         BeanUtils.copyProperties(storedEntity, entityToUpdate);
+        DeployerTaskStatus deployerTaskStatus = deployResult.getState();
         if (deployResult.getIsTaskSuccessful()) {
-            entityToUpdate.setTaskStatus(TaskStatus.SUCCESSFUL);
+            // When the status is rollback_success, the deployment order status should be failed.
+            if (deployerTaskStatus == DeployerTaskStatus.ROLLBACK_SUCCESS) {
+                entityToUpdate.setTaskStatus(TaskStatus.FAILED);
+            } else {
+                entityToUpdate.setTaskStatus(TaskStatus.SUCCESSFUL);
+            }
             entityToUpdate.setCompletedTime(OffsetDateTime.now());
         } else {
-            entityToUpdate.setTaskStatus(TaskStatus.FAILED);
             entityToUpdate.setErrorMsg(deployResult.getMessage());
-            entityToUpdate.setCompletedTime(OffsetDateTime.now());
+            // When the status is deploy_failed, the order status should not be failed util
+            // rollback id done.
+            if (deployerTaskStatus != DeployerTaskStatus.DEPLOY_FAILED) {
+                entityToUpdate.setTaskStatus(TaskStatus.FAILED);
+                entityToUpdate.setCompletedTime(OffsetDateTime.now());
+            }
         }
         serviceOrderStorage.storeAndFlush(entityToUpdate);
     }
