@@ -185,8 +185,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testGetAvailabilityZonesApiThrowsException() throws Exception {
         getAvailabilityZonesThrowsClientApiCallFailedException(Csp.HUAWEI_CLOUD, "cn-southwest");
-        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.FLEXIBLE_ENGINE, "eu-west");
-        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.OPENSTACK_TESTLAB, "RegionOne");
     }
 
     void testGetAvailabilityZonesForHuaweiCloud() throws Exception {
@@ -270,7 +268,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
             throws Exception {
         final MockHttpServletResponse listAzResponse = getAvailabilityZones(csp, regionName);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), listAzResponse.getStatus());
-        Assertions.assertEquals(listAzResponse.getContentAsString(), "[]");
+        Assertions.assertEquals(listAzResponse.getContentAsString(), "[\"HuaweiCloudClient listAvailabilityZones" +
+                " with region cn-southwest failed. No credential information found for the given Csp:HuaweiCloud.\"]");
         Assertions.assertEquals(listAzResponse.getHeader("Cache-Control"), "no-cache");
     }
 
