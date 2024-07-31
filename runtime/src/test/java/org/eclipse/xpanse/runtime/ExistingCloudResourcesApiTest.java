@@ -75,6 +75,9 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
 
     @BeforeEach
     void setUp() {
+        if (mockOsFactory != null) {
+            mockOsFactory.close();
+        }
         mockOsFactory = mockStatic(OSFactory.class);
     }
 

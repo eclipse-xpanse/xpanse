@@ -410,7 +410,8 @@ public class ServiceDeployerApi {
         } catch (Exception ex) {
             log.error("Error fetching availability zones", ex);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .cacheControl(CacheControl.noCache()).body(Collections.emptyList());
+                    .cacheControl(CacheControl.noCache())
+                    .body(Collections.singletonList(ex.getMessage()));
         }
     }
 
