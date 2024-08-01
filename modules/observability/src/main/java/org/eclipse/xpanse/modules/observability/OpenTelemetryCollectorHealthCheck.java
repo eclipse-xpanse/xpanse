@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.modules.observability;
 
 import java.net.URI;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -20,6 +21,7 @@ import org.springframework.web.client.RestClientException;
  * Bean to manage OpenTelemetry Collector Health check.
  */
 @Component
+@Slf4j
 public class OpenTelemetryCollectorHealthCheck {
 
     @Value("${otel.exporter.otlp.endpoint:http://localhost:4317}")
@@ -55,6 +57,7 @@ public class OpenTelemetryCollectorHealthCheck {
             } catch (RestClientException restClientException) {
                 backendSystemStatus.setHealthStatus(HealthStatus.NOK);
                 backendSystemStatus.setDetails(restClientException.getMessage());
+                log.error(restClientException.getMessage(), restClientException);
             }
             return backendSystemStatus;
         }
