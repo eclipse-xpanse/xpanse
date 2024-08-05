@@ -5,6 +5,9 @@
 
 package org.eclipse.xpanse.modules.logging;
 
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.ORDER_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.TRACKING_ID;
+
 import java.util.Objects;
 import java.util.UUID;
 import org.slf4j.MDC;
@@ -18,14 +21,15 @@ import org.zalando.logbook.HttpRequest;
 public class CustomRequestIdGenerator implements CorrelationId {
 
     /**
-     * The key of the task id in MDC.
+     * Generate order id for order request.
+     *
+     * @return order id.
      */
-    public static final String TASK_ID = "TASK_ID";
-
-    /**
-     * The key of the tracking id in MDC.
-     */
-    public static final String TRACKING_ID = "TRACKING_ID";
+    public static UUID generateOrderId() {
+        UUID orderId = UUID.randomUUID();
+        MDC.put(ORDER_ID, orderId.toString());
+        return orderId;
+    }
 
     @Override
     public String generate(@NonNull HttpRequest request) {
