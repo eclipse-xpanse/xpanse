@@ -5,15 +5,16 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
-import static org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator.TASK_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.TRACKING_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
@@ -100,11 +101,8 @@ public class TerraformBootScriptValidator {
 
     private TerraformDeployWithScriptsRequest getValidateScriptsInOclRequest(
             Deployment deployment) {
-        TerraformDeployWithScriptsRequest request =
-                new TerraformDeployWithScriptsRequest();
-        UUID uuid = Objects.nonNull(MDC.get(TASK_ID))
-                ? UUID.fromString(MDC.get(TASK_ID)) : UUID.randomUUID();
-        request.setRequestId(uuid);
+        TerraformDeployWithScriptsRequest request = new TerraformDeployWithScriptsRequest();
+        request.setRequestId(getRequestId());
         request.setIsPlanOnly(false);
         request.setScripts(getFilesByOcl(deployment));
         return request;
@@ -112,11 +110,8 @@ public class TerraformBootScriptValidator {
 
     private TerraformDeployFromGitRepoRequest getValidateScriptsInGitRepoRequest(
             Deployment deployment) {
-        TerraformDeployFromGitRepoRequest request =
-                new TerraformDeployFromGitRepoRequest();
-        UUID uuid = Objects.nonNull(MDC.get(TASK_ID))
-                ? UUID.fromString(MDC.get(TASK_ID)) : UUID.randomUUID();
-        request.setRequestId(uuid);
+        TerraformDeployFromGitRepoRequest request = new TerraformDeployFromGitRepoRequest();
+        request.setRequestId(getRequestId());
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
@@ -127,5 +122,16 @@ public class TerraformBootScriptValidator {
     private List<String> getFilesByOcl(Deployment deployment) {
         String deployer = deployment.getDeployer();
         return Collections.singletonList(deployer);
+    }
+
+    private UUID getRequestId() {
+        if (StringUtils.isBlank(MDC.get(TRACKING_ID))) {
+            return UUID.randomUUID();
+        }
+        try {
+            return UUID.fromString(MDC.get(SERVICE_ID));
+        } catch (IllegalArgumentException e) {
+            return UUID.randomUUID();
+        }
     }
 }

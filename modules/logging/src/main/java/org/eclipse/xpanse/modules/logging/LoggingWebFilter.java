@@ -5,8 +5,6 @@
 
 package org.eclipse.xpanse.modules.logging;
 
-import static org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator.TRACKING_ID;
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,7 +30,7 @@ public class LoggingWebFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
             ServletException, IOException {
-        MDC.put(TRACKING_ID, UUID.randomUUID().toString());
+        MDC.put(LoggingKeyConstant.TRACKING_ID, UUID.randomUUID().toString());
         log.debug("Intercept coming request and set MDC context information");
         chain.doFilter(request, response);
         MDC.clear();

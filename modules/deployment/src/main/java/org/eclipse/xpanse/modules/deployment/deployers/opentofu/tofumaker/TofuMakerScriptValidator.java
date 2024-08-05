@@ -5,15 +5,16 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
-import static org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator.TASK_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.TRACKING_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
@@ -99,11 +100,8 @@ public class TofuMakerScriptValidator {
     }
 
     private OpenTofuDeployWithScriptsRequest getValidateScriptsInOclRequest(Deployment deployment) {
-        OpenTofuDeployWithScriptsRequest request =
-                new OpenTofuDeployWithScriptsRequest();
-        UUID uuid = Objects.nonNull(MDC.get(TASK_ID))
-                ? UUID.fromString(MDC.get(TASK_ID)) : UUID.randomUUID();
-        request.setRequestId(uuid);
+        OpenTofuDeployWithScriptsRequest request = new OpenTofuDeployWithScriptsRequest();
+        request.setRequestId(getRequestId());
         request.setIsPlanOnly(false);
         request.setScripts(getFilesByOcl(deployment));
         return request;
@@ -111,11 +109,8 @@ public class TofuMakerScriptValidator {
 
     private OpenTofuDeployFromGitRepoRequest getValidateScriptsInGitRepoRequest(
             Deployment deployment) {
-        OpenTofuDeployFromGitRepoRequest request =
-                new OpenTofuDeployFromGitRepoRequest();
-        UUID uuid = Objects.nonNull(MDC.get(TASK_ID))
-                ? UUID.fromString(MDC.get(TASK_ID)) : UUID.randomUUID();
-        request.setRequestId(uuid);
+        OpenTofuDeployFromGitRepoRequest request = new OpenTofuDeployFromGitRepoRequest();
+        request.setRequestId(getRequestId());
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
@@ -126,5 +121,16 @@ public class TofuMakerScriptValidator {
     private List<String> getFilesByOcl(Deployment deployment) {
         String deployer = deployment.getDeployer();
         return Collections.singletonList(deployer);
+    }
+
+    private UUID getRequestId() {
+        if (StringUtils.isBlank(MDC.get(TRACKING_ID))) {
+            return UUID.randomUUID();
+        }
+        try {
+            return UUID.fromString(MDC.get(SERVICE_ID));
+        } catch (IllegalArgumentException e) {
+            return UUID.randomUUID();
+        }
     }
 }

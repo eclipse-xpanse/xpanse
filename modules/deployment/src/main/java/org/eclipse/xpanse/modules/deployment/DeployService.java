@@ -6,8 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import static org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator.TASK_ID;
-import static org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator.TRACKING_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
 
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
@@ -27,6 +26,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentFailedException;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceDeploymentStatusChangePolling;
+import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeploymentStatusUpdate;
@@ -144,7 +144,7 @@ public class DeployService {
             deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
         }
         DeployTask deployTask = new DeployTask();
-        deployTask.setOrderId(getOrderId());
+        deployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         deployTask.setServiceId(deployRequest.getServiceId());
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
         deployTask.setUserId(deployRequest.getUserId());
@@ -238,7 +238,7 @@ public class DeployService {
     private void deploy(DeployTask deployTask) {
         DeployResult deployResult;
         Exception exception = null;
-        MDC.put(TASK_ID, deployTask.getServiceId().toString());
+        MDC.put(SERVICE_ID, deployTask.getServiceId().toString());
         Deployer deployer =
                 deployerKindManager.getDeployment(deployTask.getOcl().getDeployment().getKind());
         ServiceOrderEntity orderTaskEntity =
@@ -274,7 +274,7 @@ public class DeployService {
     public void redeployService(DeployTask redeployTask, DeployServiceEntity deployServiceEntity) {
         DeployResult redeployResult;
         Exception exception = null;
-        MDC.put(TASK_ID, redeployTask.getServiceId().toString());
+        MDC.put(SERVICE_ID, redeployTask.getServiceId().toString());
         Deployer deployer =
                 deployerKindManager.getDeployment(redeployTask.getOcl().getDeployment().getKind());
         ServiceOrderEntity orderTaskEntity =
@@ -391,7 +391,7 @@ public class DeployService {
         }
         validateDeployRequestWithServiceTemplate(existingServiceTemplate, newDeployRequest);
         DeployTask modifyTask = new DeployTask();
-        modifyTask.setOrderId(getOrderId());
+        modifyTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         modifyTask.setTaskType(ServiceOrderType.MODIFY);
         modifyTask.setServiceId(deployServiceEntity.getId());
         modifyTask.setUserId(modifyRequest.getUserId());
@@ -427,7 +427,7 @@ public class DeployService {
                               DeployServiceEntity deployServiceEntity) {
         Exception exception = null;
         DeployResult modifyResult;
-        MDC.put(TASK_ID, modifyTask.getServiceId().toString());
+        MDC.put(SERVICE_ID, modifyTask.getServiceId().toString());
         Deployer deployer =
                 deployerKindManager.getDeployment(modifyTask.getOcl().getDeployment().getKind());
         ServiceOrderEntity orderTaskEntity =
@@ -465,7 +465,7 @@ public class DeployService {
     private void destroy(DeployTask destroyTask, DeployServiceEntity deployServiceEntity) {
         DeployResult destroyResult;
         Exception exception = null;
-        MDC.put(TASK_ID, destroyTask.getServiceId().toString());
+        MDC.put(SERVICE_ID, destroyTask.getServiceId().toString());
         ServiceOrderEntity orderTaskEntity =
                 serviceOrderManager.createServiceOrderTask(destroyTask, deployServiceEntity);
         Deployer deployer =
@@ -503,7 +503,7 @@ public class DeployService {
      */
     public void purgeService(DeployTask purgeTask, DeployServiceEntity deployServiceEntity) {
         Exception exception = null;
-        MDC.put(TASK_ID, purgeTask.getServiceId().toString());
+        MDC.put(SERVICE_ID, purgeTask.getServiceId().toString());
         DeployResult purgeResult;
         ServiceOrderEntity orderTaskEntity =
                 serviceOrderManager.createServiceOrderTask(purgeTask, deployServiceEntity);
@@ -546,7 +546,7 @@ public class DeployService {
      * @param deployRequest deploy request.
      */
     public void deployServiceById(UUID newId, String userId, DeployRequest deployRequest) {
-        MDC.put(TASK_ID, newId.toString());
+        MDC.put(SERVICE_ID, newId.toString());
         log.info("Migrate workflow start deploy new service instance with id: {}", newId);
         deployRequest.setServiceId(newId);
         deployRequest.setUserId(userId);
@@ -554,7 +554,7 @@ public class DeployService {
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         // override task id and user id.
         deployTask.setServiceId(newId);
-        deployTask.setOrderId(getOrderId());
+        deployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
         deploy(deployTask);
     }
@@ -563,13 +563,13 @@ public class DeployService {
      * Destroy service by deployed service id.
      */
     public void destroyServiceById(String id) {
-        MDC.put(TASK_ID, id);
+        MDC.put(SERVICE_ID, id);
         UUID serviceId = UUID.fromString(id);
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(serviceId);
         DeployTask destroyTask =
                 deployServiceEntityConverter.getDeployTaskByStoredService(deployServiceEntity);
-        destroyTask.setOrderId(getOrderId());
+        destroyTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         destroyTask.setTaskType(ServiceOrderType.DESTROY);
         destroyTask.setDeploymentScenario(DeploymentScenario.DESTROY);
         destroy(destroyTask, deployServiceEntity);
@@ -592,7 +592,7 @@ public class DeployService {
         }
         DeployTask destroyTask = deployServiceEntityConverter.getDeployTaskByStoredService(
                 deployServiceEntity);
-        destroyTask.setOrderId(getOrderId());
+        destroyTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         destroyTask.setTaskType(ServiceOrderType.DESTROY);
         destroyTask.setDeploymentScenario(DeploymentScenario.DESTROY);
         return destroyTask;
@@ -619,7 +619,7 @@ public class DeployService {
         DeployTask purgeTask =
                 deployServiceEntityConverter.getDeployTaskByStoredService(
                         deployServiceEntity);
-        purgeTask.setOrderId(getOrderId());
+        purgeTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         purgeTask.setTaskType(ServiceOrderType.PURGE);
         purgeTask.setDeploymentScenario(DeploymentScenario.PURGE);
         return purgeTask;
@@ -644,7 +644,7 @@ public class DeployService {
         }
         DeployTask redeployTask = deployServiceEntityConverter.getDeployTaskByStoredService(
                 deployServiceEntity);
-        redeployTask.setOrderId(getOrderId());
+        redeployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         redeployTask.setTaskType(ServiceOrderType.REDEPLOY);
         redeployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         return redeployTask;
@@ -694,19 +694,5 @@ public class DeployService {
             case PURGE -> DeployerTaskStatus.PURGE_FAILED;
             case MODIFY -> DeployerTaskStatus.MODIFICATION_FAILED;
         };
-    }
-
-    private UUID getOrderId() {
-        UUID orderId = UUID.randomUUID();
-        if (Objects.nonNull(MDC.get(TRACKING_ID))) {
-            try {
-                return UUID.fromString(MDC.get(TRACKING_ID));
-            } catch (IllegalArgumentException e) {
-                log.error("Invalid UUID string: {}", MDC.get(TRACKING_ID));
-                return orderId;
-            }
-        } else {
-            return orderId;
-        }
     }
 }
