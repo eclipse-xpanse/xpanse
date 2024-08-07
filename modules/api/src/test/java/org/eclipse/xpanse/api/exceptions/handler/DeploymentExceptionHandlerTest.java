@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoun
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavorDowngradeNotAllowed;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -152,7 +152,7 @@ class DeploymentExceptionHandlerTest {
     @Test
     void testVariableInvalidException() throws Exception {
         when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new VariableInvalidException(List.of("test error")));
+                any())).thenThrow(new VariableValidationFailedException(List.of("test error")));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Variable Validation Failed")).andExpect(

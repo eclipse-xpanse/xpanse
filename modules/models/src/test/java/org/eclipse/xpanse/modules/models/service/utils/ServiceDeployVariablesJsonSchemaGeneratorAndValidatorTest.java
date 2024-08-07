@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
@@ -77,17 +77,17 @@ class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
         Map<String, Object> validatePatternPro = new HashMap<>();
         validatePatternPro.put("admin_passwd", "12335435@Q");
 
-        assertThrows(VariableInvalidException.class, () -> {
+        assertThrows(VariableValidationFailedException.class, () -> {
             serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validateMinLengthPro,
                     jsonObjectSchema);
         });
-        assertThrows(VariableInvalidException.class, () -> {
+        assertThrows(VariableValidationFailedException.class, () -> {
             serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validateMaxLengthPro,
                     jsonObjectSchema);
         });
-        assertThrows(VariableInvalidException.class, () -> {
+        assertThrows(VariableValidationFailedException.class, () -> {
             serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validatePatternPro,
                     jsonObjectSchema);
@@ -128,7 +128,7 @@ class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
         Map<String, Object> validateRequiredPro = new HashMap<>();
         validateRequiredPro.put("admin_passwd", "123456@Qq");
 
-        assertThrows(VariableInvalidException.class, () -> {
+        assertThrows(VariableValidationFailedException.class, () -> {
             serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(variables,
                     validateRequiredPro,
                     jsonObjectSchema);

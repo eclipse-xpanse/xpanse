@@ -61,10 +61,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class ServicePricingApiTest extends ApisTestCommon {
 
-
-
     @BeforeEach
     void setUp() {
+        if (mockOsFactory != null) {
+            mockOsFactory.close();
+        }
         mockOsFactory = mockStatic(OSFactory.class);
     }
 
@@ -88,7 +89,6 @@ class ServicePricingApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("HuaweiCloud-Service-Test-" + UUID.randomUUID());
         String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
         String regionName = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
         ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
@@ -189,7 +189,6 @@ class ServicePricingApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("FlexibleEngine-Service-Test-" + UUID.randomUUID());
         ocl.getCloudServiceProvider().setName(Csp.FLEXIBLE_ENGINE);
         testGetServicePricing(ocl);
     }
@@ -213,7 +212,6 @@ class ServicePricingApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("Openstack-Service-Test-" + UUID.randomUUID());
         ocl.getCloudServiceProvider().setName(Csp.OPENSTACK_TESTLAB);
         testGetServicePricing(ocl);
     }
@@ -221,7 +219,6 @@ class ServicePricingApiTest extends ApisTestCommon {
     void testServicePricingApiWithPlusServer() throws Exception {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("PlusServer-Service-Test-" + UUID.randomUUID());
         ocl.getCloudServiceProvider().setName(Csp.PLUS_SERVER);
         testGetServicePricing(ocl);
     }
@@ -314,7 +311,6 @@ class ServicePricingApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("ServicePricingApi-error");
         ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
         UUID templateId = serviceTemplateDetails.getServiceTemplateId();
         expectedResult.setErrorMessage(

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class AvailabilityZonesRequestValidatorTest {
         final List<AvailabilityZoneConfig> zoneConfigs = List.of(availabilityZoneConfig);
         final Map<String, String> inputMap = Map.ofEntries(Map.entry("value", "value"));
         // Run the test
-        Assertions.assertThrows(VariableInvalidException.class, () -> {
+        Assertions.assertThrows(VariableValidationFailedException.class, () -> {
             AvailabilityZonesRequestValidator.validateAvailabilityZones(inputMap, zoneConfigs);
         });
     }
@@ -71,7 +71,7 @@ class AvailabilityZonesRequestValidatorTest {
         final Map<String, String> inputMap = Map.ofEntries(
                 Map.entry("varName", "value"), Map.entry("varName1", "value"));
         // Run the test
-        Assertions.assertThrows(VariableInvalidException.class, () -> {
+        Assertions.assertThrows(VariableValidationFailedException.class, () -> {
             AvailabilityZonesRequestValidator.validateAvailabilityZones(inputMap, zoneConfigs);
         });
     }

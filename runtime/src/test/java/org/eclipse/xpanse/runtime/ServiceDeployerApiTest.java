@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.runtime;
 
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.HEADER_TRACKING_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.huaweicloud.sdk.core.invoker.SyncInvoker;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
@@ -30,7 +30,6 @@ import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesResponse;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +44,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
+import org.eclipse.xpanse.modules.models.response.OrderFailedResponse;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
@@ -107,6 +107,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     @Test
     @WithJwt(file = "jwt_user.json")
     void testGetAzsApi() throws Exception {
+        if (mockOsFactory != null) {
+            mockOsFactory.close();
+        }
         mockOsFactory = mockStatic(OSFactory.class);
         testGetAvailabilityZonesApiThrowsException();
         testGetAvailabilityZonesApiWell();
@@ -147,10 +150,12 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void addServiceFlavorPolicies(ServicePolicyCreateRequest serviceFlavorPolicy)
             throws Exception {
-        mockMvc.perform(post("/xpanse/service/policies").content(
+        MockHttpServletResponse response = mockMvc.perform(post("/xpanse/service/policies").content(
                                 objectMapper.writeValueAsString(serviceFlavorPolicy))
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
     }
 
     UserPolicy addUserPolicy(UserPolicyCreateRequest userPolicy) throws Exception {
@@ -159,13 +164,17 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         post("/xpanse/policies").content(objectMapper.writeValueAsString(userPolicy))
                                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         return objectMapper.readValue(response.getContentAsString(), UserPolicy.class);
     }
 
     void deleteUserPolicy(UUID id) throws Exception {
-        mockMvc.perform(
+        MockHttpServletResponse response = mockMvc.perform(
                 delete("/xpanse/policies/{serviceId}", id).contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
     }
 
     void mockPolicyEvaluationResult(boolean isSuccessful) {
@@ -185,6 +194,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testGetAvailabilityZonesApiThrowsException() throws Exception {
         getAvailabilityZonesThrowsClientApiCallFailedException(Csp.HUAWEI_CLOUD, "cn-southwest");
+        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.FLEXIBLE_ENGINE, "eu-west-0");
     }
 
     void testGetAvailabilityZonesForHuaweiCloud() throws Exception {
@@ -204,9 +214,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         List<String> azs =
                 objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
                 });
-        Assertions.assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
-        Assertions.assertEquals(2, azs.size());
-        Assertions.assertEquals("cn-southwest-2a", azs.getFirst());
+        assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
+        assertEquals(2, azs.size());
+        assertEquals("cn-southwest-2a", azs.getFirst());
         deleteCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, "AK_SK");
     }
 
@@ -237,9 +247,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         List<String> azs =
                 objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
                 });
-        Assertions.assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
-        Assertions.assertEquals(2, azs.size());
-        Assertions.assertEquals("eu-west-0a", azs.getFirst());
+        assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
+        assertEquals(2, azs.size());
+        assertEquals("eu-west-0a", azs.getFirst());
         deleteCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK");
     }
 
@@ -258,25 +268,28 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         List<String> azNames =
                 objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
                 });
-        Assertions.assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
-        Assertions.assertEquals(1, azNames.size());
-        Assertions.assertEquals("nova", azNames.getFirst());
+        assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
+        assertEquals(1, azNames.size());
+        assertEquals("nova", azNames.getFirst());
         deleteCredential(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "USERNAME_PASSWORD");
     }
 
     void getAvailabilityZonesThrowsClientApiCallFailedException(Csp csp, String regionName)
             throws Exception {
         final MockHttpServletResponse listAzResponse = getAvailabilityZones(csp, regionName);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), listAzResponse.getStatus());
-        Assertions.assertEquals(listAzResponse.getContentAsString(), "[\"HuaweiCloudClient listAvailabilityZones" +
-                " with region cn-southwest failed. No credential information found for the given Csp:HuaweiCloud.\"]");
-        Assertions.assertEquals(listAzResponse.getHeader("Cache-Control"), "no-cache");
+        assertEquals(HttpStatus.BAD_REQUEST.value(), listAzResponse.getStatus());
+        assertEquals(listAzResponse.getHeader("Cache-Control"), "no-cache");
     }
 
     MockHttpServletResponse getAvailabilityZones(Csp csp, String regionName) throws Exception {
-        return mockMvc.perform(get("/xpanse/csp/region/azs").param("cspName", csp.toValue())
-                        .param("regionName", regionName).accept(MediaType.APPLICATION_JSON)).andReturn()
-                .getResponse();
+        MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/csp/region/azs").param("cspName",
+                                        csp.toValue())
+                                .param("regionName", regionName).accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
 
@@ -284,12 +297,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("TerraformTest-1");
         testDeployerWithOclAndPolicy(ocl);
 
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
-        ocl.setName("TerraformFromGitTest");
         testDeployerWithOclAndPolicy(oclFromGit);
     }
 
@@ -347,13 +358,11 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("OpenTofuTest");
         ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
         testDeployerWithOclAndPolicy(ocl);
 
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
-        ocl.setName("OpenTofuFromGitTest");
         oclFromGit.getDeployment().setKind(DeployerKind.OPEN_TOFU);
         testDeployerWithOclAndPolicy(oclFromGit);
     }
@@ -361,7 +370,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     void testDeployApisThrowExceptions() throws Exception {
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("DeployerErrorTest-1");
         ocl.getFlavors().setIsDowngradeAllowed(false);
         ServiceFlavorWithPrice defaultFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
         ServiceFlavorWithPrice lowerPriorityFlavor = new ServiceFlavorWithPrice();
@@ -411,10 +419,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         String errorMsg = String.format("Downgrading of flavors is not allowed. New flavor"
                         + " priority %d is lower than the original flavor priority %d.",
                 lowerPriorityFlavor.getPriority(), originalServiceFlavor.getPriority());
-        Response expectedResponse =
-                Response.errorResponse(ResultType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED,
-                        Collections.singletonList(errorMsg));
-        String result = objectMapper.writeValueAsString(expectedResponse);
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor(lowerPriorityFlavor.getName());
         modifyRequest.setServiceRequestProperties(new HashMap<>());
@@ -422,7 +426,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         final MockHttpServletResponse modifyResponse = modifyService(serviceId, modifyRequest);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
-        assertEquals(result, modifyResponse.getContentAsString());
+        assertNotNull(modifyResponse.getHeader(HEADER_TRACKING_ID));
+        OrderFailedResponse orderFailedResponse = objectMapper.readValue(
+                modifyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(),
+                ResultType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testApisThrowsServiceLockedException(UUID serviceId) throws Exception {
@@ -436,22 +447,27 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testApisThrowsServiceDeploymentNotFoundException() throws Exception {
         UUID serviceId = UUID.randomUUID();
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(
-                        String.format("Service with id %s not found.", serviceId)));
-        String result = objectMapper.writeValueAsString(expectedResponse);
+        String errorMsg = String.format("Service with id %s not found.", serviceId);
 
         // Run the test
         final MockHttpServletResponse detailResponse = getServiceDetails(serviceId);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
-        assertEquals(result, detailResponse.getContentAsString());
+        Response response =
+                objectMapper.readValue(detailResponse.getContentAsString(), Response.class);
+        assertFalse(response.getSuccess());
+        assertEquals(response.getResultType(), ResultType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(response.getDetails(), List.of(errorMsg));
 
         // SetUp getComputeResourceInventoryOfService
         final MockHttpServletResponse getResourcesResponse =
                 getComputeResourceInventoryOfService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), getResourcesResponse.getStatus());
-        assertEquals(result, getResourcesResponse.getContentAsString());
+        response =
+                objectMapper.readValue(getResourcesResponse.getContentAsString(), Response.class);
+        assertFalse(response.getSuccess());
+        assertEquals(response.getResultType(), ResultType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(response.getDetails(), List.of(errorMsg));
 
         ServiceLockConfig lockConfig = new ServiceLockConfig();
         lockConfig.setDestroyLocked(true);
@@ -460,36 +476,60 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         final MockHttpServletResponse changeLockResponse = changeLockConfig(serviceId, lockConfig);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), changeLockResponse.getStatus());
-        assertEquals(result, changeLockResponse.getContentAsString());
+        response =
+                objectMapper.readValue(changeLockResponse.getContentAsString(), Response.class);
+        assertFalse(response.getSuccess());
+        assertEquals(response.getResultType(), ResultType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(response.getDetails(), List.of(errorMsg));
 
         // Run the test
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor("flavor-new");
         final MockHttpServletResponse modifyResponse = modifyService(serviceId, modifyRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
-        assertEquals(result, modifyResponse.getContentAsString());
+        OrderFailedResponse orderFailedResponse = objectMapper.readValue(
+                modifyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // Run the test
         final MockHttpServletResponse redeployResponse = redeployService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), redeployResponse.getStatus());
-        assertEquals(result, redeployResponse.getContentAsString());
+        orderFailedResponse = objectMapper.readValue(
+                redeployResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // Run the test
         final MockHttpServletResponse destroyResponse = destroyService(serviceId);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
-        assertEquals(result, destroyResponse.getContentAsString());
+        orderFailedResponse = objectMapper.readValue(
+                destroyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // Run the test
         final MockHttpServletResponse purgeResponse = purgeService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
-        assertEquals(result, purgeResponse.getContentAsString());
+        orderFailedResponse = objectMapper.readValue(
+                purgeResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testApisThrowsInvalidServiceStateException(UUID serviceId) throws Exception {
 
         // SetUp modify
-        String modifyResult = setInvalidStateAndGetExceptedResult(serviceId,
+        String errorMsg = setInvalidStateAndGetExceptedErrorMsg(serviceId,
                 ServiceDeploymentState.DESTROYING, "modify");
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor("flavor-error");
@@ -497,46 +537,62 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse modifyResponse = modifyService(serviceId, modifyRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
-        assertEquals(modifyResult, modifyResponse.getContentAsString());
+        OrderFailedResponse orderFailedResponse = objectMapper.readValue(
+                modifyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_STATE_INVALID);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp redeploy
-        String redeployResult = setInvalidStateAndGetExceptedResult(serviceId,
+        errorMsg = setInvalidStateAndGetExceptedErrorMsg(serviceId,
                 ServiceDeploymentState.DEPLOY_SUCCESS, "redeploy");
         // Run the test
         final MockHttpServletResponse redeployResponse = redeployService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), redeployResponse.getStatus());
-        assertEquals(redeployResult, redeployResponse.getContentAsString());
+        orderFailedResponse = objectMapper.readValue(
+                redeployResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_STATE_INVALID);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp destroy
-        String destroyResult = setInvalidStateAndGetExceptedResult(serviceId,
+        errorMsg = setInvalidStateAndGetExceptedErrorMsg(serviceId,
                 ServiceDeploymentState.DEPLOYING, "destroy");
         // Run the test
         final MockHttpServletResponse destroyResponse = destroyService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
-        assertEquals(destroyResult, destroyResponse.getContentAsString());
+        orderFailedResponse = objectMapper.readValue(
+                destroyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_STATE_INVALID);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp purge
-        String purgeResult = setInvalidStateAndGetExceptedResult(serviceId,
+        errorMsg = setInvalidStateAndGetExceptedErrorMsg(serviceId,
                 ServiceDeploymentState.DEPLOYING, "purge");
         // Run the test
         final MockHttpServletResponse purgeResponse = purgeService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
-        assertEquals(purgeResult, purgeResponse.getContentAsString());
+        orderFailedResponse = objectMapper.readValue(
+                purgeResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_STATE_INVALID);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
 
-    String setInvalidStateAndGetExceptedResult(UUID serviceId,
-                                               ServiceDeploymentState state, String action)
-            throws JsonProcessingException {
+    String setInvalidStateAndGetExceptedErrorMsg(UUID serviceId,
+                                                 ServiceDeploymentState state, String action) {
         DeployServiceEntity deployServiceEntity =
                 deployServiceStorage.findDeployServiceById(serviceId);
         deployServiceEntity.setServiceDeploymentState(state);
         deployServiceStorage.storeAndFlush(deployServiceEntity);
-        String errorMsg = String.format("Service %s with the state %s is not allowed to %s.",
+        return String.format("Service %s with the state %s is not allowed to %s.",
                 serviceId, state, action);
-        return objectMapper.writeValueAsString(
-                Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
-                        Collections.singletonList(errorMsg)));
     }
 
 
@@ -548,7 +604,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         deployServiceStorage.storeAndFlush(deployServiceEntity);
 
         // SetUp changeLockConfig
-        String changeLockResult = getAccessDeniedExceptedResult("change lock config of");
+        String errorMsg1 =
+                "No permissions to change lock config of services belonging to other users.";
         ServiceLockConfig lockConfig = new ServiceLockConfig();
         lockConfig.setDestroyLocked(true);
         lockConfig.setModifyLocked(true);
@@ -556,59 +613,78 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         final MockHttpServletResponse changeLockResponse = changeLockConfig(serviceId, lockConfig);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), changeLockResponse.getStatus());
-        assertEquals(changeLockResult, changeLockResponse.getContentAsString());
+        Response response =
+                objectMapper.readValue(changeLockResponse.getContentAsString(), Response.class);
+        assertFalse(response.getSuccess());
+        assertEquals(ResultType.ACCESS_DENIED, response.getResultType());
+        assertEquals(List.of(errorMsg1), response.getDetails());
 
         // SetUp getComputeResourceInventoryOfService
-        String getResourcesResult = getAccessDeniedExceptedResult("view resources of");
+        String errorMsg2 = "No permissions to view resources of services belonging to other users.";
         final MockHttpServletResponse getResourcesResponse =
                 getComputeResourceInventoryOfService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), getResourcesResponse.getStatus());
-        assertEquals(getResourcesResult, getResourcesResponse.getContentAsString());
+        response =
+                objectMapper.readValue(getResourcesResponse.getContentAsString(), Response.class);
+        assertFalse(response.getSuccess());
+        assertEquals(ResultType.ACCESS_DENIED, response.getResultType());
+        assertEquals(List.of(errorMsg2), response.getDetails());
 
         // SetUp modify
-        String modifyResult = getAccessDeniedExceptedResult("modify");
+        String errorMsg3 = "No permissions to modify services belonging to other users.";
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor("flavor-error");
         // Run the test
         final MockHttpServletResponse modifyResponse = modifyService(serviceId, modifyRequest);
         assertEquals(HttpStatus.FORBIDDEN.value(), modifyResponse.getStatus());
-        assertEquals(modifyResult, modifyResponse.getContentAsString());
+        OrderFailedResponse orderFailedResponse = objectMapper.readValue(
+                modifyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(ResultType.ACCESS_DENIED, orderFailedResponse.getResultType());
+        assertEquals(List.of(errorMsg3), orderFailedResponse.getDetails());
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp redeploy
-        String redeployResult = getAccessDeniedExceptedResult("redeploy");
+        String errorMsg4 = "No permissions to redeploy services belonging to other users.";
         // Run the test
         final MockHttpServletResponse redeployResponse = redeployService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), redeployResponse.getStatus());
-        assertEquals(redeployResult, redeployResponse.getContentAsString());
+        orderFailedResponse = objectMapper.readValue(
+                redeployResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(ResultType.ACCESS_DENIED, orderFailedResponse.getResultType());
+        assertEquals(List.of(errorMsg4), orderFailedResponse.getDetails());
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp destroy
-        String destroyResult = getAccessDeniedExceptedResult("destroy");
+        String errorMsg5 = "No permissions to destroy services belonging to other users.";
         // Run the test
         final MockHttpServletResponse destroyResponse = destroyService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), destroyResponse.getStatus());
-        assertEquals(destroyResult, destroyResponse.getContentAsString());
+        orderFailedResponse = objectMapper.readValue(
+                destroyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(ResultType.ACCESS_DENIED, orderFailedResponse.getResultType());
+        assertEquals(List.of(errorMsg5), orderFailedResponse.getDetails());
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp purge
-        String purgeResult = getAccessDeniedExceptedResult("purge");
+        String errorMsg6 = "No permissions to purge services belonging to other users.";
         // Run the test
         final MockHttpServletResponse purgeResponse = purgeService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), purgeResponse.getStatus());
-        assertEquals(purgeResult, purgeResponse.getContentAsString());
-    }
-
-    String getAccessDeniedExceptedResult(String action) throws Exception {
-        String errorMsg = String.format("No permissions to %s services belonging to other users.",
-                action);
-        Response expectedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
-                Collections.singletonList(errorMsg));
-        return objectMapper.writeValueAsString(expectedResponse);
+        orderFailedResponse = objectMapper.readValue(
+                purgeResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(ResultType.ACCESS_DENIED, orderFailedResponse.getResultType());
+        assertEquals(List.of(errorMsg6), orderFailedResponse.getDetails());
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testDeployApiFailedWithVariableInvalidException() throws Exception {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("DeployerErrorTest-2");
         ocl.getDeployment().getVariables().getLast().setMandatory(true);
         AvailabilityZoneConfig zoneConfig = new AvailabilityZoneConfig();
         zoneConfig.setDisplayName("Primary AZ");
@@ -629,15 +705,16 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         String refuseMsg1 =
                 String.format("Variable validation failed:" + " [required property '%s' not found]",
                         ocl.getDeployment().getVariables().getLast().getName());
-        Response response1 = Response.errorResponse(ResultType.VARIABLE_VALIDATION_FAILED,
-                Collections.singletonList(refuseMsg1));
-        String result1 = objectMapper.writeValueAsString(response1);
 
         final MockHttpServletResponse deployResponse1 = deployService(deployRequest1);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse1.getStatus());
-        assertEquals(result1, deployResponse1.getContentAsString());
-
+        OrderFailedResponse response =
+                objectMapper.readValue(deployResponse1.getContentAsString(),
+                        OrderFailedResponse.class);
+        assertFalse(response.getSuccess());
+        assertEquals(response.getResultType(), ResultType.VARIABLE_VALIDATION_FAILED);
+        assertEquals(response.getDetails(), List.of(refuseMsg1));
 
         // Setup
         DeployRequest deployRequest2 = getDeployRequest(serviceTemplate);
@@ -650,14 +727,16 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 String.format("required availability zone property '%s' not found", varName)));
         String refuseMsg2 =
                 String.format("Variable validation failed: %s", StringUtils.join(errorMessages));
-        Response response2 =
-                Response.errorResponse(ResultType.VARIABLE_VALIDATION_FAILED, List.of(refuseMsg2));
-        String result2 = objectMapper.writeValueAsString(response2);
+        Response.errorResponse(ResultType.VARIABLE_VALIDATION_FAILED, List.of(refuseMsg2));
 
         final MockHttpServletResponse deployResponse2 = deployService(deployRequest2);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse2.getStatus());
-        assertEquals(result2, deployResponse2.getContentAsString());
+        Response response2 =
+                objectMapper.readValue(deployResponse2.getContentAsString(), Response.class);
+        assertFalse(response2.getSuccess());
+        assertEquals(response2.getResultType(), ResultType.VARIABLE_VALIDATION_FAILED);
+        assertEquals(response2.getDetails(), List.of(refuseMsg2));
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
@@ -722,47 +801,50 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testDestroyThrowsServiceLockedException(UUID serviceId) throws Exception {
         // SetUp
-        String message = String.format("Service %s is locked from deletion.", serviceId);
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
-                Collections.singletonList(message));
-        String result = objectMapper.writeValueAsString(expectedResponse);
+        String errorMsg = String.format("Service %s is locked from deletion.", serviceId);
         // Run the test
         final MockHttpServletResponse destroyResponse = destroyService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
-        assertEquals(result, destroyResponse.getContentAsString());
+        OrderFailedResponse orderFailedResponse = objectMapper.readValue(
+                destroyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_LOCKED);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testModifyThrowsServiceLockedException(UUID serviceId) throws Exception {
         // SetUp
-        String message = String.format("Service %s is locked from modification.",
-                serviceId);
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
-                Collections.singletonList(message));
-        String result = objectMapper.writeValueAsString(expectedResponse);
+        String errorMsg = String.format("Service %s is locked from modification.", serviceId);
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor("flavor-error");
         // Run the test
-        final MockHttpServletResponse destroyResponse =
+        final MockHttpServletResponse modifyResponse =
                 modifyService(serviceId, modifyRequest);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
-        assertEquals(result, destroyResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), modifyResponse.getStatus());
+        OrderFailedResponse orderFailedResponse = objectMapper.readValue(
+                modifyResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(orderFailedResponse.getSuccess());
+        assertEquals(orderFailedResponse.getResultType(), ResultType.SERVICE_LOCKED);
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testDeployThrowsServiceTemplateNotApproved(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
+        // SetUp
         String errorMsg = String.format("Found service template with id %s but not approved.",
                 serviceTemplate.getServiceTemplateId());
-        // SetUp
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
-                Collections.singletonList(errorMsg));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         // Run the test
         final MockHttpServletResponse deployResponse = deployService(deployRequest);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
-        assertEquals(result, deployResponse.getContentAsString());
+        OrderFailedResponse response = objectMapper.readValue(
+                deployResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(response.getSuccess());
+        assertEquals(response.getResultType(), ResultType.SERVICE_TEMPLATE_NOT_APPROVED);
+        assertEquals(response.getDetails(), List.of(errorMsg));
     }
 
 
@@ -777,16 +859,16 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
         // SetUp
         String refuseMsg = String.format("Service with id %s not found.", serviceId);
-        Response detailsErrorResponse =
-                Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                        Collections.singletonList(refuseMsg));
-        String detailsResult = objectMapper.writeValueAsString(detailsErrorResponse);
-        final MockHttpServletResponse detailsResponse =
-                mockMvc.perform(get("/xpanse/services/details/self_hosted/{serviceId}", serviceId))
-                        .andReturn().getResponse();
+        final MockHttpServletResponse detailsResponse = mockMvc.perform(
+                        get("/xpanse/services/details/self_hosted/{serviceId}", serviceId))
+                .andReturn().getResponse();
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());
-        assertEquals(detailsResult, detailsResponse.getContentAsString());
+        Response response =
+                objectMapper.readValue(detailsResponse.getContentAsString(), Response.class);
+        assertFalse(response.getSuccess());
+        assertEquals(response.getResultType(), ResultType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(response.getDetails(), List.of(refuseMsg));
     }
 
 
@@ -824,16 +906,15 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
+        assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
+        assertNotNull(listResponse.getHeader(HEADER_TRACKING_ID));
         return objectMapper.readValue(listResponse.getContentAsString(),
                 new TypeReference<>() {
                 });
     }
 
     void testDeployThrowsServiceTemplateNotRegistered() throws Exception {
-        Response expectedResponse =
-                Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
-                        Collections.singletonList("No available service templates found."));
-        String result = objectMapper.writeValueAsString(expectedResponse);
+        String errorMsg = "No available service templates found.";
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName("redis");
         deployRequest.setVersion("1.0.0");
@@ -850,66 +931,92 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         final MockHttpServletResponse deployResponse = deployService(deployRequest);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
-        assertEquals(result, deployResponse.getContentAsString());
-
+        OrderFailedResponse response = objectMapper.readValue(
+                deployResponse.getContentAsString(), OrderFailedResponse.class);
+        assertFalse(response.getSuccess());
+        assertEquals(response.getResultType(), ResultType.SERVICE_TEMPLATE_NOT_REGISTERED);
+        assertEquals(response.getDetails(), List.of(errorMsg));
     }
 
 
     MockHttpServletResponse getServiceDetails(UUID serviceId) throws Exception {
-        return mockMvc.perform(get("/xpanse/services/details/self_hosted/{serviceId}", serviceId)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+        MockHttpServletResponse response = mockMvc.perform(
+                get("/xpanse/services/details/self_hosted/{serviceId}", serviceId)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
 
     MockHttpServletResponse deployService(DeployRequest deployRequest) throws Exception {
-        return mockMvc.perform(post("/xpanse/services")
+        MockHttpServletResponse response = mockMvc.perform(post("/xpanse/services")
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(deployRequest))).andReturn()
                 .getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
 
     MockHttpServletResponse changeLockConfig(UUID serviceId, ServiceLockConfig lockConfig)
             throws Exception {
-        return mockMvc.perform(put("/xpanse/services/changelock/{serviceId}", serviceId)
-                        .content(objectMapper.writeValueAsString(lockConfig))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/xpanse/services/changelock/{serviceId}", serviceId)
+                                .content(objectMapper.writeValueAsString(lockConfig))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
     MockHttpServletResponse modifyService(UUID serviceId, ModifyRequest modifyRequest)
             throws Exception {
-        return mockMvc.perform(put("/xpanse/services/modify/{serviceId}", serviceId)
-                        .content(objectMapper.writeValueAsString(modifyRequest))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/xpanse/services/modify/{serviceId}", serviceId)
+                                .content(objectMapper.writeValueAsString(modifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
     MockHttpServletResponse destroyService(UUID serviceId) throws Exception {
-        return mockMvc.perform(delete("/xpanse/services/{serviceId}", serviceId)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+        MockHttpServletResponse response = mockMvc.perform(
+                delete("/xpanse/services/{serviceId}", serviceId)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
     MockHttpServletResponse purgeService(UUID serviceId) throws Exception {
-        return mockMvc.perform(delete("/xpanse/services/purge/{serviceId}", serviceId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        MockHttpServletResponse response = mockMvc.perform(
+                delete("/xpanse/services/purge/{serviceId}", serviceId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
     MockHttpServletResponse redeployService(UUID serviceId) throws Exception {
-        return mockMvc.perform(put("/xpanse/services/deploy/retry/{serviceId}", serviceId)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+        MockHttpServletResponse response = mockMvc.perform(
+                put("/xpanse/services/deploy/retry/{serviceId}", serviceId)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
     MockHttpServletResponse getComputeResourceInventoryOfService(UUID serviceId) throws Exception {
-        return mockMvc.perform(get("/xpanse/services/{serviceId}/resources/compute", serviceId)
-                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+        MockHttpServletResponse response = mockMvc.perform(
+                get("/xpanse/services/{serviceId}/resources/compute", serviceId)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
     }
 
 }

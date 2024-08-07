@@ -6,7 +6,9 @@
 
 package org.eclipse.xpanse.runtime;
 
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.HEADER_TRACKING_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -18,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +91,6 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("Test-" + UUID.randomUUID());
         ocl.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
@@ -157,16 +157,17 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
         // SetUp
         String refuseMsg = String.format("Service with id %s not found.", serviceId);
-        Response detailsErrorResponse =
-                Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                        Collections.singletonList(refuseMsg));
-        String detailsResult = objectMapper.writeValueAsString(detailsErrorResponse);
         final MockHttpServletResponse detailsResponse =
                 mockMvc.perform(get("/xpanse/services/details/vendor_hosted/{id}", serviceId))
                         .andReturn().getResponse();
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());
-        assertEquals(detailsResult, detailsResponse.getContentAsString());
+        assertNotNull(detailsResponse.getHeader(HEADER_TRACKING_ID));
+        Response response =
+                objectMapper.readValue(detailsResponse.getContentAsString(), Response.class);
+        assertFalse(response.getSuccess());
+        assertEquals(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND, response.getResultType());
+        assertEquals(List.of(refuseMsg), response.getDetails());
     }
 
 

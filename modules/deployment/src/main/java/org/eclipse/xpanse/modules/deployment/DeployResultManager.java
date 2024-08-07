@@ -71,7 +71,6 @@ public class DeployResultManager {
         BeanUtils.copyProperties(storedEntity, deployServiceToUpdate);
         updateServiceEntityWithDeployResult(deployResult, deployServiceToUpdate);
         return deployServiceStorage.storeAndFlush(deployServiceToUpdate);
-
     }
 
     private void updateServiceEntityWithDeployResult(DeployResult deployResult,
@@ -212,8 +211,7 @@ public class DeployResultManager {
             entityToUpdate.setCompletedTime(OffsetDateTime.now());
         } else {
             entityToUpdate.setErrorMsg(deployResult.getMessage());
-            // When the status is deploy_failed, the order status should not be failed util
-            // rollback id done.
+            // When deploy failed, the order is not be completed util the rollback is done.
             if (deployerTaskStatus != DeployerTaskStatus.DEPLOY_FAILED) {
                 entityToUpdate.setTaskStatus(TaskStatus.FAILED);
                 entityToUpdate.setCompletedTime(OffsetDateTime.now());

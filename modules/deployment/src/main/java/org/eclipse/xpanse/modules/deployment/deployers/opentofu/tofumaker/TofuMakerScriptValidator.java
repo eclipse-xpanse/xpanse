@@ -124,12 +124,13 @@ public class TofuMakerScriptValidator {
     }
 
     private UUID getRequestId() {
-        if (StringUtils.isBlank(MDC.get(TRACKING_ID))) {
-            return UUID.randomUUID();
-        }
-        try {
-            return UUID.fromString(MDC.get(SERVICE_ID));
-        } catch (IllegalArgumentException e) {
+        if (StringUtils.isNotBlank(MDC.get(TRACKING_ID))) {
+            try {
+                return UUID.fromString(MDC.get(SERVICE_ID));
+            } catch (Exception e) {
+                return UUID.randomUUID();
+            }
+        } else {
             return UUID.randomUUID();
         }
     }

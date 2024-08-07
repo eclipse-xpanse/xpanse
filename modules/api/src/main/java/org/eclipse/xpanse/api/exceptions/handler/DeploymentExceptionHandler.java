@@ -5,11 +5,12 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
+import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
+
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentFailedException;
 import org.eclipse.xpanse.modules.models.billing.exceptions.ServicePriceCalculationFailed;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
@@ -26,7 +27,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetail
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavorDowngradeNotAllowed;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.models.service.statemanagement.exceptions.ServiceStateManagementTaskNotFound;
 import org.springframework.core.Ordered;
@@ -51,9 +52,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({FlavorInvalidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleFlavorInvalidException(
-            FlavorInvalidException ex) {
-        return Response.errorResponse(ResultType.FLAVOR_NOT_FOUND,
+    public Response handleFlavorInvalidException(FlavorInvalidException ex) {
+        return getErrorResponse(ResultType.FLAVOR_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -65,7 +65,7 @@ public class DeploymentExceptionHandler {
     @ResponseBody
     public Response handleTerraformExecutorException(
             TerraformExecutorException ex) {
-        return Response.errorResponse(ResultType.TERRAFORM_EXECUTION_FAILED,
+        return getErrorResponse(ResultType.TERRAFORM_EXECUTION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -75,9 +75,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({PluginNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handlePluginNotFoundException(
-            PluginNotFoundException ex) {
-        return Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
+    public Response handlePluginNotFoundException(PluginNotFoundException ex) {
+        return getErrorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -87,9 +86,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({DeployerNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleDeployerNotFoundException(
-            DeployerNotFoundException ex) {
-        return Response.errorResponse(ResultType.DEPLOYER_NOT_FOUND,
+    public Response handleDeployerNotFoundException(DeployerNotFoundException ex) {
+        return getErrorResponse(ResultType.DEPLOYER_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -99,9 +97,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({InvalidServiceStateException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleInvalidServiceStateException(
-            InvalidServiceStateException ex) {
-        return Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
+    public Response handleInvalidServiceStateException(InvalidServiceStateException ex) {
+        return getErrorResponse(ResultType.SERVICE_STATE_INVALID,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -111,11 +108,9 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({ServiceNotDeployedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceNotDeployedException(
-            ServiceNotDeployedException ex) {
-        return Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+    public Response handleServiceNotDeployedException(ServiceNotDeployedException ex) {
+        return getErrorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
-
     }
 
     /**
@@ -126,9 +121,8 @@ public class DeploymentExceptionHandler {
     @ResponseBody
     public Response handleInvalidDeploymentVariableException(
             InvalidDeploymentVariableException ex) {
-        return Response.errorResponse(ResultType.DEPLOYMENT_VARIABLE_INVALID,
+        return getErrorResponse(ResultType.DEPLOYMENT_VARIABLE_INVALID,
                 Collections.singletonList(ex.getMessage()));
-
     }
 
 
@@ -140,19 +134,18 @@ public class DeploymentExceptionHandler {
     @ResponseBody
     public Response handleTerraformBootRequestFailedException(
             TerraformBootRequestFailedException ex) {
-        return Response.errorResponse(ResultType.TERRAFORM_BOOT_REQUEST_FAILED,
+        return getErrorResponse(ResultType.TERRAFORM_BOOT_REQUEST_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 
     /**
-     * Exception handler for VariableInvalidException.
+     * Exception handler for VariableValidationFailedException.
      */
-    @ExceptionHandler({VariableInvalidException.class})
+    @ExceptionHandler({VariableValidationFailedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleVariableInvalidException(
-            VariableInvalidException ex) {
-        return Response.errorResponse(ResultType.VARIABLE_VALIDATION_FAILED,
+    public Response handleVariableValidationFailedException(VariableValidationFailedException ex) {
+        return getErrorResponse(ResultType.VARIABLE_VALIDATION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -162,9 +155,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({ServiceDetailsNotAccessible.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    public Response handleServiceDetailsNotAccessible(
-            ServiceDetailsNotAccessible ex) {
-        return Response.errorResponse(ResultType.SERVICE_DETAILS_NOT_ACCESSIBLE,
+    public Response handleServiceDetailsNotAccessible(ServiceDetailsNotAccessible ex) {
+        return getErrorResponse(ResultType.SERVICE_DETAILS_NOT_ACCESSIBLE,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -174,9 +166,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({ActivitiTaskNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleActivitiTaskNotFoundException(
-            ActivitiTaskNotFoundException ex) {
-        return Response.errorResponse(ResultType.ACTIVITI_TASK_NOT_FOUND,
+    public Response handleActivitiTaskNotFoundException(ActivitiTaskNotFoundException ex) {
+        return getErrorResponse(ResultType.ACTIVITI_TASK_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -186,9 +177,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({ServiceLockedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceLockedException(
-            ServiceLockedException ex) {
-        return Response.errorResponse(ResultType.SERVICE_LOCKED,
+    public Response handleServiceLockedException(ServiceLockedException ex) {
+        return getErrorResponse(ResultType.SERVICE_LOCKED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -198,9 +188,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({EulaNotAccepted.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleEulaNotAcceptedException(
-            EulaNotAccepted ex) {
-        return Response.errorResponse(ResultType.EULA_NOT_ACCEPTED,
+    public Response handleEulaNotAcceptedException(EulaNotAccepted ex) {
+        return getErrorResponse(ResultType.EULA_NOT_ACCEPTED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -210,9 +199,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({ServiceFlavorDowngradeNotAllowed.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceFlavorDowngradeNotAllowed(
-            ServiceFlavorDowngradeNotAllowed ex) {
-        return Response.errorResponse(ResultType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED,
+    public Response handleServiceFlavorDowngradeNotAllowed(ServiceFlavorDowngradeNotAllowed ex) {
+        return getErrorResponse(ResultType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -222,9 +210,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({BillingModeNotSupported.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleBillingModeNotSupported(
-            BillingModeNotSupported ex) {
-        return Response.errorResponse(ResultType.BILLING_MODE_NOT_SUPPORTED,
+    public Response handleBillingModeNotSupported(BillingModeNotSupported ex) {
+        return getErrorResponse(ResultType.BILLING_MODE_NOT_SUPPORTED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -236,7 +223,7 @@ public class DeploymentExceptionHandler {
     @ResponseBody
     public Response handleServiceStateManagementTaskNotFound(
             ServiceStateManagementTaskNotFound ex) {
-        return Response.errorResponse(ResultType.SERVICE_STATE_MANAGEMENT_TASK_NOT_FOUND,
+        return getErrorResponse(ResultType.SERVICE_STATE_MANAGEMENT_TASK_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -246,9 +233,8 @@ public class DeploymentExceptionHandler {
     @ExceptionHandler({ServiceOrderNotFound.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceOrderManagementTaskNotFound(
-            ServiceOrderNotFound ex) {
-        return Response.errorResponse(ResultType.SERVICE_ORDER_NOT_FOUND,
+    public Response handleServiceOrderManagementTaskNotFound(ServiceOrderNotFound ex) {
+        return getErrorResponse(ResultType.SERVICE_ORDER_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -259,7 +245,7 @@ public class DeploymentExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleServicePriceCalculationFailed(ServicePriceCalculationFailed ex) {
-        return Response.errorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
+        return getErrorResponse(ResultType.SERVICE_PRICE_CALCULATION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -270,18 +256,6 @@ public class DeploymentExceptionHandler {
     @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
     @ResponseBody
     public Response handleFileLockedException(FileLockedException ex) {
-        return Response.errorResponse(ResultType.FILE_LOCKED,
-                Collections.singletonList(ex.getMessage()));
-    }
-
-    /**
-     * Exception handler for DeploymentFailedException.
-     */
-    @ExceptionHandler({DeploymentFailedException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public Response handleDeploymentFailedException(DeploymentFailedException ex) {
-        return Response.errorResponse(ResultType.DEPLOYMENT_FAILED,
-                Collections.singletonList(ex.getMessage()));
+        return getErrorResponse(ResultType.FILE_LOCKED, Collections.singletonList(ex.getMessage()));
     }
 }

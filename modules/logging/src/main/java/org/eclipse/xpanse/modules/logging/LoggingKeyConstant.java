@@ -24,4 +24,12 @@ public class LoggingKeyConstant {
      * The key of the order id associated with the request in MDC.
      */
     public static final String ORDER_ID = "ORDER_ID";
+
+    /**
+     * The key of the X-Tracking-ID associated with the response in Header.
+     */
+    public static final String HEADER_TRACKING_ID = "X-Tracking-ID";
+
+    private LoggingKeyConstant() {
+    }
 }

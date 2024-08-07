@@ -91,6 +91,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     @BeforeEach
     void setUp() {
         auditLogWriter = new AuditLogWriter();
+        if (mockOsFactory != null) {
+            mockOsFactory.close();
+        }
         mockOsFactory = mockStatic(OSFactory.class);
     }
 

@@ -10,19 +10,19 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test of VariableInvalidException.
+ * Test of VariableValidationFailedException.
  */
-public class VariableInvalidExceptionTest {
+public class VariableValidationFailedExceptionTest {
 
     private static List<String> errorReasons;
     private static List<String> errorReasons1;
     private static List<String> errorReasons2;
-    private static VariableInvalidException exception;
+    private static VariableValidationFailedException exception;
 
     @BeforeEach
     public void setUp() {
@@ -36,7 +36,7 @@ public class VariableInvalidExceptionTest {
         errorReasons2.add("Reason 1");
         errorReasons2.add("Reason 3");
 
-        exception = new VariableInvalidException(errorReasons);
+        exception = new VariableValidationFailedException(errorReasons);
     }
 
     @Test
@@ -54,17 +54,17 @@ public class VariableInvalidExceptionTest {
         assertNotEquals(exception, null);
         assertNotEquals(exception.hashCode(), obj.hashCode());
 
-        VariableInvalidException exception1 = new VariableInvalidException(errorReasons1);
+        VariableValidationFailedException exception1 = new VariableValidationFailedException(errorReasons1);
         assertNotEquals(exception, exception1);
         assertNotEquals(exception.hashCode(), exception1.hashCode());
 
-        VariableInvalidException exception2 = new VariableInvalidException(errorReasons);
+        VariableValidationFailedException exception2 = new VariableValidationFailedException(errorReasons);
         assertNotEquals(exception, exception2);
         assertNotEquals(exception2, exception1);
         assertNotEquals(exception.hashCode(), exception2.hashCode());
         assertNotEquals(exception2.hashCode(), exception1.hashCode());
 
-        VariableInvalidException exception3 = new VariableInvalidException(errorReasons2);
+        VariableValidationFailedException exception3 = new VariableValidationFailedException(errorReasons2);
         assertNotEquals(exception, exception3);
         assertNotEquals(exception3, exception2);
         assertNotEquals(exception3, exception1);
@@ -75,7 +75,7 @@ public class VariableInvalidExceptionTest {
 
     @Test
     void testToString() {
-        String expectedToString = "VariableInvalidException(errorReasons=" + errorReasons + ")";
+        String expectedToString = "VariableValidationFailedException(errorReasons=" + errorReasons + ")";
 
         assertEquals(expectedToString, exception.toString());
     }
