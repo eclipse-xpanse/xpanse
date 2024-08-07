@@ -21,4 +21,10 @@ public class CacheConstants {
 
     public static final int DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES = 60;
 
+    public static final String CACHE_PROVIDER_CAFFEINE = "Caffeine";
+
+    public static final String CACHE_PROVIDER_REDIS = "Redis";
+
+    public static final String CACHE_PROVIDER_CAFFEINE_ENDPOINT = "local";
+
 }
