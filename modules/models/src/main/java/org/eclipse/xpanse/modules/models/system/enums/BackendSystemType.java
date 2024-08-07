@@ -20,6 +20,7 @@ public enum BackendSystemType {
     TERRAFORM_BOOT("Terraform Boot"),
     TOFU_MAKER("Tofu Maker"),
     POLICY_MAN("Policy Man"),
+    CACHE_PROVIDER("Cache Provider"),
     OPEN_TELEMETRY_COLLECTOR("OpenTelemetry Collector");
 
     private final String code;

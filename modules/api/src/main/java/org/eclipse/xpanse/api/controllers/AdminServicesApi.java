@@ -20,6 +20,8 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
+import org.eclipse.xpanse.modules.cache.RedisCacheConfig;
+import org.eclipse.xpanse.modules.cache.consts.CacheConstants;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
@@ -56,6 +58,7 @@ public class AdminServicesApi {
 
     private final TerraformBootManager terraformBootManager;
     private final TofuMakerManager tofuMakerManager;
+    private final RedisCacheConfig redisCacheConfig;
     @Resource
     private IdentityProviderManager identityProviderManager;
     @Resource
@@ -74,9 +77,11 @@ public class AdminServicesApi {
      */
     public AdminServicesApi(
             @Nullable TerraformBootManager terraformBootManager,
-            @Nullable TofuMakerManager tofuMakerManager) {
+            @Nullable TofuMakerManager tofuMakerManager,
+            @Nullable RedisCacheConfig redisCacheConfig) {
         this.terraformBootManager = terraformBootManager;
         this.tofuMakerManager = tofuMakerManager;
+        this.redisCacheConfig = redisCacheConfig;
     }
 
 
@@ -168,6 +173,21 @@ public class AdminServicesApi {
                 BackendSystemStatus policyManStatus = policyManager.getPolicyManStatus();
                 if (Objects.nonNull(policyManStatus)) {
                     backendSystemStatuses.add(policyManStatus);
+                }
+            }
+            if (type == BackendSystemType.CACHE_PROVIDER) {
+                if (Objects.nonNull(redisCacheConfig)) {
+                    BackendSystemStatus redisCacheStatus = redisCacheConfig.getRedisCacheStatus();
+                    if (Objects.nonNull(redisCacheStatus)) {
+                        backendSystemStatuses.add(redisCacheStatus);
+                    }
+                } else {
+                    BackendSystemStatus cacheStatus = new BackendSystemStatus();
+                    cacheStatus.setBackendSystemType(BackendSystemType.CACHE_PROVIDER);
+                    cacheStatus.setHealthStatus(HealthStatus.OK);
+                    cacheStatus.setName(CacheConstants.CACHE_PROVIDER_CAFFEINE);
+                    cacheStatus.setEndpoint(CacheConstants.CACHE_PROVIDER_CAFFEINE_ENDPOINT);
+                    backendSystemStatuses.add(cacheStatus);
                 }
             }
             if (type == BackendSystemType.OPEN_TELEMETRY_COLLECTOR) {
