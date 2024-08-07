@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.api.exceptions.handler;
 
 
+import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
+
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
@@ -36,7 +38,7 @@ public class ServiceConfigurationExceptionHandler {
     @ResponseBody
     public Response handleServiceConfigurationInvalidException(
             ServiceConfigurationInvalidException ex) {
-        return Response.errorResponse(ResultType.INVALID_SERVICE_CONFIGURATION,
+        return getErrorResponse(ResultType.INVALID_SERVICE_CONFIGURATION,
                 Collections.singletonList(ex.getMessage()));
     }
 }

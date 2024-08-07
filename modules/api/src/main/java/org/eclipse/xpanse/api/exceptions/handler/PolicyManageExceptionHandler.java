@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
+import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
+
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
@@ -37,7 +39,7 @@ public class PolicyManageExceptionHandler {
     @ResponseBody
     public Response handlePolicyNotFoundException(
             PolicyNotFoundException ex) {
-        return Response.errorResponse(ResultType.POLICY_NOT_FOUND,
+        return getErrorResponse(ResultType.POLICY_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -49,7 +51,7 @@ public class PolicyManageExceptionHandler {
     @ResponseBody
     public Response handlePolicyDuplicateException(
             PolicyDuplicateException ex) {
-        return Response.errorResponse(ResultType.POLICY_DUPLICATE,
+        return getErrorResponse(ResultType.POLICY_DUPLICATE,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -61,7 +63,7 @@ public class PolicyManageExceptionHandler {
     @ResponseBody
     public Response handlePoliciesValidationFailedException(
             PoliciesValidationFailedException ex) {
-        return Response.errorResponse(ResultType.POLICY_VALIDATION_FAILED,
+        return getErrorResponse(ResultType.POLICY_VALIDATION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -74,7 +76,7 @@ public class PolicyManageExceptionHandler {
     @ResponseBody
     public Response handlePoliciesEvaluationFailedException(
             PoliciesEvaluationFailedException ex) {
-        return Response.errorResponse(ResultType.POLICY_EVALUATION_FAILED,
+        return getErrorResponse(ResultType.POLICY_EVALUATION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

@@ -5,6 +5,9 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
+
+import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
+
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
@@ -35,9 +38,8 @@ public class ServiceMetricsExceptionHandler {
     @ExceptionHandler({ClientApiCallFailedException.class})
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     @ResponseBody
-    public Response handleClientApiCalledException(
-            ClientApiCallFailedException ex) {
-        return Response.errorResponse(ResultType.BACKEND_FAILURE,
+    public Response handleClientApiCalledException(ClientApiCallFailedException ex) {
+        return getErrorResponse(ResultType.BACKEND_FAILURE,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -49,7 +51,7 @@ public class ServiceMetricsExceptionHandler {
     @ResponseBody
     public Response handleResourceNotSupportedForMonitoringException(
             ResourceNotSupportedForMonitoringException ex) {
-        return Response.errorResponse(ResultType.RESOURCE_TYPE_INVALID_FOR_MONITORING,
+        return getErrorResponse(ResultType.RESOURCE_TYPE_INVALID_FOR_MONITORING,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -59,9 +61,8 @@ public class ServiceMetricsExceptionHandler {
     @ExceptionHandler({ResourceNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleResourceNotFoundException(
-            ResourceNotFoundException ex) {
-        return Response.errorResponse(ResultType.RESOURCE_NOT_FOUND,
+    public Response handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return getErrorResponse(ResultType.RESOURCE_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -73,7 +74,7 @@ public class ServiceMetricsExceptionHandler {
     @ResponseBody
     public Response handleMetricsDataNotYetAvailableException(
             MetricsDataNotYetAvailableException ex) {
-        return Response.errorResponse(ResultType.METRICS_DATA_NOT_READY,
+        return getErrorResponse(ResultType.METRICS_DATA_NOT_READY,
                 Collections.singletonList(ex.getMessage()));
     }
 }

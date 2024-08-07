@@ -2,6 +2,7 @@ package org.eclipse.xpanse.runtime;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -16,6 +17,7 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngi
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.logging.LoggingKeyConstant;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.security.TokenResponse;
@@ -113,7 +115,8 @@ class AuthorizationApiTest extends ApisTestCommon {
     void testCallApiUnauthorized() throws Exception {
         // SetUp
         Response responseModel = Response.errorResponse(ResultType.UNAUTHORIZED,
-                Collections.singletonList(ResultType.UNAUTHORIZED.toValue()));
+                Collections.singletonList(
+                        "Full authentication is required to access this resource"));
         String resBody = objectMapper.writeValueAsString(responseModel);
 
         // Run the test
@@ -125,6 +128,7 @@ class AuthorizationApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
+        assertNotNull(response.getHeader(LoggingKeyConstant.HEADER_TRACKING_ID));
     }
 
     @Test
@@ -143,6 +147,7 @@ class AuthorizationApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
+        assertNotNull(response.getHeader(LoggingKeyConstant.HEADER_TRACKING_ID));
     }
 
     private ResponseEntity<TokenResponse> getAccessToken(String url) {

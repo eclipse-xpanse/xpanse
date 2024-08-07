@@ -6,17 +6,24 @@
 
 package org.eclipse.xpanse.modules.security;
 
+import static org.apache.commons.codec.CharEncoding.UTF_8;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.ORDER_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.response.OrderFailedResponse;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.security.common.XpanseAuthentication;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +36,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenAuthenticationConverter;
@@ -98,10 +106,9 @@ public class Oauth2WebSecurityFilter {
         http.exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint(
                 (httpRequest, httpResponse, authException) -> {
                     httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    httpResponse.setCharacterEncoding("UTF-8");
+                    httpResponse.setCharacterEncoding(UTF_8);
                     httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    Response responseModel = Response.errorResponse(ResultType.UNAUTHORIZED,
-                            Collections.singletonList(ResultType.UNAUTHORIZED.toValue()));
+                    Response responseModel = getUnauthorizedResponse(authException);
                     String resBody = objectMapper.writeValueAsString(responseModel);
                     PrintWriter printWriter = httpResponse.getWriter();
                     printWriter.print(resBody);
@@ -110,7 +117,7 @@ public class Oauth2WebSecurityFilter {
                 }));
 
         if (Objects.nonNull(opaqueTokenAuthenticationConverter)) {
-            // Config custom OpaqueTokenIntrospector
+            // Config custom OpaqueTokenIntrospect
             http.oauth2ResourceServer(oauth2 -> oauth2.opaqueToken(opaque -> opaque.introspector(
                             new NimbusOpaqueTokenIntrospector(
                                     introspectionUri, clientId, clientSecret))
@@ -125,6 +132,27 @@ public class Oauth2WebSecurityFilter {
                     jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         }
     }
+
+
+    /**
+     * Get unauthorized response.
+     *
+     * @return Response
+     */
+    private Response getUnauthorizedResponse(AuthenticationException authException) {
+        ResultType resultType = ResultType.UNAUTHORIZED;
+        List<String> details = Collections.singletonList(authException.getMessage());
+        if (StringUtils.isNotBlank(MDC.get(SERVICE_ID))) {
+            OrderFailedResponse orderFailedResponse =
+                    OrderFailedResponse.errorResponse(resultType, details);
+            orderFailedResponse.setServiceId(MDC.get(SERVICE_ID));
+            orderFailedResponse.setOrderId(MDC.get(ORDER_ID));
+            return orderFailedResponse;
+        } else {
+            return Response.errorResponse(resultType, details);
+        }
+    }
+
 
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
