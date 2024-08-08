@@ -320,10 +320,6 @@ deployment:
       override_special = "#%@"
     }
 
-    resource "openstack_compute_keypair_v2" "keypair" {
-      name = "keypair-ecs-${random_id.new.hex}"
-    }
-
     data "openstack_images_image_v2" "image" {
       name                  = var.image_name
       most_recent           = true
@@ -335,7 +331,6 @@ deployment:
       flavor_name          = var.flavor_name
       security_groups    = [ local.secgroup_name ]
       image_id           = data.openstack_images_image_v2.image.id
-      key_pair           = openstack_compute_keypair_v2.keypair.name
       admin_pass         = local.admin_passwd
       network {
         uuid = local.vpc_id

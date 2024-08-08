@@ -185,7 +185,8 @@ public class DeployResultManager {
     }
 
     /**
-     * Update service order task in the database by the deployment result.
+     * Update service order task in the database by the deployment result. We must ensure the
+     * order is not set to a final state until all related process is completed.
      *
      * @param deployResult Deployment Result.
      * @param storedEntity DB entity to be updated
@@ -193,6 +194,7 @@ public class DeployResultManager {
     public void updateServiceOrderTaskWithDeployResult(DeployResult deployResult,
                                                        ServiceOrderEntity storedEntity) {
         if (Objects.isNull(deployResult) || Objects.isNull(deployResult.getIsTaskSuccessful())) {
+            // happens when the deployment is still asynchronously running.
             return;
         }
         if (Objects.isNull(storedEntity)) {
@@ -202,8 +204,11 @@ public class DeployResultManager {
         BeanUtils.copyProperties(storedEntity, entityToUpdate);
         DeployerTaskStatus deployerTaskStatus = deployResult.getState();
         if (deployResult.getIsTaskSuccessful()) {
-            // When the status is rollback_success, the deployment order status should be failed.
+            // This can happen if any form of deployment (deploy/destroy/modify/scale/purge) is
+            // successful or if the rollback is successful.
             if (deployerTaskStatus == DeployerTaskStatus.ROLLBACK_SUCCESS) {
+                // When the status is rollback_success,
+                // then the deployment order status should be failed.
                 entityToUpdate.setTaskStatus(TaskStatus.FAILED);
             } else {
                 entityToUpdate.setTaskStatus(TaskStatus.SUCCESSFUL);
@@ -211,7 +216,8 @@ public class DeployResultManager {
             entityToUpdate.setCompletedTime(OffsetDateTime.now());
         } else {
             entityToUpdate.setErrorMsg(deployResult.getMessage());
-            // When deploy failed, the order is not be completed util the rollback is done.
+            // When the status is deploy_failed, the order status should not be set to failed until
+            // rollback is done.
             if (deployerTaskStatus != DeployerTaskStatus.DEPLOY_FAILED) {
                 entityToUpdate.setTaskStatus(TaskStatus.FAILED);
                 entityToUpdate.setCompletedTime(OffsetDateTime.now());
