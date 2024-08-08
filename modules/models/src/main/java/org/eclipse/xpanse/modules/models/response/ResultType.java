@@ -42,7 +42,6 @@ public enum ResultType {
     SERVICE_DEPLOYMENT_NOT_FOUND("Service Deployment Not Found"),
     RESOURCE_NOT_FOUND("Resource Not Found"),
     DEPLOYMENT_VARIABLE_INVALID("Deployment Variable Invalid"),
-    DEPLOYMENT_FAILED("Deployment Failed"),
     SERVICE_TEMPLATE_UPDATE_NOT_ALLOWED("Service Template Update Not Allowed"),
     SERVICE_TEMPLATE_STILL_IN_USE("Service Template Still In Use"),
     UNAUTHORIZED("Unauthorized"),

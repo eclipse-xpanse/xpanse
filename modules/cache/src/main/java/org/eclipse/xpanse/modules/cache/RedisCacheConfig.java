@@ -6,15 +6,20 @@
 
 package org.eclipse.xpanse.modules.cache;
 
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CACHE_PROVIDER_REDIS;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CREDENTIAL_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.MONITOR_METRICS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
 
+import jakarta.annotation.Resource;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
+import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
+import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
+import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.CacheManager;
@@ -26,6 +31,8 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
@@ -39,6 +46,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @ConditionalOnProperty(name = "enable.redis.distributed.cache", havingValue = "true")
 public class RedisCacheConfig {
 
+    @Resource
+    private RedisConnectionFactory connectionFactory;
+
     @Value("${region.azs.cache.expire.time.in.minutes:60}")
     private long regionAzsCacheDuration;
 
@@ -48,6 +58,12 @@ public class RedisCacheConfig {
     @Value("${service.monitor.metrics.cache.expire.time.in.minutes:60}")
     private long monitorMetricsCacheDuration;
 
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port}")
+    private String redisPort;
+
     /**
      * Config cache manager with caffeine.
      *
@@ -55,8 +71,8 @@ public class RedisCacheConfig {
      */
     @Primary
     @Bean
-    public CacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
-        checkRedisIsAvailable(connectionFactory);
+    public CacheManager redisCacheManager() {
+        checkRedisIsAvailable();
         log.info("Enable cache manager with Redis.");
         RedisCacheManager.RedisCacheManagerBuilder builder =
                 RedisCacheManager.builder(connectionFactory);
@@ -68,6 +84,39 @@ public class RedisCacheConfig {
         return builder.build();
     }
 
+
+    /**
+     * Check status redis cache.
+     *
+     * @return BackendSystemStatus
+     */
+    public BackendSystemStatus getRedisCacheStatus() {
+        BackendSystemStatus backendSystemStatus = new BackendSystemStatus();
+        backendSystemStatus.setBackendSystemType(BackendSystemType.CACHE_PROVIDER);
+        backendSystemStatus.setName(CACHE_PROVIDER_REDIS);
+        backendSystemStatus.setEndpoint(getRedisEndpoint());
+        try {
+            checkRedisIsAvailable();
+            backendSystemStatus.setHealthStatus(HealthStatus.OK);
+        } catch (RuntimeException e) {
+            backendSystemStatus.setHealthStatus(HealthStatus.NOK);
+            backendSystemStatus.setDetails(e.getMessage());
+        }
+        return backendSystemStatus;
+    }
+
+    private String getRedisEndpoint() {
+        try {
+            LettuceConnectionFactory lettuceConnectionFactory =
+                    (LettuceConnectionFactory) connectionFactory;
+            RedisStandaloneConfiguration config =
+                    lettuceConnectionFactory.getStandaloneConfiguration();
+            return config.getHostName() + ":" + config.getPort();
+        } catch (Exception e) {
+            log.error("Failed to get redis endpoint by connectionFactory.", e);
+            return redisHost + ":" + redisPort;
+        }
+    }
 
     private RedisCacheConfiguration getRegionAzsCache() {
         long duration = regionAzsCacheDuration > 0 ? regionAzsCacheDuration
@@ -106,13 +155,12 @@ public class RedisCacheConfig {
     /**
      * Config redis template.
      *
-     * @param factory RedisConnectionFactory
      * @return redisTemplate
      */
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+    public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
+        template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         template.afterPropertiesSet();
@@ -123,14 +171,12 @@ public class RedisCacheConfig {
     /**
      * Config redis template for credential.
      *
-     * @param factory RedisConnectionFactory
      * @return credentialRedisTemplate
      */
     @Bean
-    public RedisTemplate<String, AbstractCredentialInfo> credentialRedisTemplate(
-            RedisConnectionFactory factory) {
+    public RedisTemplate<String, AbstractCredentialInfo> credentialRedisTemplate() {
         RedisTemplate<String, AbstractCredentialInfo> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
+        template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(
                 new Jackson2JsonRedisSerializer<>(AbstractCredentialInfo.class));
@@ -138,8 +184,7 @@ public class RedisCacheConfig {
         return template;
     }
 
-    private void checkRedisIsAvailable(RedisConnectionFactory connectionFactory)
-            throws RuntimeException {
+    private void checkRedisIsAvailable() throws RuntimeException {
         try (RedisConnection ignored = connectionFactory.getConnection()) {
             log.info("Redis service is available.");
         } catch (RedisConnectionFailureException e) {

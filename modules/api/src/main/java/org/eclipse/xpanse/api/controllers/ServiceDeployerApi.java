@@ -14,23 +14,18 @@ import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.api.config.OrderFailedApiResponses;
 import org.eclipse.xpanse.modules.deployment.DeployService;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -38,7 +33,6 @@ import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.DeploymentStatusUpdate;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
@@ -46,16 +40,11 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
-import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
-import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -83,21 +72,10 @@ public class ServiceDeployerApi {
 
     @Value("${region.azs.cache.expire.time.in.minutes:60}")
     private long duration;
-
     @Resource
     private DeployService deployService;
-
-    @Resource
-    private UserServiceHelper userServiceHelper;
-
     @Resource
     private ServiceDetailsViewManager serviceDetailsViewManager;
-
-    @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
-
-    @Resource
-    private PluginManager pluginManager;
 
     /**
      * Get details of the managed service by serviceId.
@@ -204,15 +182,26 @@ public class ServiceDeployerApi {
     @PostMapping(value = "/services", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    @ApiResponse(description = "Id of the order task to deploy the new service.")
+    @OrderFailedApiResponses
     public ServiceOrder deploy(@Valid @RequestBody DeployRequest deployRequest) {
-        deployRequest.setServiceId(UUID.randomUUID());
-        deployRequest.setUserId(this.userServiceHelper.getCurrentUserId());
-        DeployTask deployTask = this.deployService.createNewDeployTask(deployRequest);
-        this.deployService.deployService(deployTask);
-        log.info("Order task {} for deploying new service {} started.",
-                deployTask.getOrderId(), deployTask.getServiceId());
-        return new ServiceOrder(deployTask.getOrderId(), deployTask.getServiceId());
+        return this.deployService.createOrderToDeployNewService(deployRequest);
+    }
+
+    /**
+     * Create an order task to redeploy the failed deployment using serviceId.
+     *
+     * @param serviceId ID of deployed service.
+     * @return UUID
+     */
+    @Tag(name = "Service", description = "APIs to manage the services")
+    @Operation(description = "Create an order to redeploy the failed service using service id.")
+    @PutMapping(value = "/services/deploy/retry/{serviceId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @OrderFailedApiResponses
+    public ServiceOrder redeployFailedDeployment(@PathVariable("serviceId") String serviceId) {
+        return this.deployService.createOrderToRedeployFailedService(UUID.fromString(serviceId));
     }
 
     /**
@@ -227,31 +216,12 @@ public class ServiceDeployerApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    @ApiResponse(description = "Id of the order task to modify the deployed service.")
+    @OrderFailedApiResponses
     public ServiceOrder modify(@Parameter(name = "serviceId", description = "Id of the service")
                                @PathVariable("serviceId") String serviceId,
                                @Valid @RequestBody ModifyRequest modifyRequest) {
-        DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
-        boolean currentUserIsOwner =
-                this.userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to modify services belonging to other users.");
-        }
-        if (Objects.nonNull(deployServiceEntity.getLockConfig())
-                && deployServiceEntity.getLockConfig().isModifyLocked()) {
-            String errorMsg =
-                    "Service " + serviceId + " is locked from modification.";
-            throw new ServiceLockedException(errorMsg);
-        }
-        modifyRequest.setUserId(this.userServiceHelper.getCurrentUserId());
-        DeployTask modifyTask =
-                this.deployService.getModifyTask(modifyRequest, deployServiceEntity);
-        deployService.modifyService(modifyTask, deployServiceEntity);
-        log.info("Order task {} for modifying managed service {} started.",
-                modifyTask.getOrderId(), modifyTask.getServiceId());
-        return new ServiceOrder(modifyTask.getOrderId(), modifyTask.getServiceId());
+        return this.deployService.createOrderToModifyDeployedService(
+                UUID.fromString(serviceId), modifyRequest);
     }
 
     /**
@@ -269,16 +239,7 @@ public class ServiceDeployerApi {
             @Parameter(name = "serviceId", description = "Id of the service")
             @PathVariable("serviceId") String serviceId,
             @Valid @RequestBody ServiceLockConfig serviceLockConfig) {
-        DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
-        boolean currentUserIsOwner =
-                this.userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException("No permissions to change lock config of services "
-                    + "belonging to other users.");
-        }
-        deployService.changeServiceLockConfig(serviceLockConfig, deployServiceEntity);
-        log.info("Update lock configuration of the service {} successfully.", serviceId);
+        this.deployService.changeServiceLockConfig(UUID.fromString(serviceId), serviceLockConfig);
     }
 
     /**
@@ -292,29 +253,10 @@ public class ServiceDeployerApi {
     @DeleteMapping(value = "/services/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    @ApiResponse(description = "Id of the order task to destroy the deployed service.")
+    @OrderFailedApiResponses
     public ServiceOrder destroy(@Parameter(name = "serviceId", description = "Id of the service")
                                 @PathVariable("serviceId") String serviceId) {
-        UUID serviceInstanceId = UUID.fromString(serviceId);
-        DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(serviceInstanceId);
-        boolean currentUserIsOwner =
-                this.userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to destroy services belonging to other users.");
-        }
-        if (Objects.nonNull(deployServiceEntity.getLockConfig())
-                && deployServiceEntity.getLockConfig().isDestroyLocked()) {
-            String errorMsg =
-                    String.format("Service %s is locked from deletion.", serviceId);
-            throw new ServiceLockedException(errorMsg);
-        }
-        DeployTask destroyTask = this.deployService.getDestroyTask(deployServiceEntity);
-        this.deployService.destroyService(destroyTask, deployServiceEntity);
-        log.info("Order task {} for destroying managed service {} started.",
-                destroyTask.getOrderId(), destroyTask.getServiceId());
-        return new ServiceOrder(destroyTask.getOrderId(), destroyTask.getServiceId());
+        return this.deployService.createOrderToDestroyDeployedService(UUID.fromString(serviceId));
     }
 
     /**
@@ -329,55 +271,10 @@ public class ServiceDeployerApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    @ApiResponse(description = "Id of the order task to purge the destroyed service.")
+    @OrderFailedApiResponses
     public ServiceOrder purge(@Parameter(name = "serviceId", description = "Id of the service")
                               @PathVariable("serviceId") String serviceId) {
-        UUID serviceInstanceId = UUID.fromString(serviceId);
-        DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(serviceInstanceId);
-        boolean currentUserIsOwner = this.userServiceHelper.currentUserIsOwner(
-                deployServiceEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to purge services belonging to other users.");
-        }
-        DeployTask purgeTask = this.deployService.getPurgeTask(deployServiceEntity);
-        this.deployService.purgeService(purgeTask, deployServiceEntity);
-        log.info("Order task {} to purge the managed service {} started.",
-                purgeTask.getOrderId(), serviceId);
-        return new ServiceOrder(purgeTask.getOrderId(), purgeTask.getServiceId());
-    }
-
-
-    /**
-     * Create an order task to redeploy the failed deployment using serviceId.
-     *
-     * @param serviceId ID of deployed service.
-     * @return UUID
-     */
-    @Tag(name = "Service", description = "APIs to manage the services")
-    @Operation(description = "Create an order to redeploy the failed service using service id.")
-    @PutMapping(value = "/services/deploy/retry/{serviceId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
-    @ApiResponse(description = "Id of the order task to redeploy the filed service.")
-    public ServiceOrder redeployFailedDeployment(@PathVariable("serviceId") String serviceId) {
-        UUID serviceInstanceId = UUID.fromString(serviceId);
-        DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(serviceInstanceId);
-        boolean currentUserIsOwner = this.userServiceHelper.currentUserIsOwner(
-                deployServiceEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to redeploy services belonging to other users.");
-        }
-        DeployTask redeployTask =
-                this.deployService.getRedeployTask(deployServiceEntity);
-        this.deployService.redeployService(redeployTask, deployServiceEntity);
-        log.info("Order task {} to redeploy the failed service {} started.",
-                redeployTask.getOrderId(), redeployTask.getServiceId());
-        return new ServiceOrder(redeployTask.getOrderId(), redeployTask.getServiceId());
+        return this.deployService.createOrderToPurgeDestroyedService(UUID.fromString(serviceId));
     }
 
 
@@ -401,11 +298,10 @@ public class ServiceDeployerApi {
             @Parameter(name = "serviceId", description = "Id of the deployed service")
             @RequestParam(name = "serviceId", required = false) String serviceId) {
         try {
-            UUID uuid = StringUtils.isBlank(serviceId) ? null : UUID.fromString(serviceId);
-            String currentUserId = this.userServiceHelper.getCurrentUserId();
-            OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-            List<String> availabilityZones = orchestratorPlugin.getAvailabilityZonesOfRegion(
-                    currentUserId, regionName, uuid);
+            UUID serviceUuid =
+                    StringUtils.isNotEmpty(serviceId) ? UUID.fromString(serviceId) : null;
+            List<String> availabilityZones =
+                    this.deployService.getAvailabilityZonesOfRegion(csp, regionName, serviceUuid);
             return ResponseEntity.ok().cacheControl(getCacheControl()).body(availabilityZones);
         } catch (Exception ex) {
             log.error("Error fetching availability zones", ex);
@@ -455,18 +351,8 @@ public class ServiceDeployerApi {
     public List<DeployResource> getComputeResourceInventoryOfService(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
             @PathVariable(name = "serviceId") String serviceId) {
-        DeployServiceEntity deployService =
-                deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
-        boolean currentUserIsOwner =
-                userServiceHelper.currentUserIsOwner(deployService.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to view resources of services belonging to other users.");
-        }
-        List<DeployResourceEntity> vmEntities = deployService.getDeployResourceList().stream()
-                .filter(entity -> entity.getResourceKind().equals(DeployResourceKind.VM))
-                .toList();
-        return EntityTransUtils.transToDeployResourceList(vmEntities);
+        return this.deployService.listResourcesOfDeployedService(
+                UUID.fromString(serviceId), DeployResourceKind.VM);
     }
 
     private CacheControl getCacheControl() {

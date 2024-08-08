@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.models.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,6 +19,7 @@ import lombok.Data;
  */
 @Data
 @JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Response {
 
     @NotNull
@@ -33,6 +35,9 @@ public class Response {
     @Schema(description = "Describes if the request is successful")
     private Boolean success;
 
+    Response() {
+    }
+
     /**
      * Create error response with resultCode and errorMessage.
      *
@@ -47,19 +52,4 @@ public class Response {
         response.details = errMsg;
         return response;
     }
-
-    /**
-     * Create success response with success message.
-     *
-     * @param successMsg success message
-     * @return successResponse
-     */
-    public static Response successResponse(List<String> successMsg) {
-        Response response = new Response();
-        response.success = true;
-        response.resultType = ResultType.SUCCESS;
-        response.details = successMsg;
-        return response;
-    }
-
 }

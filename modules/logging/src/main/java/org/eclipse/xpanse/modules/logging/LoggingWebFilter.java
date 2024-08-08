@@ -10,6 +10,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +27,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class LoggingWebFilter implements Filter {
-
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
-            ServletException, IOException {
-        MDC.put(LoggingKeyConstant.TRACKING_ID, UUID.randomUUID().toString());
-        log.debug("Intercept coming request and set MDC context information");
-        chain.doFilter(request, response);
-        MDC.clear();
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        String trackingId = UUID.randomUUID().toString();
+        MDC.put(LoggingKeyConstant.TRACKING_ID, trackingId);
+        log.debug("Intercept incoming request and set MDC context information");
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        httpResponse.setHeader(LoggingKeyConstant.HEADER_TRACKING_ID, trackingId);
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            MDC.clear();
+        }
     }
+
 }

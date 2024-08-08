@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.api.exceptions.handler;
 
 
+import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
+
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
@@ -36,7 +38,7 @@ public class ServiceMigrationExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleServiceNotMigrationException(ServiceMigrationFailedException ex) {
-        return Response.errorResponse(ResultType.SERVICE_MIGRATION_FAILED_EXCEPTION,
+        return getErrorResponse(ResultType.SERVICE_MIGRATION_FAILED_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -45,7 +47,7 @@ public class ServiceMigrationExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Response handleServiceNotMigrationException(ServiceMigrationNotFoundException ex) {
-        return Response.errorResponse(ResultType.SERVICE_MIGRATION_NOT_FOUND,
+        return getErrorResponse(ResultType.SERVICE_MIGRATION_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 }

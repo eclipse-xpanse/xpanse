@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.Operation;
 import java.util.List;
 import org.eclipse.xpanse.api.controllers.AdminServicesApi;
+import org.eclipse.xpanse.modules.cache.RedisCacheConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
 import org.eclipse.xpanse.modules.security.RequiredRoleDescriptionCustomizer;
@@ -37,7 +38,7 @@ class RequiredRoleDescriptionCustomizerTest {
         operation.externalDocs(externalDocs);
 
         final AdminServicesApi adminServicesApi = new AdminServicesApi(
-                new TerraformBootManager(), new TofuMakerManager());
+                new TerraformBootManager(), new TofuMakerManager(), new RedisCacheConfig());
 
         final HandlerMethod handlerMethod =
                 new HandlerMethod(adminServicesApi, "healthCheck", null);

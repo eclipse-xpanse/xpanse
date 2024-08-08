@@ -71,7 +71,6 @@ public class DeployResultManager {
         BeanUtils.copyProperties(storedEntity, deployServiceToUpdate);
         updateServiceEntityWithDeployResult(deployResult, deployServiceToUpdate);
         return deployServiceStorage.storeAndFlush(deployServiceToUpdate);
-
     }
 
     private void updateServiceEntityWithDeployResult(DeployResult deployResult,

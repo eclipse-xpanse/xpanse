@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
+import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
+
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
@@ -44,7 +46,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleServiceTemplateAlreadyRegisteredException(
             ServiceTemplateAlreadyRegistered ex) {
-        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
+        return getErrorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
                 Collections.singletonList(ex.getMessage()));
 
     }
@@ -57,7 +59,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleIconProcessingFailedException(
             IconProcessingFailedException ex) {
-        return Response.errorResponse(ResultType.ICON_PROCESSING_FAILED,
+        return getErrorResponse(ResultType.ICON_PROCESSING_FAILED,
                 Collections.singletonList(ex.getMessage()));
 
     }
@@ -70,7 +72,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleServiceTemplateNotRegisteredException(
             ServiceTemplateNotRegistered ex) {
-        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
+        return getErrorResponse(ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
                 Collections.singletonList(ex.getMessage()));
 
     }
@@ -83,7 +85,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleTerraformScriptFormatInvalidException(
             TerraformScriptFormatInvalidException ex) {
-        return Response.errorResponse(ResultType.TERRAFORM_SCRIPT_INVALID, ex.getErrorReasons());
+        return getErrorResponse(ResultType.TERRAFORM_SCRIPT_INVALID, ex.getErrorReasons());
     }
 
     /**
@@ -94,7 +96,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleServiceTemplateUpdateNotAllowed(
             ServiceTemplateUpdateNotAllowed ex) {
-        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_UPDATE_NOT_ALLOWED,
+        return getErrorResponse(ResultType.SERVICE_TEMPLATE_UPDATE_NOT_ALLOWED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -106,7 +108,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleInvalidValueSchemaException(
             InvalidValueSchemaException ex) {
-        return Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+        return getErrorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
                 ex.getInvalidValueSchemaKeys());
     }
 
@@ -118,7 +120,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleServiceTemplateNotApproved(
             ServiceTemplateNotApproved ex) {
-        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
+        return getErrorResponse(ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -131,7 +133,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleServiceTemplateAlreadyReviewed(
             ServiceTemplateAlreadyReviewed ex) {
-        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REVIEWED,
+        return getErrorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REVIEWED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -143,7 +145,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleInvalidServiceVersionException(
             InvalidServiceVersionException ex) {
-        return Response.errorResponse(ResultType.INVALID_SERVICE_VERSION,
+        return getErrorResponse(ResultType.INVALID_SERVICE_VERSION,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -155,7 +157,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleInvalidServiceFlavorsException(
             InvalidServiceFlavorsException ex) {
-        return Response.errorResponse(ResultType.INVALID_SERVICE_FLAVORS, ex.getErrorReasons());
+        return getErrorResponse(ResultType.INVALID_SERVICE_FLAVORS, ex.getErrorReasons());
     }
 
     /**
@@ -166,7 +168,7 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public Response handleServiceTemplateStillInUseException(
             ServiceTemplateStillInUseException ex) {
-        return Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE,
+        return getErrorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE,
                 Collections.singletonList(ex.getMessage()));
     }
 }

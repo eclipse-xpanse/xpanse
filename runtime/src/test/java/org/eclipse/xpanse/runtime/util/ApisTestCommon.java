@@ -1,9 +1,11 @@
 package org.eclipse.xpanse.runtime.util;
 
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.HEADER_TRACKING_ID;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OPENSTACK_TESTLAB_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.PLUS_SERVER_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.REGIO_CLOUD_AUTH_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -349,20 +351,24 @@ public class ApisTestCommon {
     }
 
     protected void addUserCredential(CreateCredential createCredential) throws Exception {
-        mockMvc.perform(post("/xpanse/user/credentials").content(
+       MockHttpServletResponse response = mockMvc.perform(post("/xpanse/user/credentials").content(
                                 objectMapper.writeValueAsString(createCredential))
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
+        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
     }
 
     protected ServiceTemplateDetailVo registerServiceTemplate(Ocl ocl) throws Exception {
 
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        ocl.setName(UUID.randomUUID().toString());
         String requestBody = yamlMapper.writeValueAsString(ocl);
         final MockHttpServletResponse registerResponse = mockMvc.perform(
                         post("/xpanse/service_templates").content(requestBody)
                                 .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
+        assertNotNull(registerResponse.getHeader(HEADER_TRACKING_ID));
         if (registerResponse.getStatus() == HttpStatus.OK.value()) {
             return objectMapper.readValue(registerResponse.getContentAsString(),
                     ServiceTemplateDetailVo.class);
@@ -383,7 +389,8 @@ public class ApisTestCommon {
                         put("/xpanse/service_templates/review/{id}", id).content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-        Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
+        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
     }
 
     protected void deleteServiceTemplate(UUID serviceTemplateId) throws Exception {
@@ -424,9 +431,12 @@ public class ApisTestCommon {
     }
 
     protected void deleteCredential(Csp csp, CredentialType type, String name) throws Exception {
-        mockMvc.perform(delete("/xpanse/user/credentials").param("cspName", csp.toValue())
+        MockHttpServletResponse response = mockMvc.perform(delete("/xpanse/user/credentials").param(
+                "cspName", csp.toValue())
                 .param("type", type.toValue()).param("name", name)
                 .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
     }
 
     protected void mockListOnDemandResourceRatingsInvokerWithBssintlClientThrowAccessDeniedException() {

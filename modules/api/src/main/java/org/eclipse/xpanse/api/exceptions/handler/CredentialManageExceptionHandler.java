@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
+import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
+
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialCapabilityNotFound;
@@ -35,9 +37,8 @@ public class CredentialManageExceptionHandler {
     @ExceptionHandler({CredentialCapabilityNotFound.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleCredentialCapabilityNotFound(
-            CredentialCapabilityNotFound ex) {
-        return Response.errorResponse(ResultType.CREDENTIAL_CAPABILITY_NOT_FOUND,
+    public Response handleCredentialCapabilityNotFound(CredentialCapabilityNotFound ex) {
+        return getErrorResponse(ResultType.CREDENTIAL_CAPABILITY_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -47,9 +48,8 @@ public class CredentialManageExceptionHandler {
     @ExceptionHandler({CredentialsNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleCredentialsNotFoundException(
-            CredentialsNotFoundException ex) {
-        return Response.errorResponse(ResultType.CREDENTIALS_NOT_FOUND,
+    public Response handleCredentialsNotFoundException(CredentialsNotFoundException ex) {
+        return getErrorResponse(ResultType.CREDENTIALS_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -59,9 +59,8 @@ public class CredentialManageExceptionHandler {
     @ExceptionHandler({CredentialVariablesNotComplete.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleCredentialVariablesNotComplete(
-            CredentialVariablesNotComplete ex) {
-        return Response.errorResponse(ResultType.CREDENTIALS_VARIABLES_NOT_COMPLETE,
+    public Response handleCredentialVariablesNotComplete(CredentialVariablesNotComplete ex) {
+        return getErrorResponse(ResultType.CREDENTIALS_VARIABLES_NOT_COMPLETE,
                 ex.getErrorReasons().stream().toList());
     }
 
@@ -73,7 +72,7 @@ public class CredentialManageExceptionHandler {
     @ResponseBody
     public Response handleNoCredentialDefinitionAvailable(
             NoCredentialDefinitionAvailable ex) {
-        return Response.errorResponse(ResultType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
+        return getErrorResponse(ResultType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
                 Collections.singletonList(ex.getMessage()));
     }
 }

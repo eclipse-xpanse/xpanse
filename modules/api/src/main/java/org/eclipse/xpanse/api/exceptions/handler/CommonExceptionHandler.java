@@ -6,6 +6,10 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
+
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.ORDER_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -23,8 +27,10 @@ import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncrypt
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
+import org.eclipse.xpanse.modules.models.response.OrderFailedResponse;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.security.access.AccessDeniedException;
@@ -49,11 +55,31 @@ public class CommonExceptionHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
+     * Get error response.
+     *
+     * @param resultType resultType
+     * @param details    details
+     * @return Response
+     */
+    public static Response getErrorResponse(ResultType resultType, List<String> details) {
+        if (StringUtils.isNotBlank(MDC.get(SERVICE_ID))) {
+            OrderFailedResponse orderFailedResponse = OrderFailedResponse.errorResponse(
+                    resultType, details);
+            orderFailedResponse.setServiceId(MDC.get(SERVICE_ID));
+            orderFailedResponse.setOrderId(MDC.get(ORDER_ID));
+            return orderFailedResponse;
+        } else {
+            return Response.errorResponse(resultType, details);
+        }
+    }
+
+    /**
      * Exception handler for MethodArgumentNotValidException.
      */
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
+    @SuppressWarnings("unchecked")
     public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.error("handleMethodArgumentNotValidException: ", ex);
         BindingResult bindingResult = ex.getBindingResult();
@@ -78,7 +104,7 @@ public class CommonExceptionHandler {
             errors.add(errorMsg);
             errors.sort(String::compareTo);
         }
-        return Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY, errors);
+        return getErrorResponse(ResultType.UNPROCESSABLE_ENTITY, errors);
     }
 
     /**
@@ -89,7 +115,7 @@ public class CommonExceptionHandler {
     public Response handleRuntimeException(RuntimeException ex) {
         String failMessage = ex.getMessage();
         log.error("handleRuntimeException: ", ex);
-        return Response.errorResponse(ResultType.RUNTIME_ERROR,
+        return getErrorResponse(ResultType.RUNTIME_ERROR,
                 Collections.singletonList(failMessage));
     }
 
@@ -101,7 +127,7 @@ public class CommonExceptionHandler {
     public Response handleHttpMessageConversionException(HttpMessageConversionException ex) {
         log.error("handleHttpMessageConversionException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS,
+        return getErrorResponse(ResultType.BAD_PARAMETERS,
                 Collections.singletonList(failMessage));
     }
 
@@ -113,7 +139,7 @@ public class CommonExceptionHandler {
     public Response handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("handleIllegalArgumentException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.BAD_PARAMETERS,
+        return getErrorResponse(ResultType.BAD_PARAMETERS,
                 Collections.singletonList(failMessage));
     }
 
@@ -125,7 +151,7 @@ public class CommonExceptionHandler {
     public Response handleException(Exception ex) {
         log.error("handleException: ", ex);
         String failMessage = ex.getClass().getName() + ":" + ex.getMessage();
-        return Response.errorResponse(ResultType.RUNTIME_ERROR,
+        return getErrorResponse(ResultType.RUNTIME_ERROR,
                 Collections.singletonList(failMessage));
     }
 
@@ -136,7 +162,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public Response handleResponseInvalidException(ResponseInvalidException ex) {
-        return Response.errorResponse(ResultType.INVALID_RESPONSE, ex.getErrorReasons());
+        return getErrorResponse(ResultType.INVALID_RESPONSE, ex.getErrorReasons());
     }
 
     /**
@@ -146,7 +172,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public Response handleXpanseUnhandledException(XpanseUnhandledException ex) {
-        return Response.errorResponse(ResultType.UNHANDLED_EXCEPTION,
+        return getErrorResponse(ResultType.UNHANDLED_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -157,7 +183,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
     public Response handleAccessDeniedException(AccessDeniedException ex) {
-        return Response.errorResponse(ResultType.ACCESS_DENIED,
+        return getErrorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -169,7 +195,7 @@ public class CommonExceptionHandler {
     @ResponseBody
     public Response handleSensitiveFieldEncryptionOrDecryptionFailedException(
             SensitiveFieldEncryptionOrDecryptionFailedException ex) {
-        return Response.errorResponse(ResultType.SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION,
+        return getErrorResponse(ResultType.SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -180,7 +206,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public Response handleUnsupportedEnumValueException(UnsupportedEnumValueException ex) {
-        return Response.errorResponse(ResultType.UNSUPPORTED_ENUM_VALUE,
+        return getErrorResponse(ResultType.UNSUPPORTED_ENUM_VALUE,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -192,7 +218,7 @@ public class CommonExceptionHandler {
     @ResponseBody
     public Response handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex) {
-        return Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY,
+        return getErrorResponse(ResultType.UNPROCESSABLE_ENTITY,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -203,7 +229,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     public Response handleUserNoLoginException(UserNotLoggedInException ex) {
-        return Response.errorResponse(ResultType.USER_NO_LOGIN_EXCEPTION,
+        return getErrorResponse(ResultType.USER_NO_LOGIN_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -215,7 +241,7 @@ public class CommonExceptionHandler {
     public Response handleGitRepoCloneException(GitRepoCloneException ex) {
         log.error("GitRepoCloneException: ", ex);
         String failMessage = ex.getMessage();
-        return Response.errorResponse(ResultType.INVALID_GIT_REPO_DETAILS,
+        return getErrorResponse(ResultType.INVALID_GIT_REPO_DETAILS,
                 Collections.singletonList(failMessage));
     }
 

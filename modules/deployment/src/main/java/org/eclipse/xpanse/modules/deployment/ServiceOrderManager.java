@@ -87,8 +87,7 @@ public class ServiceOrderManager {
      * @param orderId id of the order
      */
     public void startOrderProgress(UUID orderId) {
-        ServiceOrderEntity orderTask =
-                serviceOrderStorage.getEntityById(orderId);
+        ServiceOrderEntity orderTask = serviceOrderStorage.getEntityById(orderId);
         orderTask.setTaskStatus(TaskStatus.IN_PROGRESS);
         orderTask.setStartedTime(OffsetDateTime.now());
         serviceOrderStorage.storeAndFlush(orderTask);

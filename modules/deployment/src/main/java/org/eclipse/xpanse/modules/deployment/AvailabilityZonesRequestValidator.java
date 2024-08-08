@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableInvalidException;
+import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.springframework.util.CollectionUtils;
 
@@ -46,7 +46,7 @@ public class AvailabilityZonesRequestValidator {
                     .forEach(varName -> errorMessages.add(getErrorMessage(varName)));
         }
         if (!errorMessages.isEmpty()) {
-            throw new VariableInvalidException(errorMessages);
+            throw new VariableValidationFailedException(errorMessages);
         }
 
         Map<String, String> requiredZoneVarValues = new HashMap<>();
@@ -56,7 +56,7 @@ public class AvailabilityZonesRequestValidator {
                     String duplicatedValuesMessage = String.format("The values of required "
                                     + "availability zones variables %s are duplicated.",
                             inputMap.get(zoneVarName));
-                    throw new VariableInvalidException(List.of(duplicatedValuesMessage));
+                    throw new VariableValidationFailedException(List.of(duplicatedValuesMessage));
                 } else {
                     requiredZoneVarValues.put(zoneVarName, inputMap.get(zoneVarName));
                 }
