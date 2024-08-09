@@ -462,7 +462,13 @@ public class DeployService {
                                             DeployServiceEntity deployServiceEntity) {
         log.info("Performing rollback of already provisioned resources.");
         if (CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
-            log.info("No resources need to destroy.");
+            log.info("No resources need to destroy, the rollback task success.");
+            DeployResult rollbackResult = new DeployResult();
+            rollbackResult.setOrderId(deployTask.getOrderId());
+            rollbackResult.setServiceId(deployTask.getServiceId());
+            rollbackResult.setIsTaskSuccessful(true);
+            rollbackResult.setState(DeployerTaskStatus.ROLLBACK_SUCCESS);
+            deployResultManager.updateServiceOrderTaskWithDeployResult(rollbackResult, null);
             return;
         }
         log.info("Rollback to destroy created resources of the service {}",
