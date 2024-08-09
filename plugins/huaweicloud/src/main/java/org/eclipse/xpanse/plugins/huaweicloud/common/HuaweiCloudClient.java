@@ -30,6 +30,7 @@ import com.huaweicloud.sdk.vpc.v2.region.VpcRegion;
 import jakarta.annotation.Resource;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -166,22 +167,27 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      * @param regionName       region name.
      * @return projectId.
      */
-    public String getProjectId(ICredential globalCredential,
-                               String regionName) {
+    public String getProjectId(ICredential globalCredential, String regionName) {
         String projectId = null;
-        IamClient iamClient = getIamClient(globalCredential, regionName);
-        KeystoneListProjectsRequest listProjectsRequest =
-                new KeystoneListProjectsRequest().withName(regionName);
-        KeystoneListProjectsResponse listProjectsResponse =
-                iamClient.keystoneListProjectsInvoker(listProjectsRequest)
-                        .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
-                        .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
-                        .backoffStrategy(huaweiCloudRetryStrategy)
-                        .invoke();
-        if (!CollectionUtils.isEmpty(listProjectsResponse.getProjects())) {
-            projectId = listProjectsResponse.getProjects().getFirst().getId();
+        try {
+            IamClient iamClient = getIamClient(globalCredential, regionName);
+            KeystoneListProjectsRequest listProjectsRequest =
+                    new KeystoneListProjectsRequest().withName(regionName);
+            KeystoneListProjectsResponse listProjectsResponse =
+                    iamClient.keystoneListProjectsInvoker(listProjectsRequest)
+                            .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(huaweiCloudRetryStrategy)
+                            .invoke();
+            if (!CollectionUtils.isEmpty(listProjectsResponse.getProjects())) {
+                projectId = listProjectsResponse.getProjects().getFirst().getId();
+            }
+            return projectId;
+        } catch (Exception e) {
+            log.error("Get project id with region {} failed.", regionName);
+            huaweiCloudRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
-        return projectId;
     }
 
     private HttpConfig getHttpConfig() {

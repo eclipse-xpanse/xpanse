@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.ServiceMetricsApi;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
@@ -58,20 +57,6 @@ class ServiceMetricsExceptionHandlerTest {
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-    }
-
-    @Test
-    void testClientApiCallFailedException() throws Exception {
-        when(serviceMetricsAdapter
-                .getMetricsByServiceId(serviceId, null, null, null, null, true))
-                .thenThrow(new ClientApiCallFailedException("test error"));
-
-        this.mockMvc.perform(get("/xpanse/metrics")
-                        .param("serviceId", serviceId)
-                        .param("onlyLastKnownMetric", "true"))
-                .andExpect(status().is(502))
-                .andExpect(jsonPath("$.resultType").value("Failure while connecting to backend"))
-                .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
     @Test

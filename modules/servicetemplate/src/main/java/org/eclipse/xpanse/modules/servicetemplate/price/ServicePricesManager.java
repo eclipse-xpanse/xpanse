@@ -110,7 +110,8 @@ public class ServicePricesManager {
                 flavorPriceResult.setRecurringPrice(flavorPrice.getRecurringPrice());
                 flavorPriceResult.setOneTimePaymentPrice(flavorPrice.getOneTimePaymentPrice());
             } catch (Exception e) {
-                log.error("Failed to get price of service flavor: {}", flavor.getName(), e);
+                log.error("Get price of service flavor {} failed. {}", flavor.getName(),
+                        e.getMessage());
                 flavorPriceResult.setSuccessful(false);
                 flavorPriceResult.setErrorMessage(e.getMessage());
             }

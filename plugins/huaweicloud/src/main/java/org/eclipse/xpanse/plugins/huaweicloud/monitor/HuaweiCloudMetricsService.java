@@ -27,11 +27,11 @@ import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsCacheKey;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -40,7 +40,6 @@ import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -104,12 +103,9 @@ public class HuaweiCloudMetricsService {
             }
             return metrics;
         } catch (Exception e) {
-            String errorMsg = String.format("Get metrics of resource %s error. %s",
-                    deployResource.getResourceId(), e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("Get metrics of resource {} failed.", deployResource.getResourceId());
+            huaweiCloudRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
     }
 
@@ -159,12 +155,9 @@ public class HuaweiCloudMetricsService {
                     metrics);
             return metrics;
         } catch (Exception e) {
-            String errorMsg = String.format("Get metrics of service %s error. %s",
-                    serviceMetricRequest.getServiceId(), e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("Get metrics of service {} failed.", serviceMetricRequest.getServiceId());
+            huaweiCloudRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
     }
 

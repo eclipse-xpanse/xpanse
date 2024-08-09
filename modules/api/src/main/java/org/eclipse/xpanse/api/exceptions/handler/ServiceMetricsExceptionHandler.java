@@ -10,7 +10,6 @@ import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.g
 
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
@@ -31,17 +30,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class ServiceMetricsExceptionHandler {
-
-    /**
-     * Exception handler for ClientApiCallFailedException.
-     */
-    @ExceptionHandler({ClientApiCallFailedException.class})
-    @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    @ResponseBody
-    public Response handleClientApiCalledException(ClientApiCallFailedException ex) {
-        return getErrorResponse(ResultType.BACKEND_FAILURE,
-                Collections.singletonList(ex.getMessage()));
-    }
 
     /**
      * Exception handler for ResourceNotSupportedForMonitoringException.

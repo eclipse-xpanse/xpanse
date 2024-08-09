@@ -8,12 +8,11 @@ package org.eclipse.xpanse.plugins.openstack.common.manage;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.openstack.common.auth.ProviderAuthInfoResolver;
 import org.openstack4j.api.OSClient;
@@ -23,7 +22,6 @@ import org.openstack4j.model.compute.RebootType;
 import org.openstack4j.model.compute.Server;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -72,11 +70,8 @@ public class OpenstackServersManager {
                 throw new ClientApiCallFailedException(String.join("\n", errorMessages));
             }
         } catch (Exception e) {
-            String errorMsg = String.format("Start service %s error. %s",
-                    request.getServiceId(), e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("Start service {} failed.", request.getServiceId());
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return true;
@@ -118,11 +113,8 @@ public class OpenstackServersManager {
             }
             return true;
         } catch (Exception e) {
-            String errorMsg = String.format("Stop service %s error. %s",
-                    request.getServiceId(), e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("Stop service {} failed.", request.getServiceId());
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
     }
@@ -163,11 +155,8 @@ public class OpenstackServersManager {
             }
             return true;
         } catch (Exception e) {
-            String errorMsg = String.format("Restart service %s error. %s",
-                    request.getServiceId(), e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("Restart service {} failed.", request.getServiceId());
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
     }

@@ -20,13 +20,17 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.common.auth.keystone.OpenstackKeystoneManager;
 import org.eclipse.xpanse.plugins.openstack.common.auth.keystone.ScsKeystoneManager;
 import org.openstack4j.api.OSClient;
+import org.openstack4j.api.exceptions.AuthenticationException;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -92,7 +96,7 @@ public class ProviderAuthInfoResolver {
      * @return auth url
      */
     public String getProviderAuthUrl(Csp csp, UUID serviceId) {
-        String authUrl = "";
+        String authUrl;
         if (Objects.isNull(serviceId)) {
             authUrl = this.environment.getProperty(getAuthUrlKeyByCsp(csp));
             log.info("Get auth url {} of provider {} from environment", authUrl, csp);
@@ -155,5 +159,42 @@ public class ProviderAuthInfoResolver {
         } else {
             return (String) defaultAuthUrl;
         }
+    }
+
+
+    /**
+     * Handle auth exception for spring retry.
+     *
+     * @param ex Exception
+     */
+    public void handleAuthExceptionForSpringRetry(Exception ex) {
+        int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+        log.error(ex.getMessage() + System.lineSeparator() + "Retry count:" + retryCount);
+        if (ex instanceof ClientAuthenticationFailedException) {
+            throw new ClientAuthenticationFailedException(ex.getMessage());
+        }
+        AuthenticationException authenticationException = getAuthenticationException(ex);
+        if (Objects.nonNull(authenticationException)) {
+            int statusCode = authenticationException.getStatus();
+            if (statusCode == HttpStatus.UNAUTHORIZED.value()
+                    || statusCode == HttpStatus.FORBIDDEN.value()) {
+                throw new ClientAuthenticationFailedException(ex.getMessage());
+            }
+        }
+    }
+
+
+    private AuthenticationException getAuthenticationException(Throwable ex) {
+        if (Objects.isNull(ex)) {
+            return null;
+        }
+        if (ex instanceof AuthenticationException authException) {
+            return authException;
+        }
+        if (Objects.nonNull(ex.getCause())) {
+            return getAuthenticationException(ex.getCause());
+        }
+        return null;
     }
 }

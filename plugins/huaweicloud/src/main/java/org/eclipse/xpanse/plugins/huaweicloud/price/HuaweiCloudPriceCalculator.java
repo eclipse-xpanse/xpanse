@@ -30,16 +30,15 @@ import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -74,16 +73,7 @@ public class HuaweiCloudPriceCalculator {
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
         if (request.getBillingMode() == BillingMode.PAY_PER_USE) {
-            try {
-                return getServiceFlavorPriceWithPayPerUse(request);
-            } catch (Exception e) {
-                String errorMsg = "Get service price with billingModel Pay per Use error."
-                        + e.getMessage();
-                int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                        ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-                log.error(errorMsg + " Retry count:" + retryCount);
-                throw new ClientApiCallFailedException(errorMsg);
-            }
+            return getServiceFlavorPriceWithPayPerUse(request);
         } else {
             return getServiceFlavorPriceWithFixed(request);
         }
@@ -107,6 +97,7 @@ public class HuaweiCloudPriceCalculator {
             recurringPrice = getPriceWithResourcesUsageInInternationalWebsite(
                     request, globalCredential, projectId);
         } catch (ClientRequestException e) {
+            log.error("Call the API of the international website to calculate the price failed.");
             if (e.getHttpStatusCode() != 200 && e.getErrorCode().startsWith("CBC.")) {
                 log.error("Calling the API of the international website to calculate the price "
                         + "failed, because the user does not belong to the website. Retrying the "

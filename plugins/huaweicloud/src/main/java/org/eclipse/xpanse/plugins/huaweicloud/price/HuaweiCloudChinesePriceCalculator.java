@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.billing.Price;
 import org.eclipse.xpanse.modules.models.billing.Resource;
 import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
@@ -50,17 +51,23 @@ public class HuaweiCloudChinesePriceCalculator {
     public Price getPriceWithResourcesUsageInChineseWebsite(ServiceFlavorPriceRequest request,
                                                             ICredential globalCredential,
                                                             String projectId) {
-        log.info("Calling the API of the Chinese website to calculate the price.");
-        BssClient bssClient = huaweiCloudClient.getBssClient(globalCredential);
-        ListOnDemandResourceRatingsRequest payPerUseRequest =
-                convertToPayPerUseRequest(request, projectId);
-        ListOnDemandResourceRatingsResponse response =
-                bssClient.listOnDemandResourceRatingsInvoker(payPerUseRequest)
-                        .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
-                        .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
-                        .backoffStrategy(huaweiCloudRetryStrategy)
-                        .invoke();
-        return convertResourceRatingsResponseToRecurringPrice(response);
+        try {
+            log.info("Calling the API of the Chinese website to calculate the price.");
+            BssClient bssClient = huaweiCloudClient.getBssClient(globalCredential);
+            ListOnDemandResourceRatingsRequest payPerUseRequest =
+                    convertToPayPerUseRequest(request, projectId);
+            ListOnDemandResourceRatingsResponse response =
+                    bssClient.listOnDemandResourceRatingsInvoker(payPerUseRequest)
+                            .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(huaweiCloudRetryStrategy)
+                            .invoke();
+            return convertResourceRatingsResponseToRecurringPrice(response);
+        } catch (Exception e) {
+            log.error("Call the API of the Chinese website to calculate the price failed.");
+            huaweiCloudRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
+        }
     }
 
     private ListOnDemandResourceRatingsRequest convertToPayPerUseRequest(

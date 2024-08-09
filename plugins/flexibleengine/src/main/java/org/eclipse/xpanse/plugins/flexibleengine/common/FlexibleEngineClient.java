@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +50,7 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
     private boolean sdkHttpDebugLogsEnabled;
 
     @Resource
-    private FlexibleEngineRetryStrategy retryStrategy;
+    private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
 
     /**
      * Get client for service ECS.
@@ -144,24 +144,19 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
             listProjectsRequest.setName(regionName);
             KeystoneListProjectsResponse response =
                     iamClient.keystoneListProjectsInvoker(listProjectsRequest)
-                            .retryTimes(retryStrategy.getRetryMaxAttempts())
-                            .retryCondition(retryStrategy::matchRetryCondition)
-                            .backoffStrategy(retryStrategy)
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
                             .invoke();
             if (Objects.nonNull(response) && CollectionUtils.isNotEmpty(response.getProjects())) {
                 projectId = response.getProjects().getFirst().getId();
             }
-        } catch (RuntimeException e) {
-            String errorMsg =
-                    String.format("Query project id by region name %s failed.", regionName);
-            throw new ClientApiCallFailedException(errorMsg);
-        }
-        if (StringUtils.isNotBlank(projectId)) {
-            log.info("Query project id {} by region name {} success.", projectId, regionName);
             return projectId;
+        } catch (Exception e) {
+            log.error("Get project id with region {} failed.", regionName);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
-        String errorMsg = String.format("Query project id by region name %s failed.", regionName);
-        throw new ClientApiCallFailedException(errorMsg);
     }
 
     private HttpConfig getHttpConfig() {

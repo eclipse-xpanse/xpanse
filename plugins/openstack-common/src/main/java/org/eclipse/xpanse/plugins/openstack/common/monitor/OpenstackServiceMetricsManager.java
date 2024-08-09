@@ -15,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsCacheKey;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
 import org.eclipse.xpanse.plugins.openstack.common.auth.ProviderAuthInfoResolver;
@@ -31,7 +31,6 @@ import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.metric
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.resources.InstanceNetworkResource;
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.resources.InstanceResource;
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.utils.GnocchiToXpanseModelConverter;
-import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -116,12 +115,9 @@ public class OpenstackServiceMetricsManager {
             }
             return metrics;
         } catch (Exception e) {
-            String errorMsg = String.format("Get metrics of resource %s error. %s",
-                    resourceId, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("Get metrics of resource {} failed.", resourceId);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
     }
 

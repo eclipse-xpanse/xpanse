@@ -21,6 +21,8 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.GitRepoCloneException;
 import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidException;
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
@@ -243,6 +245,28 @@ public class CommonExceptionHandler {
         String failMessage = ex.getMessage();
         return getErrorResponse(ResultType.INVALID_GIT_REPO_DETAILS,
                 Collections.singletonList(failMessage));
+    }
+
+    /**
+     * Exception handler for ClientApiCallFailedException.
+     */
+    @ExceptionHandler({ClientApiCallFailedException.class})
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ResponseBody
+    public Response handleClientApiCalledException(ClientApiCallFailedException ex) {
+        return getErrorResponse(ResultType.BACKEND_FAILURE,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ClientAuthenticationFailedException.
+     */
+    @ExceptionHandler({ClientAuthenticationFailedException.class})
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ResponseBody
+    public Response handleClientAuthException(ClientAuthenticationFailedException ex) {
+        return getErrorResponse(ResultType.BACKEND_FAILURE,
+                Collections.singletonList(ex.getMessage()));
     }
 
     private String findDuplicatesItemsString(List<Object> list) {

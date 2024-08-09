@@ -18,8 +18,6 @@ cloudServiceProvider:
   regions:
     - name: eu-west-0
       area: Western Europe
-    - name: eu-west-1
-      area: Western Europe
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
   billingModes:

@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.monitor.exceptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

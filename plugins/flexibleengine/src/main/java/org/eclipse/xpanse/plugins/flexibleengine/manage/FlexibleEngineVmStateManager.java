@@ -24,15 +24,14 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -70,11 +69,8 @@ public class FlexibleEngineVmStateManager {
                             .invoke();
             return checkEcsExecResultByJobId(ecsClient, response.getJobId());
         } catch (Exception e) {
-            String errorMsg = String.format("Start service %s error. %s",
-                    serviceStateManageRequest.getServiceId(), e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("Start service {} failed.", serviceStateManageRequest.getServiceId());
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
     }
@@ -99,11 +95,8 @@ public class FlexibleEngineVmStateManager {
                             .invoke();
             return checkEcsExecResultByJobId(ecsClient, response.getJobId());
         } catch (Exception e) {
-            String errorMsg = String.format("Stop service %s error. %s",
-                    serviceStateManageRequest.getServiceId(), e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("Stop service {} failed.", serviceStateManageRequest.getServiceId());
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
     }
@@ -128,11 +121,8 @@ public class FlexibleEngineVmStateManager {
                             .invoke();
             return checkEcsExecResultByJobId(ecsClient, response.getJobId());
         } catch (Exception e) {
-            String errorMsg = String.format("Restart service %s error. %s",
-                    serviceStateManageRequest.getServiceId(), e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("Restart service {} failed.", serviceStateManageRequest.getServiceId());
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
     }

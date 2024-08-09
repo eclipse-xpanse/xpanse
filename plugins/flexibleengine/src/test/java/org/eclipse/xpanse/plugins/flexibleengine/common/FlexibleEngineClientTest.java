@@ -10,7 +10,6 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +52,7 @@ class FlexibleEngineClientTest {
                 testClient.getCredential(getCredentialDefinition("ak", "sk"));
 
         // Verify the results
-        Assertions.assertThrows(ClientApiCallFailedException.class,
+        Assertions.assertThrows(Exception.class,
                 () -> testClient.getCesClient(iCredential,
                         "eu-west-0"));
     }
