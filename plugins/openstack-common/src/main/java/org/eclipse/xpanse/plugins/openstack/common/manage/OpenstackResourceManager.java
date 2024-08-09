@@ -8,18 +8,16 @@ package org.eclipse.xpanse.plugins.openstack.common.manage;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.plugins.openstack.common.auth.ProviderAuthInfoResolver;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -77,12 +75,8 @@ public class OpenstackResourceManager {
             osClient.networking().availabilityzone().list().forEach(
                     availabilityZone -> availabilityZoneNames.add(availabilityZone.getName()));
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "OpenstackClient listAvailabilityZones with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("OpenstackClient listAvailabilityZones with region {} failed.", region);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return availabilityZoneNames;
@@ -96,12 +90,8 @@ public class OpenstackResourceManager {
             osClient.networking().network().list()
                     .forEach(network -> vpcNames.add(network.getName()));
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "OpenstackClient listVpcs with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("OpenstackClient listVpcs with region {} failed.", region);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return vpcNames;
@@ -114,12 +104,8 @@ public class OpenstackResourceManager {
             osClient.networking().subnet().list()
                     .forEach(subnet -> subnetNames.add(subnet.getName()));
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "OpenstackClient listSubnets with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("OpenstackClient listSubnets with region {} failed.", region);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return subnetNames;
@@ -133,12 +119,8 @@ public class OpenstackResourceManager {
             osClient.networking().securitygroup().list()
                     .forEach(securityGroup -> securityGroupNames.add(securityGroup.getName()));
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "OpenstackClient listSecurityGroups with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("OpenstackClient listSecurityGroups with region {} failed.", region);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupNames;
@@ -152,12 +134,8 @@ public class OpenstackResourceManager {
             osClient.networking().securityrule().list().forEach(
                     securityGroupRule -> securityGroupRuleIds.add(securityGroupRule.getId()));
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "OpenstackClient listSecurityGroupRules with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("OpenstackClient listSecurityGroupRules with region {} failed.", region);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupRuleIds;
@@ -171,12 +149,8 @@ public class OpenstackResourceManager {
             osClient.networking().floatingip().list().forEach(
                     floatingIp -> publicIpAddresses.add(floatingIp.getFloatingIpAddress()));
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "OpenstackClient listPublicIps with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("OpenstackClient listPublicIps with region {} failed.", region);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return publicIpAddresses;
@@ -190,12 +164,8 @@ public class OpenstackResourceManager {
             osClient.blockStorage().volumes().list()
                     .forEach(volume -> volumeNames.add(volume.getName()));
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "OpenstackClient listVolumes with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("OpenstackClient listVolumes with region {} failed.", region);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return volumeNames;
@@ -208,12 +178,8 @@ public class OpenstackResourceManager {
             osClient.compute().keypairs().list()
                     .forEach(keyPair -> keyPairNames.add(keyPair.getName()));
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "OpenstackClient listKeyPairs with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
+            log.error("OpenstackClient listKeyPairs with region {} failed.", region);
+            providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return keyPairNames;

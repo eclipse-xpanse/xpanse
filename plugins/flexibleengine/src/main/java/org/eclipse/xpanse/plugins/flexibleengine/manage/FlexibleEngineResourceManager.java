@@ -38,19 +38,17 @@ import com.huaweicloud.sdk.vpc.v2.model.Vpc;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.monitor.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -121,13 +119,9 @@ public class FlexibleEngineResourceManager {
                         .stream().map(NovaAvailabilityZone::getZoneName).toList();
             }
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "FlexibleEngineClient listAvailabilityZones with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("FlexibleEngineClient listAvailabilityZones with region {} failed.", region);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return availabilityZoneNames;
     }
@@ -146,13 +140,9 @@ public class FlexibleEngineResourceManager {
                 vpcNames = response.getVpcs().stream().map(Vpc::getName).toList();
             }
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "FlexibleEngineClient listVpcs with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("FlexibleEngineClient listVpcs with region {} failed.", region);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return vpcNames;
     }
@@ -171,13 +161,9 @@ public class FlexibleEngineResourceManager {
                 subnetNames = response.getSubnets().stream().map(Subnet::getName).toList();
             }
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "FlexibleEngineClient listSubnets with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("FlexibleEngineClient listSubnets with region {} failed.", region);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return subnetNames;
     }
@@ -197,13 +183,9 @@ public class FlexibleEngineResourceManager {
                         .stream().map(SecurityGroup::getName).toList();
             }
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "FlexibleEngineClient listSecurityGroups with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("FlexibleEngineClient listSecurityGroups with region {} failed.", region);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupNames;
     }
@@ -224,13 +206,9 @@ public class FlexibleEngineResourceManager {
                         .stream().map(SecurityGroupRule::getId).toList();
             }
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "FlexibleEngineClient listSecurityGroupRules with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("FlexibleEngineClient listSecurityGroupRules with region {} failed.", region);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupRuleIds;
     }
@@ -250,13 +228,9 @@ public class FlexibleEngineResourceManager {
                         .stream().map(PublicipShowResp::getPublicIpAddress).toList();
             }
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "FlexibleEngineClient listPublicIps with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("FlexibleEngineClient listPublicIps with region {} failed.", region);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return publicIpAddresses;
     }
@@ -275,13 +249,9 @@ public class FlexibleEngineResourceManager {
                 volumeNames = response.getVolumes().stream().map(VolumeDetail::getName).toList();
             }
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "FlexibleEngineClient listVolumes with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("FlexibleEngineClient listVolumes with region {} failed.", region);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return volumeNames;
     }
@@ -302,13 +272,9 @@ public class FlexibleEngineResourceManager {
                         .map(NovaSimpleKeypair::getName).toList();
             }
         } catch (Exception e) {
-            String errorMsg = String.format(
-                    "FlexibleEngineClient listKeyPairs with region %s failed. %s",
-                    region, e.getMessage());
-            int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                    ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-            log.error(errorMsg + " Retry count:" + retryCount);
-            throw new ClientApiCallFailedException(errorMsg);
+            log.error("FlexibleEngineClient listKeyPairs with region {} failed.", region);
+            flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
+            throw new ClientApiCallFailedException(e.getMessage());
         }
         return keyPairNames;
     }

@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.monitor.exceptions;
+package org.eclipse.xpanse.modules.models.common.exceptions;
 
 /**
  * Exception thrown when calling API by the client.

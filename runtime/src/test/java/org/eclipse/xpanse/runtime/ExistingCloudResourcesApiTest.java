@@ -496,29 +496,6 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         Assertions.assertEquals(keypairResponse.getResultType(), ResultType.BACKEND_FAILURE);
     }
 
-
-    @Test
-    @WithJwt(file = "jwt_user.json")
-    void test() throws Exception{
-        Csp csp = Csp.PLUS_SERVER;
-        OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();
-        addCredentialForOpenstack(csp);
-        String openstackRegion = "RegionOne";
-        List<String> networksResult = List.of("network_test");
-        File networksjonFile = new File("src/test/resources/openstack/network/networks.json");
-        NeutronNetwork.Networks networksResponse =
-                objectMapper.readValue(networksjonFile, NeutronNetwork.Networks.class);
-        when((List<NeutronNetwork>) mockOsClient.networking().network().list()).thenReturn(
-                networksResponse.getList());
-        // Run the test
-        final MockHttpServletResponse openstackVpcResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VPC, csp, openstackRegion);
-        // Verify the results
-        assertThat(openstackVpcResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(openstackVpcResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(networksResult));
-    }
-
     void testGetExistingResourceNamesWithKindForCspWithOsClient(Csp csp) throws Exception {
         // Setup
         OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();

@@ -7,12 +7,16 @@
 package org.eclipse.xpanse.plugins.huaweicloud.common;
 
 import com.huaweicloud.sdk.core.SdkResponse;
+import com.huaweicloud.sdk.core.exception.ClientRequestException;
 import com.huaweicloud.sdk.core.exception.ServiceResponseException;
 import com.huaweicloud.sdk.core.retry.RetryContext;
 import com.huaweicloud.sdk.core.retry.backoff.BackoffStrategy;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -92,5 +96,41 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
         int statusCode = ((ServiceResponseException) ex).getHttpStatusCode();
         return statusCode == ERROR_CODE_TOO_MANY_REQUESTS
                 || statusCode == ERROR_CODE_INTERNAL_SERVER_ERROR;
+    }
+
+
+    /**
+     * Handle auth exception for spring retry.
+     *
+     * @param ex Exception
+     */
+    public void handleAuthExceptionForSpringRetry(Exception ex) {
+        int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
+                ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+        log.error(ex.getMessage() + System.lineSeparator() + "Retry count:" + retryCount);
+        if (ex instanceof ClientAuthenticationFailedException) {
+            throw new ClientAuthenticationFailedException(ex.getMessage());
+        }
+        ClientRequestException clientRequestException = getClientRequestException(ex);
+        if (Objects.nonNull(clientRequestException)) {
+            int statusCode = clientRequestException.getHttpStatusCode();
+            if (statusCode == HttpStatus.UNAUTHORIZED.value()
+                    || statusCode == HttpStatus.FORBIDDEN.value()) {
+                throw new ClientAuthenticationFailedException(ex.getMessage());
+            }
+        }
+    }
+
+    private ClientRequestException getClientRequestException(Throwable ex) {
+        if (Objects.isNull(ex)) {
+            return null;
+        }
+        if (ex instanceof ClientRequestException requestException) {
+            return requestException;
+        }
+        if (Objects.nonNull(ex.getCause())) {
+            return getClientRequestException(ex.getCause());
+        }
+        return null;
     }
 }
