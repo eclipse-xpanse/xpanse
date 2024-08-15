@@ -7,7 +7,6 @@ import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.Opensta
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,10 +23,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import com.huaweicloud.sdk.bss.v2.BssClient;
 import com.huaweicloud.sdk.bssintl.v2.BssintlClient;
-import com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsRequest;
-import com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsResponse;
-import com.huaweicloud.sdk.core.exception.ClientRequestException;
-import com.huaweicloud.sdk.core.invoker.SyncInvoker;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.eip.v2.EipClient;
 import com.huaweicloud.sdk.evs.v2.EvsClient;
@@ -437,18 +432,6 @@ public class ApisTestCommon {
                 .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
-    }
-
-    protected void mockListOnDemandResourceRatingsInvokerWithBssintlClientThrowAccessDeniedException() {
-        ClientRequestException clientRequestException = new ClientRequestException(403, "CBC.0150"
-                , "Access Denied", UUID.randomUUID().toString());
-        SyncInvoker<ListOnDemandResourceRatingsRequest, ListOnDemandResourceRatingsResponse>
-                mockInvoker = mock(SyncInvoker.class);
-        when(mockBssintlClient.listOnDemandResourceRatingsInvoker(any())).thenReturn(mockInvoker);
-        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
-        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
-        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
-        when(mockInvoker.invoke()).thenThrow(clientRequestException);
     }
 }
 
