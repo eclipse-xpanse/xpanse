@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Implement Interface to manage service prices.
@@ -173,11 +174,11 @@ public class ServicePricesManager {
                     + "the 'ResourceUsage' is null.";
             throw new ServicePriceCalculationFailed(errorMsg);
         }
-        Price fixedPrice = flavorPriceMode.getFixedPrice();
-        if (BillingMode.FIXED.equals(billingMode) && Objects.isNull(fixedPrice)) {
+        List<Price> fixedPrices = flavorPriceMode.getFixedPrices();
+        if (BillingMode.FIXED.equals(billingMode) && CollectionUtils.isEmpty(fixedPrices)) {
 
             String errorMsg = "BillingMode 'Fixed' can not be supported due to "
-                    + "the 'FixedPrice' is null.";
+                    + "the 'FixedPrices' is null.";
             throw new ServicePriceCalculationFailed(errorMsg);
         }
     }

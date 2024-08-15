@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
 class PriceTest {
-
+    private final String region = "region";
     private final BigDecimal cost = BigDecimal.ONE;
     private final Currency currency = Currency.USD;
     private final PricingPeriod period = PricingPeriod.MONTHLY;
@@ -23,6 +23,7 @@ class PriceTest {
         priceUnderTest.setCost(cost);
         priceUnderTest.setCurrency(currency);
         priceUnderTest.setPeriod(period);
+        priceUnderTest.setRegion(region);
     }
 
     @Test
@@ -30,6 +31,7 @@ class PriceTest {
         assertThat(priceUnderTest.getCost()).isEqualTo(cost);
         assertThat(priceUnderTest.getCurrency()).isEqualTo(currency);
         assertThat(priceUnderTest.getPeriod()).isEqualTo(period);
+        assertThat(priceUnderTest.getRegion()).isEqualTo(region);
     }
 
     @Test
@@ -51,8 +53,8 @@ class PriceTest {
 
     @Test
     void testToString() {
-        String result =
-                "Price(cost=" + cost + ", currency=" + currency + ", period=" + period + ")";
+        String result = "Price(region=" + region + ", cost=" + cost + ", currency=" + currency +
+                ", period=" + period + ")";
         assertThat(priceUnderTest.toString()).isEqualTo(result);
     }
 }

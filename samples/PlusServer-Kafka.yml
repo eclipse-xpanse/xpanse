@@ -33,10 +33,11 @@ flavors:
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 95.00
-          currency: USD
-          period: monthly
+        fixedPrices:
+          - region: any
+            cost: 95.00
+            currency: USD
+            period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3
@@ -50,10 +51,11 @@ flavors:
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 95.00
-          currency: USD
-          period: monthly
+        fixedPrices:
+          - region: any
+            cost: 95.00
+            currency: USD
+            period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3

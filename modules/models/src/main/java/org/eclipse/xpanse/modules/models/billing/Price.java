@@ -24,6 +24,11 @@ public class Price implements Serializable {
     private static final long serialVersionUID = 240913796673011260L;
 
     @NotNull
+    @Schema(description = "The region name. If the special region name 'any' provided, this price "
+            + "for all unknown regions.")
+    private String region;
+
+    @NotNull
     @Schema(description = "The value of the cost.")
     private BigDecimal cost;
 

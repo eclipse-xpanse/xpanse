@@ -571,7 +571,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 String.format("Service flavor with name %s is duplicated.", duplicatedFlavorName);
         ServiceFlavorWithPrice errorBillingFlavor = ocl.getFlavors().getServiceFlavors().getLast();
         String errorBillingFlavorName = errorBillingFlavor.getName();
-        errorBillingFlavor.getPricing().setFixedPrice(null);
+        errorBillingFlavor.getPricing().setFixedPrices(null);
         errorBillingFlavor.getPricing().setResourceUsage(null);
         String errorMsg2 = String.format("Service flavor %s has no 'resourceUsage' defined in "
                 + "'pricing' for the billing mode 'pay-per-use'.", errorBillingFlavorName);
