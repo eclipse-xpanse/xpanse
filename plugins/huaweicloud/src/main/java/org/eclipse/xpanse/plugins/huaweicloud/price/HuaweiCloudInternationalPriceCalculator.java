@@ -6,11 +6,11 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.price;
 
-import com.huaweicloud.sdk.bss.v2.BssClient;
-import com.huaweicloud.sdk.bss.v2.model.DemandProductInfo;
-import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsRequest;
-import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsResponse;
-import com.huaweicloud.sdk.bss.v2.model.RateOnDemandReq;
+import com.huaweicloud.sdk.bssintl.v2.BssintlClient;
+import com.huaweicloud.sdk.bssintl.v2.model.DemandProductInfo;
+import com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsRequest;
+import com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsResponse;
+import com.huaweicloud.sdk.bssintl.v2.model.RateOnDemandReq;
 import com.huaweicloud.sdk.core.auth.ICredential;
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,11 +28,11 @@ import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
 import org.springframework.stereotype.Component;
 
 /**
- * Class that implements the price calculation for the chinese website of HuaweiCloud.
+ * Class that implements the price calculation for the international website of HuaweiCloud.
  */
 @Slf4j
 @Component
-public class HuaweiCloudChinesePriceCalculator {
+public class HuaweiCloudInternationalPriceCalculator {
 
     @jakarta.annotation.Resource
     private HuaweiCloudClient huaweiCloudClient;
@@ -41,22 +41,22 @@ public class HuaweiCloudChinesePriceCalculator {
 
 
     /**
-     * Get the price of the service in the chinese website.
+     * Get the price of the service in the international website.
      *
      * @param request          ServiceFlavorPriceRequest
      * @param globalCredential globalCredential
      * @param projectId        projectId
      * @return Price in the international website.
      */
-    public Price getPriceWithResourcesUsageInChineseWebsite(ServiceFlavorPriceRequest request,
-                                                            ICredential globalCredential,
-                                                            String projectId) {
+    public Price getPriceWithResourcesUsageInInternationalWebsite(ServiceFlavorPriceRequest request,
+                                                                  ICredential globalCredential,
+                                                                  String projectId) {
         try {
-            BssClient bssClient = huaweiCloudClient.getBssClient(globalCredential);
+            BssintlClient bssintlClient = huaweiCloudClient.getBssintlClient(globalCredential);
             ListOnDemandResourceRatingsRequest payPerUseRequest =
                     convertToPayPerUseRequest(request, projectId);
             ListOnDemandResourceRatingsResponse response =
-                    bssClient.listOnDemandResourceRatingsInvoker(payPerUseRequest)
+                    bssintlClient.listOnDemandResourceRatingsInvoker(payPerUseRequest)
                             .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
                             .backoffStrategy(huaweiCloudRetryStrategy)
